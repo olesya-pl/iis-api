@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace IIS.Storage.EntityFramework.Context
 {
-    public partial class EntityRelations
+    public partial class Relation
     {
         public long Id { get; set; }
         public int TypeId { get; set; }
@@ -14,5 +14,9 @@ namespace IIS.Storage.EntityFramework.Context
         public DateTime? EndsAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
+
+        public virtual Entity Initiator { get; set; }
+        public virtual Entity Target { get; set; }
+        public virtual EntityType Type { get; set; }
     }
 }

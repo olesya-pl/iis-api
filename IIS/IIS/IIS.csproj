@@ -6,14 +6,17 @@
 
   <ItemGroup>
     <Compile Remove="Class1.cs" />
+    <Compile Remove="Storage\EntityFramework\Context\SequelizeData.cs" />
+    <Compile Remove="Storage\EntityFramework\Context\SequelizeMeta.cs" />
+    <Compile Remove="Storage\EntityFramework\_Context\ContourContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
+    <PackageReference Include="GraphQL" Version="2.4.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Storage\" />
     <Folder Include="Storage\EntityFramework\" />
-    <Folder Include="Storage\EntityFramework\Context\" />
   </ItemGroup>
 </Project>

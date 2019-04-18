@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphiQl;
 using IIS.Storage;
 using IIS.Storage.EntityFramework;
 using Microsoft.AspNetCore.Builder;
@@ -28,7 +29,7 @@ namespace IIS.Web
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("db");
-            services.AddScoped<ISchemaRepository>(s => new SchemaRepository(connectionString));
+            services.AddScoped<ISchemaProvider>(s => new ContourSchemaProvider(connectionString));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -40,6 +41,8 @@ namespace IIS.Web
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseGraphiQl("/graphiql", "/api/graph");
 
             app.UseMvc();
         }

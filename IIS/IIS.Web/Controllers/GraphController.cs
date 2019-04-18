@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GraphQL;
 using IIS.Storage;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Web.Controllers
 {
@@ -9,16 +11,40 @@ namespace IIS.Web.Controllers
     [ApiController]
     public class GraphController : Controller
     {
-        private readonly ISchemaRepository _schemaRepository;
-
-        public GraphController(ISchemaRepository schemaRepository)
+        public class GraphQuery
         {
-            _schemaRepository = schemaRepository ?? throw new ArgumentNullException(nameof(schemaRepository));
+            public string OperationName { get; set; }
+            public string NamedQuery { get; set; }
+            public string Query { get; set; }
+            public JObject Variables { get; set; }
         }
 
-        public async Task<IActionResult> Post()
+        private readonly ISchemaProvider _schemaProvider;
+
+        public GraphController(ISchemaProvider schemaProvider)
         {
-            return Ok(await _schemaRepository.Ping());
+            _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
+        }
+
+        public async Task<IActionResult> Post([FromBody] GraphQuery query)
+        {
+            var inputs = query.Variables.ToInputs();
+            var schema = await _schemaProvider.GetSchemaAsync();
+            var result = await new DocumentExecuter().ExecuteAsync(_ =>
+            {
+                _.Schema = schema;
+                _.Query = query.Query;
+                _.OperationName = query.OperationName;
+                _.Inputs = inputs;
+            });
+
+            if (result.Errors?.Count > 0)
+            {
+                return BadRequest();
+            }
+
+            return Ok(result);
         }
     }
+
 }
