@@ -4,15 +4,19 @@ project.lock.json
 .DS_Store
 *.pyc
 nupkg/
+
 # Visual Studio Code
 .vscode
+
 # Rider
 .idea
+
 # User-specific files
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -28,5 +32,9 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+
 # Visual Studio 2015
 .vs/
+
+#data storage
+data_storage/
