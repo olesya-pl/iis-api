@@ -38,11 +38,6 @@ namespace IIS.Web.Controllers
                 _.Inputs = inputs;
             });
 
-            if (result.Errors?.Count > 0)
-            {
-                return BadRequest();
-            }
-
             return Ok(result);
         }
     }

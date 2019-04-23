@@ -14,5 +14,8 @@ namespace IIS.Storage.EntityFramework.Context
         public virtual EntityType Source { get; set; }
         public virtual EntityType RelationType { get; set; }
         public virtual EntityType Target { get; set; }
+
+        // todo: create field
+        public bool IsMultiple { get => Meta.Contains("\"multiple\":true"); }
     }
 }

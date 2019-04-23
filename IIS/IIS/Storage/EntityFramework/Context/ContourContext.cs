@@ -161,18 +161,18 @@ namespace IIS.Storage.EntityFramework.Context
                 entity.Property(e => e.TargetTypeId).HasColumnName("targetTypeId");
 
                 entity.HasOne(d => d.Source)
-                    .WithMany(p => p.BackwardRelationRestrictions)
+                    .WithMany(p => p.ForwardRelationRestrictions)
                     .HasForeignKey(d => d.InitiatorTypeId)
                     .HasConstraintName("EntityRelationRestrictions_initiatorTypeId_fkey");
 
                 entity.HasOne(d => d.RelationType)
-                    .WithMany(p => p.EntityRelationRestrictionsRelationType)
+                    .WithMany(p => p.RelationRestrictions)
                     .HasForeignKey(d => d.RelationTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("EntityRelationRestrictions_relationTypeId_fkey");
 
                 entity.HasOne(d => d.Target)
-                    .WithMany(p => p.ForwardRelationRestrictions)
+                    .WithMany(p => p.BackwardRelationRestrictions)
                     .HasForeignKey(d => d.TargetTypeId)
                     .HasConstraintName("EntityRelationRestrictions_targetTypeId_fkey");
             });
@@ -282,7 +282,7 @@ namespace IIS.Storage.EntityFramework.Context
                     .HasMaxLength(255);
 
                 entity.HasOne(d => d.Parent)
-                    .WithMany(p => p.InverseParent)
+                    .WithMany(p => p.DerivedTypes)
                     .HasForeignKey(d => d.ParentId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("EntityTypes_parentId_fkey");

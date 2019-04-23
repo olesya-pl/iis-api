@@ -29,7 +29,8 @@ namespace IIS.Web
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("db");
-            services.AddScoped<ISchemaProvider>(s => new ContourSchemaProvider(connectionString));
+            services.AddTransient<ISchemaGenerator, SchemaGenerator>();
+            services.AddScoped<ISchemaProvider>(s => new ContourSchemaProvider(connectionString, s.GetRequiredService<ISchemaGenerator>()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

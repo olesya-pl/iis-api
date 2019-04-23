@@ -8,12 +8,12 @@ namespace IIS.Storage.EntityFramework.Context
         public EntityType()
         {
             Entities = new HashSet<Entity>();
-            BackwardRelationRestrictions = new HashSet<RelationRestriction>();
-            EntityRelationRestrictionsRelationType = new HashSet<RelationRestriction>();
             ForwardRelationRestrictions = new HashSet<RelationRestriction>();
+            RelationRestrictions = new HashSet<RelationRestriction>();
+            BackwardRelationRestrictions = new HashSet<RelationRestriction>();
             EntityRelations = new HashSet<Relation>();
             EntityTypeAttributes = new HashSet<EntityTypeAttribute>();
-            InverseParent = new HashSet<EntityType>();
+            DerivedTypes = new HashSet<EntityType>();
         }
 
         public int Id { get; set; }
@@ -25,12 +25,12 @@ namespace IIS.Storage.EntityFramework.Context
         public int? ParentId { get; set; }
 
         public virtual EntityType Parent { get; set; }
-        public virtual ICollection<Entity> Entities { get; set; }
-        public virtual ICollection<RelationRestriction> BackwardRelationRestrictions { get; set; }
-        public virtual ICollection<RelationRestriction> EntityRelationRestrictionsRelationType { get; set; }
-        public virtual ICollection<RelationRestriction> ForwardRelationRestrictions { get; set; }
-        public virtual ICollection<Relation> EntityRelations { get; set; }
         public virtual ICollection<EntityTypeAttribute> EntityTypeAttributes { get; set; }
-        public virtual ICollection<EntityType> InverseParent { get; set; }
+        public virtual ICollection<RelationRestriction> ForwardRelationRestrictions { get; set; }
+        public virtual ICollection<RelationRestriction> BackwardRelationRestrictions { get; set; }
+        public virtual ICollection<Relation> EntityRelations { get; set; }
+        public virtual ICollection<Entity> Entities { get; set; }
+        public virtual ICollection<RelationRestriction> RelationRestrictions { get; set; }
+        public virtual ICollection<EntityType> DerivedTypes { get; set; }
     }
 }
