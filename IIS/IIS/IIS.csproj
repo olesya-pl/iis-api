@@ -9,6 +9,7 @@
     <Compile Remove="Storage\EntityFramework\Context\SequelizeData.cs" />
     <Compile Remove="Storage\EntityFramework\Context\SequelizeMeta.cs" />
     <Compile Remove="Storage\EntityFramework\_Context\ContourContext.cs" />
+    <Compile Remove="Storage\EntityFramework\ISchemaGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
@@ -18,5 +19,6 @@
   <ItemGroup>
     <Folder Include="Storage\" />
     <Folder Include="Storage\EntityFramework\" />
+    <Folder Include="Storage\EntityFramework\Resolvers\" />
   </ItemGroup>
 </Project>

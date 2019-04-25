@@ -19,14 +19,14 @@ namespace IIS.Storage.EntityFramework.Context
 
         public ContourContext(DbContextOptions options) : base(options) { }
 
-        public virtual DbSet<Entity> Entities { get; set; }
+        public virtual DbSet<OEntity> Entities { get; set; }
         public virtual DbSet<Attachment> Attachments { get; set; }
-        public virtual DbSet<AttributeValue> AttributeValues { get; set; }
-        public virtual DbSet<EntityAttribute> EntityAttributes { get; set; }
-        public virtual DbSet<RelationRestriction> RelationRestrictions { get; set; }
-        public virtual DbSet<Relation> Relations { get; set; }
-        public virtual DbSet<EntityTypeAttribute> EntityTypeAttributes { get; set; }
-        public virtual DbSet<EntityType> EntityTypes { get; set; }
+        public virtual DbSet<OAttributeValue> AttributeValues { get; set; }
+        public virtual DbSet<OAttribute> EntityAttributes { get; set; }
+        public virtual DbSet<ORestriction> RelationRestrictions { get; set; }
+        public virtual DbSet<ORelation> Relations { get; set; }
+        public virtual DbSet<OAttributeRestriction> EntityTypeAttributes { get; set; }
+        public virtual DbSet<OType> EntityTypes { get; set; }
         public virtual DbSet<TemporaryFile> TemporaryFiles { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
@@ -37,7 +37,7 @@ namespace IIS.Storage.EntityFramework.Context
                 .ForNpgsqlHasEnum(null, "enum_EntityTypes_type", new[] { "entity", "relation" })
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
-            modelBuilder.Entity<Entity>(entity =>
+            modelBuilder.Entity<OEntity>(entity =>
             {
                 entity.ToTable("Entities");
 
@@ -73,7 +73,7 @@ namespace IIS.Storage.EntityFramework.Context
                 entity.Property(e => e.File).HasColumnName("file");
             });
 
-            modelBuilder.Entity<AttributeValue>(entity =>
+            modelBuilder.Entity<OAttributeValue>(entity =>
             {
                 entity.ToTable("EntityAttributeValues");
 
@@ -99,18 +99,18 @@ namespace IIS.Storage.EntityFramework.Context
                     .HasColumnName("value");
 
                 entity.HasOne(d => d.Attribute)
-                    .WithMany(p => p.EntityAttributeValues)
+                    .WithMany(p => p.Values)
                     .HasForeignKey(d => d.AttributeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("EntityAttributeValues_attributeId_fkey");
 
                 entity.HasOne(d => d.Entity)
-                    .WithMany(p => p.EntityAttributeValues)
+                    .WithMany(p => p.AttributeValues)
                     .HasForeignKey(d => d.EntityId)
                     .HasConstraintName("EntityAttributeValues_entityId_fkey");
             });
 
-            modelBuilder.Entity<EntityAttribute>(entity =>
+            modelBuilder.Entity<OAttribute>(entity =>
             {
                 entity.ToTable("EntityAttributes");
 
@@ -140,7 +140,7 @@ namespace IIS.Storage.EntityFramework.Context
 
             });
 
-            modelBuilder.Entity<RelationRestriction>(entity =>
+            modelBuilder.Entity<ORestriction>(entity =>
             {
                 entity.ToTable("EntityRelationRestrictions");
 
@@ -161,23 +161,23 @@ namespace IIS.Storage.EntityFramework.Context
                 entity.Property(e => e.TargetTypeId).HasColumnName("targetTypeId");
 
                 entity.HasOne(d => d.Source)
-                    .WithMany(p => p.ForwardRelationRestrictions)
+                    .WithMany(p => p.ForwardRestrictions)
                     .HasForeignKey(d => d.InitiatorTypeId)
                     .HasConstraintName("EntityRelationRestrictions_initiatorTypeId_fkey");
 
                 entity.HasOne(d => d.RelationType)
-                    .WithMany(p => p.RelationRestrictions)
+                    .WithMany(p => p.Restrictions)
                     .HasForeignKey(d => d.RelationTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("EntityRelationRestrictions_relationTypeId_fkey");
 
                 entity.HasOne(d => d.Target)
-                    .WithMany(p => p.BackwardRelationRestrictions)
+                    .WithMany(p => p.BackwardRestrictions)
                     .HasForeignKey(d => d.TargetTypeId)
                     .HasConstraintName("EntityRelationRestrictions_targetTypeId_fkey");
             });
 
-            modelBuilder.Entity<Relation>(entity =>
+            modelBuilder.Entity<ORelation>(entity =>
             {
                 entity.ToTable("EntityRelations");
 
@@ -211,24 +211,24 @@ namespace IIS.Storage.EntityFramework.Context
 
                 entity.Property(e => e.TypeId).HasColumnName("typeId");
 
-                entity.HasOne(d => d.Initiator)
-                    .WithMany(p => p.EntityRelationsInitiator)
+                entity.HasOne(d => d.Source)
+                    .WithMany(p => p.ForwardRelations)
                     .HasForeignKey(d => d.InitiatorId)
                     .HasConstraintName("EntityRelations_initiatorId_fkey");
 
                 entity.HasOne(d => d.Target)
-                    .WithMany(p => p.EntityRelationsTarget)
+                    .WithMany(p => p.BackwardRelations)
                     .HasForeignKey(d => d.TargetId)
                     .HasConstraintName("EntityRelations_targetId_fkey");
 
                 entity.HasOne(d => d.Type)
-                    .WithMany(p => p.EntityRelations)
+                    .WithMany(p => p.Relations)
                     .HasForeignKey(d => d.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("EntityRelations_typeId_fkey");
             });
 
-            modelBuilder.Entity<EntityTypeAttribute>(entity =>
+            modelBuilder.Entity<OAttributeRestriction>(entity =>
             {
                 entity.ToTable("EntityTypeAttributes");
 
@@ -247,17 +247,17 @@ namespace IIS.Storage.EntityFramework.Context
                 entity.Property(e => e.TypeId).HasColumnName("typeId");
 
                 entity.HasOne(d => d.Attribute)
-                    .WithMany(p => p.EntityTypeAttributes)
+                    .WithMany(p => p.Restrictions)
                     .HasForeignKey(d => d.AttributeId)
                     .HasConstraintName("EntityTypeAttributes_attributeId_fkey");
 
                 entity.HasOne(d => d.Type)
-                    .WithMany(p => p.EntityTypeAttributes)
+                    .WithMany(p => p.AttributeRestrictions)
                     .HasForeignKey(d => d.TypeId)
                     .HasConstraintName("EntityTypeAttributes_typeId_fkey");
             });
 
-            modelBuilder.Entity<EntityType>(entity =>
+            modelBuilder.Entity<OType>(entity =>
             {
                 entity.ToTable("EntityTypes");
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace IIS.Storage.EntityFramework.Context
 {
-    public partial class RelationRestriction
+    public partial class ORestriction
     {
         public int Id { get; set; }
         public int RelationTypeId { get; set; }
@@ -11,11 +11,12 @@ namespace IIS.Storage.EntityFramework.Context
         public int TargetTypeId { get; set; }
         public string Meta { get; set; }
 
-        public virtual EntityType Source { get; set; }
-        public virtual EntityType RelationType { get; set; }
-        public virtual EntityType Target { get; set; }
+        public virtual OType Source { get; set; }
+        public virtual OType RelationType { get; set; }
+        public virtual OType Target { get; set; }
 
         // todo: create field
         public bool IsMultiple { get => Meta.Contains("\"multiple\":true"); }
+        public bool IsRequired { get => Meta.Contains("\"required\":true"); }
     }
 }

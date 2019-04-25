@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace IIS.Storage.EntityFramework.Context
 {
-    public partial class AttributeValue
+    public partial class OAttributeValue
     {
         public long Id { get; set; }
         public long EntityId { get; set; }
@@ -12,7 +12,7 @@ namespace IIS.Storage.EntityFramework.Context
         public DateTime CreatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        public virtual EntityAttribute Attribute { get; set; }
-        public virtual Entity Entity { get; set; }
+        public virtual OAttribute Attribute { get; set; }
+        public virtual OEntity Entity { get; set; }
     }
 }

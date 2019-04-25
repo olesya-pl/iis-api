@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GraphiQl;
 using IIS.Storage;
 using IIS.Storage.EntityFramework;
+using IIS.Storage.EntityFramework.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,8 +30,8 @@ namespace IIS.Web
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("db");
-            services.AddTransient<ISchemaGenerator, SchemaGenerator>();
-            services.AddScoped<ISchemaProvider>(s => new ContourSchemaProvider(connectionString, s.GetRequiredService<ISchemaGenerator>()));
+            services.AddDbContext<ContourContext>(b => b.UseNpgsql(connectionString), ServiceLifetime.Singleton);
+            services.AddSingleton<ISchemaProvider, ContourSchemaProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
