@@ -18,7 +18,7 @@ namespace IIS.Storage.EntityFramework.Context
         public DateTime CreatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        public virtual OType Type { get; set; }
+        public virtual OTypeEntity Type { get; set; }
         public virtual ICollection<OAttributeValue> AttributeValues { get; set; }
         public virtual ICollection<ORelation> ForwardRelations { get; set; }
         public virtual ICollection<ORelation> BackwardRelations { get; set; }

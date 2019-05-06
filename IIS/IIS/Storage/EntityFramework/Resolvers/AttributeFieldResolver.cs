@@ -16,8 +16,12 @@ namespace IIS.Storage.EntityFramework.Resolvers
 
         public object Resolve(ResolveFieldContext context)
         {
-            var source = (OEntity)context.Source;
+            var relation = (ORelation)context.Source;
+            var source = relation.Target;
             var code = context.FieldName;
+
+            if (code == "id") return source.Id;
+
             var attrValues = source.AttributeValues.Where(e => e.Attribute.Code == code && e.DeletedAt == null);
 
             return _isArray ? (object)attrValues.Select(a => new { a.Id, a.Value }).ToArray()

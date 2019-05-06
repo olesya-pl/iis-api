@@ -17,16 +17,15 @@ namespace IIS.Storage.EntityFramework.Resolvers
 
         public object Resolve(ResolveFieldContext context)
         {
-            var source = context.Source as OEntity;
-            var id = source.Id;
+            var relation = context.Source as ORelation;
+            var id = relation.Target.Id;
             var code = context.FieldName;
-            var data = _context.Relations
+            var relations = _context.Relations
                 .Where(r => r.Type.Code == code && r.Source.Id == id)
-                .Select(r => r.Target)//todo: _relation?
-                .Include(e => e.AttributeValues).ThenInclude(e => e.Attribute)
+                .Include(r => r.Target).ThenInclude(e => e.AttributeValues).ThenInclude(e => e.Attribute)
                 .ToArray();
 
-            return data;
+            return relations;
         }
     }
 }

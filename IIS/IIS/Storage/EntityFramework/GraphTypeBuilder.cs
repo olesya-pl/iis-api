@@ -12,16 +12,16 @@ namespace IIS.Storage.EntityFramework
     public class GraphTypeBuilder
     {
         private static readonly Dictionary<string, IComplexGraphType> ComplexTypes = new Dictionary<string, IComplexGraphType>();
-        private static readonly Dictionary<string, ScalarGraphType> ScalarTypes = new Dictionary<string, ScalarGraphType>
+        private static readonly Dictionary<ScalarType, ScalarGraphType> ScalarTypes = new Dictionary<ScalarType, ScalarGraphType>
         {
-            ["string"] = new StringGraphType(),
-            ["int"] = new IntGraphType(),
-            ["decimal"] = new DecimalGraphType(),
-            ["date"] = new DateGraphType(),
-            ["boolean"] = new BooleanGraphType(),
-            ["geo"] = new StringGraphType(), // todo: custom scalar
-            ["file"] = new StringGraphType(),// todo: custom object
-            ["json"] = new StringGraphType()
+            [ScalarType.String] = new StringGraphType(),
+            [ScalarType.Int] = new IntGraphType(),
+            [ScalarType.Decimal] = new DecimalGraphType(),
+            [ScalarType.Date] = new DateGraphType(),
+            [ScalarType.Boolean] = new BooleanGraphType(),
+            [ScalarType.Geo] = new StringGraphType(), // todo: custom scalar
+            [ScalarType.File] = new StringGraphType(),// todo: custom object
+            [ScalarType.Json] = new StringGraphType()
         };
 
         static GraphTypeBuilder()
@@ -29,10 +29,10 @@ namespace IIS.Storage.EntityFramework
             foreach (var type in ScalarTypes.Keys)
             {
                 var value = new ObjectGraphType { Name = type.Camelize() + "Value" };
-                value.AddField(new FieldType { Name = "Id", ResolvedType = new NonNullGraphType(ScalarTypes["int"]) });
+                value.AddField(new FieldType { Name = "Id", ResolvedType = new NonNullGraphType(ScalarTypes[ScalarType.Int]) });
                 value.AddField(new FieldType { Name = "Value", ResolvedType = new NonNullGraphType(ScalarTypes[type]) });
 
-                ComplexTypes[type] = value;
+                ComplexTypes[(string)type] = value;
             }
 
             var relationType = new ObjectGraphType { Name = "Relation" };
@@ -46,13 +46,13 @@ namespace IIS.Storage.EntityFramework
         }
 
         private readonly ContourContext _context;
-        private readonly OType _type;
+        private readonly OTypeEntity _type;
         private IComplexGraphType _graphType;
 
-        public GraphTypeBuilder(ContourContext context, OType type)
+        public GraphTypeBuilder(ContourContext context, OTypeEntity type)
         {
-            _context = context;
-            _type = type;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
         public IComplexGraphType Build()
@@ -69,7 +69,7 @@ namespace IIS.Storage.EntityFramework
             return _graphType;
         }
 
-        public void NewGraphType(OType type)
+        public void NewGraphType(OTypeEntity type)
         {
             _graphType = type.IsAbstract
                 ? new InterfaceGraphType { Name = type.Code } as IComplexGraphType
@@ -78,7 +78,7 @@ namespace IIS.Storage.EntityFramework
             ComplexTypes[type.Code] = _graphType;
         }
 
-        public void EnsureInterface(OType type)
+        public void EnsureInterface(OTypeEntity type)
         {
             if (type.Parent == null) return;
 
@@ -89,7 +89,7 @@ namespace IIS.Storage.EntityFramework
 
             var objectType = (IObjectGraphType)_graphType;
             objectType.AddResolvedInterface(abstractType);
-            objectType.IsTypeOf = entity => ((OEntity)entity).Type.Code == type.Code;
+            objectType.IsTypeOf = relation => ((ORelation)relation).Target.Type.Code == type.Code;
         }
 
         public void EnsureAttributes(OType type)
@@ -100,7 +100,7 @@ namespace IIS.Storage.EntityFramework
                 var field = _graphType.HasField(name) ? _graphType.GetField(name) : new FieldType { Name = name };
 
                 field.ResolvedType = attr.IsMultiple 
-                    ? new NonNullGraphType(new ListGraphType(new NonNullGraphType(ComplexTypes[attr.Attribute.Type])))
+                    ? new NonNullGraphType(new ListGraphType(new NonNullGraphType(ComplexTypes[(string)attr.Attribute.Type])))
                     : (attr.IsRequired ? (IGraphType)new NonNullGraphType(ScalarTypes[attr.Attribute.Type]) : ScalarTypes[attr.Attribute.Type]);
 
                 field.Resolver = new AttributeFieldResolver(attr.IsMultiple);
@@ -109,7 +109,7 @@ namespace IIS.Storage.EntityFramework
             }
         }
 
-        public void EnsureRelations(OType type)
+        public void EnsureRelations(OTypeEntity type)
         {
             var relationGroups = type.ForwardRestrictions.GroupBy(r => r.RelationType.Code);
 
@@ -148,7 +148,12 @@ namespace IIS.Storage.EntityFramework
         public void EnsureServiceAttributes()
         {
             if (!_graphType.HasField(nameof(OType.Id)))
-                _graphType.AddField(new FieldType { Name = nameof(OType.Id), ResolvedType = new NonNullGraphType(new IntGraphType()) });
+                _graphType.AddField(new FieldType
+                {
+                    Name = nameof(OType.Id),
+                    ResolvedType = new NonNullGraphType(new IntGraphType()),
+                    Resolver = new AttributeFieldResolver(false)
+                });
         }
 
         public void EnsureServiceRelationField()

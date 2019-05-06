@@ -7,7 +7,7 @@ namespace IIS.Storage.EntityFramework.Context
     {
         public long Id { get; set; }
         public int TypeId { get; set; }
-        public long InitiatorId { get; set; }
+        public long SourceId { get; set; }
         public long TargetId { get; set; }
         public bool IsInferred { get; set; }
         public DateTime? StartsAt { get; set; }
@@ -17,6 +17,6 @@ namespace IIS.Storage.EntityFramework.Context
 
         public virtual OEntity Source { get; set; }
         public virtual OEntity Target { get; set; }
-        public virtual OType Type { get; set; }
+        public virtual OTypeRelation Type { get; set; }
     }
 }

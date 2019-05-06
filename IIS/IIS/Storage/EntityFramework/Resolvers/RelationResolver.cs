@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using GraphQL.Resolvers;
+﻿using GraphQL.Resolvers;
 using GraphQL.Types;
 using IIS.Storage.EntityFramework.Context;
 
@@ -9,9 +8,8 @@ namespace IIS.Storage.EntityFramework.Resolvers
     {
         public object Resolve(ResolveFieldContext context)
         {
-            var source = (OEntity)context.Source;
-            var code = context.FieldName;
-            var relation = source.BackwardRelations.First(r => r.Target.Id == source.Id);
+            var relation = (ORelation)context.Source;
+            if (relation.SourceId < 1) return new { Id = 0, relation.Target.CreatedAt, IsInferred = false };
             return new { relation.Id, relation.StartsAt, relation.EndsAt, relation.CreatedAt, relation.IsInferred };
         }
     }

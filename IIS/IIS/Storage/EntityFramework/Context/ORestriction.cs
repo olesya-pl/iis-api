@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Storage.EntityFramework.Context
 {
@@ -7,16 +8,30 @@ namespace IIS.Storage.EntityFramework.Context
     {
         public int Id { get; set; }
         public int RelationTypeId { get; set; }
-        public int InitiatorTypeId { get; set; }
-        public int TargetTypeId { get; set; }
-        public string Meta { get; set; }
+        public int SourceId { get; set; }
+        public int TargetId { get; set; }
+        public JObject Meta { get; set; }
 
-        public virtual OType Source { get; set; }
-        public virtual OType RelationType { get; set; }
-        public virtual OType Target { get; set; }
+        public virtual OTypeEntity Source { get; set; }
+        public virtual OTypeRelation RelationType { get; set; }
+        public virtual OTypeEntity Target { get; set; }
 
-        // todo: create field
-        public bool IsMultiple { get => Meta.Contains("\"multiple\":true"); }
-        public bool IsRequired { get => Meta.Contains("\"required\":true"); }
+        public bool IsMultiple
+        {
+            get
+            {
+                var meta = Meta["multiple"];
+                return meta != null && meta.Value<bool>();
+            }
+        }
+
+        public bool IsRequired
+        {
+            get
+            {
+                var meta = Meta["validation"]?["required"];
+                return meta != null && meta.Value<bool>();
+            }
+        }
     }
 }

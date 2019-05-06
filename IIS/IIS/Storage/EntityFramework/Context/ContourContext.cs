@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json.Linq;
 
-//Enum column 'public.EntityAttributes.type' cannot be scaffolded, define a CLR enum type and add the property manually.
-//Enum column 'public.EntityTypes.type' cannot be scaffolded, define a CLR enum type and add the property manually.
-//done
-//Constraint 'EntityTypes_code_type_key' on table public.EntityTypes cannot be scaffolded because it includes a column that cannot be scaffolded(e.g. enum).
-//Index 'EntityTypes_code_type_key' on table public.EntityTypes cannot be scaffolded because it includes a column that cannot be scaffolded(e.g. enum).
+// todo: Constraint 'EntityTypes_code_type_key' on table public.EntityTypes cannot be scaffolded because it includes a column that cannot be scaffolded(e.g. enum).
+// todo: Index 'EntityTypes_code_type_key' on table public.EntityTypes cannot be scaffolded because it includes a column that cannot be scaffolded(e.g. enum).
 
 namespace IIS.Storage.EntityFramework.Context
 {
@@ -20,13 +19,15 @@ namespace IIS.Storage.EntityFramework.Context
         public ContourContext(DbContextOptions options) : base(options) { }
 
         public virtual DbSet<OEntity> Entities { get; set; }
-        public virtual DbSet<Attachment> Attachments { get; set; }
         public virtual DbSet<OAttributeValue> AttributeValues { get; set; }
-        public virtual DbSet<OAttribute> EntityAttributes { get; set; }
-        public virtual DbSet<ORestriction> RelationRestrictions { get; set; }
+        public virtual DbSet<OAttribute> Attributes { get; set; }
+        public virtual DbSet<ORestriction> Restrictions { get; set; }
         public virtual DbSet<ORelation> Relations { get; set; }
-        public virtual DbSet<OAttributeRestriction> EntityTypeAttributes { get; set; }
-        public virtual DbSet<OType> EntityTypes { get; set; }
+        public virtual DbSet<OAttributeRestriction> AttributeRestrictions { get; set; }
+        public virtual DbSet<OType> Types { get; set; }
+        public virtual DbSet<OTypeEntity> EntityTypes { get; set; }
+        public virtual DbSet<OTypeRelation> RelationTypes { get; set; }
+        public virtual DbSet<Attachment> Attachments { get; set; }
         public virtual DbSet<TemporaryFile> TemporaryFiles { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
@@ -144,13 +145,13 @@ namespace IIS.Storage.EntityFramework.Context
             {
                 entity.ToTable("EntityRelationRestrictions");
 
-                entity.HasIndex(e => new { e.RelationTypeId, e.InitiatorTypeId, e.TargetTypeId })
+                entity.HasIndex(e => new { e.RelationTypeId, e.SourceId, e.TargetId })
                     .HasName("EntityRelationRestrictions_relationTypeId_initiatorTypeId_t_key")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
-                entity.Property(e => e.InitiatorTypeId).HasColumnName("initiatorTypeId");
+                entity.Property(e => e.SourceId).HasColumnName("initiatorTypeId");
 
                 entity.Property(e => e.Meta)
                     .HasColumnName("meta")
@@ -158,11 +159,11 @@ namespace IIS.Storage.EntityFramework.Context
 
                 entity.Property(e => e.RelationTypeId).HasColumnName("relationTypeId");
 
-                entity.Property(e => e.TargetTypeId).HasColumnName("targetTypeId");
+                entity.Property(e => e.TargetId).HasColumnName("targetTypeId");
 
                 entity.HasOne(d => d.Source)
                     .WithMany(p => p.ForwardRestrictions)
-                    .HasForeignKey(d => d.InitiatorTypeId)
+                    .HasForeignKey(d => d.SourceId)
                     .HasConstraintName("EntityRelationRestrictions_initiatorTypeId_fkey");
 
                 entity.HasOne(d => d.RelationType)
@@ -173,7 +174,7 @@ namespace IIS.Storage.EntityFramework.Context
 
                 entity.HasOne(d => d.Target)
                     .WithMany(p => p.BackwardRestrictions)
-                    .HasForeignKey(d => d.TargetTypeId)
+                    .HasForeignKey(d => d.TargetId)
                     .HasConstraintName("EntityRelationRestrictions_targetTypeId_fkey");
             });
 
@@ -181,7 +182,7 @@ namespace IIS.Storage.EntityFramework.Context
             {
                 entity.ToTable("EntityRelations");
 
-                entity.HasIndex(e => new { e.TypeId, e.InitiatorId, e.TargetId })
+                entity.HasIndex(e => new { e.TypeId, e.SourceId, e.TargetId })
                     .HasName("EntityRelations_typeId_initiatorId_targetId_key")
                     .IsUnique();
 
@@ -199,7 +200,7 @@ namespace IIS.Storage.EntityFramework.Context
                     .HasColumnName("endsAt")
                     .HasColumnType("timestamp with time zone");
 
-                entity.Property(e => e.InitiatorId).HasColumnName("initiatorId");
+                entity.Property(e => e.SourceId).HasColumnName("initiatorId");
 
                 entity.Property(e => e.IsInferred).HasColumnName("isInferred");
 
@@ -213,7 +214,7 @@ namespace IIS.Storage.EntityFramework.Context
 
                 entity.HasOne(d => d.Source)
                     .WithMany(p => p.ForwardRelations)
-                    .HasForeignKey(d => d.InitiatorId)
+                    .HasForeignKey(d => d.SourceId)
                     .HasConstraintName("EntityRelations_initiatorId_fkey");
 
                 entity.HasOne(d => d.Target)
@@ -251,7 +252,7 @@ namespace IIS.Storage.EntityFramework.Context
                     .HasForeignKey(d => d.AttributeId)
                     .HasConstraintName("EntityTypeAttributes_attributeId_fkey");
 
-                entity.HasOne(d => d.Type)
+                entity.HasOne(d => d.Owner)
                     .WithMany(p => p.AttributeRestrictions)
                     .HasForeignKey(d => d.TypeId)
                     .HasConstraintName("EntityTypeAttributes_typeId_fkey");
@@ -260,6 +261,10 @@ namespace IIS.Storage.EntityFramework.Context
             modelBuilder.Entity<OType>(entity =>
             {
                 entity.ToTable("EntityTypes");
+
+                entity.HasDiscriminator(e => e.Type)
+                    .HasValue<OTypeEntity>(EntityType.Entity)
+                    .HasValue<OTypeRelation>(EntityType.Relation);
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -341,6 +346,24 @@ namespace IIS.Storage.EntityFramework.Context
                     .HasColumnName("username")
                     .HasMaxLength(255);
             });
+
+            // JObject
+            modelBuilder.RegisterObjectEnum(v => v.ToString(), v => JObject.Parse(v));
+            // ScalarType
+            modelBuilder.RegisterObjectEnum(v => (string)v, v => (ScalarType)v);
+            // EntityType
+            modelBuilder.RegisterObjectEnum(v => (string)v, v => (EntityType)v);
+        }
+    }
+
+    public static class ModelBuilderExtensions
+    {
+        public static void RegisterObjectEnum<T>(this ModelBuilder modelBuilder, Expression<Func<T, string>> to, Expression<Func<string, T>> from)
+        {
+            var valueConverter = new ValueConverter<T, string>(to, from);
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+                foreach (var property in entityType.GetProperties())
+                    if (property.ClrType == typeof(T)) property.SetValueConverter(valueConverter);
         }
     }
 }

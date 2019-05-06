@@ -17,11 +17,15 @@ namespace IIS.Storage.EntityFramework.Resolvers
 
         public object Resolve(ResolveFieldContext context)
         {
+            var id = context.Arguments.ContainsKey("id") ? (int)context.Arguments["id"] : 0;
             var code = context.FieldName.Camelize();
-            var data = _context.EntityTypes.Where(e => e.Code == code || e.Parent.Code == code)
+            var data = _context.EntityTypes
+                .Where(e => e.Code == code || e.Parent.Code == code)
                 .SelectMany(e => e.Entities)
+                .Where(e => id == 0 || e.Id == id)
                 .Include(e => e.AttributeValues).ThenInclude(e => e.Attribute)
-                .ToArray();
+                .ToArray()
+                .Select(e => new ORelation { Target = e }).ToArray();
 
             return data;
         }
