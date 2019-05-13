@@ -15,10 +15,13 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
     <PackageReference Include="GraphQL" Version="2.4.0" />
+    <PackageReference Include="NEST" Version="6.6.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Storage\" />
-    <Folder Include="Storage\EntityFramework\" />
-    <Folder Include="Storage\EntityFramework\Resolvers\" />
+    <Folder Include="OSchema\" />
+    <Folder Include="GraphQL\" />
+    <Folder Include="GraphQL.OSchema\" />
+    <Folder Include="OSchema.EntityFramework\" />
+    <Folder Include="OSchema.EntityFramework\Resolvers\" />
   </ItemGroup>
 </Project>

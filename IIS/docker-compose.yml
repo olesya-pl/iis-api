@@ -17,3 +17,11 @@ services:
         - 5432:5432
     volumes:
         - ../data_storage/postgres-data:/var/lib/postgresql/data
+        
+  es:
+    image: elasticsearch:6.6.1
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    restart: always

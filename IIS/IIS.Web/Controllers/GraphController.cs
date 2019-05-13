@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GraphQL;
-using IIS.Storage;
+using IIS.GraphQL;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -19,9 +19,9 @@ namespace IIS.Web.Controllers
             public JObject Variables { get; set; }
         }
 
-        private readonly ISchemaProvider _schemaProvider;
+        private readonly IGraphQLSchemaProvider _schemaProvider;
 
-        public GraphController(ISchemaProvider schemaProvider)
+        public GraphController(IGraphQLSchemaProvider schemaProvider)
         {
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
         }

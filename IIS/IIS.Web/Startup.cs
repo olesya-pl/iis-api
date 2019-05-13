@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphiQl;
-using IIS.Storage;
-using IIS.Storage.EntityFramework;
-using IIS.Storage.EntityFramework.Context;
+using IIS.GraphQL;
+using IIS.GraphQL.OSchema;
+using IIS.OSchema;
+using IIS.OSchema.EntityFramework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,7 +32,8 @@ namespace IIS.Web
         {
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<ContourContext>(b => b.UseNpgsql(connectionString), ServiceLifetime.Singleton);
-            services.AddSingleton<ISchemaProvider, ContourSchemaProvider>();
+            services.AddSingleton<IOSchema, OSchemaRepository>();
+            services.AddSingleton<IGraphQLSchemaProvider, GraphQLSchemaProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
