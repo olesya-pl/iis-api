@@ -23,5 +23,6 @@
     <Folder Include="GraphQL.OSchema\" />
     <Folder Include="OSchema.EntityFramework\" />
     <Folder Include="OSchema.EntityFramework\Resolvers\" />
+    <Folder Include="OSchema\Resolving\" />
   </ItemGroup>
 </Project>

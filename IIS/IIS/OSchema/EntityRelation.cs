@@ -5,16 +5,28 @@ namespace IIS.OSchema
 {
     public class EntityRelation : Relation
     {
+        private readonly IEnumerable<EntityValue> _values;
+        private readonly EntityValue _value;
+
         public new EntityConstraint Constraint => (EntityConstraint)base.Constraint;
 
-        public EntityRelation(EntityConstraint constraint, Entity entity) : base(constraint, entity) { }
+        public override object Target => Constraint.IsArray ? (object)_values : _value;
 
-        public EntityRelation(EntityConstraint constraint, IEnumerable<Entity> entities)
-            : base(constraint, entities)
+        public EntityRelation(EntityConstraint constraint, EntityValue entity) : base(constraint)
         {
-            if (entities.HaveSame(v => v.Id)) throw new ArgumentException("Duplicated ids.");
-            if (!entities.HaveAllSame(v => v.Type.Parent.Name))
+            if (IsArray) throw new Exception($"Relation {Name} supports arrays only.");
+            _value = entity ?? throw new ArgumentNullException(nameof(entity));
+        }
+
+        public EntityRelation(EntityConstraint constraint, IEnumerable<EntityValue> entities)
+            : base(constraint)
+        {
+            if (!IsArray) throw new Exception($"Relation {Name} does not support arrays.");
+            if (entities == null) throw new ArgumentNullException(nameof(entities));
+            if (entities.AnyDuplicate(v => v.Value.Id)) throw new ArgumentException("Duplicated ids.");
+            if (!entities.HaveSame(v => v.Value.Type.Parent?.Name))
                 throw new ArgumentException("Different entity types within the same set.");
+            _values = entities;
         }
     }
 }

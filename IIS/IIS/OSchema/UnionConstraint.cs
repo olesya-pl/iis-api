@@ -18,13 +18,7 @@ namespace IIS.OSchema
             : this(name, isRequired, isArray, resolver)
         {
             if (types == null) throw new ArgumentNullException(nameof(types));
-            foreach (var type in types) _targets.Add(type.Name, type);
-        }
-
-        public TypeEntity this[string name]
-        {
-            get => _targets.GetValueOrDefault(name);
-            set => _targets[name] = value ?? throw new ArgumentNullException(nameof(name));
+            foreach (var type in types) AddType(type);
         }
 
         public void AddType(TypeEntity type)

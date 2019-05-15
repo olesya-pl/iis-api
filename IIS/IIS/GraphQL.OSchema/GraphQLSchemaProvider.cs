@@ -84,14 +84,14 @@ namespace IIS.GraphQL.OSchema
             var abstractType = (IInterfaceGraphType)Build(type.Parent);
             var objectType = (IObjectGraphType)graphType;
             objectType.AddResolvedInterface(abstractType);
-            objectType.IsTypeOf = relation => ((Entity)((EntityRelation)relation).GetSingularTarget()).Type.Name == type.Name;
+            objectType.IsTypeOf = entity => ((EntityValue)entity).Value.IsTypeOf(type);
 
             return graphType;
         }
 
         private static IComplexGraphType EnsureRelations(TypeEntity type, IComplexGraphType graphType)
         {
-            foreach (var constraint in type.Constraints) graphType.AddField(CreateField(type, constraint.Name));
+            foreach (var constraintName in type.ConstraintNames) graphType.AddField(CreateField(type, constraintName));
 
             return graphType;
         }
@@ -99,7 +99,7 @@ namespace IIS.GraphQL.OSchema
         private static FieldType CreateField(TypeEntity type, string constraintName)
         {
             var childType = CreateGraphConstraint(type, constraintName);
-            var resolver = type[constraintName].Resolver;
+            var resolver = type.GetConstraint(constraintName).Resolver;
             var fieldResolver = resolver == null ? null : new GenericAsyncResolver(resolver);
             var field = new FieldType { Name = constraintName, ResolvedType = childType, Resolver = fieldResolver };
             return field;
@@ -107,7 +107,7 @@ namespace IIS.GraphQL.OSchema
 
         private static IGraphType CreateGraphConstraint(TypeEntity type, string constraintName)
         {
-            var constraint = type[constraintName];
+            var constraint = type.GetConstraint(constraintName);
             var isArray = constraint.IsArray;
             var isRequired = constraint.IsRequired;
             var childType = _graphTypeFactories[constraint.Kind](type, constraintName);

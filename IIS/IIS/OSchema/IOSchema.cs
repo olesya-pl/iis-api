@@ -7,6 +7,8 @@ namespace IIS.OSchema
     {
         Task<TypeEntity> GetRootAsync();
 
-        Task<IEnumerable<Entity>> GetEntitiesAsync(string typeName);
+        Task<IDictionary<long, EntityValue>> GetEntitiesByAsync(IEnumerable<long> entityIds);
+
+        Task<IDictionary<string, IEnumerable<EntityValue>>> GetEntitiesAsync(IEnumerable<string> typeNames);
     }
 }

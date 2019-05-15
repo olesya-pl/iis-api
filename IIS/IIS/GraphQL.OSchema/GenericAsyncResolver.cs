@@ -15,7 +15,8 @@ namespace IIS.GraphQL.OSchema
                 var newContext = new ResolveContext
                 {
                     Parameters = context.Arguments,
-                    RelationName = context.FieldName
+                    RelationName = context.FieldName,
+                    Source = context.Source
                 };
 
                 return resolver.ResolveAsync(newContext);

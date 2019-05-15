@@ -14,6 +14,8 @@ namespace IIS.OSchema
         public IEnumerable<Constraint> OwnConstraints => _constraints.Values;
         public IEnumerable<Constraint> Constraints => Parent == null ? OwnConstraints 
             : OwnConstraints.Concat(Parent.Constraints.Except(OwnConstraints, by => by.Name));
+        public IEnumerable<string> ConstraintNames => 
+            Parent == null ? _constraints.Keys : _constraints.Keys.Concat(Parent._constraints.Keys).Distinct();
 
         public TypeEntity(string name, bool isAbstract = false, TypeEntity parent = null)
         {
@@ -24,25 +26,20 @@ namespace IIS.OSchema
             Parent = parent;
         }
 
-        public TypeEntity(string name, IEnumerable<Constraint> constraints, bool isAbstract = false, TypeEntity parent = null)
-            : this(name, isAbstract, parent)
-        {
-            if (constraints == null) throw new ArgumentNullException(nameof(constraints));
-            foreach (var constraint in constraints) _constraints.Add(constraint.Name, constraint);
-        }
+        public bool HasConstraint(string name) => GetConstraintOrDefault(name) != null;
 
-        public Constraint this[string name]
-        {
-            get => _constraints.GetValueOrDefault(name) ?? Parent?._constraints.GetValueOrDefault(name);
-            set => _constraints[name] = value ?? throw new ArgumentNullException(nameof(name));
-        }
+        public Constraint GetConstraint(string name) =>
+            GetConstraintOrDefault(name) ?? throw new Exception($"Type {Name} does not have constraint {name}.");
 
-        public bool HasConstraint(string name) => this[name] != null;
-
-        public void AddConstraint(Constraint constraint)
+        public Constraint AddConstraint(Constraint constraint)
         {
             if (constraint == null) throw new ArgumentNullException(nameof(constraint));
             _constraints.Add(constraint.Name, constraint);
+            return constraint;
         }
+
+        private Constraint GetConstraintOrDefault(string name) =>
+            _constraints.GetValueOrDefault(name) ?? Parent?._constraints.GetValueOrDefault(name);
+
     }
 }

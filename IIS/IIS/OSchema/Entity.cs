@@ -14,23 +14,13 @@ namespace IIS.OSchema
         public Entity(TypeEntity type, long id)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
+            if (type.IsAbstract) throw new Exception("Cannot create instance of abstract type.");
             Id = id;
+            // todo: remove from ctor
+            _relations.Add("id", new AttributeRelation(Type.GetAttribute("id"), new AttributeValue(0, id)));
         }
 
-        public Entity(TypeEntity type, long id, IEnumerable<Relation> relations)
-            : this(type, id)
-        {
-            if (relations == null) throw new ArgumentNullException(nameof(relations));
-            foreach (var relation in relations) AddRelation(relation);
-        }
-
-        public Relation this[string name]
-        {
-            get => Type.HasConstraint(name) ? _relations[name] 
-                : throw new Exception($"Type {Type.Name} does not have constraint {name}.");
-            set => _relations[name] = Type.HasConstraint(name) ? value
-                : throw new Exception($"Type {Type.Name} does not have constraint {name}.");
-        }
+        public bool IsTypeOf(TypeEntity type) => type.Name == Type.Name || type.Name == Type.Parent?.Name;
 
         public void AddRelation(Relation relation)
         {
@@ -38,6 +28,22 @@ namespace IIS.OSchema
             if (!Type.HasConstraint(relation.Name))
                 throw new Exception($"Type {Type.Name} does not have constraint {relation.Name}.");
             _relations.Add(relation.Name, relation);
+        }
+
+        public Relation GetRelation(string name)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (!Type.HasConstraint(name))
+                throw new Exception($"Type {Type.Name} does not have constraint {name}.");
+
+            return _relations.GetValueOrDefault(name);
+        }
+
+        public object GetRelationTarget(string relationName)
+        {
+            var relation = GetRelation(relationName);
+            if (relation != null) return relation.Target;
+            return Type.GetConstraint(relationName).IsArray ? new object[0] : null;
         }
     }
 }

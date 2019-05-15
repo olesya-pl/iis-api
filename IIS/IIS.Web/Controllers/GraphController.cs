@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GraphQL;
+using GraphQL.DataLoader;
 using IIS.GraphQL;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -20,10 +21,12 @@ namespace IIS.Web.Controllers
         }
 
         private readonly IGraphQLSchemaProvider _schemaProvider;
+        private readonly DataLoaderDocumentListener _documentListener;
 
-        public GraphController(IGraphQLSchemaProvider schemaProvider)
+        public GraphController(IGraphQLSchemaProvider schemaProvider, DataLoaderDocumentListener documentListener)
         {
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
+            _documentListener = documentListener ?? throw new ArgumentNullException(nameof(documentListener));
         }
 
         public async Task<IActionResult> Post([FromBody] GraphQuery query)
@@ -36,6 +39,7 @@ namespace IIS.Web.Controllers
                 _.Query = query.Query;
                 _.OperationName = query.OperationName;
                 _.Inputs = inputs;
+                _.Listeners.Add(_documentListener);
             });
 
             return Ok(result);

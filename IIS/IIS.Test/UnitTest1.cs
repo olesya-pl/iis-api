@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using IIS;
 using IIS.OSchema;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
 namespace Tests
@@ -11,7 +10,9 @@ namespace Tests
         [Test]
         public async Task Test1()
         {
-
+            //var type = new TypeEntity("");
+            //var constraint = type.GetUnion("");
+            //constraint.
         }
     }
 }
