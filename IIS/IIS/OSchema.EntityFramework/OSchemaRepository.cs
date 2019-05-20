@@ -39,10 +39,11 @@ namespace IIS.OSchema.EntityFramework
 
         public async Task<IDictionary<string, IEnumerable<EntityValue>>> GetEntitiesAsync(IEnumerable<string> typeNames)
         {
+            var upperNames = typeNames.Select(_ => _.Camelize());
             var schema = await GetRootAsync();
             var types = schema.GetEntities().Select(e => e.Target);
             var data = await _context.Entities
-                .Where(e => typeNames.Any(typeName => e.Type.Code == typeName || e.Type.Parent.Code == typeName))
+                .Where(e => upperNames.Any(typeName => e.Type.Code == typeName || e.Type.Parent.Code == typeName))
                 .Include(e => e.Type)
                 .ToArrayAsync();
             
@@ -50,13 +51,13 @@ namespace IIS.OSchema.EntityFramework
                 .Select(e => new EntityValue(MapEntity(types.Single(t => t.Name == e.Type.Code), e), Enumerable.Empty<AttributeRelation>()))
                 .ToArray();
 
-            return entities.GroupBy(_ => _.Value.Type.Name)
+            return entities.GroupBy(_ => _.Value.Type.Name.ToLowerCamelcase())
                 .ToDictionary(_ => _.Key, _ => _.AsEnumerable());
         }
 
         private Entity MapEntity(TypeEntity type, OEntity srcEntity)
         {
-            var concreteType = _schema.GetEntity(srcEntity.Type.Code).Target;
+            var concreteType = _schema.GetEntity(srcEntity.Type.Code.ToLowerCamelcase()).Target;
             var entity = new Entity(concreteType, srcEntity.Id);
             var attributesByName = srcEntity.AttributeValues
                 .Where(e => e.DeletedAt == null)
@@ -136,7 +137,7 @@ namespace IIS.OSchema.EntityFramework
             foreach (var item in data)
             {
                 var type = MapType(item);
-                schemaType.AddEntity(type.Name, type, true, true, resolver);
+                schemaType.AddEntity(type.Name.ToLowerCamelcase(), type, true, true, resolver);
             }
             _schema = schemaType;
             return schemaType;

@@ -9,6 +9,7 @@ using IIS.GraphQL;
 using IIS.GraphQL.OSchema;
 using IIS.OSchema;
 using IIS.OSchema.EntityFramework;
+using IIS.Search;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,9 +40,12 @@ namespace IIS.Web
             services.AddDbContext<ContourContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
             services.AddSingleton<IOSchema, OSchemaRepository>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQLSchemaProvider>();
-
             services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
             services.AddSingleton<DataLoaderDocumentListener>();
+
+            // search
+            var es = Configuration.GetConnectionString("es");
+            services.AddTransient<ISearchService>(s => new SearchService(es));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

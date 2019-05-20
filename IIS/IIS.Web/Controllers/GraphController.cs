@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Transactions;
 using GraphQL;
 using GraphQL.DataLoader;
 using IIS.GraphQL;
+using IIS.OSchema;
+using IIS.Search;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -22,11 +25,16 @@ namespace IIS.Web.Controllers
 
         private readonly IGraphQLSchemaProvider _schemaProvider;
         private readonly DataLoaderDocumentListener _documentListener;
+        private readonly ISearchService _searchService;
+        private readonly IOSchema _schema;
 
-        public GraphController(IGraphQLSchemaProvider schemaProvider, DataLoaderDocumentListener documentListener)
+        public GraphController(IGraphQLSchemaProvider schemaProvider, DataLoaderDocumentListener documentListener, 
+            ISearchService searchService, IOSchema schema)
         {
             _schemaProvider = schemaProvider ?? throw new ArgumentNullException(nameof(schemaProvider));
             _documentListener = documentListener ?? throw new ArgumentNullException(nameof(documentListener));
+            _searchService = searchService;
+            _schema = schema;
         }
 
         public async Task<IActionResult> Post([FromBody] GraphQuery query)
@@ -43,6 +51,15 @@ namespace IIS.Web.Controllers
             });
 
             return Ok(result);
+        }
+
+        [HttpPost("/api/search")]
+        public async Task<IActionResult> CreateIndex()
+        {
+            var schema = await _schema.GetRootAsync();
+            await _searchService.CreateIndexAsync(schema);
+
+            return Ok();
         }
     }
 

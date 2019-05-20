@@ -9,5 +9,7 @@
             var stringValue = (string)value;
             return stringValue.Substring(0, 1).ToUpper() + stringValue.Substring(1);
         }
+
+        public static string ToLowerCamelcase(this string value) => value.Substring(0, 1).ToLower() + value.Substring(1);
     }
 }

@@ -19,10 +19,9 @@ namespace IIS.OSchema.Resolving
 
         public async Task<object> ResolveAsync(ResolveContext context)
         {
-            var relationName = context.RelationName.Camelize();
             var loader = _contextAccessor.Context
                 .GetOrAddBatchLoader<string, IEnumerable<EntityValue>>("GetEntitiesAsync", _schema.GetEntitiesAsync);
-            var data = await loader.LoadAsync(relationName);
+            var data = await loader.LoadAsync(context.RelationName);
             return data;
         }
     }
