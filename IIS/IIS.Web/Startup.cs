@@ -5,11 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphiQl;
 using GraphQL.DataLoader;
-using IIS.GraphQL;
-using IIS.GraphQL.OSchema;
-using IIS.OSchema;
-using IIS.OSchema.EntityFramework;
-using IIS.Search;
+using IIS.Core;
+using IIS.Ontology;
+using IIS.Ontology.EntityFramework;
+using IIS.Ontology.GraphQL;
+using IIS.Replication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +45,7 @@ namespace IIS.Web
 
             // search
             var es = Configuration.GetConnectionString("es");
-            services.AddTransient<ISearchService>(s => new SearchService(es));
+            services.AddTransient<IReplicationService>(s => new ReplicationService(es));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

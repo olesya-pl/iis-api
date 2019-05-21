@@ -1,6 +1,4 @@
 using System.Threading.Tasks;
-using IIS;
-using IIS.OSchema;
 using NUnit.Framework;
 
 namespace Tests

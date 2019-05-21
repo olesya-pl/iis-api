@@ -12,20 +12,6 @@
     <Compile Remove="Storage\EntityFramework\ISchemaGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
-    <PackageReference Include="GraphQL" Version="2.4.0" />
-    <PackageReference Include="NEST" Version="7.0.0-alpha2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="OSchema\" />
-    <Folder Include="GraphQL\" />
-    <Folder Include="GraphQL.OSchema\" />
-    <Folder Include="OSchema.EntityFramework\" />
-    <Folder Include="OSchema\Resolving\" />
-    <Folder Include="Search\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove=".DS_Store" />
   </ItemGroup>
 </Project>
