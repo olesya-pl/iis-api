@@ -7,7 +7,6 @@ using GraphQL.DataLoader;
 using IIS.Core;
 using IIS.Core.Resolving;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
 namespace IIS.Ontology.EntityFramework
 {
@@ -23,44 +22,76 @@ namespace IIS.Ontology.EntityFramework
             _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
         }
 
-        public async Task<IDictionary<long, EntityValue>> GetEntitiesByAsync(IEnumerable<long> entityIds)
+        public async Task<IDictionary<(long, string), IOntologyNode>> GetEntitiesByAsync(IEnumerable<(long, string)> entityIds)
         {
             var schema = await GetRootAsync();
-            var types = schema.GetEntities().Select(_ => _.Target);
-            var data = await _context.Entities.Where(_ => entityIds.Contains(_.Id))
-                .Include(e => e.Type)
-                .Include(e => e.AttributeValues).ThenInclude(e => e.Attribute)
-                .Include(e => e.ForwardRelations).ThenInclude(e => e.Type)
-                .Include(e => e.ForwardRelations).ThenInclude(e => e.Target)
-                .ToArrayAsync();
+            var data = await _context.Relations
+                .Where(r => entityIds.Any(e => e.Item1 == r.SourceId && e.Item2 == r.Type.Code))
+                .Include(r => r.Type)
+                .Include(r => r.Target).ThenInclude(t => t.AttributeValues).ThenInclude(a => a.Attribute)
+                .Include(r => r.Source)
+                .ToArrayAsync()
+                ;
+            var types = schema.GetEntities();
             var entities = data
-                .Select(e => new EntityValue(MapEntity(types.Single(t => t.Name == e.Type.Code), e), Enumerable.Empty<AttributeRelation>()))
-                .ToArray();
-            return entities.ToDictionary(_ => _.Value.Id);
+                .GroupBy(r => r.SourceId)
+                .Select(r => r.First().Source)
+                .Select(e => MapEntity(types.Single(t => t.Name == e.Type.Code), e));
+
+            //var data = await _context.Entities.Where(_ => entityIds.Contains(_.Id))
+                //.Include(e => e.Type)
+                //.Include(e => e.AttributeValues).ThenInclude(e => e.Attribute)
+                //.Include(e => e.ForwardRelations).ThenInclude(e => e.Type)
+                //.Include(e => e.ForwardRelations).ThenInclude(e => e.Target)
+                //.ToArrayAsync();
+            
+            var nodes = new Dictionary<(long, string), IOntologyNode>();
+            foreach (var entity in entities)
+            {
+                foreach (var relation in entity.RelationNames)
+                {
+                    nodes.Add((entity.Id, relation), entity.GetRelation(relation));
+                }
+            }
+            //var relations = entities
+            //.Select(e => new Relation(schema.GetConstraint(e.Type.Code.ToLowerCamelcase()), 
+            //        MapEntity(types.Single(t => t.Name == e.Type.Code), e)
+            //    )
+            //).ToArray();
+
+            return nodes;
         }
 
-        public async Task<IDictionary<string, IEnumerable<EntityValue>>> GetEntitiesAsync(IEnumerable<string> typeNames)
+        public async Task<IDictionary<string, ArrayRelation>> GetEntitiesAsync(IEnumerable<string> typeNames)
         {
             var upperNames = typeNames.Select(_ => _.Camelize());
             var schema = await GetRootAsync();
-            var types = schema.GetEntities().Select(e => e.Target);
+            var types = schema.GetEntities();
             var data = await _context.Entities
                 .Where(e => upperNames.Any(typeName => e.Type.Code == typeName || e.Type.Parent.Code == typeName))
                 .Include(e => e.Type)
+                .Include(e => e.AttributeValues).ThenInclude(a => a.Attribute)
                 .ToArrayAsync();
-            
-            var entities = data
-                .Select(e => new EntityValue(MapEntity(types.Single(t => t.Name == e.Type.Code), e), Enumerable.Empty<AttributeRelation>()))
-                .ToArray();
 
-            return entities.GroupBy(_ => _.Value.Type.Name.ToLowerCamelcase())
-                .ToDictionary(_ => _.Key, _ => _.AsEnumerable());
+            var list = new List<ArrayRelation>();
+            foreach (var group in data.GroupBy(d => d.Type.Code))
+            {
+                var type = types.Single(t => t.Name == group.Key);
+                var constraint = schema.GetConstraint(group.Key.ToLowerCamelcase());
+                var relations = group.Select(e => MapEntity(type, e))
+                    .Select(e => new Relation(constraint, e));
+                var arrayRelation = new ArrayRelation(constraint, relations);
+                list.Add(arrayRelation);
+            }
+
+            return list.ToDictionary(_ => _.Schema.Name);
         }
 
         private Entity MapEntity(TypeEntity type, OEntity srcEntity)
         {
-            var concreteType = _schema.GetEntity(srcEntity.Type.Code.ToLowerCamelcase()).Target;
-            var entity = new Entity(concreteType, srcEntity.Id);
+            var concreteType = _schema.GetEntity(srcEntity.Type.Code.ToLowerCamelcase());
+            var entity = new Entity(concreteType);
+            entity.SetAttribute("id", srcEntity.Id);
             var attributesByName = srcEntity.AttributeValues
                 .Where(e => e.DeletedAt == null)
                 .GroupBy(a => a.Attribute.Code);
@@ -72,44 +103,62 @@ namespace IIS.Ontology.EntityFramework
                     var group = attributesByName.SingleOrDefault(g => g.Key == constraintName);
                     if (group == null) continue;
 
-                    var values = group.Select(g => new AttributeValue(g.Id, g.Value));
-                    entity.AddAttribute(constraintName, values);
+                    var constraint = type.GetConstraint(constraintName);
+                    if (constraint.IsArray)
+                        foreach (var value in group) entity.AddAttribute(constraintName, value.Value, value.Id);
+                    else entity.SetAttribute(constraintName, group.Single().Value);
                 }
                 else if (type.HasEntity(constraintName))
                 {
                     var group = relationsByName.SingleOrDefault(g => g.Key == constraintName);
                     if (group == null) continue;
 
-                    var constraint = type.GetEntity(constraintName);
-                    var entities = group.Select(e => new EntityValue(MapEntity(constraint.Target, e.Target), GetRelationInfo(e)));
-                    entity.AddEntity(constraintName, entities);
+                    var constraint = type.GetConstraint(constraintName);
+                    if (constraint.IsArray)
+                    {
+                        // todo: GetRelationInfo(e)
+                        foreach (var relation in group)
+                        {
+                            var targetEntity = MapEntity((TypeEntity)constraint.Target, relation.Target);
+                            entity.AddRelation(new Relation(constraint, targetEntity));
+                        }
+                    }
+                    else
+                    {
+                        var targetEntity = MapEntity((TypeEntity)constraint.Target, group.Single().Target);
+                        entity.SetRelation(new Relation(constraint, targetEntity));
+                    }
                 }
                 else if (type.HasUnion(constraintName))
                 {
                     var group = relationsByName.SingleOrDefault(g => g.Key == constraintName);
                     if (group == null) continue;
 
-                    var constraint = type.GetUnion(constraintName);
-                    var entities = group
-                        .Select(e => 
-                        new EntityValue(
-                            MapEntity(constraint.Targets.Single(t => t.Name == e.Target.Type.Code), e.Target), GetRelationInfo(e)));
-                    entity.AddUnion(constraintName, entities);
+                    var constraint = type.GetConstraint(constraintName);
+                    var union = new Union((UnionClass)constraint.Target);
+                    // todo: GetRelationInfo(e)
+                    foreach (var relation in group)
+                    {
+                        var targetEntity = MapEntity((TypeEntity)constraint.Target, relation.Target);
+                        union.AddEntity(targetEntity);
+                        entity.SetRelation(new Relation(constraint, union));
+                    }
                 }
             }
             return entity;
         }
 
-        private IEnumerable<AttributeRelation> GetRelationInfo(ORelation e)
+        private Entity GetRelationInfo(ORelation e)
         {
-            var type = _schema.GetEntity("_relationInfo").Target;
-            var relationInfo = new Entity(type, e.Id);
-            relationInfo.AddAttribute("startsAt", new[] { new AttributeValue(0, e.StartsAt) });
-            relationInfo.AddAttribute("endsAt", new[] { new AttributeValue(0, e.EndsAt) });
-            relationInfo.AddAttribute("createdAt", new[] { new AttributeValue(0, e.CreatedAt) });
-            relationInfo.AddAttribute("isInferred", new[] { new AttributeValue(0, e.IsInferred) });
+            var type = _schema.GetEntity("_relationInfo");
+            var relationInfo = new Entity(type);
+            relationInfo.SetAttribute("id", e.TargetId);
+            relationInfo.SetAttribute("startsAt", e.StartsAt);
+            relationInfo.SetAttribute("endsAt", e.EndsAt);
+            relationInfo.SetAttribute("createdAt", e.CreatedAt);
+            relationInfo.SetAttribute("isInferred", e.IsInferred);
 
-            return relationInfo.Relations.OfType<AttributeRelation>();
+            return relationInfo;
         }
 
         // Schema
@@ -126,7 +175,7 @@ namespace IIS.Ontology.EntityFramework
                 .ToArrayAsync();
                 
             var schemaType = new TypeEntity("Entities");
-            var attrResolver = new RelationInfoAttributeResolver();
+            var attrResolver = new AttributeResolver();
             var relationInfo = new TypeEntity("RelationInfo");
             relationInfo.AddAttribute("id", ScalarType.Int, true, false, attrResolver);
             relationInfo.AddAttribute("startsAt", ScalarType.Date, false, false, attrResolver);
@@ -134,12 +183,12 @@ namespace IIS.Ontology.EntityFramework
             relationInfo.AddAttribute("createdAt", ScalarType.Date, true, false, attrResolver);
             relationInfo.AddAttribute("isInferred", ScalarType.Int, true, false, attrResolver);
             _types.Add(relationInfo.Name, relationInfo);
-            schemaType.AddEntity("_relationInfo", relationInfo, true, true, new RelationInfoResolver());
+            schemaType.AddType("_relationInfo", relationInfo, true, true, new RelationInfoResolver());
             var resolver = new EntitiesResolver(this, _contextAccessor);
             foreach (var item in data)
             {
                 var type = MapType(item);
-                schemaType.AddEntity(type.Name.ToLowerCamelcase(), type, true, true, resolver);
+                schemaType.AddType(type.Name.ToLowerCamelcase(), type, true, true, resolver);
             }
             _schema = schemaType;
             return schemaType;
@@ -152,11 +201,12 @@ namespace IIS.Ontology.EntityFramework
 
             var parent = typeEntity.Parent == null ? null : MapType(typeEntity.Parent);
             var type = _types[typeEntity.Code] = new TypeEntity(typeEntity.Code, typeEntity.IsAbstract, parent);
-            type.IndexConfig = typeEntity.Meta.ContainsKey("index") ?
-                typeEntity.Meta.GetValue("index") as JObject : new JObject();
+            //type.IndexConfig = typeEntity.Meta.ContainsKey("index") ?
+            //typeEntity.Meta.GetValue("index") as JObject : new JObject();
+            //var relationResolver = new (this, _contextAccessor);
             var relationInfo = _types["RelationInfo"];
-            type.AddEntity("_relationInfo", relationInfo, false, false, new RelationInfoResolver());
-            type.AddAttribute("id", ScalarType.Int, true, false, new EntityRelationResolver(this, _contextAccessor));
+            type.AddType("_relationInfo", relationInfo, false, false, new RelationInfoResolver());
+            type.AddType("id", new AttributeClass("id", ScalarType.Int), true, false, new AttributeResolver());
 
             var constraintsByName = typeEntity.ForwardRestrictions.GroupBy(r => r.Type.Code);
             foreach (var constraints in constraintsByName)
@@ -165,28 +215,29 @@ namespace IIS.Ontology.EntityFramework
                 var constraint = constraints.First();
                 var isArray = constraint.IsMultiple;
                 var isRequired = constraint.IsRequired;
-                var kind = constraints.Count() > 1 ? TargetKind.Union : TargetKind.Entity;
+                var kind = constraints.Count() > 1 ? Kind.Union : Kind.Class;
 
-                if (kind == TargetKind.Entity)
+                if (kind == Kind.Class)
                 {
                     var resolver = new EntityRelationResolver(this, _contextAccessor);
                     var target = MapType(constraint.Target);
-                    type.AddEntity(name, target, isRequired, isArray, resolver);
+                    type.AddType(name, target, isRequired, isArray, resolver);
                 }
-                else if (kind == TargetKind.Union)
+                else if (kind == Kind.Union)
                 {
                     var resolver = new EntityRelationResolver(this, _contextAccessor);
                     var targets = constraints.Select(e => MapType(e.Target));
-                    type.AddUnion(name, targets, isRequired, isArray, resolver);
+                    var target = new UnionClass($"{type.Name}{name.Camelize()}RelationUnion", targets);
+                    type.AddType(name, target, isRequired, isArray, resolver);
                 }
             }
 
             foreach (var constraint in typeEntity.AttributeRestrictions)
             {
-                var resolver = new EntityRelationResolver(this, _contextAccessor);
+                var resolver = new AttributeResolver();
                 type.AddAttribute(
-                    constraint.Attribute.Code, 
-                    constraint.Attribute.Type, 
+                    constraint.Attribute.Code,
+                    constraint.Attribute.Type,
                     constraint.IsRequired, 
                     constraint.IsMultiple, 
                     resolver);

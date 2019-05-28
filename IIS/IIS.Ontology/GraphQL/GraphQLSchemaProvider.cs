@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using IIS.Core;
@@ -19,7 +17,7 @@ namespace IIS.Ontology.GraphQL
         public async Task<ISchema> GetSchemaAsync()
         {
             var type = await _oSchema.GetRootAsync();
-            var query = (ObjectGraphType)Build(type);
+            var query = (IObjectGraphType)CreateType(type);
             var schema = new Schema { Query = query };
 
             return schema;
@@ -48,106 +46,92 @@ namespace IIS.Ontology.GraphQL
 
                 ComplexTypes[(string)type] = value;
             }
-
-            _graphTypeFactories.Add(TargetKind.Attribute, CreateAttribute);
-            _graphTypeFactories.Add(TargetKind.Entity, CreateEntity);
-            _graphTypeFactories.Add(TargetKind.Union, CreateUnion);
         }
 
-        private static readonly Dictionary<TargetKind, Func<TypeEntity, string, IGraphType>> _graphTypeFactories =
-            new Dictionary<TargetKind, Func<TypeEntity, string, IGraphType>>();
-
-        public static IComplexGraphType Build(TypeEntity type)
+        private IGraphType CreateType(TypeEntity type)
         {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-
             if (ComplexTypes.ContainsKey(type.Name)) return ComplexTypes[type.Name];
-
-            var graphType = NewGraphType(type);
-            graphType = EnsureInterface(type, graphType);
-            graphType = EnsureRelations(type, graphType);
-
+            var graphType = CreateComplexType(type);
+            if (type.HasParent)
+            {
+                var derived = (IObjectGraphType)graphType;
+                var abstractType = (IInterfaceGraphType)CreateType(type.Parent);
+                derived.AddResolvedInterface(abstractType);
+                derived.IsTypeOf = relation => ((Entity)((Relation)relation).Target).IsTypeOf(type);
+            }
+            foreach (var constraintName in type.ConstraintNames)
+            {
+                var constraint = type.GetConstraint(constraintName);
+                var targetGraphType = default(IGraphType);
+                if (type.HasAttribute(constraintName))
+                {
+                    targetGraphType = CreateAttribute(constraint);
+                }
+                else if (type.HasEntity(constraintName))
+                {
+                    var target = type.GetEntity(constraintName);
+                    targetGraphType = CreateType(target);
+                }
+                else if (type.HasUnion(constraintName))
+                {
+                    var target = type.GetUnion(constraintName);
+                    var unionGraphType = new UnionGraphType { Name = target.Name };
+                    foreach (var item in target.Classes)
+                    {
+                        var unionPart = (IObjectGraphType)CreateType(item);
+                        unionGraphType.AddPossibleType(unionPart);
+                    }
+                    targetGraphType = unionGraphType;
+                }
+                var field = CreateFieldType(constraint, targetGraphType);
+                graphType.AddField(field);
+            }
             return graphType;
         }
 
-        private static IComplexGraphType NewGraphType(TypeEntity type)
+        private IComplexGraphType CreateComplexType(TypeEntity type)
         {
-            return ComplexTypes[type.Name] = type.IsAbstract
-                ? new InterfaceGraphType { Name = type.Name } as IComplexGraphType
-                : new ObjectGraphType { Name = type.Name } as IComplexGraphType;
+            if (type.IsAbstract) return CreateInterfaceType(type);
+            return CreateObjectType(type);
         }
 
-        private static IComplexGraphType EnsureInterface(TypeEntity type, IComplexGraphType graphType)
+        private static IInterfaceGraphType CreateInterfaceType(TypeEntity type)
         {
-            if (type.Parent == null) return graphType;
-
-            var abstractType = (IInterfaceGraphType)Build(type.Parent);
-            var objectType = (IObjectGraphType)graphType;
-            objectType.AddResolvedInterface(abstractType);
-            objectType.IsTypeOf = entity => ((EntityValue)entity).Value.IsTypeOf(type);
-
+            var graphType = new InterfaceGraphType { Name = type.Name };
+            ComplexTypes[type.Name] = graphType;
             return graphType;
         }
 
-        private static IComplexGraphType EnsureRelations(TypeEntity type, IComplexGraphType graphType)
+        private static IObjectGraphType CreateObjectType(TypeEntity type)
         {
-            foreach (var constraintName in type.ConstraintNames) graphType.AddField(CreateField(type, constraintName));
-
+            var graphType = new ObjectGraphType { Name = type.Name };
+            ComplexTypes[type.Name] = graphType;
             return graphType;
         }
 
-        private static FieldType CreateField(TypeEntity type, string constraintName)
+        private static IGraphType CreateAttribute(Constraint constraint)
         {
-            var childType = CreateGraphConstraint(type, constraintName);
-            var resolver = type.GetConstraint(constraintName).Resolver;
-            var fieldResolver = resolver == null ? null : new GenericAsyncResolver(resolver);
-            var field = new FieldType { Name = constraintName, ResolvedType = childType, Resolver = fieldResolver };
-            return field;
-        }
-
-        private static IGraphType CreateGraphConstraint(TypeEntity type, string constraintName)
-        {
-            var constraint = type.GetConstraint(constraintName);
-            var isArray = constraint.IsArray;
-            var isRequired = constraint.IsRequired;
-            var childType = _graphTypeFactories[constraint.Kind](type, constraintName);
-
-            if (isRequired && !isArray) childType = new NonNullGraphType(childType);
-            if (isArray) childType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(childType)));
-
-            return childType;
-        }
-
-        private static IGraphType CreateUnion(TypeEntity type, string constraintName)
-        {
-            // todo: camelize and nonNull for union parts
-            var unionConstraint = type.GetUnion(constraintName);
-            var union = new UnionGraphType { Name = $"{type.Name}{constraintName}RelationUnion" };
-            var possibleTypes = unionConstraint.Targets
-                .Select(item => (IObjectGraphType)Build(item));
-
-            foreach (var item in possibleTypes) union.AddPossibleType(item);
-
-            return union;
-        }
-
-        private static IGraphType CreateEntity(TypeEntity type, string constraintName)
-        {
-            var entityConstraint = type.GetEntity(constraintName);
-            var entity = Build(entityConstraint.Target);
-
-            return entity;
-        }
-
-        private static IGraphType CreateAttribute(TypeEntity type, string constraintName)
-        {
-            var attributeConstraint = type.GetAttribute(constraintName);
-            var attributeType = attributeConstraint.Type;
-            var attribute = attributeConstraint.IsArray
+            var attributeType = ((AttributeClass)constraint.Target).Type;
+            var resolvedType = constraint.IsArray
                 ? (IGraphType)ComplexTypes[(string)attributeType]
                 : ScalarTypes[attributeType];
+            return resolvedType;
+        }
 
-            return attribute;
+        private static FieldType CreateFieldType(Constraint constraint, IGraphType resolvedType)
+        {
+            var isArray = constraint.IsArray;
+            var isRequired = constraint.IsRequired;
+            if (isRequired && !isArray) resolvedType = new NonNullGraphType(resolvedType);
+            if (isArray) resolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(resolvedType)));
+            var resolver = constraint.Resolver;
+            var fieldType = new FieldType
+            {
+                Name = constraint.Name,
+                Resolver = resolver == null ? null : new GenericAsyncResolver(resolver),
+                ResolvedType = resolvedType
+            };
+            return fieldType;
         }
     }
 }

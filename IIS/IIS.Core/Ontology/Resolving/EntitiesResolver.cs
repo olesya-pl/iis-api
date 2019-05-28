@@ -20,9 +20,9 @@ namespace IIS.Core.Resolving
         public async Task<object> ResolveAsync(ResolveContext context)
         {
             var loader = _contextAccessor.Context
-                .GetOrAddBatchLoader<string, IEnumerable<EntityValue>>("GetEntitiesAsync", _schema.GetEntitiesAsync);
+                .GetOrAddBatchLoader<string, ArrayRelation>("GetEntitiesAsync", _schema.GetEntitiesAsync);
             var data = await loader.LoadAsync(context.RelationName);
-            return data;
+            return data.Relations;
         }
     }
 }

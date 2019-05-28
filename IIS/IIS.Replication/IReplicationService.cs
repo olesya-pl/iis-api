@@ -6,5 +6,7 @@ namespace IIS.Replication
     public interface IReplicationService
     {
         Task CreateIndexAsync(TypeEntity schema);
+
+        Task IndexEntityAsync(Entity entity);
     }
 }

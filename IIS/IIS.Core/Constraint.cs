@@ -1,28 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace IIS.Core
 {
-    public abstract class Constraint
+    public class Constraint : ISchemaNode
     {
         public string Name { get; }
         public bool IsRequired { get; }
         public bool IsArray { get; }
-        public IRelationResolver Resolver { get; set; }
-        public abstract TargetKind Kind { get; }
+        public IRelationResolver Resolver { get; }
+        public IType Target { get; }
 
-        protected Constraint(string name, bool isRequired, bool isArray, IRelationResolver resolver = null)
+        public Constraint(string name, IType target, bool isRequired, bool isArray, IRelationResolver resolver = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
+            Target = target ?? throw new ArgumentNullException(nameof(target));
             IsRequired = isRequired;
             IsArray = isArray;
             Resolver = resolver;
         }
-    }
 
-    public enum TargetKind
-    {
-        Attribute = 1,
-        Entity,
-        Union
+        // ISchemaNode
+        public void AcceptVisitor(ISchemaVisitor visitor) => visitor.VisitConstraint(this);
+        IEnumerable<ISchemaNode> ISchemaNode.Nodes => new[] { Target };
     }
 }

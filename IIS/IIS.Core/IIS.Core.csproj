@@ -5,12 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Resolving\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\IIS\IIS.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GraphQL" Version="2.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="AttributeConstraint.cs" />
+    <Compile Remove="AttributeRelation.cs" />
+    <Compile Remove="Resolving\EntitiesResolver.cs" />
   </ItemGroup>
 </Project>

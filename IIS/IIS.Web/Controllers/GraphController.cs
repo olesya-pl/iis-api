@@ -7,6 +7,7 @@ using IIS.Replication;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using IIS.Core;
+using System.Linq;
 
 namespace IIS.Web.Controllers
 {
@@ -57,6 +58,22 @@ namespace IIS.Web.Controllers
         {
             var schema = await _schema.GetRootAsync();
             await _replicationService.CreateIndexAsync(schema);
+
+            return Ok();
+        }
+
+        [HttpPost("/api/index")]
+        public async Task<IActionResult> Index()
+        {
+            var endpoints = await _schema.GetEntitiesAsync(new[] { "Person" });
+            var person = endpoints["person"];
+            var people = await _schema.GetEntitiesByAsync(person.Relations.Select(r => (((Entity)r.Target).Id,"person")));
+            foreach (var relation in people.Values)
+            {
+                //relation.Schema.Resolver.ResolveAsync(new ResolveContext {  })
+                //var entity = (Entity)relation.Target;
+                //await _replicationService.IndexEntityAsync(entity);
+            }
 
             return Ok();
         }

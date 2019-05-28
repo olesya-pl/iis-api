@@ -7,8 +7,8 @@ namespace IIS.Core
     {
         Task<TypeEntity> GetRootAsync();
 
-        Task<IDictionary<long, EntityValue>> GetEntitiesByAsync(IEnumerable<long> entityIds);
+        Task<IDictionary<(long, string), IOntologyNode>> GetEntitiesByAsync(IEnumerable<(long, string)> entityIds);
 
-        Task<IDictionary<string, IEnumerable<EntityValue>>> GetEntitiesAsync(IEnumerable<string> typeNames);
+        Task<IDictionary<string, ArrayRelation>> GetEntitiesAsync(IEnumerable<string> typeNames);
     }
 }

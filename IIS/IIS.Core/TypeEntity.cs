@@ -1,48 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 
 namespace IIS.Core
 {
-    public class TypeEntity
+    public class TypeEntity : IType
     {
-        private readonly Dictionary<string, Constraint> _constraints = new Dictionary<string, Constraint>();
+        private readonly Dictionary<string, Constraint> _ownConstraints = new Dictionary<string, Constraint>();
 
+        // IType
         public string Name { get; }
+        public Kind Kind => Kind.Class;
+
         public bool IsAbstract { get; }
         public TypeEntity Parent { get; }
-        public IEnumerable<Constraint> OwnConstraints => _constraints.Values;
-        public IEnumerable<Constraint> Constraints => Parent == null ? OwnConstraints 
-            : OwnConstraints.Concat(Parent.Constraints.Except(OwnConstraints, by => by.Name));
-        public IEnumerable<string> ConstraintNames => 
-            Parent == null ? _constraints.Keys : _constraints.Keys.Concat(Parent._constraints.Keys).Distinct();
 
-        public JObject IndexConfig { get; set; } = new JObject();
+        public IEnumerable<Constraint> OwnConstraints => _ownConstraints.Values;
+        public IEnumerable<Constraint> Constraints
+        {
+            get
+            {
+                if (!HasParent) return OwnConstraints;
+                var parentConstraints = Parent.Constraints.Except(OwnConstraints, by => by.Name);
+                return OwnConstraints.Concat(parentConstraints);
+            }
+        }
+        public IEnumerable<string> ConstraintNames => Constraints.Select(c => c.Name);
 
         public TypeEntity(string name, bool isAbstract = false, TypeEntity parent = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            if (isAbstract && parent != null)
-                throw new InvalidOperationException("Only one-tier inheritance is supported.");
+            if (parent != null && (parent.HasParent || !parent.IsAbstract || IsAbstract)) 
+                throw new InvalidInheritanceException(name, parent.Name);
             IsAbstract = isAbstract;
             Parent = parent;
         }
 
-        public bool HasConstraint(string name) => GetConstraintOrDefault(name) != null;
+        public bool HasParent => Parent != null;
 
-        public Constraint GetConstraint(string name) =>
-            GetConstraintOrDefault(name) ?? throw new Exception($"Type {Name} does not have constraint {name}.");
+        public bool HasConstraint(string constraintName) => ConstraintNames.Contains(constraintName);
+
+        public Constraint GetConstraint(string constraintName)
+        {
+            if (!HasConstraint(constraintName)) throw new ConstraintNotFoundException(Name, constraintName);
+            return _ownConstraints.GetValueOrDefault(constraintName) ?? Parent._ownConstraints[constraintName];
+        }
 
         public Constraint AddConstraint(Constraint constraint)
         {
             if (constraint == null) throw new ArgumentNullException(nameof(constraint));
-            _constraints.Add(constraint.Name, constraint);
+            _ownConstraints.Add(constraint.Name, constraint);
             return constraint;
         }
 
-        private Constraint GetConstraintOrDefault(string name) =>
-            _constraints.GetValueOrDefault(name) ?? Parent?._constraints.GetValueOrDefault(name);
+        public Constraint AddType(string constraintName, IType type, bool isRequired, bool isArray = false, 
+            IRelationResolver resolver = null)
+        {
+            var constraint = new Constraint(constraintName, type, isRequired, isArray, resolver);
+            _ownConstraints.Add(constraint.Name, constraint);
+            return constraint;
+        }
 
+        // ISchemaNode
+        public void AcceptVisitor(ISchemaVisitor visitor)
+        {
+            if (IsAbstract) visitor.VisitAbstractClass(this);
+            else visitor.VisitClass(this);
+        }
+        IEnumerable<ISchemaNode> ISchemaNode.Nodes => Constraints;
     }
 }
