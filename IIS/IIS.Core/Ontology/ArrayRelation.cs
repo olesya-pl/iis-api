@@ -5,15 +5,15 @@ namespace IIS.Core
 {
     public class ArrayRelation : IOntologyNode
     {
-        private readonly List<Relation> _relations = new List<Relation>();
+        private readonly List<IInstance> _instances = new List<IInstance>();
 
         public Constraint Schema { get; }
-        public IEnumerable<Relation> Relations => _relations;
+        public IEnumerable<IInstance> Instances => _instances;
 
-        public ArrayRelation(Constraint schema, IEnumerable<Relation> relations)
+        public ArrayRelation(Constraint schema, IEnumerable<IInstance> instances)
             : this(schema)
         {
-            foreach (var relation in relations) AddRelation(relation);
+            foreach (var instance in instances) AddInstance(instance);
         }
 
         public ArrayRelation(Constraint schema)
@@ -22,15 +22,15 @@ namespace IIS.Core
             if (!schema.IsArray) throw new SingleValueUnsupportedException(schema.Name);
         }
 
-        public void AddRelation(Relation relation)
+        public void AddInstance(IInstance instance)
         {
-            if (Schema != relation.Schema) throw new Exception($"Incompatible schemas.");
-            _relations.Add(relation);
+            //if (Schema.Target != instance.Schema) throw new Exception($"Incompatible schemas.");
+            _instances.Add(instance);
         }
 
         // IOntologyNode
         public void AcceptVisitor(IOntologyVisitor visitor) => visitor.VisitArrayRelation(this);
         ISchemaNode IOntologyNode.Schema => Schema;
-        IEnumerable<IOntologyNode> IOntologyNode.Nodes => Relations;
+        IEnumerable<IOntologyNode> IOntologyNode.Nodes => Instances;
     }
 }

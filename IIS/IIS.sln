@@ -5,11 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Web", "IIS.Web\IIS.Web.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS", "IIS\IIS.csproj", "{6B1F0A87-5B02-440C-BADC-50097DA960D2}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{61338CDF-05BA-4023-AB3B-0B4474B47E8C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Test", "IIS.Test\IIS.Test.csproj", "{C530A569-230E-4F0A-8417-5754D94C41E5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Replication", "IIS.Replication\IIS.Replication.csproj", "{51678C96-1D85-447F-A0B7-AC8DB183BF05}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Ontology", "IIS.Ontology\IIS.Ontology.csproj", "{F40A447D-A307-40A8-898B-01018C3CE3CF}"
 EndProject
@@ -22,6 +18,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Introspection", "IIS.Introspection\IIS.Introspection.csproj", "{17A6A38F-5F77-4708-9FE4-2A91FCFAFBB7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Materials", "IIS.Materials\IIS.Materials.csproj", "{479F61BD-B0E2-41BE-BB58-2B012506F20C}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F272F4DF-9BD2-4C16-BD6E-EEC34C8052B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Replication", "IIS.Replication\IIS.Replication.csproj", "{094D61A6-2365-4A25-80C6-36D36417916C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,18 +37,10 @@ Global
 		{6B1F0A87-5B02-440C-BADC-50097DA960D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B1F0A87-5B02-440C-BADC-50097DA960D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B1F0A87-5B02-440C-BADC-50097DA960D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61338CDF-05BA-4023-AB3B-0B4474B47E8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61338CDF-05BA-4023-AB3B-0B4474B47E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61338CDF-05BA-4023-AB3B-0B4474B47E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61338CDF-05BA-4023-AB3B-0B4474B47E8C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C530A569-230E-4F0A-8417-5754D94C41E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C530A569-230E-4F0A-8417-5754D94C41E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C530A569-230E-4F0A-8417-5754D94C41E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C530A569-230E-4F0A-8417-5754D94C41E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{51678C96-1D85-447F-A0B7-AC8DB183BF05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{51678C96-1D85-447F-A0B7-AC8DB183BF05}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{51678C96-1D85-447F-A0B7-AC8DB183BF05}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{51678C96-1D85-447F-A0B7-AC8DB183BF05}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F40A447D-A307-40A8-898B-01018C3CE3CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F40A447D-A307-40A8-898B-01018C3CE3CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F40A447D-A307-40A8-898B-01018C3CE3CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -73,5 +65,13 @@ Global
 		{479F61BD-B0E2-41BE-BB58-2B012506F20C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{479F61BD-B0E2-41BE-BB58-2B012506F20C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{479F61BD-B0E2-41BE-BB58-2B012506F20C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F272F4DF-9BD2-4C16-BD6E-EEC34C8052B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F272F4DF-9BD2-4C16-BD6E-EEC34C8052B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F272F4DF-9BD2-4C16-BD6E-EEC34C8052B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F272F4DF-9BD2-4C16-BD6E-EEC34C8052B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{094D61A6-2365-4A25-80C6-36D36417916C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{094D61A6-2365-4A25-80C6-36D36417916C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{094D61A6-2365-4A25-80C6-36D36417916C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{094D61A6-2365-4A25-80C6-36D36417916C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

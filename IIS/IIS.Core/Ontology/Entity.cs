@@ -53,7 +53,7 @@ namespace IIS.Core
             if (!relation.Schema.IsArray) throw new SingleValueUnsupportedException(name);
 
             var arrayRelation = (ArrayRelation)_relations[name];
-            arrayRelation.AddRelation(relation);
+            arrayRelation.AddInstance(relation.Target);////
         }
 
         // IInstance

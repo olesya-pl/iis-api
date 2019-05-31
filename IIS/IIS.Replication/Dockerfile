@@ -4,20 +4,18 @@ EXPOSE 80
 
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
-COPY IIS.Web/IIS.Web.csproj IIS.Web/
-COPY IIS/IIS.csproj IIS/
 COPY IIS.Replication/IIS.Replication.csproj IIS.Replication/
 COPY IIS.Core/IIS.Core.csproj IIS.Core/
-COPY IIS.Ontology/IIS.Ontology.csproj IIS.Ontology/
-RUN dotnet restore IIS.Web/IIS.Web.csproj
+COPY IIS/IIS.csproj IIS/
+RUN dotnet restore IIS.Replication/IIS.Replication.csproj
 COPY . .
-WORKDIR /src/IIS.Web
-RUN dotnet build IIS.Web.csproj -c Release -o /app
+WORKDIR /src/IIS.Replication
+RUN dotnet build IIS.Replication.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish IIS.Web.csproj -c Release -o /app
+RUN dotnet publish IIS.Replication.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "IIS.Web.dll"]
+ENTRYPOINT ["dotnet", "IIS.Replication.dll"]

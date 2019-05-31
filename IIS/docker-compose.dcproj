@@ -3,8 +3,8 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>{61338CDF-05BA-4023-AB3B-0B4474B47E8C}</ProjectGuid>
-    <DockerLaunchBrowser>false</DockerLaunchBrowser>
+    <ProjectGuid>{F272F4DF-9BD2-4C16-BD6E-EEC34C8052B1}</ProjectGuid>
+    <DockerLaunchBrowser>True</DockerLaunchBrowser>
     <DockerServiceUrl>http://localhost:{ServicePort}</DockerServiceUrl>
     <DockerServiceName>iis.web</DockerServiceName>
   </PropertyGroup>

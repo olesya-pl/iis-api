@@ -11,12 +11,13 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="GraphQL" Version="2.4.0" />
     <PackageReference Include="GraphiQL" Version="1.2.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\IIS\IIS.csproj" />
-    <ProjectReference Include="..\IIS.Replication\IIS.Replication.csproj" />
     <ProjectReference Include="..\IIS.Ontology\IIS.Ontology.csproj" />
+    <ProjectReference Include="..\IIS.Introspection\IIS.Introspection.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\" />

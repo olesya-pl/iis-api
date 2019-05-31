@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using GraphiQl;
 using GraphQL.DataLoader;
 using IIS.Core;
+using IIS.Core.Ontology;
+using IIS.Core.Resolving;
+using IIS.Introspection;
 using IIS.Ontology;
 using IIS.Ontology.EntityFramework;
 using IIS.Ontology.GraphQL;
-using IIS.Replication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 
 namespace IIS.Web
 {
@@ -38,14 +41,26 @@ namespace IIS.Web
             loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<ContourContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
-            services.AddSingleton<IOSchema, OSchemaRepository>();
+            services.AddSingleton<IOSchema, SchemaRepository>();
+            services.AddSingleton<IOntology, OntologyRepository>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQLSchemaProvider>();
             services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
             services.AddSingleton<DataLoaderDocumentListener>();
+            services.AddSingleton<QueueReanimator>();
+
+            services.AddSingleton<IDictionary<string, IRelationResolver>>(s => new Dictionary<string, IRelationResolver>
+            {
+                ["entities"] = null,//new EntitiesResolver(s.GetRequiredService<IOntology>(), s.GetRequiredService<IDataLoaderContextAccessor>()),
+                ["entityRelation"] = null,//new EntityRelationResolver(s.GetRequiredService<IOntology>(), s.GetRequiredService<IDataLoaderContextAccessor>()),
+            });
+
+            // mq
+            var factory = new ConnectionFactory() { HostName = "mq" };
+            services.AddTransient(s => factory);
 
             // search
-            var es = Configuration.GetConnectionString("es");
-            services.AddTransient<IReplicationService>(s => new ReplicationService(es));
+            //var es = Configuration.GetConnectionString("es");
+            //services.AddTransient<IReplicationService>(s => new ReplicationService(es));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

@@ -23,6 +23,16 @@ namespace IIS.Replication
             _elasticClient = new ElasticClient(settings);
         }
 
+        public void IndexEntity(string message)
+        {
+            var json = JObject.Parse(message);
+            var index = json["type"].Value<string>().ToLower();
+            var entity = json["entity"].ToString();
+            var id = json["entity"]["id"].Value<string>();
+            var postData = PostData.String(entity);
+            var indexResponse =  _elasticClient.LowLevel.IndexPut<StringResponse>(index, id, postData);
+        }
+
         public async Task IndexEntityAsync(Entity entity)
         {
             var obj = ToJObject(entity);
@@ -47,9 +57,9 @@ namespace IIS.Replication
                     {
                         var arrRelation = entity.GetArrayRelation(name);
                         var array = new JArray();
-                        foreach (var relation in arrRelation.Relations)
+                        foreach (var target in arrRelation.Instances)
                         {
-                            var attr = (Attribute)relation.Target;
+                            var attr = (Attribute)target;
                             var obj = new JObject();
                             obj.Add("id", JToken.FromObject(attr.Id));
                             obj.Add("value", JToken.FromObject(attr.Value));
@@ -69,9 +79,9 @@ namespace IIS.Replication
                     {
                         var arrayRelation = entity.GetArrayRelation(name);
                         var array = new JArray();
-                        foreach (var relation in arrayRelation.Relations)
+                        foreach (var target in arrayRelation.Instances)
                         {
-                            var iobj = ToJObject((Entity)relation.Target);
+                            var iobj = ToJObject((Entity)target);
                             array.Add(iobj);
                         }
                         prop.Value = array;

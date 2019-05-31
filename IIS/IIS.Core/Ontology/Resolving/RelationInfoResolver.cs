@@ -9,8 +9,8 @@ namespace IIS.Core.Resolving
         public async Task<object> ResolveAsync(ResolveContext context)
         {
             return null;
-            var relation = (Relation)context.Source;
-            return relation.Attributes.Any() ? relation.Attributes : null;
+            //var relation = (Relation)context.Source;
+            //return relation.Attributes.Any() ? relation.Attributes : null;
         }
     }
 
