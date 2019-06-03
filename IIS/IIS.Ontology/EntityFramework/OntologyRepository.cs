@@ -37,57 +37,57 @@ namespace IIS.Ontology.EntityFramework
             return entities;
         }
 
-        public async Task<IDictionary<(long, string), IOntologyNode>> GetEntitiesByAsync(IEnumerable<(long, string)> entityIds)
-        {
-            var schema = _schema = await _schemaProvider.GetRootAsync();
-            var data = await _context.Relations
-                .Where(r => entityIds.Any(e => e.Item1 == r.SourceId && e.Item2 == r.Type.Code))
-                .Include(r => r.Type)
-                .Include(r => r.Target).ThenInclude(t => t.AttributeValues).ThenInclude(a => a.Attribute)
-                .Include(r => r.Source)
-                .ToArrayAsync()
-                ;
-            var types = schema.GetEntities();
-            var entities = data
-                .GroupBy(r => r.SourceId)
-                .Select(r => r.First().Source)
-                .Select(e => MapEntity(types.Single(t => t.Name == e.Type.Code), e));
+        //public async Task<IDictionary<(long, string), IOntologyNode>> GetEntitiesByAsync(IEnumerable<(long, string)> entityIds)
+        //{
+        //    var schema = _schema = await _schemaProvider.GetRootAsync();
+        //    var data = await _context.Relations
+        //        .Where(r => entityIds.Any(e => e.Item1 == r.SourceId && e.Item2 == r.Type.Code))
+        //        .Include(r => r.Type)
+        //        .Include(r => r.Target).ThenInclude(t => t.AttributeValues).ThenInclude(a => a.Attribute)
+        //        .Include(r => r.Source)
+        //        .ToArrayAsync()
+        //        ;
+        //    var types = schema.GetEntities();
+        //    var entities = data
+        //        .GroupBy(r => r.SourceId)
+        //        .Select(r => r.First().Source)
+        //        .Select(e => MapEntity(types.Single(t => t.Name == e.Type.Code), e));
 
-            var nodes = new Dictionary<(long, string), IOntologyNode>();
-            foreach (var entity in entities)
-            {
-                foreach (var relation in entity.RelationNames)
-                {
-                    nodes.Add((entity.Id, relation), entity.GetRelation(relation));
-                }
-            }
+        //    var nodes = new Dictionary<(long, string), IOntologyNode>();
+        //    foreach (var entity in entities)
+        //    {
+        //        foreach (var relation in entity.RelationNames)
+        //        {
+        //            nodes.Add((entity.Id, relation), entity.GetRelation(relation));
+        //        }
+        //    }
 
-            return nodes;
-        }
+        //    return nodes;
+        //}
 
-        public async Task<IDictionary<string, ArrayRelation>> GetEntitiesAsync(IEnumerable<string> typeNames)
-        {
-            var upperNames = typeNames.Select(_ => _.Camelize());
-            var schema = _schema = await _schemaProvider.GetRootAsync();
-            var types = schema.GetEntities();
-            var data = await _context.Entities
-                .Where(e => upperNames.Any(typeName => e.Type.Code == typeName || e.Type.Parent.Code == typeName))
-                .Include(e => e.Type)
-                .Include(e => e.AttributeValues).ThenInclude(a => a.Attribute)
-                .ToArrayAsync();
+        //public async Task<IDictionary<string, ArrayRelation>> GetEntitiesAsync(IEnumerable<string> typeNames)
+        //{
+        //    var upperNames = typeNames.Select(_ => _.Camelize());
+        //    var schema = _schema = await _schemaProvider.GetRootAsync();
+        //    var types = schema.GetEntities();
+        //    var data = await _context.Entities
+        //        .Where(e => upperNames.Any(typeName => e.Type.Code == typeName || e.Type.Parent.Code == typeName))
+        //        .Include(e => e.Type)
+        //        .Include(e => e.AttributeValues).ThenInclude(a => a.Attribute)
+        //        .ToArrayAsync();
 
-            var list = new List<ArrayRelation>();
-            foreach (var group in data.GroupBy(d => d.Type.Code))
-            {
-                var type = types.Single(t => t.Name == group.Key);
-                var constraint = schema.GetConstraint(group.Key.ToLowerCamelcase());
-                var entities = group.Select(e => MapEntity(type, e));
-                var arrayRelation = new ArrayRelation(constraint, entities);
-                list.Add(arrayRelation);
-            }
+        //    var list = new List<ArrayRelation>();
+        //    foreach (var group in data.GroupBy(d => d.Type.Code))
+        //    {
+        //        var type = types.Single(t => t.Name == group.Key);
+        //        var constraint = schema.GetConstraint(group.Key.ToLowerCamelcase());
+        //        var entities = group.Select(e => MapEntity(type, e));
+        //        var arrayRelation = new ArrayRelation(constraint, entities);
+        //        list.Add(arrayRelation);
+        //    }
 
-            return list.ToDictionary(_ => _.Schema.Name);
-        }
+        //    return list.ToDictionary(_ => _.Schema.Name);
+        //}
 
         private Entity MapEntity(TypeEntity type, OEntity srcEntity, int depth = -1)
         {

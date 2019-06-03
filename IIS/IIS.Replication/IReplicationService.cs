@@ -7,8 +7,6 @@ namespace IIS.Replication
     {
         void IndexEntity(string message);
 
-        Task CreateIndexAsync(TypeEntity schema);
-
         Task IndexEntityAsync(Entity entity);
     }
 }

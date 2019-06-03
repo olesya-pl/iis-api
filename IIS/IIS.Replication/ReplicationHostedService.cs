@@ -14,28 +14,26 @@ namespace IIS.Replication
         private readonly ILogger _logger;
         private IConnection _connection;
         private IModel _channel;
-        private readonly IReplicationService _replicationService = new ReplicationService("http://es:9200");
+        private readonly ConnectionFactory _connectionFactory;
+        private readonly IReplicationService _replicationService;
 
-        public ReplicationHostedService(ILoggerFactory loggerFactory)
+        public ReplicationHostedService(ILoggerFactory loggerFactory, ConnectionFactory connectionFactory,
+            IReplicationService replicationService)
         {
             _logger = loggerFactory.CreateLogger<ReplicationHostedService>();
+            _connectionFactory = connectionFactory;
+            _replicationService = replicationService;
             InitRabbitMQ();
         }
 
         private void InitRabbitMQ()
         {
-            var factory = new ConnectionFactory
-            {
-                HostName = "mq",
-                RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
-            };
-
             // create connection  
             while (true)
             {
                 try
                 {
-                    _connection = factory.CreateConnection();
+                    _connection = _connectionFactory.CreateConnection();
                     break;
                 }
                 catch (BrokerUnreachableException ex)

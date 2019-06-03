@@ -8,8 +8,8 @@ namespace IIS.Core.Ontology
     {
         Task<IEnumerable<Entity>> GetEntitiesAsync(string typeName);
 
-        Task<IDictionary<(long, string), IOntologyNode>> GetEntitiesByAsync(IEnumerable<(long, string)> entityIds);
+        //Task<IDictionary<(long, string), IOntologyNode>> GetEntitiesByAsync(IEnumerable<(long, string)> entityIds);
 
-        Task<IDictionary<string, ArrayRelation>> GetEntitiesAsync(IEnumerable<string> typeNames);
+        //Task<IDictionary<string, ArrayRelation>> GetEntitiesAsync(IEnumerable<string> typeNames);
     }
 }

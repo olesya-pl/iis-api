@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core;
-using IIS.Core.Resolving;
 using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Ontology.EntityFramework
@@ -31,17 +30,22 @@ namespace IIS.Ontology.EntityFramework
                 .Include(_ => _.ForwardRestrictions).ThenInclude(_ => _.Type)
                 .Include(_ => _.ForwardRestrictions).ThenInclude(_ => _.Target)
                 .ToArrayAsync();
-                
+
             var schemaType = new TypeEntity("Entities");
-            var attrResolver = new AttributeResolver();
-            var relationInfo = new TypeEntity("RelationInfo");
-            relationInfo.AddAttribute("id", ScalarType.Int, true, false, attrResolver);
-            relationInfo.AddAttribute("startsAt", ScalarType.Date, false, false, attrResolver);
-            relationInfo.AddAttribute("endsAt", ScalarType.Date, false, false, attrResolver);
-            relationInfo.AddAttribute("createdAt", ScalarType.Date, true, false, attrResolver);
-            relationInfo.AddAttribute("isInferred", ScalarType.Int, true, false, attrResolver);
-            _types.Add(relationInfo.Name, relationInfo);
-            schemaType.AddType("_relationInfo", relationInfo, true, true, new RelationInfoResolver());
+            if (_types.ContainsKey("RelationInfo"))
+                schemaType.AddType("_relationInfo", _types["RelationInfo"], true, true, _resolvers["relationInfo"]);
+            else
+            {
+                var attrResolver = _resolvers["attribute"];
+                var relationInfo = new TypeEntity("RelationInfo");
+                relationInfo.AddAttribute("id", ScalarType.Keyword, true, false, attrResolver);
+                relationInfo.AddAttribute("startsAt", ScalarType.Date, false, false, attrResolver);
+                relationInfo.AddAttribute("endsAt", ScalarType.Date, false, false, attrResolver);
+                relationInfo.AddAttribute("createdAt", ScalarType.Date, true, false, attrResolver);
+                relationInfo.AddAttribute("isInferred", ScalarType.Int, true, false, attrResolver);
+                _types.Add(relationInfo.Name, relationInfo);
+                schemaType.AddType("_relationInfo", relationInfo, true, true, _resolvers["relationInfo"]);
+            }
             var resolver = _resolvers["entities"];
             foreach (var item in data)
             {
@@ -63,8 +67,8 @@ namespace IIS.Ontology.EntityFramework
             //typeEntity.Meta.GetValue("index") as JObject : new JObject();
             //var relationResolver = new (this, _contextAccessor);
             var relationInfo = _types["RelationInfo"];
-            type.AddType("_relationInfo", relationInfo, false, false, new RelationInfoResolver());
-            type.AddType("id", new AttributeClass("id", ScalarType.Int), true, false, new AttributeResolver());
+            type.AddType("_relationInfo", relationInfo, false, false, _resolvers["relationInfo"]);
+            type.AddType("id", new AttributeClass("id", ScalarType.Keyword), true, false, _resolvers["attribute"]);
 
             var constraintsByName = typeEntity.ForwardRestrictions.GroupBy(r => r.Type.Code);
             foreach (var constraints in constraintsByName)
@@ -92,7 +96,7 @@ namespace IIS.Ontology.EntityFramework
 
             foreach (var constraint in typeEntity.AttributeRestrictions)
             {
-                var resolver = new AttributeResolver();
+                var resolver = _resolvers["attribute"];
                 type.AddAttribute(
                     constraint.Attribute.Code,
                     constraint.Attribute.Type,

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GraphQL.Types;
 using IIS.Core;
 
-namespace IIS.Ontology.GraphQL
+namespace IIS.Search
 {
     public class GraphQLSchemaProvider : IGraphQLSchemaProvider
     {
@@ -57,7 +57,7 @@ namespace IIS.Ontology.GraphQL
                 var derived = (IObjectGraphType)graphType;
                 var abstractType = (IInterfaceGraphType)CreateType(type.Parent);
                 derived.AddResolvedInterface(abstractType);
-                derived.IsTypeOf = relation => ((Entity)((Relation)relation).Target).IsTypeOf(type);
+                derived.IsTypeOf = relation => true;//((Entity)((Relation)relation).Target).IsTypeOf(type);
             }
             foreach (var constraintName in type.ConstraintNames)
             {

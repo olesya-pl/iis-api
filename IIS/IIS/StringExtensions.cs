@@ -1,4 +1,6 @@
-﻿namespace IIS
+﻿using System.Linq;
+
+namespace IIS
 {
     public static class StringExtensions
     {
@@ -11,5 +13,8 @@
         }
 
         public static string ToLowerCamelcase(this string value) => value.Substring(0, 1).ToLower() + value.Substring(1);
+
+        public static string ToUnderscore(this string str) =>
+            string.Concat(str.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
     }
 }

@@ -4,7 +4,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using IIS.Core;
 
-namespace IIS.Ontology.GraphQL
+namespace IIS.Search
 {
     public class GenericAsyncResolver : AsyncFieldResolver<object>
     {

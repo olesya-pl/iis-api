@@ -18,6 +18,7 @@
     <ProjectReference Include="..\IIS\IIS.csproj" />
     <ProjectReference Include="..\IIS.Ontology\IIS.Ontology.csproj" />
     <ProjectReference Include="..\IIS.Introspection\IIS.Introspection.csproj" />
+    <ProjectReference Include="..\IIS.Search\IIS.Search.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\" />

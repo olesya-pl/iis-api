@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using GraphQL.Types;
 
-namespace IIS.Ontology.GraphQL
+namespace IIS.Search
 {
     public interface IGraphQLSchemaProvider
     {

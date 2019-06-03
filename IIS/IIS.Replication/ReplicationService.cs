@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using IIS.Core;
@@ -105,71 +102,6 @@ namespace IIS.Replication
                 result.Add(prop);
             }
             return result;
-        }
-
-        public async Task CreateIndexAsync(TypeEntity schema)
-        {
-            foreach (var constraintName in schema.ConstraintNames)
-            {
-                if (constraintName == "_relationInfo") continue;
-                var indexName = constraintName.ToLower();
-                var constraint = schema.GetConstraint(constraintName);
-                if (_elasticClient.IndexExists(indexName).Exists)
-                    await _elasticClient.DeleteIndexAsync(indexName); // todo: use update
-                await _elasticClient.CreateIndexAsync(indexName, desc => GetIndexRequest(desc, constraint));
-            }
-        }
-
-        private ICreateIndexRequest GetIndexRequest(CreateIndexDescriptor descriptor, Constraint constraint)
-        {
-            var type = (TypeEntity)constraint.Target;
-            descriptor.Map(d => GetTypeMapping(d, type));
-            return descriptor;
-        }
-
-        private ITypeMapping GetTypeMapping(TypeMappingDescriptor<object> arg, TypeEntity type)
-        {
-            arg.Properties(d => GetPropertiesSelector(d, type, 3));
-            return arg;
-        }
-
-        private IPromise<IProperties> GetPropertiesSelector(PropertiesDescriptor<object> arg, TypeEntity type, int depth)
-        {
-            if (depth == 0) return arg;
-
-            foreach (var constraintName in type.ConstraintNames)
-            {
-                if (type.HasAttribute(constraintName))
-                {
-                    var isIndexed = true;//prop.Value.Value<bool>("_indexed");
-                    var attribute = type.GetAttribute(constraintName);
-                    if (attribute.Type == ScalarType.String) arg.Text(s => s.Name(constraintName).Index(isIndexed));
-                    else if (attribute.Type == ScalarType.Int) arg.Number(s => s.Name(constraintName).Index(isIndexed));
-                    else if (attribute.Type == ScalarType.Date) arg.Date(s => s.Name(constraintName).Index(isIndexed));
-                }
-                else if (type.HasEntity(constraintName))
-                {
-                    var target = type.GetEntity(constraintName);
-                    //var value = map.GetValue(constraintName) as JObject;
-                    arg.Object<object>(d =>
-                        d.Name(constraintName)
-                        .Properties(p => GetPropertiesSelector(p, target, depth - 1))
-                    );
-                }
-                else if (type.HasUnion(constraintName))
-                {
-                    var union = type.GetUnion(constraintName);
-                    //var value = map.GetValue(constraintName) as JObject;
-                    foreach (var target in union.Classes)
-                    {
-                        arg.Object<object>(d =>
-                            d.Name($"{constraintName}_{target.Name}")
-                            .Properties(p => GetPropertiesSelector(p, target, depth - 1))
-                        );
-                    }
-                }
-            }
-            return arg;
         }
     }
 }

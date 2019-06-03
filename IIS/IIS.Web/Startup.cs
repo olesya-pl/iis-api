@@ -9,9 +9,9 @@ using IIS.Core;
 using IIS.Core.Ontology;
 using IIS.Core.Resolving;
 using IIS.Introspection;
-using IIS.Ontology;
 using IIS.Ontology.EntityFramework;
-using IIS.Ontology.GraphQL;
+using IIS.Search;
+using IIS.Search.Resolving;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +20,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Nest;
 using RabbitMQ.Client;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace IIS.Web
 {
@@ -47,20 +49,26 @@ namespace IIS.Web
             services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
             services.AddSingleton<DataLoaderDocumentListener>();
             services.AddSingleton<QueueReanimator>();
-
             services.AddSingleton<IDictionary<string, IRelationResolver>>(s => new Dictionary<string, IRelationResolver>
             {
-                ["entities"] = null,//new EntitiesResolver(s.GetRequiredService<IOntology>(), s.GetRequiredService<IDataLoaderContextAccessor>()),
-                ["entityRelation"] = null,//new EntityRelationResolver(s.GetRequiredService<IOntology>(), s.GetRequiredService<IDataLoaderContextAccessor>()),
+                ["relationInfo"] = null,
+                ["attribute"] = new AttributeResolver(),
+                ["entities"] = new EntitiesResolver(s.GetRequiredService<OntologySearchService>(), s.GetRequiredService<IDataLoaderContextAccessor>()),//new EntitiesResolver(s.GetRequiredService<IOntology>(), s.GetRequiredService<IDataLoaderContextAccessor>()),
+                ["entityRelation"] = new EntityRelationResolver(s.GetRequiredService<OntologySearchService>(), s.GetRequiredService<IDataLoaderContextAccessor>()),
             });
 
             // mq
             var factory = new ConnectionFactory() { HostName = "mq" };
             services.AddTransient(s => factory);
 
+            var es = Configuration.GetConnectionString("es");
+            var node = new Uri(es);
+            var settings = new ConnectionSettings(node)
+                .ThrowExceptions();
+            services.AddSingleton<IElasticClient>(s => new ElasticClient(settings));
+
             // search
-            //var es = Configuration.GetConnectionString("es");
-            //services.AddTransient<IReplicationService>(s => new ReplicationService(es));
+            services.AddTransient<OntologySearchService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
