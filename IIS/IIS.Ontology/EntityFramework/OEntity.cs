@@ -12,8 +12,8 @@ namespace IIS.Ontology.EntityFramework
             BackwardRelations = new HashSet<ORelation>();
         }
 
-        public long Id { get; set; }
-        public int TypeId { get; set; }
+        public Guid Id { get; set; }
+        public Guid TypeId { get; set; }
         public DateTime UpdatedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }

@@ -1,8 +1,12 @@
 version: '3.4'
 
 services:
-  iis.web:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "80"
+    iis.web:
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        ports:
+            - "80"
+
+    iis.replication:
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development

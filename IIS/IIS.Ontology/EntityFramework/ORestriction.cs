@@ -6,10 +6,10 @@ namespace IIS.Ontology.EntityFramework
 {
     public partial class ORestriction
     {
-        public int Id { get; set; }
-        public int RelationTypeId { get; set; }
-        public int SourceId { get; set; }
-        public int TargetId { get; set; }
+        public Guid Id { get; set; }
+        public Guid RelationTypeId { get; set; }
+        public Guid SourceId { get; set; }
+        public Guid TargetId { get; set; }
         public JObject Meta { get; set; }
 
         public virtual OTypeEntity Source { get; set; }

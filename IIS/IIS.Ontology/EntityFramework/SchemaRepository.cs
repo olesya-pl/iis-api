@@ -99,7 +99,7 @@ namespace IIS.Ontology.EntityFramework
                 var resolver = _resolvers["attribute"];
                 type.AddAttribute(
                     constraint.Attribute.Code,
-                    constraint.Attribute.Type,
+                    constraint.Attribute.Kind,
                     constraint.IsRequired, 
                     constraint.IsMultiple, 
                     resolver);

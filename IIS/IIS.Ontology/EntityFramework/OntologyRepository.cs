@@ -20,10 +20,11 @@ namespace IIS.Ontology.EntityFramework
             _schemaProvider = schema ?? throw new ArgumentNullException(nameof(schema));
         }
 
-        public async Task<IEnumerable<Entity>> GetEntitiesAsync(string typeName)
+        public async Task<IEnumerable<Entity>> GetEntitiesAsync(string typeName, int limit = int.MaxValue, int offset = 0)
         {
             var data = await _context.Entities
                 .Where(e => e.Type.Code == typeName || e.Type.Parent.Code == typeName)
+                .Skip(offset).Take(limit)
                 .Include(e => e.Type)
                 .Include(e => e.AttributeValues).ThenInclude(a => a.Attribute)
                 .Include(e => e.ForwardRelations).ThenInclude(e => e.Target).ThenInclude(e => e.Type)

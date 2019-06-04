@@ -57,12 +57,18 @@ namespace IIS.Web
                 ["entityRelation"] = new EntityRelationResolver(s.GetRequiredService<OntologySearchService>(), s.GetRequiredService<IDataLoaderContextAccessor>()),
             });
 
-            // mq
-            var factory = new ConnectionFactory() { HostName = "mq" };
+            var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
+            var factory = new ConnectionFactory
+            {
+                HostName = mq.Host,
+                UserName = mq.Username,
+                Password = mq.Password,
+                RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
+            };
             services.AddTransient(s => factory);
 
-            var es = Configuration.GetConnectionString("es");
-            var node = new Uri(es);
+            var es = Configuration.GetSection("es").Get<EsConfiguration>();
+            var node = new Uri(es.Host);
             var settings = new ConnectionSettings(node)
                 .ThrowExceptions();
             services.AddSingleton<IElasticClient>(s => new ElasticClient(settings));
@@ -80,11 +86,23 @@ namespace IIS.Web
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseDeveloperExceptionPage();
 
             app.UseGraphiQl("/graphiql", "/api/graph");
 
             app.UseMvc();
         }
+    }
+
+    public class MqConfiguration
+    {
+        public string Host { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+    public class EsConfiguration
+    {
+        public string Host { get; set; }
     }
 
     public class TraceLogger : ILogger

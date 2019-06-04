@@ -114,8 +114,12 @@ namespace IIS.Web.Controllers
                     var attribute = type.GetAttribute(constraintName);
                     if (attribute.Type == ScalarType.String) arg.Text(s => s.Name(constraintName).Index(isIndexed));
                     else if (attribute.Type == ScalarType.Int) arg.Number(s => s.Name(constraintName).Index(isIndexed));
+                    else if (attribute.Type == ScalarType.Decimal) arg.Number(s => s.Name(constraintName).Index(isIndexed));
                     else if (attribute.Type == ScalarType.Keyword) arg.Keyword(s => s.Name(constraintName).Index(isIndexed));
                     else if (attribute.Type == ScalarType.Date) arg.Date(s => s.Name(constraintName).Index(isIndexed));
+                    else if (attribute.Type == ScalarType.Boolean) arg.Boolean(s => s.Name(constraintName).Index(isIndexed));
+                    else if (attribute.Type == ScalarType.Geo) arg.GeoShape(s => s.Name(constraintName));
+                    else arg.Text(s => s.Name(constraintName).Index(isIndexed));
                 }
                 else if (type.HasEntity(constraintName))
                 {

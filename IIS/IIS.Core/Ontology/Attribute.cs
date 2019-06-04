@@ -8,14 +8,14 @@ namespace IIS.Core
     public class Attribute : IInstance
     {
         public AttributeClass Schema { get; }
-        public long Id { get; }
+        public Guid Id { get; }
         public object Value { get; }
 
-        public Attribute(AttributeClass schema, object value = null, long id = 0)
+        public Attribute(AttributeClass schema, object value = null, Guid? id = null)
         {
             Schema = schema ?? throw new ArgumentNullException(nameof(schema));
             Value = value;
-            Id = id;
+            Id = id == null ? Guid.Empty : id.Value;
         }
 
         // IInstance

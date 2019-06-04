@@ -6,7 +6,7 @@ namespace IIS.Core.Ontology
 {
     public interface IOntology
     {
-        Task<IEnumerable<Entity>> GetEntitiesAsync(string typeName);
+        Task<IEnumerable<Entity>> GetEntitiesAsync(string typeName, int limit = 0, int offset = 0);
 
         //Task<IDictionary<(long, string), IOntologyNode>> GetEntitiesByAsync(IEnumerable<(long, string)> entityIds);
 

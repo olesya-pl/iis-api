@@ -12,7 +12,7 @@ namespace IIS.Ontology.EntityFramework
             Restrictions = new HashSet<OAttributeRestriction>();
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Code { get; set; }
         public JObject Meta { get; set; }
@@ -27,6 +27,15 @@ namespace IIS.Ontology.EntityFramework
             {
                 var meta = Meta["validation"]?["required"];
                 return meta != null && meta.Value<bool>();
+            }
+        }
+
+        public ScalarType Kind
+        {
+            get
+            {
+                var meta = Meta["kind"];
+                return meta == null ? Type : (ScalarType)meta.Value<string>();
             }
         }
     }

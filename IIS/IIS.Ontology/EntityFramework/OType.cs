@@ -12,13 +12,13 @@ namespace IIS.Ontology.EntityFramework
             DerivedTypes = new HashSet<OType>();
         }
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Code { get; set; }
         public bool IsAbstract { get; set; }
         public JObject Meta { get; set; }
         public EntityKind Kind { get; set; }
-        public int? ParentId { get; set; }
+        public Guid? ParentId { get; set; }
 
         public virtual ICollection<OAttributeRestriction> AttributeRestrictions { get; set; }
         public virtual OType Parent { get; set; }

@@ -6,9 +6,9 @@ namespace IIS.Ontology.EntityFramework
 {
     public partial class OAttributeRestriction
     {
-        public int Id { get; set; }
-        public int TypeId { get; set; }
-        public int AttributeId { get; set; }
+        public Guid Id { get; set; }
+        public Guid TypeId { get; set; }
+        public Guid AttributeId { get; set; }
         public JObject Meta { get; set; }
 
         public virtual OAttribute Attribute { get; set; }

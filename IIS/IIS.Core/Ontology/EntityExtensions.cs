@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace IIS.Core
@@ -11,7 +12,7 @@ namespace IIS.Core
             entity.SetRelation(new Relation(type.GetConstraint(name), new Attribute(type.GetAttribute(name), value)));
         }
 
-        public static void AddAttribute(this Entity entity, string name, object value, long id)
+        public static void AddAttribute(this Entity entity, string name, object value, Guid id)
         {
             var type = entity.Schema;
             var relation = new Relation(type.GetConstraint(name), new Attribute(type.GetAttribute(name), value, id));

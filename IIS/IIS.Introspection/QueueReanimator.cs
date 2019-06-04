@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IIS.Core;
@@ -36,28 +37,33 @@ namespace IIS.Introspection
                     var root = await _schema.GetRootAsync();
                     foreach (var type in root.GetEntities())
                     {
-                        var entities = await _ontology.GetEntitiesAsync(type.Name);
-
-                        foreach (var entity in entities)
+                        var limit = 20;
+                        for (int offset = 0; ; offset += limit)
                         {
-                            var stringBuilder = new StringBuilder();
-                            var textWriter = new StringWriter(stringBuilder);
-                            var jsonWriter = new JsonTextWriter(textWriter);
-                            var writer = new JsonOntologyWriter(jsonWriter);
-                            jsonWriter.WriteStartObject();
-                            jsonWriter.WritePropertyName("type");
-                            jsonWriter.WriteValue(entity.Schema.Name);
-                            jsonWriter.WritePropertyName("entity");
-                            entity.AcceptVisitor(writer);
-                            jsonWriter.WriteEndObject();
+                            var entities = await _ontology.GetEntitiesAsync(type.Name, limit, offset);
+                            if (!entities.Any()) break;
+                            foreach (var entity in entities)
+                            {
+                                var typeName = type.HasParent ? (type.Parent.Name + type.Name).ToUnderscore() : type.Name.ToUnderscore();
+                                var stringBuilder = new StringBuilder();
+                                var textWriter = new StringWriter(stringBuilder);
+                                var jsonWriter = new JsonTextWriter(textWriter);
+                                var writer = new JsonOntologyWriter(jsonWriter);
+                                jsonWriter.WriteStartObject();
+                                jsonWriter.WritePropertyName("type");
+                                jsonWriter.WriteValue(typeName);
+                                jsonWriter.WritePropertyName("entity");
+                                entity.AcceptVisitor(writer);
+                                jsonWriter.WriteEndObject();
 
-                            var message = stringBuilder.ToString();
+                                var message = stringBuilder.ToString();
 
-                            var body = Encoding.UTF8.GetBytes(message);
-                            channel.BasicPublish(exchange: "",
-                                                 routingKey: "entities",
-                                                 basicProperties: null,
-                                                 body: body);
+                                var body = Encoding.UTF8.GetBytes(message);
+                                channel.BasicPublish(exchange: "",
+                                                     routingKey: "entities",
+                                                     basicProperties: null,
+                                                     body: body);
+                            }
                         }
                     }
                 }

@@ -5,9 +5,9 @@ namespace IIS.Ontology.EntityFramework
 {
     public partial class OAttributeValue
     {
-        public long Id { get; set; }
-        public long EntityId { get; set; }
-        public int AttributeId { get; set; }
+        public Guid Id { get; set; }
+        public Guid EntityId { get; set; }
+        public Guid AttributeId { get; set; }
         public string Value { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
