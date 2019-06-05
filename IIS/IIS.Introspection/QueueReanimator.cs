@@ -35,39 +35,43 @@ namespace IIS.Introspection
                                  autoDelete: false,
                                  arguments: null);
                     var root = await _schema.GetRootAsync();
-                    foreach (var type in root.GetEntities())
-                    {
-                        var limit = 20;
-                        for (int offset = 0; ; offset += limit)
-                        {
-                            var entities = await _ontology.GetEntitiesAsync(type.Name, limit, offset);
-                            if (!entities.Any()) break;
-                            foreach (var entity in entities)
-                            {
-                                var typeName = type.HasParent ? (type.Parent.Name + type.Name).ToUnderscore() : type.Name.ToUnderscore();
-                                var stringBuilder = new StringBuilder();
-                                var textWriter = new StringWriter(stringBuilder);
-                                var jsonWriter = new JsonTextWriter(textWriter);
-                                var writer = new JsonOntologyWriter(jsonWriter);
-                                jsonWriter.WriteStartObject();
-                                jsonWriter.WritePropertyName("type");
-                                jsonWriter.WriteValue(typeName);
-                                jsonWriter.WritePropertyName("entity");
-                                entity.AcceptVisitor(writer);
-                                jsonWriter.WriteEndObject();
-
-                                var message = stringBuilder.ToString();
-
-                                var body = Encoding.UTF8.GetBytes(message);
-                                channel.BasicPublish(exchange: "",
-                                                     routingKey: "entities",
-                                                     basicProperties: null,
-                                                     body: body);
-                            }
-                        }
-                    }
+                    var typesToReplication = root.GetEntities().Where(e => !e.IsAbstract && e.Parent?.Name != "ObjectSign"); // tmp
+                    var tasks = typesToReplication.Select(type => RestoreForType(type, channel));
+                    await Task.WhenAll(tasks);
                 }
             }
+        }
+
+        private async Task RestoreForType(TypeEntity type, IModel channel)
+        {
+            var entities = await _ontology.GetEntitiesAsync(type.Name);//, limit, offset
+            foreach (var entity in entities)
+            {
+                var typeName = type.HasParent ? (type.Parent.Name + type.Name).ToUnderscore() : type.Name.ToUnderscore();
+                var stringBuilder = new StringBuilder();
+                var textWriter = new StringWriter(stringBuilder);
+                var jsonWriter = new JsonTextWriter(textWriter);
+                var writer = new JsonOntologyWriter(jsonWriter);
+                jsonWriter.WriteStartObject();
+                jsonWriter.WritePropertyName("type");
+                jsonWriter.WriteValue(typeName);
+                jsonWriter.WritePropertyName("entity");
+                entity.AcceptVisitor(writer);
+                jsonWriter.WriteEndObject();
+
+                var message = stringBuilder.ToString();
+
+                var body = Encoding.UTF8.GetBytes(message);
+                channel.BasicPublish(exchange: "",
+                                     routingKey: "entities",
+                                     basicProperties: null,
+                                     body: body);
+            }
+            //var limit = 550;
+            //for (int offset = 0; ; offset += limit)
+            //{
+
+            //}
         }
     }
 }

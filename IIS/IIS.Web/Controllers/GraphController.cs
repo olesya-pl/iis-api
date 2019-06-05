@@ -82,23 +82,23 @@ namespace IIS.Web.Controllers
                 if (constraintName == "_relationInfo") continue;
                 var constraint = schema.GetConstraint(constraintName);
                 var type = (TypeEntity)constraint.Target;
+                if (type.IsAbstract || type.Parent?.Name == "ObjectSign") continue; // tmp
                 var indexName = type.HasParent ? (type.Parent.Name + type.Name).ToUnderscore() : type.Name.ToUnderscore();
                 if (_elasticClient.IndexExists(indexName).Exists)
                     await _elasticClient.DeleteIndexAsync(indexName); // todo: use update
-                await _elasticClient.CreateIndexAsync(indexName, desc => GetIndexRequest(desc, constraint));
+                await _elasticClient.CreateIndexAsync(indexName, desc => GetIndexRequest(desc, type));
             }
         }
 
-        private ICreateIndexRequest GetIndexRequest(CreateIndexDescriptor descriptor, Constraint constraint)
+        private ICreateIndexRequest GetIndexRequest(CreateIndexDescriptor descriptor, TypeEntity type)
         {
-            var type = (TypeEntity)constraint.Target;
             descriptor.Map(d => GetTypeMapping(d, type));
             return descriptor;
         }
 
         private ITypeMapping GetTypeMapping(TypeMappingDescriptor<object> arg, TypeEntity type)
         {
-            arg.Properties(d => GetPropertiesSelector(d, type, 3));
+            arg.Properties(d => GetPropertiesSelector(d, type, 2));
             return arg;
         }
 
@@ -112,7 +112,7 @@ namespace IIS.Web.Controllers
                 {
                     var isIndexed = true;//prop.Value.Value<bool>("_indexed");
                     var attribute = type.GetAttribute(constraintName);
-                    if (attribute.Type == ScalarType.String) arg.Text(s => s.Name(constraintName).Index(isIndexed));
+                    if (attribute.Type == ScalarType.String) arg.Text(s => s.Name(constraintName).Analyzer("ukrainian").Index(isIndexed));
                     else if (attribute.Type == ScalarType.Int) arg.Number(s => s.Name(constraintName).Index(isIndexed));
                     else if (attribute.Type == ScalarType.Decimal) arg.Number(s => s.Name(constraintName).Index(isIndexed));
                     else if (attribute.Type == ScalarType.Keyword) arg.Keyword(s => s.Name(constraintName).Index(isIndexed));

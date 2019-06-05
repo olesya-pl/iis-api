@@ -23,13 +23,30 @@ namespace IIS.Ontology.EntityFramework
         public async Task<IEnumerable<Entity>> GetEntitiesAsync(string typeName, int limit = int.MaxValue, int offset = 0)
         {
             var data = await _context.Entities
-                .Where(e => e.Type.Code == typeName || e.Type.Parent.Code == typeName)
-                .Skip(offset).Take(limit)
+                .Where(e => e.Type.Code == typeName && e.DeletedAt == null)
                 .Include(e => e.Type)
                 .Include(e => e.AttributeValues).ThenInclude(a => a.Attribute)
                 .Include(e => e.ForwardRelations).ThenInclude(e => e.Target).ThenInclude(e => e.Type)
                 .Include(e => e.ForwardRelations).ThenInclude(e => e.Target).ThenInclude(e => e.AttributeValues).ThenInclude(e => e.Attribute)
+                //.Skip(offset).Take(limit)
                 .ToArrayAsync();
+
+            if (!data.Any()) return Enumerable.Empty<Entity>();
+
+            data = data
+                .Select(e =>
+                {
+                    e.AttributeValues = e.AttributeValues.Where(a => a.DeletedAt == null).ToArray();
+                    e.ForwardRelations = e.ForwardRelations.Where(r => r.DeletedAt == null)
+                    .Select(fr =>
+                    {
+                        fr.Target.AttributeValues = fr.Target.AttributeValues.Where(a => a.DeletedAt == null).ToArray();
+                        return fr;
+                    })
+                    .ToArray();
+                    return e;
+                })
+                .ToArray();
             var schema = _schema = await _schemaProvider.GetRootAsync();
             var types = schema.GetEntities();
             var entities = data.Select(e => MapEntity(types.Single(t => t.Name == typeName), e, 3))
@@ -141,15 +158,17 @@ namespace IIS.Ontology.EntityFramework
                     if (group == null) continue;
 
                     var constraint = type.GetConstraint(constraintName);
-                    var union = new Union((UnionClass)constraint.Target);
+                    var unionClass = (UnionClass)constraint.Target;
+                    var union = new Union(unionClass);
+                    // non array
+                    var relation = group.Single();
+                    var newSrcEntity = relation.Target;
+                    var newSrcEntityType = unionClass.Classes.Single(u => u.Name == newSrcEntity.Type.Code);
+                    var targetEntity = MapEntity(newSrcEntityType, newSrcEntity, depth - 1);
+                    if (targetEntity is null) continue;
+                    union.AddEntity(targetEntity);
+                    entity.SetRelation(new Relation(constraint, union));
                     // todo: GetRelationInfo(e)
-                    foreach (var relation in group)
-                    {
-                        var targetEntity = MapEntity((TypeEntity)constraint.Target, relation.Target, depth - 1);
-                        if (targetEntity is null) continue;
-                        union.AddEntity(targetEntity);
-                        entity.SetRelation(new Relation(constraint, union));
-                    }
                 }
             }
             return entity;
