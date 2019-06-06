@@ -7,3 +7,5 @@ or `dotnet IIS.Replication.dll server.urls=http://localhost:PORT/` where any POR
 You can run it in detached mode or use tools like supervisor to start/stop services.
 web is on port 5000 by default.
 replication is on port 5500. Look at console output to find out which port is used.
+
+To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html)
