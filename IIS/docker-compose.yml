@@ -1,7 +1,8 @@
-version: '3.4'
+version: '3.6'
 
 services:
     iis.web:
+        container_name: iis.web
         build:
             context: .
             dockerfile: IIS.Web/Dockerfile
@@ -11,9 +12,12 @@ services:
             - es
         ports:
             - 5000:80
+        networks:
+            - iis-network
         restart: always
     
     iis.replication:
+        container_name: iis.replication
         build:
             context: .
             dockerfile: IIS.Replication/Dockerfile
@@ -21,28 +25,59 @@ services:
             - mq
         ports:
             - 5500:80
+        networks:
+            - iis-network
         restart: always
     
     db:
+        container_name: iis.db
         image: postgres:latest
         ports:
             - 5432:5432
+        networks:
+            - iis-network
         volumes:
             - ../data_storage/postgres-data:/var/lib/postgresql/data
         restart: always
   
     mq:
+        container_name: iis.mq
         image: rabbitmq:latest
+        networks:
+            - iis-network
         volumes:
             - ../data_storage/rabbitmq-data:/var/lib/rabbitmq
         restart: always
 
     es:
-        image: elasticsearch:7.0.1
+        container_name: iis.es
+        image: elasticsearch:iis
+        build:
+            context: .
+            dockerfile: ElasticSearch/Dockerfile
         environment:
             - discovery.type=single-node
         volumes:
             - ../data_storage/elasticsearch-data:/usr/share/elasticsearch/data
         ports:
             - 9200:9200
+        networks:
+            - iis-network
         restart: always
+    
+    kibana:
+        container_name: iis.kibana
+        image: kibana:7.1.1
+        ports:
+            - 5601:5601
+        networks:
+            - iis-network
+        depends_on:
+            - es
+        environment:
+            ELASTICSEARCH_HOSTS: http://es:9200
+            
+networks:
+  iis-network:
+    external: false
+    name: iis-network

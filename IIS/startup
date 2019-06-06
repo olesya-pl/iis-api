@@ -1,0 +1,15 @@
+#!/bin/bash
+echo "Current directory is:"
+pwd
+
+RED='\033[0;32m'
+NC='\033[0m' # No Color
+
+dotnet publish IIS.Web/IIS.Web.csproj -o ../publish/web
+echo -e "${RED}Web has been published${NC}"
+
+dotnet publish IIS.Replication/IIS.Replication.csproj -o ../publish/replication
+echo -e "${RED}Replication has been published${NC}"
+
+export ASPNETCORE_ENVIRONMENT=Staging
+echo -e "${RED}Environment set to Staging${NC}"

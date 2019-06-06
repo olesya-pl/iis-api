@@ -39,7 +39,7 @@ namespace IIS.Replication
                 catch (BrokerUnreachableException ex)
                 {
                     var timeout = 5000;
-                    _logger.LogError(ex, $"Attempting to connect again in {timeout / 1000} sec.");
+                    _logger.LogError($"Attempting to connect again in {timeout / 1000} sec.");
                     Thread.Sleep(timeout);
                 }
             }
@@ -53,6 +53,7 @@ namespace IIS.Replication
                  exclusive: false,
                  autoDelete: false,
                  arguments: null);
+
             //_channel.QueueBind("demo.queue.log", "demo.exchange", "demo.queue.*", null);
             //_channel.BasicQos(0, 1, false);
 
@@ -70,8 +71,9 @@ namespace IIS.Replication
                 var message = System.Text.Encoding.UTF8.GetString(ea.Body);
                 _logger.LogInformation(message);
                 _replicationService.IndexEntity(message);
+                _channel.BasicAck(ea.DeliveryTag, false);
+
                 _logger.LogInformation("*********SAVED********");
-                //_channel.BasicAck(ea.DeliveryTag, false);
             };
 
             //consumer.Shutdown += OnConsumerShutdown;
@@ -80,7 +82,7 @@ namespace IIS.Replication
             //consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
 
             _channel.BasicConsume(queue: "entities",
-                                 autoAck: true,
+                                 autoAck: false,
                                  consumer: consumer);
 
             return Task.CompletedTask;
