@@ -70,10 +70,17 @@ namespace IIS.Replication
                 // received message  
                 var message = System.Text.Encoding.UTF8.GetString(ea.Body);
                 _logger.LogInformation(message);
-                _replicationService.IndexEntity(message);
-                _channel.BasicAck(ea.DeliveryTag, false);
-
-                _logger.LogInformation("*********SAVED********");
+                try
+                {
+                    _replicationService.IndexEntity(message);
+                    _channel.BasicAck(ea.DeliveryTag, false);
+                    _logger.LogInformation("*********SAVED********");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "");
+                    throw;
+                }
             };
 
             //consumer.Shutdown += OnConsumerShutdown;
