@@ -8,4 +8,6 @@ You can run it in detached mode or use tools like supervisor to start/stop servi
 web is on port 5000 by default.
 replication is on port 5500. Look at console output to find out which port is used.
 
-To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html)
+To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html) or `pm2`. 
+To change configuration find `IIS/publish/replication/appsettings.${ENV}.json` file and `IIS/publish/web/appsettings.${ENV}.json`. 
+`${ENV}` is env name and equals to the value of env variable `ASPNETCORE_ENVIRONMENT` (in our case `Staging`)
