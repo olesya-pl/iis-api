@@ -31,10 +31,12 @@ namespace IIS.Core.Ontology
 
     public class AttributeType : Type
     {
-        public AttributeType(Guid id, string name)
+        public string ScalarType { get; }
+
+        public AttributeType(Guid id, string name, string scalarType)
             : base(id, name)
         {
-
+            ScalarType = scalarType;
         }
     }
 

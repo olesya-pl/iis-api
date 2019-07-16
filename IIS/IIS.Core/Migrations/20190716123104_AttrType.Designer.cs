@@ -3,15 +3,17 @@ using System;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20190716123104_AttrType")]
+    partial class AttrType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,8 +84,6 @@ namespace IIS.Core.Migrations
                 {
                     b.Property<Guid>("Id");
 
-                    b.Property<bool>("IsArray");
-
                     b.Property<int>("Kind");
 
                     b.Property<Guid>("SourceTypeId");
@@ -136,7 +136,7 @@ namespace IIS.Core.Migrations
             modelBuilder.Entity("IIS.Core.Ontology.EntityFramework.Context.AttributeType", b =>
                 {
                     b.HasOne("IIS.Core.Ontology.EntityFramework.Context.Type", "Type")
-                        .WithOne("AttributeType")
+                        .WithOne()
                         .HasForeignKey("IIS.Core.Ontology.EntityFramework.Context.AttributeType", "Id")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

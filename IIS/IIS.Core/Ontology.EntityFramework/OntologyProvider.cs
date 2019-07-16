@@ -33,7 +33,8 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             if (type.Kind == Kind.Attribute)
             {
-                var attr = new AttributeType(type.Id, type.Name);
+                var attributeType = type.AttributeType;
+                var attr = new AttributeType(type.Id, type.Name, attributeType.ScalarType.ToString());
                 return attr;
             }
             if (type.Kind == Kind.Entity)
@@ -53,11 +54,10 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             var type = relationType.Type;
             var isRequired = false; // todo: map from type.Meta
-            var isArray = false; // todo: map from type.Meta
             var relation = default(RelationType);
             if (relationType.Kind == RelationKind.Embedding)
             {
-                relation = new EmbeddingRelationType(type.Id, type.Name, isRequired, isArray);
+                relation = new EmbeddingRelationType(type.Id, type.Name, isRequired, relationType.IsArray);
                 var target = MapType(relationType.TargetType);
                 relation.AddType(target);
             }

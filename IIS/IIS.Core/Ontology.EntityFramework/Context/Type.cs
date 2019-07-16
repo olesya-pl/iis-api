@@ -18,6 +18,8 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual ICollection<RelationType> IncomingRelations { get; set; } = new List<RelationType>();
         public virtual ICollection<RelationType> OutgoingRelations { get; set; } = new List<RelationType>();
         public virtual ICollection<Node> Nodes { get; set; } = new List<Node>();
+
+        public virtual AttributeType AttributeType { get; set; }
     }
 
     public enum Kind { Entity, Relation, Attribute }

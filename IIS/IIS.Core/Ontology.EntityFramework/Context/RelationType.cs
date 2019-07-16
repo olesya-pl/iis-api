@@ -6,6 +6,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
     {
         public Guid Id { get; set; }
         public RelationKind Kind { get; set; }
+        public bool IsArray { get; set; }
         public Guid SourceTypeId { get; set; }
         public Guid TargetTypeId { get; set; }
 

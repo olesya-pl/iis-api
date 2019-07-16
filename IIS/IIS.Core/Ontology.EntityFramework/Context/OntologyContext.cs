@@ -10,9 +10,10 @@ namespace IIS.Core.Ontology.EntityFramework.Context
 
         public virtual DbSet<Type> Types { get; set; }
         public virtual DbSet<RelationType> RelationTypes { get; set; }
+        public virtual DbSet<AttributeType> AttributeTypes { get; set; }
         public virtual DbSet<Node> Nodes { get; set; }
-        public virtual DbSet<Attribute> Attributes { get; set; }
         public virtual DbSet<Relation> Relations { get; set; }
+        public virtual DbSet<Attribute> Attributes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +21,12 @@ namespace IIS.Core.Ontology.EntityFramework.Context
             relationType.HasOne(p => p.Type)
                 .WithOne()
                 .HasForeignKey<RelationType>(p => p.Id)
+                ;
+
+            var attributeType = modelBuilder.Entity<AttributeType>();
+            attributeType.HasOne(p => p.Type)
+                .WithOne(p => p.AttributeType)
+                .HasForeignKey<AttributeType>(p => p.Id)
                 ;
 
             var type = modelBuilder.Entity<Type>();
