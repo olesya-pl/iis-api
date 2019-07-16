@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using HotChocolate;
+using HotChocolate.AspNetCore;
+using IIS.Core.GraphQL;
 using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.Ontology;
 using IIS.Core.Ontology;
@@ -26,7 +29,7 @@ namespace IIS.Core
         {
             Configuration = configuration;
         }
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -49,6 +52,9 @@ namespace IIS.Core
             };
             services.AddTransient(s => factory);
             
+            services.AddGraphQL(GraphQlSchemaProvider.GetSchema);
+
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -60,6 +66,9 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             app.UseDeveloperExceptionPage();
+            
+            app.UseGraphQL();
+            app.UsePlayground();
 
             app.UseMvc();
 

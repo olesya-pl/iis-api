@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Types;
+using HotChocolate;
 
 namespace IIS.Core.GraphQL
 {
