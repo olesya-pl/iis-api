@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using IIS.Core.GraphQL;
+using IIS.Core.GraphQL.Ontology;
 using IIS.Core.Ontology;
-using IIS.Core.Schema;
-using IIS.Introspection;
-using IIS.Ontology.EntityFramework;
-using IIS.Schema.EntityFramework;
+using IIS.Core.Ontology.EntityFramework;
+using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +26,7 @@ namespace IIS.Core
         {
             Configuration = configuration;
         }
-
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -34,18 +34,11 @@ namespace IIS.Core
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
-            services.AddDbContext<ContourContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
-            services.AddTransient<ISchemaProvider, SchemaProvider>();
-            services.AddSingleton<IOSchema, SchemaRepository>();
-            services.AddSingleton<IOntology, OntologyRepository>();
-            services.AddSingleton<IDictionary<string, IRelationResolver>>(s => new Dictionary<string, IRelationResolver>
-            {
-                ["relationInfo"] = null,
-                ["attribute"] = null,
-                ["entities"] = null,
-                ["entityRelation"] = null,
-            });
-            services.AddSingleton<QueueReanimator>();
+            services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
+            services.AddTransient<IOntologyProvider, OntologyProvider>();
+            services.AddSingleton<IGraphQLSchemaProvider, GraphQLSchemaProvider>();
+            services.AddSingleton<IOntologyService, OntologyService>();
+            //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
             var factory = new ConnectionFactory
             {
@@ -55,12 +48,12 @@ namespace IIS.Core
                 RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
             };
             services.AddTransient(s => factory);
-
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, OntologyContext context)
         {
             if (env.IsDevelopment())
             {
@@ -69,6 +62,9 @@ namespace IIS.Core
             app.UseDeveloperExceptionPage();
 
             app.UseMvc();
+
+            // MIGRATION IS APPLIED HERE
+            context.Database.Migrate();
         }
     }
 

@@ -5,6 +5,12 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
@@ -16,11 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="GraphQL\" />
+    <Folder Include="GraphQL.Ontology\" />
     <Folder Include="Ontology\" />
     <Folder Include="Ontology.EntityFramework\" />
-    <Folder Include="Schema\" />
-    <Folder Include="Schema.EntityFramework\" />
-    <Folder Include="Controllers\" />
+    <Folder Include="Ontology.EntityFramework\Context\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IIS\IIS.csproj" />
