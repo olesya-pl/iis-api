@@ -12,7 +12,7 @@ namespace IIS.Core.Ontology
 
         public Guid Id { get; }
         public string Name { get; }
-        public string Title { get; }
+        public string Title { get; set; }
         public JObject Meta { get; }
         public DateTime CreatedAt { get; }
         public DateTime UpdatedAt { get; }
@@ -61,16 +61,15 @@ namespace IIS.Core.Ontology
         }
     }
 
+    public enum EmbeddingOptions { Optional, Required, Multiple }
     public class EmbeddingRelationType : RelationType
     {
-        public bool IsRequired;
-        public bool IsArray;
+        public EmbeddingOptions EmbeddingOptions { get; }
 
-        public EmbeddingRelationType(Guid id, string name, bool isRequired, bool isArray)
+        public EmbeddingRelationType(Guid id, string name, EmbeddingOptions embeddingOptions)
             : base(id, name)
         {
-            IsRequired = isRequired;
-            IsArray = isArray;
+            EmbeddingOptions = embeddingOptions;
         }
     }
 

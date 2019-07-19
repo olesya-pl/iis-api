@@ -53,11 +53,11 @@ namespace IIS.Core.Ontology.EntityFramework
         private static RelationType MapRelation(Context.RelationType relationType)
         {
             var type = relationType.Type;
-            var isRequired = false; // todo: map from type.Meta
+            //var isRequired = false; // todo: map from type.Meta
             var relation = default(RelationType);
             if (relationType.Kind == RelationKind.Embedding)
             {
-                relation = new EmbeddingRelationType(type.Id, type.Name, isRequired, relationType.IsArray);
+                relation = new EmbeddingRelationType(type.Id, type.Name, EmbeddingOptions.Optional);
                 var target = MapType(relationType.TargetType);
                 relation.AddType(target);
             }
