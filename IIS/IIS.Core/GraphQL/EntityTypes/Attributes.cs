@@ -1,7 +1,9 @@
 using System;
 using HotChocolate;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Ontology;
+using Newtonsoft.Json.Linq;
 using Attribute = IIS.Core.Ontology.Attribute;
 
 namespace IIS.Core.GraphQL.EntityTypes
@@ -44,50 +46,60 @@ namespace IIS.Core.GraphQL.EntityTypes
         string Format { get; }
         // TODO: formField: JSON
         // TODO: validation: JSON
+        string MetaString { get; }
+        [GraphQLType(typeof(JsonScalarType))] JObject Meta { get; }
     }
 
-    public class EntityAttributePrimitive : IEntityAttribute
+    public abstract class EntityAttributeBase : IEntityAttribute
     {
         protected EmbeddingRelationType Source { get; }
-
-        public EntityAttributePrimitive(EmbeddingRelationType source)
+        
+        public EntityAttributeBase(EmbeddingRelationType source)
         {
             Source = source;
         }
-        
+
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
 
         [GraphQLType(typeof(EntityAttributeTypeEnum))]
-        public string Type => Source.AttributeType.ScalarType; //Source.Attribute.Type.ToString();
-            
+        public abstract string Type { get; }
+
         [GraphQLNonNullType]
-        public string Title => Source.Title;
-            
+        public string Title => Source.TargetType.Title;
+
         [GraphQLNonNullType]
-        public string Code => Source.Name;
+        public string Code => Source.TargetType.Name;
 
         public string Hint => null; // null on dev also
-
         public bool Multiple => Source.IsArray;
-            
         public string Format => Source.Meta?.Value<string>("format");
-            
-        // TODO: formField: JSON
-        // TODO: validation: JSON
-        
-        [GraphQLName("_relationInfo")]
-        public EntityType AttributeType => new EntityType(Source.AttributeType);
 
-        public string MetaJson => Source.Meta.ToString(); // absent on schema
+        [GraphQLName("_targetType")]
+        public EntityType TargetType => new EntityType(Source.TargetType);
+
+        public string MetaString => Source.Meta?.ToString(); // absent on schema
+        
+        [GraphQLType(typeof(JsonScalarType))]
+        public JObject Meta => Source.Meta;
     }
 
-    public class EntityAttributeRelation : EntityAttributePrimitive
+    public class EntityAttributePrimitive : EntityAttributeBase
+    {
+        public EntityAttributePrimitive(EmbeddingRelationType source) : base(source){}
+        
+        public override string Type => Source.AttributeType.ScalarType;
+    }
+
+
+    public class EntityAttributeRelation : EntityAttributeBase
     {
         public EntityAttributeRelation(EmbeddingRelationType source) : base(source){}
 
-        public string[] AcceptsEntityOperations => new[] {"Create", "Read"};
+        public override string Type => "relation";
 
-        public EntityType To() => new EntityType(null); // todo
+        public string[] AcceptsEntityOperations => new[] {"Create", "Read"}; // TODO: take from meta
+
+        public EntityType To => new EntityType(Source.EntityType);
     }
 }

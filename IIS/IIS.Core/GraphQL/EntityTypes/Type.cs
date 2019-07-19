@@ -4,6 +4,7 @@ using System.Linq;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
+using IIS.Core.Ontology;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.EntityTypes
@@ -37,9 +38,14 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]
         public IEnumerable<IEntityAttribute> Attributes => 
-            Source.AllProperties.Select(a => new EntityAttributePrimitive(a));
+            Source.AllProperties.Select(CreateEntityAttribute);
 
         public EntityType Parent =>
             Source.DirectParents.Select(p => new EntityType(p)).FirstOrDefault();
+
+        protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType) =>
+            relationType.IsAttributeType
+                ? (IEntityAttribute) new EntityAttributePrimitive(relationType)
+                : new EntityAttributeRelation(relationType);
     }
 }

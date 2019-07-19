@@ -5,7 +5,6 @@ using HotChocolate;
 using HotChocolate.AspNetCore;
 using IIS.Core.GraphQL;
 using IIS.Core.GraphQL;
-using IIS.Core.GraphQL.Ontology;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -39,7 +38,8 @@ namespace IIS.Core
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
             services.AddTransient<IOntologyProvider, OntologyProvider>();
-            services.AddSingleton<IGraphQLSchemaProvider, GraphQLSchemaProvider>();
+            services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
+            services.AddSingleton<IGraphQlOntologyTypeProvider, GraphQlOntologyTypeProvider>();
             services.AddSingleton<IOntologyService, OntologyService>();
             //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
@@ -51,10 +51,10 @@ namespace IIS.Core
                 RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
             };
             services.AddTransient(s => factory);
-            
-            services.AddGraphQL(GraphQlSchemaProvider.GetSchema);
 
-            
+            var schema = services.BuildServiceProvider().GetService<IGraphQLSchemaProvider>().GetSchema();
+            services.AddGraphQL(schema);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

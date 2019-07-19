@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL;
@@ -6,11 +9,18 @@ using IIS.Core.GraphQL.Mutations;
 
 namespace IIS.Core.GraphQL
 {
-    public static class GraphQlSchemaProvider
+    public class GraphQlSchemaProvider : IGraphQLSchemaProvider
     {
-        public static ISchema GetSchema(IServiceProvider s) =>
+        private readonly IServiceProvider _serviceProvider;
+
+        public GraphQlSchemaProvider(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public ISchema GetSchema() =>
             SchemaBuilder.New()
-                .AddServices(s)
+                .AddServices(_serviceProvider)
                 .AddQueryType<Query>()
                 .AddMutationType<Mutation>()
                 // TODO: Find a better way to register interface implementation types
@@ -23,13 +33,15 @@ namespace IIS.Core.GraphQL
     {
         protected override void Configure(IObjectTypeDescriptor descriptor) => descriptor
             .Include<EntityTypes.Query>()
-            //.Include<Entities.Query>()
+            .Include<Entities.EntityQuery>()
             ;
     }
 
     public class Mutation : ObjectType
     {
         protected override void Configure(IObjectTypeDescriptor descriptor) => descriptor
-            .Include<DemoMutation>();
+            .Include<DemoMutation>()
+            .Include<EntityMutation>()
+            ;
     }
 }

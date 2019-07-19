@@ -7,6 +7,6 @@ namespace IIS.Core.GraphQL
 {
     public interface IGraphQLSchemaProvider
     {
-        Task<ISchema> GetSchemaAsync(CancellationToken cancellationToken = default);
+        ISchema GetSchema();
     }
 }
