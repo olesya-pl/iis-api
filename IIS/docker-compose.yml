@@ -1,28 +1,28 @@
-version: '3.6'
+﻿version: '3.6'
 
 services:
-    iis.web:
-        container_name: iis.web
+    iis.core:
+        container_name: iis.core
         build:
             context: .
-            dockerfile: IIS.Web/Dockerfile
+            dockerfile: IIS.Core/Dockerfile
         depends_on:
             - db
             - mq
-            - es
         ports:
             - 5000:80
         networks:
             - iis-network
         restart: always
     
-    iis.replication:
-        container_name: iis.replication
+    iis.search:
+        container_name: iis.search
         build:
             context: .
-            dockerfile: IIS.Replication/Dockerfile
+            dockerfile: IIS.Search/Dockerfile
         depends_on:
             - mq
+            - es
         ports:
             - 5500:80
         networks:
@@ -82,7 +82,7 @@ services:
             - es
         environment:
             ELASTICSEARCH_HOSTS: http://es:9200
-            
+
 networks:
   iis-network:
     external: false
