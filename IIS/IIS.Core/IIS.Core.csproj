@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -12,10 +12,11 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="HotChocolate" Version="9.1.0-preview.24" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="9.1.0-preview.24" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="9.1.0-preview.24" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="GraphQL" Version="2.4.0" />
-    <PackageReference Include="GraphiQL" Version="1.2.0" />
     <PackageReference Include="protobuf-net" Version="2.4.0" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
@@ -24,7 +25,6 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="GraphQL\" />
-    <Folder Include="GraphQL.Ontology\" />
     <Folder Include="Ontology\" />
     <Folder Include="Ontology.EntityFramework\" />
     <Folder Include="Ontology.EntityFramework\Context\" />

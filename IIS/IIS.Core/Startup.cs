@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using HotChocolate;
+using HotChocolate.AspNetCore;
 using IIS.Core.GraphQL;
-using IIS.Core.GraphQL.Ontology;
+using IIS.Core.GraphQL;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -26,7 +28,7 @@ namespace IIS.Core
         {
             Configuration = configuration;
         }
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -36,7 +38,8 @@ namespace IIS.Core
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
             services.AddTransient<IOntologyProvider, OntologyProvider>();
-            services.AddSingleton<IGraphQLSchemaProvider, GraphQLSchemaProvider>();
+            services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
+            services.AddSingleton<IGraphQlOntologyTypeProvider, GraphQlOntologyTypeProvider>();
             services.AddSingleton<IOntologyService, OntologyService>();
             //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
@@ -48,7 +51,10 @@ namespace IIS.Core
                 RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
             };
             services.AddTransient(s => factory);
-            
+
+            var schema = services.BuildServiceProvider().GetService<IGraphQLSchemaProvider>().GetSchema();
+            services.AddGraphQL(schema);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -60,6 +66,9 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             app.UseDeveloperExceptionPage();
+            
+            app.UseGraphQL();
+            app.UsePlayground();
 
             app.UseMvc();
 

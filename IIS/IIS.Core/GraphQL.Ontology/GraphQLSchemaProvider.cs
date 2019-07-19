@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Types;
+using HotChocolate;
 using IIS.Core.Ontology;
 using Type = IIS.Core.Ontology.Type;
 
@@ -17,7 +17,7 @@ namespace IIS.Core.GraphQL.Ontology
             _ontologyProvider = ontologyProvider;
         }
 
-        public async Task<ISchema> GetSchemaAsync(CancellationToken cancellationToken = default)
+        public ISchema GetSchema()
         {
             //var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
             var ontology = new List<Type>();

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -22,6 +23,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var types = await _context.Types.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
                 .Include(e => e.IncomingRelations).ThenInclude(e => e.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
+                .Include(e => e.AttributeType)
                 .ToArrayAsync(cancellationToken);
 
             var result = types.Select(MapType).ToArray();
@@ -35,11 +37,13 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 var attributeType = type.AttributeType;
                 var attr = new AttributeType(type.Id, type.Name, attributeType.ScalarType.ToString());
+                FillProperties(type, attr);
                 return attr;
             }
             if (type.Kind == Kind.Entity)
             {
                 var entity = new EntityType(type.Id, type.Name, type.IsAbstract);
+                FillProperties(type, entity);
                 foreach (var outgoingRelation in type.OutgoingRelations)
                 {
                     var relation = MapRelation(outgoingRelation);
@@ -58,16 +62,26 @@ namespace IIS.Core.Ontology.EntityFramework
             if (relationType.Kind == RelationKind.Embedding)
             {
                 relation = new EmbeddingRelationType(type.Id, type.Name, EmbeddingOptions.Optional);
+                FillProperties(type, relation);
                 var target = MapType(relationType.TargetType);
                 relation.AddType(target);
             }
             if (relationType.Kind == RelationKind.Inheritance)
             {
                 relation = new InheritanceRelationType(type.Id);
+                FillProperties(type, relation);
                 var target = MapType(relationType.TargetType);
                 relation.AddType(target);
             }
             return relation;
+        }
+
+        private static void FillProperties(Context.Type type, Type ontologyType)
+        {
+            ontologyType.Title = type.Title;
+            ontologyType.Meta = type.Meta == null ? null : JObject.Parse(type.Meta);
+            ontologyType.CreatedAt = type.CreatedAt;
+            ontologyType.UpdatedAt = type.UpdatedAt;
         }
     }
 }

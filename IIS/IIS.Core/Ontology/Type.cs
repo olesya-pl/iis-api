@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.Types.Relay.Descriptors;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -13,10 +14,23 @@ namespace IIS.Core.Ontology
         public Guid Id { get; }
         public string Name { get; }
         public string Title { get; set; }
-        public JObject Meta { get; }
-        public DateTime CreatedAt { get; }
-        public DateTime UpdatedAt { get; }
+        public JObject Meta { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        
+        
+        public IEnumerable<EntityType> DirectParents =>
+            Nodes.OfType<InheritanceRelationType>().Select(r => r.ParentType);
 
+        public IEnumerable<EntityType> AllParents =>
+            DirectParents.SelectMany(e => e.AllParents).Union(DirectParents);
+
+        public IEnumerable<EmbeddingRelationType> DirectProperties =>
+            Nodes.OfType<EmbeddingRelationType>();
+
+        public IEnumerable<EmbeddingRelationType> AllProperties =>
+            AllParents.SelectMany(p => p.DirectProperties).Union(DirectProperties);
+        
         public Type(Guid id, string name)
         {
             Id = id;
@@ -66,6 +80,14 @@ namespace IIS.Core.Ontology
     {
         public EmbeddingOptions EmbeddingOptions { get; }
 
+        // Embedding relation can have single attribute or single entity as a node
+        public AttributeType AttributeType => Nodes.OfType<AttributeType>().SingleOrDefault(); 
+        public EntityType EntityType => Nodes.OfType<EntityType>().SingleOrDefault();
+        public Type TargetType => (Type) AttributeType ?? EntityType;
+        public IEnumerable<RelationType> RelationTypes => Nodes.OfType<RelationType>();
+        public bool IsAttributeType => Nodes.OfType<AttributeType>().Any();
+        public bool IsEntityType => Nodes.OfType<EntityType>().Any();
+
         public EmbeddingRelationType(Guid id, string name, EmbeddingOptions embeddingOptions)
             : base(id, name)
         {
@@ -75,6 +97,8 @@ namespace IIS.Core.Ontology
 
     public class InheritanceRelationType : RelationType
     {
+        public EntityType ParentType => Nodes.OfType<EntityType>().Single(); // Inheritance relation should always have single EntityType node (parent)
+        
         public InheritanceRelationType(Guid id)
             : base(id, "Is")
         {

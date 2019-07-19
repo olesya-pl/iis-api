@@ -11,15 +11,14 @@ namespace IIS.Core.Controllers
 {
     [Route("api/{controller}")]
     [ApiController]
-    public class GraphController : Controller
+    public class ReanimatorController : Controller
     {
-        private readonly IGraphQLSchemaProvider _schemaProvider;
         //private readonly QueueReanimator _reanimator;
         private OntologyContext _context;
 
-        public GraphController(IGraphQLSchemaProvider schemaProvider, OntologyContext context)//, QueueReanimator reanimator
+        public ReanimatorController(IGraphQLSchemaProvider schemaProvider, OntologyContext context)//, QueueReanimator reanimator
         {
-            _schemaProvider = schemaProvider;
+            //_schemaProvider = schemaProvider;
             //_reanimator = reanimator;
             _context = context;
         }
@@ -56,7 +55,7 @@ namespace IIS.Core.Controllers
             //_context.RelationTypes.Add(iRelation);
             //await _context.SaveChangesAsync();
 
-            var schema = await _schemaProvider.GetSchemaAsync();
+            //var schema = await _schemaProvider.GetSchemaAsync();
 
             return null;
         }
