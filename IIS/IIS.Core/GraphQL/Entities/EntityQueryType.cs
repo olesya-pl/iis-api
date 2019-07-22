@@ -14,31 +14,19 @@ namespace IIS.Core.GraphQL.Entities
     public class EntityQueryType : ObjectType
     {
         private readonly IOntologyProvider _ontologyProvider;
-        private readonly IGraphQlOntologyTypeProvider _graphQlOntologyTypeProvider;
+        private readonly IGraphQlTypeProvider _graphQlTypeProvider;
 
-        public EntityQueryType(IOntologyProvider ontologyProvider, IGraphQlOntologyTypeProvider graphQlOntologyTypeProvider)
+        public EntityQueryType(IOntologyProvider ontologyProvider, IGraphQlTypeProvider graphQlTypeProvider)
         {
-            _ontologyProvider = ontologyProvider ?? throw new ArgumentNullException(nameof(ontologyProvider));
-            _graphQlOntologyTypeProvider = graphQlOntologyTypeProvider;
+            _ontologyProvider = ontologyProvider;
+            _graphQlTypeProvider = graphQlTypeProvider;
         }
         
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
-            var creator = new EntityTypesCreator(_graphQlOntologyTypeProvider.OntologyTypes);
-            var types = _ontologyProvider.GetTypes().OfType<EntityType>();
-            descriptor.Name("EntityQuery");
-            descriptor.Field("_typesCount").Type<IntType>().Resolver(types.Count());
-            foreach (var type in types)
-                descriptor.Field(type.Name).Type(creator.CreateObjectType(type)).ResolverNotImplemented();
-        }
-    }
-
-    // Explicit interface declaration, that would be implemented by each EntityType
-    public class EntityInterface : InterfaceType
-    {
-        protected override void Configure(IInterfaceTypeDescriptor descriptor)
-        {
-            descriptor.Field("id").Type<IdType>();
+            var creator = new ReadQueryTypeCreator(_graphQlTypeProvider);
+            descriptor.Name(nameof(EntityQuery));
+            descriptor.PopulateFields(_ontologyProvider, creator);
         }
     }
 }

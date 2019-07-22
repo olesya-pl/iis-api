@@ -4,9 +4,9 @@ using IIS.Core.Ontology;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
-    public class UpdateMutatorTypeCreator : MutatorTypeCreator
+    public class UpdateMutatorTypeCreator : MutatorTypeCreator, ITypeFieldPopulator
     {
-        public UpdateMutatorTypeCreator(Dictionary<string, ObjectType> knownTypes) : base(knownTypes, "Update")
+        public UpdateMutatorTypeCreator(IGraphQlTypeProvider typeProvider) : base(typeProvider, "Update")
         {
         }
 
