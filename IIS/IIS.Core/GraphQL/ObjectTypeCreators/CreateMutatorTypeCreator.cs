@@ -6,7 +6,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
     public class CreateMutatorTypeCreator : MutatorTypeCreator
     {
-        public CreateMutatorTypeCreator(Dictionary<string, ObjectType> knownTypes) : base(knownTypes, "Create")
+        public CreateMutatorTypeCreator(IGraphQlTypeProvider typeProvider) : base(typeProvider, "Create")
         {
         }
 

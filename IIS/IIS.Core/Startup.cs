@@ -39,7 +39,7 @@ namespace IIS.Core
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
             services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
-            services.AddSingleton<IGraphQlOntologyTypeProvider, GraphQlOntologyTypeProvider>();
+            services.AddSingleton<IGraphQlTypeProvider, GraphQlTypeProvider>();
             services.AddSingleton<IOntologyService, OntologyService>();
             //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();

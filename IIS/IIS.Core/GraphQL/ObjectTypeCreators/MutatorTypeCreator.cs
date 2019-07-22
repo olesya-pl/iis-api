@@ -9,11 +9,11 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
     public abstract class MutatorTypeCreator
     {
-        protected readonly Dictionary<string, ObjectType> KnownTypes;
+        protected readonly IGraphQlTypeProvider TypeProvider;
         public string Operation { get; }
-        public MutatorTypeCreator(Dictionary<string, ObjectType> knownTypes, string operation)
+        public MutatorTypeCreator(IGraphQlTypeProvider typeProvider, string operation)
         {
-            KnownTypes = knownTypes;
+            TypeProvider = typeProvider;
             Operation = operation;
         }
 
@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         protected void OnAttributeRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor)
         {
             objectTypeDescriptor.Field(relationType.TargetType.Name)
-                .ScalarType(relationType.AttributeType);
+                .ScalarType(relationType.AttributeType, TypeProvider);
         }
 
         public ObjectType CreateResponse(string entityTypeName)
@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 d.Name($"{Operation}{entityTypeName}Response");
                 d.Field("type").Type<StringType>()
                     .ResolverNotImplemented();
-                d.Field("details").Type(KnownTypes[entityTypeName])
+                d.Field("details").Type(TypeProvider.OntologyTypes[entityTypeName])
                     .ResolverNotImplemented();
             });
         }
