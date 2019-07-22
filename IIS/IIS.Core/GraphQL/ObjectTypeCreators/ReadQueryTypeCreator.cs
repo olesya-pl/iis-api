@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HotChocolate.Language;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors.Definitions;
@@ -19,56 +20,86 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         {
             _typeProvider = typeProvider;
         }
+        
+        // ----- Object creation ----- //
 
-        protected void OnObject(Type type, IObjectTypeDescriptor d)
+        protected void OnObject(EntityType type, IObjectTypeDescriptor d)
         {
             d.Name(type.Name + "Entity");
+            foreach (var parentInterface in type.AllParents.Select(CreateOutputType).OfType<InterfaceType>())
+                d.Interface(parentInterface);
             d.Interface<EntityInterface>();
             d.Field("id").Type<NonNullType<IdType>>().Resolver(ctx => Resolvers.ResolveId(ctx));
+            d.Field("createdAt").Type<NonNullType<DateTimeType>>().ResolverNotImplemented();
+            d.Field("updatedAt").Type<NonNullType<DateTimeType>>().ResolverNotImplemented();
+            d.FieldNotImplemented("_relation");
         }
 
-        protected void OnEntityRelation(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor)
-        {
-            var type = CreateObjectType(relationType.EntityType).WrapOutputType(relationType);
-            objectTypeDescriptor.Field(relationType.TargetType.Name)
-                .Type(new NonNullType(type))
-                .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
-        }
-
-        protected void OnAttributeRelation(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor)
-        {
-            objectTypeDescriptor.Field(relationType.TargetType.Name)
-                .ScalarType(relationType, _typeProvider)
-                .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
-        }
-
-        public ObjectType CreateObjectType(Type type)
-        {
-            if (_typeProvider.OntologyTypes.ContainsKey(type.Name))
-                return _typeProvider.OntologyTypes[type.Name];
-            var ot = new ObjectType(d =>
-            {
-                OnObject(type, d);
-                foreach (var attr in type.AllProperties)
-                    CreateField(attr, d);
-            });
-            _typeProvider.OntologyTypes.Add(type.Name, ot);
-            return ot;
-        }
-        
-        protected void CreateField(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor)
+        protected void OnRelation(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor)
         {
             if (relationType.IsAttributeType)
-                OnAttributeRelation(relationType, objectTypeDescriptor);
+                objectTypeDescriptor.Field(relationType.TargetType.Name)
+                    .Type(_typeProvider.GetOutputAttributeType(relationType.AttributeType).WrapOutputType(relationType))
+                    .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
             else if (relationType.IsEntityType)
-                OnEntityRelation(relationType, objectTypeDescriptor);
+                objectTypeDescriptor.Field(relationType.TargetType.Name)
+                    .Type(CreateOutputType(relationType.EntityType).WrapOutputType(relationType))
+                    .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
+            else
+                throw new ArgumentException(nameof(relationType));
+        }
+        
+        // ----- Interfaces creation ----- //
+        
+        protected void OnInterface(EntityType type, IInterfaceTypeDescriptor d)
+        {
+            d.Name(type.Name + "Entity");
+            d.Field("id").Type<NonNullType<IdType>>();
+            d.Field("createdAt").Type<NonNullType<DateTimeType>>();
+            d.Field("updatedAt").Type<NonNullType<DateTimeType>>();
+            d.Field("_relation").Type<NotImplementedType>();
+        }
+
+        protected void OnRelation(EmbeddingRelationType relationType, IInterfaceTypeDescriptor interfaceTypeDescriptor)
+        {
+            if (relationType.IsAttributeType)
+                interfaceTypeDescriptor.Field(relationType.TargetType.Name)
+                    .Type(_typeProvider.GetOutputAttributeType(relationType.AttributeType).WrapOutputType(relationType));
+            else if (relationType.IsEntityType)
+                interfaceTypeDescriptor.Field(relationType.TargetType.Name)
+                    .Type(CreateOutputType(relationType.EntityType).WrapOutputType(relationType));
             else
                 throw new ArgumentException(nameof(relationType));
         }
 
-        public void AddFields(IObjectTypeDescriptor descriptor, Type type)
+        // ----- Generic ----- //
+
+        public IOutputType CreateOutputType(EntityType type)
         {
-            var objectType = CreateObjectType(type);
+            if (_typeProvider.OntologyTypes.ContainsKey(type.Name))
+                return _typeProvider.OntologyTypes[type.Name];
+            IOutputType outputType;
+            if (type.IsAbstract)
+                outputType = new InterfaceType(d =>
+                {
+                    OnInterface(type, d);
+                    foreach (var attr in type.AllProperties)
+                        OnRelation(attr, d);
+                });
+            else
+                outputType = new ObjectType(d =>
+                {
+                    OnObject(type, d);
+                    foreach (var attr in type.AllProperties)
+                        OnRelation(attr, d);
+                });
+            _typeProvider.OntologyTypes.Add(type.Name, outputType);
+            return outputType;
+        }
+
+        public void AddFields(IObjectTypeDescriptor descriptor, EntityType type)
+        {
+            var objectType = CreateOutputType(type);
             var collectionType = new CollectionType(type.Name, objectType); // TODO: new NonNullType() won't work
             descriptor.Field(type.Name)
                 .Type(objectType)
@@ -86,6 +117,9 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         protected override void Configure(IInterfaceTypeDescriptor descriptor)
         {
             descriptor.Field("id").Type<NonNullType<IdType>>();
+            descriptor.Field("createdAt").Type<NonNullType<DateTimeType>>();
+            descriptor.Field("updatedAt").Type<NonNullType<DateTimeType>>();
+            descriptor.Field("_relation").Type<NotImplementedType>();
         }
     }
 }

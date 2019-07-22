@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Common;
+using IIS.Core.GraphQL.Entities;
+using IIS.Core.GraphQL.Mutations;
 using IIS.Core.GraphQL.ObjectTypeCreators;
 using IIS.Core.Ontology;
 using Type = IIS.Core.Ontology.Type;
@@ -27,17 +30,30 @@ namespace IIS.Core.GraphQL
         }
 
         public static HotChocolate.Types.ScalarType GetScalarType(this IGraphQlTypeProvider typeProvider, AttributeType attributeType)
-            => typeProvider.Scalars[attributeType.ScalarType.ToLower()];
+            => typeProvider.Scalars[attributeType.ScalarTypeEnum];
         
-        // Remake ths to use ScalarType enum
         /// <summary>
         /// Sets field type with known scalar type considering RelationType's embedding options (NonNull or/and List)
         /// </summary>
-        public static IObjectFieldDescriptor ScalarType(this IObjectFieldDescriptor d, EmbeddingRelationType relationType, IGraphQlTypeProvider typeProvider)
-            => d.Type(typeProvider.GetScalarType(relationType.AttributeType).WrapOutputType(relationType));
-        
-        public static IInputFieldDescriptor ScalarType(this IInputFieldDescriptor d, AttributeType attributeType, IGraphQlTypeProvider typeProvider)
-            => d.Type(typeProvider.GetScalarType(attributeType)); // no wrapping currently
+        public static IOutputType GetOutputAttributeType(this IGraphQlTypeProvider typeProvider, AttributeType attributeType)
+        {
+            IOutputType type;
+            if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
+                type = typeProvider.GetType<ObjectType<Attachment>>();
+            else
+                type = typeProvider.GetScalarType(attributeType);
+            return type;
+        }
+
+        public static IInputType GetInputAttributeType(this IGraphQlTypeProvider typeProvider, AttributeType attributeType)
+        {
+            IInputType type;
+            if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
+                type = typeProvider.GetType<InputObjectType<FileValueInput>>();
+            else
+                type = typeProvider.GetScalarType(attributeType);
+            return type;
+        }
 
         public static IOutputType WrapOutputType(this IOutputType type, EmbeddingRelationType relationType)
         {
@@ -56,5 +72,8 @@ namespace IIS.Core.GraphQL
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d) =>
             d.Resolver(_ => throw new NotImplementedException());
+        
+        public static IObjectFieldDescriptor FieldNotImplemented(this IObjectTypeDescriptor d, string name) =>
+            d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
     }
 }

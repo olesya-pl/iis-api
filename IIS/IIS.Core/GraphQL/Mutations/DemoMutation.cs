@@ -1,6 +1,8 @@
 using System;
 using HotChocolate;
+using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Ontology.EntityFramework.Context;
+using Newtonsoft.Json.Linq;
 using Type = IIS.Core.Ontology.EntityFramework.Context.Type;
 
 namespace IIS.Core.GraphQL.Mutations
@@ -8,6 +10,7 @@ namespace IIS.Core.GraphQL.Mutations
     public class DemoMutation
     {
         private static string _savedString;
+        private static JObject _jobject;
         
         public string SaveString(string param)
         {
@@ -35,8 +38,14 @@ namespace IIS.Core.GraphQL.Mutations
             CreateRelation(context, person, car, RelationKind.Embedding);
             var ageattr = CreateAttribute(context, "Age", "Возраст", Core.Ontology.EntityFramework.Context.ScalarType.Int);
             CreateRelation(context, person, ageattr, RelationKind.Embedding);
+            var homeattr = CreateAttribute(context, "HomeLocation", "Домашний адрес", Core.Ontology.EntityFramework.Context.ScalarType.Geo);
+            CreateRelation(context, person, homeattr, RelationKind.Embedding);
+            var photoattr = CreateAttribute(context, "Photo", "Фотография", Core.Ontology.EntityFramework.Context.ScalarType.File);
+            CreateRelation(context, person, photoattr, RelationKind.Embedding);
+            var birthattr = CreateAttribute(context, "BirthDate", "Дата рождения", Core.Ontology.EntityFramework.Context.ScalarType.Date);
+            CreateRelation(context, person, birthattr, RelationKind.Embedding);
             context.SaveChanges();
-
+            
             return "Yep.";
         }
 
@@ -76,6 +85,22 @@ namespace IIS.Core.GraphQL.Mutations
             };
             context.Add(type);
             return type;
+        }
+
+        [GraphQLType(typeof(JsonScalarType))]
+        public JObject SaveObject([GraphQLType(typeof(JsonScalarType))] JObject data)
+        {
+            var old = _jobject;
+            _jobject = data;
+            return old;
+        }
+        
+        [GraphQLType(typeof(GeoJsonScalarType))]
+        public JObject SaveGeo([GraphQLType(typeof(GeoJsonScalarType))] JObject data)
+        {
+            var old = _jobject;
+            _jobject = data;
+            return old;
         }
     }
 }

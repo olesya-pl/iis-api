@@ -4,7 +4,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Ontology;
 using Newtonsoft.Json.Linq;
-using Attribute = IIS.Core.Ontology.Attribute;
+using OScalarType = IIS.Core.Ontology.ScalarType;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -13,14 +13,14 @@ namespace IIS.Core.GraphQL.EntityTypes
         protected override void Configure(IEnumTypeDescriptor descriptor)
         {
             descriptor.Name("EntityAttributeType"); // Typo on dev: EnityAttributeType 
-            descriptor.Item("int");
-            descriptor.Item("float");
-            descriptor.Item("string");
-            descriptor.Item("boolean");
-            descriptor.Item("date");
-            descriptor.Item("geo");
-            descriptor.Item("relation");
-            descriptor.Item("file");
+            descriptor.Item(OScalarType.Integer).Name("int");
+            descriptor.Item(OScalarType.Decimal).Name("float");
+            descriptor.Item(OScalarType.String).Name("string");
+            descriptor.Item(OScalarType.Boolean).Name("boolean");
+            descriptor.Item(OScalarType.DateTime).Name("date");
+            descriptor.Item(OScalarType.Geo).Name("geo");
+            descriptor.Item(OScalarType.File).Name("file");
+            descriptor.Item("relation").Name("relation");
         }
     }
     
@@ -36,7 +36,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         Guid Id { get; }
 //        [GraphQLNonNullType]
         [GraphQLType(typeof(EntityAttributeTypeEnum))]
-        string Type { get; }
+        object Type { get; }
         [GraphQLNonNullType]
         string Title { get; }
         [GraphQLNonNullType]
@@ -63,7 +63,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public Guid Id => Source.Id;
 
         [GraphQLType(typeof(EntityAttributeTypeEnum))]
-        public abstract string Type { get; }
+        public abstract object Type { get; }
 
         [GraphQLNonNullType]
         public string Title => Source.TargetType.Title;
@@ -88,7 +88,7 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
         public EntityAttributePrimitive(EmbeddingRelationType source) : base(source){}
         
-        public override string Type => Source.AttributeType.ScalarType;
+        public override object Type => Source.AttributeType.ScalarTypeEnum;
     }
 
 
@@ -96,7 +96,7 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
         public EntityAttributeRelation(EmbeddingRelationType source) : base(source){}
 
-        public override string Type => "relation";
+        public override object Type => "relation";
 
         public string[] AcceptsEntityOperations => new[] {"Create", "Read"}; // TODO: take from meta
 

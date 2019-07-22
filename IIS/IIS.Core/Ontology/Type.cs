@@ -45,12 +45,21 @@ namespace IIS.Core.Ontology
 
     public class AttributeType : Type
     {
-        public string ScalarType { get; }
-
+        [Obsolete("Use ScalarTypeEnum")]
+        public string ScalarType => ScalarTypeEnum.ToString(); // todo: remove and rename ScalarTypeEnum
+        public ScalarType ScalarTypeEnum { get; }
+        
+        [Obsolete]
         public AttributeType(Guid id, string name, string scalarType)
             : base(id, name)
         {
-            ScalarType = scalarType;
+            ScalarTypeEnum = scalarType.ToScalarType();
+        }
+        
+        public AttributeType(Guid id, string name, ScalarType scalarType)
+            : base(id, name)
+        {
+            ScalarTypeEnum = scalarType;
         }
     }
 

@@ -7,9 +7,9 @@ namespace IIS.Core.GraphQL.Common
     public class CollectionType : ObjectType
     {
         private readonly string _itemsTypeName;
-        private readonly ObjectType _itemsType;
+        private readonly IOutputType _itemsType;
 
-        public CollectionType(string itemsTypeName, ObjectType itemsType)
+        public CollectionType(string itemsTypeName, IOutputType itemsType)
         {
             _itemsTypeName = itemsTypeName;
             _itemsType = itemsType;

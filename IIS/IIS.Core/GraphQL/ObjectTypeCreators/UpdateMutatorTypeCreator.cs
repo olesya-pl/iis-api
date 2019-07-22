@@ -10,7 +10,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         {
         }
 
-        public override void AddFields(IObjectTypeDescriptor descriptor, Type type)
+        public override void AddFields(IObjectTypeDescriptor descriptor, EntityType type)
         {
             descriptor.Field(Operation + type.Name)
                 .Type(CreateResponse(type.Name))

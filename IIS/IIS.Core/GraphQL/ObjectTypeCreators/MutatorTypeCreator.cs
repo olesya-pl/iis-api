@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         protected void OnAttributeRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor)
         {
             objectTypeDescriptor.Field(relationType.TargetType.Name)
-                .ScalarType(relationType.AttributeType, TypeProvider);
+                .Type(TypeProvider.GetInputAttributeType(relationType.AttributeType));
         }
 
         public ObjectType CreateResponse(string entityTypeName)
@@ -66,7 +66,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 throw new ArgumentException(nameof(relationType));
         }
 
-        public abstract void AddFields(IObjectTypeDescriptor descriptor, Type type);
+        public abstract void AddFields(IObjectTypeDescriptor descriptor, EntityType type);
     }
 
     public class MutatorInputType : InputObjectType

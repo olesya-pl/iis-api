@@ -8,6 +8,7 @@ using IIS.Core.GraphQL;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
+using IIS.Legacy.EntityFramework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,8 @@ namespace IIS.Core
             loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
-            services.AddTransient<IOntologyProvider, OntologyProvider>();
+            services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
+            services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
             services.AddSingleton<IGraphQlTypeProvider, GraphQlTypeProvider>();
             services.AddSingleton<IOntologyService, OntologyService>();

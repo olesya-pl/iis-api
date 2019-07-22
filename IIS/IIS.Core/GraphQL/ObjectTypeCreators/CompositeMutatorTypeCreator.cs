@@ -20,7 +20,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         }
 
 
-        public void AddFields(IObjectTypeDescriptor descriptor, Type type) 
+        public void AddFields(IObjectTypeDescriptor descriptor, EntityType type) 
         {
             foreach (var creator in creators)
                 creator.AddFields(descriptor, type);
