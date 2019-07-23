@@ -66,7 +66,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             app.UseDeveloperExceptionPage();
-            
+
             app.UseGraphQL();
             app.UsePlayground();
 

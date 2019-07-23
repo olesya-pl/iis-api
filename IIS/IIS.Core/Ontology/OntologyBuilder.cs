@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
 {
@@ -8,6 +9,7 @@ namespace IIS.Core.Ontology
     {
         ITypeBuilder WithName(string name);
         ITypeBuilder WithTitle(string name);
+        ITypeBuilder WithMeta(JObject meta);
         ITypeBuilder Is(string name);
         ITypeBuilder Is(Type type);
         ITypeBuilder Is(Action<ITypeBuilder> buildAction);
@@ -36,9 +38,10 @@ namespace IIS.Core.Ontology
             public string Name;
             public EmbeddingOptions EmbeddingOptions;
         }
-
+        public string Name => _name;
         private string _name;
         private string _title;
+        private JObject _meta;
         private List<string> _parents = new List<string>();
         private List<Action<ITypeBuilder>> _parentBuilders = new List<Action<ITypeBuilder>>();
         private List<Relation> _childNodes = new List<Relation>();
@@ -62,6 +65,12 @@ namespace IIS.Core.Ontology
         public ITypeBuilder WithTitle(string name)
         {
             _title = name;
+            return this;
+        }
+
+        public ITypeBuilder WithMeta(JObject meta)
+        {
+            _meta = meta;
             return this;
         }
 
@@ -157,6 +166,7 @@ namespace IIS.Core.Ontology
             }
 
             type.Title = _title;
+            type.Meta = _meta;
 
             foreach (var buildAction in _parentBuilders)
             {
