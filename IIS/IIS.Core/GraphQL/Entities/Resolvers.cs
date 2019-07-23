@@ -8,8 +8,7 @@ namespace IIS.Core.GraphQL.Entities
     {
         public static object ResolveRelation(IResolverContext context, EmbeddingRelationType relationType)
         {
-            // var node = context.Parent<Node>();
-            return "dummy";
+            throw new NotImplementedException();
         }
 
         public static Guid ResolveId(IResolverContext context)
