@@ -14,7 +14,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         {
             descriptor.Field(Operation + type.Name)
                 .Type(CreateResponse(type.Name))
-                .Argument("id", d => d.Type<IdType>())
+                .Argument("id", d => d.Type<NonNullType<IdType>>())
                 .ResolverNotImplemented();
         }
     }

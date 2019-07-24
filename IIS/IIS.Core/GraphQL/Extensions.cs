@@ -69,6 +69,21 @@ namespace IIS.Core.GraphQL
                     throw new ArgumentOutOfRangeException();
             }
         }
+        
+        public static IInputType WrapInputType(this IInputType type, EmbeddingRelationType relationType)
+        {
+            switch (relationType.EmbeddingOptions)
+            {
+                case EmbeddingOptions.Optional:
+                    return type;
+                case EmbeddingOptions.Required:
+                    return new NonNullType(type);
+                case EmbeddingOptions.Multiple:
+                    return new NonNullType(new ListType(new NonNullType(type)));
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d) =>
             d.Resolver(_ => throw new NotImplementedException());

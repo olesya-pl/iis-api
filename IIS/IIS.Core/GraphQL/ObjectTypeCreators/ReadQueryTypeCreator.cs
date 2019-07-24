@@ -105,7 +105,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 .Type(objectType)
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
                 .ResolverNotImplemented();
-            descriptor.Field(type.Name.Pluralize())
+            descriptor.Field(type.Name + "List")
                 .Type(collectionType)
                 .ResolverNotImplemented();
         }

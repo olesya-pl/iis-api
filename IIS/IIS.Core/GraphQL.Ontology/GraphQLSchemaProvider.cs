@@ -26,7 +26,7 @@ namespace IIS.Core.GraphQL.Ontology
             var name = builder
                 .WithName("Name")
                 .IsAttribute()
-                .HasValueOf("String")
+                .HasValueOf(Core.Ontology.ScalarType.String)
                 .Build();
             ontology.Add(name);
 
@@ -38,23 +38,23 @@ namespace IIS.Core.GraphQL.Ontology
             //    .Build();
             //ontology.Add(obj);
 
-            builder = new OntologyBuilder(ontology);
-            var phone = builder
-                .WithName("PhoneNumber")
-                .IsAttribute()
-                .HasValueOf("String")
-                .Build();
-            ontology.Add(phone);
-
-            builder = new OntologyBuilder(ontology);
-            var person = builder
-                .WithName("Person")
-                //.Is("ObjectOfStudy")
-                .Is(b => b.WithName("ObjectOfStudy").HasRequired("Name").IsAbstraction())
-                .HasMultiple("PhoneNumber")
-                .IsEntity()
-                .Build();
-            ontology.Add(person);
+//            builder = new OntologyBuilder(ontology);
+//            var phone = builder
+//                .WithName("PhoneNumber")
+//                .IsAttribute()
+//                .HasValueOf("String")
+//                .Build();
+//            ontology.Add(phone);
+//
+//            builder = new OntologyBuilder(ontology);
+//            var person = builder
+//                .WithName("Person")
+//                //.Is("ObjectOfStudy")
+//                .Is(b => b.WithName("ObjectOfStudy").HasRequired("Name").IsAbstraction())
+//                .HasMultiple("PhoneNumber")
+//                .IsEntity()
+//                .Build();
+//            ontology.Add(person);
 
 
             // todo: Build graphql mutation schema based on the ontology

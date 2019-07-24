@@ -4,9 +4,9 @@ using System.Linq;
 using HotChocolate;
 using HotChocolate.Configuration;
 using HotChocolate.Types;
-using HotChocolate.Types.Descriptors.Definitions;
 using IIS.Core.GraphQL.ObjectTypeCreators;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -24,6 +24,7 @@ namespace IIS.Core.GraphQL.Entities
         
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
+            _ontologyProvider.GetTypes().ValidateMeta(); // temporary meta validation
             var creator = new ReadQueryTypeCreator(_graphQlTypeProvider);
             descriptor.Name(nameof(EntityQuery));
             descriptor.PopulateFields(_ontologyProvider, creator);

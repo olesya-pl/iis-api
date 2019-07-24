@@ -13,20 +13,15 @@ namespace IIS.Core.GraphQL
     {
         Dictionary<string, IOutputType> OntologyTypes { get; }
         Dictionary<OScalarType, HCScalarType> Scalars { get; }
-        T GetType<T>() where T : IType;
-        T GetType<T>(Type type) where T : IType;
+        T GetType<T>() where T : IType, new();
     }
 
     public class GraphQlTypeProvider : IGraphQlTypeProvider
     {
-        public Dictionary<Type, IType> CommonTypes { get; } = new Dictionary<Type, IType>
-        {
-            [typeof(ObjectType<Attachment>)] = new ObjectType<Attachment>(),
-            [typeof(InputObjectType<FileValueInput>)] = new InputObjectType<FileValueInput>(),
-        };
+        public Dictionary<Type, IType> CommonTypes { get; } = new Dictionary<Type, IType>();
         
         public Dictionary<string, IOutputType> OntologyTypes { get; } = new Dictionary<string, IOutputType>();
-        
+
         public Dictionary<OScalarType, HCScalarType> Scalars { get; } = new Dictionary<OScalarType, HCScalarType>
         {
             [OScalarType.String] = new StringType(),
@@ -38,14 +33,13 @@ namespace IIS.Core.GraphQL
 //            [OScalarType.File] = null, // Implemented as a dirty hack in Extensions.AttributeType(), because File attribute is not scalar
         };
 
-        public T GetType<T>() where T : IType
-        {
-            return (T) CommonTypes[typeof(T)];
-        }
+        protected void AddType<T>() where T : IType, new() => CommonTypes.Add(typeof(T), new T());
 
-        public T GetType<T>(Type type) where T : IType
+        public T GetType<T>() where T : IType, new()
         {
-            return (T) CommonTypes[type];
+            if (!CommonTypes.ContainsKey(typeof(T)))
+                AddType<T>();
+            return (T) CommonTypes[typeof(T)];
         }
     }
 }

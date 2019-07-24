@@ -22,16 +22,17 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             d.Name($"{Operation}{type.Name}Input");
         }
 
-        protected void OnEntityRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor)
+        protected void OnRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor)
         {
-            objectTypeDescriptor.Field(relationType.TargetType.Name)
-                .Type<InputObjectType<EntityRelationInput>>();
-        }
-
-        protected void OnAttributeRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor)
-        {
-            objectTypeDescriptor.Field(relationType.TargetType.Name)
-                .Type(TypeProvider.GetInputAttributeType(relationType.AttributeType));
+            
+            if (relationType.IsAttributeType)
+                objectTypeDescriptor.Field(relationType.TargetType.Name)
+                    .Type(TypeProvider.GetInputAttributeType(relationType.AttributeType).WrapInputType(relationType));
+            else if (relationType.IsEntityType)
+                objectTypeDescriptor.Field(relationType.TargetType.Name)
+                    .Type(TypeProvider.GetType<InputObjectType<EntityRelationInput>>().WrapInputType(relationType));
+            else
+                throw new ArgumentException(nameof(relationType));
         }
 
         public ObjectType CreateResponse(string entityTypeName)
@@ -39,31 +40,22 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             return new ObjectType(d =>
             {
                 d.Name($"{Operation}{entityTypeName}Response");
-                d.Field("type").Type<StringType>()
+                d.Field("type").Type<NonNullType<StringType>>()
                     .ResolverNotImplemented();
-                d.Field("details").Type(TypeProvider.OntologyTypes[entityTypeName])
+                d.Field("details").Type(new NonNullType(TypeProvider.OntologyTypes[entityTypeName]))
                     .ResolverNotImplemented();
             });
         }
 
+        // this return value should not be wrapped in NonNullType()
         public InputObjectType CreateObjectType(Type type)
         {
             return new MutatorInputType(d =>
             {
                 OnObject(type, d);
                 foreach (var attr in type.AllProperties)
-                    CreateField(attr, d);
+                    OnRelation(attr, d);
             });
-        }
-        
-        protected void CreateField(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor)
-        {
-            if (relationType.IsAttributeType)
-                OnAttributeRelation(relationType, objectTypeDescriptor);
-            else if (relationType.IsEntityType)
-                OnEntityRelation(relationType, objectTypeDescriptor);
-            else
-                throw new ArgumentException(nameof(relationType));
         }
 
         public abstract void AddFields(IObjectTypeDescriptor descriptor, EntityType type);

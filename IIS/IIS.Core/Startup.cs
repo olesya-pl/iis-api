@@ -5,6 +5,7 @@ using HotChocolate;
 using HotChocolate.AspNetCore;
 using IIS.Core.GraphQL;
 using IIS.Core.GraphQL;
+using IIS.Core.Mocks;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -38,7 +39,8 @@ namespace IIS.Core
             loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
-            services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
+            services.AddTransient<IOntologyProvider, EntityRelationMock<ILegacyOntologyProvider>>();
+//            services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
             services.AddSingleton<IGraphQlTypeProvider, GraphQlTypeProvider>();

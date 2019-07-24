@@ -59,7 +59,7 @@ namespace IIS.Legacy.EntityFramework
                 .WithTitle(attribute.Title)
                 .WithMeta(attribute.Meta)
                 .IsAttribute()
-                .HasValueOf(attribute.Type.ToString())
+                .HasValueOf(attribute.Type.ToString().ToScalarType())
                 .Build();
             
             return type;
@@ -74,9 +74,9 @@ namespace IIS.Legacy.EntityFramework
 
             foreach (var attr in srcType.AttributeRestrictions)
             {
-                if (attr.IsMultiple) builder.HasMultiple(attr.Attribute.Code);
-                else if (attr.IsRequired) builder.HasRequired(attr.Attribute.Code);
-                else builder.HasOptional(attr.Attribute.Code);
+                if (attr.IsMultiple) builder.HasMultiple(attr.Attribute.Code, attr.Meta);
+                else if (attr.IsRequired) builder.HasRequired(attr.Attribute.Code, attr.Meta);
+                else builder.HasOptional(attr.Attribute.Code, attr.Meta);
             }
 
             if (srcType.Parent != null)
