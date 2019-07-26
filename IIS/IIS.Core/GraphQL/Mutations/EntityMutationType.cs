@@ -9,17 +9,17 @@ namespace IIS.Core.GraphQL.Mutations
     public class EntityMutationType : ObjectType
     {
         private readonly IOntologyProvider _ontologyProvider;
-        private readonly IGraphQlTypeProvider _graphQlTypeProvider;
+        private readonly GraphQlTypeCreator _graphQlTypeCreator;
 
-        public EntityMutationType(IOntologyProvider ontologyProvider, IGraphQlTypeProvider graphQlTypeProvider)
+        public EntityMutationType(IOntologyProvider ontologyProvider, GraphQlTypeCreator graphQlTypeCreator)
         {
             _ontologyProvider = ontologyProvider;
-            _graphQlTypeProvider = graphQlTypeProvider;
+            _graphQlTypeCreator = graphQlTypeCreator;
         }
 
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
-            var creator = new CompositeMutatorTypeCreator(_graphQlTypeProvider);
+            var creator = new CompositeMutatorTypeCreator(_graphQlTypeCreator);
             descriptor.Name(nameof(EntityMutation));
             descriptor.PopulateFields(_ontologyProvider, creator);
         }

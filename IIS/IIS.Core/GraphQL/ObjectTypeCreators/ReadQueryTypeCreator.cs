@@ -7,6 +7,7 @@ using HotChocolate.Types.Descriptors.Definitions;
 using Humanizer;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities;
+using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
 using Type = IIS.Core.Ontology.Type;
 
@@ -14,13 +15,13 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
     public class ReadQueryTypeCreator : ITypeFieldPopulator
     {
-        private readonly IGraphQlTypeProvider _typeProvider;
+        private readonly IGraphQlTypeRepository _typeRepository;
 
-        public ReadQueryTypeCreator(IGraphQlTypeProvider typeProvider)
+        public ReadQueryTypeCreator(IGraphQlTypeRepository typeRepository)
         {
-            _typeProvider = typeProvider;
+            _typeRepository = typeRepository;
         }
-        
+
         // ----- Object creation ----- //
 
         protected void OnObject(EntityType type, IObjectTypeDescriptor d)
@@ -38,11 +39,11 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         protected void OnRelation(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor)
         {
             if (relationType.IsAttributeType)
-                objectTypeDescriptor.Field(relationType.TargetType.Name)
-                    .Type(_typeProvider.GetOutputAttributeType(relationType.AttributeType).WrapOutputType(relationType))
+                objectTypeDescriptor.Field(relationType.GetFieldName())
+                    .Type(_typeRepository.GetOutputAttributeType(relationType.AttributeType).WrapOutputType(relationType))
                     .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
             else if (relationType.IsEntityType)
-                objectTypeDescriptor.Field(relationType.TargetType.Name)
+                objectTypeDescriptor.Field(relationType.GetFieldName())
                     .Type(CreateOutputType(relationType.EntityType).WrapOutputType(relationType))
                     .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
             else
@@ -63,10 +64,10 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         protected void OnRelation(EmbeddingRelationType relationType, IInterfaceTypeDescriptor interfaceTypeDescriptor)
         {
             if (relationType.IsAttributeType)
-                interfaceTypeDescriptor.Field(relationType.TargetType.Name)
-                    .Type(_typeProvider.GetOutputAttributeType(relationType.AttributeType).WrapOutputType(relationType));
+                interfaceTypeDescriptor.Field(relationType.GetFieldName())
+                    .Type(_typeRepository.GetOutputAttributeType(relationType.AttributeType).WrapOutputType(relationType));
             else if (relationType.IsEntityType)
-                interfaceTypeDescriptor.Field(relationType.TargetType.Name)
+                interfaceTypeDescriptor.Field(relationType.GetFieldName())
                     .Type(CreateOutputType(relationType.EntityType).WrapOutputType(relationType));
             else
                 throw new ArgumentException(nameof(relationType));
@@ -76,24 +77,24 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 
         public IOutputType CreateOutputType(EntityType type)
         {
-            if (_typeProvider.OntologyTypes.ContainsKey(type.Name))
-                return _typeProvider.OntologyTypes[type.Name];
+            if (_typeRepository.OntologyTypes.ContainsKey(type.Name))
+                return _typeRepository.OntologyTypes[type.Name];
             IOutputType outputType;
             if (type.IsAbstract)
-                outputType = new InterfaceType(d =>
+                outputType = new OntologyInterfaceType(d =>
                 {
                     OnInterface(type, d);
                     foreach (var attr in type.AllProperties)
                         OnRelation(attr, d);
                 });
             else
-                outputType = new ObjectType(d =>
+                outputType = new OntologyObjectType(d =>
                 {
                     OnObject(type, d);
                     foreach (var attr in type.AllProperties)
                         OnRelation(attr, d);
                 });
-            _typeProvider.OntologyTypes.Add(type.Name, outputType);
+            _typeRepository.OntologyTypes.Add(type.Name, outputType);
             return outputType;
         }
 
@@ -108,18 +109,6 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             descriptor.Field(type.Name + "List")
                 .Type(collectionType)
                 .ResolverNotImplemented();
-        }
-    }
-    
-    // Explicit interface declaration, that would be implemented by each EntityType
-    public class EntityInterface : InterfaceType
-    {
-        protected override void Configure(IInterfaceTypeDescriptor descriptor)
-        {
-            descriptor.Field("id").Type<NonNullType<IdType>>();
-            descriptor.Field("createdAt").Type<NonNullType<DateTimeType>>();
-            descriptor.Field("updatedAt").Type<NonNullType<DateTimeType>>();
-            descriptor.Field("_relation").Type<NotImplementedType>();
         }
     }
 }

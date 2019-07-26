@@ -2,7 +2,7 @@ using System;
 using HotChocolate;
 using HotChocolate.Types;
 
-namespace IIS.Core.GraphQL.Mutations
+namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 {
     // This class represents Ontology.ScalarType.File input type
     public class FileValueInput

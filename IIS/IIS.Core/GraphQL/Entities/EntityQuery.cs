@@ -5,9 +5,9 @@ namespace IIS.Core.GraphQL.Entities
     public class EntityQuery
     {
         [GraphQLType(typeof(EntityQueryType))]
-        public object GetEntities()
+        public string GetEntities()
         {
-            return new { }; // Stub for generating dummy entity query schema
+            return ""; // Stub for generating dummy entity query schema
         }
     }
 }

@@ -6,14 +6,14 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
     public class DeleteMutatorTypeCreator : MutatorTypeCreator, ITypeFieldPopulator
     {
-        public DeleteMutatorTypeCreator(IGraphQlTypeProvider typeProvider) : base(typeProvider, "Delete")
+        public DeleteMutatorTypeCreator(GraphQlTypeCreator typeCreator) : base(typeCreator, "Delete")
         {
         }
 
         public override void AddFields(IObjectTypeDescriptor descriptor, EntityType type)
         {
             descriptor.Field(Operation + type.Name)
-                .Type(CreateResponse(type.Name))
+                .Type(TypeCreator.GetMutatorResponseType(this, type))
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
                 .ResolverNotImplemented();
         }

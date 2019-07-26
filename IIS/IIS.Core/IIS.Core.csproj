@@ -13,7 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="GeoJSON.Net" Version="1.1.72" />
-    <PackageReference Include="HotChocolate" Version="9.1.0-preview.24" />
+    <PackageReference Include="HotChocolate" Version="9.1.0-preview.35" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="9.1.0-preview.24" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="9.1.0-preview.24" />
     <PackageReference Include="Microsoft.AspNetCore.App" />

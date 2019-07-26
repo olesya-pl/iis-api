@@ -14,18 +14,18 @@ namespace IIS.Core.GraphQL.Entities
     public class EntityQueryType : ObjectType
     {
         private readonly IOntologyProvider _ontologyProvider;
-        private readonly IGraphQlTypeProvider _graphQlTypeProvider;
+        private readonly IGraphQlTypeRepository _graphQlTypeRepository;
 
-        public EntityQueryType(IOntologyProvider ontologyProvider, IGraphQlTypeProvider graphQlTypeProvider)
+        public EntityQueryType(IOntologyProvider ontologyProvider, IGraphQlTypeRepository graphQlTypeRepository)
         {
             _ontologyProvider = ontologyProvider;
-            _graphQlTypeProvider = graphQlTypeProvider;
+            _graphQlTypeRepository = graphQlTypeRepository;
         }
         
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
             //_ontologyProvider.GetTypes().ValidateMeta(); // temporary meta validation
-            var creator = new ReadQueryTypeCreator(_graphQlTypeProvider);
+            var creator = new ReadQueryTypeCreator(_graphQlTypeRepository);
             descriptor.Name(nameof(EntityQuery));
             descriptor.PopulateFields(_ontologyProvider, creator);
         }

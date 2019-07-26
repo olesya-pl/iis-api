@@ -6,6 +6,7 @@ using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.Mutations;
 using IIS.Core.GraphQL.ObjectTypeCreators;
+using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
 using Type = IIS.Core.Ontology.Type;
 
@@ -29,29 +30,19 @@ namespace IIS.Core.GraphQL
             return descriptor;
         }
 
-        public static HotChocolate.Types.ScalarType GetScalarType(this IGraphQlTypeProvider typeProvider, AttributeType attributeType)
-            => typeProvider.Scalars[attributeType.ScalarTypeEnum];
+        public static HotChocolate.Types.ScalarType GetScalarType(this IGraphQlTypeRepository typeRepository, AttributeType attributeType)
+            => typeRepository.Scalars[attributeType.ScalarTypeEnum];
         
         /// <summary>
         /// Sets field type with known scalar type considering RelationType's embedding options (NonNull or/and List)
         /// </summary>
-        public static IOutputType GetOutputAttributeType(this IGraphQlTypeProvider typeProvider, AttributeType attributeType)
+        public static IOutputType GetOutputAttributeType(this IGraphQlTypeRepository typeRepository, AttributeType attributeType)
         {
             IOutputType type;
             if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
-                type = typeProvider.GetType<ObjectType<Attachment>>();
+                type = typeRepository.GetType<ObjectType<Attachment>>();
             else
-                type = typeProvider.GetScalarType(attributeType);
-            return type;
-        }
-
-        public static IInputType GetInputAttributeType(this IGraphQlTypeProvider typeProvider, AttributeType attributeType)
-        {
-            IInputType type;
-            if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
-                type = typeProvider.GetType<InputObjectType<FileValueInput>>();
-            else
-                type = typeProvider.GetScalarType(attributeType);
+                type = typeRepository.GetScalarType(attributeType);
             return type;
         }
 
@@ -84,6 +75,8 @@ namespace IIS.Core.GraphQL
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public static string GetFieldName(this EmbeddingRelationType relationType) => relationType.Name;
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d) =>
             d.Resolver(_ => throw new NotImplementedException());

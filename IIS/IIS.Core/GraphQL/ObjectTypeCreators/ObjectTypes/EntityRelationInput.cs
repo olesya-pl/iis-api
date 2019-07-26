@@ -2,7 +2,7 @@ using System;
 using HotChocolate;
 using HotChocolate.Types;
 
-namespace IIS.Core.GraphQL.Mutations
+namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 {
     public class EntityRelationInput
     {
@@ -10,5 +10,10 @@ namespace IIS.Core.GraphQL.Mutations
         public Guid TargetId { get; set; }
         public DateTime StartsAt { get; set; }
         public DateTime EndsAt { get; set; }
+    }
+    
+    public class EntityRelationInputType : InputObjectType<EntityRelationInput>
+    {
+        
     }
 }

@@ -1,44 +1,51 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.Mutations;
+using IIS.Core.GraphQL.ObjectTypeCreators;
+using IIS.Core.Ontology;
 
 namespace IIS.Core.GraphQL
 {
     public class GraphQlSchemaProvider : IGraphQLSchemaProvider
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IGraphQlTypeProvider _typeProvider;
+        private readonly IGraphQlTypeRepository _typeRepository;
+        private readonly IOntologyProvider _ontologyProvider;
 
-        public GraphQlSchemaProvider(IServiceProvider serviceProvider, IGraphQlTypeProvider typeProvider)
+        public GraphQlSchemaProvider(IServiceProvider serviceProvider, IGraphQlTypeRepository typeRepository, IOntologyProvider ontologyProvider)
         {
             _serviceProvider = serviceProvider;
-            _typeProvider = typeProvider;
+            _typeRepository = typeRepository;
+            _ontologyProvider = ontologyProvider;
         }
 
-        public ISchema GetSchema() =>
-            SchemaBuilder.New()
-                .AddServices(_serviceProvider)
-                .RegisterScalars(_typeProvider)
-                .AddQueryType<Query>()
-                .AddMutationType<Mutation>()
-                // TODO: Find a better way to register interface implementation types
-                .AddType<EntityTypes.EntityAttributePrimitive>() 
-                .AddType<EntityTypes.EntityAttributeRelation>()
-                .Create();
-
+        public ISchema GetSchema()
+        {
+            var builder = SchemaBuilder.New().AddServices(_serviceProvider);
+            builder.RegisterTypes(_typeRepository, _ontologyProvider); // TODO: remake dynamic type registration
+            builder.AddQueryType<Query>()
+                .AddMutationType<Mutation>();
+            return builder.Create();
+        }
     }
 
     static class FluentExtensions
     {
-        public static ISchemaBuilder RegisterScalars(this ISchemaBuilder schemaBuilder, IGraphQlTypeProvider typeProvider)
+        public static ISchemaBuilder RegisterTypes(this ISchemaBuilder schemaBuilder, IGraphQlTypeRepository typeRepository, IOntologyProvider ontologyProvider)
         {
-            foreach (var scalarType in typeProvider.Scalars.Values)
-                schemaBuilder.AddType(scalarType);
+            var creator = new GraphQlTypeCreator(typeRepository, ontologyProvider);
+            creator.Create();
+            foreach (var type in typeRepository.AllTypes)
+                schemaBuilder.AddType(type);
+            schemaBuilder // TODO: Find a better way to register interface implementation types
+                .AddType<EntityTypes.EntityAttributePrimitive>()
+                .AddType<EntityTypes.EntityAttributeRelation>();
             return schemaBuilder;
         }
     }
