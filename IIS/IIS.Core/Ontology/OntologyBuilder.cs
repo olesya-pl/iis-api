@@ -13,11 +13,11 @@ namespace IIS.Core.Ontology
         ITypeBuilder Is(string name);
         ITypeBuilder Is(Type type);
         ITypeBuilder Is(Action<ITypeBuilder> buildAction);
-        ITypeBuilder HasRequired(string name, JObject meta);
+        ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null);
         ITypeBuilder HasRequired(Type type);
-        ITypeBuilder HasOptional(string name, JObject meta);
+        ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null);
         ITypeBuilder HasOptional(Type type);
-        ITypeBuilder HasMultiple(string name, JObject meta);
+        ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null);
         ITypeBuilder HasMultiple(Type type);
         ITypeBuilder IsAbstraction();
         ITypeBuilder IsEntity();
@@ -35,14 +35,14 @@ namespace IIS.Core.Ontology
         private enum Kind { Attribute, Entity, Abstraction }
         private struct Relation
         {
-            public string Name;
+            public string TargetName;
+            public string RelationName;
             public EmbeddingOptions EmbeddingOptions;
             public JObject Meta { get; set; }
         }
         private Type _builtType;
-        public bool IsBuilt => _builtType != null;
-        public bool IsBuilding { get; private set; }
-        event EventHandler<EventArgs> TypeBuilt;
+        private event EventHandler<EventArgs> TypeBuilt;
+        private bool _isBuilding;
 
         public string Name => _name;
         private string _name;
@@ -93,9 +93,15 @@ namespace IIS.Core.Ontology
             return this;
         }
 
-        public ITypeBuilder HasRequired(string name, JObject meta)
+        public ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null)
         {
-            _childNodes.Add(new Relation { Name = name, EmbeddingOptions = EmbeddingOptions.Required, Meta = meta });
+            _childNodes.Add(new Relation
+            {
+                TargetName = targetName,
+                RelationName = relationName,
+                EmbeddingOptions = EmbeddingOptions.Required,
+                Meta = meta
+            });
             return this;
         }
 
@@ -104,9 +110,15 @@ namespace IIS.Core.Ontology
             throw new NotImplementedException();
         }
 
-        public ITypeBuilder HasOptional(string name, JObject meta)
+        public ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null)
         {
-            _childNodes.Add(new Relation { Name = name, EmbeddingOptions = EmbeddingOptions.Optional, Meta = meta });
+            _childNodes.Add(new Relation
+            {
+                TargetName = targetName,
+                RelationName = relationName,
+                EmbeddingOptions = EmbeddingOptions.Optional,
+                Meta = meta
+            });
             return this;
         }
 
@@ -115,9 +127,15 @@ namespace IIS.Core.Ontology
             throw new NotImplementedException();
         }
 
-        public ITypeBuilder HasMultiple(string name, JObject meta)
+        public ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null)
         {
-            _childNodes.Add(new Relation { Name = name, EmbeddingOptions = EmbeddingOptions.Multiple, Meta = meta });
+            _childNodes.Add(new Relation
+            {
+                TargetName = targetName,
+                RelationName = relationName,
+                EmbeddingOptions = EmbeddingOptions.Multiple,
+                Meta = meta
+            });
             return this;
         }
 
@@ -153,9 +171,9 @@ namespace IIS.Core.Ontology
         
         public Type Build()
         {
-            if (IsBuilt) return _builtType;
+            if (_builtType != null) return _builtType;
 
-            IsBuilding = true;
+            _isBuilding = true;
 
             var type = default(Type);
             if (_kind == Kind.Attribute)
@@ -195,30 +213,30 @@ namespace IIS.Core.Ontology
 
             foreach (var child in _childNodes)
             {
-                var targetBuilder = Builders[child.Name];
-
-                if (targetBuilder.IsBuilt)
-                {
-                    var targetType = targetBuilder.Build();
-                    var embedding = new EmbeddingRelationType(Guid.NewGuid(), child.Name, child.EmbeddingOptions)
-                    { Meta = child.Meta };
-                    embedding.AddType(targetType);
-                    type.AddType(embedding);
-                }
-                else if (targetBuilder.IsBuilding)
+                var targetBuilder = Builders[child.TargetName];
+                var relationName = child.RelationName ?? child.TargetName.ToLower();
+                if (targetBuilder._isBuilding)
                 {
                     targetBuilder.TypeBuilt += (sender, e) =>
                     {
                         var builder = (OntologyBuilder)sender;
                         var targetType = builder.Build();
-                        var embedding = new EmbeddingRelationType(Guid.NewGuid(), child.Name, child.EmbeddingOptions)
+                        var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
                         { Meta = child.Meta };
                         embedding.AddType(targetType);
                         type.AddType(embedding);
                     };
                 }
+                else
+                {
+                    var targetType = targetBuilder.Build();
+                    var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
+                    { Meta = child.Meta };
+                    embedding.AddType(targetType);
+                    type.AddType(embedding);
+                }
             }
-            IsBuilding = false;
+            _isBuilding = false;
             _builtType = type;
             TypeBuilt?.Invoke(this, EventArgs.Empty);
 

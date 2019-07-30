@@ -26,7 +26,7 @@ namespace IIS.Legacy.EntityFramework
             var attrs = await contourContext.Attributes.ToListAsync();
             var types = await contourContext.EntityTypes
                 .Include(e => e.AttributeRestrictions)
-                .Include(e => e.ForwardRestrictions)
+                .Include(e => e.ForwardRestrictions).ThenInclude(e => e.Type)
                 .ToListAsync()
                 ;
             
@@ -48,7 +48,6 @@ namespace IIS.Legacy.EntityFramework
                 var type = builder.Build();
                 Ontology[type.Name] = type;
             }
-            
             return Ontology.Values;
         }
 
@@ -72,9 +71,9 @@ namespace IIS.Legacy.EntityFramework
 
             foreach (var attr in srcType.AttributeRestrictions)
             {
-                if (attr.IsMultiple) builder.HasMultiple(attr.Attribute.Code, attr.Meta);
-                else if (attr.IsRequired) builder.HasRequired(attr.Attribute.Code, attr.Meta);
-                else builder.HasOptional(attr.Attribute.Code, attr.Meta);
+                if (attr.IsMultiple) builder.HasMultiple(attr.Attribute.Code, attr.Attribute.Code, attr.Meta);
+                else if (attr.IsRequired) builder.HasRequired(attr.Attribute.Code, attr.Attribute.Code, attr.Meta);
+                else builder.HasOptional(attr.Attribute.Code, attr.Attribute.Code, attr.Meta);
             }
             
             if (srcType.Parent != null)
@@ -85,10 +84,10 @@ namespace IIS.Legacy.EntityFramework
             foreach (var restriction in srcType.ForwardRestrictions)
             {
                 var code = restriction.Target.Code;
-
-                if (restriction.IsMultiple) builder.HasMultiple(code, restriction.Meta);
-                else if (restriction.IsRequired) builder.HasRequired(code, restriction.Meta);
-                else builder.HasOptional(code, restriction.Meta);
+                var relationName = restriction.Type.Code;
+                if (restriction.IsMultiple) builder.HasMultiple(code, relationName, restriction.Meta);
+                else if (restriction.IsRequired) builder.HasRequired(code, relationName, restriction.Meta);
+                else builder.HasOptional(code, relationName, restriction.Meta);
             }
 
             if (srcType.IsAbstract)

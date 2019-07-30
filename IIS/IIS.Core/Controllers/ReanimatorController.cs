@@ -29,8 +29,6 @@ namespace IIS.Core.Controllers
             _context = context;
         }
 
-        private static Dictionary<System.Guid, Type> _typesCache = new Dictionary<System.Guid, Type>();
-
         public async Task<IActionResult> Get()
         {
             _context.Types.RemoveRange(_context.Types.ToArray());
@@ -42,8 +40,11 @@ namespace IIS.Core.Controllers
             var ormTypes = types.Select(MapType).ToArray();
             _context.AddRange(ormTypes);
             await _context.SaveChangesAsync();
-            return null;
+
+            return Ok();
         }
+
+        private static Dictionary<System.Guid, Type> _typesCache = new Dictionary<System.Guid, Type>();
 
         private static Type MapType(OType type)
         {
@@ -57,7 +58,7 @@ namespace IIS.Core.Controllers
 
         private static Type ToEntity(OEntityType entityType)
         {
-            var type = ToType(entityType);
+            var type = _typesCache[entityType.Id] = ToType(entityType);
             type.Kind = Kind.Entity;
             type.IsAbstract = entityType.IsAbstract;
 
@@ -80,7 +81,7 @@ namespace IIS.Core.Controllers
 
         private static RelationType ToEmbeddingRelation(EmbeddingRelationType relationType, System.Guid sourceId)
         {
-            return new RelationType
+            var relation = new RelationType
             {
                 Id = relationType.Id,
                 IsArray = relationType.EmbeddingOptions == Ontology.EmbeddingOptions.Multiple,
@@ -89,11 +90,13 @@ namespace IIS.Core.Controllers
                 SourceTypeId = sourceId,
                 Type = ToType(relationType)
             };
+            relation.Type.Kind = Kind.Relation;
+            return relation;
         }
 
         private static RelationType ToInheritanceRelation(InheritanceRelationType relationType, System.Guid sourceId)
         {
-            return new RelationType
+            var relation = new RelationType
             {
                 Id = relationType.Id,
                 Kind = RelationKind.Inheritance,
@@ -101,6 +104,8 @@ namespace IIS.Core.Controllers
                 SourceTypeId = sourceId,
                 Type = ToType(relationType)
             };
+            relation.Type.Kind = Kind.Relation;
+            return relation;
         }
 
         private static Type ToAttribute(OAttributeType attributeType)
