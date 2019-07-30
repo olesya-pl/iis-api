@@ -119,5 +119,42 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             return _typeRepository.GetOrCreate(type.Name, () =>
                 _createCreator.NewCreateEntityRelationToTargetInputType(type));
         }
+        
+        // ----- UPDATE TYPES ----- //
+        
+        public UpdateMultipleInputType GetUpdateMultipleInputType(AttributeType type)
+        {
+            var name = type.ScalarTypeEnum.ToString();
+            return _typeRepository.GetOrCreate(name, () =>
+                _updateCreator.NewUpdateMultipleInputType(type));
+        }
+
+        public UpdateEntityRelationToInputType GetUpdateEntityRelationToInputType(EntityType type)
+        {
+            var name = type.Name;
+            return _typeRepository.GetOrCreate(name, () =>
+                _updateCreator.NewUpdateEntityRelationToInputType(type));
+        }
+
+        public UpdateEntityRelationToTargetInputType GetUpdateEntityRelationToTargetInputType(EntityType type)
+        {
+            var name = type.Name;
+            return _typeRepository.GetOrCreate(name, () =>
+                _updateCreator.NewUpdateEntityRelationToTargetInputType(type));
+        }
+
+        public EntityRelationPatchType GetEntityRelationPatchType(EntityType type)
+        {
+            var name = type.Name;
+            return _typeRepository.GetOrCreate(name, () =>
+                _updateCreator.NewEntityRelationPatchType(type));
+        }
+        
+        public AttributeRelationPatchType GetAttributeRelationPatchType(AttributeType type)
+        {
+            var name = type.Name;
+            return _typeRepository.GetOrCreate(name, () =>
+                _updateCreator.NewAttributeRelationPatchType(type));
+        }
     }
 }

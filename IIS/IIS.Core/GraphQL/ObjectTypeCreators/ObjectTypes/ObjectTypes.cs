@@ -92,14 +92,16 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     }
 
     // Pseudo-union of all child types. Only one field should be present.
-    public class CreateEntityRelationToTargetInputType : InputObjectType
+    public class InputEntityUnionType : InputObjectType
     {
-        private readonly EntityType _type;
-        private readonly GraphQlTypeCreator _typeCreator;
-        private readonly CreateMutatorTypeCreator _mutator;
+        private readonly string _operation;
+        private EntityType _type;
+        private GraphQlTypeCreator _typeCreator;
+        private MutatorTypeCreator _mutator;
 
-        public CreateEntityRelationToTargetInputType(EntityType type, GraphQlTypeCreator typeCreator, CreateMutatorTypeCreator mutator)
+        public InputEntityUnionType(string operation, EntityType type, GraphQlTypeCreator typeCreator, MutatorTypeCreator mutator)
         {
+            _operation = operation;
             _type = type;
             _typeCreator = typeCreator;
             _mutator = mutator;
@@ -107,7 +109,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"CreateEntityRelationTo{_type.Name}TargetInput");
+            d.Name($"{_operation}EntityRelationTo{_type.Name}TargetInput");
             d.Description("Unites multiple input types. Specify only single field.");
             if (_type.IsAbstract)
                 foreach (var child in _typeCreator.GetChildTypes(_type))
@@ -123,26 +125,127 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         }
     }
 
-    // Specify relation to existing object or create new with target field
-    public class CreateEntityRelationToInputType : InputObjectType
+    // GraphQL name = "CreateEntityRelationTo{_type.Name}TargetInput"
+    public class CreateEntityRelationToTargetInputType : InputEntityUnionType
     {
-        private readonly CreateEntityRelationToTargetInputType _target;
-        private readonly Type _type;
-
-        public CreateEntityRelationToInputType(Type type, CreateEntityRelationToTargetInputType target)
+        public CreateEntityRelationToTargetInputType(EntityType type, GraphQlTypeCreator typeCreator, CreateMutatorTypeCreator mutator)
+            : base("Create", type, typeCreator, mutator)
         {
+        }
+    }
+
+    // Specify relation to existing object or create new with target field
+    public class EntityRelationToInputTypeBase : InputObjectType
+    {
+        private readonly string _operation;
+        private InputEntityUnionType _target;
+        private Type _type;
+
+        public EntityRelationToInputTypeBase(string operation, Type type, InputEntityUnionType target)
+        {
+            _operation = operation;
             _target = target;
             _type = type;
         }
 
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"CreateEntityRelationToInput{_type.Name}Type");
+            d.Name($"{_operation}EntityRelationToInput{_type.Name}Type");
             d.Description("Specify relation to existing object or create new with target field.");
             d.Field("startsAt").Type<DateTimeType>();
             d.Field("endsAt").Type<DateTimeType>();
             d.Field("targetId").Type<IdType>();
             d.Field("target").Type(_target);
+        }
+    }
+
+    public class CreateEntityRelationToInputType : EntityRelationToInputTypeBase
+    {
+        public CreateEntityRelationToInputType(Type type, CreateEntityRelationToTargetInputType target)
+            : base("Create", type, target)
+        {
+        }
+    }
+    
+    // ----- Update ----- //
+    
+    public class UpdateMultipleInputType : InputObjectType
+    {
+        private readonly string _scalarName;
+        private readonly IInputType _inputType;
+
+        public UpdateMultipleInputType(string scalarName, IInputType inputType)
+        {
+            _scalarName = scalarName;
+            _inputType = inputType;
+        }
+        
+        protected override void Configure(IInputObjectTypeDescriptor d)
+        {
+            d.Name($"UpdateMultiple{_scalarName}Input");
+            d.Field("id").Type<IdType>();
+            d.Field("value").Type(_inputType);
+        }
+    }
+
+    public class AttributeRelationPatchType : InputObjectType
+    {
+        private AttributeType _type;
+        private IType _createType;
+        private IType _updateType;
+
+        public AttributeRelationPatchType(AttributeType type, GraphQlTypeCreator typeCreator)
+        {
+            _type = type;
+            _createType = typeCreator.GetCreateMultipleInputType(_type);
+            _updateType = typeCreator.GetUpdateMultipleInputType(_type);
+        }
+        
+        protected override void Configure(IInputObjectTypeDescriptor d)
+        {
+            d.Name($"Patch{_type.ScalarTypeEnum.ToString()}Type");
+            d.Field("delete").Type<ListType<NonNullType<IdType>>>();
+            d.Field("create").Type(new ListType(new NonNullType(_createType)));
+            d.Field("update").Type(new ListType(new NonNullType(_updateType)));
+        }
+    }
+    
+    // GraphQL name = "UpdateEntityRelationTo{_type.Name}TargetInput"
+    public class UpdateEntityRelationToTargetInputType : InputEntityUnionType
+    {
+        public UpdateEntityRelationToTargetInputType(EntityType type, GraphQlTypeCreator typeCreator, UpdateMutatorTypeCreator mutator)
+            : base("Update", type, typeCreator, mutator)
+        {
+        }
+    }
+    
+    public class UpdateEntityRelationToInputType : EntityRelationToInputTypeBase
+    {
+        public UpdateEntityRelationToInputType(Type type, UpdateEntityRelationToTargetInputType target)
+            : base("Update", type, target)
+        {
+        }
+    }
+
+    public class EntityRelationPatchType : InputObjectType
+    {
+        private EntityType _type;
+        private IType _createType;
+        private IType _updateType;
+
+        public EntityRelationPatchType(EntityType type, GraphQlTypeCreator typeCreator)
+        {
+            _type = type;
+            _createType = typeCreator.GetCreateEntityRelationToInputType(_type);
+            _updateType = typeCreator.GetUpdateEntityRelationToInputType(_type);
+        }
+
+        protected override void Configure(IInputObjectTypeDescriptor d)
+        {
+            d.Name($"Patch{_type.Name}Type");
+            d.Field("delete").Type<ListType<NonNullType<IdType>>>();
+            d.Field("create").Type(new ListType(new NonNullType(_createType)));
+            d.Field("update").Type(new ListType(new NonNullType(_updateType)));
         }
     }
 }
