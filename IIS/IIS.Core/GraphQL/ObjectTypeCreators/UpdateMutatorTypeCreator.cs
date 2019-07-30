@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
@@ -17,13 +19,11 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
             {
-                if (relationType.IsEntityType && /* relationType.AcceptsEntityOperations == Update */ true)
-                    type = TypeCreator.GetEntityRelationPatchType(relationType.EntityType)
-                        .WrapInputType(relationType);
+                if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Update))
+                    type = TypeCreator.GetEntityRelationPatchType(relationType.EntityType);
                 
                 if (relationType.IsAttributeType)
-                    type = TypeCreator.GetAttributeRelationPatchType(relationType.AttributeType)
-                        .WrapInputType(relationType);
+                    type = TypeCreator.GetAttributeRelationPatchType(relationType.AttributeType);
             }
             
             if (type == null)

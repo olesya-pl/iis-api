@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
@@ -19,7 +21,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         {
             IInputType type = null;
 
-            if (relationType.IsEntityType && /* relationType.AcceptsEntityOperations == Create */ true)
+            if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Create))
                 type = TypeCreator.GetCreateEntityRelationToInputType(relationType.EntityType)
                     .WrapInputType(relationType);
 

@@ -8,6 +8,7 @@ using IIS.Core.GraphQL.Mutations;
 using IIS.Core.GraphQL.ObjectTypeCreators;
 using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL
@@ -77,6 +78,10 @@ namespace IIS.Core.GraphQL
         }
 
         public static string GetFieldName(this EmbeddingRelationType relationType) => relationType.Name;
+
+        [Obsolete("Remove this abomination asap. Was created for testing.")]
+        public static bool AcceptsOperation(this EmbeddingRelationType relationType, EntityOperation operation) =>
+            (relationType.CreateMeta() as RelationTypeMeta)?.AcceptsEntityOperations?.Contains(operation) == true;
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d) =>
             d.Resolver(_ => throw new NotImplementedException());
