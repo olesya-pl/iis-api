@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL.Entities
         
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
-            _ontologyProvider.GetTypes().ValidateMeta(); // temporary meta validation
+            //_ontologyProvider.GetTypes().ValidateMeta(); // temporary meta validation
             var creator = new ReadQueryTypeCreator(_graphQlTypeProvider);
             descriptor.Name(nameof(EntityQuery));
             descriptor.PopulateFields(_ontologyProvider, creator);

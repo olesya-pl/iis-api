@@ -20,15 +20,15 @@ namespace IIS.Core.GraphQL.Ontology
         public ISchema GetSchema()
         {
             //var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
-            var ontology = new List<Type>();
+            var ontology = new Dictionary<string, Type>();
 
-            var builder = new OntologyBuilder(ontology);
-            var name = builder
-                .WithName("Name")
-                .IsAttribute()
-                .HasValueOf(Core.Ontology.ScalarType.String)
-                .Build();
-            ontology.Add(name);
+            var builder = new OntologyBuilder();
+            //var name = builder
+            //    .WithName("Name")
+            //    .IsAttribute()
+            //    .HasValueOf(Core.Ontology.ScalarType.String)
+            //    .Build();
+            //ontology.Add(name);
 
             //builder = new OntologyBuilder(ontology);
             //var obj = builder

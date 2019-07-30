@@ -39,6 +39,11 @@ namespace IIS.Core.Ontology
             public EmbeddingOptions EmbeddingOptions;
             public JObject Meta { get; set; }
         }
+        private Type _builtType;
+        public bool IsBuilt => _builtType != null;
+        public bool IsBuilding { get; private set; }
+        event EventHandler<EventArgs> TypeBuilt;
+
         public string Name => _name;
         private string _name;
         private string _title;
@@ -49,17 +54,13 @@ namespace IIS.Core.Ontology
         private Kind _kind;
         private ScalarType _scalarType;
 
-        private readonly List<Type> _ontology;
-
-        public OntologyBuilder(List<Type> ontology)
-        {
-            _ontology = ontology;
-        }
+        private static Dictionary<string, OntologyBuilder> Builders = new Dictionary<string, OntologyBuilder>();
 
         // Type
         public ITypeBuilder WithName(string name)
         {
             _name = name;
+            Builders.Add(name, this);
             return this;
         }
 
@@ -149,9 +150,13 @@ namespace IIS.Core.Ontology
             _scalarType = scalarType;
             return this;
         }
-
+        
         public Type Build()
         {
+            if (IsBuilt) return _builtType;
+
+            IsBuilding = true;
+
             var type = default(Type);
             if (_kind == Kind.Attribute)
             {
@@ -169,20 +174,20 @@ namespace IIS.Core.Ontology
             type.Title = _title;
             type.Meta = _meta;
 
-            foreach (var buildAction in _parentBuilders)
-            {
-                var builder = new OntologyBuilder(_ontology);
-                buildAction(builder);
-                var targetType = builder.Build();
-                _ontology.Add(targetType);
-                var inheritance = new InheritanceRelationType(Guid.NewGuid());
-                inheritance.AddType(targetType);
-                type.AddType(inheritance);
-            }
+            //foreach (var buildAction in _parentBuilders)
+            //{
+            //    var builder = new OntologyBuilder(_ontology);
+            //    buildAction(builder);
+            //    var targetType = builder.Build();
+            //    _ontology.Add(targetType);
+            //    var inheritance = new InheritanceRelationType(Guid.NewGuid());
+            //    inheritance.AddType(targetType);
+            //    type.AddType(inheritance);
+            //}
 
             foreach (var parent in _parents)
             {
-                var targetType = _ontology.First(e => e.Name == parent);
+                var targetType = Builders[parent].Build();
                 var inheritance = new InheritanceRelationType(Guid.NewGuid());
                 inheritance.AddType(targetType);
                 type.AddType(inheritance);
@@ -190,12 +195,32 @@ namespace IIS.Core.Ontology
 
             foreach (var child in _childNodes)
             {
-                var targetType = _ontology.First(e => e.Name == child.Name);
-                var embedding = new EmbeddingRelationType(Guid.NewGuid(), child.Name, child.EmbeddingOptions)
+                var targetBuilder = Builders[child.Name];
+
+                if (targetBuilder.IsBuilt)
+                {
+                    var targetType = targetBuilder.Build();
+                    var embedding = new EmbeddingRelationType(Guid.NewGuid(), child.Name, child.EmbeddingOptions)
                     { Meta = child.Meta };
-                embedding.AddType(targetType);
-                type.AddType(embedding);
+                    embedding.AddType(targetType);
+                    type.AddType(embedding);
+                }
+                else if (targetBuilder.IsBuilding)
+                {
+                    targetBuilder.TypeBuilt += (sender, e) =>
+                    {
+                        var builder = (OntologyBuilder)sender;
+                        var targetType = builder.Build();
+                        var embedding = new EmbeddingRelationType(Guid.NewGuid(), child.Name, child.EmbeddingOptions)
+                        { Meta = child.Meta };
+                        embedding.AddType(targetType);
+                        type.AddType(embedding);
+                    };
+                }
             }
+            IsBuilding = false;
+            _builtType = type;
+            TypeBuilt?.Invoke(this, EventArgs.Empty);
 
             return type;
         }
