@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"CreateMultiple{_scalarName}Input");
+            d.Name($"MultipleInput_C_{_scalarName}");
             d.Field("value").Type(_inputType);
         }
     }
@@ -109,7 +109,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"{_operation}EntityRelationTo{_type.Name}TargetInput");
+            d.Name($"UnionInput_{_operation[0]}_{_type.Name}");
             d.Description("Unites multiple input types. Specify only single field.");
             if (_type.IsAbstract)
                 foreach (var child in _typeCreator.GetChildTypes(_type))
@@ -150,7 +150,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"{_operation}EntityRelationToInput{_type.Name}Type");
+            d.Name($"RelationTo_{_operation[0]}_{_type.Name}");
             d.Description("Specify relation to existing object or create new with target field.");
             d.Field("startsAt").Type<DateTimeType>();
             d.Field("endsAt").Type<DateTimeType>();
@@ -182,7 +182,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"UpdateMultiple{_scalarName}Input");
+            d.Name($"MultipleInput_U_{_scalarName}");
             d.Field("id").Type<IdType>();
             d.Field("value").Type(_inputType);
         }
@@ -203,7 +203,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"Patch{_type.ScalarTypeEnum.ToString()}Type");
+            d.Name($"PatchInput_{_type.ScalarTypeEnum.ToString()}");
             d.Field("delete").Type<ListType<NonNullType<IdType>>>();
             d.Field("create").Type(new ListType(new NonNullType(_createType)));
             d.Field("update").Type(new ListType(new NonNullType(_updateType)));
@@ -242,7 +242,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"Patch{_type.Name}Type");
+            d.Name($"PatchInput_{_type.Name}");
             d.Field("delete").Type<ListType<NonNullType<IdType>>>();
             d.Field("create").Type(new ListType(new NonNullType(_createType)));
             d.Field("update").Type(new ListType(new NonNullType(_updateType)));

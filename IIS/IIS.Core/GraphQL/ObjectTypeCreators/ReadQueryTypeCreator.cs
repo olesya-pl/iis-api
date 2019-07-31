@@ -41,11 +41,11 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             if (relationType.IsAttributeType)
                 objectTypeDescriptor.Field(relationType.GetFieldName())
                     .Type(_typeRepository.GetOutputAttributeType(relationType.AttributeType).WrapOutputType(relationType))
-                    .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
+                    .Resolver(ctx => Resolvers.ResolveAttributeRelation(ctx, relationType));
             else if (relationType.IsEntityType)
                 objectTypeDescriptor.Field(relationType.GetFieldName())
                     .Type(CreateOutputType(relationType.EntityType).WrapOutputType(relationType))
-                    .Resolver(ctx => Resolvers.ResolveRelation(ctx, relationType));
+                    .Resolver(ctx => Resolvers.ResolveEntityRelation(ctx, relationType));
             else
                 throw new ArgumentException(nameof(relationType));
         }
@@ -105,10 +105,10 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             descriptor.Field(type.Name)
                 .Type(objectType)
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
-                .ResolverNotImplemented();
+                .Resolver(ctx => Resolvers.ResolveEntity(ctx, type));
             descriptor.Field(type.Name + "List")
                 .Type(collectionType)
-                .ResolverNotImplemented();
+                .Resolver(ctx => Resolvers.ResolveEntityList(ctx, type));
         }
     }
 }

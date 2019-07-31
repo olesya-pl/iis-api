@@ -69,11 +69,14 @@ namespace IIS.Core.Ontology.Meta
     class MetaForEntityTypeRelation : TypeMeta
     {
         public InversedEntityTypeRelation Inversed { get; set; }
+        public bool Multiple { get; set; } // why are you here?
     }
 
     class InversedEntityTypeRelation
     {
         public string Code { get; set; }
+        public bool Multiple { get; set; } // why are you here?
+        public bool Editable { get; set; } // why are you here?
     }
 
     public class RelationTypeMeta : TypeMeta
