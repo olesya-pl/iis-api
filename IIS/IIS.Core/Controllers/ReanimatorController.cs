@@ -44,9 +44,9 @@ namespace IIS.Core.Controllers
             return Ok();
         }
 
-        private static Dictionary<System.Guid, Type> _typesCache = new Dictionary<System.Guid, Type>();
+        private Dictionary<System.Guid, Type> _typesCache = new Dictionary<System.Guid, Type>();
 
-        private static Type MapType(OType type)
+        private Type MapType(OType type)
         {
             if (_typesCache.ContainsKey(type.Id)) return _typesCache[type.Id];
 
@@ -56,7 +56,7 @@ namespace IIS.Core.Controllers
             throw new System.Exception("Unknown type.");
         }
 
-        private static Type ToEntity(OEntityType entityType)
+        private Type ToEntity(OEntityType entityType)
         {
             var type = _typesCache[entityType.Id] = ToType(entityType);
             type.Kind = Kind.Entity;
@@ -79,7 +79,7 @@ namespace IIS.Core.Controllers
             return type;
         }
 
-        private static RelationType ToEmbeddingRelation(EmbeddingRelationType relationType, System.Guid sourceId)
+        private RelationType ToEmbeddingRelation(EmbeddingRelationType relationType, System.Guid sourceId)
         {
             var relation = new RelationType
             {
@@ -94,7 +94,7 @@ namespace IIS.Core.Controllers
             return relation;
         }
 
-        private static RelationType ToInheritanceRelation(InheritanceRelationType relationType, System.Guid sourceId)
+        private RelationType ToInheritanceRelation(InheritanceRelationType relationType, System.Guid sourceId)
         {
             var relation = new RelationType
             {
@@ -108,7 +108,7 @@ namespace IIS.Core.Controllers
             return relation;
         }
 
-        private static Type ToAttribute(OAttributeType attributeType)
+        private Type ToAttribute(OAttributeType attributeType)
         {
             Ontology.EntityFramework.Context.ScalarType MapScalarType(Ontology.ScalarType scalarType)
             {

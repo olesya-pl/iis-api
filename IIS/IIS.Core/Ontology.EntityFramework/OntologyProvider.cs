@@ -33,10 +33,25 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private static Type MapType(Context.Type type)
         {
+            ScalarType MapScalarType(Context.ScalarType scalarType)
+            {
+                switch (scalarType)
+                {
+                    case Context.ScalarType.Boolean: return ScalarType.Boolean;
+                    case Context.ScalarType.Date: return ScalarType.DateTime;
+                    case Context.ScalarType.Decimal: return ScalarType.Decimal;
+                    case Context.ScalarType.File: return ScalarType.File;
+                    case Context.ScalarType.Geo: return ScalarType.Geo;
+                    case Context.ScalarType.Int: return ScalarType.Integer;
+                    case Context.ScalarType.String: return ScalarType.String;
+                    default: throw new NotImplementedException();
+                }
+            }
+
             if (type.Kind == Kind.Attribute)
             {
                 var attributeType = type.AttributeType;
-                var attr = new AttributeType(type.Id, type.Name, attributeType.ScalarType.ToString());
+                var attr = new AttributeType(type.Id, type.Name, MapScalarType(attributeType.ScalarType));
                 FillProperties(type, attr);
                 return attr;
             }

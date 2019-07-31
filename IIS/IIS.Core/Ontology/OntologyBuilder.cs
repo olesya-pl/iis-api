@@ -1,35 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
 {
-    public interface ITypeBuilder
-    {
-        ITypeBuilder WithName(string name);
-        ITypeBuilder WithTitle(string name);
-        ITypeBuilder WithMeta(JObject meta);
-        ITypeBuilder Is(string name);
-        ITypeBuilder Is(Type type);
-        ITypeBuilder Is(Action<ITypeBuilder> buildAction);
-        ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null);
-        ITypeBuilder HasRequired(Type type);
-        ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null);
-        ITypeBuilder HasOptional(Type type);
-        ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null);
-        ITypeBuilder HasMultiple(Type type);
-        ITypeBuilder IsAbstraction();
-        ITypeBuilder IsEntity();
-        IAttributeBuilder IsAttribute();
-        Type Build();
-    }
-
-    public interface IAttributeBuilder : ITypeBuilder
-    {
-        IAttributeBuilder HasValueOf(ScalarType name);
-    }
-
     public class OntologyBuilder : IAttributeBuilder, ITypeBuilder
     {
         private enum Kind { Attribute, Entity, Abstraction }
@@ -54,7 +28,12 @@ namespace IIS.Core.Ontology
         private Kind _kind;
         private ScalarType _scalarType;
 
-        private static Dictionary<string, OntologyBuilder> Builders = new Dictionary<string, OntologyBuilder>();
+        private readonly Dictionary<string, OntologyBuilder> Builders;
+
+        public OntologyBuilder(Dictionary<string, OntologyBuilder> builders)
+        {
+            Builders = builders;
+        }
 
         // Type
         public ITypeBuilder WithName(string name)
@@ -191,6 +170,10 @@ namespace IIS.Core.Ontology
 
             type.Title = _title;
             type.Meta = _meta;
+            // todo: make configurable
+            var now = DateTime.UtcNow;
+            type.CreatedAt = now;
+            type.UpdatedAt = now;
 
             //foreach (var buildAction in _parentBuilders)
             //{
@@ -206,7 +189,7 @@ namespace IIS.Core.Ontology
             foreach (var parent in _parents)
             {
                 var targetType = Builders[parent].Build();
-                var inheritance = new InheritanceRelationType(Guid.NewGuid());
+                var inheritance = new InheritanceRelationType(Guid.NewGuid()) { CreatedAt = now, UpdatedAt = now };
                 inheritance.AddType(targetType);
                 type.AddType(inheritance);
             }
@@ -222,7 +205,7 @@ namespace IIS.Core.Ontology
                         var builder = (OntologyBuilder)sender;
                         var targetType = builder.Build();
                         var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-                        { Meta = child.Meta };
+                        { Meta = child.Meta, CreatedAt = now, UpdatedAt = now };
                         embedding.AddType(targetType);
                         type.AddType(embedding);
                     };
@@ -231,7 +214,7 @@ namespace IIS.Core.Ontology
                 {
                     var targetType = targetBuilder.Build();
                     var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-                    { Meta = child.Meta };
+                    { Meta = child.Meta, CreatedAt = now, UpdatedAt = now };
                     embedding.AddType(targetType);
                     type.AddType(embedding);
                 }

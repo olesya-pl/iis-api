@@ -22,7 +22,7 @@ namespace IIS.Core.GraphQL.Ontology
             //var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
             var ontology = new Dictionary<string, Type>();
 
-            var builder = new OntologyBuilder();
+            //var builder = new OntologyBuilder();
             //var name = builder
             //    .WithName("Name")
             //    .IsAttribute()
