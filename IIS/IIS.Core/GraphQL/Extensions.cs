@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL
 
         public static IObjectTypeDescriptor PopulateFields(this IObjectTypeDescriptor descriptor, IOntologyProvider ontologyProvider, ITypeFieldPopulator populator)
         {
-            var types = ontologyProvider.GetTypes().OfType<EntityType>();
+            var types = ontologyProvider.GetTypes().OfType<EntityType>().Where(et => !et.IsAbstract);
             foreach (var type in types)
                 populator.AddFields(descriptor, type);
             return descriptor;

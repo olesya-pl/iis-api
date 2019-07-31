@@ -26,6 +26,7 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="GraphQL\" />
+    <Folder Include="GraphQL\Resolvers" />
     <Folder Include="Ontology\" />
     <Folder Include="Ontology.EntityFramework\" />
     <Folder Include="Ontology.EntityFramework\Context\" />
