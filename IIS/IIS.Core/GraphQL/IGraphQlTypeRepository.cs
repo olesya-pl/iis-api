@@ -15,7 +15,6 @@ namespace IIS.Core.GraphQL
 {
     public interface IGraphQlTypeRepository
     {
-        Dictionary<string, IOutputType> OntologyTypes { get; }
         Dictionary<OScalarType, HCScalarType> Scalars { get; }
         IEnumerable<INamedType> AllTypes { get; }
         T GetType<T>() where T : IType, new();
@@ -25,20 +24,8 @@ namespace IIS.Core.GraphQL
 
     public class GraphQlTypeRepository : IGraphQlTypeRepository
     {
-        // Remove it asap
-        [Obsolete]
-        public List<Core.Ontology.Type> OntologyTypeList { get; }
-        public GraphQlTypeRepository(IOntologyProvider ontologyProvider)
-        {
-            OntologyTypeList = ontologyProvider.GetTypes().ToList();
-        }
-        // Remove it asap
-        
-        
         public Dictionary<Type, IType> CommonTypes { get; } = new Dictionary<Type, IType>();
         
-        public Dictionary<string, IOutputType> OntologyTypes { get; } = new Dictionary<string, IOutputType>();
-
         public Dictionary<OScalarType, HCScalarType> Scalars { get; } = new Dictionary<OScalarType, HCScalarType>
         {
             [OScalarType.String] = new StringType(),
@@ -51,8 +38,7 @@ namespace IIS.Core.GraphQL
         };
 
         public IEnumerable<INamedType> AllTypes => InputTypes.Values.SelectMany(d => d.Values)
-            .Union(Scalars.Values)
-            .Union(OntologyTypes.Values.Cast<INamedType>());
+            .Union(Scalars.Values);
 
         public Dictionary<Type, Dictionary<string, INamedType>> InputTypes = new Dictionary<Type, Dictionary<string, INamedType>>();
 

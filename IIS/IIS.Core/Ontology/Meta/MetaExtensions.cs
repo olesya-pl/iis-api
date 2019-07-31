@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace IIS.Core.Ontology.Meta
@@ -7,7 +8,7 @@ namespace IIS.Core.Ontology.Meta
     public static class MetaExtensions
     {
         public static JsonSerializer CreateSerializer() =>
-            new JsonSerializer {MissingMemberHandling = MissingMemberHandling.Error};
+            new JsonSerializer {MissingMemberHandling = MissingMemberHandling.Error, NullValueHandling = NullValueHandling.Ignore};
         
         public static ITypeMeta CreateMeta(this Type type)
         {
@@ -17,9 +18,27 @@ namespace IIS.Core.Ontology.Meta
                 return attributeType.CreateMeta();
             if (type is EmbeddingRelationType relationType)
                 return relationType.CreateMeta();
+            if (type is EntityType entityType)
+                return entityType.CreateMeta();
             var js = CreateSerializer();
             js.Converters.Add(new TypeMetaConverter(null));
             return type.Meta?.ToObject<ITypeMeta>(js);
+        }
+
+        public static ITypeMeta CreateMeta(this EntityType type)
+        {
+            var js = CreateSerializer();
+            js.Converters.Add(new TypeMetaConverter(null));
+            var meta = new TypeMeta();
+            var hierarchy = type.AllParents.Concat(new[] {type});
+            foreach (var t in hierarchy)
+            {
+                if (t.Meta == null) continue;
+                using (var reader = t.Meta.CreateReader())
+                    js.Populate(reader, meta);
+            }
+
+            return meta;
         }
 
         public static ITypeMeta CreateMeta(this EmbeddingRelationType type)

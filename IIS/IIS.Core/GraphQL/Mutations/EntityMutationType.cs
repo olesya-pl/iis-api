@@ -3,6 +3,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.ObjectTypeCreators;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 
 namespace IIS.Core.GraphQL.Mutations
 {
@@ -19,9 +20,13 @@ namespace IIS.Core.GraphQL.Mutations
 
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
-            var creator = new CompositeMutatorTypeCreator(_graphQlTypeCreator);
+            var populator = new TypeFieldPopulator(_graphQlTypeCreator);
             descriptor.Name(nameof(EntityMutation));
-            descriptor.PopulateFields(_ontologyProvider, creator);
+            var typesToPopulate = _ontologyProvider.GetTypes().OfType<EntityType>()
+                .Where(t => t.CreateMeta().ExposeOnApi != false);
+            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
+            populator.PopulateFields(descriptor, typesToPopulate,
+                Operation.Create, Operation.Update, Operation.Delete);
         }
     }
 }

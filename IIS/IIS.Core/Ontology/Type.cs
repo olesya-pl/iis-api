@@ -27,7 +27,9 @@ namespace IIS.Core.Ontology
             Nodes.OfType<EmbeddingRelationType>();
 
         public IEnumerable<EmbeddingRelationType> AllProperties =>
-            AllParents.SelectMany(p => p.DirectProperties).Union(DirectProperties);
+            AllParents.SelectMany(p => p.DirectProperties)
+                .Where(pp => DirectProperties.All(dp => dp.Name != pp.Name)) // Ignore parent properties with same name (overriden)
+                .Union(DirectProperties);
         
         public Type(Guid id, string name)
         {

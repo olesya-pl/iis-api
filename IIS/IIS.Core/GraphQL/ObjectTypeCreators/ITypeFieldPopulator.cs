@@ -5,6 +5,6 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
     public interface ITypeFieldPopulator
     {
-        void AddFields(IObjectTypeDescriptor descriptor, EntityType type);
+        void AddFields(IObjectTypeDescriptor descriptor, EntityType type, Operation operation);
     }
 }

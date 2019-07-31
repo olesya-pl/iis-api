@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities;
@@ -23,28 +24,13 @@ namespace IIS.Core.GraphQL
             return task.Result;
         }
 
-        public static IObjectTypeDescriptor PopulateFields(this IObjectTypeDescriptor descriptor, IOntologyProvider ontologyProvider, ITypeFieldPopulator populator)
+        public static IObjectTypeDescriptor PopulateFields(this ITypeFieldPopulator populator, IObjectTypeDescriptor descriptor,
+            IEnumerable<EntityType> entityTypes, params Operation[] operations)
         {
-            var types = ontologyProvider.GetTypes().OfType<EntityType>().Where(et => !et.IsAbstract);
-            foreach (var type in types)
-                populator.AddFields(descriptor, type);
+            foreach (var type in entityTypes)
+                foreach (var operation in operations)
+                    populator.AddFields(descriptor, type, operation);
             return descriptor;
-        }
-
-        public static HotChocolate.Types.ScalarType GetScalarType(this IGraphQlTypeRepository typeRepository, AttributeType attributeType)
-            => typeRepository.Scalars[attributeType.ScalarTypeEnum];
-        
-        /// <summary>
-        /// Sets field type with known scalar type considering RelationType's embedding options (NonNull or/and List)
-        /// </summary>
-        public static IOutputType GetOutputAttributeType(this IGraphQlTypeRepository typeRepository, AttributeType attributeType)
-        {
-            IOutputType type;
-            if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
-                type = typeRepository.GetType<ObjectType<Attachment>>();
-            else
-                type = typeRepository.GetScalarType(attributeType);
-            return type;
         }
 
         public static IOutputType WrapOutputType(this IOutputType type, EmbeddingRelationType relationType)

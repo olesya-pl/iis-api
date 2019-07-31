@@ -19,6 +19,13 @@ namespace IIS.Core.GraphQL.Entities
             var parent = ctx.Parent<Node>();
             throw new NotImplementedException();
         }
+        
+        public static async Task<Relation> ResolveParentRelation(IResolverContext ctx)
+        {
+            // resolver for "_relation" field on schema
+            // todo: You should resolve parent-to-current entity relation here. However, ctx.Parent would return current entity.
+            throw new NotImplementedException();
+        }
 
         public static async Task<Guid> ResolveId(IResolverContext ctx)
         {

@@ -66,10 +66,10 @@ namespace IIS.Core.GraphQL.EntityTypes
         public abstract object Type { get; }
 
         [GraphQLNonNullType]
-        public string Title => Source.TargetType.Title;
+        public string Title => Source.Title ?? Source.TargetType.Title; // fallback to target type 
 
         [GraphQLNonNullType]
-        public string Code => Source.TargetType.Name;
+        public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type 
 
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
