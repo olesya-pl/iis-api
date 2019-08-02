@@ -22,7 +22,8 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         public EntityType GetEntityType([GraphQLNonNullType] string code)
         {
-            return new EntityType(_ontologyProvider.GetTypes().SingleOrDefault(t => t.Name == code));
+            var type = _ontologyProvider.GetTypes().SingleOrDefault(t => t.Name == code);
+            return type == null ? null : new EntityType(type);
         }
     }
 }

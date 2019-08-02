@@ -16,4 +16,15 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     {
         
     }
+    
+    public class UpdateEntityRelationInput : EntityRelationInput
+    {
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public Guid Id { get; set; }
+    }
+    
+    public class UpdateEntityRelationInputType : InputObjectType<UpdateEntityRelationInput>
+    {
+        
+    }
 }

@@ -55,7 +55,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             var inversed = meta?.Inversed;
             if (inversed != null)
             {
-                objectTypeDescriptor.Field(inversed.Code).Type(type)
+                objectTypeDescriptor.Field(inversed.Code ?? relationType.GetFieldName() + "Inversed").Type(type)
                     .Description("Inversed relation resolvers and wrapping are not implemented.")
                     .ResolverNotImplemented();
             }

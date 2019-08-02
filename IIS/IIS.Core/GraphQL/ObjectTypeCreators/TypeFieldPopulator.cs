@@ -1,5 +1,6 @@
 using System;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Mutations;
 using IIS.Core.Ontology;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
@@ -26,7 +27,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 //                .Argument("data", d => d.Type(new NonNullType(TypeProvider.Scalars[Core.Ontology.ScalarType.String]))) // fail
                 .Argument("data", d =>
                     d.Type(_creator.GetMutatorInputType(operation, type)))
-                .ResolverNotImplemented();
+                .Resolver(ctx => Resolvers.CreateEntity(ctx, type));
         }
         
         public void AddUpdateFields(IObjectTypeDescriptor descriptor, EntityType type)
@@ -37,7 +38,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
                 .Argument("data", d =>
                     d.Type(_creator.GetMutatorInputType(operation, type)))
-                .ResolverNotImplemented();
+                .Resolver(ctx => Resolvers.UpdateEntity(ctx, type));
         }
         
         public void AddDeleteFields(IObjectTypeDescriptor descriptor, EntityType type)
@@ -46,7 +47,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             descriptor.Field(GetName(operation, type))
                 .Type(_creator.GetMutatorResponseType(operation, type))
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
-                .ResolverNotImplemented();
+                .Resolver(ctx => Resolvers.DeleteEntity(ctx, type));
         }
 
         public void AddFields(IObjectTypeDescriptor descriptor, EntityType type, Operation operation)

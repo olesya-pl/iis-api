@@ -19,7 +19,6 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         private CreateMutatorTypeCreator _createCreator;
         private DeleteMutatorTypeCreator _deleteCreator;
         private UpdateMutatorTypeCreator _updateCreator;
-        private MutatorTypeCreator[] _mutatorCreators;
 
         public GraphQlTypeCreator(IGraphQlTypeRepository typeRepository, IOntologyProvider ontologyProvider)
         {
@@ -30,7 +29,6 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             _createCreator = new CreateMutatorTypeCreator(this);
             _deleteCreator = new DeleteMutatorTypeCreator(this);
             _updateCreator = new UpdateMutatorTypeCreator(this);
-            _mutatorCreators = new MutatorTypeCreator[] {_createCreator, _deleteCreator, _updateCreator};
         }
 
         public void Create()
@@ -42,12 +40,13 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             foreach (var type in entityTypes)
                 GetOntologyType(type);
             // Create input types
+            var mutations = new[] {Operation.Create, Operation.Delete, Operation.Update};
             foreach (var type in entityTypes)
             {
-                foreach (var mutator in _mutatorCreators)
+                foreach (var mutator in mutations)
                 {
-                    GetMutatorInputType(mutator.Operation, type);
-                    GetMutatorResponseType(mutator.Operation, type);
+                    GetMutatorInputType(mutator, type);
+                    GetMutatorResponseType(mutator, type);
                 }
             }
         }
@@ -151,19 +150,12 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         }
 
         // ----- UPDATE TYPES ----- //
-        
-        public EntityRelationPatchType GetEntityRelationPatchType(EntityType type)
+
+        public RelationPatchType GetRelationPatchType(EmbeddingRelationType relationType)
         {
-            var name = type.Name;
+            var name = RelationPatchType.GetName(relationType);
             return _typeRepository.GetOrCreate(name, () =>
-                new EntityRelationPatchType(type, this));
-        }
-        
-        public AttributeRelationPatchType GetAttributeRelationPatchType(AttributeType type)
-        {
-            var name = type.Name;
-            return _typeRepository.GetOrCreate(name, () =>
-                new AttributeRelationPatchType(type, this));
+                new RelationPatchType(relationType, this));
         }
     }
 }

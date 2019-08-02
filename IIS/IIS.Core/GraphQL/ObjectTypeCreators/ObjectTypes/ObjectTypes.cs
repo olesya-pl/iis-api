@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using HotChocolate.Types;
-using Humanizer.Configuration;
-using IIS.Core.GraphQL.Common;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
@@ -192,48 +190,59 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     }
 
     // ----- Update ----- //
-
-    public class AttributeRelationPatchType : InputObjectType
+    
+    public class RelationPatchType : InputObjectType
     {
-        private AttributeType _type;
-        private IType _createType;
-        private IType _updateType;
-
-        public AttributeRelationPatchType(AttributeType type, GraphQlTypeCreator typeCreator)
+        public static string GetName(EmbeddingRelationType relationType)
         {
-            _type = type;
-            _createType = typeCreator.GetMultipleInputType(Operation.Create, _type);
-            _updateType = typeCreator.GetMultipleInputType(Operation.Update, _type);
+            if (relationType.IsAttributeType)
+                return relationType.AttributeType.ScalarTypeEnum.ToString();
+            if (relationType.IsEntityType)
+                return relationType.AcceptsOperation(EntityOperation.Update)
+                    ? relationType.EntityType.Name
+                    : nameof(EntityRelationInput);
+            throw new ArgumentException(nameof(relationType));
         }
         
-        protected override void Configure(IInputObjectTypeDescriptor d)
-        {
-            d.Name($"PatchInput_{_type.ScalarTypeEnum.ToString()}");
-            d.Field("delete").Type<ListType<NonNullType<IdType>>>();
-            d.Field("create").Type(new ListType(new NonNullType(_createType)));
-            d.Field("update").Type(new ListType(new NonNullType(_updateType)));
-        }
-    }
-
-    public class EntityRelationPatchType : InputObjectType
-    {
-        private EntityType _type;
+        private readonly string _typeName;
         private IType _createType;
         private IType _updateType;
 
-        public EntityRelationPatchType(EntityType type, GraphQlTypeCreator typeCreator)
+        public RelationPatchType(EmbeddingRelationType relationType, GraphQlTypeCreator typeCreator)
         {
-            _type = type;
-            _createType = typeCreator.GetEntityRelationToInputTypeBase(Operation.Create, _type);
-            _updateType = typeCreator.GetEntityRelationToInputTypeBase(Operation.Update, _type);
+            _typeName = GetName(relationType);
+            if (relationType.IsAttributeType)
+            {
+                _createType = typeCreator.GetMultipleInputType(Operation.Create, relationType.AttributeType);
+                _updateType = typeCreator.GetMultipleInputType(Operation.Update, relationType.AttributeType);
+            }
+            else if (relationType.IsEntityType)
+            {
+                if (relationType.AcceptsOperation(EntityOperation.Update))
+                {
+                    _createType = typeCreator.GetEntityRelationToInputTypeBase(Operation.Create, relationType.EntityType);
+                    _updateType = typeCreator.GetEntityRelationToInputTypeBase(Operation.Update, relationType.EntityType);
+                }
+                else
+                {
+                    _createType = null; // typeCreator.GetType<EntityRelationInputType>();
+                    _updateType = null; // typeCreator.GetType<UpdateEntityRelationInputType>();
+                }
+            }
         }
 
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
-            d.Name($"PatchInput_{_type.Name}");
+            d.Name($"PatchInput_{_typeName}");
             d.Field("delete").Type<ListType<NonNullType<IdType>>>();
-            d.Field("create").Type(new ListType(new NonNullType(_createType)));
-            d.Field("update").Type(new ListType(new NonNullType(_updateType)));
+            if (_createType == null)
+                d.Field("create").Type<ListType<NonNullType<EntityRelationInputType>>>();
+            else
+                d.Field("create").Type(new ListType(new NonNullType(_createType)));
+            if (_updateType == null)
+                d.Field("update").Type<ListType<NonNullType<UpdateEntityRelationInputType>>>();
+            else
+                d.Field("update").Type(new ListType(new NonNullType(_updateType)));
         }
     }
 }
