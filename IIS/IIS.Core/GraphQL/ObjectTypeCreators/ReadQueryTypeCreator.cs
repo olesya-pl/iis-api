@@ -51,7 +51,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             else
                 fd.Resolver(ctx => Resolvers.ResolveEntityRelation(ctx, relationType));
             // todo: Move inversed relations to domain
-            var meta = relationType.CreateMeta() as MetaForEntityTypeRelation;
+            var meta = relationType.CreateMeta() as EntityRelationMeta;
             var inversed = meta?.Inversed;
             if (inversed != null)
             {

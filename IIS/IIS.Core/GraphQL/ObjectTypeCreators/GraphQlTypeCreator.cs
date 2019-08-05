@@ -33,7 +33,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 
         public void Create()
         {
-            var entityTypes = _ontologyProvider.GetTypes().OfType<EntityType>().ToList();
+            var entityTypes = _ontologyTypes.OfType<EntityType>().ToList();
             // Create output types
             foreach (Core.Ontology.ScalarType scalar in Enum.GetValues(typeof(Core.Ontology.ScalarType)))
                 GetMultipleOutputType(scalar);

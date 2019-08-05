@@ -65,9 +65,8 @@ namespace IIS.Core.GraphQL
 
         public static string GetFieldName(this EmbeddingRelationType relationType) => relationType.Name;
 
-        [Obsolete("Remove this abomination asap. Was created for testing.")]
         public static bool AcceptsOperation(this EmbeddingRelationType relationType, EntityOperation operation) =>
-            (relationType.CreateMeta() as RelationTypeMeta)?.AcceptsEntityOperations?.Contains(operation) == true;
+            ((EntityRelationMeta)relationType.CreateMeta()).AcceptsEntityOperations?.Contains(operation) == true;
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d) =>
             d.Resolver(_ => throw new NotImplementedException());

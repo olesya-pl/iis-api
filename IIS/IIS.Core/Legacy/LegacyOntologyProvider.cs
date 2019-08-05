@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IIS.Core.Ontology;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Legacy.EntityFramework
 {
@@ -66,11 +67,14 @@ namespace IIS.Legacy.EntityFramework
             foreach (var restriction in srcType.ForwardRestrictions)
             {
                 var code = restriction.Target.Code;
-                var title = restriction.Type.Title; // todo: implement title for relations
+                // todo: move title to relation builder
+                var title = restriction.Meta["title"]?.ToString() ?? restriction.Type.Title; 
                 var relationName = restriction.Type.Code;
-                if (restriction.IsMultiple) builder.HasMultiple(code, relationName, restriction.Meta);
-                else if (restriction.IsRequired) builder.HasRequired(code, relationName, restriction.Meta);
-                else builder.HasOptional(code, relationName, restriction.Meta);
+                var meta = (JObject) restriction.Type.Meta.DeepClone();
+                meta.Merge(restriction.Meta); // Merge restriction meta into type meta
+                if (restriction.IsMultiple) builder.HasMultiple(code, relationName, meta, title);
+                else if (restriction.IsRequired) builder.HasRequired(code, relationName, meta, title);
+                else builder.HasOptional(code, relationName, meta, title);
             }
 
             if (srcType.IsAbstract) builder.IsAbstraction();

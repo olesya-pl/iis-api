@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.Meta
 {
@@ -9,8 +11,15 @@ namespace IIS.Core.Ontology.Meta
     {
         public static JsonSerializer CreateSerializer() =>
             new JsonSerializer {MissingMemberHandling = MissingMemberHandling.Error, NullValueHandling = NullValueHandling.Ignore};
+
+        public static TMeta CreateMeta<TMeta>(Type type, JsonConverter typeConverter) where TMeta : IMeta
+        {
+            var js = CreateSerializer();
+            js.Converters.Add(typeConverter);
+            return type.GetFullMeta().ToObject<TMeta>(js);
+        }
         
-        public static ITypeMeta CreateMeta(this Type type)
+        public static IMeta CreateMeta(this Type type)
         {
             if (type?.Meta == null)
                 return null;
@@ -20,41 +29,30 @@ namespace IIS.Core.Ontology.Meta
                 return relationType.CreateMeta();
             if (type is EntityType entityType)
                 return entityType.CreateMeta();
-            var js = CreateSerializer();
-            js.Converters.Add(new TypeMetaConverter(null));
-            return type.Meta?.ToObject<ITypeMeta>(js);
+            throw new ArgumentException(nameof(type));
         }
 
-        public static ITypeMeta CreateMeta(this EntityType type)
-        {
-            var js = CreateSerializer();
-            js.Converters.Add(new TypeMetaConverter(null));
-            var meta = new TypeMeta();
-            var hierarchy = type.AllParents.Concat(new[] {type});
-            foreach (var t in hierarchy)
-            {
-                if (t.Meta == null) continue;
-                using (var reader = t.Meta.CreateReader())
-                    js.Populate(reader, meta);
-            }
+        public static EntityMeta CreateMeta(this EntityType type) =>
+            CreateMeta<EntityMeta>(type, new MetaConverter<EntityMeta>(null));
+        
+        public static AttributeMeta CreateMeta(this AttributeType type) =>
+            CreateMeta<AttributeMeta>(type, new MetaConverter<AttributeMeta>(type.ScalarTypeEnum));
 
-            return meta;
+        public static RelationMetaBase CreateMeta(this EmbeddingRelationType type) =>
+            type.IsAttributeType ? (RelationMetaBase) CreateAttributeRelationMeta(type) : CreateEntityRelationMeta(type);
+
+        public static AttributeRelationMeta CreateAttributeRelationMeta(this EmbeddingRelationType type)
+        {
+            if (!type.IsAttributeType) throw new ArgumentException(nameof(type));
+            var converter = new MetaConverter<AttributeRelationMeta>(type.AttributeType.ScalarTypeEnum);
+            return CreateMeta<AttributeRelationMeta>(type, converter);
         }
-
-        public static ITypeMeta CreateMeta(this EmbeddingRelationType type)
+        
+        public static EntityRelationMeta CreateEntityRelationMeta(this EmbeddingRelationType type)
         {
-            var js = CreateSerializer();
-            js.Converters.Add(type.IsAttributeType
-                ? new RelationTypeMetaConverter(type.AttributeType.ScalarTypeEnum)
-                : new RelationTypeMetaConverter(null));
-            return type.Meta?.ToObject<ITypeMeta>(js);
-        }
-
-        public static ITypeMeta CreateMeta(this AttributeType type)
-        {
-            var js = CreateSerializer();
-            js.Converters.Add(new TypeMetaConverter(type.ScalarTypeEnum));
-            return type.Meta?.ToObject<ITypeMeta>(js);
+            if (!type.IsEntityType) throw new ArgumentException(nameof(type));
+            var converter = new MetaConverter<EntityRelationMeta>(null);
+            return CreateMeta<EntityRelationMeta>(type, converter);
         }
 
         // ugly quick solution to validate existing ontology meta
@@ -78,6 +76,21 @@ namespace IIS.Core.Ontology.Meta
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine(type.Meta);
             }
+        }
+
+        public static JObject GetFullMeta(this Type type)
+        {
+            var settings = new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Replace,
+                MergeNullValueHandling = MergeNullValueHandling.Merge
+            };
+            var meta = new JObject();
+            var hierarchy = type.AllParents.Concat(new[] {type});
+            foreach (var t in hierarchy)
+                if (t.Meta != null)
+                    meta.Merge(t.Meta, settings);
+            return meta;
         }
     }
 }
