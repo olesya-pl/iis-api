@@ -1,17 +1,30 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Legacy.EntityFramework
 {
     public class LegacyOntologyProvider : ILegacyOntologyProvider
     {
         private readonly string _connectionString;
+        
+        struct UnionInfo
+        { 
+            public IGrouping<OTypeRelation, ORestriction> Union;
+            public OTypeEntity Source;
+            public string Name;
+        }
 
+        private List<UnionInfo> _unionInfos = new List<UnionInfo>();
+        
+        
         public LegacyOntologyProvider(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("db-legacy");
@@ -32,7 +45,7 @@ namespace IIS.Legacy.EntityFramework
             foreach (var type in types) DescribeTypeEntity(type, buildContext);
 
             var ontology = buildContext.BuildOntology();
-
+            BuildUnions(ontology);
             return ontology;
         }
 
@@ -64,14 +77,19 @@ namespace IIS.Legacy.EntityFramework
             
             if (srcType.Parent != null) builder.Is(srcType.Parent.Code);
 
-            foreach (var restriction in srcType.ForwardRestrictions)
+            foreach (var restrictionGroup in srcType.ForwardRestrictions.GroupBy(r => r.Type))
             {
+                var restriction = restrictionGroup.First();
                 var code = restriction.Target.Code;
                 // todo: move title to relation builder
-                var title = restriction.Meta["title"]?.ToString() ?? restriction.Type.Title; 
+                var title = restriction.Meta["title"]?.ToString() ?? restriction.Type.Title;
                 var relationName = restriction.Type.Code;
                 var meta = (JObject) restriction.Type.Meta.DeepClone();
                 meta.Merge(restriction.Meta); // Merge restriction meta into type meta
+                if (restrictionGroup.Count() > 1) // Create common abstract type to represent union or interface
+                {
+                    _unionInfos.Add(new UnionInfo {Name = relationName, Union = restrictionGroup, Source = srcType});
+                }
                 if (restriction.IsMultiple) builder.HasMultiple(code, relationName, meta, title);
                 else if (restriction.IsRequired) builder.HasRequired(code, relationName, meta, title);
                 else builder.HasOptional(code, relationName, meta, title);
@@ -79,6 +97,30 @@ namespace IIS.Legacy.EntityFramework
 
             if (srcType.IsAbstract) builder.IsAbstraction();
             else builder.IsEntity();
+        }
+
+        private void BuildUnions(IEnumerable<Type> ontology)
+        {
+            var entities = ontology.OfType<EntityType>().ToDictionary(t => t.Name);
+            foreach (var info in _unionInfos)
+            {
+                var source = entities[info.Source.Code];
+                var relation = source.DirectProperties.Single(p => p.Name == info.Name);
+                var nodes = (List<Type>) relation.Nodes;
+                
+                var unionName = $"{source.Name}_{relation.Name}";
+                var unionType = new EntityType(Guid.Empty, unionName, true);
+                foreach (var child in info.Union)
+                {
+                    var childType = entities[child.Target.Code];
+                    var isRelation = new InheritanceRelationType(Guid.Empty);
+                    isRelation.AddType(unionType); // set ParentType
+                    childType.AddType(isRelation); // add relation to ParentType
+                }
+                
+                nodes.RemoveAll(n => n is EntityType); // remove old relation type
+                nodes.Add(unionType); // replace with union type
+            }
         }
     }
 }

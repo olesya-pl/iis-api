@@ -42,6 +42,7 @@ namespace IIS.Core
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
             services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
 //            services.AddTransient<IOntologyProvider, OntologyProvider>();
+            services.AddTransient<IOntologyRepository, OntologyRepository>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
             services.AddSingleton<IGraphQlTypeRepository, GraphQlTypeRepository>();

@@ -11,20 +11,18 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
     public class GraphQlTypeCreator
     {
-        private IOntologyProvider _ontologyProvider;
+        private IOntologyRepository _ontologyRepository;
         private IGraphQlTypeRepository _typeRepository;
-        private List<Type> _ontologyTypes;
-        
+
         private ReadQueryTypeCreator _readCreator;
         private CreateMutatorTypeCreator _createCreator;
         private DeleteMutatorTypeCreator _deleteCreator;
         private UpdateMutatorTypeCreator _updateCreator;
 
-        public GraphQlTypeCreator(IGraphQlTypeRepository typeRepository, IOntologyProvider ontologyProvider)
+        public GraphQlTypeCreator(IGraphQlTypeRepository typeRepository, IOntologyRepository ontologyRepository)
         {
             _typeRepository = typeRepository;
-            _ontologyProvider = ontologyProvider;
-            _ontologyTypes = ontologyProvider.GetTypes().ToList();
+            _ontologyRepository = ontologyRepository;
             _readCreator = new ReadQueryTypeCreator(_typeRepository, this);
             _createCreator = new CreateMutatorTypeCreator(this);
             _deleteCreator = new DeleteMutatorTypeCreator(this);
@@ -33,7 +31,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 
         public void Create()
         {
-            var entityTypes = _ontologyTypes.OfType<EntityType>().ToList();
+            var entityTypes = _ontologyRepository.EntityTypes;
             // Create output types
             foreach (Core.Ontology.ScalarType scalar in Enum.GetValues(typeof(Core.Ontology.ScalarType)))
                 GetMultipleOutputType(scalar);
@@ -50,10 +48,8 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 }
             }
         }
-        
-        public IEnumerable<Type> GetChildTypes(Type parent) =>
-            _ontologyTypes.Where(t => t.Nodes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == parent.Name));
 
+        public IEnumerable<Type> GetChildTypes(Type parent) => _ontologyRepository.GetChildTypes(parent);
 
         private MutatorTypeCreator GetMutator(Operation operation)
         {

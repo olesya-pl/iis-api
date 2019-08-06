@@ -156,8 +156,8 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         {
             d.Name(GetName(_operation, _type));
             d.Description("Specify relation to existing object or create new with target field.");
-            d.Field("startsAt").Type<DateTimeType>();
-            d.Field("endsAt").Type<DateTimeType>();
+//            d.Field("startsAt").Type<DateTimeType>();
+//            d.Field("endsAt").Type<DateTimeType>();
             d.Field("targetId").Type<IdType>();
             d.Field("target").Type(_target);
         }
@@ -198,18 +198,26 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
             if (relationType.IsAttributeType)
                 return relationType.AttributeType.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
-                return relationType.AcceptsOperation(EntityOperation.Update)
-                    ? relationType.EntityType.Name
-                    : nameof(EntityRelationInput);
+            {
+                var ops = ((EntityRelationMeta) relationType.CreateMeta()).AcceptsEntityOperations;
+                if (ops == null || ops.Length == 0)
+                    return nameof(EntityRelationInput);
+                return $"{relationType.EntityType.Name}_{GetAbbreviation(ops)}";
+            }
             throw new ArgumentException(nameof(relationType));
         }
-        
+
+        private static string GetAbbreviation(EntityOperation[] ops) =>
+            ops == null ? null : new string(ops.Select(o => o.ToString()[0]).ToArray());
+
         private readonly string _typeName;
         private IType _createType;
         private IType _updateType;
+        private EmbeddingRelationType _relationType;
 
         public RelationPatchType(EmbeddingRelationType relationType, GraphQlTypeCreator typeCreator)
         {
+            _relationType = relationType;
             _typeName = GetName(relationType);
             if (relationType.IsAttributeType)
             {
@@ -218,22 +226,19 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
             }
             else if (relationType.IsEntityType)
             {
-                if (relationType.AcceptsOperation(EntityOperation.Update))
-                {
-                    _createType = typeCreator.GetEntityRelationToInputTypeBase(Operation.Create, relationType.EntityType);
-                    _updateType = typeCreator.GetEntityRelationToInputTypeBase(Operation.Update, relationType.EntityType);
-                }
-                else
-                {
-                    _createType = null; // typeCreator.GetType<EntityRelationInputType>();
-                    _updateType = null; // typeCreator.GetType<UpdateEntityRelationInputType>();
-                }
+                _createType = relationType.AcceptsOperation(EntityOperation.Create)
+                    ? typeCreator.GetEntityRelationToInputTypeBase(Operation.Create, relationType.EntityType)
+                    : null;
+                _updateType = relationType.AcceptsOperation(EntityOperation.Update)
+                    ? typeCreator.GetEntityRelationToInputTypeBase(Operation.Update, relationType.EntityType)
+                    : null;
             }
         }
 
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
             d.Name($"PatchInput_{_typeName}");
+            SetDescription(d);
             d.Field("delete").Type<ListType<NonNullType<IdType>>>();
             if (_createType == null)
                 d.Field("create").Type<ListType<NonNullType<EntityRelationInputType>>>();
@@ -243,6 +248,24 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
                 d.Field("update").Type<ListType<NonNullType<UpdateEntityRelationInputType>>>();
             else
                 d.Field("update").Type(new ListType(new NonNullType(_updateType)));
+        }
+
+        protected void SetDescription(IInputObjectTypeDescriptor d)
+        {
+            var meta = _relationType.CreateMeta();
+            if (_relationType.IsAttributeType)
+            {
+                d.Description($"Patch array of {_typeName} attribute.");
+            }
+            else
+            {
+                var ops = (meta as EntityRelationMeta)?.AcceptsEntityOperations;
+                var description = $"Patch array of {_relationType.EntityType.Name} entity type.";
+                if (ops != null)
+                    description += $" Accepts entity operations: {string.Join(", ", ops)}";
+                d.Description(description);
+            }
+            
         }
     }
 }

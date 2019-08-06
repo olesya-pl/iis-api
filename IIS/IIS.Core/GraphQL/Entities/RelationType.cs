@@ -18,9 +18,9 @@ namespace IIS.Core.GraphQL.Entities
             [GraphQLType(typeof(NonNullType<IdType>))]
             public Guid Id([Parent] Relation parent) => parent.Id;
             
-            public DateTime StartsAt([Parent] Relation parent) => throw new NotImplementedException();
-            
-            public DateTime EndsAt([Parent] Relation parent) => throw new NotImplementedException();
+//            public DateTime StartsAt([Parent] Relation parent) => throw new NotImplementedException();
+//            
+//            public DateTime EndsAt([Parent] Relation parent) => throw new NotImplementedException();
 
             public DateTime CreatedAt([Parent] Relation parent) => parent.CreatedAt;
             

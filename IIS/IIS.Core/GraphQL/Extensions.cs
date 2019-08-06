@@ -16,14 +16,6 @@ namespace IIS.Core.GraphQL
 {
     public static class Extensions
     {
-        // Query should depend on OntologyRepository. Delete this method after.
-        public static IEnumerable<Type> GetTypes(this IOntologyProvider ontologyProvider)
-        {
-            var task = ontologyProvider.GetTypesAsync();
-            task.Wait();
-            return task.Result;
-        }
-
         public static IObjectTypeDescriptor PopulateFields(this ITypeFieldPopulator populator, IObjectTypeDescriptor descriptor,
             IEnumerable<EntityType> entityTypes, params Operation[] operations)
         {
@@ -73,5 +65,8 @@ namespace IIS.Core.GraphQL
         
         public static IObjectFieldDescriptor FieldNotImplemented(this IObjectTypeDescriptor d, string name) =>
             d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
+
+        public static IEnumerable<Type> GetInheritors(this Type type, IEnumerable<Type> ontology) =>
+            ontology.Where(t => t.Nodes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));
     }
 }

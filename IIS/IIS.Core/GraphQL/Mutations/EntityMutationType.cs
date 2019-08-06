@@ -9,12 +9,12 @@ namespace IIS.Core.GraphQL.Mutations
 {
     public class EntityMutationType : ObjectType
     {
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyRepository _ontologyRepository;
         private readonly GraphQlTypeCreator _graphQlTypeCreator;
 
-        public EntityMutationType(IOntologyProvider ontologyProvider, GraphQlTypeCreator graphQlTypeCreator)
+        public EntityMutationType(IOntologyRepository ontologyRepository, GraphQlTypeCreator graphQlTypeCreator)
         {
-            _ontologyProvider = ontologyProvider;
+            _ontologyRepository = ontologyRepository;
             _graphQlTypeCreator = graphQlTypeCreator;
         }
 
@@ -22,7 +22,7 @@ namespace IIS.Core.GraphQL.Mutations
         {
             var populator = new TypeFieldPopulator(_graphQlTypeCreator);
             descriptor.Name(nameof(EntityMutation));
-            var typesToPopulate = _ontologyProvider.GetTypes().OfType<EntityType>()
+            var typesToPopulate = _ontologyRepository.EntityTypes
                 .Where(t => t.CreateMeta().ExposeOnApi != false);
             typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
             populator.PopulateFields(descriptor, typesToPopulate,
