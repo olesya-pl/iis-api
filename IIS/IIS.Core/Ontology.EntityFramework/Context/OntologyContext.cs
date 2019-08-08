@@ -19,7 +19,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         {
             var relationType = modelBuilder.Entity<RelationType>();
             relationType.HasOne(p => p.Type)
-                .WithOne()
+                .WithOne(p => p.RelationType)
                 .HasForeignKey<RelationType>(p => p.Id)
                 ;
 
@@ -45,7 +45,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
 
             var relation = modelBuilder.Entity<Relation>();
             relation.HasOne(p => p.Node)
-                .WithOne()
+                .WithOne(e => e.Relation)
                 .HasForeignKey<Relation>(p => p.Id)
                 ;
             var node = modelBuilder.Entity<Node>();
@@ -60,7 +60,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
 
             var attribute = modelBuilder.Entity<Attribute>();
             attribute.HasOne(p => p.Node)
-                .WithOne()
+                .WithOne(p => p.Attribute)
                 .HasForeignKey<Attribute>(p => p.Id)
                 ;
         }

@@ -10,13 +10,19 @@ namespace IIS.Core.GraphQL.Entities
     {
         public static async Task<object> ResolveEntityRelation(IResolverContext ctx, EmbeddingRelationType relationType)
         {
+            var ontologyService = ctx.Service<IOntologyService>();
             var parent = ctx.Parent<Node>();
+            var node = await ontologyService.LoadNodesAsync(parent, new[] { relationType });
+            // return ??
             throw new NotImplementedException();
         }
         
-        public static Task<object> ResolveAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType)
+        public static async Task<object> ResolveAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType)
         {
+            var ontologyService = ctx.Service<IOntologyService>();
             var parent = ctx.Parent<Node>();
+            var node = await ontologyService.LoadNodesAsync(parent, new[] { relationType });
+            // return ??
             throw new NotImplementedException();
         }
 
@@ -27,13 +33,19 @@ namespace IIS.Core.GraphQL.Entities
 
         public static async Task<Node> ResolveEntity(IResolverContext ctx, EntityType type)
         {
+            var ontologyService = ctx.Service<IOntologyService>();
             var id = ctx.Argument<Guid>("id");
-            throw new NotImplementedException();
+            var node = await ontologyService.LoadNodesAsync(new Entity(id), null);
+            return node; // ???
+            //throw new NotImplementedException();
         }
 
         public static async Task<IEnumerable<Node>> ResolveEntityList(IResolverContext ctx, EntityType type)
         {
-            throw new NotImplementedException();
+            var ontologyService = ctx.Service<IOntologyService>();
+            var list = await ontologyService.GetNodesByTypeAsync(type);
+            return list;
+            //throw new NotImplementedException();
         }
     }
 }

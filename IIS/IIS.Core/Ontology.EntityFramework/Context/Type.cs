@@ -20,6 +20,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual ICollection<Node> Nodes { get; set; } = new List<Node>();
 
         public virtual AttributeType AttributeType { get; set; }
+        public virtual RelationType RelationType { get; set; }
     }
 
     public enum Kind { Entity, Relation, Attribute }

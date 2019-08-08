@@ -14,6 +14,9 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual Type Type { get; set; }
         public virtual ICollection<Relation> IncomingRelations { get; set; } = new List<Relation>();
         public virtual ICollection<Relation> OutgoingRelations { get; set; } = new List<Relation>();
+
+        public virtual Attribute Attribute { get; set; }
+        public virtual Relation Relation { get; set; }
     }
 
     public class Relation
