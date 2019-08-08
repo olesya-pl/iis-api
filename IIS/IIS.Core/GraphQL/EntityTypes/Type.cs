@@ -40,8 +40,12 @@ namespace IIS.Core.GraphQL.EntityTypes
         public IEnumerable<IEntityAttribute> Attributes => 
             Source.AllProperties.Select(CreateEntityAttribute);
 
+        [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
         public EntityType Parent =>
             Source.DirectParents.Select(p => new EntityType(p)).FirstOrDefault();
+
+        [GraphQLNonNullType]
+        public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p));
 
         protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType) =>
             relationType.IsAttributeType

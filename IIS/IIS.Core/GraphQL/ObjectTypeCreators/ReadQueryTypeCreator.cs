@@ -33,7 +33,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             foreach (var parentInterface in type.AllParents.Select(_creator.GetOntologyType).OfType<InterfaceType>())
                 d?.Interface(parentInterface);
             if (d == null) return;
-            d.Name(type.Name + "Entity");
+            d.Name(OntologyObjectType.GetName(type));
             d.Interface(_creator.GetType<EntityInterface>());
             d.Field("id").Type<NonNullType<IdType>>().Resolver(ctx => Resolvers.ResolveId(ctx));
             d.Field("createdAt").Type<NonNullType<DateTimeType>>().ResolverNotImplemented();
@@ -82,11 +82,12 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         protected void OnInterface(EntityType type, IInterfaceTypeDescriptor d = null)
         {
             if (d == null) return;
-            d.Name(type.Name + "Entity");
+            d.Name(OntologyInterfaceType.GetName(type));
             d.Field("id").Type<NonNullType<IdType>>();
             d.Field("createdAt").Type<NonNullType<DateTimeType>>();
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>();
             d.Field("_relation").Type<RelationType>();
+            d.ResolveAbstractType(Resolvers.ResolveAbstractType);
         }
 
         protected void OnRelation(EmbeddingRelationType relationType, IInterfaceTypeDescriptor interfaceTypeDescriptor = null)

@@ -19,7 +19,10 @@ namespace IIS.Core.GraphQL.Common
         {
             descriptor.Name($"{_itemsTypeName}Collection");
             descriptor.Field("meta")
+                .Deprecated("Use direct count property - get rid of useless meta")
                 .Type<NonNullType<ObjectType<CollectionMeta>>>()
+                .Resolver(ctx => new CollectionMeta(ctx.Parent<ICollection>().Count));
+            descriptor.Field("count")
                 .Resolver(ctx => ctx.Parent<ICollection>().Count);
             descriptor.Field("items")
                 .Type(new NonNullType(new ListType(new NonNullType(_itemsType))))

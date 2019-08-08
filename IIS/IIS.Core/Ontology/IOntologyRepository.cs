@@ -14,20 +14,40 @@ namespace IIS.Core.Ontology
 
     public class OntologyRepository : IOntologyRepository
     {
+        private Dictionary<string, EntityType> _entityTypes;
+        private Dictionary<string, List<Type>> _inheritors;
         public IEnumerable<Type> Types { get; }
-        public IEnumerable<EntityType> EntityTypes { get; }
+        public IEnumerable<EntityType> EntityTypes => _entityTypes.Values;
 
         public OntologyRepository(IOntologyProvider ontologyProvider)
         {
             var task = ontologyProvider.GetTypesAsync();
             task.Wait();
-            Types = task.Result;
-            EntityTypes = Types.OfType<EntityType>().ToList();
+            Types = task.Result.ToList();
+            _entityTypes = Types.OfType<EntityType>().ToDictionary(t => t.Name);
+            _inheritors = BuildInheritors(Types);
         }
-        
-        public IEnumerable<Type> GetChildTypes(Type parent) =>
-            Types.Where(t => t.Nodes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == parent.Name));
 
-        public EntityType GetEntityType(string name) => EntityTypes.SingleOrDefault(t => t.Name == name);
+        private static Dictionary<string, List<T>> BuildInheritors<T>(IEnumerable<T> entityTypes) where T : Type
+        {
+            var result = new Dictionary<string, List<T>>();
+            foreach (var et in entityTypes)
+                foreach (var parent in et.AllParents)
+                {
+                    if (!result.ContainsKey(parent.Name))
+                        result.Add(parent.Name, new List<T>());
+                    result[parent.Name].Add(et);
+                }
+
+            return result;
+        }
+
+        public IEnumerable<Type> GetChildTypes(Type parent) => _inheritors.GetOrDefault(parent.Name);
+
+        public EntityType GetEntityType(string name)
+        {
+            _entityTypes.TryGetValue(name, out var value);
+            return value;
+        }
     }
 }

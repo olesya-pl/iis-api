@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
-using IIS.Core.GraphQL.Entities;
-using IIS.Core.GraphQL.Mutations;
 using IIS.Core.GraphQL.ObjectTypeCreators;
-using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
@@ -68,5 +65,15 @@ namespace IIS.Core.GraphQL
 
         public static IEnumerable<Type> GetInheritors(this Type type, IEnumerable<Type> ontology) =>
             ontology.Where(t => t.Nodes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));
+
+        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            TValue value = default;
+            dictionary.TryGetValue(key, out value);
+            return value;
+        }
+        
+        public static TValue GetOrDefault<TValue>(this IResolverContext context, string key) =>
+            (TValue) context.ContextData.GetOrDefault(key);
     }
 }

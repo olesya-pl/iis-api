@@ -106,7 +106,8 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLType(typeof(ListType<NonNullType<StringType>>))]
         public IEnumerable<string> AcceptsEntityOperations => MetaObject.AcceptsEntityOperations?.Select(e => e.ToString());
 
-        [GraphQLType(typeof(NonNullType<ListType<NonNullType<ObjectType<EntityType>>>>))]
+        [GraphQLNonNullType]
+        [GraphQLDeprecated("Legacy version which is emulated for union types.")]
         public IEnumerable<EntityType> To([Service] IOntologyRepository repository)
         {
             if (repository.GetEntityType(Source.EntityType.Name) != null)
@@ -116,6 +117,22 @@ namespace IIS.Core.GraphQL.EntityTypes
             // todo: maybe we should get rid of this behaviour and change response type to single element (parent type)
             var children = repository.GetChildTypes(Source.EntityType);
             return children.Select(t => new EntityType(t));
+        }
+        
+        [GraphQLNonNullType]
+        [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]
+        public EntityType Target => new EntityType(Source.EntityType);
+        
+        [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
+        [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
+        public IEnumerable<EntityType> TargetTypes([Service] IOntologyRepository repository, bool? concreteTypes = false)
+        {
+            var types = repository.GetChildTypes(Source.EntityType)?.OfType<Core.Ontology.EntityType>();
+            if (types == null)
+                return null;
+            if (concreteTypes == true)
+                types = types.Where(t => !t.IsAbstract);
+            return types.Select(t => new EntityType(t));
         }
     }
 }

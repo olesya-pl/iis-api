@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using IIS.Core.GraphQL;
-using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.ObjectTypeCreators;
-using IIS.Core.Mocks;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -42,7 +39,7 @@ namespace IIS.Core
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
             services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
 //            services.AddTransient<IOntologyProvider, OntologyProvider>();
-            services.AddTransient<IOntologyRepository, OntologyRepository>();
+            services.AddSingleton<IOntologyRepository, OntologyRepository>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
             services.AddSingleton<IGraphQlTypeRepository, GraphQlTypeRepository>();

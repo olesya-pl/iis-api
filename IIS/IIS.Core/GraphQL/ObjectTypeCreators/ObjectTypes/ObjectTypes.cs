@@ -27,6 +27,8 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 
     public class OntologyInterfaceType : InterfaceType, IOntologyType
     {
+        public static string GetName(Type type) => OntologyObjectType.GetName(type);
+        
         public OntologyInterfaceType(Action<IInterfaceTypeDescriptor> configure) : base(configure)
         {
         }
@@ -34,6 +36,8 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     
     public class OntologyObjectType : ObjectType, IOntologyType
     {
+        public static string GetName(Type type) => $"{type.Name}Entity";
+        
         public OntologyObjectType(Action<IObjectTypeDescriptor> configure) : base(configure)
         {
         }
