@@ -53,7 +53,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             IInputType type = null;
 
             if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Create))
-                type = TypeCreator.GetEntityRelationToInputTypeBase(Operation.Create, relationType.EntityType)
+                type = TypeCreator.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)
                     .WrapInputType(relationType);
 
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple && relationType.IsAttributeType)

@@ -60,7 +60,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                     .ResolverNotImplemented();
             }
         }
-        
+
         private void OnRelation(EntityType entityType, IGrouping<string, EmbeddingRelationType> relationTypeGroup,
             IObjectTypeDescriptor objectTypeDescriptor = null)
         {
@@ -76,9 +76,9 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                     .ResolverNotImplemented();
             }
         }
-        
+
         // ----- Interfaces creation ----- //
-        
+
         protected void OnInterface(EntityType type, IInterfaceTypeDescriptor d = null)
         {
             if (d == null) return;
@@ -95,7 +95,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             var type = GetType(relationType);
             interfaceTypeDescriptor?.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
         }
-        
+
         private void OnRelation(EntityType entityType, IGrouping<string, EmbeddingRelationType> relationTypeGroup,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
@@ -110,7 +110,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 interfaceTypeDescriptor?.Field(relationTypeGroup.Key).Type(union.WrapOutputType(first));
             }
         }
-        
+
         private OutputUnionType GetOutputUnionType(EntityType entityType, IGrouping<string, EmbeddingRelationType> relationTypeGroup)
         {
             if (relationTypeGroup.Any(r => !r.IsEntityType))
@@ -130,7 +130,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 ? GetAttributeType(relationType)
                 : relationType.IsEntityType
                     ? _creator.GetOntologyType(relationType.EntityType)
-                    : throw new ArgumentException(nameof(relationType)); 
+                    : throw new ArgumentException(nameof(relationType));
             return type;
         }
 
@@ -171,7 +171,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         public void AddFields(IObjectTypeDescriptor descriptor, EntityType type)
         {
             var objectType = _creator.GetOntologyType(type);
-            var collectionType = new CollectionType(type.Name, objectType); // TODO: new NonNullType() won't work
+            var collectionType = new CollectionType(OntologyObjectType.GetName(type), objectType); // TODO: new NonNullType() won't work
             descriptor.Field($"entity{type.Name}")
                 .Type(objectType)
                 .Argument("id", d => d.Type<NonNullType<IdType>>())

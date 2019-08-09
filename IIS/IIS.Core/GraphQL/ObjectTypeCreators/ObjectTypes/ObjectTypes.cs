@@ -28,26 +28,26 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     public class OntologyInterfaceType : InterfaceType, IOntologyType
     {
         public static string GetName(Type type) => OntologyObjectType.GetName(type);
-        
+
         public OntologyInterfaceType(Action<IInterfaceTypeDescriptor> configure) : base(configure)
         {
         }
     }
-    
+
     public class OntologyObjectType : ObjectType, IOntologyType
     {
-        public static string GetName(Type type) => $"{type.Name}Entity";
-        
+        public static string GetName(Type type) => $"Entity{type.Name}";
+
         public OntologyObjectType(Action<IObjectTypeDescriptor> configure) : base(configure)
         {
         }
     }
-    
+
     public class OutputUnionType : UnionType
     {
         public static string GetName(EntityType source, string relationName) =>
-            $"{source.Name}_{relationName}_Union";
-        
+            $"{OntologyObjectType.GetName(source)}_{relationName}_Union";
+
         private readonly EntityType _source;
         private readonly IEnumerable<ObjectType> _objectTypes;
         private string _relationName;
@@ -68,9 +68,9 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
                 d.Type(type);
         }
     }
-    
+
     // ----- Mutator types ----- //
-    
+
     public class MutatorInputType : InputObjectType
     {
         public static string GetName(Operation operation, string entityTypeName) => $"{operation}{entityTypeName}Input";
@@ -81,22 +81,23 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 
     public class MutatorResponseType : ObjectType
     {
-        public static string GetName(Operation operation, string entityTypeName) => $"{operation}{entityTypeName}Response";
+        public static string GetName(Operation operation, EntityType entityType) =>
+            $"{operation}{OntologyObjectType.GetName(entityType)}Response";
 
         private readonly Operation _operation;
-        private readonly string _entityTypeName;
+        private readonly string _name;
         private readonly IOutputType _ontologyType;
 
-        public MutatorResponseType(Operation operation, string entityTypeName, IOutputType ontologyType)
+        public MutatorResponseType(Operation operation, EntityType entityType, IOutputType ontologyType)
         {
             _operation = operation;
-            _entityTypeName = entityTypeName;
+            _name = GetName(operation, entityType);
             _ontologyType = ontologyType;
         }
 
         protected override void Configure(IObjectTypeDescriptor d)
         {
-            d.Name(GetName(_operation, _entityTypeName));
+            d.Name(_name);
             d.Field("type").Type<NonNullType<StringType>>()
                 .ResolverNotImplemented();
             d.Field("details").Type(new NonNullType(_ontologyType))
@@ -107,15 +108,16 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     // ----- Mutator CUD types ----- //
 
     // Pseudo-union of all child types. Only one field should be present.
-    public class InputEntityUnionType : InputObjectType
+    public class EntityUnionInputType : InputObjectType
     {
-        public static string GetName(Operation operation, EntityType type) => $"UnionInput_{operation.Short()}_{type.Name}";
-        
+        public static string GetName(Operation operation, EntityType type) =>
+            $"UnionInput_{operation.Short()}_{OntologyObjectType.GetName(type)}";
+
         private readonly Operation _operation;
         private EntityType _type;
         private GraphQlTypeCreator _typeCreator;
 
-        public InputEntityUnionType(Operation operation, EntityType type, GraphQlTypeCreator typeCreator)
+        public EntityUnionInputType(Operation operation, EntityType type, GraphQlTypeCreator typeCreator)
         {
             _operation = operation;
             _type = type;
@@ -141,15 +143,16 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     }
 
     // Specify relation to existing object or create new with target field
-    public class EntityRelationToInputTypeBase : InputObjectType
+    public class EntityRelationToInputType : InputObjectType
     {
-        public static string GetName(Operation operation, Type type) => $"RelationTo_{operation.Short()}_{type.Name}";
-        
+        public static string GetName(Operation operation, Type type) =>
+            $"RelationTo_{operation.Short()}_{OntologyObjectType.GetName(type)}";
+
         private readonly Operation _operation;
-        private InputEntityUnionType _target;
+        private EntityUnionInputType _target;
         private Type _type;
 
-        public EntityRelationToInputTypeBase(Operation operation, Type type, InputEntityUnionType target)
+        public EntityRelationToInputType(Operation operation, Type type, EntityUnionInputType target)
         {
             _operation = operation;
             _target = target;
@@ -166,13 +169,13 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
             d.Field("target").Type(_target);
         }
     }
-    
+
     // ----- Create ----- //
-    
+
     public class MultipleInputType : InputObjectType
     {
         public static string GetName(Operation operation, string scalarName) => $"MultipleInput_{operation.Short()}_{scalarName}";
-        
+
         private readonly string _scalarName;
         private readonly IInputType _inputType;
         private readonly Operation _operation;
@@ -183,7 +186,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
             _inputType = inputType;
             _operation = operation;
         }
-        
+
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
             d.Name(GetName(_operation, _scalarName));
@@ -194,7 +197,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
     }
 
     // ----- Update ----- //
-    
+
     public class RelationPatchType : InputObjectType
     {
         public static string GetName(EmbeddingRelationType relationType)
@@ -206,7 +209,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
                 var ops = ((EntityRelationMeta) relationType.CreateMeta()).AcceptsEntityOperations;
                 if (ops == null || ops.Length == 0)
                     return nameof(EntityRelationInput);
-                return $"{relationType.EntityType.Name}_{GetAbbreviation(ops)}";
+                return $"{OntologyObjectType.GetName(relationType.EntityType)}_{GetAbbreviation(ops)}";
             }
             throw new ArgumentException(nameof(relationType));
         }
@@ -231,10 +234,10 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
             else if (relationType.IsEntityType)
             {
                 _createType = relationType.AcceptsOperation(EntityOperation.Create)
-                    ? typeCreator.GetEntityRelationToInputTypeBase(Operation.Create, relationType.EntityType)
+                    ? typeCreator.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)
                     : null;
                 _updateType = relationType.AcceptsOperation(EntityOperation.Update)
-                    ? typeCreator.GetEntityRelationToInputTypeBase(Operation.Update, relationType.EntityType)
+                    ? typeCreator.GetEntityRelationToInputType(Operation.Update, relationType.EntityType)
                     : null;
             }
         }
@@ -269,7 +272,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
                     description += $" Accepts entity operations: {string.Join(", ", ops)}";
                 d.Description(description);
             }
-            
+
         }
     }
 }
