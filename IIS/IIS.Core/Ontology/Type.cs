@@ -16,7 +16,7 @@ namespace IIS.Core.Ontology
         public JObject Meta { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        
+
         public IEnumerable<EntityType> DirectParents =>
             Nodes.OfType<InheritanceRelationType>().Select(r => r.ParentType);
 
@@ -30,7 +30,7 @@ namespace IIS.Core.Ontology
             AllParents.SelectMany(p => p.DirectProperties)
                 .Where(pp => DirectProperties.All(dp => dp.Name != pp.Name)) // Ignore parent properties with same name (overriden)
                 .Union(DirectProperties);
-        
+
         public Type(Guid id, string name)
         {
             Id = id;

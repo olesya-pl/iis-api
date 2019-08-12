@@ -19,9 +19,9 @@ namespace IIS.Core.GraphQL.Entities
         {
             d.Name(GetName(_scalarName));
             d.Field("id").Type<NonNullType<IdType>>()
-                .ResolverNotImplemented();
+                .Resolver(ctx => Resolvers.ResolveId(ctx));
             d.Field("value").Type(new NonNullType(_outputType))
-                .ResolverNotImplemented();
+                .Resolver(ctx => Resolvers.ResolveMultipleAttributeRelationTarget(ctx));
         }
     }
 }

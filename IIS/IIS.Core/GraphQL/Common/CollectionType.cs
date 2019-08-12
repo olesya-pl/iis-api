@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using HotChocolate;
 using HotChocolate.Types;
 
@@ -23,7 +25,7 @@ namespace IIS.Core.GraphQL.Common
                 .Type<NonNullType<ObjectType<CollectionMeta>>>()
                 .Resolver(ctx => new CollectionMeta(ctx.Parent<ICollection>().Count));
             descriptor.Field("count")
-                .Resolver(ctx => ctx.Parent<ICollection>().Count);
+                .Resolver(ctx => ctx.Parent<IEnumerable<object>>().Count());
             descriptor.Field("items")
                 .Type(new NonNullType(new ListType(new NonNullType(_itemsType))))
                 .Resolver(ctx => ctx.Parent<object>());

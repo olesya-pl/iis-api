@@ -47,7 +47,12 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             if (objectTypeDescriptor == null) return;
             var fd = objectTypeDescriptor.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
             if (relationType.IsAttributeType)
-                fd.Resolver(ctx => Resolvers.ResolveAttributeRelation(ctx, relationType));
+            {
+                if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+                    fd.Resolver(ctx => Resolvers.ResolveMultipleAttributeRelation(ctx, relationType));
+                else
+                    fd.Resolver(ctx => Resolvers.ResolveAttributeRelation(ctx, relationType));
+            }
             else
                 fd.Resolver(ctx => Resolvers.ResolveEntityRelation(ctx, relationType));
             // todo: Move inversed relations to domain

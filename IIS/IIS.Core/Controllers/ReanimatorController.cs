@@ -11,6 +11,7 @@ using InheritanceRelationType = IIS.Core.Ontology.InheritanceRelationType;
 using ORelationType = IIS.Core.Ontology.RelationType;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Controllers
 {
@@ -27,6 +28,47 @@ namespace IIS.Core.Controllers
             _legacyOntologyProvider = legacyOntologyProvider;
             //_reanimator = reanimator;
             _context = context;
+        }
+
+        [HttpGet]
+        [Route("/api/data")]
+        public async Task<IActionResult> Data()
+        {
+            _context.Nodes.RemoveRange(_context.Nodes.ToArray());
+            _context.Attributes.RemoveRange(_context.Attributes.ToArray());
+            _context.Relations.RemoveRange(_context.Relations.ToArray());
+            _context.SaveChanges();
+
+            var person = _context.Types.Where(e => e.Name == "Person")
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetType)
+                .First();
+            var nameRelationType = person.OutgoingRelations.First(e => e.Type.Name == "firstName");
+            var nameType = nameRelationType.TargetType;
+            var entity = new Node { Type = person, Id = System.Guid.NewGuid() };
+            var attr = new Attribute { Node = new Node { Type = nameType, Id = System.Guid.NewGuid() }, Value = "Petro" };
+            var nameRelation = new Relation
+            {
+                Node = new Node { Type = nameRelationType.Type, Id = System.Guid.NewGuid() },
+                SourceNode = entity,
+                TargetNode = attr.Node
+            };
+            _context.AddRange(entity, attr, nameRelation);
+            await _context.SaveChangesAsync();
+
+            var entity2 = new Node { Type = person, Id = System.Guid.NewGuid() };
+            var attr2 = new Attribute { Node = new Node { Type = nameType, Id = System.Guid.NewGuid() }, Value = "Inner Petro" };
+            var nameRelation2 = new Relation
+            {
+                Node = new Node { Type = nameRelationType.Type, Id = System.Guid.NewGuid() },
+                SourceNode = entity,
+                TargetNode = entity2
+            };
+
+            _context.AddRange(entity2, attr2, nameRelation2);
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
 
         public async Task<IActionResult> Get()
