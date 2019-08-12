@@ -3,15 +3,17 @@ using System;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20190812113008_FileTable")]
+    partial class FileTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,11 +30,7 @@ namespace IIS.Core.Migrations
 
                     b.Property<byte[]>("Contents");
 
-                    b.Property<bool>("IsTemporary");
-
                     b.Property<string>("Name");
-
-                    b.Property<DateTime>("UploadTime");
 
                     b.HasKey("Id");
 

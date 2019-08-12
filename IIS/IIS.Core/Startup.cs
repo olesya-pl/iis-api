@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using HotChocolate;
 using HotChocolate.AspNetCore;
+using IIS.Core.Files;
+using IIS.Core.Files.EntityFramework;
 using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.ObjectTypeCreators;
 using IIS.Core.Ontology;
@@ -45,6 +47,7 @@ namespace IIS.Core
             services.AddSingleton<IGraphQlTypeRepository, GraphQlTypeRepository>();
             services.AddSingleton<IOntologyService, OntologyService>();
             services.AddSingleton<GraphQlTypeCreator>();
+            services.AddTransient<IFileService, FileService>();
             //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
             var factory = new ConnectionFactory

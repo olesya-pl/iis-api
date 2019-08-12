@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using IIS.Core.Files.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Ontology.EntityFramework.Context
 {
@@ -14,6 +15,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<Node> Nodes { get; set; }
         public virtual DbSet<Relation> Relations { get; set; }
         public virtual DbSet<Attribute> Attributes { get; set; }
+        public virtual DbSet<File> Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
