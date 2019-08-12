@@ -1,77 +1,101 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
-using Microsoft.EntityFrameworkCore.Design;
+using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
 {
     public class GraphQlTypeCreator
     {
-        private IOntologyProvider _ontologyProvider;
+        private IOntologyRepository _ontologyRepository;
         private IGraphQlTypeRepository _typeRepository;
-        private List<Type> _ontologyTypes;
-        
+
         private ReadQueryTypeCreator _readCreator;
         private CreateMutatorTypeCreator _createCreator;
         private DeleteMutatorTypeCreator _deleteCreator;
         private UpdateMutatorTypeCreator _updateCreator;
-        private MutatorTypeCreator[] _mutatorCreators;
 
-        public GraphQlTypeCreator(IGraphQlTypeRepository typeRepository, IOntologyProvider ontologyProvider)
+        public GraphQlTypeCreator(IGraphQlTypeRepository typeRepository, IOntologyRepository ontologyRepository)
         {
             _typeRepository = typeRepository;
-            _ontologyProvider = ontologyProvider;
-            _ontologyTypes = ontologyProvider.GetTypes().ToList();
-            _readCreator = new ReadQueryTypeCreator(_typeRepository);
+            _ontologyRepository = ontologyRepository;
+            _readCreator = new ReadQueryTypeCreator(_typeRepository, this);
             _createCreator = new CreateMutatorTypeCreator(this);
             _deleteCreator = new DeleteMutatorTypeCreator(this);
             _updateCreator = new UpdateMutatorTypeCreator(this);
-            _mutatorCreators = new MutatorTypeCreator[] {_createCreator, _deleteCreator, _updateCreator};
         }
 
         public void Create()
         {
-            var entityTypes = _ontologyProvider.GetTypes().OfType<EntityType>().ToList();
+            var entityTypes = _ontologyRepository.EntityTypes;
             // Create output types
+            foreach (Core.Ontology.ScalarType scalar in Enum.GetValues(typeof(Core.Ontology.ScalarType)))
+                GetMultipleOutputType(scalar);
             foreach (var type in entityTypes)
-                _readCreator.CreateOutputType(type);
+                GetOntologyType(type);
             // Create input types
+            var mutations = new[] {Operation.Create, Operation.Delete, Operation.Update};
             foreach (var type in entityTypes)
             {
-                foreach (var mutator in _mutatorCreators)
+                foreach (var mutator in mutations)
                 {
                     GetMutatorInputType(mutator, type);
                     GetMutatorResponseType(mutator, type);
                 }
-
-                GetCreateEntityRelationToTargetInputType(type);
-            }
-
-            var attributeTypes = _ontologyProvider.GetTypes().OfType<AttributeType>().ToList();
-            foreach (var attr in attributeTypes)
-            {
-                GetCreateMultipleInputType(attr);
             }
         }
-        
-        public IEnumerable<Type> GetChildTypes(Type parent) =>
-            _ontologyTypes.Where(t => t.Nodes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == parent.Name));
-        
-        
-        // ----- READ QUERY TYPES ----- //
-        
-        public IOutputType GetOntologyType(Type type)
+
+        public IEnumerable<Type> GetChildTypes(Type parent) => _ontologyRepository.GetChildTypes(parent);
+
+        private MutatorTypeCreator GetMutator(Operation operation)
         {
-            if (_typeRepository.OntologyTypes.ContainsKey(type.Name))
-                return _typeRepository.OntologyTypes[type.Name];
-            var typeGraph = _ontologyTypes.OfType<EntityType>().Single(t => t.Name == type.Name);
-            return _readCreator.CreateOutputType(typeGraph);
+            switch (operation)
+            {
+                case Operation.Create: return _createCreator;
+                case Operation.Update: return _updateCreator;
+                case Operation.Delete: return _deleteCreator;
+                default: throw new ArgumentException(nameof(operation));
+            }
         }
-        
+
+        // ----- READ QUERY TYPES ----- //
+
+        public IOntologyType GetOntologyType(EntityType type)
+        {
+            return _typeRepository.GetOrCreate(type.Name, () => _readCreator.NewOntologyType(type));
+        }
+
+        public IOutputType GetScalarOutputType(Core.Ontology.ScalarType scalarType)
+        {
+            IOutputType type;
+            if (scalarType == Core.Ontology.ScalarType.File)
+                type = _typeRepository.GetType<ObjectType<Attachment>>();
+            else
+                type = _typeRepository.Scalars[scalarType];
+            return type;
+        }
+
+        public IOutputType GetMultipleOutputType(Core.Ontology.ScalarType scalarType)
+        {
+            var name = scalarType.ToString();
+            return _typeRepository.GetOrCreate(name, () =>
+                new MultipleOutputType(name, GetScalarOutputType(scalarType)));
+        }
+
+        public OutputUnionType GetOutputUnionType(EntityType source, string propertyName, IEnumerable<ObjectType> outputTypes)
+        {
+            var name = OutputUnionType.GetName(source, propertyName);
+            var union = _typeRepository.GetOrCreate(name, () =>
+                new OutputUnionType(source, propertyName, outputTypes));
+            return union;
+        }
+
         // ----- GENERIC SCHEMA TYPES ----- //
-        
+
         public T GetType<T>() where T : IType, new() => _typeRepository.GetType<T>();
 
         public IInputType GetInputAttributeType(AttributeType attributeType)
@@ -80,81 +104,54 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
                 type = _typeRepository.GetType<InputObjectType<FileValueInput>>();
             else
-                type = _typeRepository.GetScalarType(attributeType);
+                type = _typeRepository.Scalars[attributeType.ScalarTypeEnum];
             return type;
         }
-        
+
         // ----- GENERIC MUTATOR TYPES ----- //
-        
-        public MutatorInputType GetMutatorInputType(MutatorTypeCreator creator, Type type)
+
+        public MutatorInputType GetMutatorInputType(Operation operation, Type type)
         {
-            var name = MutatorInputType.GetName(creator.Operation, type.Name);
-            return _typeRepository.GetOrCreate(name, () => creator.NewMutatorInputType(type));
+            var name = MutatorInputType.GetName(operation, type.Name);
+            return _typeRepository.GetOrCreate(name, () => GetMutator(operation).NewMutatorInputType(type));
         }
 
-        public MutatorResponseType GetMutatorResponseType(MutatorTypeCreator creator, Type type)
+        public MutatorResponseType GetMutatorResponseType(Operation operation, EntityType type)
         {
-            var name = MutatorResponseType.GetName(creator.Operation, type.Name);
-            return _typeRepository.GetOrCreate(name, () => creator.NewMutatorResponseType(type));
-        }
-        
-        // ----- CREATE TYPES ----- //
-
-        public CreateMultipleInputType GetCreateMultipleInputType(AttributeType type)
-        {
-            var name = type.ScalarTypeEnum.ToString();
+            var name = MutatorResponseType.GetName(operation, type);
             return _typeRepository.GetOrCreate(name, () =>
-                _createCreator.NewCreateMultipleInputType(type));
+                new MutatorResponseType(GetMutator(operation).Operation, type, GetOntologyType(type)));
         }
 
-        public CreateEntityRelationToInputType GetCreateEntityRelationToInputType(EntityType type)
+        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, EntityType type)
         {
-            var name = type.Name;
+            var name = EntityRelationToInputType.GetName(operation, type);
             return _typeRepository.GetOrCreate(name, () =>
-                _createCreator.NewCreateEntityRelationToInputType(type));
+                new EntityRelationToInputType(operation, type, GetEntityUnionInputType(operation, type)));
         }
 
-        public CreateEntityRelationToTargetInputType GetCreateEntityRelationToTargetInputType(EntityType type)
+        public EntityUnionInputType GetEntityUnionInputType(Operation operation, EntityType type)
         {
-            return _typeRepository.GetOrCreate(type.Name, () =>
-                _createCreator.NewCreateEntityRelationToTargetInputType(type));
+            var name = EntityUnionInputType.GetName(operation, type);
+            return _typeRepository.GetOrCreate(name, () =>
+                new EntityUnionInputType(operation, type, this));
         }
-        
+
+        public MultipleInputType GetMultipleInputType(Operation operation, AttributeType type)
+        {
+            var scalarName = type.ScalarTypeEnum.ToString();
+            var name = MultipleInputType.GetName(operation, scalarName);
+            return _typeRepository.GetOrCreate(name, () =>
+                new MultipleInputType(operation, scalarName, GetInputAttributeType(type)));
+        }
+
         // ----- UPDATE TYPES ----- //
-        
-        public UpdateMultipleInputType GetUpdateMultipleInputType(AttributeType type)
-        {
-            var name = type.ScalarTypeEnum.ToString();
-            return _typeRepository.GetOrCreate(name, () =>
-                _updateCreator.NewUpdateMultipleInputType(type));
-        }
 
-        public UpdateEntityRelationToInputType GetUpdateEntityRelationToInputType(EntityType type)
+        public RelationPatchType GetRelationPatchType(EmbeddingRelationType relationType)
         {
-            var name = type.Name;
+            var name = RelationPatchType.GetName(relationType);
             return _typeRepository.GetOrCreate(name, () =>
-                _updateCreator.NewUpdateEntityRelationToInputType(type));
-        }
-
-        public UpdateEntityRelationToTargetInputType GetUpdateEntityRelationToTargetInputType(EntityType type)
-        {
-            var name = type.Name;
-            return _typeRepository.GetOrCreate(name, () =>
-                _updateCreator.NewUpdateEntityRelationToTargetInputType(type));
-        }
-
-        public EntityRelationPatchType GetEntityRelationPatchType(EntityType type)
-        {
-            var name = type.Name;
-            return _typeRepository.GetOrCreate(name, () =>
-                _updateCreator.NewEntityRelationPatchType(type));
-        }
-        
-        public AttributeRelationPatchType GetAttributeRelationPatchType(AttributeType type)
-        {
-            var name = type.Name;
-            return _typeRepository.GetOrCreate(name, () =>
-                _updateCreator.NewAttributeRelationPatchType(type));
+                new RelationPatchType(relationType, this));
         }
     }
 }

@@ -16,19 +16,19 @@ namespace IIS.Core.GraphQL
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IGraphQlTypeRepository _typeRepository;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyRepository _ontologyRepository;
 
-        public GraphQlSchemaProvider(IServiceProvider serviceProvider, IGraphQlTypeRepository typeRepository, IOntologyProvider ontologyProvider)
+        public GraphQlSchemaProvider(IServiceProvider serviceProvider, IGraphQlTypeRepository typeRepository, IOntologyRepository ontologyRepository)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
-            _ontologyProvider = ontologyProvider;
+            _ontologyRepository = ontologyRepository;
         }
 
         public ISchema GetSchema()
         {
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
-            builder.RegisterTypes(_typeRepository, _ontologyProvider); // TODO: remake dynamic type registration
+            builder.RegisterTypes(_typeRepository, _ontologyRepository); // TODO: remake dynamic type registration
             builder.AddQueryType<Query>()
                 .AddMutationType<Mutation>();
             return builder.Create();
@@ -37,9 +37,9 @@ namespace IIS.Core.GraphQL
 
     static class FluentExtensions
     {
-        public static ISchemaBuilder RegisterTypes(this ISchemaBuilder schemaBuilder, IGraphQlTypeRepository typeRepository, IOntologyProvider ontologyProvider)
+        public static ISchemaBuilder RegisterTypes(this ISchemaBuilder schemaBuilder, IGraphQlTypeRepository typeRepository, IOntologyRepository ontologyRepository)
         {
-            var creator = new GraphQlTypeCreator(typeRepository, ontologyProvider);
+            var creator = new GraphQlTypeCreator(typeRepository, ontologyRepository);
             creator.Create();
             foreach (var type in typeRepository.AllTypes)
                 schemaBuilder.AddType(type);

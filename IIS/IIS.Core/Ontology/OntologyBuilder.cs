@@ -12,7 +12,8 @@ namespace IIS.Core.Ontology
             public string TargetName;
             public string RelationName;
             public EmbeddingOptions EmbeddingOptions;
-            public JObject Meta { get; set; }
+            public JObject Meta;
+            public string Title;
         }
         private Type _builtType;
         private event EventHandler<EventArgs> TypeBuilt;
@@ -72,14 +73,15 @@ namespace IIS.Core.Ontology
             return this;
         }
 
-        public ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null)
+        public ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null, string title = null)
         {
             _childNodes.Add(new Relation
             {
                 TargetName = targetName,
                 RelationName = relationName,
                 EmbeddingOptions = EmbeddingOptions.Required,
-                Meta = meta
+                Meta = meta,
+                Title = title
             });
             return this;
         }
@@ -89,14 +91,15 @@ namespace IIS.Core.Ontology
             throw new NotImplementedException();
         }
 
-        public ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null)
+        public ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null, string title = null)
         {
             _childNodes.Add(new Relation
             {
                 TargetName = targetName,
                 RelationName = relationName,
                 EmbeddingOptions = EmbeddingOptions.Optional,
-                Meta = meta
+                Meta = meta,
+                Title = title
             });
             return this;
         }
@@ -106,14 +109,15 @@ namespace IIS.Core.Ontology
             throw new NotImplementedException();
         }
 
-        public ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null)
+        public ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null, string title = null)
         {
             _childNodes.Add(new Relation
             {
                 TargetName = targetName,
                 RelationName = relationName,
                 EmbeddingOptions = EmbeddingOptions.Multiple,
-                Meta = meta
+                Meta = meta,
+                Title = title
             });
             return this;
         }
@@ -205,7 +209,7 @@ namespace IIS.Core.Ontology
                         var builder = (OntologyBuilder)sender;
                         var targetType = builder.Build();
                         var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-                        { Meta = child.Meta, CreatedAt = now, UpdatedAt = now };
+                        { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
                         embedding.AddType(targetType);
                         type.AddType(embedding);
                     };
@@ -214,7 +218,7 @@ namespace IIS.Core.Ontology
                 {
                     var targetType = targetBuilder.Build();
                     var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-                    { Meta = child.Meta, CreatedAt = now, UpdatedAt = now };
+                    { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
                     embedding.AddType(targetType);
                     type.AddType(embedding);
                 }

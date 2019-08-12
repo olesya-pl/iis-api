@@ -9,20 +9,21 @@ namespace IIS.Core.GraphQL.EntityTypes
 {
     public class Query
     {
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyRepository _ontologyRepository;
 
-        public Query([Service] IOntologyProvider ontologyProvider)
+        public Query([Service] IOntologyRepository ontologyProvider)
         {
-            _ontologyProvider = ontologyProvider?? throw new ArgumentNullException(nameof(ontologyProvider));
+            _ontologyRepository = ontologyProvider?? throw new ArgumentNullException(nameof(ontologyProvider));
         }
 
         [GraphQLNonNullType]
         public EntityTypeCollection GetEntityTypes(EntityTypesFilter filter = null) =>
-            new EntityTypeCollection(_ontologyProvider.GetTypes().OfType<Core.Ontology.EntityType>());
+            new EntityTypeCollection(_ontologyRepository.EntityTypes);
 
         public EntityType GetEntityType([GraphQLNonNullType] string code)
         {
-            return new EntityType(_ontologyProvider.GetTypes().SingleOrDefault(t => t.Name == code));
+            var type = _ontologyRepository.GetEntityType(code);
+            return type == null ? null : new EntityType(type);
         }
     }
 }

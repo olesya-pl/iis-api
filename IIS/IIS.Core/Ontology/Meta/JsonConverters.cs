@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.Meta
 {
-    public abstract class TypeMetaConverterBase : JsonConverter<ITypeMeta>
+    public abstract class TypeMetaConverterBase : JsonConverter<IMeta>
     {
         protected readonly JsonSerializer js;
 
@@ -13,42 +13,26 @@ namespace IIS.Core.Ontology.Meta
             js.Converters.Add(new ValidationConverter(scalarType, js));
         }
 
-        public override void WriteJson(JsonWriter writer, ITypeMeta value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IMeta value, JsonSerializer serializer)
         {
             throw new System.NotImplementedException();
         }
     }
 
-    public class RelationTypeMetaConverter : TypeMetaConverterBase
+    public class MetaConverter<TMeta> : TypeMetaConverterBase where TMeta : IMeta
     {
-        public RelationTypeMetaConverter(ScalarType? scalarType) : base(scalarType)
+        public MetaConverter(ScalarType? scalarType) : base(scalarType)
         {
         }
 
-        public override ITypeMeta ReadJson(JsonReader reader, System.Type objectType, ITypeMeta existingValue, bool hasExistingValue,
+        public override IMeta ReadJson(JsonReader reader, System.Type objectType, IMeta existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
             var jo = JObject.Load(reader);
-            if (jo.ContainsKey("inversed"))
-                return jo.ToObject<MetaForEntityTypeRelation>(js);
-            return jo.ToObject<RelationTypeMeta>(js);
+            return jo.ToObject<TMeta>(js);
         }
     }
-    
-    public class TypeMetaConverter : TypeMetaConverterBase
-    {
-        public TypeMetaConverter(ScalarType? scalarType) : base(scalarType)
-        {
-        }
 
-        public override ITypeMeta ReadJson(JsonReader reader, System.Type objectType, ITypeMeta existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
-        {
-            var jo = JObject.Load(reader);
-            return jo.ToObject<TypeMeta>(js);
-        }
-    }
-    
     public class ValidationConverter : JsonConverter<IValidation>
     {
         private readonly ScalarType? _scalarType;

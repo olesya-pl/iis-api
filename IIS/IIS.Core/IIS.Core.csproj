@@ -13,9 +13,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="GeoJSON.Net" Version="1.1.72" />
-    <PackageReference Include="HotChocolate" Version="9.1.0-preview.35" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="9.1.0-preview.24" />
-    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="9.1.0-preview.24" />
+    <PackageReference Include="HotChocolate" Version="10.0.0-preview.47" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="10.0.0-preview.47" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.0.0-preview.47" />
     <PackageReference Include="Microsoft.AspNetCore.App">
       <PrivateAssets Condition="'%(PackageReference.Version)' == ''">all</PrivateAssets>
       <Publish Condition="'%(PackageReference.Version)' == ''">true</Publish>
@@ -29,7 +29,6 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="GraphQL\" />
-    <Folder Include="GraphQL\Resolvers" />
     <Folder Include="Ontology\" />
     <Folder Include="Ontology.EntityFramework\" />
     <Folder Include="Ontology.EntityFramework\Context\" />

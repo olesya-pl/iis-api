@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using HotChocolate;
 using HotChocolate.AspNetCore;
-using IIS.Core.GraphQL;
+using IIS.Core.Files;
+using IIS.Core.Files.EntityFramework;
 using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.ObjectTypeCreators;
-using IIS.Core.Mocks;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -42,11 +41,13 @@ namespace IIS.Core
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
             services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
 //            services.AddTransient<IOntologyProvider, OntologyProvider>();
+            services.AddSingleton<IOntologyRepository, OntologyRepository>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
             services.AddSingleton<IGraphQlTypeRepository, GraphQlTypeRepository>();
             services.AddSingleton<IOntologyService, OntologyService>();
             services.AddSingleton<GraphQlTypeCreator>();
+            services.AddTransient<IFileService, FileService>();
             //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
             var factory = new ConnectionFactory

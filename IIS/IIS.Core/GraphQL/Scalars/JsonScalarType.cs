@@ -31,7 +31,9 @@ namespace IIS.Core.GraphQL.Scalars
 
         public override object Serialize(object value)
         {
-            if (!(value is JObject jo)) throw new ArgumentException(nameof(value));
+            if (!(value is JObject jo))
+                throw new ArgumentException(nameof(value));
+//                return JObject.FromObject(value);
             return jo;
         }
 
@@ -53,6 +55,6 @@ namespace IIS.Core.GraphQL.Scalars
             return false;
         }
 
-        public override Type ClrType => typeof(JObject);
+        public override Type ClrType => typeof(object);
     }
 }

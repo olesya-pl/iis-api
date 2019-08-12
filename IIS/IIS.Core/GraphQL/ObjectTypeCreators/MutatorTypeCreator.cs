@@ -4,6 +4,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Mutations;
 using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
@@ -11,15 +12,13 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
     public abstract class MutatorTypeCreator
     {
         protected readonly GraphQlTypeCreator TypeCreator;
-        public string Operation { get; }
-        public MutatorTypeCreator(GraphQlTypeCreator typeCreator, string operation)
+        public Operation Operation { get; }
+        public MutatorTypeCreator(GraphQlTypeCreator typeCreator, Operation operation)
         {
             TypeCreator = typeCreator;
             Operation = operation;
         }
 
-        // ----- MutatorInputType ----- //
-        
         // this return value should not be wrapped in NonNullType()
         public MutatorInputType NewMutatorInputType(Type type)
         {
@@ -40,22 +39,58 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 : TypeCreator.GetType<EntityRelationInputType>().WrapInputType(relationType);
             objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
         }
-        
-        // ----- MutatorResponseType ----- //
-
-        public MutatorResponseType NewMutatorResponseType(Type type)
+    }
+    
+     // ----- CREATE ----- //
+    public class CreateMutatorTypeCreator : MutatorTypeCreator
+    {
+        public CreateMutatorTypeCreator(GraphQlTypeCreator typeCreator) : base(typeCreator, Operation.Create)
         {
-            return new MutatorResponseType(Operation, type.Name, TypeCreator.GetOntologyType(type));
         }
 
-        // ----- Types end ----- //
+        protected override void OnRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor = null)
+        {
+            IInputType type = null;
 
-        public abstract void AddFields(IObjectTypeDescriptor descriptor, EntityType type);
+            if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Create))
+                type = TypeCreator.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)
+                    .WrapInputType(relationType);
 
-//        public virtual void CreateTypes(EntityType type)
-//        {
-//            NewMutatorInputType(type);
-//            NewMutatorResponseType(type);
-//        }
+            if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple && relationType.IsAttributeType)
+                type = TypeCreator.GetMultipleInputType(Operation.Create, relationType.AttributeType)
+                    .WrapInputType(relationType);
+
+            if (type == null)
+                base.OnRelation(relationType, objectTypeDescriptor);
+            else
+                objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+        }
+    }
+
+    // ----- UPDATE ----- //
+    public class UpdateMutatorTypeCreator : MutatorTypeCreator
+    {
+        public UpdateMutatorTypeCreator(GraphQlTypeCreator typeCreator) : base(typeCreator, Operation.Update)
+        {
+        }
+        
+        protected override void OnRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor = null)
+        {
+            if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+            {
+                var type = TypeCreator.GetRelationPatchType(relationType);
+                objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+            }
+            else
+                base.OnRelation(relationType, objectTypeDescriptor);
+        }
+    }
+
+    // ----- DELETE ----- //
+    public class DeleteMutatorTypeCreator : MutatorTypeCreator
+    {
+        public DeleteMutatorTypeCreator(GraphQlTypeCreator typeCreator) : base(typeCreator, Operation.Delete)
+        {
+        }
     }
 }

@@ -5,6 +5,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.EntityTypes
@@ -27,21 +28,31 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
-        
+
         [GraphQLNonNullType]
         public string Title => Source.Title;
-        
+
         [GraphQLNonNullType]
         public string Code => Source.Name;
-        
+
         public bool IsAbstract => Source is IIS.Core.Ontology.EntityType et && et.IsAbstract; // todo
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]
-        public IEnumerable<IEntityAttribute> Attributes => 
-            Source.AllProperties.Select(CreateEntityAttribute);
+        [GraphQLDescription("Get all type relations. Sort argument is deprecated.")]
+        public IEnumerable<IEntityAttribute> GetAttributes(bool? sort = false)
+        {
+            var props = Source.AllProperties;
+            if (sort == true)
+                props = props.OrderBy(a => a.CreateMeta().SortOrder);
+            return props.Select(CreateEntityAttribute);
+        }
 
+        [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
         public EntityType Parent =>
             Source.DirectParents.Select(p => new EntityType(p)).FirstOrDefault();
+
+        [GraphQLNonNullType]
+        public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p));
 
         protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType) =>
             relationType.IsAttributeType
