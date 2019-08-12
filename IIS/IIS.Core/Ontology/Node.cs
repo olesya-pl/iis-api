@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IIS.Core.Ontology
 {
@@ -23,6 +24,20 @@ namespace IIS.Core.Ontology
         public void AddNode(Node node)
         {
             _nodes.Add(node.Type.Name, node);
+        }
+
+        public object GetAttributeValue(string relationName)
+        {
+            var relation = Nodes.SingleOrDefault(e => e.Type.Name == relationName);
+            var attribute = relation?.Nodes.OfType<Attribute>().Single();
+            return attribute.Value;
+        }
+
+        public Entity GetEntity(string relationName)
+        {
+            var relation = Nodes.SingleOrDefault(e => e.Type.Name == relationName);
+            var entity = relation?.Nodes.OfType<Entity>().Single();
+            return entity;
         }
     }
 
