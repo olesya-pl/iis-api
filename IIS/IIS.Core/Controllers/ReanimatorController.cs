@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using IIS.Legacy.EntityFramework;
@@ -12,6 +13,8 @@ using ORelationType = IIS.Core.Ontology.RelationType;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Attribute = IIS.Core.Ontology.EntityFramework.Context.Attribute;
+using Type = IIS.Core.Ontology.EntityFramework.Context.Type;
 
 namespace IIS.Core.Controllers
 {
@@ -73,6 +76,8 @@ namespace IIS.Core.Controllers
 
         public async Task<IActionResult> Get()
         {
+            throw new NotImplementedException("Broken Reanimators type conversion because of relation model change. Use Graphql mutation 'migrateTypes'.");
+
             _context.Types.RemoveRange(_context.Types.ToArray());
             _context.AttributeTypes.RemoveRange(_context.AttributeTypes.ToArray());
             _context.RelationTypes.RemoveRange(_context.RelationTypes.ToArray());
@@ -94,7 +99,7 @@ namespace IIS.Core.Controllers
 
             if (type is OEntityType) return _typesCache[type.Id] = ToEntity((OEntityType)type);
             if (type is OAttributeType) return _typesCache[type.Id] = ToAttribute((OAttributeType)type);
-            
+
             throw new System.Exception("Unknown type.");
         }
 
@@ -126,7 +131,7 @@ namespace IIS.Core.Controllers
             var relation = new RelationType
             {
                 Id = relationType.Id,
-                IsArray = relationType.EmbeddingOptions == Ontology.EmbeddingOptions.Multiple,
+//                IsArray = relationType.EmbeddingOptions == Ontology.EmbeddingOptions.Multiple,
                 Kind = RelationKind.Embedding,
                 TargetType = MapType(relationType.TargetType),
                 SourceTypeId = sourceId,
@@ -176,7 +181,7 @@ namespace IIS.Core.Controllers
             };
             type.AttributeType = attr;
             attr.Type = type;
-            
+
             return type;
         }
 

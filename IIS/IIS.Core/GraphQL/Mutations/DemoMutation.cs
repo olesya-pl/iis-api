@@ -1,8 +1,13 @@
 using System;
 using HotChocolate;
 using IIS.Core.GraphQL.Scalars;
+using IIS.Core.Ontology;
+using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
+using IIS.Legacy.EntityFramework;
 using Newtonsoft.Json.Linq;
+using AttributeType = IIS.Core.Ontology.EntityFramework.Context.AttributeType;
+using RelationType = IIS.Core.Ontology.EntityFramework.Context.RelationType;
 using Type = IIS.Core.Ontology.EntityFramework.Context.Type;
 
 namespace IIS.Core.GraphQL.Mutations
@@ -11,7 +16,7 @@ namespace IIS.Core.GraphQL.Mutations
     {
         private static string _savedString;
         private static JObject _jobject;
-        
+
         public string SaveString(string param)
         {
             var old = _savedString;
@@ -25,7 +30,7 @@ namespace IIS.Core.GraphQL.Mutations
             context.SaveChanges();
             return "Cleared.";
         }
-        
+
         public string FillDummyDatabase([Service] OntologyContext context)
         {
             var oos = CreateEntity(context, "ObjectOfStudy", "Объект разведки", true);
@@ -45,7 +50,7 @@ namespace IIS.Core.GraphQL.Mutations
             var birthattr = CreateAttribute(context, "BirthDate", "Дата рождения", Core.Ontology.EntityFramework.Context.ScalarType.Date);
             CreateRelation(context, person, birthattr, RelationKind.Embedding);
             context.SaveChanges();
-            
+
             return "Yep.";
         }
 
@@ -94,13 +99,27 @@ namespace IIS.Core.GraphQL.Mutations
             _jobject = data;
             return old;
         }
-        
+
         [GraphQLType(typeof(GeoJsonScalarType))]
         public JObject SaveGeo([GraphQLType(typeof(GeoJsonScalarType))] JObject data)
         {
             var old = _jobject;
             _jobject = data;
             return old;
+        }
+
+        public string ClearTypes([Service] OntologyTypeSaver typeSaver)
+        {
+            typeSaver.ClearTypes();
+            return "Types cleared";
+        }
+
+        public string MigrateLegacyTypes([Service] ILegacyOntologyProvider provider, [Service] OntologyTypeSaver typeSaver)
+        {
+            var task = provider.GetTypesAsync();
+            task.Wait();
+            typeSaver.SaveTypes(task.Result);
+            return "Types migrated";
         }
     }
 }

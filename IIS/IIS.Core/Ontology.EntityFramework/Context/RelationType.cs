@@ -6,7 +6,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
     {
         public Guid Id { get; set; }
         public RelationKind Kind { get; set; }
-        public bool IsArray { get; set; }
+        public EmbeddingOptions EmbeddingOptions { get; set; }
         public Guid SourceTypeId { get; set; }
         public Guid TargetTypeId { get; set; }
 
@@ -16,4 +16,5 @@ namespace IIS.Core.Ontology.EntityFramework.Context
     }
 
     public enum RelationKind { Embedding, Inheritance }
+    public enum EmbeddingOptions { None, Optional, Required, Multiple }
 }

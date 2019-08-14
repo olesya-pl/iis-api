@@ -18,7 +18,7 @@ namespace IIS.Core.Ontology.Meta
             js.Converters.Add(typeConverter);
             return type.GetFullMeta().ToObject<TMeta>(js);
         }
-        
+
         public static IMeta CreateMeta(this Type type)
         {
             if (type?.Meta == null)
@@ -34,7 +34,7 @@ namespace IIS.Core.Ontology.Meta
 
         public static EntityMeta CreateMeta(this EntityType type) =>
             CreateMeta<EntityMeta>(type, new MetaConverter<EntityMeta>(null));
-        
+
         public static AttributeMeta CreateMeta(this AttributeType type) =>
             CreateMeta<AttributeMeta>(type, new MetaConverter<AttributeMeta>(type.ScalarTypeEnum));
 
@@ -47,7 +47,7 @@ namespace IIS.Core.Ontology.Meta
             var converter = new MetaConverter<AttributeRelationMeta>(type.AttributeType.ScalarTypeEnum);
             return CreateMeta<AttributeRelationMeta>(type, converter);
         }
-        
+
         public static EntityRelationMeta CreateEntityRelationMeta(this EmbeddingRelationType type)
         {
             if (!type.IsEntityType) throw new ArgumentException(nameof(type));
@@ -61,7 +61,7 @@ namespace IIS.Core.Ontology.Meta
             foreach (var type in ontologyTypes)
                 ValidateMeta(type);
         }
-        
+
         public static void ValidateMeta(Type type)
         {
             try

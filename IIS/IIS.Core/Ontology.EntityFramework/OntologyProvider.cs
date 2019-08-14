@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
+using IIS.Core.Ontology.Meta;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
@@ -12,6 +13,7 @@ namespace IIS.Core.Ontology.EntityFramework
     public class OntologyProvider : IOntologyProvider
     {
         private readonly OntologyContext _context;
+        private Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
 
         public OntologyProvider(OntologyContext context)
         {
@@ -31,33 +33,23 @@ namespace IIS.Core.Ontology.EntityFramework
             return result;
         }
 
-        private static Type MapType(Context.Type type)
+        private Type MapType(Context.Type type)
         {
-            ScalarType MapScalarType(Context.ScalarType scalarType)
-            {
-                switch (scalarType)
-                {
-                    case Context.ScalarType.Boolean: return ScalarType.Boolean;
-                    case Context.ScalarType.Date: return ScalarType.DateTime;
-                    case Context.ScalarType.Decimal: return ScalarType.Decimal;
-                    case Context.ScalarType.File: return ScalarType.File;
-                    case Context.ScalarType.Geo: return ScalarType.Geo;
-                    case Context.ScalarType.Int: return ScalarType.Integer;
-                    case Context.ScalarType.String: return ScalarType.String;
-                    default: throw new NotImplementedException();
-                }
-            }
+            if (_types.ContainsKey(type.Id))
+                return _types[type.Id];
 
             if (type.Kind == Kind.Attribute)
             {
                 var attributeType = type.AttributeType;
                 var attr = new AttributeType(type.Id, type.Name, MapScalarType(attributeType.ScalarType));
+                _types.Add(type.Id, attr);
                 FillProperties(type, attr);
                 return attr;
             }
             if (type.Kind == Kind.Entity)
             {
                 var entity = new EntityType(type.Id, type.Name, type.IsAbstract);
+                _types.Add(type.Id, entity);
                 FillProperties(type, entity);
                 foreach (var outgoingRelation in type.OutgoingRelations)
                 {
@@ -69,14 +61,13 @@ namespace IIS.Core.Ontology.EntityFramework
             throw new Exception("Unsupported type.");
         }
 
-        private static RelationType MapRelation(Context.RelationType relationType)
+        private RelationType MapRelation(Context.RelationType relationType)
         {
             var type = relationType.Type;
-            //var isRequired = false; // todo: map from type.Meta
             var relation = default(RelationType);
             if (relationType.Kind == RelationKind.Embedding)
             {
-                relation = new EmbeddingRelationType(type.Id, type.Name, EmbeddingOptions.Optional);
+                relation = new EmbeddingRelationType(type.Id, type.Name, Map(relationType.EmbeddingOptions));
                 FillProperties(type, relation);
                 var target = MapType(relationType.TargetType);
                 relation.AddType(target);
@@ -95,8 +86,35 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             ontologyType.Title = type.Title;
             ontologyType.Meta = type.Meta == null ? null : JObject.Parse(type.Meta);
+            //ontologyType.TypeMeta = ontologyType.CreateMeta(); // todo: remake meta creation
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;
+        }
+
+        private static ScalarType MapScalarType(Context.ScalarType scalarType)
+        {
+            switch (scalarType)
+            {
+                case Context.ScalarType.Boolean: return ScalarType.Boolean;
+                case Context.ScalarType.Date: return ScalarType.DateTime;
+                case Context.ScalarType.Decimal: return ScalarType.Decimal;
+                case Context.ScalarType.File: return ScalarType.File;
+                case Context.ScalarType.Geo: return ScalarType.Geo;
+                case Context.ScalarType.Int: return ScalarType.Integer;
+                case Context.ScalarType.String: return ScalarType.String;
+                default: throw new NotImplementedException();
+            }
+        }
+
+        private static EmbeddingOptions Map(Context.EmbeddingOptions embeddingOptions)
+        {
+            switch (embeddingOptions)
+            {
+                case Context.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
+                case Context.EmbeddingOptions.Required: return EmbeddingOptions.Required;
+                case Context.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
+                default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
+            }
         }
     }
 }

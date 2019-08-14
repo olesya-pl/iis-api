@@ -39,14 +39,15 @@ namespace IIS.Core
             loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
-            services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
-//            services.AddTransient<IOntologyProvider, OntologyProvider>();
+//            services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
+            services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddSingleton<IOntologyRepository, OntologyRepository>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
             services.AddSingleton<IGraphQlTypeRepository, GraphQlTypeRepository>();
             services.AddSingleton<IOntologyService, OntologyService>();
             services.AddSingleton<GraphQlTypeCreator>();
+            services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();

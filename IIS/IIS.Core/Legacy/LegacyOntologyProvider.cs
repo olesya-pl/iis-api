@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -14,22 +15,22 @@ namespace IIS.Legacy.EntityFramework
     public class LegacyOntologyProvider : ILegacyOntologyProvider
     {
         private readonly string _connectionString;
-        
+
         struct UnionInfo
-        { 
+        {
             public IGrouping<OTypeRelation, ORestriction> Union;
             public OTypeEntity Source;
             public string Name;
         }
 
         private List<UnionInfo> _unionInfos = new List<UnionInfo>();
-        
-        
+
+
         public LegacyOntologyProvider(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("db-legacy");
         }
-        
+
         public async Task<IEnumerable<Type>> GetTypesAsync(CancellationToken cancellationToken = default)
         {
             var opts = new DbContextOptionsBuilder().UseNpgsql(_connectionString).Options;
@@ -74,7 +75,7 @@ namespace IIS.Legacy.EntityFramework
                 else if (attr.IsRequired) builder.HasRequired(attr.Attribute.Code, attr.Attribute.Code, attr.Meta);
                 else builder.HasOptional(attr.Attribute.Code, attr.Attribute.Code, attr.Meta);
             }
-            
+
             if (srcType.Parent != null) builder.Is(srcType.Parent.Code);
 
             foreach (var restrictionGroup in srcType.ForwardRestrictions.GroupBy(r => r.Type))
@@ -107,17 +108,17 @@ namespace IIS.Legacy.EntityFramework
                 var source = entities[info.Source.Code];
                 var relation = source.DirectProperties.Single(p => p.Name == info.Name);
                 var nodes = (List<Type>) relation.Nodes;
-                
+
                 var unionName = $"{source.Name}_{relation.Name}";
-                var unionType = new EntityType(Guid.Empty, unionName, true);
+                var unionType = new EntityType(Guid.NewGuid(), unionName, true);
                 foreach (var child in info.Union)
                 {
                     var childType = entities[child.Target.Code];
-                    var isRelation = new InheritanceRelationType(Guid.Empty);
+                    var isRelation = new InheritanceRelationType(Guid.NewGuid());
                     isRelation.AddType(unionType); // set ParentType
                     childType.AddType(isRelation); // add relation to ParentType
                 }
-                
+
                 nodes.RemoveAll(n => n is EntityType); // remove old relation type
                 nodes.Add(unionType); // replace with union type
             }

@@ -5,6 +5,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
@@ -39,7 +40,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 GetOntologyType(type);
             // Create input types
             var mutations = new[] {Operation.Create, Operation.Delete, Operation.Update};
-            foreach (var type in entityTypes)
+            foreach (var type in entityTypes.Where(t => !t.IsAbstract))
             {
                 foreach (var mutator in mutations)
                 {
