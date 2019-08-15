@@ -32,8 +32,8 @@ namespace IIS.Core.GraphQL.Entities
         {
             var ontologyService = ctx.Service<IOntologyService>();
             var id = ctx.Argument<Guid>("id");
-            var node = await ontologyService.LoadNodesAsync(new Entity(id), null);
-            return node as Entity; // ???
+            var node = await ontologyService.LoadNodesAsync(id, null);
+            return (Entity)node; // ???
         }
 
         public static async Task<IEnumerable<Entity>> ResolveEntityList(IResolverContext ctx, EntityType type)
@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.Entities
         {
             var parent = ctx.Parent<Node>();
             var ontologyService = ctx.Service<IOntologyService>();
-            var node = await ontologyService.LoadNodesAsync(parent, new[] { relationType });
+            var node = await ontologyService.LoadNodesAsync(parent.Id, new[] { relationType });
             var relation = node.Nodes.OfType<Relation>().Single(n => n.Type.Name == relationType.Name);
             var attribute = relation.Nodes.OfType<Attribute>().Single();
             return await ResolveAttributeValue(ctx, attribute);
@@ -61,7 +61,7 @@ namespace IIS.Core.GraphQL.Entities
         {
             var parent = ctx.Parent<Node>();
             var ontologyService = ctx.Service<IOntologyService>();
-            var node = await ontologyService.LoadNodesAsync(parent, new[] { relationType });
+            var node = await ontologyService.LoadNodesAsync(parent.Id, new[] { relationType });
             return node.Nodes.OfType<Relation>().Where(n => n.Type.Name == relationType.Name);
         }
 
@@ -105,7 +105,7 @@ namespace IIS.Core.GraphQL.Entities
         {
             var ontologyService = ctx.Service<IOntologyService>();
             var parent = ctx.Parent<Node>();
-            var node = await ontologyService.LoadNodesAsync(parent, new[] { relationType });
+            var node = await ontologyService.LoadNodesAsync(parent.Id, new[] { relationType });
             var relations = node.Nodes.OfType<Relation>().Where(r => r.Type.Name == relationType.Name);
             var relationsInfo = relations.ToDictionary(r => r.Nodes.OfType<Entity>().Single());
             ctx.SetRelationInfo(relationsInfo); // pass info to _relation

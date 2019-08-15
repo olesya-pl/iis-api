@@ -6,24 +6,25 @@ namespace IIS.Core.Ontology
 {
     public abstract class Node
     {
-        private Dictionary<string, Node> _nodes = new Dictionary<string, Node>();
+        private List<Node> _nodes = new List<Node>();
 
         public Guid Id { get; }
         public Type Type { get; }
-        public IEnumerable<Node> Nodes => _nodes.Values;
+        public IEnumerable<Node> Nodes => _nodes;
         public DateTime CreatedAt { get; }
         public DateTime UpdatedAt { get; }
 
-        public Node(Guid id, DateTime createdAt = default, DateTime updatedAt = default)
+        public Node(Guid id, Type type, DateTime createdAt = default, DateTime updatedAt = default)
         {
             Id = id;
+            Type = type;
             CreatedAt = createdAt;
             UpdatedAt = updatedAt;
         }
 
         public void AddNode(Node node)
         {
-            _nodes.Add(node.Type.Name, node);
+            _nodes.Add(node);
         }
 
         public object GetAttributeValue(string relationName)
@@ -45,8 +46,8 @@ namespace IIS.Core.Ontology
     {
         public object Value { get; }
 
-        public Attribute(Guid id, object value, DateTime createdAt = default, DateTime updatedAt = default)
-            : base(id, createdAt, updatedAt)
+        public Attribute(Guid id, AttributeType type, object value, DateTime createdAt = default, DateTime updatedAt = default)
+            : base(id, type, createdAt, updatedAt)
         {
             Value = value;
         }
@@ -54,8 +55,8 @@ namespace IIS.Core.Ontology
 
     public class Entity : Node
     {
-        public Entity(Guid id, DateTime createdAt = default, DateTime updatedAt = default)
-            : base(id, createdAt, updatedAt)
+        public Entity(Guid id, EntityType type, DateTime createdAt = default, DateTime updatedAt = default)
+            : base(id, type, createdAt, updatedAt)
         {
 
         }
@@ -63,8 +64,8 @@ namespace IIS.Core.Ontology
 
     public class Relation : Node
     {
-        public Relation(Guid id, DateTime createdAt = default, DateTime updatedAt = default)
-            : base(id, createdAt, updatedAt)
+        public Relation(Guid id, RelationType type, DateTime createdAt = default, DateTime updatedAt = default)
+            : base(id, type, createdAt, updatedAt)
         {
 
         }

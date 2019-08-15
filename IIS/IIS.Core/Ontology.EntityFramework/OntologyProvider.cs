@@ -28,7 +28,10 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Include(e => e.AttributeType)
                 .ToArrayAsync(cancellationToken);
 
-            var result = types.Select(MapType).ToArray();
+            var result = types.Select(MapType).ToList();
+
+            // todo: refactor
+            result.AddRange(_types.Values.Where(e => e is RelationType));
 
             return result;
         }
@@ -61,14 +64,18 @@ namespace IIS.Core.Ontology.EntityFramework
             throw new Exception("Unsupported type.");
         }
 
-        private RelationType MapRelation(Context.RelationType relationType)
+        private Type MapRelation(Context.RelationType relationType)
         {
+            if (_types.ContainsKey(relationType.Id))
+                return _types[relationType.Id];
+
             var type = relationType.Type;
             var relation = default(RelationType);
             if (relationType.Kind == RelationKind.Embedding)
             {
                 relation = new EmbeddingRelationType(type.Id, type.Name, Map(relationType.EmbeddingOptions));
                 FillProperties(type, relation);
+                _types.Add(type.Id, relation);
                 var target = MapType(relationType.TargetType);
                 relation.AddType(target);
             }
@@ -76,9 +83,11 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 relation = new InheritanceRelationType(type.Id);
                 FillProperties(type, relation);
+                _types.Add(type.Id, relation);
                 var target = MapType(relationType.TargetType);
                 relation.AddType(target);
             }
+
             return relation;
         }
 

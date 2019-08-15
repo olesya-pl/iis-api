@@ -11,17 +11,13 @@ namespace IIS.Core.Ontology.EntityFramework
     public class OntologyService : IOntologyService
     {
         private readonly OntologyContext _context;
+        private readonly IOntologyProvider _ontologyProvider;
 
-        public OntologyService(OntologyContext context)
+        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider)
         {
             _context = context;
+            _ontologyProvider = ontologyProvider;
         }
-
-        // if single attr:
-        //      if new value -> replace value
-        //      if no relation -> mark relation & attribute as deleted
-        // if multiple attr:
-        //      if
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
@@ -141,36 +137,23 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, CancellationToken cancellationToken = default)
         {
-            var typeId = type.Id;
-            var ctxType = await _context.Types.Where(e => e.Name == type.Name) // todo: replace with id search
-                .Include(e => e.Nodes)
-                    .ThenInclude(n => n.Type)
-                .FirstOrDefaultAsync(cancellationToken);
+            var ctxNodes = await _context.Nodes.Where(e => e.Type.Name == type.Name) // todo: replace with id search
+                .Include(n => n.Type)
+                .ToArrayAsync(cancellationToken);
 
-            if (ctxType is null) throw new Exception("The given type is not found.");
-
-            var nodes = ctxType.Nodes.Select(MapNode).ToArray();
+            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+            var nodes = ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
 
             return nodes;
         }
 
-        public async Task<IDictionary<string, IEnumerable<Node>>> GetNodesByTypesAsync(IEnumerable<string> typeNames,
-            CancellationToken cancellationToken = default)
+        public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
         {
-            var ctxTypes = await _context.Types.Where(e => typeNames.Contains(e.Name))
-                .Include(e => e.Nodes)
-                .ToArrayAsync(cancellationToken);
-
-            var types = ctxTypes.ToDictionary(e => e.Name, e => e.Nodes.Select(MapNode));
-
-            return types;
-        }
-
-        public async Task<Node> LoadNodesAsync(Node source, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
-        {
-            var sourceId = source.Id;
-            var ctxSource = await _context.Nodes.Where(e => e.Id == sourceId)
+            var ctxSource = await _context.Nodes.Where(e => e.Id == nodeId)
+                .Include(e => e.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node.Type.RelationType)
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -182,9 +165,25 @@ namespace IIS.Core.Ontology.EntityFramework
             //var ctxSource = relations.First().SourceNode;
             //source = MapNode(ctxSource);
 
-            source = MapNode(ctxSource);
+            if (ctxSource is null) return null;
 
-            return source;
+            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+            var node = MapNode(ctxSource, ontology);
+
+            return node;
+        }
+
+        public async Task<IDictionary<string, IEnumerable<Node>>> GetNodesByTypesAsync(IEnumerable<string> typeNames,
+            CancellationToken cancellationToken = default)
+        {
+            var ctxTypes = await _context.Types.Where(e => typeNames.Contains(e.Name))
+                .Include(e => e.Nodes)
+                .ToArrayAsync(cancellationToken);
+
+            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+            var types = ctxTypes.ToDictionary(e => e.Name, e => e.Nodes.Select(ee => MapNode(ee, ontology)));
+
+            return types;
         }
 
         public async Task<IDictionary<Guid, Node>> LoadNodesAsync(IEnumerable<Guid> sourceIds,
@@ -195,26 +194,37 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .ToArrayAsync(cancellationToken);
 
-            var sources = ctxSources.Select(MapNode).ToDictionary(e => e.Id);
+            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+            var sources = ctxSources.Select(e => MapNode(e, ontology)).ToDictionary(e => e.Id);
 
             return sources;
         }
 
-        private Node MapNode(Context.Node ctxNode)
+        private Node MapNode(Context.Node ctxNode, IEnumerable<Type> ontology)
         {
-            if (ctxNode == null) return null;
             Node node;
             if (ctxNode.Type.Kind == Kind.Attribute)
-                node = new Attribute(ctxNode.Id, ctxNode.Attribute.Value);
+            {
+                var type = ontology.Single(e => e.Name == ctxNode.Type.Name && e is AttributeType) as AttributeType;
+                node = new Attribute(ctxNode.Id, type, ctxNode.Attribute.Value);
+            }
             else if (ctxNode.Type.Kind == Kind.Entity)
-                node = new Entity(ctxNode.Id);
+            {
+                var type = ontology.Single(e => e.Name == ctxNode.Type.Name && e is EntityType) as EntityType;
+                node = new Entity(ctxNode.Id, type);
+            }
             else if (ctxNode.Type.Kind == Kind.Relation && ctxNode.Type.RelationType.Kind == RelationKind.Embedding)
-                node = new Relation(ctxNode.Id);
+            {
+                var type = ontology.Single(e => e.Name == ctxNode.Type.Name && e is RelationType) as RelationType;
+                node = new Relation(ctxNode.Id, type);
+                var target = MapNode(ctxNode.Relation.TargetNode, ontology);
+                node.AddNode(target);
+            }
             else throw new Exception("Unsupported.");
-
+            
             foreach (var relatedNode in ctxNode.OutgoingRelations)
             {
-                var mapped = MapNode(relatedNode.Node);
+                var mapped = MapNode(relatedNode.Node, ontology);
                 node.AddNode(mapped);
             }
 

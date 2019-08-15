@@ -8,7 +8,7 @@ namespace IIS.Core.Ontology
     public abstract class Type
     {
         private readonly List<Type> _nodes = new List<Type>();
-        public IEnumerable<Type> Nodes => _nodes;
+        public IEnumerable<Type> RelatedTypes => _nodes;
 
         public Guid Id { get; }
         public string Name { get; }
@@ -18,13 +18,13 @@ namespace IIS.Core.Ontology
         public DateTime UpdatedAt { get; set; }
 
         public IEnumerable<EntityType> DirectParents =>
-            Nodes.OfType<InheritanceRelationType>().Select(r => r.ParentType);
+            RelatedTypes.OfType<InheritanceRelationType>().Select(r => r.ParentType);
 
         public IEnumerable<EntityType> AllParents =>
             DirectParents.SelectMany(e => e.AllParents).Union(DirectParents);
 
         public IEnumerable<EmbeddingRelationType> DirectProperties =>
-            Nodes.OfType<EmbeddingRelationType>();
+            RelatedTypes.OfType<EmbeddingRelationType>();
 
         public IEnumerable<EmbeddingRelationType> AllProperties =>
             AllParents.SelectMany(p => p.DirectProperties)

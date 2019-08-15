@@ -67,7 +67,7 @@ namespace IIS.Core.Ontology.Meta
             try
             {
                 var meta = type.CreateMeta();
-                foreach (var node in type.Nodes)
+                foreach (var node in type.RelatedTypes)
                     meta = node.CreateMeta();
             }
             catch (Exception ex)

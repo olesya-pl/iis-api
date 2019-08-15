@@ -64,7 +64,7 @@ namespace IIS.Core.GraphQL
             d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
 
         public static IEnumerable<Type> GetInheritors(this Type type, IEnumerable<Type> ontology) =>
-            ontology.Where(t => t.Nodes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));
+            ontology.Where(t => t.RelatedTypes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));
 
         public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {

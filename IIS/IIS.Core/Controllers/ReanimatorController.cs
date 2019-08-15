@@ -59,18 +59,6 @@ namespace IIS.Core.Controllers
             _context.AddRange(entity, attr, nameRelation);
             await _context.SaveChangesAsync();
 
-            var entity2 = new Node { Type = person, Id = System.Guid.NewGuid() };
-            var attr2 = new Attribute { Node = new Node { Type = nameType, Id = System.Guid.NewGuid() }, Value = "Inner Petro" };
-            var nameRelation2 = new Relation
-            {
-                Node = new Node { Type = nameRelationType.Type, Id = System.Guid.NewGuid() },
-                SourceNode = entity,
-                TargetNode = entity2
-            };
-
-            _context.AddRange(entity2, attr2, nameRelation2);
-            await _context.SaveChangesAsync();
-
             return Ok();
         }
 
@@ -109,7 +97,7 @@ namespace IIS.Core.Controllers
             type.Kind = Kind.Entity;
             type.IsAbstract = entityType.IsAbstract;
 
-            foreach (var relation in entityType.Nodes.OfType<ORelationType>())
+            foreach (var relation in entityType.RelatedTypes.OfType<ORelationType>())
             {
                 var relationType = default(RelationType);
                 if (relation is EmbeddingRelationType)

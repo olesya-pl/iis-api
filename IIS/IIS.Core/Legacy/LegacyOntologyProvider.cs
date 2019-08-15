@@ -107,7 +107,7 @@ namespace IIS.Legacy.EntityFramework
             {
                 var source = entities[info.Source.Code];
                 var relation = source.DirectProperties.Single(p => p.Name == info.Name);
-                var nodes = (List<Type>) relation.Nodes;
+                var nodes = (List<Type>) relation.RelatedTypes;
 
                 var unionName = $"{source.Name}_{relation.Name}";
                 var unionType = new EntityType(Guid.NewGuid(), unionName, true);

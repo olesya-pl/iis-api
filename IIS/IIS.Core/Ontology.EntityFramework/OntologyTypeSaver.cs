@@ -87,7 +87,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             _types.Add(type.Id, result); // Add to created types cache
 
-            foreach (var node in type.Nodes.OfType<RelationType>()) // saving only relation nodes
+            foreach (var node in type.RelatedTypes.OfType<RelationType>()) // saving only relation nodes
                 SaveType(node, type);
 
             return result;

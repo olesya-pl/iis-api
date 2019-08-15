@@ -12,7 +12,7 @@ namespace IIS.Core.Ontology
         Task<IDictionary<string, IEnumerable<Node>>> GetNodesByTypesAsync(IEnumerable<string> typeNames,
             CancellationToken cancellationToken = default);
 
-        Task<Node> LoadNodesAsync(Node source, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default);
+        Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default);
 
         Task<IDictionary<Guid, Node>> LoadNodesAsync(IEnumerable<Guid> sourceIds,
             IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default);
