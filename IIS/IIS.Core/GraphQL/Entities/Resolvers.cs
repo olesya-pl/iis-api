@@ -33,7 +33,7 @@ namespace IIS.Core.GraphQL.Entities
             var ontologyService = ctx.Service<IOntologyService>();
             var id = ctx.Argument<Guid>("id");
             var node = await ontologyService.LoadNodesAsync(id, null);
-            return (Entity)node; // ???
+            return node as Entity; // return null if node was not entity
         }
 
         public static async Task<IEnumerable<Entity>> ResolveEntityList(IResolverContext ctx, EntityType type)
@@ -51,9 +51,9 @@ namespace IIS.Core.GraphQL.Entities
             var parent = ctx.Parent<Node>();
             var ontologyService = ctx.Service<IOntologyService>();
             var node = await ontologyService.LoadNodesAsync(parent.Id, new[] { relationType });
-            var relation = node.Nodes.OfType<Relation>().Single(n => n.Type.Name == relationType.Name);
-            var attribute = relation.Nodes.OfType<Attribute>().Single();
-            return await ResolveAttributeValue(ctx, attribute);
+            var relation = node.GetRelation(relationType);
+            if (relation == null) return null;
+            return await ResolveAttributeValue(ctx, relation.AttributeTarget);
         }
 
         // resolve multiple entity-[attribute] relation
@@ -62,15 +62,14 @@ namespace IIS.Core.GraphQL.Entities
             var parent = ctx.Parent<Node>();
             var ontologyService = ctx.Service<IOntologyService>();
             var node = await ontologyService.LoadNodesAsync(parent.Id, new[] { relationType });
-            return node.Nodes.OfType<Relation>().Where(n => n.Type.Name == relationType.Name);
+            return node.GetRelations(relationType);
         }
 
         // Parent - embedding relation to attribute, resolve attribute value here
         public static async Task<object> ResolveMultipleAttributeRelationTarget(IResolverContext ctx)
         {
             var parent = ctx.Parent<Relation>();
-            var attribute = parent.Nodes.OfType<Attribute>().Single();
-            return await ResolveAttributeValue(ctx, attribute);
+            return await ResolveAttributeValue(ctx, parent.AttributeTarget);
         }
 
         // Return any scalar type for given attribute
@@ -92,7 +91,7 @@ namespace IIS.Core.GraphQL.Entities
                 case Core.Ontology.ScalarType.Geo:
                     throw new NotImplementedException();
                 case Core.Ontology.ScalarType.File:
-                    throw new NotImplementedException();
+                    return attribute.Value; // Guid of file
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -106,12 +105,12 @@ namespace IIS.Core.GraphQL.Entities
             var ontologyService = ctx.Service<IOntologyService>();
             var parent = ctx.Parent<Node>();
             var node = await ontologyService.LoadNodesAsync(parent.Id, new[] { relationType });
-            var relations = node.Nodes.OfType<Relation>().Where(r => r.Type.Name == relationType.Name);
-            var relationsInfo = relations.ToDictionary(r => r.Nodes.OfType<Entity>().Single());
+            var relations = node.GetRelations(relationType);
+            var relationsInfo = relations.ToDictionary(r => r.EntityTarget);
             ctx.SetRelationInfo(relationsInfo); // pass info to _relation
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
                 return relationsInfo.Keys;
-            return relationsInfo.Keys.Single();
+            return relationsInfo.Keys.SingleOrDefault();
         }
 
         // resolver for "_relation" field on schema, passed through context

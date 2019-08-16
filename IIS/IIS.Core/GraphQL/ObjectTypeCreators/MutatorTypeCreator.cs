@@ -40,7 +40,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
             objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
         }
     }
-    
+
      // ----- CREATE ----- //
     public class CreateMutatorTypeCreator : MutatorTypeCreator
     {
@@ -73,7 +73,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         public UpdateMutatorTypeCreator(GraphQlTypeCreator typeCreator) : base(typeCreator, Operation.Update)
         {
         }
-        
+
         protected override void OnRelation(EmbeddingRelationType relationType, IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
@@ -82,7 +82,12 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
                 objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
             }
             else
-                base.OnRelation(relationType, objectTypeDescriptor);
+            {
+                var type = relationType.IsAttributeType
+                    ? TypeCreator.GetInputAttributeType(relationType.AttributeType)
+                    : TypeCreator.GetType<EntityRelationInputType>();
+                objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+            }
         }
     }
 

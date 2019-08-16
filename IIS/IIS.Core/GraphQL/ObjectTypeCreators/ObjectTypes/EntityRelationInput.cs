@@ -4,27 +4,20 @@ using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
 {
-    public class EntityRelationInput
+    public class EntityRelationInputType : InputObjectType
     {
-        [GraphQLType(typeof(NonNullType<IdType>))]
-        public Guid TargetId { get; set; }
-//        public DateTime StartsAt { get; set; }
-//        public DateTime EndsAt { get; set; }
+        protected override void Configure(IInputObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("targetId").Type<NonNullType<IdType>>();
+        }
     }
-    
-    public class EntityRelationInputType : InputObjectType<EntityRelationInput>
+
+    public class UpdateEntityRelationInputType : InputObjectType
     {
-        
-    }
-    
-    public class UpdateEntityRelationInput : EntityRelationInput
-    {
-        [GraphQLType(typeof(NonNullType<IdType>))]
-        public Guid Id { get; set; }
-    }
-    
-    public class UpdateEntityRelationInputType : InputObjectType<UpdateEntityRelationInput>
-    {
-        
+        protected override void Configure(IInputObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("targetId").Type<NonNullType<IdType>>();
+            descriptor.Field("id").Type<NonNullType<IdType>>();
+        }
     }
 }

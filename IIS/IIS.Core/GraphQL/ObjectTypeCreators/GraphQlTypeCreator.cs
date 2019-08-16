@@ -74,7 +74,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         {
             IOutputType type;
             if (scalarType == Core.Ontology.ScalarType.File)
-                type = _typeRepository.GetType<ObjectType<Attachment>>();
+                type = _typeRepository.GetType<AttachmentType>();
             else
                 type = _typeRepository.Scalars[scalarType];
             return type;

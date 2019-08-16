@@ -61,5 +61,8 @@ namespace IIS.Core.Ontology
         {
             _relatedTypes.Add(type);
         }
+
+        public EmbeddingRelationType GetProperty(string typeName) =>
+            AllProperties.SingleOrDefault(p => p.Name == typeName);
     }
 }

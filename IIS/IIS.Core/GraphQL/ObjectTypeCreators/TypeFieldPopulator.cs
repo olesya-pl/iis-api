@@ -1,6 +1,8 @@
 using System;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.Mutations;
+using IIS.Core.GraphQL.Mutations.Resolvers;
 using IIS.Core.Ontology;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
@@ -19,6 +21,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         public void AddCreateFields(IObjectTypeDescriptor descriptor, EntityType type)
         {
             var operation = Operation.Create;
+            var name = type.Name;
             descriptor.Field(GetName(operation, type))
                 .Type(_creator.GetMutatorResponseType(operation, type))
 //                .Argument("data", d => d.Type(new NonNullType(CreateObjectType(type)))) // fail
@@ -27,27 +30,29 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
 //                .Argument("data", d => d.Type(new NonNullType(TypeProvider.Scalars[Core.Ontology.ScalarType.String]))) // fail
                 .Argument("data", d =>
                     d.Type(_creator.GetMutatorInputType(operation, type)))
-                .Resolver(ctx => Resolvers.CreateEntity(ctx, type));
+                .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().CreateEntity(ctx, name));
         }
-        
+
         public void AddUpdateFields(IObjectTypeDescriptor descriptor, EntityType type)
         {
             var operation = Operation.Update;
+            var name = type.Name;
             descriptor.Field(GetName(operation, type))
                 .Type(_creator.GetMutatorResponseType(operation, type))
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
                 .Argument("data", d =>
                     d.Type(_creator.GetMutatorInputType(operation, type)))
-                .Resolver(ctx => Resolvers.UpdateEntity(ctx, type));
+                .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().UpdateEntity(ctx, name));
         }
-        
+
         public void AddDeleteFields(IObjectTypeDescriptor descriptor, EntityType type)
         {
             var operation = Operation.Delete;
+            var name = type.Name;
             descriptor.Field(GetName(operation, type))
                 .Type(_creator.GetMutatorResponseType(operation, type))
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
-                .Resolver(ctx => Resolvers.DeleteEntity(ctx, type));
+                .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().DeleteEntity(ctx, name));
         }
 
         public void AddFields(IObjectTypeDescriptor descriptor, EntityType type, Operation operation)

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.Language;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Mutations.Resolvers;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
@@ -99,9 +101,9 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         {
             d.Name(_name);
             d.Field("type").Type<NonNullType<StringType>>()
-                .ResolverNotImplemented();
+                .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().ResolveResponseType(ctx));
             d.Field("details").Type(new NonNullType(_ontologyType))
-                .ResolverNotImplemented();
+                .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().ResolveResponseDetails(ctx));
         }
     }
 
@@ -162,11 +164,21 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
             d.Name(GetName(_operation, _type));
-            d.Description("Specify relation to existing object or create new with target field.");
 //            d.Field("startsAt").Type<DateTimeType>();
 //            d.Field("endsAt").Type<DateTimeType>();
-            d.Field("targetId").Type<IdType>();
-            d.Field("target").Type(_target);
+            if (_operation == Operation.Create)
+            {
+                d.Description("Specify relation to existing object or create new with target field.");
+                d.Field("targetId").Type<IdType>();
+                d.Field("target").Type(_target);
+            }
+            else if (_operation == Operation.Update)
+            {
+                d.Description("Specify object id that you wish to update");
+                d.Field("id").Type<NonNullType<IdType>>();
+                d.Field("target").Type(new NonNullType(_target));
+            }
+            else throw new NotImplementedException();
         }
     }
 
@@ -190,9 +202,9 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
             d.Name(GetName(_operation, _scalarName));
-            d.Field("value").Type(_inputType);
+            d.Field("value").Type(new NonNullType(_inputType));
             if (_operation == Operation.Update)
-                d.Field("id").Type<IdType>();
+                d.Field("id").Type<NonNullType<IdType>>();
         }
     }
 
@@ -208,7 +220,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes
             {
                 var ops = ((EntityRelationMeta) relationType.CreateMeta()).AcceptsEntityOperations;
                 if (ops == null || ops.Length == 0)
-                    return nameof(EntityRelationInput);
+                    return "EntityRelationInput";
                 return $"{OntologyObjectType.GetName(relationType.EntityType)}_{GetAbbreviation(ops)}";
             }
             throw new ArgumentException(nameof(relationType));

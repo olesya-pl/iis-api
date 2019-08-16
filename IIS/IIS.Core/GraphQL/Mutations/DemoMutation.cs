@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using HotChocolate;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Ontology;
@@ -24,14 +25,7 @@ namespace IIS.Core.GraphQL.Mutations
             return old;
         }
 
-        public string ClearDatabase([Service] OntologyContext context)
-        {
-            context.Types.RemoveRange(context.Types);
-            context.SaveChanges();
-            return "Cleared.";
-        }
-
-        public string FillDummyDatabase([Service] OntologyContext context)
+        public string FillDummyTypes([Service] OntologyContext context)
         {
             var oos = CreateEntity(context, "ObjectOfStudy", "Объект разведки", true);
             var nameattr = CreateAttribute(context, "Name", "Название", Core.Ontology.EntityFramework.Context.ScalarType.String);
@@ -120,6 +114,15 @@ namespace IIS.Core.GraphQL.Mutations
             task.Wait();
             typeSaver.SaveTypes(task.Result);
             return "Types migrated";
+        }
+
+        public string ClearEntities([Service] OntologyContext context)
+        {
+            context.Nodes.RemoveRange(context.Nodes.ToArray());
+            context.Attributes.RemoveRange(context.Attributes.ToArray());
+            context.Relations.RemoveRange(context.Relations.ToArray());
+            context.SaveChanges();
+            return "Entities cleared.";
         }
     }
 }
