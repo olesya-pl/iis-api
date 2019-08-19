@@ -64,6 +64,10 @@ namespace IIS.Core.Ontology
 
     public class Relation : Node
     {
+        public bool IsAimedTo<TNode>() where TNode: Node => Nodes.OfType<TNode>().Any();
+
+        public Node Target => Nodes.Single(e => e.Type.GetType() != typeof(RelationType));
+
         public Relation(Guid id, RelationType type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
