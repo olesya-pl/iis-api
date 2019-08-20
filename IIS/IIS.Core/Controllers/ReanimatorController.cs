@@ -42,22 +42,22 @@ namespace IIS.Core.Controllers
             _context.Relations.RemoveRange(_context.Relations.ToArray());
             _context.SaveChanges();
 
-            var person = _context.Types.Where(e => e.Name == "Person")
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetType)
-                .First();
-            var nameRelationType = person.OutgoingRelations.First(e => e.Type.Name == "firstName");
-            var nameType = nameRelationType.TargetType;
-            var entity = new Node { Type = person, Id = System.Guid.NewGuid() };
-            var attr = new Attribute { Node = new Node { Type = nameType, Id = System.Guid.NewGuid() }, Value = "Petro" };
-            var nameRelation = new Relation
-            {
-                Node = new Node { Type = nameRelationType.Type, Id = System.Guid.NewGuid() },
-                SourceNode = entity,
-                TargetNode = attr.Node
-            };
-            _context.AddRange(entity, attr, nameRelation);
-            await _context.SaveChangesAsync();
+            //var person = _context.Types.Where(e => e.Name == "Person")
+            //    .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
+            //    .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetType)
+            //    .First();
+            //var nameRelationType = person.OutgoingRelations.First(e => e.Type.Name == "firstName");
+            //var nameType = nameRelationType.TargetType;
+            //var entity = new Node { Type = person, Id = System.Guid.NewGuid() };
+            //var attr = new Attribute { Node = new Node { Type = nameType, Id = System.Guid.NewGuid() }, Value = "Petro" };
+            //var nameRelation = new Relation
+            //{
+            //    Node = new Node { Type = nameRelationType.Type, Id = System.Guid.NewGuid() },
+            //    SourceNode = entity,
+            //    TargetNode = attr.Node
+            //};
+            //_context.AddRange(entity, attr, nameRelation);
+            //await _context.SaveChangesAsync();
 
             return Ok();
         }

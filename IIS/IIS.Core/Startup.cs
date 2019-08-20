@@ -48,7 +48,7 @@ namespace IIS.Core
             services.AddSingleton<IGraphQLSchemaProvider, GraphQlSchemaProvider>();
             services.AddSingleton<IGraphQlTypeRepository, GraphQlTypeRepository>();
             services.AddSingleton<IOntologyMutationResolver, OntologyMutationResolver>();
-            services.AddSingleton<IOntologyService, OntologyService>();
+            services.AddTransient<IOntologyService, OntologyService>();
 //            services.AddSingleton<IOntologyService, OntologyServiceMock>();
             services.AddSingleton<GraphQlTypeCreator>();
             services.AddTransient<OntologyTypeSaver>();

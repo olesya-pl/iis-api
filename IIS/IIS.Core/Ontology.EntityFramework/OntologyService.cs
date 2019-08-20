@@ -21,29 +21,35 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
-            var sourceId = source.Id;
-            var existing = await _context.Nodes.Where(e => e.Id == sourceId)
+            var existing = await _context.Nodes.Where(e => e.Id == source.Id)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            foreach (var relationType in source.Type.RelatedTypes.OfType<EmbeddingRelationType>())
+            if (existing is null)
+            {
+                existing = new Context.Node
+                {
+                    Id = source.Id,
+                    TypeId = source.Type.Id,
+                    CreatedAt = source.CreatedAt,
+                    UpdatedAt = source.UpdatedAt
+                };
+            }
+
+            foreach (var relationType in source.Type.AllProperties)
             {
                 // Single attribute
-                if (relationType.IsAttributeType && relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
                     var sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
-                    var existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Id == sourceRelation.Id);
+                    var existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Id == sourceRelation?.Id);
                     ApplyChanges(existing, sourceRelation, existingRelation);
                 }
                 // Multiple attributes
-                else if (relationType.IsAttributeType && relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+                //relationType.IsAttributeType && 
+                else if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
                 {
-                    // source   existing
-                    // 0        0   // nothing
-                    // 1        1   // possible update
-                    // 1        0   // new relation
-                    // 0        1   // remove relation
                     var sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
                     var existingRelations = existing.OutgoingRelations.Where(e => e.Node.TypeId == relationType.Id);
                     var left =
@@ -62,105 +68,32 @@ namespace IIS.Core.Ontology.EntityFramework
                         ApplyChanges(existing, pair.Source, pair.Existing);
                     }
                 }
-                // Single Entity
-                else if (relationType.IsEntityType && relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
-                {
-                    // todo: just recursion
-                }
-                // Multiple Entity
-                else if (relationType.IsEntityType && relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
-                {
-                    // MMMMMMULTIPLE RECURSION
-                }
+                //// Single Entity
+                //else if (relationType.IsEntityType && relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                //{
+                    
+                //}
+                //// Multiple Entity
+                //else if (relationType.IsEntityType && relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+                //{
+                //    // MMMMMMULTIPLE RECURSION
+                //}
             }
 
-            //// For each node from the input
-            //foreach (var relation in source.Nodes.OfType<Relation>())
-            //{
-            //    var existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Id == relation.Id);
-            //    if (existingRelation != null)
-            //    {
-            //        // Possible relation update
-            //        if (relation.IsAimedTo<Attribute>())
-            //        {
-            //            var attr = relation.Nodes.OfType<Attribute>().Single();
-            //            // Reset value
-            //            if (attr.Value is null)
-            //            {
-            //                existingRelation.Node.IsArchived = true;
-            //                existingRelation.TargetNode.IsArchived = true;
-            //            }
-            //            // Change value
-            //            else
-            //            {
-            //                // todo: Soft delete & create new relation
-            //                //existingRelation.Node.IsArchived = true;
-            //                //existingRelation.TargetNode.IsArchived = true;
-            //                existingRelation.TargetNode.Attribute.Value = attr.Value.ToString();
-            //            }
-            //        }
-            //        else if (relation.IsAimedTo<Entity>())
-            //        {
-            //            var entity = relation.Nodes.OfType<Entity>().Single();
-            //            if (entity != null)
-            //            {
-            //                // handle next entity recursively
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // new relation
-            //        // check diff in targets (if target exists -> link, otherwise -> create new target recursively)
-            //        // todo: query for target??
-            //        var ctxNode = Map(relation);
-            //        existing.OutgoingRelations.Add(ctxNode.Relation);
-            //    }
-            //}
-
-            //foreach (var relation in existing.OutgoingRelations)
-            //{
-            //    if (!source.Nodes.Any(e => e.Id == relation.Id))
-            //    {
-            //        // relation removed
-            //        relation.Node.IsArchived = true;
-            //        if (relation.TargetNode.Type.Kind == Kind.Attribute)
-            //            relation.TargetNode.IsArchived = true;
-            //        else; // ???
-            //    }
-            //}
-
-            //var srcEntity = (Entity)source;
-            //foreach (var node in srcEntity.Nodes)
-            //{
-            //    var relation = (Relation)node;
-            //    var type = (EmbeddingRelationType)relation.Type;
-            //    if (type.IsAttributeType)
-            //    {
-            //        var attrTarget = relation.Nodes.OfType<Attribute>().Single();
-            //        var attrTargetType = (AttributeType)attrTarget.Type;
-
-            //    }
-            //    else if (type.IsEntityType)
-            //    {
-
-            //    }
-            //}
-
-            //var ctxNode = Map(source);
-
-            //_context.Add(ctxNode);
+            _context.Add(existing);
 
             await _context.SaveChangesAsync(cancellationToken);
         }
 
         void ApplyChanges(Context.Node existing, Relation sourceRelation, Context.Relation existingRelation)
         {
+            if (sourceRelation is null && existingRelation is null) return;
+
             // Set null value
             if (sourceRelation is null && existingRelation != null)
             {
                 Archive(existingRelation.Node);
-                Archive(existingRelation.TargetNode);
+                //Archive(existingRelation.TargetNode);
             }
             // New relation
             else if (sourceRelation != null && existingRelation is null)
@@ -168,16 +101,14 @@ namespace IIS.Core.Ontology.EntityFramework
                 var relation = MapRelation(sourceRelation);
                 existing.OutgoingRelations.Add(relation);
             }
-            // Change value
+            // Change target
             else
             {
-                var existingValue = existingRelation.TargetNode.Attribute.Value;
-                var sourceAttribute = (Attribute)sourceRelation.Target;
-                var sourceValue = sourceAttribute.Value.ToString();
-                if (existingValue != sourceValue)
+                var existingId = existingRelation.TargetNode.Id;
+                var sourceId = sourceRelation.Target.Id;
+                if (existingId != sourceId)
                 {
                     Archive(existingRelation.Node);
-                    Archive(existingRelation.TargetNode);
 
                     var relation = MapRelation(sourceRelation);
                     existing.OutgoingRelations.Add(relation);
@@ -201,9 +132,25 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
+        Context.Node MapEntity(Entity entity)
+        {
+            //var existing = _context.Nodes.Single(e => e.Id == entity.Id);
+            //return existing;
+            //_context.Attach
+            return new Context.Node
+            {
+                Id = entity.Id,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt,
+                TypeId = entity.Type.Id
+            };
+        }
+
         Context.Relation MapRelation(Relation relation)
         {
-            var attribute = (Attribute)relation.Target;
+            var target = relation.Target is Attribute
+                ? MapAttribute((Attribute)relation.Target)
+                : MapEntity((Entity)relation.Target);
             return new Context.Relation
             {
                 Id = relation.Id,
@@ -214,7 +161,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     UpdatedAt = relation.UpdatedAt,
                     TypeId = relation.Type.Id
                 },
-                TargetNode = MapAttribute(attribute)
+                TargetNode = target
             };
         }
 
@@ -223,40 +170,6 @@ namespace IIS.Core.Ontology.EntityFramework
             node.IsArchived = true;
             node.UpdatedAt = DateTime.UtcNow;
         }
-
-        //private Context.Node Map(Node source)//, Node existingNode
-        //{
-        //    var node = new Context.Node
-        //    {
-        //        Id = source.Id,
-        //        CreatedAt = source.CreatedAt,
-        //        UpdatedAt = source.UpdatedAt,
-        //        TypeId = source.Type.Id
-        //    };
-
-        //    if (source.Type is AttributeType)
-        //    {
-        //        var attribute = (Attribute)source;
-        //        node.Attribute = new Context.Attribute { Id = source.Id, Value = attribute.Value.ToString(), Node = node };
-        //        _context.Add(node.Attribute);
-        //    }
-        //    else if (source.Type is EmbeddingRelationType)
-        //    {
-        //        var relation = (Relation)source;
-        //        ///
-        //    }
-        //    else if (source.Type is EntityType)
-        //    {
-        //        foreach (var childSrc in source.Nodes)
-        //        {
-        //            var childNode = Map(childSrc);
-        //        }
-        //    }
-
-        //    _context.Add(node);
-
-        //    return node;
-        //}
 
         public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, CancellationToken cancellationToken = default)
         {
@@ -338,7 +251,7 @@ namespace IIS.Core.Ontology.EntityFramework
             }
             else if (ctxNode.Type.Kind == Kind.Relation && ctxNode.Type.RelationType.Kind == RelationKind.Embedding)
             {
-                var type = ontology.Single(e => e.Name == ctxNode.Type.Name && e is RelationType) as RelationType;
+                var type = ontology.Single(e => e.Id == ctxNode.TypeId && e is RelationType) as RelationType;
                 node = new Relation(ctxNode.Id, type);
                 var target = MapNode(ctxNode.Relation.TargetNode, ontology);
                 node.AddNode(target);
