@@ -31,6 +31,15 @@ namespace IIS.Core.GraphQL.Entities
         {
             descriptor.Name("Attachment").BindFieldsExplicitly();
             descriptor.Include<Attachment>();
+//            descriptor.Field("urlTest").Resolver(ctx =>
+//            {
+//                var httpContext = ctx.CustomProperty<HttpContext>("HttpContext");
+//                var urlHelperFactory = ctx.Service<IUrlHelperFactory>();
+//                var acc = ctx.Service<IActionContextAccessor>();
+//                var helper = urlHelperFactory.GetUrlHelper(acc.ActionContext);
+//                var url = helper.Action("Get", "Files", new {Id = Guid.NewGuid()}, acc.ActionContext.HttpContext.Request.Scheme);
+//                return url;
+//            });
         }
     }
 }

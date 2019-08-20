@@ -5,7 +5,6 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.Meta;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.ObjectTypeCreators
@@ -103,7 +102,7 @@ namespace IIS.Core.GraphQL.ObjectTypeCreators
         {
             IInputType type;
             if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
-                type = _typeRepository.GetType<InputObjectType<FileValueInput>>();
+                type = _typeRepository.GetType<FileValueInputType>();
             else
                 type = _typeRepository.Scalars[attributeType.ScalarTypeEnum];
             return type;

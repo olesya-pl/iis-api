@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
+using IIS.Core.Files;
 using IIS.Core.Ontology;
 using Type = IIS.Core.Ontology.Type;
 
@@ -40,10 +40,22 @@ namespace IIS.Core.GraphQL.Mutations.Resolvers
             return existingNode;
         }
 
-        public static Guid ProcessFileInput(FileValueInput value)
+        public static async Task<Guid> ProcessFileInput(IFileService fileService, object value)
         {
-            // todo: mark file as permanent through IFileService
-            return value.FileId;
+            // todo: think about file service work, where to store file info (name, etc.) - in ontology or in files db table
+            var fileId = ParseGuid(((Dictionary<string, object>)value)["fileId"]);
+            var fi = await fileService.GetFileAsync(fileId);
+            if (fi == null) throw new ArgumentException($"There is no file with id {fileId}");
+            if (fi.IsTemporary)
+                await fileService.MarkFilePermanentAsync(fileId);
+            return fileId;
+        }
+
+        public static object ProcessGeoInput(object value)
+        {
+            // todo: implement validation - just json or use geo lib?
+            // seems like validation is not happening if json scalar is inside other object
+            return value;
         }
     }
 }

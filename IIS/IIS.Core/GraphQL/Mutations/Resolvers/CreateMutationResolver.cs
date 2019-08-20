@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
-using IIS.Core.GraphQL.ObjectTypeCreators.ObjectTypes;
+using IIS.Core.Files;
 using IIS.Core.Ontology;
-using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.Mutations.Resolvers
 {
@@ -13,15 +11,18 @@ namespace IIS.Core.GraphQL.Mutations.Resolvers
     {
         private readonly IOntologyRepository _repository;
         private readonly IOntologyService _ontologyService;
+        private readonly IFileService _fileService;
 
-        public CreateMutationResolver(IOntologyRepository repository, IOntologyService ontologyService)
+        public CreateMutationResolver(IOntologyRepository repository, IOntologyService ontologyService, IFileService fileService)
         {
             _repository = repository;
             _ontologyService = ontologyService;
+            _fileService = fileService;
         }
 
         public CreateMutationResolver(IResolverContext ctx)
         {
+            _fileService = ctx.Service<IFileService>();
             _repository = ctx.Service<IOntologyRepository>();
             _ontologyService = ctx.Service<IOntologyService>();
         }
@@ -31,9 +32,9 @@ namespace IIS.Core.GraphQL.Mutations.Resolvers
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
             var type = _repository.GetEntityType(typeName);
-            var entity = CreateEntity(type, data);
+            var entity = await CreateEntity(type, data);
 
-            return await entity;
+            return entity;
         }
 
         public async Task<Entity> CreateEntity(EntityType type, Dictionary<string, object> properties)
@@ -97,7 +98,9 @@ namespace IIS.Core.GraphQL.Mutations.Resolvers
             if (embed.IsAttributeType)
             {
                 if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
-                    value = InputExtensions.ProcessFileInput((FileValueInput) value);
+                    value = await InputExtensions.ProcessFileInput(_fileService, value);
+                if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.Geo)
+                    value = InputExtensions.ProcessGeoInput(value);
                 return new IIS.Core.Ontology.Attribute(Guid.NewGuid(), embed.AttributeType, value);
             }
             if (embed.IsEntityType)

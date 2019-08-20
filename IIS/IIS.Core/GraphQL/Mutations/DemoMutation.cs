@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using HotChocolate;
 using IIS.Core.GraphQL.Scalars;
-using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Legacy.EntityFramework;

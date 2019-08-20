@@ -75,26 +75,7 @@ namespace IIS.Core.GraphQL.Entities
         // Return any scalar type for given attribute
         public static async Task<object> ResolveAttributeValue(IResolverContext ctx, Attribute attribute)
         {
-            var attributeType = (AttributeType) attribute.Type;
-            switch (attributeType.ScalarTypeEnum)
-            {
-                case Core.Ontology.ScalarType.String:
-                    return attribute.Value;
-                case Core.Ontology.ScalarType.Integer:
-                    return attribute.Value;
-                case Core.Ontology.ScalarType.Decimal:
-                    return attribute.Value;
-                case Core.Ontology.ScalarType.Boolean:
-                    return attribute.Value;
-                case Core.Ontology.ScalarType.DateTime:
-                    return attribute.Value;
-                case Core.Ontology.ScalarType.Geo:
-                    throw new NotImplementedException();
-                case Core.Ontology.ScalarType.File:
-                    return attribute.Value; // Guid of file
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return attribute.Value;
         }
 
         // ----- Relations to entities ----- //
