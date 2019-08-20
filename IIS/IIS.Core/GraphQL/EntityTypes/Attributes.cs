@@ -26,23 +26,27 @@ namespace IIS.Core.GraphQL.EntityTypes
             descriptor.Item("relation").Name("relation");
         }
     }
-    
+
     public class EntityAttributeType : InterfaceType<IEntityAttribute>
     {
-        protected override void Configure(IInterfaceTypeDescriptor<IEntityAttribute> descriptor) =>
+        protected override void Configure(IInterfaceTypeDescriptor<IEntityAttribute> descriptor)
+        {
             descriptor.Name("EntityAttribute");
+        }
     }
-    
+
     public interface IEntityAttribute
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
         Guid Id { get; }
+
         [GraphQLType(typeof(NonNullType<EntityAttributeTypeEnum>))]
         string Type { get; }
-        [GraphQLNonNullType]
-        string Title { get; }
-        [GraphQLNonNullType]
-        string Code { get; }
+
+        [GraphQLNonNullType] string Title { get; }
+
+        [GraphQLNonNullType] string Code { get; }
+
         string Hint { get; }
         bool Multiple { get; }
         string Format { get; }
@@ -53,14 +57,14 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public abstract class EntityAttributeBase : IEntityAttribute
     {
-        protected EmbeddingRelationType Source { get; }
-        protected RelationMetaBase MetaObject { get; }
-        
         public EntityAttributeBase(EmbeddingRelationType source)
         {
             Source = source;
             MetaObject = Source.CreateMeta();
         }
+
+        protected EmbeddingRelationType Source { get; }
+        protected RelationMetaBase MetaObject { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -68,66 +72,69 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLType(typeof(NonNullType<EntityAttributeTypeEnum>))]
         public abstract string Type { get; }
 
-        [GraphQLNonNullType]
-        public string Title => Source.Title ?? Source.TargetType.Title; // fallback to target type 
+        [GraphQLNonNullType] public string Title => Source.Title ?? Source.TargetType.Title; // fallback to target type 
 
-        [GraphQLNonNullType]
-        public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type 
+        [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type 
 
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
         public string Format => Source.Meta?.Value<string>("format");
 
-        [GraphQLType(typeof(JsonScalarType))]
-        public JObject Meta => Source.Meta;
+        [GraphQLType(typeof(JsonScalarType))] public JObject Meta => Source.Meta;
 
         [GraphQLType(typeof(JsonScalarType))]
         public JObject FormField => (JObject) Source.Meta["formField"]; // Source.CreateMeta().FormField;
-        
-        [GraphQLType(typeof(JsonScalarType))]
-        public JObject Validation => (JObject) Source.Meta["validation"];
+
+        [GraphQLType(typeof(JsonScalarType))] public JObject Validation => (JObject) Source.Meta["validation"];
     }
 
     public class EntityAttributePrimitive : EntityAttributeBase
     {
-        public EntityAttributePrimitive(EmbeddingRelationType source) : base(source){}
-        
+        public EntityAttributePrimitive(EmbeddingRelationType source) : base(source)
+        {
+        }
+
         public override string Type => Source.AttributeType.ScalarTypeEnum.ToString();
     }
 
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
+        public EntityAttributeRelation(EmbeddingRelationType source) : base(source)
+        {
+        }
+
         protected new EntityRelationMeta MetaObject => (EntityRelationMeta) base.MetaObject;
-        public EntityAttributeRelation(EmbeddingRelationType source) : base(source){}
 
         public override string Type => "relation";
 
         [GraphQLType(typeof(ListType<NonNullType<StringType>>))]
-        public IEnumerable<string> AcceptsEntityOperations => MetaObject.AcceptsEntityOperations?.Select(e => e.ToString());
+        public IEnumerable<string> AcceptsEntityOperations =>
+            MetaObject.AcceptsEntityOperations?.Select(e => e.ToString());
 
-        [GraphQLNonNullType]
-        [GraphQLDeprecated("Legacy version which is emulated for union types.")]
-        public IEnumerable<EntityType> To([Service] IOntologyRepository repository)
-        {
-            if (repository.GetEntityType(Source.EntityType.Name) != null)
-                return new [] {new EntityType(Source.EntityType)};
-            // Only if entity type was not found in ontology root elements,
-            // emulate old union behavior, and create response of all child types
-            // todo: maybe we should get rid of this behaviour and change response type to single element (parent type)
-            var children = repository.GetChildTypes(Source.EntityType);
-            return children.Select(t => new EntityType(t));
-        }
-        
         [GraphQLNonNullType]
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]
         public EntityType Target => new EntityType(Source.EntityType);
-        
+
+        [GraphQLNonNullType]
+        [GraphQLDeprecated("Legacy version which is emulated for union types.")]
+        public IEnumerable<EntityType> To([Service] IOntologyTypesService typesService)
+        {
+            if (typesService.GetEntityType(Source.EntityType.Name) != null)
+                return new[] {new EntityType(Source.EntityType)};
+            // Only if entity type was not found in ontology root elements,
+            // emulate old union behavior, and create response of all child types
+            // todo: maybe we should get rid of this behaviour and change response type to single element (parent type)
+            var children = typesService.GetChildTypes(Source.EntityType);
+            return children.Select(t => new EntityType(t));
+        }
+
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
-        public IEnumerable<EntityType> TargetTypes([Service] IOntologyRepository repository, bool? concreteTypes = false)
+        public IEnumerable<EntityType> TargetTypes([Service] IOntologyTypesService typesService,
+            bool? concreteTypes = false)
         {
-            var types = repository.GetChildTypes(Source.EntityType)?.OfType<Core.Ontology.EntityType>();
+            var types = typesService.GetChildTypes(Source.EntityType)?.OfType<Core.Ontology.EntityType>();
             if (types == null)
                 return null;
             if (concreteTypes == true)

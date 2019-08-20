@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using HotChocolate;
 using HotChocolate.Language;
 using Newtonsoft.Json.Linq;
 
@@ -8,8 +7,15 @@ namespace IIS.Core.GraphQL.Scalars
 {
     public class JsonScalarType : HotChocolate.Types.ScalarType
     {
-        public JsonScalarType() : base("JsonScalar"){}
-        protected JsonScalarType(string name) : base(name){}
+        public JsonScalarType() : base("JsonScalar")
+        {
+        }
+
+        protected JsonScalarType(string name) : base(name)
+        {
+        }
+
+        public override Type ClrType => typeof(object);
 
         public override bool IsInstanceOfType(IValueNode literal)
         {
@@ -44,17 +50,15 @@ namespace IIS.Core.GraphQL.Scalars
                 value = JObject.FromObject(serialized);
                 return true;
             }
-            
+
             if (serialized is JObject)
             {
                 value = serialized;
                 return true;
             }
-            
+
             value = null;
             return false;
         }
-
-        public override Type ClrType => typeof(object);
     }
 }

@@ -19,6 +19,7 @@ namespace IIS.Core.GraphQL.Scalars
                 JsonConvert.DeserializeObject<IGeometryObject>(jo.ToString(), new GeometryConverter());
                 return true;
             }
+
             return false;
         }
     }

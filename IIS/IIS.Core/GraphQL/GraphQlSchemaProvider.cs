@@ -1,68 +1,63 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using IIS.Core.GraphQL;
-using IIS.Core.GraphQL.Mutations;
-using IIS.Core.GraphQL.ObjectTypeCreators;
-using IIS.Core.Ontology;
+using IIS.Core.GraphQL.Entities;
+using IIS.Core.GraphQL.EntityTypes;
 
 namespace IIS.Core.GraphQL
 {
-    public class GraphQlSchemaProvider : IGraphQLSchemaProvider
+    public class GraphQlSchemaProvider : IGraphQlSchemaProvider
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IGraphQlTypeRepository _typeRepository;
-        private readonly IOntologyRepository _ontologyRepository;
+        private readonly TypeRepository _typeRepository;
 
-        public GraphQlSchemaProvider(IServiceProvider serviceProvider, IGraphQlTypeRepository typeRepository, IOntologyRepository ontologyRepository)
+        public GraphQlSchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
-            _ontologyRepository = ontologyRepository;
         }
 
         public ISchema GetSchema()
         {
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
-            builder.RegisterTypes(_typeRepository, _ontologyRepository); // TODO: remake dynamic type registration
+            builder.RegisterTypes(_typeRepository); // TODO: remake dynamic type registration
             builder.AddQueryType<Query>()
                 .AddMutationType<Mutation>();
             return builder.Create();
         }
     }
 
-    static class FluentExtensions
+    internal static class FluentExtensions
     {
-        public static ISchemaBuilder RegisterTypes(this ISchemaBuilder schemaBuilder, IGraphQlTypeRepository typeRepository, IOntologyRepository ontologyRepository)
+        public static ISchemaBuilder RegisterTypes(this ISchemaBuilder schemaBuilder, TypeRepository repository)
         {
-            var creator = new GraphQlTypeCreator(typeRepository, ontologyRepository);
-            creator.Create();
-            foreach (var type in typeRepository.AllTypes)
+            repository.InitializeTypes();
+            foreach (var type in repository.AllTypes)
                 schemaBuilder.AddType(type);
             schemaBuilder // TODO: Find a better way to register interface implementation types
-                .AddType<EntityTypes.EntityAttributePrimitive>()
-                .AddType<EntityTypes.EntityAttributeRelation>();
+                .AddType<EntityAttributePrimitive>()
+                .AddType<EntityAttributeRelation>();
             return schemaBuilder;
         }
     }
-    
+
     public class Query : ObjectType
     {
-        protected override void Configure(IObjectTypeDescriptor descriptor) => descriptor
-            .Include<EntityTypes.Query>()
-            .Include<Entities.EntityQuery>()
-            ;
+        protected override void Configure(IObjectTypeDescriptor descriptor)
+        {
+            descriptor
+                .Include<EntityTypes.Query>()
+                .Include<QueryEndpoint>();
+        }
     }
 
     public class Mutation : ObjectType
     {
-        protected override void Configure(IObjectTypeDescriptor descriptor) => descriptor
-            .Include<DemoMutation>()
-            .Include<EntityMutation>()
-            ;
+        protected override void Configure(IObjectTypeDescriptor descriptor)
+        {
+            descriptor
+                .Include<DummyMutation>()
+                .Include<MutationEndpoint>();
+        }
     }
 }

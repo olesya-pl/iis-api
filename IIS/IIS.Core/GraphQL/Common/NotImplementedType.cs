@@ -1,5 +1,4 @@
 using System;
-using HotChocolate;
 using HotChocolate.Language;
 
 namespace IIS.Core.GraphQL.Common
@@ -10,6 +9,8 @@ namespace IIS.Core.GraphQL.Common
         {
             Description = "This field is not yet implemented. Don't even try querying it. Seriously.";
         }
+
+        public override Type ClrType => typeof(object);
 
         public override bool IsInstanceOfType(IValueNode literal)
         {
@@ -35,7 +36,5 @@ namespace IIS.Core.GraphQL.Common
         {
             throw new NotImplementedException();
         }
-
-        public override Type ClrType => typeof(object);
     }
 }

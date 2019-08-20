@@ -12,11 +12,11 @@ namespace IIS.Core.Mocks
     public class OntologyServiceMock : IOntologyService
     {
         private readonly Dictionary<Guid, Node> _nodes = new Dictionary<Guid, Node>();
-        private IOntologyRepository _repository;
+        private IOntologyTypesService _typesService;
 
-        public OntologyServiceMock(IOntologyRepository repository)
+        public OntologyServiceMock(IOntologyTypesService typesService)
         {
-            _repository = repository;
+            _typesService = typesService;
 
             AddNode("ObjectImportance", "ae1560f24d3e4ed49ced155bdea89cd7",
                 new Dictionary<string, object> {["code"] = "important", ["name"] = "IMPORTANT"});
@@ -38,7 +38,7 @@ namespace IIS.Core.Mocks
 
         private Node CreateNode(string typeName, Guid id, Dictionary<string, object> props)
         {
-            var type = _repository.GetEntityType(typeName);
+            var type = _typesService.GetEntityType(typeName);
             var entity = new Entity(id, type);
             foreach (var (key, value) in props)
                 AddRelation(entity, key, value);
