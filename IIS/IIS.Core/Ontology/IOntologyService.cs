@@ -17,10 +17,6 @@ namespace IIS.Core.Ontology
         Task<IDictionary<Guid, Node>> LoadNodesAsync(IEnumerable<Guid> sourceIds,
             IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default);
 
-        Task SaveTypeAsync(Type type, CancellationToken cancellationToken = default);
-
-        Task RemoveTypeAsync(string typeName, CancellationToken cancellationToken = default);
-
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
 
         Task RemoveNodeAsync(Guid nodeId, CancellationToken cancellationToken = default);

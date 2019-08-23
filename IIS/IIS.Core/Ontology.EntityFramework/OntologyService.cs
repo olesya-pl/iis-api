@@ -35,6 +35,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     CreatedAt = source.CreatedAt,
                     UpdatedAt = source.UpdatedAt
                 };
+                _context.Add(existing);
             }
 
             foreach (var relationType in source.Type.AllProperties)
@@ -68,19 +69,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         ApplyChanges(existing, pair.Source, pair.Existing);
                     }
                 }
-                //// Single Entity
-                //else if (relationType.IsEntityType && relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
-                //{
-                    
-                //}
-                //// Multiple Entity
-                //else if (relationType.IsEntityType && relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
-                //{
-                //    // MMMMMMULTIPLE RECURSION
-                //}
             }
-
-            _context.Add(existing);
 
             await _context.SaveChangesAsync(cancellationToken);
         }
@@ -109,8 +98,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 if (existingId != sourceId)
                 {
                     Archive(existingRelation.Node);
-
+                    
                     var relation = MapRelation(sourceRelation);
+                    relation.Id = Guid.NewGuid();
                     existing.OutgoingRelations.Add(relation);
                 }
             }
@@ -265,16 +255,6 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             return node;
-        }
-
-        public async Task SaveTypeAsync(Type type, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task RemoveTypeAsync(string typeName, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task RemoveNodeAsync(Guid nodeId, CancellationToken cancellationToken = default)

@@ -40,7 +40,11 @@ namespace IIS.Core
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
-            services.AddDbContext<OntologyContext>(b => b.UseNpgsql(connectionString).UseLoggerFactory(loggerFactory), ServiceLifetime.Singleton);
+            services.AddDbContext<OntologyContext>(b => b
+                .UseNpgsql(connectionString)
+                .UseLoggerFactory(loggerFactory)
+                .EnableSensitiveDataLogging(),
+                ServiceLifetime.Singleton);
             //services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddSingleton<IOntologyRepository, OntologyRepository>();
