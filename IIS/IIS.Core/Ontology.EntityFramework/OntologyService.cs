@@ -48,7 +48,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     ApplyChanges(existing, sourceRelation, existingRelation);
                 }
                 // Multiple attributes
-                //relationType.IsAttributeType && 
+                //relationType.IsAttributeType &&
                 else if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
                 {
                     var sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
@@ -98,7 +98,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 if (existingId != sourceId)
                 {
                     Archive(existingRelation.Node);
-                    
+
                     var relation = MapRelation(sourceRelation);
                     relation.Id = Guid.NewGuid();
                     existing.OutgoingRelations.Add(relation);
@@ -163,7 +163,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, CancellationToken cancellationToken = default)
         {
-            var ctxNodes = await _context.Nodes.Where(e => e.Type.Name == type.Name) // todo: replace with id search
+            var ctxNodes = await _context.Nodes.Where(e => e.Type.Id == type.Id && !e.IsArchived)
                 .Include(n => n.Type)
                 .ToArrayAsync(cancellationToken);
 
@@ -175,7 +175,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
         {
-            var ctxSource = await _context.Nodes.Where(e => e.Id == nodeId)
+            var ctxSource = await _context.Nodes.Where(e => e.Id == nodeId && !e.IsArchived)
                 .Include(e => e.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node.Type.RelationType)
@@ -193,6 +193,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
             if (ctxSource is null) return null;
 
+            ctxSource.OutgoingRelations = ctxSource.OutgoingRelations.Where(r => !r.Node.IsArchived).ToList(); // no way to filter inner entities with EF
+
             var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
             var node = MapNode(ctxSource, ontology);
 
@@ -202,7 +204,7 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<IDictionary<string, IEnumerable<Node>>> GetNodesByTypesAsync(IEnumerable<string> typeNames,
             CancellationToken cancellationToken = default)
         {
-            var ctxTypes = await _context.Types.Where(e => typeNames.Contains(e.Name))
+            var ctxTypes = await _context.Types.Where(e => typeNames.Contains(e.Name) && !e.IsArchived)
                 .Include(e => e.Nodes)
                 .ToArrayAsync(cancellationToken);
 
@@ -215,10 +217,13 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<IDictionary<Guid, Node>> LoadNodesAsync(IEnumerable<Guid> sourceIds,
             IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
         {
-            var ctxSources = await _context.Nodes.Where(e => sourceIds.Contains(e.Id))
+            var ctxSources = await _context.Nodes.Where(e => sourceIds.Contains(e.Id) && !e.IsArchived)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .ToArrayAsync(cancellationToken);
+
+            foreach (var src in ctxSources)
+                src.OutgoingRelations = src.OutgoingRelations.Where(r => !r.Node.IsArchived).ToList();
 
             var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
             var sources = ctxSources.Select(e => MapNode(e, ontology)).ToDictionary(e => e.Id);
@@ -247,7 +252,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 node.AddNode(target);
             }
             else throw new Exception("Unsupported.");
-            
+
             foreach (var relatedNode in ctxNode.OutgoingRelations)
             {
                 var mapped = MapNode(relatedNode.Node, ontology);
@@ -259,7 +264,18 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task RemoveNodeAsync(Guid nodeId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var ctxNode = _context.Nodes.Where(n => n.Id == nodeId)
+                .Include(n => n.IncomingRelations).ThenInclude(r => r.Node)
+                .Single();
+
+            var sourceNodes = await LoadNodesAsync(ctxNode.IncomingRelations.Select(r => r.SourceNodeId), null, cancellationToken);
+            // todo: add validation for source nodes with deleted node
+
+            foreach (var relation in ctxNode.IncomingRelations)
+                Archive(relation.Node);
+
+            Archive(ctxNode);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
