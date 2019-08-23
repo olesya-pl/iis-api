@@ -92,12 +92,12 @@ namespace IIS.Core.GraphQL.Entities
             descriptor.Field($"entity{type.Name}")
                 .Type(objectType)
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
-                .Resolver(ctx => QueryResolvers.ResolveEntity(ctx, type));
+                .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntity(ctx, type));
             descriptor.Field($"entity{type.Name}List")
                 .Type(collectionType)
                 .Argument("pagination", d => d.Type<NonNullType<InputObjectType<PaginationInput>>>())
                 .Argument("filter", d => d.Type<InputObjectType<FilterInput>>())
-                .Resolver(ctx => QueryResolvers.ResolveEntityList(ctx, type));
+                .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntityList(ctx, type));
         }
     }
 }

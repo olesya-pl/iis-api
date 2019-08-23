@@ -61,6 +61,7 @@ namespace IIS.Core
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
+            services.AddTransient<GraphQL.Entities.Resolvers.IOntologyQueryResolver, GraphQL.Entities.Resolvers.OntologyQueryResolver>();
             services.AddSingleton<GraphQL.Entities.TypeRepository>(); // For HotChocolate ontology types creation. Should have same lifetime as GraphQL schema
             var schema = services.BuildServiceProvider().GetService<GraphQL.ISchemaProvider>().GetSchema();
             services.AddGraphQL(schema);

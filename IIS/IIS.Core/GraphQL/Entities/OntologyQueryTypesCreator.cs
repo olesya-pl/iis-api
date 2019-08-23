@@ -27,10 +27,10 @@ namespace IIS.Core.GraphQL.Entities
             if (d == null) return;
             d.Name(OntologyObjectType.GetName(type));
             d.Interface(_repository.GetType<EntityInterface>());
-            d.Field("id").Type<NonNullType<IdType>>().Resolver(ctx => QueryResolvers.ResolveId(ctx));
+            d.Field("id").Type<NonNullType<IdType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveId(ctx));
             d.Field("createdAt").Type<NonNullType<DateTimeType>>().ResolverNotImplemented();
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>().ResolverNotImplemented();
-            d.Field("_relation").Type<RelationType>().Resolver(ctx => QueryResolvers.ResolveParentRelation(ctx));
+            d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
         }
 
         protected void OnRelation(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
@@ -41,13 +41,13 @@ namespace IIS.Core.GraphQL.Entities
             if (relationType.IsAttributeType)
             {
                 if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
-                    fd.Resolver(ctx => QueryResolvers.ResolveMultipleAttributeRelation(ctx, relationType));
+                    fd.Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveMultipleAttributeRelation(ctx, relationType));
                 else
-                    fd.Resolver(ctx => QueryResolvers.ResolveAttributeRelation(ctx, relationType));
+                    fd.Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveAttributeRelation(ctx, relationType));
             }
             else
             {
-                fd.Resolver(ctx => QueryResolvers.ResolveEntityRelation(ctx, relationType));
+                fd.Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntityRelation(ctx, relationType));
             }
 
             // todo: Move inversed relations to domain
@@ -85,7 +85,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdAt").Type<NonNullType<DateTimeType>>();
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>();
             d.Field("_relation").Type<RelationType>();
-            d.ResolveAbstractType(QueryResolvers.ResolveAbstractType);
+            d.ResolveAbstractType((ctx, obj) => ctx.Service<IOntologyQueryResolver>().ResolveAbstractType(ctx, obj));
         }
 
         protected void OnRelation(EmbeddingRelationType relationType,
