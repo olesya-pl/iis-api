@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Files.EntityFramework
 {
@@ -42,7 +43,7 @@ namespace IIS.Core.Files.EntityFramework
             var file = _context.Files.SingleOrDefault(f => f.Id == id);
             if (file == null) return null;
             var ms = new MemoryStream(file.Contents);
-            return new FileInfo(id, file.Name, file.ContentType, ms);
+            return new FileInfo(id, file.Name, file.ContentType, ms, file.IsTemporary);
         }
 
         public async Task FlushTemporaryFilesAsync(Predicate<DateTime> predicate)
@@ -54,7 +55,9 @@ namespace IIS.Core.Files.EntityFramework
 
         public async Task MarkFilePermanentAsync(Guid fileId)
         {
-            var file = _context.Files.Single(f => f.IsTemporary && f.Id == fileId);
+            var file = await _context.Files.SingleOrDefaultAsync(f => f.IsTemporary && f.Id == fileId);
+            if (file == null)
+                throw new ArgumentException($"There is no temporary file with id {fileId}");
             file.IsTemporary = false;
             await _context.SaveChangesAsync();
         }

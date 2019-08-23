@@ -8,7 +8,7 @@ using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.Ontology
 {
-    public class GraphQLSchemaProvider : IGraphQLSchemaProvider
+    public class GraphQLSchemaProvider : IGraphQlSchemaProvider
     {
         private readonly IOntologyProvider _ontologyProvider;
 

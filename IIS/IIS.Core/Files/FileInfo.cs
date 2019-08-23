@@ -9,6 +9,8 @@ namespace IIS.Core.Files
         public string Name { get; }
         public string ContentType { get; }
         public Stream Contents { get; }
+        public bool IsTemporary { get; }
+
         public byte[] ContentBytes
         {
             get
@@ -19,12 +21,13 @@ namespace IIS.Core.Files
             }
         }
 
-        public FileInfo(Guid id, string name, string contentType, Stream contents)
+        public FileInfo(Guid id, string name, string contentType, Stream contents, bool isTemporary)
         {
             Id = id;
             Name = name;
             ContentType = contentType;
             Contents = contents;
+            IsTemporary = isTemporary;
         }
     }
 }

@@ -12,30 +12,40 @@ namespace IIS.Core.GraphQL.EntityTypes
 {
     public class EntityTypeCollection : Collection<Type, EntityType>
     {
-        public EntityTypeCollection(IEnumerable<Type> source) : base(source){}
+        public EntityTypeCollection(IEnumerable<Type> source) : base(source)
+        {
+        }
 
-        protected override EntityType Select(Type arg) => new EntityType(arg);
+        protected override EntityType Select(Type arg)
+        {
+            return new EntityType(arg);
+        }
     }
 
     public class EntityType
     {
-        protected Type Source { get; }
-
         public EntityType(Type source)
         {
             Source = source;
         }
 
+        protected Type Source { get; }
+
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
 
-        [GraphQLNonNullType]
-        public string Title => Source.Title;
+        [GraphQLNonNullType] public string Title => Source.Title;
+
+        [GraphQLNonNullType] public string Code => Source.Name;
+
+        public bool IsAbstract => Source is Core.Ontology.EntityType et && et.IsAbstract; // todo
+
+        [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
+        public EntityType Parent =>
+            Source.DirectParents.Select(p => new EntityType(p)).FirstOrDefault();
 
         [GraphQLNonNullType]
-        public string Code => Source.Name;
-
-        public bool IsAbstract => Source is IIS.Core.Ontology.EntityType et && et.IsAbstract; // todo
+        public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p));
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]
         [GraphQLDescription("Get all type relations. Sort argument is deprecated.")]
@@ -47,16 +57,11 @@ namespace IIS.Core.GraphQL.EntityTypes
             return props.Select(CreateEntityAttribute);
         }
 
-        [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
-        public EntityType Parent =>
-            Source.DirectParents.Select(p => new EntityType(p)).FirstOrDefault();
-
-        [GraphQLNonNullType]
-        public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p));
-
-        protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType) =>
-            relationType.IsAttributeType
+        protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType)
+        {
+            return relationType.IsAttributeType
                 ? (IEntityAttribute) new EntityAttributePrimitive(relationType)
                 : new EntityAttributeRelation(relationType);
+        }
     }
 }

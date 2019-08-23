@@ -12,15 +12,21 @@ namespace IIS.Core.GraphQL.Common
         {
             _source = source;
         }
-        
-        [GraphQLNonNullType]
-        [GraphQLDeprecated("static collection meta is also deprecated, same as EntityMeta")]
-        public CollectionMeta GetMeta() => new CollectionMeta(_source.Count());
-        
-        [GraphQLNonNullType] //[GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityType>>>))]
-        public IEnumerable<TResult> GetItems() => _source.Select(this.Select);
 
         public int Count => _source.Count();
+
+        [GraphQLNonNullType]
+        [GraphQLDeprecated("static collection meta is also deprecated, same as EntityMeta")]
+        public CollectionMeta GetMeta()
+        {
+            return new CollectionMeta(_source.Count());
+        }
+
+        [GraphQLNonNullType] //[GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityType>>>))]
+        public IEnumerable<TResult> GetItems()
+        {
+            return _source.Select(Select);
+        }
 
         protected abstract TResult Select(TSource arg);
     }
