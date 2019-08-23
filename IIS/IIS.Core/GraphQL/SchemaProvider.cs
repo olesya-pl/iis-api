@@ -6,12 +6,12 @@ using IIS.Core.GraphQL.EntityTypes;
 
 namespace IIS.Core.GraphQL
 {
-    public class GraphQlSchemaProvider : IGraphQlSchemaProvider
+    public class SchemaProvider : ISchemaProvider
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly TypeRepository _typeRepository;
 
-        public GraphQlSchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository)
+        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;

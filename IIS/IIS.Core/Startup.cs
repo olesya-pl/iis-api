@@ -4,10 +4,6 @@ using HotChocolate;
 using HotChocolate.AspNetCore;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
-using IIS.Core.GraphQL;
-using IIS.Core.GraphQL.Entities;
-using IIS.Core.GraphQL.Entities.Resolvers;
-using IIS.Core.Mocks;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -44,19 +40,13 @@ namespace IIS.Core
                 .UseNpgsql(connectionString)
                 .UseLoggerFactory(loggerFactory)
                 .EnableSensitiveDataLogging(),
-                ServiceLifetime.Singleton);
-            //services.AddTransient<IOntologyProvider, LegacyOntologyProvider>();
+                ServiceLifetime.Transient);
             services.AddTransient<IOntologyProvider, OntologyProvider>();
-            services.AddSingleton<IOntologyTypesService, OntologyTypesService>();
+            services.AddTransient<IOntologyTypesService, OntologyTypesService>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
-            services.AddSingleton<IGraphQlSchemaProvider, GraphQlSchemaProvider>();
-            services.AddSingleton<IOntologyMutationResolver, OntologyMutationResolver>();
             services.AddTransient<IOntologyService, OntologyService>();
-//            services.AddSingleton<IOntologyService, OntologyServiceMock>();
-            services.AddSingleton<TypeRepository>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
-            services.AddTransient<IOntologyFieldPopulator, OntologyFieldPopulator>();
             //services.AddSingleton<QueueReanimator>();
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
             var factory = new ConnectionFactory
@@ -68,7 +58,11 @@ namespace IIS.Core
             };
             services.AddTransient(s => factory);
 
-            var schema = services.BuildServiceProvider().GetService<IGraphQlSchemaProvider>().GetSchema();
+            services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
+            services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
+            services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
+            services.AddSingleton<GraphQL.Entities.TypeRepository>(); // For HotChocolate ontology types creation. Should have same lifetime as GraphQL schema
+            var schema = services.BuildServiceProvider().GetService<GraphQL.ISchemaProvider>().GetSchema();
             services.AddGraphQL(schema);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

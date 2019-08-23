@@ -2,7 +2,7 @@
 
 namespace IIS.Core.GraphQL
 {
-    public interface IGraphQlSchemaProvider
+    public interface ISchemaProvider
     {
         ISchema GetSchema();
     }
