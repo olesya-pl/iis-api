@@ -3,9 +3,10 @@ build:
   
   script:
     - ls
-    - mv -f IIS/iis-api.net /home/gitlab-runner/
-    - cd /home/gitlab-runner/iis-api.net/IIS/
+    - mkdir /home/gitlab-runner/iis-api.net
+    - mv -f IIS /home/gitlab-runner/iis-api.net/
     - bash /home/gitlab-runner/sr.sh
+    - cd /home/gitlab-runner/iis-api.net/IIS/
     - export ASPNETCORE_ENVIRONMENT=Staging && dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/web
     
   only:
