@@ -48,15 +48,15 @@ namespace IIS.Core
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             //services.AddSingleton<QueueReanimator>();
-            var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
-            var factory = new ConnectionFactory
-            {
-                HostName = mq.Host,
-                UserName = mq.Username,
-                Password = mq.Password,
-                RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
-            };
-            services.AddTransient(s => factory);
+            //var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
+            //var factory = new ConnectionFactory
+            //{
+            //    HostName = mq.Host,
+            //    UserName = mq.Username,
+            //    Password = mq.Password,
+            //    RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
+            //};
+            //services.AddTransient(s => factory);
 
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
@@ -93,11 +93,7 @@ namespace IIS.Core
         public string Username { get; set; }
         public string Password { get; set; }
     }
-    public class EsConfiguration
-    {
-        public string Host { get; set; }
-    }
-
+    
     public class TraceLogger : ILogger
     {
         private readonly string categoryName;
