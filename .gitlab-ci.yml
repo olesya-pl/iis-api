@@ -4,7 +4,7 @@ build:
     - master
   script:
     - ls
-    - mv -f iis-api.net /home/gitlab-runner/
+    - cd IIS && mv -f iis-api.net /home/gitlab-runner/
     - cd /home/gitlab-runner/iis-api.net/IIS/
     - bash /home/gitlab-runner/sr.sh
     - export ASPNETCORE_ENVIRONMENT=Staging && dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/web
