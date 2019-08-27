@@ -1,0 +1,10 @@
+build:
+  stage: build
+  only:
+    - master
+  script:
+    - ls -la
+  
+  
+  tags:
+    - dev
