@@ -3,7 +3,10 @@ build:
   only:
     - master
   script:
-    - ls -la
+    - mv -f IIS/iis-api.net /home/gitlab-runner/
+    - cd /home/gitlab-runner/iis-api.net/IIS/
+    - sed -i 's/"db": "Server=ref-db-01.contour.net;Database=contour_dev;Username=postgres;Password=S1mpl3xTLS2709;"/"db": "Server=ref-db-01.contour.net;Database=contour_dev_net;Username=postgres;Password=S1mpl3xTLS2709;"/g' /home/gitlab-runner/iis-api.net/IIS/publish/core/appsettings.Staging.json
+    - export ASPNETCORE_ENVIRONMENT=Staging && dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/web
   
   
   tags:
