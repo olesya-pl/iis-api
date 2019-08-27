@@ -7,8 +7,9 @@ build:
     - mkdir /home/gitlab-runner/iis-api.net
     - mv -f IIS /home/gitlab-runner/iis-api.net/
     - cd /home/gitlab-runner/iis-api.net/IIS/
-    - export ASPNETCORE_ENVIRONMENT=Staging && dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/web
+    - dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/web
     - bash /home/gitlab-runner/sr.sh
+    - cd /home/gitlab-runner/iis-api.net/IIS/publish/web/ && export ASPNETCORE_ENVIRONMENT=Staging && dotnet IIS.Core.dll
     
   only:
     - master
