@@ -3,6 +3,7 @@ build:
   only:
     - master
   script:
+    - ls
     - mv -f IIS/iis-api.net /home/gitlab-runner/
     - cd /home/gitlab-runner/iis-api.net/IIS/
     - bash /home/gitlab-runner/sr.sh
