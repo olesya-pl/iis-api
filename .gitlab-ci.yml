@@ -3,6 +3,7 @@ build:
   
   script:
     - ls
+    - rm -rf /home/gitlab-runner/iis-api.net
     - mkdir /home/gitlab-runner/iis-api.net
     - mv -f IIS /home/gitlab-runner/iis-api.net/
     - cd /home/gitlab-runner/iis-api.net/IIS/
