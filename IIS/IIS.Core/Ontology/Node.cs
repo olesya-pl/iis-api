@@ -8,11 +8,11 @@ namespace IIS.Core.Ontology
     {
         private List<Node> _nodes = new List<Node>();
 
-        public Guid Id { get; }
+        public Guid Id { get; set; }
         public Type Type { get; }
         public IEnumerable<Node> Nodes => _nodes;
-        public DateTime CreatedAt { get; }
-        public DateTime UpdatedAt { get; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         public Node(Guid id, Type type, DateTime createdAt = default, DateTime updatedAt = default)
         {
@@ -55,6 +55,11 @@ namespace IIS.Core.Ontology
         // For single or multiple relations
         public Relation GetRelation(RelationType relationType, Guid targetId) =>
             GetRelations(relationType).SingleOrDefault(r => r.Target.Id == targetId);
+
+        public override string ToString()
+        {
+            return $"Instance of type {Type.Name} with ID: {Id}.";
+        }
     }
 
     public class Attribute : Node
@@ -65,6 +70,11 @@ namespace IIS.Core.Ontology
             : base(id, type, createdAt, updatedAt)
         {
             Value = value;
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Value: {Value.ToString()}";
         }
     }
 
@@ -89,6 +99,11 @@ namespace IIS.Core.Ontology
             : base(id, type, createdAt, updatedAt)
         {
 
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Aimed to: {Target.ToString()}";
         }
     }
 }

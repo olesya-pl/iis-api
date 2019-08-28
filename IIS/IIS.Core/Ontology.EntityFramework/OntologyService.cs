@@ -16,6 +16,7 @@ namespace IIS.Core.Ontology.EntityFramework
         public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider)
         {
             _context = context;
+            _context.ChangeTracker.LazyLoadingEnabled = false;
             _ontologyProvider = ontologyProvider;
         }
 
@@ -40,33 +41,20 @@ namespace IIS.Core.Ontology.EntityFramework
 
             foreach (var relationType in source.Type.AllProperties)
             {
-                // Single attribute
                 if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
                     var sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
                     var existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Id == sourceRelation?.Id);
                     ApplyChanges(existing, sourceRelation, existingRelation);
                 }
-                // Multiple attributes
-                //relationType.IsAttributeType &&
-                else if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+                else
                 {
                     var sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
                     var existingRelations = existing.OutgoingRelations.Where(e => e.Node.TypeId == relationType.Id);
-                    var left =
-                        from sourceRelation in sourceRelations
-                        join existingRelation in existingRelations on sourceRelation.Id equals existingRelation.Id into se
-                        from p in se.DefaultIfEmpty()
-                        select new { Source = sourceRelation, Existing = p };
-                    var right =
-                        from existingRelation in existingRelations
-                        join sourceRelation in sourceRelations on existingRelation.Id equals sourceRelation.Id into se
-                        from p in se.DefaultIfEmpty()
-                        select new { Source = p, Existing = existingRelation };
-                    var union = left.Union(right);
-                    foreach (var pair in union)
+                    var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
+                    foreach (var pair in pairs)
                     {
-                        ApplyChanges(existing, pair.Source, pair.Existing);
+                        ApplyChanges(existing, pair.Left, pair.Right);
                     }
                 }
             }
@@ -101,7 +89,22 @@ namespace IIS.Core.Ontology.EntityFramework
 
                     var relation = MapRelation(sourceRelation);
                     relation.Id = Guid.NewGuid();
+                    relation.Node.Id = relation.Id;
+                    // set tracked target
+                    if (sourceRelation.Target is Attribute)
+                    {
+                        //
+                    }
+                    else
+                    {
+                        relation.TargetNode = null;
+                        relation.TargetNodeId = sourceId;
+                    }
                     existing.OutgoingRelations.Add(relation);
+
+                    sourceRelation.Id = relation.Id;
+                    sourceRelation.CreatedAt = DateTime.UtcNow;
+                    sourceRelation.UpdatedAt = DateTime.UtcNow;
                 }
             }
         }

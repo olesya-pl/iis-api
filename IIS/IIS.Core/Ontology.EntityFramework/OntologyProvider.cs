@@ -4,34 +4,40 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
-using IIS.Core.Ontology.Meta;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
     public class OntologyProvider : IOntologyProvider
     {
+        private readonly IMemoryCache _cache;
         private readonly OntologyContext _context;
         private Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
 
-        public OntologyProvider(OntologyContext context)
+        public OntologyProvider(OntologyContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         public async Task<IEnumerable<Type>> GetTypesAsync(CancellationToken cancellationToken = default)
         {
+            var result = default(List<Type>);
+            if (_cache.TryGetValue("ontology", out result)) return result;
+
             var types = await _context.Types.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
                 .Include(e => e.IncomingRelations).ThenInclude(e => e.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
                 .Include(e => e.AttributeType)
                 .ToArrayAsync(cancellationToken);
-
-            var result = types.Select(MapType).ToList();
+            result = types.Select(MapType).ToList();
 
             // todo: refactor
             result.AddRange(_types.Values.Where(e => e is RelationType));
+
+            _cache.Set("ontology", result);
 
             return result;
         }
