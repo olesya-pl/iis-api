@@ -8,8 +8,9 @@ build:
     - mv -f IIS /home/gitlab-runner/iis-api.net/
     - cd /home/gitlab-runner/iis-api.net/IIS/
     - dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/web
-    - bash /home/gitlab-runner/sr.sh
-    - cd /home/gitlab-runner/iis-api.net/IIS/publish/web/ && export ASPNETCORE_ENVIRONMENT=Staging && dotnet IIS.Core.dll
+    #- bash /home/gitlab-runner/sr.sh
+    #- cd /home/gitlab-runner/iis-api.net/IIS/publish/web/ && export ASPNETCORE_ENVIRONMENT=Staging && dotnet IIS.Core.dll
+    - sudo systemctl restart supervisord
     
   only:
     - master
