@@ -10,6 +10,13 @@ using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.Entities
 {
+    public class OntologyTypesException : Exception
+    {
+        public OntologyTypesException(string message) : base(message)
+        {
+        }
+    }
+
     public class TypeRepository : TypeStorage
     {
         private readonly OntologyQueryTypesCreator _creator;
@@ -30,12 +37,14 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
-            var entityTypes = _ontologyTypesService.EntityTypes;
+            var entityTypes = _ontologyTypesService.EntityTypes.ToList();
+            if (entityTypes.Count == 0)
+                throw new OntologyTypesException("There are no entity types to register on graphql schema");
+
             // Create output types
-            foreach (Core.Ontology.ScalarType scalar in Enum.GetValues(typeof(Core.Ontology.ScalarType)))
-                GetMultipleOutputType(scalar);
             foreach (var type in entityTypes)
                 GetOntologyType(type);
+
             // Create input types
             var mutations = _mutators.Select(m => m.Operation).ToArray();
             foreach (var type in entityTypes.Where(t => !t.IsAbstract))

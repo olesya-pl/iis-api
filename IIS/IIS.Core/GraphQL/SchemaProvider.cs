@@ -2,7 +2,6 @@ using System;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities;
-using IIS.Core.GraphQL.EntityTypes;
 
 namespace IIS.Core.GraphQL
 {
@@ -20,44 +19,47 @@ namespace IIS.Core.GraphQL
         public ISchema GetSchema()
         {
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
-            builder.RegisterTypes(_typeRepository); // TODO: remake dynamic type registration
-            builder.AddQueryType<Query>()
-                .AddMutationType<Mutation>();
+            RegisterTypes(builder);
+            var ontologyRegistered = TryRegisterOntologyTypes(builder, _typeRepository);
+            builder.AddQueryType(d =>
+            {
+                d.Name("QueryType");
+                d.Include<EntityTypes.Query>();
+                if (ontologyRegistered)
+                    d.Include<Entities.QueryEndpoint>();
+            });
+            builder.AddMutationType(d =>
+            {
+                d.Name("MutationType");
+                d.Include<DummyMutation>();
+                if (ontologyRegistered)
+                    d.Include<Entities.MutationEndpoint>();
+            });
             return builder.Create();
         }
-    }
 
-    internal static class FluentExtensions
-    {
-        public static ISchemaBuilder RegisterTypes(this ISchemaBuilder schemaBuilder, TypeRepository repository)
+        public static void RegisterTypes(ISchemaBuilder schemaBuilder)
         {
-            repository.InitializeTypes();
-            foreach (var type in repository.AllTypes)
-                schemaBuilder.AddType(type);
             schemaBuilder // TODO: Find a better way to register interface implementation types
-                .AddType<EntityAttributePrimitive>()
-                .AddType<EntityAttributeRelation>();
-            return schemaBuilder;
+                .AddType<EntityTypes.EntityAttributePrimitive>()
+                .AddType<EntityTypes.EntityAttributeRelation>();
         }
-    }
 
-    public class Query : ObjectType
-    {
-        protected override void Configure(IObjectTypeDescriptor descriptor)
+        public static bool TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder, TypeRepository repository)
         {
-            descriptor
-                .Include<EntityTypes.Query>()
-                .Include<QueryEndpoint>();
-        }
-    }
-
-    public class Mutation : ObjectType
-    {
-        protected override void Configure(IObjectTypeDescriptor descriptor)
-        {
-            descriptor
-                .Include<DummyMutation>()
-                .Include<MutationEndpoint>();
+            try
+            {
+                repository.InitializeTypes();
+                foreach (var type in repository.AllTypes)
+                    schemaBuilder.AddType(type);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Unable to register ontology types");
+                Console.Error.WriteLine(ex);
+                return false;
+            }
         }
     }
 }

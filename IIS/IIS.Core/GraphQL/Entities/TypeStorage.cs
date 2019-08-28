@@ -42,8 +42,9 @@ namespace IIS.Core.GraphQL.Entities
                 return (T) dict[name];
             }
 
+            dict.Add(name, null); // Place empty record to avoid recursive calls on object creation
             var result = creator();
-            dict.Add(name, result);
+            dict[name] = result; // replace empty record with actual value
             return result;
         }
 

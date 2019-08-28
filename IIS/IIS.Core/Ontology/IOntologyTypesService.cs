@@ -14,18 +14,20 @@ namespace IIS.Core.Ontology
 
     public class OntologyTypesService : IOntologyTypesService
     {
-        private Dictionary<string, EntityType> _entityTypes;
+        private readonly IOntologyProvider _ontologyProvider;
+        private IEnumerable<Type> _types;
         private Dictionary<string, List<Type>> _inheritors;
-        public IEnumerable<Type> Types { get; }
-        public IEnumerable<EntityType> EntityTypes => _entityTypes.Values;
+        private Dictionary<string, EntityType> _entityTypes;
+
+        public IEnumerable<Type> Types => _types ?? (_types = _ontologyProvider.GetTypesAsync().Result.ToList());
+        public Dictionary<string, List<Type>> Inheritors => _inheritors ?? (_inheritors = BuildInheritors(Types));
+
+        public IEnumerable<EntityType> EntityTypes =>
+            _entityTypes?.Values ?? (_entityTypes = Types.OfType<EntityType>().ToDictionary(t => t.Name)).Values;
 
         public OntologyTypesService(IOntologyProvider ontologyProvider)
         {
-            var task = ontologyProvider.GetTypesAsync();
-            task.Wait();
-            Types = task.Result.ToList();
-            _entityTypes = Types.OfType<EntityType>().ToDictionary(t => t.Name);
-            _inheritors = BuildInheritors(Types);
+            _ontologyProvider = ontologyProvider;
         }
 
         private static Dictionary<string, List<T>> BuildInheritors<T>(IEnumerable<T> entityTypes) where T : Type
@@ -42,7 +44,7 @@ namespace IIS.Core.Ontology
             return result;
         }
 
-        public IEnumerable<Type> GetChildTypes(Type parent) => _inheritors.GetOrDefault(parent.Name);
+        public IEnumerable<Type> GetChildTypes(Type parent) => Inheritors.GetOrDefault(parent.Name);
 
         public EntityType GetEntityType(string name)
         {

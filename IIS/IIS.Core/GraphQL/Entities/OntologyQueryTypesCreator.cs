@@ -154,7 +154,7 @@ namespace IIS.Core.GraphQL.Entities
                     foreach (var attr in type.AllProperties.GroupBy(r => r.Name))
                         OnRelation(type, attr, d);
                 };
-//                configure(null);
+                configure(null);
                 return new OntologyInterfaceType(configure);
             }
             else
@@ -165,7 +165,7 @@ namespace IIS.Core.GraphQL.Entities
                     foreach (var attr in type.AllProperties.GroupBy(r => r.Name))
                         OnRelation(type, attr, d);
                 };
-//                configure(null); // Recursive loop if trying to create types explicitly
+                configure(null);
                 return new OntologyObjectType(configure);
             }
         }

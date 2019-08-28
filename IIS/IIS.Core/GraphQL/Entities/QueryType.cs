@@ -25,8 +25,9 @@ namespace IIS.Core.GraphQL.Entities
         {
             descriptor.Name(nameof(QueryEndpoint));
             var typesToPopulate = _ontologyTypesService.EntityTypes
-                .Where(t => t.CreateMeta().ExposeOnApi != false);
+                .Where(t => t.CreateMeta().ExposeOnApi != false).ToList();
             _populator.PopulateFields(descriptor, typesToPopulate, Operation.Read);
+            if (typesToPopulate.Count == 0) return;
             descriptor.Field("allEntities")
                 .Type(new CollectionType("AllEntities", _repository.GetType<EntityInterface>()))
                 .Argument("pagination", d => d.Type<NonNullType<InputObjectType<PaginationInput>>>())
