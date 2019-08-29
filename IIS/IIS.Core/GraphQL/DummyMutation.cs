@@ -129,5 +129,10 @@ namespace IIS.Core.GraphQL
             context.SaveChanges();
             return "Entities cleared.";
         }
+
+        public string RaiseException()
+        {
+            throw new Exception("Whoops.");
+        }
     }
 }

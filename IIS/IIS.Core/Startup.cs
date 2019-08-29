@@ -2,6 +2,11 @@
 using System.Diagnostics;
 using HotChocolate;
 using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Subscriptions;
+using HotChocolate.Execution;
+using HotChocolate.Execution.Batching;
+using HotChocolate.Execution.Configuration;
+using HotChocolate.Types.Relay;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Ontology;
@@ -66,7 +71,18 @@ namespace IIS.Core
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyQueryResolver, GraphQL.Entities.Resolvers.OntologyQueryResolver>();
             services.AddSingleton<GraphQL.Entities.TypeRepository>(); // For HotChocolate ontology types creation. Should have same lifetime as GraphQL schema
             var schema = services.BuildServiceProvider().GetService<GraphQL.ISchemaProvider>().GetSchema();
-            services.AddGraphQL(schema);
+            // Here it hits the fan. Removed AddGraphQL() method and stripped it to submethods because of IncludeExceptionDetails.
+            // todo: remake graphql engine registration in DI
+//            services.AddGraphQL(schema);
+            QueryExecutionBuilder.BuildDefault(services);
+            services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions {IncludeExceptionDetails = true});
+            services.AddSingleton<ISchema>(schema)
+                .AddSingleton<IBatchQueryExecutor, BatchQueryExecutor>()
+                .AddSingleton<IIdSerializer, IdSerializer>()
+                .AddJsonQueryResultSerializer()
+                .AddJsonArrayResponseStreamSerializer()
+                .AddGraphQLSubscriptions();
+            // end of graphql engine registration
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -96,7 +112,7 @@ namespace IIS.Core
         public string Username { get; set; }
         public string Password { get; set; }
     }
-    
+
     public class TraceLogger : ILogger
     {
         private readonly string categoryName;
