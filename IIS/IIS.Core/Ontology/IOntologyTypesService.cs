@@ -48,8 +48,7 @@ namespace IIS.Core.Ontology
 
         public EntityType GetEntityType(string name)
         {
-            _entityTypes.TryGetValue(name, out var value);
-            return value;
+            return EntityTypes.SingleOrDefault(e => e.Name == name);
         }
     }
 }

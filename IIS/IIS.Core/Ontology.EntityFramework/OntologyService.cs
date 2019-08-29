@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -12,12 +13,14 @@ namespace IIS.Core.Ontology.EntityFramework
     {
         private readonly OntologyContext _context;
         private readonly IOntologyProvider _ontologyProvider;
+        private readonly IMemoryCache _cache;
 
-        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider)
+        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache)
         {
             _context = context;
             _context.ChangeTracker.LazyLoadingEnabled = false;
             _ontologyProvider = ontologyProvider;
+            _cache = cache;
         }
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
@@ -127,16 +130,15 @@ namespace IIS.Core.Ontology.EntityFramework
 
         Context.Node MapEntity(Entity entity)
         {
-            //var existing = _context.Nodes.Single(e => e.Id == entity.Id);
-            //return existing;
-            //_context.Attach
-            return new Context.Node
-            {
-                Id = entity.Id,
-                CreatedAt = entity.CreatedAt,
-                UpdatedAt = entity.UpdatedAt,
-                TypeId = entity.Type.Id
-            };
+            var existing = _context.Nodes.Single(e => e.Id == entity.Id);
+            return existing;
+            //return new Context.Node
+            //{
+            //    Id = entity.Id,
+            //    CreatedAt = entity.CreatedAt,
+            //    UpdatedAt = entity.UpdatedAt,
+            //    TypeId = entity.Type.Id
+            //};
         }
 
         Context.Relation MapRelation(Relation relation)
@@ -204,18 +206,18 @@ namespace IIS.Core.Ontology.EntityFramework
             return node;
         }
 
-        public async Task<IDictionary<string, IEnumerable<Node>>> GetNodesByTypesAsync(IEnumerable<string> typeNames,
-            CancellationToken cancellationToken = default)
-        {
-            var ctxTypes = await _context.Types.Where(e => typeNames.Contains(e.Name) && !e.IsArchived)
-                .Include(e => e.Nodes)
-                .ToArrayAsync(cancellationToken);
+        //public async Task<IDictionary<string, IEnumerable<Node>>> GetNodesByTypesAsync(IEnumerable<string> typeNames,
+        //    CancellationToken cancellationToken = default)
+        //{
+        //    var ctxTypes = await _context.Types.Where(e => typeNames.Contains(e.Name) && !e.IsArchived)
+        //        .Include(e => e.Nodes)
+        //        .ToArrayAsync(cancellationToken);
 
-            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
-            var types = ctxTypes.ToDictionary(e => e.Name, e => e.Nodes.Select(ee => MapNode(ee, ontology)));
+        //    var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+        //    var types = ctxTypes.ToDictionary(e => e.Name, e => e.Nodes.Select(ee => MapNode(ee, ontology)));
 
-            return types;
-        }
+        //    return types;
+        //}
 
         public async Task<IDictionary<Guid, Node>> LoadNodesAsync(IEnumerable<Guid> sourceIds,
             IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
@@ -261,7 +263,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 var mapped = MapNode(relatedNode.Node, ontology);
                 node.AddNode(mapped);
             }
-
+            
             return node;
         }
 
