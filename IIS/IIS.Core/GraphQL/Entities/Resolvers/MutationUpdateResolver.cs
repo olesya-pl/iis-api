@@ -123,7 +123,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                         {
                             var id = InputExtensions.ParseGuid(dv);
                             // todo: maybe we should delete only relation? Or relation with entity?
-                            await _mutationDeleteResolver.DeleteEntity(id, embed.TargetType.Name);
+                            //await _mutationDeleteResolver.DeleteEntity(id, embed.TargetType.Name);
+                            var relation = node.GetRelation(embed, id);
+                            node.RemoveNode(relation);
+                            // todo: real deletion of entity/attribute is not implemented currently
                         }
 
                         break;
