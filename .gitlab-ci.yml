@@ -1,20 +1,27 @@
-build:
-  stage: build
+stages:
+  - build
+  - deploy
   
+build_job:
+  stage: build
+  script:
+    - cd IIS/ && sh ./startup
+    - ls
+  artifacts:
+    paths:
+    - publish
+    expire_in: 1 week
+    
+  tags:
+    - ci
+    
+deploy_job:
+  stage: deploy
   script:
     - ls
-    - rm -rf /home/gitlab-runner/iis-api.net
-    - mkdir /home/gitlab-runner/iis-api.net
-    - mv -f IIS /home/gitlab-runner/iis-api.net/
-    - cd /home/gitlab-runner/iis-api.net/IIS/
-    - dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/web
-    #- bash /home/gitlab-runner/sr.sh
-    #- cd /home/gitlab-runner/iis-api.net/IIS/publish/web/ && export ASPNETCORE_ENVIRONMENT=Staging && dotnet IIS.Core.dll
-    - sudo systemctl restart supervisord
     
-  only:
-    - master
-  
-  
+  when: manual
   tags:
-    - dev
+    - ci
+
+  
