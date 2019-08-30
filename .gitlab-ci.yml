@@ -9,7 +9,7 @@ build_job:
     - ls
   artifacts:
     paths:
-    - publish
+    - IIS/publish
     expire_in: 1 week
     
   tags:
