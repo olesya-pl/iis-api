@@ -56,7 +56,8 @@ namespace IIS.Core.GraphQL.Entities
             if (inversed != null)
                 objectTypeDescriptor.Field(inversed.Code ?? relationType.GetFieldName() + "Inversed").Type(type)
                     .Description("Inversed relation resolvers and wrapping are not implemented.")
-                    .ResolverNotImplemented();
+                    .Resolver(ctx => null); // todo: remove stub from IIS-4140
+//                    .ResolverNotImplemented();
         }
 
         private void OnRelation(EntityType entityType, IGrouping<string, EmbeddingRelationType> relationTypeGroup,
