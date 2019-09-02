@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using IIS.Core.Files;
 using IIS.Core.Ontology;
+using Newtonsoft.Json.Linq;
 using Attribute = IIS.Core.Ontology.Attribute;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
@@ -104,7 +105,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
                 if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
-                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
+                // Convert object value to string and parse
+                return new Attribute(Guid.NewGuid(), embed.AttributeType,
+                    AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum));
             }
 
             if (embed.IsEntityType)

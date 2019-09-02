@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -18,7 +19,6 @@ namespace IIS.Core.Ontology.EntityFramework
         public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache)
         {
             _context = context;
-            _context.ChangeTracker.LazyLoadingEnabled = false;
             _ontologyProvider = ontologyProvider;
             _cache = cache;
         }
@@ -123,7 +123,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Attribute = new Context.Attribute
                 {
                     Id = attribute.Id,
-                    Value = attribute.Value.ToString()
+                    Value = ValueToString(attribute.Value, default)
                 }
             };
         }
@@ -184,7 +184,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Include(e => e.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node.Type.RelationType)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode.Type)
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode.Type.AttributeType)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -206,43 +206,14 @@ namespace IIS.Core.Ontology.EntityFramework
             return node;
         }
 
-        //public async Task<IDictionary<string, IEnumerable<Node>>> GetNodesByTypesAsync(IEnumerable<string> typeNames,
-        //    CancellationToken cancellationToken = default)
-        //{
-        //    var ctxTypes = await _context.Types.Where(e => typeNames.Contains(e.Name) && !e.IsArchived)
-        //        .Include(e => e.Nodes)
-        //        .ToArrayAsync(cancellationToken);
-
-        //    var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
-        //    var types = ctxTypes.ToDictionary(e => e.Name, e => e.Nodes.Select(ee => MapNode(ee, ontology)));
-
-        //    return types;
-        //}
-
-        public async Task<IDictionary<Guid, Node>> LoadNodesAsync(IEnumerable<Guid> sourceIds,
-            IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
-        {
-            var ctxSources = await _context.Nodes.Where(e => sourceIds.Contains(e.Id) && !e.IsArchived)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                .ToArrayAsync(cancellationToken);
-
-            foreach (var src in ctxSources)
-                src.OutgoingRelations = src.OutgoingRelations.Where(r => !r.Node.IsArchived).ToList();
-
-            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
-            var sources = ctxSources.Select(e => MapNode(e, ontology)).ToDictionary(e => e.Id);
-
-            return sources;
-        }
-
         private Node MapNode(Context.Node ctxNode, IEnumerable<Type> ontology)
         {
             Node node;
             if (ctxNode.Type.Kind == Kind.Attribute)
             {
                 var type = ontology.Single(e => e.Name == ctxNode.Type.Name && e is AttributeType) as AttributeType;
-                node = new Attribute(ctxNode.Id, type, ctxNode.Attribute.Value);
+                var value = ParseValue(ctxNode.Attribute.Value, ctxNode.Type.AttributeType.ScalarType);
+                node = new Attribute(ctxNode.Id, type, value);
             }
             else if (ctxNode.Type.Kind == Kind.Entity)
             {
@@ -267,19 +238,38 @@ namespace IIS.Core.Ontology.EntityFramework
             return node;
         }
 
+        private object ParseValue(string value, Context.ScalarType scalarType)
+        {
+            switch (scalarType)
+            {
+                case Context.ScalarType.Boolean: return bool.Parse(value);
+                case Context.ScalarType.Date: return DateTime.Parse(value);
+                case Context.ScalarType.Decimal: return decimal.Parse(value);
+                case Context.ScalarType.Int: return int.Parse(value);
+                case Context.ScalarType.String: return value;
+                case Context.ScalarType.Json: return JObject.Parse(value);
+                case Context.ScalarType.Geo: return JObject.Parse(value);
+                case Context.ScalarType.File: return Guid.Parse(value);
+                default: throw new NotImplementedException();
+            }
+        }
+
+        private string ValueToString(object value, ScalarType scalarType)
+        {
+            return value.ToString();
+        }
+
         public async Task RemoveNodeAsync(Guid nodeId, CancellationToken cancellationToken = default)
         {
             var ctxNode = _context.Nodes.Where(n => n.Id == nodeId)
                 .Include(n => n.IncomingRelations).ThenInclude(r => r.Node)
                 .Single();
 
-            var sourceNodes = await LoadNodesAsync(ctxNode.IncomingRelations.Select(r => r.SourceNodeId), null, cancellationToken);
-            // todo: add validation for source nodes with deleted node
-
             foreach (var relation in ctxNode.IncomingRelations)
                 Archive(relation.Node);
 
             Archive(ctxNode);
+
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

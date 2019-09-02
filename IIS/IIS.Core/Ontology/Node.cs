@@ -69,6 +69,8 @@ namespace IIS.Core.Ontology
         public Attribute(Guid id, AttributeType type, object value, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
+            if (!type.AcceptsScalar(value)) throw new Exception("Inconsistency between attribute type and given object.");
+
             Value = value;
         }
 
