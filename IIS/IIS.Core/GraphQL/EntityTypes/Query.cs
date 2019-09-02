@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using HotChocolate;
 using IIS.Core.Ontology;
+using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -16,7 +18,20 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType]
         public EntityTypeCollection GetEntityTypes(EntityTypesFilter filter = null)
         {
-            return new EntityTypeCollection(_ontologyTypesService.EntityTypes);
+            IEnumerable<Type> types;
+            if (filter != null)
+            {
+                var et = _ontologyTypesService.GetEntityType(filter.Parent);
+                if (et == null)
+                    types = new List<Type>();
+                else
+                    types = _ontologyTypesService.GetChildTypes(et);
+            }
+            else
+            {
+                types = _ontologyTypesService.EntityTypes;
+            }
+            return new EntityTypeCollection(types);
         }
 
         public EntityType GetEntityType([GraphQLNonNullType] string code)
