@@ -1,6 +1,11 @@
 using System;
+using System.Linq;
 using HotChocolate;
 using IIS.Core.GraphQL.Entities;
+using IIS.Core.GraphQL.Entities.InputTypes;
+using IIS.Core.GraphQL.Entities.ObjectTypes;
+using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
 
 namespace IIS.Core.GraphQL
 {
@@ -8,11 +13,15 @@ namespace IIS.Core.GraphQL
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly TypeRepository _typeRepository;
+        private readonly IOntologyTypesService _ontologyTypesService;
+        private readonly IOntologyFieldPopulator _populator;
 
-        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository)
+        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyTypesService ontologyTypesService, IOntologyFieldPopulator populator)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
+            _ontologyTypesService = ontologyTypesService;
+            _populator = populator;
         }
 
         public ISchema GetSchema()
@@ -26,7 +35,7 @@ namespace IIS.Core.GraphQL
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
                 if (ontologyRegistered)
-                    d.Include<Entities.QueryEndpoint>();
+                    ConfigureOntologyQuery(d);
             });
             builder.AddMutationType(d =>
             {
@@ -34,7 +43,7 @@ namespace IIS.Core.GraphQL
                 d.Include<DummyMutation>();
                 d.Include<Materials.Mutation>();
                 if (ontologyRegistered)
-                    d.Include<Entities.MutationEndpoint>();
+                    ConfigureOntologyMutation(d);
             });
             return builder.Create();
         }
@@ -61,6 +70,33 @@ namespace IIS.Core.GraphQL
                 Console.Error.WriteLine(ex);
                 return false;
             }
+        }
+
+        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor)
+        {
+            var typesToPopulate = _ontologyTypesService.EntityTypes
+                .Where(t => t.CreateMeta().ExposeOnApi != false).ToList();
+            _populator.PopulateFields(descriptor, typesToPopulate, Operation.Read);
+            if (typesToPopulate.Count == 0) return;
+            ConfigureAllEntitiesQuery(descriptor);
+        }
+
+        protected void ConfigureAllEntitiesQuery(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("allEntities")
+                .Type(new CollectionType("AllEntities", _typeRepository.GetType<EntityInterface>()))
+                .Argument("pagination", d => d.Type<NonNullType<InputObjectType<PaginationInput>>>())
+                .Argument("filter", d => d.Type<InputObjectType<FilterInput>>())
+                .ResolverNotImplemented();
+        }
+
+        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor)
+        {
+            var typesToPopulate = _ontologyTypesService.EntityTypes
+                .Where(t => t.CreateMeta().ExposeOnApi != false);
+            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
+            _populator.PopulateFields(descriptor, typesToPopulate,
+                Operation.Create, Operation.Update, Operation.Delete);
         }
     }
 }
