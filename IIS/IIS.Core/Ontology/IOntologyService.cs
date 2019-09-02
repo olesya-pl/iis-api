@@ -13,6 +13,6 @@ namespace IIS.Core.Ontology
 
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
 
-        Task RemoveNodeAsync(Guid nodeId, CancellationToken cancellationToken = default);
+        Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default);
     }
 }

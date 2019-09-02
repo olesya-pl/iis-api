@@ -259,11 +259,9 @@ namespace IIS.Core.Ontology.EntityFramework
             return value.ToString();
         }
 
-        public async Task RemoveNodeAsync(Guid nodeId, CancellationToken cancellationToken = default)
+        public async Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default)
         {
-            var ctxNode = _context.Nodes.Where(n => n.Id == nodeId)
-                .Include(n => n.IncomingRelations).ThenInclude(r => r.Node)
-                .Single();
+            var ctxNode = _context.Nodes.Local.Single(n => n.Id == node.Id);
 
             foreach (var relation in ctxNode.IncomingRelations)
                 Archive(relation.Node);
