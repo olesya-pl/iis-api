@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using Attribute = IIS.Core.Ontology.Attribute;
@@ -39,7 +40,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<IEnumerable<Entity>> ResolveEntityList(IResolverContext ctx, EntityType type)
         {
             var ontologyService = ctx.Service<IOntologyService>();
+            var pagination = ctx.Argument<PaginationInput>("pagination");
             var list = await ontologyService.GetNodesByTypeAsync(type); // Direct type
+            if (pagination != null)
+                list = list.Skip(pagination.Page * pagination.PageSize).Take(pagination.PageSize);
             return list.OfType<Entity>();
         }
 
