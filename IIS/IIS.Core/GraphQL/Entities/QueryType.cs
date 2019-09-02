@@ -1,5 +1,6 @@
 using System.Linq;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;

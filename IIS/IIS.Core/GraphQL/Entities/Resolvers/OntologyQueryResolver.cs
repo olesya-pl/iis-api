@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.Entities.InputTypes;
+using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using Attribute = IIS.Core.Ontology.Attribute;

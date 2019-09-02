@@ -1,6 +1,5 @@
 using System;
 using HotChocolate;
-using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities;
 
 namespace IIS.Core.GraphQL
@@ -25,6 +24,7 @@ namespace IIS.Core.GraphQL
             {
                 d.Name("QueryType");
                 d.Include<EntityTypes.Query>();
+                d.Include<Materials.Query>();
                 if (ontologyRegistered)
                     d.Include<Entities.QueryEndpoint>();
             });
@@ -32,6 +32,7 @@ namespace IIS.Core.GraphQL
             {
                 d.Name("MutationType");
                 d.Include<DummyMutation>();
+                d.Include<Materials.Mutation>();
                 if (ontologyRegistered)
                     d.Include<Entities.MutationEndpoint>();
             });

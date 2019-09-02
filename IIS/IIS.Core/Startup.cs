@@ -9,6 +9,8 @@ using HotChocolate.Execution.Configuration;
 using HotChocolate.Types.Relay;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
+using IIS.Core.Materials;
+using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -54,6 +56,7 @@ namespace IIS.Core
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IMaterialService, MaterialService>();
             //services.AddSingleton<QueueReanimator>();
             //var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
             //var factory = new ConnectionFactory

@@ -134,5 +134,21 @@ namespace IIS.Core.GraphQL
         {
             throw new Exception("Whoops.");
         }
+
+        public string ProcessJsonScalar([GraphQLType(typeof(JsonScalarType))] JObject input)
+        {
+            return $"ok: {input}";
+        }
+
+        public string ProcessComplexJsonScalar(ComplexInput input)
+        {
+            return $"ok: {input.Inner}";
+        }
+    }
+
+    public class ComplexInput
+    {
+        [GraphQLType(typeof(JsonScalarType))]
+        public JObject Inner { get; set; }
     }
 }

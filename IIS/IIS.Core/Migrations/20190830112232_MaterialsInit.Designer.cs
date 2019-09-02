@@ -3,15 +3,17 @@ using System;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20190830112232_MaterialsInit")]
+    partial class MaterialsInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,9 +48,9 @@ namespace IIS.Core.Migrations
 
                     b.Property<string>("Data");
 
-                    b.Property<Guid?>("FileId");
+                    b.Property<Guid>("FileId");
 
-                    b.Property<Guid?>("ParentId");
+                    b.Property<Guid>("ParentId");
 
                     b.Property<string>("Source");
 
@@ -219,11 +221,13 @@ namespace IIS.Core.Migrations
                 {
                     b.HasOne("IIS.Core.Files.EntityFramework.File", "File")
                         .WithOne()
-                        .HasForeignKey("IIS.Core.Materials.EntityFramework.Material", "FileId");
+                        .HasForeignKey("IIS.Core.Materials.EntityFramework.Material", "FileId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("IIS.Core.Materials.EntityFramework.Material", "Parent")
                         .WithMany("Children")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("IIS.Core.Materials.EntityFramework.MaterialFeature", b =>

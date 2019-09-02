@@ -1,4 +1,4 @@
-namespace IIS.Core.GraphQL.Entities.InputTypes
+namespace IIS.Core.GraphQL.Common
 {
     public class PaginationInput
     {

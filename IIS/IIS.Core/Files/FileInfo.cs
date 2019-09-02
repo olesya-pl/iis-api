@@ -29,5 +29,9 @@ namespace IIS.Core.Files
             Contents = contents;
             IsTemporary = isTemporary;
         }
+
+        public FileInfo(Guid id) : this(id, null, null, null, false)
+        {
+        }
     }
 }

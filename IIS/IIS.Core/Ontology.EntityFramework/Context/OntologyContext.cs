@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Files.EntityFramework;
+using IIS.Core.Materials.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Ontology.EntityFramework.Context
@@ -18,6 +19,9 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<Relation> Relations { get; set; }
         public virtual DbSet<Attribute> Attributes { get; set; }
         public virtual DbSet<File> Files { get; set; }
+        public virtual DbSet<Material> Materials { get; set; }
+        public virtual DbSet<MaterialInfo> MaterialInfos { get; set; }
+        public virtual DbSet<MaterialFeature> MaterialFeatures { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +70,36 @@ namespace IIS.Core.Ontology.EntityFramework.Context
             attribute.HasOne(p => p.Node)
                 .WithOne(p => p.Attribute)
                 .HasForeignKey<Attribute>(p => p.Id)
+                ;
+
+            // ----- materials ----- //
+
+            var material = modelBuilder.Entity<Material>();
+            material.HasOne(e => e.Parent)
+                .WithMany(e => e.Children)
+                .HasForeignKey(e => e.ParentId)
+                ;
+            material.HasOne(e => e.File)
+                .WithOne()
+                .HasForeignKey<Material>(e => e.FileId)
+                ;
+            material.HasMany(e => e.Infos)
+                .WithOne(e => e.Material)
+                .HasForeignKey(e => e.MaterialId)
+                ;
+            material.Property(e => e.ParentId).IsRequired(false);
+            material.Property(e => e.FileId).IsRequired(false);
+
+            var materialInfo = modelBuilder.Entity<MaterialInfo>();
+            materialInfo.HasMany(e => e.Features)
+                .WithOne(e => e.Info)
+                .HasForeignKey(e => e.MaterialInfoId)
+                ;
+
+            var materialFeature = modelBuilder.Entity<MaterialFeature>();
+            materialFeature.HasOne(e => e.Node)
+                .WithOne()
+                .HasForeignKey<MaterialFeature>(e => e.NodeId)
                 ;
         }
     }
