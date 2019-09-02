@@ -1,13 +1,43 @@
-0. Install dotnet-sdk-2.2.105 on machine.
-1. Run `cd IIS/ && sh ./startup` bash script. Services will be published to IIS/publish folder.
-2. Setup configuration env `export ASPNETCORE_ENVIRONMENT=Staging`
-3. Go to `cd IIS/publish/web` folder and run `dotnet IIS.Web.dll`
-4. Go to `cd IIS/publish/replication` folder and run `dotnet IIS.Replication.dll`
-or `dotnet IIS.Replication.dll server.urls=http://localhost:PORT/` where any PORT can be assigned.
-You can run it in detached mode or use tools like supervisor to start/stop services.
-web is on port 5000 by default.
-replication is on port 5500. Look at console output to find out which port is used.
-
+Примечание:
 To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html) or `pm2`. 
 To change configuration find `IIS/publish/replication/appsettings.${ENV}.json` file and `IIS/publish/web/appsettings.${ENV}.json`. 
 `${ENV}` is env name and equals to the value of env variable `ASPNETCORE_ENVIRONMENT` (in our case `Staging`)
+
+0. Установить dotnet-sdk-2.2.* на машину.
+1. Выполнить (паблиш исполняемых файлов и конфигов) [https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net.sh](https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net.sh)
+2. Запустить веб с помощью supervisor
+```
+[root@contour-run-01 web]# cat /etc/supervisord.d/iis_web.ini 
+[program:iis_web]
+command=/usr/bin/dotnet /home/iis/iis-api.net/IIS/publish/web/IIS.Web.dll
+directory=/home/iis/iis-api.net/IIS/publish/web
+Environment=ASPNETCORE_ENVIRONMENT=Staging
+stdout_logfile=/var/log/iis_web.log
+autostart=true
+autorestart=true
+user=iis
+stopsignal=KILL
+numprocs=1
+```
+
+или (для теста) [https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net2.sh](https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net2.sh)
+
+3. Запустить репликатор с помощью supervisor
+```
+[iis@contour-run-01 web]$ cat /etc/supervisord.d/iis_replication.ini
+[program:iis_replication]
+command=/usr/bin/dotnet /home/iis/iis-api.net/IIS/publish/replication/IIS.Replication.dll server.urls=http://localhost:5005
+directory=/home/iis/iis-api.net/IIS/publish/replication
+stdout_logfile=/var/log/iis_replication.log
+Environment=ASPNETCORE_ENVIRONMENT=Staging
+autostart=true
+autorestart=true
+user=iis
+stopsignal=KILL
+numprocs=1
+```
+
+или (для теста) [https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net3.sh](https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net3.sh)
+
+4. Выполнить (post запросы на web для репликации схемы и данных) [https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net4.sh](https://git.warfare-tec.com/IIS/contour-docker/blob/master/iis_api_net4.sh)
+
