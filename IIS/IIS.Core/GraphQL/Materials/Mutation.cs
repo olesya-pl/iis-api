@@ -9,18 +9,12 @@ namespace IIS.Core.GraphQL.Materials
 {
     public class Mutation
     {
-        public async Task<string> CreateMaterial([Service] IMaterialService materialService, [GraphQLNonNullType] MaterialInput input)
+        public async Task<Material> CreateMaterial([Service] IMaterialService materialService, [GraphQLNonNullType] MaterialInput input)
         {
-            await materialService.SaveAsync(Map(input), input.ParentId);
-            return "ok";
-        }
-
-        private Core.Materials.Material Map(MaterialInput input)
-        {
-            var result = new Core.Materials.Material(Guid.NewGuid(), JObject.Parse(input.Data), input.Type, input.Source);
-            if (input.FileId.HasValue)
-                result.File = new FileInfo(input.FileId.Value);
-            return result;
+            var inputMaterial = input.ToDomain();
+            await materialService.SaveAsync(inputMaterial, input.ParentId);
+            var material = await materialService.GetMaterialAsync(inputMaterial.Id);
+            return material.ToView();
         }
     }
 }

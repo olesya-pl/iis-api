@@ -37,6 +37,8 @@ namespace IIS.Core.Materials.EntityFramework
                 if (!file.IsTemporary) throw new ArgumentException($"File with guid {material.File.Id} is already used");
                 await _fileService.MarkFilePermanentAsync(file.Id);
             }
+            if (parentId.HasValue && GetMaterialAsync(parentId.Value) == null)
+                throw new ArgumentException($"Material with guid {parentId.Value} does not exist");
             _context.Add(Map(material, parentId));
             foreach (var child in material.Children)
                 await SaveAsync(child, material.Id);

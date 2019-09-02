@@ -18,37 +18,15 @@ namespace IIS.Core.GraphQL.Materials
         public async Task<IEnumerable<Material>> GetMaterials([Service] IMaterialService materialService)
         {
             var materials = await materialService.GetMaterialsAsync();
-            return materials.Select(Map);
+            return materials.Select(m => m.ToView());
         }
 
         public async Task<Material> GetMaterial([Service] IMaterialService materialService, [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
         {
             var material = await materialService.GetMaterialAsync(materialId);
-            return material == null ? null : Map(material);
+            return material?.ToView();
         }
 
-        private Material Map(IIS.Core.Materials.Material material)
-        {
-            return new Material
-            {
-                Id = material.Id,
-                Children = material.Children.Select(Map).ToList(),
-                Data = material.Data?.ToString(),
-                File = material.File == null ? null : Map(material.File),
-                Source = material.Source,
-                Type = material.Type,
-            };
-        }
 
-        private FileInfo Map(IIS.Core.Files.FileInfo fileInfo)
-        {
-            return new FileInfo
-            {
-                Id = fileInfo.Id,
-                Name = fileInfo.Name,
-                ContentType = fileInfo.ContentType,
-                IsTemporary = fileInfo.IsTemporary,
-            };
-        }
     }
 }
