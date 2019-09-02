@@ -55,10 +55,50 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var parent = ctx.Parent<Node>();
             var ontologyService = ctx.Service<IOntologyService>();
             var node = await ontologyService.LoadNodesAsync(parent.Id, new[] {relationType});
+            var stub = ResolveComputedAttributeStub(relationType, node);
+            if (stub != null) return stub;
             var relation = node.GetRelation(relationType);
             if (relation == null) return null;
             return await ResolveAttributeValue(ctx, relation.AttributeTarget);
         }
+
+        [Obsolete] // Todo: implement computed relations and delete this
+        private string ResolveComputedAttributeStub(EmbeddingRelationType relationType, Node node)
+        {
+            if (relationType.Name != "title") return null;
+            var type = node.Type.Name;
+            if (node.Type.AllParents.All(p => p.Name != "ObjectOfStudy"))
+                return null;
+            var name = GetAttr(node, "name");
+
+            if (type == "Infrastructure" || type == "MilitaryMachinery" || type == "Subdivision")
+            {
+                var shortName = GetAttr(node, "shortName");
+                if (shortName != null && name != null)
+                    return $"{shortName} ({name})";
+                return shortName ?? name;
+            }
+
+            if (type == "MilitaryBase")
+            {
+                var baseCode = GetAttr(node, "baseCode");
+
+                var shortName = GetAttr(node, "shortName");
+                if (baseCode != null && shortName != null)
+                    return $"{baseCode} ({shortName})";
+                return shortName ?? name;
+            }
+
+            if (type == "Person")
+            {
+                var arr = new[] {GetAttr(node, "secondName"), GetAttr(node, "firstName"), GetAttr(node, "fatherName")};
+                return string.Join(" ", arr.Where(string.IsNullOrWhiteSpace));
+            }
+
+            return name;
+        }
+
+        private string GetAttr(Node node, string attrName) => node.GetAttributeValue(attrName) as string;
 
         // resolve multiple entity-[attribute] relation
         public async Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType)
