@@ -36,6 +36,7 @@ namespace IIS.Core.GraphQL
                 d.Name("QueryType");
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
+                d.Include<Users.Query>();
                 if (ontologyRegistered)
                     ConfigureOntologyQuery(d);
             });
