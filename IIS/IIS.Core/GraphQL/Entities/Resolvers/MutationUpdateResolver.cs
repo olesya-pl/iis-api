@@ -139,16 +139,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         protected virtual async Task UpdateSingleProperty(Node node, EmbeddingRelationType embed, object value,
             Relation relation)
         {
-            if (relation == null)
-            {
+            if (relation != null)
+                node.RemoveNode(relation);
+            if (value != null)
                 node.AddNode(await _mutationCreateResolver.CreateSingleProperty(embed, value));
-            }
-            else
-            {
-                relation.RemoveNode(relation.Target);
-                var newTarget = await _mutationCreateResolver.CreateNode(embed, value);
-                relation.AddNode(newTarget);
-            }
         }
 
         protected virtual async Task<Node> CreateNode(EmbeddingRelationType embed, object value) // attribute or entity

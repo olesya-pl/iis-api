@@ -47,7 +47,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
                     var sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
-                    var existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Id == sourceRelation?.Id);
+                    var existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Node.TypeId == relationType.Id);
                     ApplyChanges(existing, sourceRelation, existingRelation);
                 }
                 else
@@ -234,7 +234,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 var mapped = MapNode(relatedNode.Node, ontology);
                 node.AddNode(mapped);
             }
-            
+
             return node;
         }
 
