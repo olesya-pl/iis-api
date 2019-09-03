@@ -136,7 +136,7 @@ namespace IIS.Core
         private Task BeginInvoke(HttpContext context)
         {
             context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { (string)context.Request.Headers["Origin"] });
-            context.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "*" });
+            context.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "authorization,content-type" });
             context.Response.Headers.Add("Access-Control-Allow-Methods", new[] { "GET, POST, PUT, DELETE, OPTIONS" });
             context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
 
