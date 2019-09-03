@@ -144,6 +144,7 @@ namespace IIS.Core
             if (context.Request.Method == "OPTIONS")
             {    
                 context.Response.StatusCode = 200;
+                return context.Response.WriteAsync("OK");
             }
 
             return _next.Invoke(context);
