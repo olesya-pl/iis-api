@@ -43,7 +43,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var pagination = ctx.Argument<PaginationInput>("pagination");
             var list = await ontologyService.GetNodesByTypeAsync(type); // Direct type
             if (pagination != null)
-                list = list.Skip(pagination.Page * pagination.PageSize).Take(pagination.PageSize);
+                list = pagination.Apply(list);
             return list.OfType<Entity>();
         }
 
