@@ -44,12 +44,12 @@ namespace IIS.Core
         {
             services.AddMemoryCache();
 
-            var loggerFactory = new LoggerFactory();
-            loggerFactory.AddProvider(new TraceLoggerProvider());
+            //var loggerFactory = new LoggerFactory();
+            //loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b
-                .UseNpgsql(connectionString)
-                .UseLoggerFactory(loggerFactory),
+                .UseNpgsql(connectionString).EnableSensitiveDataLogging(),
+                //.UseLoggerFactory(loggerFactory),
                 ServiceLifetime.Scoped);
             services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyTypesService, OntologyTypesService>();
@@ -150,32 +150,32 @@ namespace IIS.Core
         }
     }
 
-    public class TraceLogger : ILogger
-    {
-        private readonly string categoryName;
+    //public class TraceLogger : ILogger
+    //{
+    //    private readonly string categoryName;
 
-        public TraceLogger(string categoryName) => this.categoryName = categoryName;
+    //    public TraceLogger(string categoryName) => this.categoryName = categoryName;
 
-        public bool IsEnabled(LogLevel logLevel) => true;
+    //    public bool IsEnabled(LogLevel logLevel) => true;
 
-        public void Log<TState>(
-            LogLevel logLevel,
-            EventId eventId,
-            TState state,
-            Exception exception,
-            Func<TState, Exception, string> formatter)
-        {
-            Trace.WriteLine($"{DateTime.Now.ToString("o")} {logLevel} {eventId.Id} {this.categoryName}");
-            Trace.WriteLine(formatter(state, exception));
-        }
+    //    public void Log<TState>(
+    //        LogLevel logLevel,
+    //        EventId eventId,
+    //        TState state,
+    //        Exception exception,
+    //        Func<TState, Exception, string> formatter)
+    //    {
+    //        Trace.WriteLine($"{DateTime.Now.ToString("o")} {logLevel} {eventId.Id} {this.categoryName}");
+    //        Trace.WriteLine(formatter(state, exception));
+    //    }
 
-        public IDisposable BeginScope<TState>(TState state) => null;
-    }
+    //    public IDisposable BeginScope<TState>(TState state) => null;
+    //}
 
-    public class TraceLoggerProvider : ILoggerProvider
-    {
-        public ILogger CreateLogger(string categoryName) => new TraceLogger(categoryName);
+    //public class TraceLoggerProvider : ILoggerProvider
+    //{
+    //    public ILogger CreateLogger(string categoryName) => new TraceLogger(categoryName);
 
-        public void Dispose() { }
-    }
+    //    public void Dispose() { }
+    //}
 }

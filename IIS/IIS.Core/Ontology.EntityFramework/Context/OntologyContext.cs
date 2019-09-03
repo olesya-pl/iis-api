@@ -8,7 +8,10 @@ namespace IIS.Core.Ontology.EntityFramework.Context
 {
     public class OntologyContext : DbContext
     {
-        public OntologyContext() { }
+        public OntologyContext()
+        {
+            ChangeTracker.LazyLoadingEnabled = false;
+        }
 
         public OntologyContext(DbContextOptions options) : base(options) { }
 

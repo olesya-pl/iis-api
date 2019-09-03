@@ -129,13 +129,6 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             var existing = _context.Nodes.Local.Single(e => e.Id == entity.Id);
             return existing;
-            //return new Context.Node
-            //{
-            //    Id = entity.Id,
-            //    CreatedAt = entity.CreatedAt,
-            //    UpdatedAt = entity.UpdatedAt,
-            //    TypeId = entity.Type.Id
-            //};
         }
 
         Context.Relation MapRelation(Relation relation)
@@ -166,66 +159,76 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
-            var derived = ontology.Where(e => e is EntityType && e.IsSubtypeOf(type)).Select(e => e.Id).ToArray();
-            var ctxNodes = await _context.Nodes.Where(e => derived.Contains(e.Type.Id) && !e.IsArchived)
-                .Include(n => n.Type)
+            var derived = ontology.Where(e => e is EntityType && e.IsSubtypeOf(type)).Select(e => e.Id)
+                .Concat(new[] { type.Id }).Distinct().ToArray();
+            var ctxNodes = await _context.Nodes.Where(e => derived.Contains(e.TypeId) && !e.IsArchived)
                 .ToArrayAsync(cancellationToken);
+            // prefetch +1 level
+            var nodeIds = ctxNodes.Select(e => e.Id).ToArray();
+            var relations = await _context.Relations.Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived)
+                        .Include(e => e.Node)
+                        .Include(e => e.TargetNode)
+                        .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
+                        .ToArrayAsync(cancellationToken);
+
+            var groups = relations.GroupBy(e => e.SourceNodeId);
+            foreach (var node in ctxNodes)
+            {
+                node.OutgoingRelations = groups.Single(e => e.Key == node.Id).ToArray();
+            }
 
             var nodes = ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
 
             return nodes;
         }
-
+        
+        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
         {
-            var ctxSource = await _context.Nodes.Where(e => e.Id == nodeId && !e.IsArchived)
-                .Include(e => e.Type)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node.Type)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node.Type.RelationType)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode.Type)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode.Type.AttributeType)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                .FirstOrDefaultAsync(cancellationToken);
+            await semaphoreSlim.WaitAsync(cancellationToken);
+            try
+            {
+                var ctxSource = await _context.Nodes.FindAsync(nodeId);
 
-            // todo: fix
-            //var relationIds = toLoad.Select(e => e.Id);
-            //var relations = await _context.Relations.Where(e => e.SourceNode.Id == sourceId && relationIds.Contains(e.Node.Type.Id))
-            //    .Include(e => e.SourceNode)
-            //    .ToArrayAsync(cancellationToken);
-            //var ctxSource = relations.First().SourceNode;
-            //source = MapNode(ctxSource);
+                if (ctxSource is null) return null;
+                if (!ctxSource.OutgoingRelations.Any())
+                {
+                    var relations = await _context.Relations.Where(e => e.SourceNodeId == nodeId && !e.Node.IsArchived)
+                        .Include(e => e.Node)
+                        .Include(e => e.TargetNode)
+                        .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
+                        .ToArrayAsync(cancellationToken);
+                    ctxSource.OutgoingRelations = relations;
+                }
 
-            if (ctxSource is null) return null;
+                var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+                var node = MapNode(ctxSource, ontology);
 
-            ctxSource.OutgoingRelations = ctxSource.OutgoingRelations.Where(r => !r.Node.IsArchived).ToList(); // no way to filter inner entities with EF
-
-            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
-            var node = MapNode(ctxSource, ontology);
-
-            return node;
+                return node;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
         }
 
         private Node MapNode(Context.Node ctxNode, IEnumerable<Type> ontology)
         {
-            //var type = ontology.First(e => e.Id == ctxNode.TypeId);
+            var type = ontology.First(e => e.Id == ctxNode.TypeId);
             Node node;
-            if (ctxNode.Type.Kind == Kind.Attribute)
+            if (type is AttributeType)
             {
-                var type = ontology.Single(e => e.Name == ctxNode.Type.Name && e is AttributeType) as AttributeType;
-                var value = ParseValue(ctxNode.Attribute.Value, ctxNode.Type.AttributeType.ScalarType);
-                node = new Attribute(ctxNode.Id, type, value);
+                var attrType = (AttributeType)type;
+                var value = ParseValue(ctxNode.Attribute.Value, attrType.ScalarTypeEnum);
+                node = new Attribute(ctxNode.Id, (AttributeType)type, value);
             }
-            else if (ctxNode.Type.Kind == Kind.Entity)
+            else if (type is EntityType)
             {
-                var type = ontology.Single(e => e.Name == ctxNode.Type.Name && e is EntityType) as EntityType;
-                node = new Entity(ctxNode.Id, type);
+                node = new Entity(ctxNode.Id, (EntityType)type);
             }
-            else if (ctxNode.Type.Kind == Kind.Relation && ctxNode.Type.RelationType.Kind == RelationKind.Embedding)
+            else if (type is EmbeddingRelationType)
             {
-                var type = ontology.Single(e => e.Id == ctxNode.TypeId && e is RelationType) as RelationType;
-                node = new Relation(ctxNode.Id, type);
+                node = new Relation(ctxNode.Id, (EmbeddingRelationType)type);
                 var target = MapNode(ctxNode.Relation.TargetNode, ontology);
                 node.AddNode(target);
             }
@@ -240,18 +243,18 @@ namespace IIS.Core.Ontology.EntityFramework
             return node;
         }
 
-        private object ParseValue(string value, Context.ScalarType scalarType)
+        private object ParseValue(string value, ScalarType scalarType)
         {
             switch (scalarType)
             {
-                case Context.ScalarType.Boolean: return bool.Parse(value);
-                case Context.ScalarType.Date: return DateTime.Parse(value);
-                case Context.ScalarType.Decimal: return decimal.Parse(value);
-                case Context.ScalarType.Int: return int.Parse(value);
-                case Context.ScalarType.String: return value;
-                case Context.ScalarType.Json: return JObject.Parse(value);
-                case Context.ScalarType.Geo: return JObject.Parse(value);
-                case Context.ScalarType.File: return Guid.Parse(value);
+                case ScalarType.Boolean: return bool.Parse(value);
+                case ScalarType.DateTime: return DateTime.Parse(value);
+                case ScalarType.Decimal: return decimal.Parse(value);
+                case ScalarType.Integer: return int.Parse(value);
+                case ScalarType.String: return value;
+                //case ScalarType.Json: return JObject.Parse(value);
+                case ScalarType.Geo: return JObject.Parse(value);
+                case ScalarType.File: return Guid.Parse(value);
                 default: throw new NotImplementedException();
             }
         }
