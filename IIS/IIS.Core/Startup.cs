@@ -87,18 +87,18 @@ namespace IIS.Core
                 .AddGraphQLSubscriptions();
             // end of graphql engine registration
             
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    builder =>
-                    {
-                        builder
-                        //.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials();
-                    });
-            });
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowAll",
+            //        builder =>
+            //        {
+            //            builder
+            //            //.AllowAnyOrigin()
+            //            .AllowAnyMethod()
+            //            .AllowAnyHeader()
+            //            .AllowCredentials();
+            //        });
+            //});
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -112,11 +112,12 @@ namespace IIS.Core
             }
             app.UseDeveloperExceptionPage();
             
-            app.UseCors("AllowAll");
+            //app.UseCors("AllowAll");
 
             app.Use((ctx, next) =>
             {
                 ctx.Response.Headers["Access-Control-Allow-Origin"] = ctx.Request.Host.ToString();
+                ctx.Response.Headers["Access-Control-Allow-Credentials"] = true.ToString();
                 return next.Invoke();
             });
 
