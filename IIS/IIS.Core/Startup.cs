@@ -117,7 +117,7 @@ namespace IIS.Core
             app.Use((ctx, next) =>
             {
                 ctx.Response.Headers["Access-Control-Allow-Origin"] = ctx.Request.Headers["Origin"];
-                ctx.Response.Headers["Access-Control-Allow-Credentials"] = true.ToString();
+                ctx.Response.Headers["Access-Control-Allow-Credentials"] = "true";
                 return next.Invoke();
             });
 
