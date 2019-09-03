@@ -86,14 +86,14 @@ namespace IIS.Core
                 .AddJsonArrayResponseStreamSerializer()
                 .AddGraphQLSubscriptions();
             // end of graphql engine registration
-
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
                     builder =>
                     {
                         builder
-                        .AllowAnyOrigin()
+                        //.AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
@@ -111,8 +111,14 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             app.UseDeveloperExceptionPage();
-
+            
             app.UseCors("AllowAll");
+
+            app.Use((ctx, next) =>
+            {
+                ctx.Response.Headers["Access-Control-Allow-Origin"] = ctx.Request.Host.ToString();
+                return next.Invoke();
+            });
 
             app.UseGraphQL();
             app.UsePlayground();
