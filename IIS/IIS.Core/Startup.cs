@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -17,6 +18,7 @@ using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Legacy.EntityFramework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +37,7 @@ namespace IIS.Core
         {
             Configuration = configuration;
         }
-
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -86,19 +88,6 @@ namespace IIS.Core
                 .AddJsonArrayResponseStreamSerializer()
                 .AddGraphQLSubscriptions();
             // end of graphql engine registration
-            
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowAll",
-            //        builder =>
-            //        {
-            //            builder
-            //            //.AllowAnyOrigin()
-            //            .AllowAnyMethod()
-            //            .AllowAnyHeader()
-            //            .AllowCredentials();
-            //        });
-            //});
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -112,15 +101,8 @@ namespace IIS.Core
             }
             app.UseDeveloperExceptionPage();
             
-            //app.UseCors("AllowAll");
-
-            app.Use((ctx, next) =>
-            {
-                ctx.Response.Headers["Access-Control-Allow-Origin"] = ctx.Request.Headers["Origin"];
-                ctx.Response.Headers["Access-Control-Allow-Credentials"] = "true";
-                return next.Invoke();
-            });
-
+            app.UseMiddleware<OptionsMiddleware>();
+            
             app.UseGraphQL();
             app.UsePlayground();
 
@@ -136,6 +118,36 @@ namespace IIS.Core
         public string Host { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+    }
+
+    public class OptionsMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public OptionsMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public Task Invoke(HttpContext context)
+        {
+            return BeginInvoke(context);
+        }
+
+        private Task BeginInvoke(HttpContext context)
+        {
+            if (context.Request.Method == "OPTIONS")
+            {
+                context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { (string)context.Request.Headers["Origin"] });
+                context.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "*" });
+                context.Response.Headers.Add("Access-Control-Allow-Methods", new[] { "GET, POST, PUT, DELETE, OPTIONS" });
+                context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
+                context.Response.StatusCode = 200;
+                return context.Response.WriteAsync("OK");
+            }
+
+            return _next.Invoke(context);
+        }
     }
 
     public class TraceLogger : ILogger
