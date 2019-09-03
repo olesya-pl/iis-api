@@ -9,6 +9,7 @@ namespace IIS.Core.Materials.EntityFramework
         public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
         public Guid? FileId { get; set; }
+        public string Metadata { get; set; }
         public string Data { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }

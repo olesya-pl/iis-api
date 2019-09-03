@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -8,7 +9,8 @@ namespace IIS.Core.GraphQL.Materials
     {
         public static Core.Materials.Material ToDomain(this MaterialInput input)
         {
-            var result = new Core.Materials.Material(Guid.NewGuid(), JObject.Parse(input.Data), input.Type, input.Source);
+            var result = new Core.Materials.Material(Guid.NewGuid(), JObject.FromObject(input.Metadata),
+                JArray.FromObject(input.Data), input.Metadata.Type, input.Metadata.Source);
             if (input.FileId.HasValue)
                 result.File = new IIS.Core.Files.FileInfo(input.FileId.Value);
             return result;
@@ -20,10 +22,9 @@ namespace IIS.Core.GraphQL.Materials
             {
                 Id = material.Id,
                 Children = material.Children.Select(ToView).ToList(),
-                Data = material.Data?.ToString(),
+                Metadata = material.Metadata.ToObject<Metadata>(),
+                Data = material.Data.ToObject<IEnumerable<Data>>(),
                 File = material.File == null ? null : ToView(material.File),
-                Source = material.Source,
-                Type = material.Type,
             };
         }
 

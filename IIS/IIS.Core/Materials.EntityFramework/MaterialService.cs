@@ -73,7 +73,7 @@ namespace IIS.Core.Materials.EntityFramework
         // Todo: think about enumerable.Select(MapAsync) trouble
         private async Task<Materials.Material> MapAsync(Material material)
         {
-            var result = new Materials.Material(material.Id, JObject.Parse(material.Data), material.Type, material.Source);
+            var result = new Materials.Material(material.Id, JObject.Parse(material.Metadata), JArray.Parse(material.Data), material.Type, material.Source);
             if (material.FileId.HasValue)
                 result.File = await _fileService.GetFileAsync(material.FileId.Value);
             if (material.Children != null)
@@ -106,6 +106,7 @@ namespace IIS.Core.Materials.EntityFramework
                 Id = material.Id,
                 FileId = material.File?.Id,
                 ParentId = parentId,
+                Metadata = material.Metadata.ToString(),
                 Data = material.Data.ToString(),
                 Type = material.Type,
                 Source = material.Source,

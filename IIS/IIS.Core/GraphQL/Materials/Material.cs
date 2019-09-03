@@ -12,8 +12,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(NonNullType<IdType>))] public Guid Id { get; set; }
         [GraphQLNonNullType] public IEnumerable<Material> Children { get; set; }
         public FileInfo File { get; set; }
-        public string Data { get; set; }
-        public string Type { get; set; }
-        public string Source { get; set; }
+        [GraphQLNonNullType] public Metadata Metadata { get; set; }
+        public IEnumerable<Data> Data { get; set; }
     }
 }
