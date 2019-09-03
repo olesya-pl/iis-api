@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.Files;
+using IIS.Core.Materials.EntityFramework.Workers;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +16,14 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly OntologyContext _context;
         private readonly IFileService _fileService;
         private readonly IOntologyService _ontologyService;
+        private readonly IOntologyTypesService _ontologyTypesService;
 
-        public MaterialService(OntologyContext context, IFileService fileService, IOntologyService ontologyService)
+        public MaterialService(OntologyContext context, IFileService fileService, IOntologyService ontologyService, IOntologyTypesService ontologyTypesService)
         {
             _context = context;
             _fileService = fileService;
             _ontologyService = ontologyService;
+            _ontologyTypesService = ontologyTypesService;
         }
 
         public async Task SaveAsync(Materials.Material material)
@@ -44,6 +47,10 @@ namespace IIS.Core.Materials.EntityFramework
                 await SaveAsync(child, material.Id);
             foreach (var info in material.Infos)
                 _context.Add(Map(info, material.Id));
+            // todo: put message to rabbit instead of calling another service directly
+            await new MetadataExtractor(_context, this, _ontologyService, _ontologyTypesService)
+                .ExtractInfo(material);
+            // end
             await _context.SaveChangesAsync();
         }
 

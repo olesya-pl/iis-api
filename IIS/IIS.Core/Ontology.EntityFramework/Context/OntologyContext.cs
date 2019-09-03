@@ -98,8 +98,8 @@ namespace IIS.Core.Ontology.EntityFramework.Context
 
             var materialFeature = modelBuilder.Entity<MaterialFeature>();
             materialFeature.HasOne(e => e.Node)
-                .WithOne()
-                .HasForeignKey<MaterialFeature>(e => e.NodeId)
+                .WithMany()
+                .HasForeignKey(e => e.NodeId)
                 ;
         }
     }
