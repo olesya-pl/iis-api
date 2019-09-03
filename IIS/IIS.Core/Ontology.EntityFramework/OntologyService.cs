@@ -25,10 +25,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
-            var existing = await _context.Nodes.Where(e => e.Id == source.Id)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                .FirstOrDefaultAsync(cancellationToken);
+            var existing = _context.Nodes.Local.FirstOrDefault(e => e.Id == source.Id);
 
             if (existing is null)
             {
@@ -130,7 +127,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         Context.Node MapEntity(Entity entity)
         {
-            var existing = _context.Nodes.Single(e => e.Id == entity.Id);
+            var existing = _context.Nodes.Local.Single(e => e.Id == entity.Id);
             return existing;
             //return new Context.Node
             //{
@@ -168,11 +165,12 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, CancellationToken cancellationToken = default)
         {
-            var ctxNodes = await _context.Nodes.Where(e => e.Type.Id == type.Id && !e.IsArchived)
+            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+            var derived = ontology.Where(e => e is EntityType && e.IsSubtypeOf(type)).Select(e => e.Id).ToArray();
+            var ctxNodes = await _context.Nodes.Where(e => derived.Contains(e.Type.Id) && !e.IsArchived)
                 .Include(n => n.Type)
                 .ToArrayAsync(cancellationToken);
 
-            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
             var nodes = ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
 
             return nodes;
@@ -183,7 +181,10 @@ namespace IIS.Core.Ontology.EntityFramework
             var ctxSource = await _context.Nodes.Where(e => e.Id == nodeId && !e.IsArchived)
                 .Include(e => e.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node)
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.Node.Type.RelationType)
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode)
+                .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode.Type)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode.Type.AttributeType)
                 .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -208,6 +209,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private Node MapNode(Context.Node ctxNode, IEnumerable<Type> ontology)
         {
+            //var type = ontology.First(e => e.Id == ctxNode.TypeId);
             Node node;
             if (ctxNode.Type.Kind == Kind.Attribute)
             {

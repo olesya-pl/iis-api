@@ -22,24 +22,33 @@ namespace IIS.Core.Ontology.EntityFramework
             _cache = cache;
         }
 
+        private static readonly object _locker = new object();
+        private static List<Type> _ontology;
         public async Task<IEnumerable<Type>> GetTypesAsync(CancellationToken cancellationToken = default)
         {
-            var result = default(List<Type>);
-            if (_cache.TryGetValue("ontology", out result)) return result;
+            try
+            {
+                Monitor.Enter(_locker);
+                if (_ontology != null) return _ontology;
 
-            var types = await _context.Types.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                .Include(e => e.IncomingRelations).ThenInclude(e => e.Type)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
-                .Include(e => e.AttributeType)
-                .ToArrayAsync(cancellationToken);
-            result = types.Select(MapType).ToList();
+                var types = await _context.Types.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
+                    .Include(e => e.IncomingRelations).ThenInclude(e => e.Type)
+                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
+                    .Include(e => e.AttributeType)
+                    .ToArrayAsync(cancellationToken);
+                var result = types.Select(MapType).ToList();
 
-            // todo: refactor
-            result.AddRange(_types.Values.Where(e => e is RelationType));
+                // todo: refactor
+                result.AddRange(_types.Values.Where(e => e is RelationType));
 
-            _cache.Set("ontology", result);
+                _ontology = result;
 
-            return result;
+                return _ontology;
+            }
+            finally
+            {
+                Monitor.Exit(_locker);
+            }
         }
 
         private Type MapType(Context.Type type)

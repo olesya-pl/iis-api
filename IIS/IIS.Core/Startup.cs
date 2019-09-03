@@ -49,9 +49,8 @@ namespace IIS.Core
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b
                 .UseNpgsql(connectionString)
-                .UseLoggerFactory(loggerFactory)
-                .EnableSensitiveDataLogging(),
-                ServiceLifetime.Transient);
+                .UseLoggerFactory(loggerFactory),
+                ServiceLifetime.Scoped);
             services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyTypesService, OntologyTypesService>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
