@@ -28,16 +28,22 @@ namespace IIS.Core.Ontology
         {
             switch (scalarType)
             {
-                case Core.Ontology.ScalarType.Boolean: return bool.Parse(value);
-                case Core.Ontology.ScalarType.DateTime: return DateTime.Parse(value);
-                case Core.Ontology.ScalarType.Decimal: return decimal.Parse(value);
-                case Core.Ontology.ScalarType.Integer: return int.Parse(value);
-                case Core.Ontology.ScalarType.String: return value;
-                //case Core.Ontology.ScalarType.Json: return value;
-                case Core.Ontology.ScalarType.Geo: return JObject.Parse(value);
-                case Core.Ontology.ScalarType.File: return Guid.Parse(value);
+                case ScalarType.Boolean: return bool.Parse(value);
+                case ScalarType.DateTime: return DateTime.Parse(value);
+                case ScalarType.Decimal: return decimal.Parse(value);
+                case ScalarType.Integer: return int.Parse(value);
+                case ScalarType.String: return value;
+                //case ScalarType.Json: return JObject.Parse(value);
+                case ScalarType.Geo: return JObject.Parse(value);
+                case ScalarType.File: return Guid.Parse(value);
                 default: throw new NotImplementedException();
             }
         }
+
+        public static string ValueToString(object value, ScalarType scalarType)
+        {
+            return value.ToString();
+        }
+
     }
 }

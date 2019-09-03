@@ -115,9 +115,9 @@ namespace IIS.Core.GraphQL
         public string MigrateLegacyTypes([Service] ILegacyOntologyProvider provider,
             [Service] OntologyTypeSaver typeSaver)
         {
-            var task = provider.GetTypesAsync();
+            var task = provider.GetOntologyAsync();
             task.Wait();
-            typeSaver.SaveTypes(task.Result);
+            typeSaver.SaveTypes(task.Result.Types);
             return "Types migrated";
         }
 

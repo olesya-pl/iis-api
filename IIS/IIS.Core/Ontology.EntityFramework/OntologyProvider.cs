@@ -22,8 +22,9 @@ namespace IIS.Core.Ontology.EntityFramework
             _cache = cache;
         }
 
-        private static List<Type> _ontology;
-        public async Task<IEnumerable<Type>> GetTypesAsync(CancellationToken cancellationToken = default)
+        // todo: ensure thread safe
+        private static Ontology _ontology;
+        public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
             if (_ontology != null) return _ontology;
 
@@ -37,7 +38,7 @@ namespace IIS.Core.Ontology.EntityFramework
             // todo: refactor
             result.AddRange(_types.Values.Where(e => e is RelationType));
 
-            _ontology = result;
+            _ontology = new Ontology(result);
 
             return _ontology;
         }

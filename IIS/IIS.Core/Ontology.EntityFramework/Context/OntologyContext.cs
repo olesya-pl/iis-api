@@ -15,6 +15,8 @@ namespace IIS.Core.Ontology.EntityFramework.Context
 
         public OntologyContext(DbContextOptions options) : base(options) { }
 
+        public SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
+
         public virtual DbSet<Type> Types { get; set; }
         public virtual DbSet<RelationType> RelationTypes { get; set; }
         public virtual DbSet<AttributeType> AttributeTypes { get; set; }

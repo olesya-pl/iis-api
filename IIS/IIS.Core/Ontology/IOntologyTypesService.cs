@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using IIS.Core.GraphQL;
 
 namespace IIS.Core.Ontology
 {
+    // todo: Use Ontology container
+    [Obsolete]
     public interface IOntologyTypesService
     {
         IEnumerable<Type> Types { get; }
@@ -12,6 +15,7 @@ namespace IIS.Core.Ontology
         EntityType GetEntityType(string name);
     }
 
+    [Obsolete]
     public class OntologyTypesService : IOntologyTypesService
     {
         private readonly IOntologyProvider _ontologyProvider;
@@ -19,8 +23,8 @@ namespace IIS.Core.Ontology
         private Dictionary<string, List<Type>> _inheritors;
         private Dictionary<string, EntityType> _entityTypes;
 
-        public IEnumerable<Type> Types => _types ?? (_types = _ontologyProvider.GetTypesAsync().Result.ToList());
-        public Dictionary<string, List<Type>> Inheritors => _inheritors ?? (_inheritors = BuildInheritors(Types));
+        public IEnumerable<Type> Types => _types ?? (_types = _ontologyProvider.GetOntologyAsync().Result.Types.ToList());
+        private Dictionary<string, List<Type>> Inheritors => _inheritors ?? (_inheritors = BuildInheritors(Types));
 
         public IEnumerable<EntityType> EntityTypes =>
             _entityTypes?.Values ?? (_entityTypes = Types.OfType<EntityType>().ToDictionary(t => t.Name)).Values;

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -120,7 +119,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Attribute = new Context.Attribute
                 {
                     Id = attribute.Id,
-                    Value = ValueToString(attribute.Value, default)
+                    Value = AttributeType.ValueToString(attribute.Value, default)
                 }
             };
         }
@@ -158,8 +157,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, CancellationToken cancellationToken = default)
         {
-            var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
-            var derived = ontology.Where(e => e is EntityType && e.IsSubtypeOf(type)).Select(e => e.Id)
+            var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+            var derived = ontology.GetChildTypes(type).Select(e => e.Id)
                 .Concat(new[] { type.Id }).Distinct().ToArray();
             var ctxNodes = await _context.Nodes.Where(e => derived.Contains(e.TypeId) && !e.IsArchived)
                 .ToArrayAsync(cancellationToken);
@@ -182,10 +181,9 @@ namespace IIS.Core.Ontology.EntityFramework
             return nodes;
         }
         
-        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
         {
-            await semaphoreSlim.WaitAsync(cancellationToken);
+            await _context.Semaphore.WaitAsync(cancellationToken);
             try
             {
                 var ctxSource = await _context.Nodes.FindAsync(nodeId);
@@ -201,26 +199,26 @@ namespace IIS.Core.Ontology.EntityFramework
                     ctxSource.OutgoingRelations = relations;
                 }
 
-                var ontology = await _ontologyProvider.GetTypesAsync(cancellationToken);
+                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
                 var node = MapNode(ctxSource, ontology);
 
                 return node;
             }
             finally
             {
-                semaphoreSlim.Release();
+                _context.Semaphore.Release();
             }
         }
 
-        private Node MapNode(Context.Node ctxNode, IEnumerable<Type> ontology)
+        private Node MapNode(Context.Node ctxNode, Ontology ontology)
         {
-            var type = ontology.First(e => e.Id == ctxNode.TypeId);
+            var type = ontology.GetType(ctxNode.TypeId);
             Node node;
             if (type is AttributeType)
             {
                 var attrType = (AttributeType)type;
-                var value = ParseValue(ctxNode.Attribute.Value, attrType.ScalarTypeEnum);
-                node = new Attribute(ctxNode.Id, (AttributeType)type, value);
+                var value = AttributeType.ParseValue(ctxNode.Attribute.Value, attrType.ScalarTypeEnum);
+                node = new Attribute(ctxNode.Id, attrType, value);
             }
             else if (type is EntityType)
             {
@@ -241,27 +239,6 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             return node;
-        }
-
-        private object ParseValue(string value, ScalarType scalarType)
-        {
-            switch (scalarType)
-            {
-                case ScalarType.Boolean: return bool.Parse(value);
-                case ScalarType.DateTime: return DateTime.Parse(value);
-                case ScalarType.Decimal: return decimal.Parse(value);
-                case ScalarType.Integer: return int.Parse(value);
-                case ScalarType.String: return value;
-                //case ScalarType.Json: return JObject.Parse(value);
-                case ScalarType.Geo: return JObject.Parse(value);
-                case ScalarType.File: return Guid.Parse(value);
-                default: throw new NotImplementedException();
-            }
-        }
-
-        private string ValueToString(object value, ScalarType scalarType)
-        {
-            return value.ToString();
         }
 
         public async Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default)

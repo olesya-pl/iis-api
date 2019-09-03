@@ -71,8 +71,8 @@ namespace IIS.Core.Controllers
             _context.RelationTypes.RemoveRange(_context.RelationTypes.ToArray());
             await _context.SaveChangesAsync();
 
-            var types = await _legacyOntologyProvider.GetTypesAsync();
-            var ormTypes = types.Select(MapType).ToArray();
+            var types = await _legacyOntologyProvider.GetOntologyAsync();
+            var ormTypes = types.Types.Select(MapType).ToArray();
             _context.AddRange(ormTypes);
             await _context.SaveChangesAsync();
 

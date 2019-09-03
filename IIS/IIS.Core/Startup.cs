@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -23,9 +21,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace IIS.Core
 {
@@ -44,12 +39,10 @@ namespace IIS.Core
         {
             services.AddMemoryCache();
 
-            //var loggerFactory = new LoggerFactory();
-            //loggerFactory.AddProvider(new TraceLoggerProvider());
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b
-                .UseNpgsql(connectionString).EnableSensitiveDataLogging(),
-                //.UseLoggerFactory(loggerFactory),
+                .UseNpgsql(connectionString)
+                .EnableSensitiveDataLogging(),
                 ServiceLifetime.Scoped);
             services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyTypesService, OntologyTypesService>();
@@ -58,17 +51,7 @@ namespace IIS.Core
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IMaterialService, MaterialService>();
-            //services.AddSingleton<QueueReanimator>();
-            //var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
-            //var factory = new ConnectionFactory
-            //{
-            //    HostName = mq.Host,
-            //    UserName = mq.Username,
-            //    Password = mq.Password,
-            //    RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
-            //};
-            //services.AddTransient(s => factory);
-
+            
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
@@ -106,17 +89,10 @@ namespace IIS.Core
             app.UsePlayground();
 
             app.UseMvc();
-
+            
             // MIGRATION IS APPLIED HERE
             context.Database.Migrate();
         }
-    }
-
-    public class MqConfiguration
-    {
-        public string Host { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
     }
 
     public class OptionsMiddleware
@@ -149,33 +125,4 @@ namespace IIS.Core
             return _next.Invoke(context);
         }
     }
-
-    //public class TraceLogger : ILogger
-    //{
-    //    private readonly string categoryName;
-
-    //    public TraceLogger(string categoryName) => this.categoryName = categoryName;
-
-    //    public bool IsEnabled(LogLevel logLevel) => true;
-
-    //    public void Log<TState>(
-    //        LogLevel logLevel,
-    //        EventId eventId,
-    //        TState state,
-    //        Exception exception,
-    //        Func<TState, Exception, string> formatter)
-    //    {
-    //        Trace.WriteLine($"{DateTime.Now.ToString("o")} {logLevel} {eventId.Id} {this.categoryName}");
-    //        Trace.WriteLine(formatter(state, exception));
-    //    }
-
-    //    public IDisposable BeginScope<TState>(TState state) => null;
-    //}
-
-    //public class TraceLoggerProvider : ILoggerProvider
-    //{
-    //    public ILogger CreateLogger(string categoryName) => new TraceLogger(categoryName);
-
-    //    public void Dispose() { }
-    //}
 }

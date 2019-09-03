@@ -31,7 +31,7 @@ namespace IIS.Legacy.EntityFramework
             _connectionString = configuration.GetConnectionString("db-legacy");
         }
 
-        public async Task<IEnumerable<Type>> GetTypesAsync(CancellationToken cancellationToken = default)
+        public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
             var opts = new DbContextOptionsBuilder().UseNpgsql(_connectionString).Options;
             var contourContext = new ContourContext(opts);
@@ -47,7 +47,7 @@ namespace IIS.Legacy.EntityFramework
 
             var ontology = buildContext.BuildOntology();
             BuildUnions(ontology);
-            return ontology;
+            return new Ontology(ontology);
         }
 
         private void DescribeAttribute(OAttribute attribute, OntologyBuildContext buildContext)
