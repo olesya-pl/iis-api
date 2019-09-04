@@ -15,7 +15,7 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
         protected override void Configure(IEnumTypeDescriptor descriptor)
         {
-            descriptor.Name("EntityAttributeType"); // Typo on dev: EnityAttributeType 
+            descriptor.Name("EntityAttributeType"); // Typo on dev: EnityAttributeType
             descriptor.Item(OScalarType.Integer.ToString()).Name("int");
             descriptor.Item(OScalarType.Decimal.ToString()).Name("float");
             descriptor.Item(OScalarType.String.ToString()).Name("string");
@@ -72,9 +72,9 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLType(typeof(NonNullType<EntityAttributeTypeEnum>))]
         public abstract string Type { get; }
 
-        [GraphQLNonNullType] public string Title => Source.Title ?? Source.TargetType.Title; // fallback to target type 
+        [GraphQLNonNullType] public string Title => Source.Title ?? Source.TargetType.Title; // fallback to target type
 
-        [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type 
+        [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type
 
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
@@ -136,7 +136,9 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
             var types = typesService.GetChildTypes(Source.EntityType)?.OfType<Core.Ontology.EntityType>();
             if (types == null)
-                return null;
+                types = new[] {Source.EntityType};
+            else
+                types = types.Union(new[] {Source.EntityType});
             if (concreteTypes == true)
                 types = types.Where(t => !t.IsAbstract);
             return types.Select(t => new EntityType(t));
