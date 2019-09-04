@@ -47,7 +47,7 @@ namespace IIS.Core.GraphQL
                 case EmbeddingOptions.Required:
                     return new NonNullType(type);
                 case EmbeddingOptions.Multiple:
-                    return new NonNullType(new ListType(new NonNullType(type)));
+                    return new ListType(new NonNullType(type)); // Input arrays are optional, opposed to output type
                 default:
                     throw new ArgumentOutOfRangeException();
             }
