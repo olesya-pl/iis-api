@@ -46,15 +46,13 @@ namespace IIS.Core.Ontology
         public bool IsSubtypeOf(Type type)
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
-            
+            if (this == type) return true;
             foreach (var inheritance in RelatedTypes.OfType<InheritanceRelationType>())
             {
                 var parent = inheritance.ParentType;
-                if (parent == type) return true;
-                else return parent.IsSubtypeOf(type);
+                if (parent == type || parent.IsSubtypeOf(type)) return true;
             }
-
-            return this == type;
+            return false;
         }
 
         public void AddType(Type type)
