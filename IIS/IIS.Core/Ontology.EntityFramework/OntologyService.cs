@@ -229,6 +229,14 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private Node MapNode(Context.Node ctxNode, Ontology ontology)
         {
+            return MapNode(ctxNode, ontology, new List<Node>());
+        }
+
+        private Node MapNode(Context.Node ctxNode, Ontology ontology, List<Node> mappedNodes)
+        {
+            var m = mappedNodes.SingleOrDefault(e => e.Id == ctxNode.Id);
+            if (m != null) return m;
+
             var type = ontology.GetType(ctxNode.TypeId);
             Node node;
             if (type is AttributeType)
@@ -240,18 +248,19 @@ namespace IIS.Core.Ontology.EntityFramework
             else if (type is EntityType)
             {
                 node = new Entity(ctxNode.Id, (EntityType)type, ctxNode.CreatedAt, ctxNode.UpdatedAt);
+                mappedNodes.Add(node);
             }
             else if (type is EmbeddingRelationType)
             {
                 node = new Relation(ctxNode.Id, (EmbeddingRelationType)type, ctxNode.CreatedAt, ctxNode.UpdatedAt);
-                var target = MapNode(ctxNode.Relation.TargetNode, ontology);
+                var target = MapNode(ctxNode.Relation.TargetNode, ontology, mappedNodes);
                 node.AddNode(target);
             }
             else throw new Exception("Unsupported.");
 
             foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived))
             {
-                var mapped = MapNode(relatedNode.Node, ontology);
+                var mapped = MapNode(relatedNode.Node, ontology, mappedNodes);
                 node.AddNode(mapped);
             }
 

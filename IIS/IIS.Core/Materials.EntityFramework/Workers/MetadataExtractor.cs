@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.GraphQL.Materials;
@@ -6,7 +7,8 @@ using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using AttributeType = IIS.Core.Ontology.AttributeType;
+using EmbeddingOptions = IIS.Core.Ontology.EmbeddingOptions;
+using Node = IIS.Core.Ontology.Node;
 
 namespace IIS.Core.Materials.EntityFramework.Workers
 {
@@ -25,36 +27,44 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             _ontologyTypesService = ontologyTypesService;
         }
 
-        public async Task ExtractInfo(Guid materialId) =>
-            await ExtractInfo(await _materialService.GetMaterialAsync(materialId));
-
         public async Task ExtractInfo(Materials.Material material)
         {
-            _context.Add(ToDal(material.Metadata, material.Id));
-            await _context.SaveChangesAsync();
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                _context.Add(ToDal(material.Metadata, material.Id));
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
             await ExtractFeatures(material.Id); // todo: to separate service
         }
 
         // ----- features ----- //
 
-        public async Task ExtractFeatures(Guid materialId)
+        private async Task ExtractFeatures(Guid materialId)
         {
             var material = await _materialService.GetMaterialAsync(materialId);
             foreach (var info in material.Infos)
                 await ExtractFeatures(info);
         }
 
-        public async Task ExtractFeatures(Materials.MaterialInfo info)
+        private async Task ExtractFeatures(Materials.MaterialInfo info)
         {
             var view = info.Data.ToObject<Metadata>();
             var type = _ontologyTypesService.GetEntityType("EmailSign");
             var relationType = type.GetProperty("value");
+            var features = new List<Materials.MaterialFeature>();
             foreach (var node in view.Features.Nodes)
             {
                 var feat = ToDomain(node);
                 feat = await MapToNodeDirect(feat, type, relationType);
+                features.Add(feat);
                 _context.Add(ToDal(feat, info.Id));
             }
+            await CreateRelations(features, type);
             await _context.SaveChangesAsync();
         }
 
@@ -70,7 +80,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             if (existingRelation == null)
                 feature.Node = await CreateEntity(feature.Value, type, relationType);
             else
-                feature.Node = new Entity(existingRelation.SourceNodeId, null); // pass only id
+                feature.Node = new Entity(existingRelation.SourceNodeId, type); // pass only id
             return feature;
         }
 
@@ -83,6 +93,60 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             entity.AddNode(relation);
             await _ontologyService.SaveNodeAsync(entity);
             return entity;
+        }
+
+        // ----- Relation creation ----- //
+
+        private string GetName(string rel1, string rel2) => $"EmailSign_{rel1}_{rel2}";
+
+        private async Task CreateRelations(List<Materials.MaterialFeature> features, EntityType type)
+        {
+            foreach (var feat1 in features)
+            {
+                foreach (var feat2 in features)
+                {
+                    if (feat1.Relation == feat2.Relation) continue;
+                    var rname = GetName(feat1.Relation, feat2.Relation);
+                    var rtype = await GetRelationType(rname, type.Id);
+                    await SaveRelation(feat1.Node, feat2.Node, rtype);
+                }
+            }
+        }
+
+        private async Task<EmbeddingRelationType> GetRelationType(string name, Guid entityTypeId)
+        {
+            var type = _ontologyTypesService.Types.OfType<EmbeddingRelationType>().SingleOrDefault(t => t.Name == name);
+            if (type != null) return type;
+            // kill me for this
+            var rt = new EmbeddingRelationType(Guid.NewGuid(), name, EmbeddingOptions.Multiple);
+            ((List<Ontology.Type>)_ontologyTypesService.Types).Add(rt);
+            var ctxType = new IIS.Core.Ontology.EntityFramework.Context.Type
+            {
+                Id = rt.Id, Kind = Kind.Relation, Name = name, Meta = "{}", Title = name,
+            };
+            ctxType.RelationType = new Ontology.EntityFramework.Context.RelationType
+            {
+                Id = rt.Id, Kind = RelationKind.Embedding,
+                EmbeddingOptions = Ontology.EntityFramework.Context.EmbeddingOptions.Multiple,
+                SourceTypeId = entityTypeId, TargetTypeId = entityTypeId,
+            };
+            _context.Add(ctxType);
+            await _context.SaveChangesAsync();
+            return rt;
+        }
+
+        private async Task SaveRelation(Node node1, Node node2, EmbeddingRelationType rtype)
+        {
+            var node = new IIS.Core.Ontology.EntityFramework.Context.Node
+            {
+                Id = Guid.NewGuid(), TypeId = rtype.Id, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow,
+            };
+            node.Relation = new IIS.Core.Ontology.EntityFramework.Context.Relation
+            {
+                Id = node.Id, SourceNodeId = node1.Id, TargetNodeId = node2.Id
+            };
+            _context.Add(node);
+            await _context.SaveChangesAsync();
         }
 
         public MaterialInfo ToDal(JObject metadata, Guid materialId)

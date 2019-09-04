@@ -132,6 +132,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var parent = ctx.Parent<Node>();
             var node = await ontologyService.LoadNodesAsync(parent.Id, new[] {relationType});
             var relations = node.GetRelations(relationType);
+            if (!relations.GroupBy(r => r.EntityTarget).All(g => g.Count() == 1))
+                return relations.Select(r => r.EntityTarget); // Non-unique targets breaks our _relation !!!
             var relationsInfo = relations.ToDictionary(r => r.EntityTarget);
             SetRelationInfo(ctx, relationsInfo); // pass info to _relation
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
