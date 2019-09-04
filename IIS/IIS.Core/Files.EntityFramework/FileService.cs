@@ -40,8 +40,17 @@ namespace IIS.Core.Files.EntityFramework
 
         public async Task<FileInfo> GetFileAsync(Guid id)
         {
-            var file = _context.Files.SingleOrDefault(f => f.Id == id);
-            if (file == null) return null;
+            await _context.Semaphore.WaitAsync();
+            File file;
+            try
+            {
+                file = _context.Files.SingleOrDefault(f => f.Id == id);
+                if (file == null) return null;
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
             var ms = new MemoryStream(file.Contents);
             return new FileInfo(id, file.Name, file.ContentType, ms, file.IsTemporary);
         }

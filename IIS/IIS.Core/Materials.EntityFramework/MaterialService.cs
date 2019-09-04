@@ -56,11 +56,21 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(Guid? parentId = null)
         {
-            IQueryable<Material> materials = _context.Materials
-                .Include(m => m.Infos)
+            IEnumerable<Material> materials;
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                IQueryable<Material> materialsQ = _context.Materials
+                    .Include(m => m.Infos)
                     .ThenInclude(m => m.Features);
-            if (parentId != null)
-                materials = materials.Where(e => e.ParentId == parentId);
+                if (parentId != null)
+                    materialsQ = materialsQ.Where(e => e.ParentId == parentId);
+                materials = await materialsQ.ToArrayAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
             var result = new List<Materials.Material>();
             foreach (var material in materials)
                 result.Add(await MapAsync(material));
@@ -69,10 +79,19 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<Materials.Material> GetMaterialAsync(Guid id)
         {
-            var material = _context.Materials
-                .Include(m => m.Infos)
+            Material material;
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                material = _context.Materials
+                    .Include(m => m.Infos)
                     .ThenInclude(m => m.Features)
-                .SingleOrDefault(m => m.Id == id);
+                    .SingleOrDefault(m => m.Id == id);
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
             if (material == null) return null;
             return await MapAsync(material);
         }
