@@ -21,14 +21,13 @@ namespace IIS.Core.GraphQL.Materials
             return new Material
             {
                 Id = material.Id,
-                Children = material.Children.Select(ToView).ToList(),
                 Metadata = material.Metadata.ToObject<Metadata>(),
                 Data = material.Data.ToObject<IEnumerable<Data>>(),
-                File = material.File == null ? null : ToView(material.File),
+                FileId = material.File?.Id
             };
         }
 
-        private static Files.FileInfo ToView(this IIS.Core.Files.FileInfo fileInfo)
+        public static Files.FileInfo ToView(this IIS.Core.Files.FileInfo fileInfo)
         {
             return new Files.FileInfo
             {

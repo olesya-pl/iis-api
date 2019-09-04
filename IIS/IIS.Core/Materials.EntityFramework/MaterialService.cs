@@ -54,12 +54,13 @@ namespace IIS.Core.Materials.EntityFramework
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync()
+        public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(Guid? parentId = null)
         {
-            var materials = _context.Materials
-                .Include(m => m.Children)
+            IQueryable<Material> materials = _context.Materials
                 .Include(m => m.Infos)
                     .ThenInclude(m => m.Features);
+            if (parentId != null)
+                materials = materials.Where(e => e.ParentId == parentId);
             var result = new List<Materials.Material>();
             foreach (var material in materials)
                 result.Add(await MapAsync(material));
@@ -69,7 +70,6 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<Materials.Material> GetMaterialAsync(Guid id)
         {
             var material = _context.Materials
-                .Include(m => m.Children)
                 .Include(m => m.Infos)
                     .ThenInclude(m => m.Features)
                 .SingleOrDefault(m => m.Id == id);
@@ -85,10 +85,7 @@ namespace IIS.Core.Materials.EntityFramework
                 material.Data == null ? null : JArray.Parse(material.Data),
                 material.Type, material.Source);
             if (material.FileId.HasValue)
-                result.File = await _fileService.GetFileAsync(material.FileId.Value);
-            if (material.Children != null)
-                foreach (var child in material.Children)
-                    result.Children.Add(await GetMaterialAsync(child.Id)); // todo: lazy load recursion with graphql resolvers
+                result.File = new FileInfo(material.FileId.Value);
             foreach (var info in material.Infos)
                 result.Infos.Add(await MapAsync(info));
             return result;

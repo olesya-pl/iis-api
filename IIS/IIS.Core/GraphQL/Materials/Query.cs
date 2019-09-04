@@ -26,7 +26,5 @@ namespace IIS.Core.GraphQL.Materials
             var material = await materialService.GetMaterialAsync(materialId);
             return material?.ToView();
         }
-
-
     }
 }
