@@ -28,8 +28,8 @@ namespace IIS.Core.GraphQL.Entities
             d.Name(OntologyObjectType.GetName(type));
             d.Interface(_repository.GetType<EntityInterface>());
             d.Field("id").Type<NonNullType<IdType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveId(ctx));
-            d.Field("createdAt").Type<NonNullType<DateTimeType>>().ResolverNotImplemented();
-            d.Field("updatedAt").Type<NonNullType<DateTimeType>>().ResolverNotImplemented();
+            d.Field("createdAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedAt(ctx));
+            d.Field("updatedAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveUpdatedAt(ctx));
             d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
         }
 

@@ -20,5 +20,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<object> ResolveAttributeValue(IResolverContext ctx, Attribute attribute);
         Task<object> ResolveEntityRelation(IResolverContext ctx, EmbeddingRelationType relationType);
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
+        Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
+        Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
     }
 }

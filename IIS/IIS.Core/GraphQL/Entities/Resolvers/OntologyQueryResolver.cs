@@ -157,5 +157,19 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var dict = (Dictionary<Entity, Relation>) ctx.ScopedContextData.GetValueOrDefault(LastRelation);
             return dict?.GetOrDefault(entity);
         }
+
+        // ----- Created-updated ----- //
+
+        public async Task<DateTime> ResolveCreatedAt(IResolverContext ctx)
+        {
+            var parent = ctx.Parent<Entity>();
+            return parent.CreatedAt;
+        }
+
+        public async Task<DateTime> ResolveUpdatedAt(IResolverContext ctx)
+        {
+            var parent = ctx.Parent<Entity>();
+            return parent.UpdatedAt;
+        }
     }
 }
