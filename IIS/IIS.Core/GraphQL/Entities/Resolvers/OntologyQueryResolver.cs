@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
+using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using Attribute = IIS.Core.Ontology.Attribute;
@@ -170,6 +171,26 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var parent = ctx.Parent<Entity>();
             return parent.UpdatedAt;
+        }
+
+        // ------ All entities ----- //
+
+        public async Task<IEnumerable<Entity>> GetAllEntities(IResolverContext ctx)
+        {
+            var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
+            var pagination = ctx.Argument<PaginationInput>("pagination");
+            var ontologyService = ctx.Service<IOntologyService>();
+            var ontologyTypesService = ctx.Service<IOntologyTypesService>();
+
+            var types = ontologyTypesService.EntityTypes;
+            if (filter?.Types != null)
+                types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
+
+            var nodes = await ontologyService.GetNodesAsync(types);
+            var entities = nodes.OfType<Entity>();
+            if (pagination != null)
+                entities = pagination.Apply(entities);
+            return entities;
         }
     }
 }

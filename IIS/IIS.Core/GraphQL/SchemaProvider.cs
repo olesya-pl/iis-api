@@ -6,6 +6,7 @@ using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
+using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
 
@@ -89,8 +90,8 @@ namespace IIS.Core.GraphQL
             descriptor.Field("allEntities")
                 .Type(new CollectionType("AllEntities", _typeRepository.GetType<EntityInterface>()))
                 .Argument("pagination", d => d.Type<NonNullType<InputObjectType<PaginationInput>>>())
-                .Argument("filter", d => d.Type<InputObjectType<FilterInput>>())
-                .ResolverNotImplemented();
+                .Argument("filter", d => d.Type<InputObjectType<AllEntitiesFilterInput>>())
+                .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().GetAllEntities(ctx));
         }
 
         protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor)

@@ -22,5 +22,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
+        Task<IEnumerable<Entity>> GetAllEntities(IResolverContext ctx);
     }
 }

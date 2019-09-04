@@ -100,9 +100,21 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                                     $"There is no relation from {node.Type} {node.Id} to {embed.Name} of type {embed.TargetType} with id {id}");
                             if (embed.IsEntityType)
                             {
-                                var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
-                                var type = _typesService.GetEntityType(typeName);
-                                await UpdateEntity(type, id, targetValue);
+                                if (uvdict.ContainsKey("target"))
+                                {
+                                    var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
+                                    var type = _typesService.GetEntityType(typeName);
+                                    await UpdateEntity(type, id, targetValue);
+                                }
+                                else
+                                {
+                                    // todo: look at it again and refactor
+                                    var targetId = InputExtensions.ParseGuid(uvdict["targetId"]); // just check
+                                    var targetRelation = node.GetRelation(embed, id);
+                                    node.RemoveNode(targetRelation);
+                                    var newRel = await _mutationCreateResolver.CreateSingleProperty(embed, uvdict);
+                                    node.AddNode(newRel);
+                                }
                             }
                             else if (embed.IsAttributeType)
                             {
