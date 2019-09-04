@@ -47,6 +47,8 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] string Code { get; }
 
+        [GraphQLNonNullType] bool Editable { get; }
+
         string Hint { get; }
         bool Multiple { get; }
         string Format { get; }
@@ -75,6 +77,9 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType] public string Title => Source.Title ?? Source.TargetType.Title; // fallback to target type
 
         [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type
+
+        // TODO: change Editable to return false for computed attributes and inversed relations
+        [GraphQLNonNullType] public bool Editable => Source.Name != "title" && Source.Name != "parent";
 
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
