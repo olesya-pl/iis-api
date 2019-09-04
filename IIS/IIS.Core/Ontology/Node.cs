@@ -18,8 +18,8 @@ namespace IIS.Core.Ontology
         {
             Id = id;
             Type = type;
-            CreatedAt = createdAt;
-            UpdatedAt = updatedAt;
+            CreatedAt = createdAt == default ? DateTime.UtcNow : createdAt; // todo: remove stubs
+            UpdatedAt = updatedAt == default ? DateTime.UtcNow : updatedAt; // todo: remove stubs
         }
 
         public void AddNode(Node node)

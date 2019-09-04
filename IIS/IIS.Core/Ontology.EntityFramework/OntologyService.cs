@@ -180,7 +180,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             return nodes;
         }
-        
+
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
@@ -218,15 +218,15 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 var attrType = (AttributeType)type;
                 var value = AttributeType.ParseValue(ctxNode.Attribute.Value, attrType.ScalarTypeEnum);
-                node = new Attribute(ctxNode.Id, attrType, value);
+                node = new Attribute(ctxNode.Id, attrType, value, ctxNode.CreatedAt, ctxNode.UpdatedAt);
             }
             else if (type is EntityType)
             {
-                node = new Entity(ctxNode.Id, (EntityType)type);
+                node = new Entity(ctxNode.Id, (EntityType)type, ctxNode.CreatedAt, ctxNode.UpdatedAt);
             }
             else if (type is EmbeddingRelationType)
             {
-                node = new Relation(ctxNode.Id, (EmbeddingRelationType)type);
+                node = new Relation(ctxNode.Id, (EmbeddingRelationType)type, ctxNode.CreatedAt, ctxNode.UpdatedAt);
                 var target = MapNode(ctxNode.Relation.TargetNode, ontology);
                 node.AddNode(target);
             }
