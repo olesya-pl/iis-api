@@ -173,7 +173,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var groups = relations.GroupBy(e => e.SourceNodeId);
             foreach (var node in ctxNodes)
             {
-                node.OutgoingRelations = groups.Single(e => e.Key == node.Id).ToArray();
+                node.OutgoingRelations = groups.Single(e => e.Key == node.Id).ToList();
             }
 
             var nodes = ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
@@ -195,7 +195,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         .Include(e => e.Node)
                         .Include(e => e.TargetNode)
                         .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                        .ToArrayAsync(cancellationToken);
+                        .ToListAsync(cancellationToken);
                     ctxSource.OutgoingRelations = relations;
                 }
 
