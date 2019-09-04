@@ -51,7 +51,9 @@ namespace IIS.Core
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IMaterialService, MaterialService>();
-            
+
+            services.AddTransient<Seeder>();
+
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
@@ -89,9 +91,6 @@ namespace IIS.Core
             app.UsePlayground();
 
             app.UseMvc();
-            
-            // MIGRATION IS APPLIED HERE
-            context.Database.Migrate();
         }
     }
 

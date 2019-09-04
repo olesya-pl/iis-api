@@ -1,0 +1,26 @@
+[
+  {
+    "name": "першочерговий",
+    "code": "critical"
+  },
+  {
+    "name": "важливий",
+    "code": "high"
+  },
+  {
+    "name": "підвищений",
+    "code": "medium"
+  },
+  {
+    "name": "звичайний",
+    "code": "normal"
+  },
+  {
+    "name": "низький",
+    "code": "low"
+  },
+  {
+    "name": "ігнорувати",
+    "code": "ignore"
+  }
+]

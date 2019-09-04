@@ -1,0 +1,47 @@
+[
+  {
+    "sidc": "SPG---------",
+    "code": "pending",
+    "name": "очікує розгляду"
+  },
+  {
+    "sidc": "SUG---------",
+    "code": "unknown",
+    "name": "невідомий"
+  },
+  {
+    "sidc": "SSG---------",
+    "code": "suspect",
+    "name": "підозрілий"
+  },
+  {
+    "sidc": "SHG---------",
+    "code": "hostile",
+    "name": "ворожий"
+  },
+  {
+    "sidc": "SNG---------",
+    "code": "neutral",
+    "name": "нейтральний"
+  },
+  {
+    "sidc": "SAG---------",
+    "code": "assumed_friend",
+    "name": "умовно дружній"
+  },
+  {
+    "sidc": "SFG---------",
+    "code": "friend",
+    "name": "дружній"
+  },
+  {
+    "sidc": "SJG---------",
+    "code": "joker",
+    "name": "джокер"
+  },
+  {
+    "sidc": "SKG---------",
+    "code": "faker",
+    "name": "удавальник"
+  }
+]

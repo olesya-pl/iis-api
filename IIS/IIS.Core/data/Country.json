@@ -1,0 +1,2592 @@
+[
+  {
+    "id": "AU",
+    "alpha3": "AUS",
+    "text": "Австралія",
+    "code": 36,
+    "lat": "-25.274398",
+    "lng": "133.775136",
+    "region": "Oceania",
+    "sub_region": "Australia and New Zealand"
+  },
+  {
+    "id": "AT",
+    "alpha3": "AUT",
+    "text": "Австрія",
+    "code": 40,
+    "lat": "47.516231",
+    "lng": "14.550072",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "AZ",
+    "alpha3": "AZE",
+    "text": "Азербайджан",
+    "code": 31,
+    "lat": "40.143105",
+    "lng": "47.576927",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "AX",
+    "alpha3": "ALA",
+    "text": "Аландські острови",
+    "code": 248,
+    "lat": "''",
+    "lng": "''",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "AL",
+    "alpha3": "ALB",
+    "text": "Албанія",
+    "code": 8,
+    "lat": "41.153332",
+    "lng": "20.168331",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "DZ",
+    "alpha3": "DZA",
+    "text": "Алжир",
+    "code": 12,
+    "lat": "28.033886",
+    "lng": "1.659626",
+    "region": "Africa",
+    "sub_region": "Northern Africa"
+  },
+  {
+    "id": "AS",
+    "alpha3": "ASM",
+    "text": "Американське Самоа",
+    "code": 16,
+    "lat": "-14.270972",
+    "lng": "-170.132217",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "AI",
+    "alpha3": "AIA",
+    "text": "Ангілья",
+    "code": 660,
+    "lat": "18.220554",
+    "lng": "-63.068615",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "AO",
+    "alpha3": "AGO",
+    "text": "Ангола",
+    "code": 24,
+    "lat": "-11.202692",
+    "lng": "17.873887",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "AD",
+    "alpha3": "AND",
+    "text": "Андорра",
+    "code": 20,
+    "lat": "42.546245",
+    "lng": "1.601554",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "AQ",
+    "alpha3": "ATA",
+    "text": "Антарктика (Антарктида)",
+    "code": 10,
+    "lat": "-75.250973",
+    "lng": "-0.071389",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "AG",
+    "alpha3": "ATG",
+    "text": "Антигуа і Барбуда",
+    "code": 28,
+    "lat": "17.060816",
+    "lng": "-61.796428",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "AR",
+    "alpha3": "ARG",
+    "text": "Аргентина",
+    "code": 32,
+    "lat": "-38.416097",
+    "lng": "-63.616672",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "AW",
+    "alpha3": "ABW",
+    "text": "Аруба",
+    "code": 533,
+    "lat": "42.546245",
+    "lng": "1.601554",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "AF",
+    "alpha3": "AFG",
+    "text": "Афганістан",
+    "code": 4,
+    "lat": "33.93911",
+    "lng": "67.709953",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "BS",
+    "alpha3": "BHS",
+    "text": "Багамські Острови",
+    "code": 44,
+    "lat": "25.03428",
+    "lng": "-77.39628",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "BD",
+    "alpha3": "BGD",
+    "text": "Бангладеш",
+    "code": 50,
+    "lat": "23.684994",
+    "lng": "90.356331",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "BB",
+    "alpha3": "BRB",
+    "text": "Барбадос",
+    "code": 52,
+    "lat": "13.193887",
+    "lng": "-59.543198",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "BH",
+    "alpha3": "BHR",
+    "text": "Бахрейн",
+    "code": 48,
+    "lat": "25.930414",
+    "lng": "50.637772",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "BZ",
+    "alpha3": "BLZ",
+    "text": "Беліз",
+    "code": 84,
+    "lat": "17.189877",
+    "lng": "-88.49765",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "BE",
+    "alpha3": "BEL",
+    "text": "Бельгія",
+    "code": 56,
+    "lat": "50.503887",
+    "lng": "4.469936",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "BJ",
+    "alpha3": "BEN",
+    "text": "Бенін",
+    "code": 204,
+    "lat": "9.30769",
+    "lng": "2.315834",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "BM",
+    "alpha3": "BMU",
+    "text": "Бермудські острови",
+    "code": 60,
+    "lat": "32.321384",
+    "lng": "-64.75737",
+    "region": "Americas",
+    "sub_region": "Northern America"
+  },
+  {
+    "id": "BY",
+    "alpha3": "BLR",
+    "text": "Білорусь",
+    "code": 112,
+    "lat": "53.709807",
+    "lng": "27.953389",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "BG",
+    "alpha3": "BGR",
+    "text": "Болгарія",
+    "code": 100,
+    "lat": "42.733883",
+    "lng": "25.48583",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "BO",
+    "alpha3": "BOL",
+    "text": "Болівія",
+    "code": 68,
+    "lat": "-16.290154",
+    "lng": "-63.588653",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "BA",
+    "alpha3": "BIH",
+    "text": "Боснія і Герцоговина",
+    "code": 70,
+    "lat": "43.915886",
+    "lng": "17.679076",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "BW",
+    "alpha3": "BWA",
+    "text": "Ботсвана",
+    "code": 72,
+    "lat": "-22.328474",
+    "lng": "24.684866",
+    "region": "Africa",
+    "sub_region": "Southern Africa"
+  },
+  {
+    "id": "BR",
+    "alpha3": "BRA",
+    "text": "Бразилія",
+    "code": 76,
+    "lat": "-14.235004",
+    "lng": "-51.92528",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "IO",
+    "alpha3": "IOT",
+    "text": "Британська територія в Індійському океані",
+    "code": 86,
+    "lat": "-6.343194",
+    "lng": "71.876519",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "VG",
+    "alpha3": "VGB",
+    "text": "Британські Віргінські острови",
+    "code": 92,
+    "lat": "18.420695",
+    "lng": "-64.639968",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "BN",
+    "alpha3": "BRN",
+    "text": "Бруней",
+    "code": 96,
+    "lat": "4.535277",
+    "lng": "114.727669",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "BF",
+    "alpha3": "BFA",
+    "text": "Буркіна-Фасо",
+    "code": 854,
+    "lat": "12.238333",
+    "lng": "-1.561593",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "BI",
+    "alpha3": "BDI",
+    "text": "Бурунді",
+    "code": 108,
+    "lat": "-3.373056",
+    "lng": "29.918886",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "BT",
+    "alpha3": "BTN",
+    "text": "Бутан",
+    "code": 64,
+    "lat": "27.514162",
+    "lng": "90.433601",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "VU",
+    "alpha3": "VUT",
+    "text": "Вануату",
+    "code": 548,
+    "lat": "-15.376706",
+    "lng": "166.959158",
+    "region": "Oceania",
+    "sub_region": "Melanesia"
+  },
+  {
+    "id": "VA",
+    "alpha3": "VAT",
+    "text": "Ватикан",
+    "code": 336,
+    "lat": "41.902916",
+    "lng": "12.453389",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "GB",
+    "alpha3": "GBR",
+    "text": "Велика Британія",
+    "code": 826,
+    "lat": "55.378051",
+    "lng": "-3.435973",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "VE",
+    "alpha3": "VEN",
+    "text": "Венесуела",
+    "code": 862,
+    "lat": "6.42375",
+    "lng": "-66.58973",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "VN",
+    "alpha3": "VNM",
+    "text": "Вʼєтнам",
+    "code": 704,
+    "lat": "14.058324",
+    "lng": "108.277199",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "VI",
+    "alpha3": "VIR",
+    "text": "Віргінські острови, США",
+    "code": 850,
+    "lat": "18.335765",
+    "lng": "-64.896335",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "AM",
+    "alpha3": "ARM",
+    "text": "Вірменія",
+    "code": 51,
+    "lat": "40.069099",
+    "lng": "45.038189",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "WF",
+    "alpha3": "WLF",
+    "text": "Волліс і Футуна",
+    "code": 876,
+    "lat": "-13.768752",
+    "lng": "-177.156097",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "GA",
+    "alpha3": "GAB",
+    "text": "Габон",
+    "code": 266,
+    "lat": "-0.803689",
+    "lng": "11.609444",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "HT",
+    "alpha3": "HTI",
+    "text": "Гаїті",
+    "code": 332,
+    "lat": "18.971187",
+    "lng": "-72.285215",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "GM",
+    "alpha3": "GMB",
+    "text": "Гамбія",
+    "code": 270,
+    "lat": "13.443182",
+    "lng": "-15.310139",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "GH",
+    "alpha3": "GHA",
+    "text": "Гана",
+    "code": 288,
+    "lat": "7.946527",
+    "lng": "-1.023194",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "GY",
+    "alpha3": "GUY",
+    "text": "Гаяна (Гайана)",
+    "code": 328,
+    "lat": "4.860416",
+    "lng": "-58.93018",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "GP",
+    "alpha3": "GLP",
+    "text": "Гваделупа",
+    "code": 312,
+    "lat": "16.995971",
+    "lng": "-62.067641",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "GT",
+    "alpha3": "GTM",
+    "text": "Гватемала",
+    "code": 320,
+    "lat": "15.783471",
+    "lng": "-90.230759",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "GN",
+    "alpha3": "GIN",
+    "text": "Гвінея",
+    "code": 324,
+    "lat": "9.945587",
+    "lng": "-9.696645",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "GW",
+    "alpha3": "GNB",
+    "text": "Гвінея-Бісау",
+    "code": 624,
+    "lat": "11.803749",
+    "lng": "-15.180413",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "GG",
+    "alpha3": "GGY",
+    "text": "Гернсі",
+    "code": 831,
+    "lat": "49.465691",
+    "lng": "-2.585278",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "GI",
+    "alpha3": "GIB",
+    "text": "Гібралтар",
+    "code": 292,
+    "lat": "36.137741",
+    "lng": "-5.345374",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "HN",
+    "alpha3": "HND",
+    "text": "Гондурас",
+    "code": 340,
+    "lat": "15.199999",
+    "lng": "-86.241905",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "HK",
+    "alpha3": "HKG",
+    "text": "Гонконг, О.А.Р. Китаю",
+    "code": 344,
+    "lat": "22.396428",
+    "lng": "114.109497",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  },
+  {
+    "id": "GD",
+    "alpha3": "GRD",
+    "text": "Гренада",
+    "code": 308,
+    "lat": "12.262776",
+    "lng": "-61.604171",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "GL",
+    "alpha3": "GRL",
+    "text": "Гренландія",
+    "code": 304,
+    "lat": "71.706936",
+    "lng": "-42.604303",
+    "region": "Americas",
+    "sub_region": "Northern America"
+  },
+  {
+    "id": "GR",
+    "alpha3": "GRC",
+    "text": "Греція",
+    "code": 300,
+    "lat": "39.074208",
+    "lng": "21.824312",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "GE",
+    "alpha3": "GEO",
+    "text": "Грузія",
+    "code": 268,
+    "lat": "42.315407",
+    "lng": "43.356892",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "GU",
+    "alpha3": "GUM",
+    "text": "Гуам",
+    "code": 316,
+    "lat": "13.444304",
+    "lng": "144.793731",
+    "region": "Oceania",
+    "sub_region": "Micronesia"
+  },
+  {
+    "id": "DK",
+    "alpha3": "DNK",
+    "text": "Данія",
+    "code": 208,
+    "lat": "56.26392",
+    "lng": "9.501785",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "JE",
+    "alpha3": "JEY",
+    "text": "Джерсі",
+    "code": 832,
+    "lat": "49.214439",
+    "lng": "-2.13125",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "DJ",
+    "alpha3": "DJI",
+    "text": "Джибуті",
+    "code": 262,
+    "lat": "11.825138",
+    "lng": "42.590275",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "DG",
+    "alpha3": "DGI",
+    "text": "Дієго-Гарсія",
+    "code": null,
+    "lat": "''",
+    "lng": "''",
+    "region": "",
+    "sub_region": ""
+  },
+  {
+    "id": "DM",
+    "alpha3": "DMA",
+    "text": "Домініка",
+    "code": 212,
+    "lat": "15.414999",
+    "lng": "-61.370976",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "DO",
+    "alpha3": "DOM",
+    "text": "Домініканська Республіка",
+    "code": 214,
+    "lat": "18.735693",
+    "lng": "-70.162651",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "CD",
+    "alpha3": "COD",
+    "text": "ДР Конго – Кіншаса",
+    "code": 180,
+    "lat": "-4.038333",
+    "lng": "21.758664",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "EC",
+    "alpha3": "ECU",
+    "text": "Еквадор",
+    "code": 218,
+    "lat": "-1.831239",
+    "lng": "-78.183406",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "GQ",
+    "alpha3": "GNQ",
+    "text": "Екваторіальна Гвінея",
+    "code": 226,
+    "lat": "1.650801",
+    "lng": "10.267895",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "ER",
+    "alpha3": "ERI",
+    "text": "Еритрея",
+    "code": 232,
+    "lat": "15.179384",
+    "lng": "39.782334",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "EE",
+    "alpha3": "EST",
+    "text": "Естонія",
+    "code": 233,
+    "lat": "58.595272",
+    "lng": "25.013607",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "ET",
+    "alpha3": "ETH",
+    "text": "Ефіопія",
+    "code": 231,
+    "lat": "9.145",
+    "lng": "40.489673",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "EG",
+    "alpha3": "EGY",
+    "text": "Єгипет",
+    "code": 818,
+    "lat": "26.820553",
+    "lng": "30.802498",
+    "region": "Africa",
+    "sub_region": "Northern Africa"
+  },
+  {
+    "id": "YE",
+    "alpha3": "YEM",
+    "text": "Ємен",
+    "code": 887,
+    "lat": "15.552727",
+    "lng": "48.516388",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "ZM",
+    "alpha3": "ZMB",
+    "text": "Замбія",
+    "code": 894,
+    "lat": "-13.133897",
+    "lng": "27.849332",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "EH",
+    "alpha3": "ESH",
+    "text": "Західна Сахара",
+    "code": 732,
+    "lat": "24.215527",
+    "lng": "-12.885834",
+    "region": "Africa",
+    "sub_region": "Northern Africa"
+  },
+  {
+    "id": "ZW",
+    "alpha3": "ZWE",
+    "text": "Зімбабве",
+    "code": 716,
+    "lat": "-19.015438",
+    "lng": "29.154857",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "UM",
+    "alpha3": "UMI",
+    "text": "Зовнішні віддалені острови США",
+    "code": 581,
+    "lat": "\\'\\'",
+    "lng": "\\'\\'",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "IL",
+    "alpha3": "ISR",
+    "text": "Ізраїль",
+    "code": 376,
+    "lat": "31.046051",
+    "lng": "34.851612",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "IN",
+    "alpha3": "IND",
+    "text": "Індія",
+    "code": 356,
+    "lat": "20.593684",
+    "lng": "78.96288",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "ID",
+    "alpha3": "IDN",
+    "text": "Індонезія",
+    "code": 360,
+    "lat": "-0.789275",
+    "lng": "113.921327",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "IQ",
+    "alpha3": "IRQ",
+    "text": "Ірак",
+    "code": 368,
+    "lat": "33.223191",
+    "lng": "43.679291",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "IR",
+    "alpha3": "IRN",
+    "text": "Іран",
+    "code": 364,
+    "lat": "32.427908",
+    "lng": "53.688046",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "IE",
+    "alpha3": "IRL",
+    "text": "Ірландія",
+    "code": 372,
+    "lat": "53.41291",
+    "lng": "-8.24389",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "IS",
+    "alpha3": "ISL",
+    "text": "Ісландія",
+    "code": 352,
+    "lat": "64.963051",
+    "lng": "-19.020835",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "ES",
+    "alpha3": "ESP",
+    "text": "Іспанія",
+    "code": 724,
+    "lat": "40.463667",
+    "lng": "-3.74922",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "IT",
+    "alpha3": "ITA",
+    "text": "Італія",
+    "code": 380,
+    "lat": "41.87194",
+    "lng": "12.56738",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "JO",
+    "alpha3": "JOR",
+    "text": "Йорданія",
+    "code": 400,
+    "lat": "30.585164",
+    "lng": "36.238414",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "CV",
+    "alpha3": "CPV",
+    "text": "Кабо Верде (Кабо-Верде)",
+    "code": 132,
+    "lat": "16.002082",
+    "lng": "-24.013197",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "KZ",
+    "alpha3": "KAZ",
+    "text": "Казахстан",
+    "code": 398,
+    "lat": "48.019573",
+    "lng": "66.923684",
+    "region": "Asia",
+    "sub_region": "Central Asia"
+  },
+  {
+    "id": "KY",
+    "alpha3": "CYM",
+    "text": "Кайманові острови",
+    "code": 136,
+    "lat": "19.513469",
+    "lng": "-80.566956",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "KH",
+    "alpha3": "KHM",
+    "text": "Камбоджа",
+    "code": 116,
+    "lat": "12.565679",
+    "lng": "104.990963",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "CM",
+    "alpha3": "CMR",
+    "text": "Камерун",
+    "code": 120,
+    "lat": "7.369722",
+    "lng": "12.354722",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "CA",
+    "alpha3": "CAN",
+    "text": "Канада",
+    "code": 124,
+    "lat": "56.130366",
+    "lng": "-106.346771",
+    "region": "Americas",
+    "sub_region": "Northern America"
+  },
+  {
+    "id": "IC",
+    "alpha3": "ES-CN",
+    "text": "Канарські острови",
+    "code": null,
+    "lat": "''",
+    "lng": "''",
+    "region": "",
+    "sub_region": ""
+  },
+  {
+    "id": "QA",
+    "alpha3": "QAT",
+    "text": "Катар",
+    "code": 634,
+    "lat": "25.354826",
+    "lng": "51.183884",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "KE",
+    "alpha3": "KEN",
+    "text": "Кенія",
+    "code": 404,
+    "lat": "-0.023559",
+    "lng": "37.906193",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "KG",
+    "alpha3": "KGZ",
+    "text": "Киргизстан",
+    "code": 417,
+    "lat": "41.20438",
+    "lng": "74.766098",
+    "region": "Asia",
+    "sub_region": "Central Asia"
+  },
+  {
+    "id": "CN",
+    "alpha3": "CHN",
+    "text": "Китай (КНР)",
+    "code": 156,
+    "lat": "35.86166",
+    "lng": "104.195397",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  },
+  {
+    "id": "CY",
+    "alpha3": "CYP",
+    "text": "Кіпр",
+    "code": 196,
+    "lat": "35.126413",
+    "lng": "33.429859",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "KI",
+    "alpha3": "KIR",
+    "text": "Кірибаті",
+    "code": 296,
+    "lat": "-3.370417",
+    "lng": "-168.734039",
+    "region": "Oceania",
+    "sub_region": "Micronesia"
+  },
+  {
+    "id": "CC",
+    "alpha3": "CCK",
+    "text": "Кокосові острови (Кілінг)",
+    "code": 166,
+    "lat": "-12.164165",
+    "lng": "96.870956",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "CO",
+    "alpha3": "COL",
+    "text": "Колумбія",
+    "code": 170,
+    "lat": "4.570868",
+    "lng": "-74.297333",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "KM",
+    "alpha3": "COM",
+    "text": "Коморські острови",
+    "code": 174,
+    "lat": "-11.875001",
+    "lng": "43.872219",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "CG",
+    "alpha3": "COG",
+    "text": "Конго – Браззавіль",
+    "code": 178,
+    "lat": "-0.228021",
+    "lng": "15.827659",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "XK",
+    "alpha3": "XKK",
+    "text": "Косово",
+    "code": null,
+    "lat": "42.602636",
+    "lng": "20.902977",
+    "region": "",
+    "sub_region": ""
+  },
+  {
+    "id": "CR",
+    "alpha3": "CRI",
+    "text": "Коста-Рика",
+    "code": 188,
+    "lat": "9.748917",
+    "lng": "-83.753428",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "CI",
+    "alpha3": "CIV",
+    "text": "Кот-д’Івуар",
+    "code": 384,
+    "lat": "7.539989",
+    "lng": "-5.54708",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "CU",
+    "alpha3": "CUB",
+    "text": "Куба",
+    "code": 192,
+    "lat": "21.521757",
+    "lng": "-77.781167",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "KW",
+    "alpha3": "KWT",
+    "text": "Кувейт",
+    "code": 414,
+    "lat": "29.31166",
+    "lng": "47.481766",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "CW",
+    "alpha3": "CUW",
+    "text": "Кюрасао",
+    "code": 531,
+    "lat": "''",
+    "lng": "''",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "LA",
+    "alpha3": "LAO",
+    "text": "Лаос",
+    "code": 418,
+    "lat": "19.85627",
+    "lng": "102.495496",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "LV",
+    "alpha3": "LVA",
+    "text": "Латвія",
+    "code": 428,
+    "lat": "56.879635",
+    "lng": "24.603189",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "LS",
+    "alpha3": "LSO",
+    "text": "Лесото",
+    "code": 426,
+    "lat": "-29.609988",
+    "lng": "28.233608",
+    "region": "Africa",
+    "sub_region": "Southern Africa"
+  },
+  {
+    "id": "LT",
+    "alpha3": "LTU",
+    "text": "Литва",
+    "code": 440,
+    "lat": "55.169438",
+    "lng": "23.881275",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "LR",
+    "alpha3": "LBR",
+    "text": "Ліберія",
+    "code": 430,
+    "lat": "6.428055",
+    "lng": "-9.429499",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "LB",
+    "alpha3": "LBN",
+    "text": "Ліван",
+    "code": 422,
+    "lat": "33.854721",
+    "lng": "35.862285",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "LY",
+    "alpha3": "LBY",
+    "text": "Лівія",
+    "code": 434,
+    "lat": "26.3351",
+    "lng": "17.228331",
+    "region": "Africa",
+    "sub_region": "Northern Africa"
+  },
+  {
+    "id": "LI",
+    "alpha3": "LIE",
+    "text": "Ліхтенштейн",
+    "code": 438,
+    "lat": "47.166",
+    "lng": "9.555373",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "LU",
+    "alpha3": "LUX",
+    "text": "Люксембург",
+    "code": 442,
+    "lat": "49.815273",
+    "lng": "6.129583",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "MU",
+    "alpha3": "MUS",
+    "text": "Маврикій",
+    "code": 480,
+    "lat": "-20.348404",
+    "lng": "57.552152",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "MR",
+    "alpha3": "MRT",
+    "text": "Мавританія",
+    "code": 478,
+    "lat": "21.00789",
+    "lng": "-10.940835",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "MG",
+    "alpha3": "MDG",
+    "text": "Мадагаскар",
+    "code": 450,
+    "lat": "-18.766947",
+    "lng": "46.869107",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "YT",
+    "alpha3": "MYT",
+    "text": "Майотта",
+    "code": 175,
+    "lat": "-12.8275",
+    "lng": "45.166244",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "MO",
+    "alpha3": "MAC",
+    "text": "Макао О.А.Р. Китаю",
+    "code": 446,
+    "lat": "22.198745",
+    "lng": "113.543873",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  },
+  {
+    "id": "MW",
+    "alpha3": "MWI",
+    "text": "Малаві",
+    "code": 454,
+    "lat": "-13.254308",
+    "lng": "34.301525",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "MY",
+    "alpha3": "MYS",
+    "text": "Малайзія",
+    "code": 458,
+    "lat": "4.210484",
+    "lng": "101.975766",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "ML",
+    "alpha3": "MLI",
+    "text": "Малі",
+    "code": 466,
+    "lat": "17.570692",
+    "lng": "-3.996166",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "MV",
+    "alpha3": "MDV",
+    "text": "Мальдіви",
+    "code": 462,
+    "lat": "3.202778",
+    "lng": "73.22068",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "MT",
+    "alpha3": "MLT",
+    "text": "Мальта",
+    "code": 470,
+    "lat": "35.937496",
+    "lng": "14.375416",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "MA",
+    "alpha3": "MAR",
+    "text": "Марокко",
+    "code": 504,
+    "lat": "31.791702",
+    "lng": "-7.09262",
+    "region": "Africa",
+    "sub_region": "Northern Africa"
+  },
+  {
+    "id": "MQ",
+    "alpha3": "MTQ",
+    "text": "Мартиніка",
+    "code": 474,
+    "lat": "14.641528",
+    "lng": "-61.024174",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "MH",
+    "alpha3": "MHL",
+    "text": "Маршаллові Острови",
+    "code": 584,
+    "lat": "7.131474",
+    "lng": "171.184478",
+    "region": "Oceania",
+    "sub_region": "Micronesia"
+  },
+  {
+    "id": "MX",
+    "alpha3": "MEX",
+    "text": "Мексика",
+    "code": 484,
+    "lat": "23.634501",
+    "lng": "-102.552784",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "FM",
+    "alpha3": "FSM",
+    "text": "Мікронезія (Федеративні Штати Мікронезії)",
+    "code": 583,
+    "lat": "7.425554",
+    "lng": "150.550812",
+    "region": "Oceania",
+    "sub_region": "Micronesia"
+  },
+  {
+    "id": "MZ",
+    "alpha3": "MOZ",
+    "text": "Мозамбік",
+    "code": 508,
+    "lat": "-18.665695",
+    "lng": "35.529562",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "MD",
+    "alpha3": "MDA",
+    "text": "Молдова",
+    "code": 498,
+    "lat": "47.411631",
+    "lng": "28.369885",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "MC",
+    "alpha3": "MCO",
+    "text": "Монако",
+    "code": 492,
+    "lat": "43.750298",
+    "lng": "7.412841",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "MN",
+    "alpha3": "MNG",
+    "text": "Монголія",
+    "code": 496,
+    "lat": "46.862496",
+    "lng": "103.846656",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  },
+  {
+    "id": "MS",
+    "alpha3": "MSR",
+    "text": "Монтсеррат",
+    "code": 500,
+    "lat": "16.742498",
+    "lng": "-62.187366",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "MM",
+    "alpha3": "MMR",
+    "text": "Мʼянма (Бірма)",
+    "code": 104,
+    "lat": "21.913965",
+    "lng": "95.956223",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "NA",
+    "alpha3": "NAM",
+    "text": "Намібія",
+    "code": 516,
+    "lat": "-22.95764",
+    "lng": "18.49041",
+    "region": "Africa",
+    "sub_region": "Southern Africa"
+  },
+  {
+    "id": "NR",
+    "alpha3": "NRU",
+    "text": "Науру",
+    "code": 520,
+    "lat": "-0.522778",
+    "lng": "166.931503",
+    "region": "Oceania",
+    "sub_region": "Micronesia"
+  },
+  {
+    "id": "NP",
+    "alpha3": "NPL",
+    "text": "Непал",
+    "code": 524,
+    "lat": "28.394857",
+    "lng": "84.124008",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "NE",
+    "alpha3": "NER",
+    "text": "Нігер",
+    "code": 562,
+    "lat": "17.607789",
+    "lng": "8.081666",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "NG",
+    "alpha3": "NGA",
+    "text": "Нігерія",
+    "code": 566,
+    "lat": "9.081999",
+    "lng": "8.675277",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "NL",
+    "alpha3": "NLD",
+    "text": "Нідерланди",
+    "code": 528,
+    "lat": "52.132633",
+    "lng": "5.291266",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "AN",
+    "alpha3": "ANT",
+    "text": "Нідерландські Антильські острови",
+    "code": 530,
+    "lat": "12.226079",
+    "lng": "-69.060087",
+    "region": "",
+    "sub_region": ""
+  },
+  {
+    "id": "BQ",
+    "alpha3": "BES",
+    "text": "Нідерландські Карибські острови",
+    "code": 535,
+    "lat": "''",
+    "lng": "''",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "NI",
+    "alpha3": "NIC",
+    "text": "Нікарагуа",
+    "code": 558,
+    "lat": "12.865416",
+    "lng": "-85.207229",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "DE",
+    "alpha3": "DEU",
+    "text": "Німеччина",
+    "code": 276,
+    "lat": "51.165691",
+    "lng": "10.451526",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "NU",
+    "alpha3": "NIU",
+    "text": "Ніуе",
+    "code": 570,
+    "lat": "-19.054445",
+    "lng": "-169.867233",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "NZ",
+    "alpha3": "NZL",
+    "text": "Нова Зеландія",
+    "code": 554,
+    "lat": "-40.900557",
+    "lng": "174.885971",
+    "region": "Oceania",
+    "sub_region": "Australia and New Zealand"
+  },
+  {
+    "id": "NC",
+    "alpha3": "NCL",
+    "text": "Нова Каледонія",
+    "code": 540,
+    "lat": "-20.904305",
+    "lng": "165.618042",
+    "region": "Oceania",
+    "sub_region": "Melanesia"
+  },
+  {
+    "id": "NO",
+    "alpha3": "NOR",
+    "text": "Норвегія",
+    "code": 578,
+    "lat": "60.472024",
+    "lng": "8.468946",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "AE",
+    "alpha3": "ARE",
+    "text": "Обʼєднані Арабські Емірати (ОАЕ)",
+    "code": 784,
+    "lat": "23.424076",
+    "lng": "53.847818",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "OM",
+    "alpha3": "OMN",
+    "text": "Оман",
+    "code": 512,
+    "lat": "21.512583",
+    "lng": "55.923255",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "BV",
+    "alpha3": "BVT",
+    "text": "Острів Буве",
+    "code": 74,
+    "lat": "-54.423199",
+    "lng": "3.413194",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "IM",
+    "alpha3": "IMN",
+    "text": "Острів Мен",
+    "code": 833,
+    "lat": "54.236107",
+    "lng": "-4.548056",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "NF",
+    "alpha3": "NFK",
+    "text": "Острів Норфолк",
+    "code": 574,
+    "lat": "-29.040835",
+    "lng": "167.954712",
+    "region": "Oceania",
+    "sub_region": "Australia and New Zealand"
+  },
+  {
+    "id": "CX",
+    "alpha3": "CXR",
+    "text": "Острів Різдва",
+    "code": 162,
+    "lat": "-10.447525",
+    "lng": "105.690449",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "SH",
+    "alpha3": "SHE",
+    "text": "Острів Святої Єлени",
+    "code": null,
+    "lat": "-24.143474",
+    "lng": "-10.030696",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "HM",
+    "alpha3": "HMD",
+    "text": "Острів Херд і острови Макдональд",
+    "code": 334,
+    "lat": "-53.08181",
+    "lng": "73.504158",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "CK",
+    "alpha3": "COK",
+    "text": "Острови Кука",
+    "code": 184,
+    "lat": "-21.236736",
+    "lng": "-159.777671",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "PN",
+    "alpha3": "PCN",
+    "text": "Острови Піткерн",
+    "code": 612,
+    "lat": "-24.703615",
+    "lng": "-127.439308",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "SJ",
+    "alpha3": "SJM",
+    "text": "Острови Свальбард і Ян-Маєн",
+    "code": 744,
+    "lat": "77.553604",
+    "lng": "23.670272",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "AC",
+    "alpha3": "SHN",
+    "text": "Острови Святої Єлени, Вознесіння і Тристан-да-Кунья",
+    "code": 654,
+    "lat": "''",
+    "lng": "''",
+    "region": "",
+    "sub_region": ""
+  },
+  {
+    "id": "TC",
+    "alpha3": "TCA",
+    "text": "Острови Теркс і Кайкос",
+    "code": 796,
+    "lat": "21.694025",
+    "lng": "-71.797928",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "PK",
+    "alpha3": "PAK",
+    "text": "Пакистан",
+    "code": 586,
+    "lat": "30.375321",
+    "lng": "69.345116",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "PW",
+    "alpha3": "PLW",
+    "text": "Палау",
+    "code": 585,
+    "lat": "7.51498",
+    "lng": "134.58252",
+    "region": "Oceania",
+    "sub_region": "Micronesia"
+  },
+  {
+    "id": "PS",
+    "alpha3": "PSE",
+    "text": "Палестинські території (Палестинська держава)",
+    "code": 275,
+    "lat": "31.952162",
+    "lng": "35.233154",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "PA",
+    "alpha3": "PAN",
+    "text": "Панама",
+    "code": 591,
+    "lat": "8.537981",
+    "lng": "-80.782127",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "PG",
+    "alpha3": "PNG",
+    "text": "Папуа Нова Гвінея",
+    "code": 598,
+    "lat": "-6.314993",
+    "lng": "143.95555",
+    "region": "Oceania",
+    "sub_region": "Melanesia"
+  },
+  {
+    "id": "ZA",
+    "alpha3": "ZAF",
+    "text": "ПАР",
+    "code": 710,
+    "lat": "-30.559482",
+    "lng": "22.937506",
+    "region": "Africa",
+    "sub_region": "Southern Africa"
+  },
+  {
+    "id": "PY",
+    "alpha3": "PRY",
+    "text": "Парагвай",
+    "code": 600,
+    "lat": "-23.442503",
+    "lng": "-58.443832",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "PE",
+    "alpha3": "PER",
+    "text": "Перу",
+    "code": 604,
+    "lat": "-9.189967",
+    "lng": "-75.015152",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "GS",
+    "alpha3": "SGS",
+    "text": "Південна Джорджія та Південні Сандвічеві острови",
+    "code": 239,
+    "lat": "-54.429579",
+    "lng": "-36.587909",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "KR",
+    "alpha3": "KOR",
+    "text": "Південна Корея",
+    "code": 410,
+    "lat": "35.907757",
+    "lng": "127.766922",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  },
+  {
+    "id": "SS",
+    "alpha3": "SSD",
+    "text": "Південний Судан",
+    "code": 728,
+    "lat": "''",
+    "lng": "''",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "KP",
+    "alpha3": "PRK",
+    "text": "Північна Корея",
+    "code": 408,
+    "lat": "40.339852",
+    "lng": "127.510093",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  },
+  {
+    "id": "MP",
+    "alpha3": "MNP",
+    "text": "Північні Маріанські острови",
+    "code": 580,
+    "lat": "17.33083",
+    "lng": "145.38469",
+    "region": "Oceania",
+    "sub_region": "Micronesia"
+  },
+  {
+    "id": "PL",
+    "alpha3": "POL",
+    "text": "Польща",
+    "code": 616,
+    "lat": "51.919438",
+    "lng": "19.145136",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "PT",
+    "alpha3": "PRT",
+    "text": "Португалія",
+    "code": 620,
+    "lat": "39.399872",
+    "lng": "-8.224454",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "PR",
+    "alpha3": "PRI",
+    "text": "Пуерто-Рико",
+    "code": 630,
+    "lat": "18.220833",
+    "lng": "-66.590149",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "MK",
+    "alpha3": "MKD",
+    "text": "Республіка Македонія",
+    "code": 807,
+    "lat": "41.608635",
+    "lng": "21.745275",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "RE",
+    "alpha3": "REU",
+    "text": "Реюньйон",
+    "code": 638,
+    "lat": "-21.115141",
+    "lng": "55.536384",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "RU",
+    "alpha3": "RUS",
+    "text": "Росія",
+    "code": 643,
+    "lat": "61.52401",
+    "lng": "105.318756",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "RW",
+    "alpha3": "RWA",
+    "text": "Руанда",
+    "code": 646,
+    "lat": "-1.940278",
+    "lng": "29.873888",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "RO",
+    "alpha3": "ROU",
+    "text": "Румунія",
+    "code": 642,
+    "lat": "45.943161",
+    "lng": "24.96676",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "SV",
+    "alpha3": "SLV",
+    "text": "Сальвадор",
+    "code": 222,
+    "lat": "13.794185",
+    "lng": "-88.89653",
+    "region": "Americas",
+    "sub_region": "Central America"
+  },
+  {
+    "id": "WS",
+    "alpha3": "WSM",
+    "text": "Самоа",
+    "code": 882,
+    "lat": "-13.759029",
+    "lng": "-172.104629",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "SM",
+    "alpha3": "SMR",
+    "text": "Сан-Марино",
+    "code": 674,
+    "lat": "43.94236",
+    "lng": "12.457777",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "ST",
+    "alpha3": "STP",
+    "text": "Сан-Томе і Прінсіпі",
+    "code": 678,
+    "lat": "0.18636",
+    "lng": "6.613081",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "SA",
+    "alpha3": "SAU",
+    "text": "Саудівська Аравія",
+    "code": 682,
+    "lat": "23.885942",
+    "lng": "45.079162",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "SZ",
+    "alpha3": "SWZ",
+    "text": "Свазіленд",
+    "code": 748,
+    "lat": "-26.522503",
+    "lng": "31.465866",
+    "region": "Africa",
+    "sub_region": "Southern Africa"
+  },
+  {
+    "id": "SC",
+    "alpha3": "SYC",
+    "text": "Сейшельські острови",
+    "code": 690,
+    "lat": "-4.679574",
+    "lng": "55.491977",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "BL",
+    "alpha3": "BLM",
+    "text": "Сен-Бартельмі",
+    "code": 652,
+    "lat": "''",
+    "lng": "''",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "SN",
+    "alpha3": "SEN",
+    "text": "Сенегал",
+    "code": 686,
+    "lat": "14.497401",
+    "lng": "-14.452362",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "MF",
+    "alpha3": "MAF",
+    "text": "Сен-Мартен",
+    "code": 663,
+    "lat": "''",
+    "lng": "''",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "PM",
+    "alpha3": "SPM",
+    "text": "Сен-Пʼєр і Мікелон",
+    "code": 666,
+    "lat": "46.941936",
+    "lng": "-56.27111",
+    "region": "Americas",
+    "sub_region": "Northern America"
+  },
+  {
+    "id": "VC",
+    "alpha3": "VCT",
+    "text": "Сент-Вінсент і Гренадини",
+    "code": 670,
+    "lat": "12.984305",
+    "lng": "-61.287228",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "KN",
+    "alpha3": "KNA",
+    "text": "Сент-Кіттс і Невіс",
+    "code": 659,
+    "lat": "17.357822",
+    "lng": "-62.782998",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "LC",
+    "alpha3": "LCA",
+    "text": "Сент-Люсія",
+    "code": 662,
+    "lat": "13.909444",
+    "lng": "-60.978893",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "RS",
+    "alpha3": "SRB",
+    "text": "Сербія",
+    "code": 688,
+    "lat": "44.016521",
+    "lng": "21.005859",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "EA",
+    "alpha3": "ES-CE",
+    "text": "Сеута і Мелілья",
+    "code": null,
+    "lat": "''",
+    "lng": "''",
+    "region": "",
+    "sub_region": ""
+  },
+  {
+    "id": "SY",
+    "alpha3": "SYR",
+    "text": "Сирія",
+    "code": 760,
+    "lat": "34.802075",
+    "lng": "38.996815",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "SG",
+    "alpha3": "SGP",
+    "text": "Сінгапур",
+    "code": 702,
+    "lat": "1.352083",
+    "lng": "103.819836",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "SX",
+    "alpha3": "SXM",
+    "text": "Сінт-Мартен",
+    "code": 534,
+    "lat": "''",
+    "lng": "''",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "SK",
+    "alpha3": "SVK",
+    "text": "Словаччина",
+    "code": 703,
+    "lat": "48.669026",
+    "lng": "19.699024",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "SI",
+    "alpha3": "SVN",
+    "text": "Словенія",
+    "code": 705,
+    "lat": "46.151241",
+    "lng": "14.995463",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "SB",
+    "alpha3": "SLB",
+    "text": "Соломонові Острови",
+    "code": 90,
+    "lat": "-9.64571",
+    "lng": "160.156194",
+    "region": "Oceania",
+    "sub_region": "Melanesia"
+  },
+  {
+    "id": "SO",
+    "alpha3": "SOM",
+    "text": "Сомалі",
+    "code": 706,
+    "lat": "5.152149",
+    "lng": "46.199616",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "SD",
+    "alpha3": "SDN",
+    "text": "Судан",
+    "code": 729,
+    "lat": "12.862807",
+    "lng": "30.217636",
+    "region": "Africa",
+    "sub_region": "Northern Africa"
+  },
+  {
+    "id": "SR",
+    "alpha3": "SUR",
+    "text": "Суринам",
+    "code": 740,
+    "lat": "3.919305",
+    "lng": "-56.027783",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "TL",
+    "alpha3": "TLS",
+    "text": "Східний Тимор",
+    "code": 626,
+    "lat": "-8.874217",
+    "lng": "125.727539",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "US",
+    "alpha3": "USA",
+    "text": "США",
+    "code": 840,
+    "lat": "37.09024",
+    "lng": "-95.712891",
+    "region": "Americas",
+    "sub_region": "Northern America"
+  },
+  {
+    "id": "SL",
+    "alpha3": "SLE",
+    "text": "Сьєрра-Леоне",
+    "code": 694,
+    "lat": "8.460555",
+    "lng": "-11.779889",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "TJ",
+    "alpha3": "TJK",
+    "text": "Таджикистан",
+    "code": 762,
+    "lat": "38.861034",
+    "lng": "71.276093",
+    "region": "Asia",
+    "sub_region": "Central Asia"
+  },
+  {
+    "id": "TH",
+    "alpha3": "THA",
+    "text": "Таїланд",
+    "code": 764,
+    "lat": "15.870032",
+    "lng": "100.992541",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "TW",
+    "alpha3": "TWN",
+    "text": "Тайвань",
+    "code": 158,
+    "lat": "23.69781",
+    "lng": "120.960515",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  },
+  {
+    "id": "TZ",
+    "alpha3": "TZA",
+    "text": "Танзанія",
+    "code": 834,
+    "lat": "-6.369028",
+    "lng": "34.888822",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "TG",
+    "alpha3": "TGO",
+    "text": "Того",
+    "code": 768,
+    "lat": "8.619543",
+    "lng": "0.824782",
+    "region": "Africa",
+    "sub_region": "Western Africa"
+  },
+  {
+    "id": "TK",
+    "alpha3": "TKL",
+    "text": "Токелау",
+    "code": 772,
+    "lat": "-8.967363",
+    "lng": "-171.855881",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "TO",
+    "alpha3": "TON",
+    "text": "Тонга",
+    "code": 776,
+    "lat": "-21.178986",
+    "lng": "-175.198242",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "UL",
+    "alpha3": "TUL",
+    "text": "ТОТ АР Крим",
+    "code": 804,
+    "lat": "45.301488",
+    "lng": "34.156661",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "UD",
+    "alpha3": "TUD",
+    "text": "ТОТ Донецької області",
+    "code": 804,
+    "lat": "48.015321",
+    "lng": "37.799855",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "UC",
+    "alpha3": "TUC",
+    "text": "ТОТ Луганської області",
+    "code": 804,
+    "lat": "48.561635",
+    "lng": "39.293362",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "TT",
+    "alpha3": "TTO",
+    "text": "Тринідад і Тобаго",
+    "code": 780,
+    "lat": "10.691803",
+    "lng": "-61.222503",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "TA",
+    "alpha3": "TAK",
+    "text": "Трістан-да-Кунья",
+    "code": 290,
+    "lat": "''",
+    "lng": "''",
+    "region": "",
+    "sub_region": ""
+  },
+  {
+    "id": "TV",
+    "alpha3": "TUV",
+    "text": "Тувалу",
+    "code": 798,
+    "lat": "-7.109535",
+    "lng": "177.64933",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "TN",
+    "alpha3": "TUN",
+    "text": "Туніс",
+    "code": 788,
+    "lat": "33.886917",
+    "lng": "9.537499",
+    "region": "Africa",
+    "sub_region": "Northern Africa"
+  },
+  {
+    "id": "TR",
+    "alpha3": "TUR",
+    "text": "Туреччина",
+    "code": 792,
+    "lat": "38.963745",
+    "lng": "35.243322",
+    "region": "Asia",
+    "sub_region": "Western Asia"
+  },
+  {
+    "id": "TM",
+    "alpha3": "TKM",
+    "text": "Туркменістан",
+    "code": 795,
+    "lat": "38.969719",
+    "lng": "59.556278",
+    "region": "Asia",
+    "sub_region": "Central Asia"
+  },
+  {
+    "id": "UG",
+    "alpha3": "UGA",
+    "text": "Уганда",
+    "code": 800,
+    "lat": "1.373333",
+    "lng": "32.290275",
+    "region": "Africa",
+    "sub_region": "Eastern Africa"
+  },
+  {
+    "id": "HU",
+    "alpha3": "HUN",
+    "text": "Угорщина",
+    "code": 348,
+    "lat": "47.162494",
+    "lng": "19.503304",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "UZ",
+    "alpha3": "UZB",
+    "text": "Узбекистан",
+    "code": 860,
+    "lat": "41.377491",
+    "lng": "64.585262",
+    "region": "Asia",
+    "sub_region": "Central Asia"
+  },
+  {
+    "id": "UA",
+    "alpha3": "UKR",
+    "text": "Україна",
+    "code": 804,
+    "lat": "48.379433",
+    "lng": "31.16558",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "UY",
+    "alpha3": "URY",
+    "text": "Уругвай",
+    "code": 858,
+    "lat": "-32.522779",
+    "lng": "-55.765835",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "FO",
+    "alpha3": "FRO",
+    "text": "Фарерські острови",
+    "code": 234,
+    "lat": "61.892635",
+    "lng": "-6.911806",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "FJ",
+    "alpha3": "FJI",
+    "text": "Фіджі",
+    "code": 242,
+    "lat": "-16.578193",
+    "lng": "179.414413",
+    "region": "Oceania",
+    "sub_region": "Melanesia"
+  },
+  {
+    "id": "PH",
+    "alpha3": "PHL",
+    "text": "Філіппіни",
+    "code": 608,
+    "lat": "12.879721",
+    "lng": "121.774017",
+    "region": "Asia",
+    "sub_region": "South-Eastern Asia"
+  },
+  {
+    "id": "FI",
+    "alpha3": "FIN",
+    "text": "Фінляндія",
+    "code": 246,
+    "lat": "61.92411",
+    "lng": "25.748151",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "FK",
+    "alpha3": "FLK",
+    "text": "Фолклендські (Мальвінські) острови",
+    "code": 238,
+    "lat": "-51.796253",
+    "lng": "-59.523613",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "FR",
+    "alpha3": "FRA",
+    "text": "Франція",
+    "code": 250,
+    "lat": "46.227638",
+    "lng": "2.213749",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "GF",
+    "alpha3": "GUF",
+    "text": "Французька Гвіана",
+    "code": 254,
+    "lat": "3.933889",
+    "lng": "-53.125782",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "PF",
+    "alpha3": "PYF",
+    "text": "Французька Полінезія",
+    "code": 258,
+    "lat": "-17.679742",
+    "lng": "-149.406843",
+    "region": "Oceania",
+    "sub_region": "Polynesia"
+  },
+  {
+    "id": "TF",
+    "alpha3": "ATF",
+    "text": "Французькі Південні і Антарктичні території",
+    "code": 260,
+    "lat": "-49.280366",
+    "lng": "69.348557",
+    "region": "''",
+    "sub_region": "''"
+  },
+  {
+    "id": "HR",
+    "alpha3": "HRV",
+    "text": "Хорватія",
+    "code": 191,
+    "lat": "45.1",
+    "lng": "15.2",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "CF",
+    "alpha3": "CAF",
+    "text": "Центральноафриканська Республіка",
+    "code": 140,
+    "lat": "6.611111",
+    "lng": "20.939444",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "TD",
+    "alpha3": "TCD",
+    "text": "Чад",
+    "code": 148,
+    "lat": "15.454166",
+    "lng": "18.732207",
+    "region": "Africa",
+    "sub_region": "Middle Africa"
+  },
+  {
+    "id": "CZ",
+    "alpha3": "CZE",
+    "text": "Чехія",
+    "code": 203,
+    "lat": "49.817492",
+    "lng": "15.472962",
+    "region": "Europe",
+    "sub_region": "Eastern Europe"
+  },
+  {
+    "id": "CL",
+    "alpha3": "CHL",
+    "text": "Чилі",
+    "code": 152,
+    "lat": "-35.675147",
+    "lng": "-71.542969",
+    "region": "Americas",
+    "sub_region": "South America"
+  },
+  {
+    "id": "ME",
+    "alpha3": "MNE",
+    "text": "Чорногорія",
+    "code": 499,
+    "lat": "42.708678",
+    "lng": "19.37439",
+    "region": "Europe",
+    "sub_region": "Southern Europe"
+  },
+  {
+    "id": "CH",
+    "alpha3": "CHE",
+    "text": "Швейцарія",
+    "code": 756,
+    "lat": "46.818188",
+    "lng": "8.227512",
+    "region": "Europe",
+    "sub_region": "Western Europe"
+  },
+  {
+    "id": "SE",
+    "alpha3": "SWE",
+    "text": "Швеція",
+    "code": 752,
+    "lat": "60.128161",
+    "lng": "18.643501",
+    "region": "Europe",
+    "sub_region": "Northern Europe"
+  },
+  {
+    "id": "LK",
+    "alpha3": "LKA",
+    "text": "Шрі-Ланка",
+    "code": 144,
+    "lat": "7.873054",
+    "lng": "80.771797",
+    "region": "Asia",
+    "sub_region": "Southern Asia"
+  },
+  {
+    "id": "JM",
+    "alpha3": "JAM",
+    "text": "Ямайка",
+    "code": 388,
+    "lat": "18.109581",
+    "lng": "-77.297508",
+    "region": "Americas",
+    "sub_region": "Caribbean"
+  },
+  {
+    "id": "JP",
+    "alpha3": "JPN",
+    "text": "Японія",
+    "code": 392,
+    "lat": "36.204824",
+    "lng": "138.252924",
+    "region": "Asia",
+    "sub_region": "Eastern Asia"
+  }
+]

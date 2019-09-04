@@ -15,7 +15,7 @@ namespace IIS.Core.Ontology
 
         public bool AcceptsScalar(object value)
         {
-            return value is int && ScalarTypeEnum == ScalarType.Integer
+            return (value is int || value is long) && ScalarTypeEnum == ScalarType.Integer
                 || value is bool && ScalarTypeEnum == ScalarType.Boolean
                 || value is decimal && ScalarTypeEnum == ScalarType.Decimal
                 || value is string && ScalarTypeEnum == ScalarType.String

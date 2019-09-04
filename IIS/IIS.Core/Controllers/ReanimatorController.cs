@@ -25,41 +25,45 @@ namespace IIS.Core.Controllers
         private readonly ILegacyOntologyProvider _legacyOntologyProvider;
         //private readonly QueueReanimator _reanimator;
         private OntologyContext _context;
+        private Seeder _seeder;
 
-        public ReanimatorController(ILegacyOntologyProvider legacyOntologyProvider, OntologyContext context)
+        public ReanimatorController(ILegacyOntologyProvider legacyOntologyProvider, Seeder seeder, OntologyContext context)
         {
             _legacyOntologyProvider = legacyOntologyProvider;
-            //_reanimator = reanimator;
+            _seeder = seeder;
             _context = context;
         }
 
         [HttpGet]
-        [Route("/api/data")]
-        public async Task<IActionResult> Data()
+        [Route("/api/clear")]
+        public async Task<IActionResult> Clear(CancellationToken cancellationToken)
         {
-            _context.Nodes.RemoveRange(_context.Nodes.ToArray());
-            _context.Attributes.RemoveRange(_context.Attributes.ToArray());
-            _context.Relations.RemoveRange(_context.Relations.ToArray());
-            _context.SaveChanges();
+            _context.Nodes.RemoveRange(await _context.Nodes.ToArrayAsync(cancellationToken));
+            _context.Attributes.RemoveRange(await _context.Attributes.ToArrayAsync(cancellationToken));
+            _context.Relations.RemoveRange(await _context.Relations.ToArrayAsync(cancellationToken));
+            await _context.SaveChangesAsync(cancellationToken);
 
-            //var person = _context.Types.Where(e => e.Name == "Person")
-            //    .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
-            //    .Include(e => e.OutgoingRelations).ThenInclude(e => e.TargetType)
-            //    .First();
-            //var nameRelationType = person.OutgoingRelations.First(e => e.Type.Name == "firstName");
-            //var nameType = nameRelationType.TargetType;
-            //var entity = new Node { Type = person, Id = System.Guid.NewGuid() };
-            //var attr = new Attribute { Node = new Node { Type = nameType, Id = System.Guid.NewGuid() }, Value = "Petro" };
-            //var nameRelation = new Relation
-            //{
-            //    Node = new Node { Type = nameRelationType.Type, Id = System.Guid.NewGuid() },
-            //    SourceNode = entity,
-            //    TargetNode = attr.Node
-            //};
-            //_context.AddRange(entity, attr, nameRelation);
-            //await _context.SaveChangesAsync();
+            return Ok("Database is empty now.");
+        }
 
-            return Ok();
+        [HttpGet]
+        [Route("/api/seed")]
+        public async Task<IActionResult> Seed(CancellationToken cancellationToken)
+        {
+            //if (_context.Nodes.Any()) return Ok("Cannot seed database because it is not empty. Clear db explicitly via /api/clear");
+
+            await _seeder.Seed(cancellationToken);
+
+            return Ok("Seeded");
+        }
+
+        [HttpGet]
+        [Route("/api/migrate")]
+        public async Task<IActionResult> Migrate(CancellationToken cancellationToken)
+        {
+            await _context.Database.MigrateAsync(cancellationToken);
+
+            return Ok("Migration has been applied.");
         }
 
         public async Task<IActionResult> Get()

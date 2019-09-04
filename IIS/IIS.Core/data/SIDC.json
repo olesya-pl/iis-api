@@ -1,0 +1,3462 @@
+[
+  {
+    "code":"G-C-B----------",
+    "name":"MOBILITY/ SURVIVABILITY"
+  },
+  {
+    "code":"G-C-BOAID------",
+    "name":"SCATTERABLE MINEFIELD WITH"
+  },
+  {
+    "code":"G-C-BOAIH------",
+    "name":"ANTIPERSONNEL (AP) MINEFIELD"
+  },
+  {
+    "code":"G-C-BOAIS------",
+    "name":"SCATTERABLE MINES"
+  },
+  {
+    "code":"G-C-BOAMC------",
+    "name":"ANTITANK MINE (ARROW SHOWS"
+  },
+  {
+    "code":"G-C-BOARE------",
+    "name":"ROADBLOCK WITH EXPLOSIVES,"
+  },
+  {
+    "code":"G-C-BOARS------",
+    "name":"ROADBLOCK WITH EXPLOSIVES,"
+  },
+  {
+    "code":"G-C-BOATD------",
+    "name":"ANTITANK OBSTACLES,"
+  },
+  {
+    "code":"G-C-BOAWB------",
+    "name":"DOUBLE STRAND CONCERTINA"
+  },
+  {
+    "code":"G-C-BOAWC------",
+    "name":"SINGLE CONCERTINA"
+  },
+  {
+    "code":"G-C-BOAWR------",
+    "name":"TRIPLE STRAND CONCERTINA"
+  },
+  {
+    "code":"G-C-BOAWS------",
+    "name":"SINGLE FENCE"
+  },
+  {
+    "code":"G-C-BS---------",
+    "name":"SURVIVABILITY"
+  },
+  {
+    "code":"G-C-BSE--------",
+    "name":"EARTHWORK, SMALL TRENCH OR"
+  },
+  {
+    "code":"G-C-BSH--------",
+    "name":"SURFACE SHELTER"
+  },
+  {
+    "code":"G-C-BSP--------",
+    "name":"STRONG POINT"
+  },
+  {
+    "code":"G-C-BSU--------",
+    "name":"UNDERGROUND SHELTER"
+  },
+  {
+    "code":"G-C-BSW--------",
+    "name":"FOXHOLE, EMPLACEMENT OR"
+  },
+  {
+    "code":"G-C-BWDA-------",
+    "name":"ALTERNATE DECON SITE/POINT"
+  },
+  {
+    "code":"G-C-BWDE-------",
+    "name":"DECON SITE/POINT (EQUIPMENT)"
+  },
+  {
+    "code":"G-C-BWDG-------",
+    "name":"DECON SITE/POINT (THOROUGH"
+  },
+  {
+    "code":"G-C-BWDO-------",
+    "name":"DECON SITE/POINT"
+  },
+  {
+    "code":"G-C-BWDP-------",
+    "name":"DECON SITE/POINT (UNSPECIFIED)"
+  },
+  {
+    "code":"G-C-BWDS-------",
+    "name":"DECON SITE/POINT (EQUIPMENT"
+  },
+  {
+    "code":"G-C-BWDT-------",
+    "name":"DECON SITE/POINT (TROOPS)"
+  },
+  {
+    "code":"G-C-BWK--------",
+    "name":"BIOLOGICAL AND CHEMICAL"
+  },
+  {
+    "code":"G-C-BWM--------",
+    "name":"MINIMUM SAFE DISTANCE ZONES"
+  },
+  {
+    "code":"G-C-BYC--------",
+    "name":"CROSSING SITE/WATER CROSSING"
+  },
+  {
+    "code":"G-C-BYCR-------",
+    "name":"RAFT SITE"
+  },
+  {
+    "code":"G-C-BYO--------",
+    "name":"OBSTACLE BYPASS DIFFICULTY"
+  },
+  {
+    "code":"G-C-F----------",
+    "name":"FIRE SUPPORT GRAPHICS"
+  },
+  {
+    "code":"G-C-FAC--------",
+    "name":"AIRSPACE COORDINATION AREA"
+  },
+  {
+    "code":"G-C-FAR--------",
+    "name":"SERIES TARGET"
+  },
+  {
+    "code":"G-C-FARS-------",
+    "name":"SERIES OF TARGETS USING"
+  },
+  {
+    "code":"G-C-FARU-------",
+    "name":"SERIES OF TARGETS USING"
+  },
+  {
+    "code":"G-C-FAS--------",
+    "name":"FIRE SUPPORT AREA"
+  },
+  {
+    "code":"G-C-FL---------",
+    "name":"FIRE SUPPORT LINES"
+  },
+  {
+    "code":"G-C-FLC--------",
+    "name":"FIRE SUPPORT COORDINATION"
+  },
+  {
+    "code":"G-C-FLK--------",
+    "name":"SMOKE"
+  },
+  {
+    "code":"G-C-FLKP-------",
+    "name":"PLANNED WITH DESIGNATED"
+  },
+  {
+    "code":"G-C-FLKS-------",
+    "name":"SMOKE (ACTUALLY IN PLACE)"
+  },
+  {
+    "code":"G-C-FLKT-------",
+    "name":"LINEAR SMOKE TARGET"
+  },
+  {
+    "code":"G-C-FS---------",
+    "name":"FIRE SUPPORT POINT"
+  },
+  {
+    "code":"G-C-FSS--------",
+    "name":"FIRE SUPPORT STATION"
+  },
+  {
+    "code":"G-C-MALS-------",
+    "name":"STANDARD-USE ARMY AIRCRAFT"
+  },
+  {
+    "code":"G-C-MAV--------",
+    "name":"AVIATION AREAS"
+  },
+  {
+    "code":"G-C-MGAS-------",
+    "name":"SPECIFIED AREA"
+  },
+  {
+    "code":"G-C-MGASS------",
+    "name":"SEARCH AREA/RECONNAISSANCE"
+  },
+  {
+    "code":"G-C-MGAST------",
+    "name":"STAGING AREA"
+  },
+  {
+    "code":"G-C-MGAUA------",
+    "name":"GENERAL AREA"
+  },
+  {
+    "code":"G-C-MMPBO------",
+    "name":"OCCUPIED (BATTALION SIZED"
+  },
+  {
+    "code":"G-C-MMPON------",
+    "name":"CBRN OBSERVATION POST"
+  },
+  {
+    "code":"G-C-MMPOR------",
+    "name":"OBSERVATION POST OCCUPIED"
+  },
+  {
+    "code":"G-C-MMPOS------",
+    "name":"SENSOR OUTPOST/LISTENING"
+  },
+  {
+    "code":"G-CMMPS-------ST",
+    "name":"RONG POINT (SP)"
+  },
+  {
+    "code":"G-C-MOOS-------",
+    "name":"SUPPORT BY FIRE POSITION"
+  },
+  {
+    "code":"G-C-MS---------",
+    "name":"SPECIAL MANOEUVRE GRAPHIC"
+  },
+  {
+    "code":"G-C-MSLH-------",
+    "name":"HOLDING LINE"
+  },
+  {
+    "code":"G-C-O----------",
+    "name":"COMMAND AND CONTROL"
+  },
+  {
+    "code":"G-C-OGI--------",
+    "name":"START POINT"
+  },
+  {
+    "code":"G-C-OGL--------",
+    "name":"LINKUP POINT"
+  },
+  {
+    "code":"G-C-OGS--------",
+    "name":"RELEASE POINT"
+  },
+  {
+    "code":"G-C-OX---------",
+    "name":"SPECIAL POINT"
+  },
+  {
+    "code":"G-C-OXAS-------",
+    "name":"STRIKE IP"
+  },
+  {
+    "code":"G-C-OXRD-------",
+    "name":"DIVERSIONS"
+  },
+  {
+    "code":"G-C-OXS--------",
+    "name":"SEARCH"
+  },
+  {
+    "code":"G-C-OXSA-------",
+    "name":"SEARCH AREA"
+  },
+  {
+    "code":"G-C-OXSC-------",
+    "name":"SEARCH CENTRE"
+  },
+  {
+    "code":"G-C-OXSD-------",
+    "name":"DIP POSITION"
+  },
+  {
+    "code":"G-C-OXST-------",
+    "name":"STATION"
+  },
+  {
+    "code":"G-C-OXSTC------",
+    "name":"COMBATANT STATION"
+  },
+  {
+    "code":"G-C-OXSTCA-----",
+    "name":"ASW SHIP STATION"
+  },
+  {
+    "code":"G-C-OXSTCP-----",
+    "name":"PICKET STATION"
+  },
+  {
+    "code":"G-C-OXSTH-----R",
+    "name":"ESCUE STATION"
+  },
+  {
+    "code":"G-C-OXSTR------",
+    "name":"REPLENISHMENT AT SEA (RAS)"
+  },
+  {
+    "code":"G-C-OXSTS------",
+    "name":"SUBMARINE STATION"
+  },
+  {
+    "code":"G-C-OXSTSA-----",
+    "name":"ASW SUBMARINE STATION"
+  },
+  {
+    "code":"G-C-OXUS-------",
+    "name":"SINKER"
+  },
+  {
+    "code":"G-C-OXY--------",
+    "name":"SONOBUOY"
+  },
+  {
+    "code":"G-C-S----------",
+    "name":"COMBAT SERVICE SUPPORT"
+  },
+  {
+    "code":"G-C-SA---------",
+    "name":"AREA"
+  },
+  {
+    "code":"G-C-SAD--------",
+    "name":"DETAINEE HOLDING AREA"
+  },
+  {
+    "code":"G-C-SAH--------",
+    "name":"REFUGEE HOLDING AREA"
+  },
+  {
+    "code":"G-C-SAP--------",
+    "name":"ENEMY PRISONER OF WAR (EPW)"
+  },
+  {
+    "code":"G-C-SAR--------",
+    "name":"FORWARD ARMING AND"
+  },
+  {
+    "code":"G-C-SARR-------",
+    "name":"REST (RA)"
+  },
+  {
+    "code":"G-C-SAT--------",
+    "name":"SUPPORT AREAS"
+  },
+  {
+    "code":"G-C-SATB-------",
+    "name":"BRIGADE (BSA)"
+  },
+  {
+    "code":"G-C-SATD-------",
+    "name":"DIVISION (DSA)"
+  },
+  {
+    "code":"G-C-SATR-------",
+    "name":"REGIMENTAL (RSA)"
+  },
+  {
+    "code":"G-C-SL---------",
+    "name":"LINES"
+  },
+  {
+    "code":"G-C-SLC--------",
+    "name":"CONVOYS"
+  },
+  {
+    "code":"G-C-SLCH-------",
+    "name":"HALTED CONVOY"
+  },
+  {
+    "code":"G-C-SLCM-------",
+    "name":"MOVING CONVOY"
+  },
+  {
+    "code":"G-C-SLR--------",
+    "name":"SUPPLY ROUTES"
+  },
+  {
+    "code":"G-C-SLRA-------",
+    "name":"ALTERNATE SUPPLY ROUTE"
+  },
+  {
+    "code":"G-C-SLRM-------",
+    "name":"MAIN SUPPLY ROUTE"
+  },
+  {
+    "code":"G-C-SLRO-------",
+    "name":"ONE-WAY TRAFFIC"
+  },
+  {
+    "code":"G-C-SLRT-------",
+    "name":"ALTERNATING TRAFFIC"
+  },
+  {
+    "code":"G-C-SLRW-------",
+    "name":"TWO-WAY TRAFFIC"
+  },
+  {
+    "code":"G-C-SP---------",
+    "name":"POINTS"
+  },
+  {
+    "code":"G-C-SPA--------",
+    "name":"AMBULANCE EXCHANGE POINT"
+  },
+  {
+    "code":"G-C-SPC--------",
+    "name":"CANNIBALIZATION POINT"
+  },
+  {
+    "code":"G-C-SPD--------",
+    "name":"DETAINEE COLLECTION POINT"
+  },
+  {
+    "code":"G-C-SPE--------",
+    "name":"ENEMY PRISONER OF WAR (EPW)"
+  },
+  {
+    "code":"G-C-SPI--------",
+    "name":"TRAILER TRANSFER POINT"
+  },
+  {
+    "code":"G-C-SPL--------",
+    "name":"LOGISTICS RELEASE POINT (LRP)"
+  },
+  {
+    "code":"G-C-SPM--------",
+    "name":"MAINTENANCE COLLECTION"
+  },
+  {
+    "code":"G-C-SPMA-------",
+    "name":"AMMUNITION SUPPLY POINT"
+  },
+  {
+    "code":"G-C-SPMT-------",
+    "name":"AMMUNITION TRANSFER POINT"
+  },
+  {
+    "code":"G-C-SPN--------",
+    "name":"UNIT MAINTENANCE COLLECTION"
+  },
+  {
+    "code":"G-C-SPO--------",
+    "name":"TRAFFIC CONTROL POST (TCP)"
+  },
+  {
+    "code":"G-C-SPQ--------",
+    "name":"SUPPLY POINTS"
+  },
+  {
+    "code":"G-C-SPQA-------",
+    "name":"CLASS I"
+  },
+  {
+    "code":"G-C-SPQB-------",
+    "name":"CLASS II"
+  },
+  {
+    "code":"G-C-SPQC-------",
+    "name":"CLASS III"
+  },
+  {
+    "code":"G-C-SPQD-------",
+    "name":"CLASS IV"
+  },
+  {
+    "code":"G-C-SPQE-------",
+    "name":"CLASS V"
+  },
+  {
+    "code":"G-C-SPQF-------",
+    "name":"CLASS VI"
+  },
+  {
+    "code":"G-C-SPQG-------",
+    "name":"CLASS VII"
+  },
+  {
+    "code":"G-C-SPQH-------",
+    "name":"CLASS VIII"
+  },
+  {
+    "code":"G-C-SPQI-------",
+    "name":"CLASS IX"
+  },
+  {
+    "code":"G-C-SPQJ-------",
+    "name":"CLASS X"
+  },
+  {
+    "code":"G-C-SPQT-------",
+    "name":"GENERAL"
+  },
+  {
+    "code":"G-C-SPR--------",
+    "name":"REARM, REFUEL AND RE-SUPPLY"
+  },
+  {
+    "code":"G-C-SPT--------",
+    "name":"CIVILIAN COLLECTION POINT"
+  },
+  {
+    "code":"G-C-SPU--------",
+    "name":"REFUEL ON THE MOVE (ROM)"
+  },
+  {
+    "code":"G-C-SPY--------",
+    "name":"CASUALTY COLLECTION POINT"
+  },
+  {
+    "code":"GFC-MOLAS------",
+    "name":"FRIENDLY GROUND AXIS OF"
+  },
+  {
+    "code":"GFC-MOLDS------",
+    "name":"FRIENDLY DIRECTION OF"
+  },
+  {
+    "code":"GFC-MOOTC------",
+    "name":"FRIENDLY OCCUPIED (ONLY IF A"
+  },
+  {
+    "code":"GFO-IF---------",
+    "name":"INTERNAL SECURITY FORCE"
+  },
+  {
+    "code":"GHC-MGAUAS-----",
+    "name":"ENEMY SUSPECTED/TEMPLATED"
+  },
+  {
+    "code":"GHC-MGLBGS-----",
+    "name":"ENEMY SUSPECTED OR"
+  },
+  {
+    "code":"GHC-MOLDG------",
+    "name":"ENEMY CONFIRMED/KNOWN"
+  },
+  {
+    "code":"GHO-IG---------",
+    "name":"GRAFFITI"
+  },
+  {
+    "code":"GHO-PS---------",
+    "name":"SPY"
+  },
+  {
+    "code":"GHO-VD---------",
+    "name":"DRIVE-BY SHOOTING"
+  },
+  {
+    "code":"GHO-VS---------",
+    "name":"SNIPING"
+  },
+  {
+    "code":"GHO-VX---------",
+    "name":"SIGNAL/RADIO STATION"
+  },
+  {
+    "code":"GHO-VZ---------",
+    "name":"SUPPLY CACHE"
+  },
+  {
+    "code":"G-O-IS---------",
+    "name":"SAFE HOUSE"
+  },
+  {
+    "code":"G-T-GAS--------",
+    "name":"FOLLOW AND SUPPORT"
+  },
+  {
+    "code":"G-T-GLT--------",
+    "name":"DELAY (UNTIL A SPECIFIED TIME)"
+  },
+  {
+    "code":"G-T-GS---------",
+    "name":"SECURE"
+  },
+  {
+    "code":"G-T-GSC--------",
+    "name":"SECURITY (COVER)"
+  },
+  {
+    "code":"G-T-GSG--------",
+    "name":"SECURITY (GUARD)"
+  },
+  {
+    "code":"G-T-GSS--------",
+    "name":"SECURITY (SCREEN)"
+  },
+  {
+    "code":"G-T-GZ---------",
+    "name":"SEIZE"
+  },
+  {
+    "code":"S--------------",
+    "name":"WARFIGHTING SYMBOLS"
+  },
+  {
+    "code":"S-A------------",
+    "name":"AIR TRACK"
+  },
+  {
+    "code":"S-A-C----------",
+    "name":"CIVIL AIRCRAFT"
+  },
+  {
+    "code":"S-A-CF---------",
+    "name":"FIXED WING"
+  },
+  {
+    "code":"S-A-CH---------",
+    "name":"ROTARY WING"
+  },
+  {
+    "code":"S-A-CL---------",
+    "name":"LIGHTER THAN AIR"
+  },
+  {
+    "code":"S-A-M----------",
+    "name":"MILITARY"
+  },
+  {
+    "code":"S-A-MF---------",
+    "name":"FIXED WING"
+  },
+  {
+    "code":"S-A-MFA--------",
+    "name":"ATTACK/STRIKE"
+  },
+  {
+    "code":"S-A-MFB--------",
+    "name":"BOMBER"
+  },
+  {
+    "code":"S-A-MFC--------",
+    "name":"CARGO AIRLIFT (TRANSPORT)"
+  },
+  {
+    "code":"S-A-MFCH-------",
+    "name":"CARGO AIRLIFT (HEAVY)"
+  },
+  {
+    "code":"S-A-MFCL-------",
+    "name":"CARGO AIRLIFT (LIGHT)"
+  },
+  {
+    "code":"S-A-MFCM-------",
+    "name":"CARGO AIRLIFT (MEDIUM)"
+  },
+  {
+    "code":"S-A-MFD--------",
+    "name":"AIRBORNE COMMAND POST (C2)"
+  },
+  {
+    "code":"S-A-MFF--------",
+    "name":"FIGHTER"
+  },
+  {
+    "code":"S-A-MFFI-------",
+    "name":"INTERCEPTOR"
+  },
+  {
+    "code":"S-A-MFH--------",
+    "name":"SEARCH AND RESCUE (CSAR)"
+  },
+  {
+    "code":"S-A-MFJ--------",
+    "name":"ELECTRONIC COUNTERMEASURES"
+  },
+  {
+    "code":"S-A-MFK--------",
+    "name":"TANKER"
+  },
+  {
+    "code":"S-A-MFL--------",
+    "name":"VSTOL"
+  },
+  {
+    "code":"S-A-MFM--------",
+    "name":"SPECIAL OPERATIONS FORCE"
+  },
+  {
+    "code":"S-A-MFO--------",
+    "name":"MEDEVAC"
+  },
+  {
+    "code":"S-A-MFP--------",
+    "name":"PATROL"
+  },
+  {
+    "code":"S-A-MFPM-------",
+    "name":"MINE COUNTER MEASURES"
+  },
+  {
+    "code":"S-A-MFPN-------",
+    "name":"ANTI SURFACE WARFARE/ASUW"
+  },
+  {
+    "code":"S-A-MFQ--------",
+    "name":"DRONE (RPV/UAV)"
+  },
+  {
+    "code":"S-A-MFR--------",
+    "name":"RECONNAISSANCE"
+  },
+  {
+    "code":"S-A-MFRW-------",
+    "name":"AIRBORNE EARLY WARNING (AEW)"
+  },
+  {
+    "code":"S-A-MFRX-------",
+    "name":"PHOTOGRAPHIC"
+  },
+  {
+    "code":"S-A-MFRZ-------",
+    "name":"ELECTRONIC SURVEILLANCE"
+  },
+  {
+    "code":"S-A-MFS---------",
+    "name":" ANTI SUBMARINE WARFARE"
+  },
+  {
+    "code":"S-A-MFT--------",
+    "name":"TRAINER"
+  },
+  {
+    "code":"S-A-MFU--------",
+    "name":"UTILITY"
+  },
+  {
+    "code":"S-A-MFUH-------",
+    "name":"UTILITY (HEAVY)"
+  },
+  {
+    "code":"S-A-MFUL-------",
+    "name":"UTILITY (LIGHT)"
+  },
+  {
+    "code":"S-A-MFUM-------",
+    "name":"UTILITY (MEDIUM)"
+  },
+  {
+    "code":"S-A-MFY--------",
+    "name":"COMMUNICATIONS (C3I)"
+  },
+  {
+    "code":"S-A-MH---------",
+    "name":"ROTARY WING"
+  },
+  {
+    "code":"S-A-MHA--------",
+    "name":"ATTACK"
+  },
+  {
+    "code":"S-A-MHC--------",
+    "name":"CARGO AIRLIFT (TRANSPORT)"
+  },
+  {
+    "code":"S-A-MHCH-------",
+    "name":"CARGO AIRLIFT (HEAVY)"
+  },
+  {
+    "code":"S-A-MHCL-------",
+    "name":"CARGO AIRLIFT (LIGHT)"
+  },
+  {
+    "code":"S-A-MHCM-------",
+    "name":"CARGO AIRLIFT (MEDIUM)"
+  },
+  {
+    "code":"S-A-MHD--------",
+    "name":"AIRBORNE COMMAND POST (C2)"
+  },
+  {
+    "code":"S-A-MHH--------",
+    "name":"COMBAT SEARCH AND RESCUE"
+  },
+  {
+    "code":"S-A-MHI--------",
+    "name":"MINE COUNTER MEASURES"
+  },
+  {
+    "code":"S-A-MHJ--------",
+    "name":"ELECTRONIC COUNTER MEASURES"
+  },
+  {
+    "code":"S-A-MHK--------",
+    "name":"TANKER"
+  },
+  {
+    "code":"S-A-MHM--------",
+    "name":"SPECIAL OPERATIONS FORCE (SOF)"
+  },
+  {
+    "code":"S-A-MHO--------",
+    "name":"MEDEVAC"
+  },
+  {
+    "code":"S-A-MHQ--------",
+    "name":"DRONE (RPV/UAV)"
+  },
+  {
+    "code":"S-A-MHR--------",
+    "name":"RECONNAISSANCE"
+  },
+  {
+    "code":"S-A-MHS--------",
+    "name":"ANTISUBMARINE WARFARE"
+  },
+  {
+    "code":"S-A-MHT--------",
+    "name":"TRAINER"
+  },
+  {
+    "code":"S-A-MHU--------",
+    "name":"UTILITY"
+  },
+  {
+    "code":"S-A-MHUH-------",
+    "name":"UTILITY (HEAVY)"
+  },
+  {
+    "code":"S-A-MHUL-------",
+    "name":"UTILITY (LIGHT)"
+  },
+  {
+    "code":"S-A-MHUM-------",
+    "name":"UTILITY (MEDIUM)"
+  },
+  {
+    "code":"S-A-ML---------",
+    "name":"LIGHTER THAN AIR"
+  },
+  {
+    "code":"S-A-W----------",
+    "name":"WEAPON"
+  },
+  {
+    "code":"S-A-WD---------",
+    "name":"DECOY"
+  },
+  {
+    "code":"S-A-WM---------",
+    "name":"MISSILE IN FLIGHT"
+  },
+  {
+    "code":"S-A-WMA--------",
+    "name":"AIR LAUNCHED MISSILE"
+  },
+  {
+    "code":"S-A-WMAA-------",
+    "name":"AIR TO AIR MISSILE (AAM)"
+  },
+  {
+    "code":"S-A-WMAS-------",
+    "name":"AIR TO SURFACE MISSILE (ASM)"
+  },
+  {
+    "code":"S-A-WML--------",
+    "name":"LAND ATTACK MISSILE"
+  },
+  {
+    "code":"S-A-WMS--------",
+    "name":"SURFACE/LAND LAUNCHED MISSILE"
+  },
+  {
+    "code":"S-A-WMSA-------",
+    "name":"SURFACE TO AIR MISSILE (SAM)"
+  },
+  {
+    "code":"S-A-WMSS-------",
+    "name":"SURFACE TO SURFACE MISSILE (SSM)"
+  },
+  {
+    "code":"S-A-WMU--------",
+    "name":"SUBSURFACE TO SURFACE MISSILE"
+  },
+  {
+    "code":"S-F------------",
+    "name":"SPECIAL OPERATIONS FORCE (SOF)"
+  },
+  {
+    "code":"S-F-A----------",
+    "name":"SOF UNIT AVIATION"
+  },
+  {
+    "code":"S-F-AF---------",
+    "name":"SOF UNIT FIXED WING"
+  },
+  {
+    "code":"S-F-AFA--------",
+    "name":"SOF UNIT ATTACK"
+  },
+  {
+    "code":"S-F-AFK--------",
+    "name":"SOF UNIT REFUEL"
+  },
+  {
+    "code":"S-F-AFU--------",
+    "name":"SOF UNIT UTILITY"
+  },
+  {
+    "code":"S-F-AFUH-------",
+    "name":"SOF UNIT UTILITY (HEAVY)"
+  },
+  {
+    "code":"S-F-AFUL-------",
+    "name":"SOF UNIT UTILITY (LIGHT)"
+  },
+  {
+    "code":"S-F-AFUM-------",
+    "name":"SOF UNIT UTILITY (MEDIUM)"
+  },
+  {
+    "code":"S-F-AH---------",
+    "name":"SOF UNIT ROTARY WING"
+  },
+  {
+    "code":"S-F-AHA--------",
+    "name":"SOF UNIT ATTACK"
+  },
+  {
+    "code":"S-F-AHH--------",
+    "name":"SOF UNIT COMBAT SEARCH AND"
+  },
+  {
+    "code":"S-F-AHU--------",
+    "name":"SOF UNIT UTILITY"
+  },
+  {
+    "code":"S-F-AHUH-------",
+    "name":"SOF UNIT UTILITY (HEAVY)"
+  },
+  {
+    "code":"S-F-AHUL-------",
+    "name":"SOF UNIT UTILITY (LIGHT)"
+  },
+  {
+    "code":"S-F-AHUM-------",
+    "name":"SOF UNIT UTILITY (MEDIUM)"
+  },
+  {
+    "code":"S-F-AV---------",
+    "name":"SOF UNIT VSTOL"
+  },
+  {
+    "code":"S-F-G----------",
+    "name":"SOF UNIT GROUND"
+  },
+  {
+    "code":"S-F-GB---------",
+    "name":"SOF UNIT SUPPORT"
+  },
+  {
+    "code":"S-F-GCA--------",
+    "name":"SOF UNIT CIVIL AFFAIRS"
+  },
+  {
+    "code":"S-F-GS---------",
+    "name":"SOF UNIT SPECIAL FORCES"
+  },
+  {
+    "code":"S-F-GSP--------",
+    "name":"SOF UNIT PSYCHOLOGICAL"
+  },
+  {
+    "code":"S-F-GSPA-------",
+    "name":"SOF UNIT FIXED AVIATION"
+  },
+  {
+    "code":"S-F-GSR--------",
+    "name":"SOF UNIT RANGER"
+  },
+  {
+    "code":"S-F-SN---------",
+    "name":"SOF UNIT SOF UNIT NAVAL"
+  },
+  {
+    "code":"S-F-SNB--------",
+    "name":"SOF UNIT SPECIAL BOAT"
+  },
+  {
+    "code":"S-F-SNN--------",
+    "name":"SOF UNIT SPECIAL SSNR"
+  },
+  {
+    "code":"S-F-SNS--------",
+    "name":"SOF UNIT SEAL"
+  },
+  {
+    "code":"S-F-SNU--------",
+    "name":"SOF UNIT UNDERWATER"
+  },
+  {
+    "code":"S-G------------",
+    "name":"GROUND TRACK"
+  },
+  {
+    "code":"S-G-E----------",
+    "name":"GROUND TRACK EQUIPMENT"
+  },
+  {
+    "code":"S-G-ES---------",
+    "name":"SENSOR"
+  },
+  {
+    "code":"S-G-ESE--------",
+    "name":"EMPLACED SENSOR"
+  },
+  {
+    "code":"S-G-ESR--------",
+    "name":"RADAR"
+  },
+  {
+    "code":"S-G-EV---------",
+    "name":"GROUND VEHICLE"
+  },
+  {
+    "code":"S-G-EVA--------",
+    "name":"ARMOURED VEHICLE"
+  },
+  {
+    "code":"S-G-EVAA-------",
+    "name":"ARMOURED PERSONNEL"
+  },
+  {
+    "code":"S-G-EVAAR------",
+    "name":"ARMOURED PERSONNEL"
+  },
+  {
+    "code":"S-G-EVAC-------",
+    "name":"C2V/ACV"
+  },
+  {
+    "code":"S-G-EVAI-------",
+    "name":"ARMOURED INFANTRY"
+  },
+  {
+    "code":"S-G-EVAL-------",
+    "name":"LIGHT ARMOURED VEHICLE"
+  },
+  {
+    "code":"S-G-EVAS-------",
+    "name":"COMBAT SERVICE SUPPORT"
+  },
+  {
+    "code":"S-G-EVAT-------",
+    "name":"TANK"
+  },
+  {
+    "code":"S-G-EVATH------",
+    "name":"TANK HEAVY"
+  },
+  {
+    "code":"S-G-EVATL------",
+    "name":"TANK LIGHT"
+  },
+  {
+    "code":"S-G-EVATM------",
+    "name":"TANK MEDIUM"
+  },
+  {
+    "code":"S-G-EVATW------",
+    "name":"TANK LIGHT RECOVERY"
+  },
+  {
+    "code":"S-G-EVATX------",
+    "name":"TANK MEDIUM RECOVERY"
+  },
+  {
+    "code":"S-G-EVATY------",
+    "name":"TANK HEAVY RECOVERY"
+  },
+  {
+    "code":"S-G-EVC--------",
+    "name":"CIVILIAN VEHICLE"
+  },
+  {
+    "code":"S-G-EVD--------",
+    "name":"DRILLING VEHICLE"
+  },
+  {
+    "code":"S-G-EVE--------",
+    "name":"ENGINEER VEHICLE"
+  },
+  {
+    "code":"S-G-EVEB-------",
+    "name":"BRIDGE"
+  },
+  {
+    "code":"S-G-EVEC-------",
+    "name":"CONSTRUCTION VEHICLE"
+  },
+  {
+    "code":"S-G-EVED-------",
+    "name":"DOZER"
+  },
+  {
+    "code":"S-G-EVEE-------",
+    "name":"EARTHMOVER"
+  },
+  {
+    "code":"S-G-EVEM-------",
+    "name":"MINE LAYING VEHICLE"
+  },
+  {
+    "code":"S-G-EVEMA------",
+    "name":"ARMOURED VEHICLE MOUNTED"
+  },
+  {
+    "code":"S-G-EVEMSM-----",
+    "name":"ARMOURED CARRIER WITH"
+  },
+  {
+    "code":"S-G-EVEMT------",
+    "name":"TRAILER MOUNTED"
+  },
+  {
+    "code":"S-G-EVEMV------",
+    "name":"''"
+  },
+  {
+    "code":"S-G-EVST-------",
+    "name":"TRAIN LOCOMOTIVE"
+  },
+  {
+    "code":"S-G-EVU--------",
+    "name":"UTILITY VEHICLE"
+  },
+  {
+    "code":"S-G-EVUB-------",
+    "name":"BUS"
+  },
+  {
+    "code":"S-G-EVUL-------",
+    "name":"LIMITED CROSS-COUNTRY"
+  },
+  {
+    "code":"S-G-EVUR-------",
+    "name":"WATER CRAFT"
+  },
+  {
+    "code":"S-G-EVUS-------",
+    "name":"SEMI"
+  },
+  {
+    "code":"S-G-EVUX-------",
+    "name":"CROSS-COUNTRY TRUCK"
+  },
+  {
+    "code":"S-G-EW---------",
+    "name":"WEAPONS"
+  },
+  {
+    "code":"S-G-EWA--------",
+    "name":"AIR DEFENCE GUN"
+  },
+  {
+    "code":"S-G-EWAH-------",
+    "name":"AIR DEFENCE GUN HEAVY"
+  },
+  {
+    "code":"S-G-EWAL-------",
+    "name":"AIR DEFENCE GUN LIGHT"
+  },
+  {
+    "code":"S-G-EWAM-------",
+    "name":"AIR DEFENCE GUN MEDIUM"
+  },
+  {
+    "code":"S-G-EWD--------",
+    "name":"DIRECT FIRE GUN"
+  },
+  {
+    "code":"S-G-EWDH-------",
+    "name":"DIRECT FIRE GUN HEAVY"
+  },
+  {
+    "code":"S-G-EWDHS------",
+    "name":"DIRECT FIRE GUN HEAVY"
+  },
+  {
+    "code":"S-G-EWDL-------",
+    "name":"DIRECT FIRE GUN LIGHT"
+  },
+  {
+    "code":"S-G-EWDLS------",
+    "name":"DIRECT FIRE GUN LIGHT"
+  },
+  {
+    "code":"S-G-EWDM-------",
+    "name":"DIRECT FIRE GUN MEDIUM"
+  },
+  {
+    "code":"S-G-EWDMS------",
+    "name":"DIRECT FIRE GUN MEDIUM"
+  },
+  {
+    "code":"S-G-EWG--------",
+    "name":"ANTITANK GUN"
+  },
+  {
+    "code":"S-G-EWGH-------",
+    "name":"ANTITANK GUN HEAVY"
+  },
+  {
+    "code":"S-G-EWGL-------",
+    "name":"ANTITANK GUN LIGHT"
+  },
+  {
+    "code":"S-G-EWGM-------",
+    "name":"ANTITANK GUN MEDIUM"
+  },
+  {
+    "code":"S-G-EWGR-------",
+    "name":"ANTITANK GUN RECOILLESS"
+  },
+  {
+    "code":"S-G-EWH--------",
+    "name":"HOWITZER"
+  },
+  {
+    "code":"S-G-EWHH-------",
+    "name":"HOWITZER HEAVY"
+  },
+  {
+    "code":"S-G-EWHHS------",
+    "name":"HOWITZER HEAVY"
+  },
+  {
+    "code":"S-G-EWHL-------",
+    "name":"HOWITZER LIGHT"
+  },
+  {
+    "code":"S-G-EWHLS------",
+    "name":"HOWITZER LIGHT"
+  },
+  {
+    "code":"S-G-EWHM-------",
+    "name":"HOWITZER MEDIUM"
+  },
+  {
+    "code":"S-G-EWHMS------",
+    "name":"HOWITZER MEDIUM"
+  },
+  {
+    "code":"S-G-EWM--------",
+    "name":"MISSILE LAUNCHERS"
+  },
+  {
+    "code":"S-G-EWMA-------",
+    "name":"AIR DEFENCE (AD) MISSILE"
+  },
+  {
+    "code":"S-G-EWMAI------",
+    "name":"INTERMEDIATE RANGE AD"
+  },
+  {
+    "code":"S-G-EWMAL------",
+    "name":"LONG RANGE AD MISSILE"
+  },
+  {
+    "code":"S-G-EWMAS------",
+    "name":"SHORT RANGE AD MISSILE"
+  },
+  {
+    "code":"S-G-EWMAT------",
+    "name":"AD MISSILE LAUNCH THEATRE"
+  },
+  {
+    "code":"S-G-EWMS-------",
+    "name":"SURFACE-SURFACE (SS) MISSILE"
+  },
+  {
+    "code":"S-G-EWMSI------",
+    "name":"INTERMEDIATE RANGE SS"
+  },
+  {
+    "code":"S-G-EWMSL------",
+    "name":"LONG RANGE SS MISSILE"
+  },
+  {
+    "code":"S-G-EWMSS------",
+    "name":"SHORT RANGE SS MISSILE"
+  },
+  {
+    "code":"S-G-EWMT-------",
+    "name":"MISSILE LAUNCHERS ANTI TANK"
+  },
+  {
+    "code":"S-G-EWMTH------",
+    "name":"MISSILE LAUNCHER AT HEAVY"
+  },
+  {
+    "code":"S-G-EWMTL------",
+    "name":"MISSILE LAUNCHERS AT LIGHT"
+  },
+  {
+    "code":"S-G-EWMTM------",
+    "name":"MISSILE LAUNCHER AT MEDIUM"
+  },
+  {
+    "code":"S-G-EWO--------",
+    "name":"MORTAR"
+  },
+  {
+    "code":"S-G-EWOH-------",
+    "name":"MORTAR HEAVY"
+  },
+  {
+    "code":"S-G-EWOL-------",
+    "name":"MORTAR LIGHT"
+  },
+  {
+    "code":"S-G-EWOM-------",
+    "name":"MORTAR MEDIUM"
+  },
+  {
+    "code":"S-G-EWR--------",
+    "name":"RIFLE/AUTOMATIC WEAPON"
+  },
+  {
+    "code":"S-G-EWRH-------",
+    "name":"HEAVY MACHINE GUN"
+  },
+  {
+    "code":"S-G-EWRL-------",
+    "name":"LIGHT MACHINE GUN"
+  },
+  {
+    "code":"S-G-EWRR-------",
+    "name":"RIFLE"
+  },
+  {
+    "code":"S-G-EWS--------",
+    "name":"SINGLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWSH-------",
+    "name":"SINGLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWSL-------",
+    "name":"SINGLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWSM-------",
+    "name":"SINGLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWT--------",
+    "name":"ANTITANK ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWTH-------",
+    "name":"ANTITANK ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWTL-------",
+    "name":"ANTITANK ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWTM-------",
+    "name":"ANTITANK ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWX--------",
+    "name":"MULTIPLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWXH-------",
+    "name":"MULTIPLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWXL-------",
+    "name":"MULTIPLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWXM-------",
+    "name":"MULTIPLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-EWZ--------",
+    "name":"GRENADE LAUNCHER"
+  },
+  {
+    "code":"S-G-EWZH-------",
+    "name":"GRENADE LAUNCHER HEAVY"
+  },
+  {
+    "code":"S-G-EWZL-------",
+    "name":"GRENADE LAUNCHER LIGHT"
+  },
+  {
+    "code":"S-G-EWZM-------",
+    "name":"GRENADE LAUNCHER MEDIUM"
+  },
+  {
+    "code":"S-G-EX---------",
+    "name":"SPECIAL EQUIPMENT"
+  },
+  {
+    "code":"S-G-EXF--------",
+    "name":"FLAME THROWER"
+  },
+  {
+    "code":"S-G-EXL--------",
+    "name":"LASER"
+  },
+  {
+    "code":"S-G-EXM--------",
+    "name":"LAND MINES"
+  },
+  {
+    "code":"S-G-EXMC-------",
+    "name":"LAND MINES, LETHAL"
+  },
+  {
+    "code":"S-G-EXML-------",
+    "name":"LESS THAN LETHAL"
+  },
+  {
+    "code":"S-G-EXN--------",
+    "name":"CBRN EQUIPMENT"
+  },
+  {
+    "code":"S-G-IBA---H----",
+    "name":"AIRPORT/AIRBASE"
+  },
+  {
+    "code":"S-G-IB----H----",
+    "name":"MILITARY BASE/FACILITY"
+  },
+  {
+    "code":"S-G-IBN---H----",
+    "name":"SEAPORT/NAVAL BASE"
+  },
+  {
+    "code":"S-G-IE----H----",
+    "name":"EQUIPMENT MANUFACTURE"
+  },
+  {
+    "code":"S-G-IG----H----",
+    "name":"GOVERNMENT LEADERSHIP"
+  },
+  {
+    "code":"S-G-I-----H----",
+    "name":"INSTALLATION"
+  },
+  {
+    "code":"S-G-IMA---H----",
+    "name":"AIRCRAFT PRODUCTION &"
+  },
+  {
+    "code":"S-G-IMC---H----",
+    "name":"CHEMICAL & BIOLOGICAL"
+  },
+  {
+    "code":"S-G-IME---H----",
+    "name":"AMMUNITION AND EXPLOSIVES"
+  },
+  {
+    "code":"S-G-IMF---H----",
+    "name":"ATOMIC ENERGY PRODUCTION"
+  },
+  {
+    "code":"S-G-IMG---H----",
+    "name":"ARMAMENT PRODUCTION"
+  },
+  {
+    "code":"S-G-IM----H----",
+    "name":"MILITARY MATERIEL FACILITY"
+  },
+  {
+    "code":"S-G-IMM---H----",
+    "name":"MISSILE & SPACE SYSTEM"
+  },
+  {
+    "code":"S-G-IMNB--H----",
+    "name":"BRIDGE"
+  },
+  {
+    "code":"S-G-IMN---H----",
+    "name":"ENGINEERING EQUIPMENT"
+  },
+  {
+    "code":"S-G-IMS---H----",
+    "name":"SHIP CONSTRUCTION"
+  },
+  {
+    "code":"S-G-IMV---H----",
+    "name":"MILITARY VEHICLE PRODUCTION"
+  },
+  {
+    "code":"S-G-IPD---H----",
+    "name":"DECON"
+  },
+  {
+    "code":"S-G-IP----H----",
+    "name":"PROCESSING FACILITY"
+  },
+  {
+    "code":"S-G-IR----H----",
+    "name":"RAW MATERIAL"
+  },
+  {
+    "code":"S-G-IRM---H----",
+    "name":"MINE"
+  },
+  {
+    "code":"S-G-IRNB--H----",
+    "name":"BIOLOGICAL"
+  },
+  {
+    "code":"S-G-IRNC--H----",
+    "name":"CHEMICAL"
+  },
+  {
+    "code":"S-G-IRN---H----",
+    "name":"CBRN"
+  },
+  {
+    "code":"S-G-IRNN--H----",
+    "name":"NUCLEAR"
+  },
+  {
+    "code":"S-G-IRP---H----",
+    "name":"PETROLEUM/GAS/OIL"
+  },
+  {
+    "code":"S-G-IRR---H----",
+    "name":"SEA SURFACE INSTALLATION,"
+  },
+  {
+    "code":"S-G-IT----H----",
+    "name":"TRANSPORT FACILITY"
+  },
+  {
+    "code":"S-G-IUE---H----",
+    "name":"ELECTRIC POWER FACILITY"
+  },
+  {
+    "code":"S-G-IU----H----",
+    "name":"SERVICE, RESEARCH, UTILITY"
+  },
+  {
+    "code":"S-G-IUP---H----",
+    "name":"PUBLIC WATER SERVICES"
+  },
+  {
+    "code":"S-G-IUR---H----",
+    "name":"TECHNOLOGICAL RESEARCH"
+  },
+  {
+    "code":"S-G-IUT---H----",
+    "name":"TELECOMMUNICATIONS"
+  },
+  {
+    "code":"S-G-IX----H----",
+    "name":"MEDICAL FACILITY"
+  },
+  {
+    "code":"S-G-IXH---H----",
+    "name":"HOSPITAL"
+  },
+  {
+    "code":"S-G-U----------",
+    "name":"UNIT"
+  },
+  {
+    "code":"S-G-UC---------",
+    "name":"COMBAT"
+  },
+  {
+    "code":"S-G-UCA--------",
+    "name":"ARMOUR"
+  },
+  {
+    "code":"S-G-UCAA-------",
+    "name":"ANTI ARMOUR"
+  },
+  {
+    "code":"S-G-UCAAA------",
+    "name":"ANTI ARMOUR ARMOURED"
+  },
+  {
+    "code":"S-G-UCAAAS-----",
+    "name":"ANTI ARMOUR ARMOURED AIR"
+  },
+  {
+    "code":"S-G-UCAAAT-----",
+    "name":"ANTI ARMOUR ARMOURED"
+  },
+  {
+    "code":"S-G-UCAAAW-----",
+    "name":"ANTI ARMOUR ARMOURED"
+  },
+  {
+    "code":"S-G-UCAAC------",
+    "name":"ANTI ARMOUR ARCTIC"
+  },
+  {
+    "code":"S-G-UCAAD------",
+    "name":"ANTI ARMOUR DISMOUNTED"
+  },
+  {
+    "code":"S-G-UCAAL------",
+    "name":"ANTI ARMOUR LIGHT"
+  },
+  {
+    "code":"S-G-UCAAM------",
+    "name":"ANTI ARMOUR AIRBORNE"
+  },
+  {
+    "code":"S-G-UCAAO------",
+    "name":"ANTI ARMOUR MOTORIZED"
+  },
+  {
+    "code":"S-G-UCAAOS-----",
+    "name":"ANTI ARMOUR MOTORIZED AIR"
+  },
+  {
+    "code":"S-G-UCAAS------",
+    "name":"ANTI ARMOUR AIR ASSAULT"
+  },
+  {
+    "code":"S-G-UCAAU------",
+    "name":"ANTI ARMOUR MOUNTAIN"
+  },
+  {
+    "code":"S-G-UCAT-------",
+    "name":"ARMOUR TRACK"
+  },
+  {
+    "code":"S-G-UCATA------",
+    "name":"ARMOUR TRACK AIRBORNE"
+  },
+  {
+    "code":"S-G-UCATH------",
+    "name":"ARMOUR TRACK, HEAVY"
+  },
+  {
+    "code":"S-G-UCATL------",
+    "name":"ARMOUR TRACK, LIGHT"
+  },
+  {
+    "code":"S-G-UCATM------",
+    "name":"ARMOUR TRACK, MEDIUM"
+  },
+  {
+    "code":"S-G-UCATR------",
+    "name":"ARMOUR TRACK, RECOVERY"
+  },
+  {
+    "code":"S-G-UCATW------",
+    "name":"ARMOUR TRACK AMPHIBIOUS"
+  },
+  {
+    "code":"S-G-UCATWR-----",
+    "name":"ARMOUR TRACK AMPHIBIOUS"
+  },
+  {
+    "code":"S-G-UCAW-------",
+    "name":"ARMOUR, WHEELED"
+  },
+  {
+    "code":"S-G-UCAWA------",
+    "name":"ARMOUR, WHEELED AIRBORNE"
+  },
+  {
+    "code":"S-G-UCAWH------",
+    "name":"ARMOUR, WHEELED HEAVY"
+  },
+  {
+    "code":"S-G-UCAWL------",
+    "name":"ARMOUR, WHEELED LIGHT"
+  },
+  {
+    "code":"S-G-UCAWM------",
+    "name":"ARMOUR, WHEELED MEDIUM"
+  },
+  {
+    "code":"S-G-UCAWR------",
+    "name":"ARMOUR, WHEELED RECOVERY"
+  },
+  {
+    "code":"S-G-UCAWS------",
+    "name":"ARMOUR, WHEELED AIR"
+  },
+  {
+    "code":"S-G-UCD--------",
+    "name":"AIR DEFENCE"
+  },
+  {
+    "code":"S-G-UCDC-------",
+    "name":"COMPOSITE"
+  },
+  {
+    "code":"S-G-UCDG-------",
+    "name":"GUN UNIT"
+  },
+  {
+    "code":"S-G-UCDH-------",
+    "name":"H/MAD"
+  },
+  {
+    "code":"S-G-UCDM-------",
+    "name":"AIR DEFENCE MISSILE"
+  },
+  {
+    "code":"S-G-UCDMH------",
+    "name":"AIR DEFENCE MISSILE HEAVY"
+  },
+  {
+    "code":"S-G-UCDML------",
+    "name":"AIR DEFENCE MISSILE LIGHT"
+  },
+  {
+    "code":"S-G-UCDMLA-----",
+    "name":"AIR DEFENCE MISSILE"
+  },
+  {
+    "code":"S-G-UCDMM------",
+    "name":"AIR DEFENCE MISSILE MEDIUM"
+  },
+  {
+    "code":"S-G-UCDO-------",
+    "name":"THEATRE MISSILE DEFENCE UNIT"
+  },
+  {
+    "code":"S-G-UCDS-------",
+    "name":"SHORT RANGE"
+  },
+  {
+    "code":"S-G-UCDT-------",
+    "name":"TARGETING UNIT"
+  },
+  {
+    "code":"S-G-UCE--------",
+    "name":"ENGINEER"
+  },
+  {
+    "code":"S-G-UCEC-------",
+    "name":"ENGINEER COMBAT"
+  },
+  {
+    "code":"S-G-UCECA------",
+    "name":"ENGINEER COMBAT AIRBORNE"
+  },
+  {
+    "code":"S-G-UCECC------",
+    "name":"ENGINEER COMBAT ARCTIC"
+  },
+  {
+    "code":"S-G-UCECH------",
+    "name":"ENGINEER COMBAT HEAVY"
+  },
+  {
+    "code":"S-G-UCECL------",
+    "name":"ENGINEER COMBAT LIGHT"
+  },
+  {
+    "code":"S-G-UCECM------",
+    "name":"ENGINEER COMBAT MEDIUM"
+  },
+  {
+    "code":"S-G-UCECO------",
+    "name":"ENGINEER COMBAT MOUNTAIN"
+  },
+  {
+    "code":"S-G-UCECR------",
+    "name":"ENGINEER COMBAT RECON"
+  },
+  {
+    "code":"S-G-UCECS------",
+    "name":"ENGINEER COMBAT AIR ASSAULT"
+  },
+  {
+    "code":"S-G-UCECT------",
+    "name":"ENGINEER COMBAT"
+  },
+  {
+    "code":"S-G-UCECW------",
+    "name":"ENGINEER COMBAT MOTORIZED"
+  },
+  {
+    "code":"S-G-UCEN-------",
+    "name":"ENGINEER CONSTRUCTION"
+  },
+  {
+    "code":"S-G-UCENN------",
+    "name":"ENGINEER NAVAL"
+  },
+  {
+    "code":"S-G-UCF--------",
+    "name":"FIELD ARTILLERY"
+  },
+  {
+    "code":"S-G-UCFH-------",
+    "name":"HOWITZER/GUN"
+  },
+  {
+    "code":"S-G-UCFHA------",
+    "name":"AIRBORNE"
+  },
+  {
+    "code":"S-G-UCFHC------",
+    "name":"ARCTIC"
+  },
+  {
+    "code":"S-G-UCFHE------",
+    "name":"SELF PROPELLED"
+  },
+  {
+    "code":"S-G-UCFHH------",
+    "name":"HEAVY"
+  },
+  {
+    "code":"S-G-UCFHL------",
+    "name":"LIGHT"
+  },
+  {
+    "code":"S-G-UCFHM------",
+    "name":"MEDIUM"
+  },
+  {
+    "code":"S-G-UCFHO------",
+    "name":"MOUNTAIN"
+  },
+  {
+    "code":"S-G-UCFHS------",
+    "name":"AIR ASSAULT"
+  },
+  {
+    "code":"S-G-UCFHX------",
+    "name":"AMPHIBIOUS"
+  },
+  {
+    "code":"S-G-UCFM-------",
+    "name":"MORTAR"
+  },
+  {
+    "code":"S-G-UCFML------",
+    "name":"AMPHIBIOUS MORTAR"
+  },
+  {
+    "code":"S-G-UCFMS------",
+    "name":"SELF PROPELLED (SP) TRACKED"
+  },
+  {
+    "code":"S-G-UCFMSW-----",
+    "name":"SP WHEELED MORTAR"
+  },
+  {
+    "code":"S-G-UCFMT------",
+    "name":"TOWED MORTAR"
+  },
+  {
+    "code":"S-G-UCFMTA-----",
+    "name":"TOWED AIRBORNE MORTAR"
+  },
+  {
+    "code":"S-G-UCFMTC-----",
+    "name":"TOWED ARCTIC MORTAR"
+  },
+  {
+    "code":"S-G-UCFMTO-----",
+    "name":"TOWED MOUNTAIN MORTAR"
+  },
+  {
+    "code":"S-G-UCFMTS-----",
+    "name":"TOWED AIR ASSAULT MORTAR"
+  },
+  {
+    "code":"S-G-UCFO-------",
+    "name":"METEOROLOGICAL"
+  },
+  {
+    "code":"S-G-UCFOA------",
+    "name":"AIRBORNE METEOROLOGICAL"
+  },
+  {
+    "code":"S-G-UCFOL------",
+    "name":"LIGHT METEOROLOGICAL"
+  },
+  {
+    "code":"S-G-UCFOO------",
+    "name":"MOUNTAIN METEOROLOGICAL"
+  },
+  {
+    "code":"S-G-UCFOS------",
+    "name":"AIR ASSAULT METEOROLOGICAL"
+  },
+  {
+    "code":"S-G-UCFR-------",
+    "name":"ROCKET"
+  },
+  {
+    "code":"S-G-UCFRM------",
+    "name":"MULTI ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-UCFRMR-----",
+    "name":"MULTI ROCKET TRUCK"
+  },
+  {
+    "code":"S-G-UCFRMS-----",
+    "name":"MULTI ROCKET SELF PROPELLED"
+  },
+  {
+    "code":"S-G-UCFRMT-----",
+    "name":"MULTI ROCKET TOWED"
+  },
+  {
+    "code":"S-G-UCFRS------",
+    "name":"SINGLE ROCKET LAUNCHER"
+  },
+  {
+    "code":"S-G-UCFRSR-----",
+    "name":"SINGLE ROCKET TRUCK"
+  },
+  {
+    "code":"S-G-UCFRSS-----",
+    "name":"SINGLE ROCKET SELF"
+  },
+  {
+    "code":"S-G-UCFRST-----",
+    "name":"SINGLE ROCKET TOWED"
+  },
+  {
+    "code":"S-G-UCFS-------",
+    "name":"ARTILLERY SURVEY"
+  },
+  {
+    "code":"S-G-UCFSA------",
+    "name":"AIRBORNE"
+  },
+  {
+    "code":"S-G-UCFSL------",
+    "name":"LIGHT"
+  },
+  {
+    "code":"S-G-UCFSO------",
+    "name":"MOUNTAIN"
+  },
+  {
+    "code":"S-G-UCFSS------",
+    "name":"AIR ASSAULT"
+  },
+  {
+    "code":"S-G-UCFT-------",
+    "name":"TARGET ACQUISITION"
+  },
+  {
+    "code":"S-G-UCFTA------",
+    "name":"TARGET ACQUISITION NAVAL"
+  },
+  {
+    "code":"S-G-UCFTC------",
+    "name":"TARGET ACQUISITION MOUNTED"
+  },
+  {
+    "code":"S-G-UCFTCD-----",
+    "name":"TARGET ACQUISITION"
+  },
+  {
+    "code":"S-G-UCFTCM-----",
+    "name":"TARGET ACQUISITION TRACKED"
+  },
+  {
+    "code":"S-G-UCFTF------",
+    "name":"FLASH (OPTICAL)"
+  },
+  {
+    "code":"S-G-UCFTR------",
+    "name":"RADAR"
+  },
+  {
+    "code":"S-G-UCFTS------",
+    "name":"SOUND"
+  },
+  {
+    "code":"S-G-UCI--------",
+    "name":"INFANTRY"
+  },
+  {
+    "code":"S-G-UCIA-------",
+    "name":"INFANTRY AIRBORNE"
+  },
+  {
+    "code":"S-G-UCIC-------",
+    "name":"INFANTRY ARCTIC"
+  },
+  {
+    "code":"S-G-UCII-------",
+    "name":"INFANTRY FIGHTING VEHICLE"
+  },
+  {
+    "code":"S-G-UCIL-------",
+    "name":"INFANTRY LIGHT"
+  },
+  {
+    "code":"S-G-UCIM-------",
+    "name":"INFANTRY MOTORIZED"
+  },
+  {
+    "code":"S-G-UCIN-------",
+    "name":"INFANTRY NAVAL"
+  },
+  {
+    "code":"S-G-UCIO-------",
+    "name":"INFANTRY MOUNTAIN"
+  },
+  {
+    "code":"S-G-UCIS-------",
+    "name":"INFANTRY AIR ASSAULT"
+  },
+  {
+    "code":"S-G-UCIZ-------",
+    "name":"INFANTRY MECHANIZED"
+  },
+  {
+    "code":"S-G-UCM--------",
+    "name":"MISSILE (SURFACE-SURFACE)"
+  },
+  {
+    "code":"S-G-UCMS-------",
+    "name":"MISSILE (SURFACE-SURFACE)"
+  },
+  {
+    "code":"S-G-UCMT-------",
+    "name":"MISSILE (SURFACE-SURFACE)"
+  },
+  {
+    "code":"S-G-UCR--------",
+    "name":"RECONNAISSANCE"
+  },
+  {
+    "code":"S-G-UCRA-------",
+    "name":"RECONNAISSANCE AIRBORNE"
+  },
+  {
+    "code":"S-G-UCRC-------",
+    "name":"RECONNAISSANCE ARCTIC"
+  },
+  {
+    "code":"S-G-UCRH-------",
+    "name":"RECONNAISSANCE HORSE"
+  },
+  {
+    "code":"S-G-UCRLL-------",
+    "name":" RECONNAISSANCE LIGHT"
+  },
+  {
+    "code":"S-G-UCRO-------",
+    "name":"RECONNAISSANCE MOUNTAIN"
+  },
+  {
+    "code":"S-G-UCRR-------",
+    "name":"RECONNAISSANCE MARINE"
+  },
+  {
+    "code":"S-G-UCRRD------",
+    "name":"RECONNAISSANCE MARINE"
+  },
+  {
+    "code":"S-G-UCRRF------",
+    "name":"RECONNAISSANCE MARINE"
+  },
+  {
+    "code":"S-G-UCRRL------",
+    "name":"RECONNAISSANCE MARINE"
+  },
+  {
+    "code":"S-G-UCRS-------",
+    "name":"RECONNAISSANCE AIR ASSAULT"
+  },
+  {
+    "code":"S-G-UCRV-------",
+    "name":"RECONNAISSANCE CAVALRY"
+  },
+  {
+    "code":"S-G-UCRVA------",
+    "name":"RECONNAISSANCE CAVALRY"
+  },
+  {
+    "code":"S-G-UCRVG------",
+    "name":"RECONNAISSANCE CAVALRY"
+  },
+  {
+    "code":"S-G-UCRVM------",
+    "name":"RECONNAISSANCE CAVALRY"
+  },
+  {
+    "code":"S-G-UCRVO------",
+    "name":"RECONNAISSANCE CAVALRY AIR"
+  },
+  {
+    "code":"S-G-UCRX-------",
+    "name":"RECONNAISSANCE LONG RANGE"
+  },
+  {
+    "code":"S-G-UCS--------",
+    "name":"INTERNAL SECURITY FORCES"
+  },
+  {
+    "code":"S-G-UCSA-------",
+    "name":"AVIATION"
+  },
+  {
+    "code":"S-G-UCSG-------",
+    "name":"GROUND"
+  },
+  {
+    "code":"S-G-UCSGA------",
+    "name":"MECHANIZED GROUND"
+  },
+  {
+    "code":"S-G-UCSGD------",
+    "name":"DISMOUNTED GROUND"
+  },
+  {
+    "code":"S-G-UCSGM------",
+    "name":"MOTORIZED GROUND"
+  },
+  {
+    "code":"S-G-UCSM-------",
+    "name":"WHEELED MECHANIZED"
+  },
+  {
+    "code":"S-G-UCSR-------",
+    "name":"RAILROAD"
+  },
+  {
+    "code":"S-G-UCSW-------",
+    "name":"RIVERINE"
+  },
+  {
+    "code":"S-G-UCV--------",
+    "name":"AVIATION"
+  },
+  {
+    "code":"S-G-UCVC-------",
+    "name":"COMPOSITE"
+  },
+  {
+    "code":"S-G-UCVF-------",
+    "name":"FIXED WING"
+  },
+  {
+    "code":"S-G-UCVFA------",
+    "name":"ATTACK FIXED WING"
+  },
+  {
+    "code":"S-G-UCVFR------",
+    "name":"RECON FIXED WING"
+  },
+  {
+    "code":"S-G-UCVFU------",
+    "name":"UTILITY FIXED WING"
+  },
+  {
+    "code":"S-G-UCVR-------",
+    "name":"ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRA------",
+    "name":"ATTACK ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRM------",
+    "name":"MINE COUNTERMEASURE"
+  },
+  {
+    "code":"S-G-UCVRS------",
+    "name":"SCOUT ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRU------",
+    "name":"UTILITY ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRUC-----",
+    "name":"C2 ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRUE-----",
+    "name":"MEDEVAC ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRUH-----",
+    "name":"HEAVY UTILITY ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRUL-----",
+    "name":"LIGHT UTILITY ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRUM-----",
+    "name":"MEDIUM UTILITY ROTARY WING"
+  },
+  {
+    "code":"S-G-UCVRW------",
+    "name":"ANTISUBMARINE WARFARE"
+  },
+  {
+    "code":"S-G-UCVS-------",
+    "name":"PERSONNEL RECOVERY"
+  },
+  {
+    "code":"S-G-UCVU-------",
+    "name":"UNMANNED AERIAL VEHICLE"
+  },
+  {
+    "code":"S-G-UCVUF------",
+    "name":"UNMANNED AERIAL VEHICLE"
+  },
+  {
+    "code":"S-G-UCVUFC-----",
+    "name":"FORWARD AIR CONTROLLER"
+  },
+  {
+    "code":"S-G-UCVUR------",
+    "name":"UNMANNED AERIAL VEHICLE"
+  },
+  {
+    "code":"S-G-UCVUTP-----",
+    "name":"TACTICAL AIR CONTROL PARTY"
+  },
+  {
+    "code":"S-G-UCVV-------",
+    "name":"VERTICAL/SHORT TAKEOFF AND"
+  },
+  {
+    "code":"S-G-UH---------",
+    "name":"''"
+  },
+  {
+    "code":"S-G-UHGL-------",
+    "name":"UNIT GENERAL LIAISON"
+  },
+  {
+    "code":"S-G-US---------",
+    "name":"COMBAT SERVICE SUPPORT"
+  },
+  {
+    "code":"S-G-USA--------",
+    "name":"ADMINISTRATIVE (ADMIN)"
+  },
+  {
+    "code":"S-G-USAC-------",
+    "name":"ADMIN CORPS"
+  },
+  {
+    "code":"S-G-USAF-------",
+    "name":"FINANCE"
+  },
+  {
+    "code":"S-G-USAFC------",
+    "name":"FINANCE CORPS"
+  },
+  {
+    "code":"S-G-USAFT------",
+    "name":"FINANCE THEATRE"
+  },
+  {
+    "code":"S-G-USAJ-------",
+    "name":"JUDGE ADVOCATE GENERAL"
+  },
+  {
+    "code":"S-G-USAJC------",
+    "name":"JAG CORPS"
+  },
+  {
+    "code":"S-G-USAJT------",
+    "name":"JAG THEATRE"
+  },
+  {
+    "code":"S-G-USAL-------",
+    "name":"LABOUR"
+  },
+  {
+    "code":"S-G-USALC------",
+    "name":"LABOUR CORPS"
+  },
+  {
+    "code":"S-G-USALT------",
+    "name":"LABOUR THEATRE"
+  },
+  {
+    "code":"S-G-USAM-------",
+    "name":"MORTUARY/GRAVES REGISTRY"
+  },
+  {
+    "code":"S-G-USAMC------",
+    "name":"MORTUARY/GRAVES REGISTRY"
+  },
+  {
+    "code":"S-G-USAMT------",
+    "name":"MORTUARY/GRAVES REGISTRY"
+  },
+  {
+    "code":"S-G-USAO-------",
+    "name":"POSTAL"
+  },
+  {
+    "code":"S-G-USAOC------",
+    "name":"POSTAL CORPS"
+  },
+  {
+    "code":"S-G-USAOT------",
+    "name":"POSTAL THEATRE"
+  },
+  {
+    "code":"S-G-USAP-------",
+    "name":"PUBLIC AFFAIRS"
+  },
+  {
+    "code":"S-G-USAPB------",
+    "name":"PUBLIC AFFAIRS BROADCAST"
+  },
+  {
+    "code":"S-G-USAPBC-----",
+    "name":"PUBLIC AFFAIRS BROADCAST"
+  },
+  {
+    "code":"S-G-USAPBT-----",
+    "name":"PUBLIC AFFAIRS BROADCAST"
+  },
+  {
+    "code":"S-G-USAPC------",
+    "name":"PUBLIC AFFAIRS CORPS"
+  },
+  {
+    "code":"S-G-USAPM------",
+    "name":"PUBLIC AFFAIRS JOINT"
+  },
+  {
+    "code":"S-G-USAPMC-----",
+    "name":"PUBLIC AFFAIRS JIB CORPS"
+  },
+  {
+    "code":"S-G-USAPMT-----",
+    "name":"PUBLIC AFFAIRS JIB THEATRE"
+  },
+  {
+    "code":"S-G-USAPT------",
+    "name":"PUBLIC AFFAIRS THEATRE"
+  },
+  {
+    "code":"S-G-USAQ-------",
+    "name":"QUARTERMASTER (SUPPLY)"
+  },
+  {
+    "code":"S-G-USAQC------",
+    "name":"QUARTERMASTER (SUPPLY)"
+  },
+  {
+    "code":"S-G-USAQT------",
+    "name":"QUARTERMASTER (SUPPLY)"
+  },
+  {
+    "code":"S-G-USAR-------",
+    "name":"RELIGIOUS/CHAPLAIN"
+  },
+  {
+    "code":"S-G-USARC------",
+    "name":"RELIGIOUS/CHAPLAIN CORPS"
+  },
+  {
+    "code":"S-G-USART------",
+    "name":"RELIGIOUS/CHAPLAIN THEATRE"
+  },
+  {
+    "code":"S-G-USAS-------",
+    "name":"PERSONNEL SERVICES"
+  },
+  {
+    "code":"S-G-USASC------",
+    "name":"PERSONNEL CORPS"
+  },
+  {
+    "code":"S-G-USAST------",
+    "name":"PERSONNEL THEATRE"
+  },
+  {
+    "code":"S-G-USAT-------",
+    "name":"ADMIN THEATRE"
+  },
+  {
+    "code":"S-G-USAW-------",
+    "name":"MORAL, WELFARE, RECREATION"
+  },
+  {
+    "code":"S-G-USAWC------",
+    "name":"MWR CORPS"
+  },
+  {
+    "code":"S-G-USAWT------",
+    "name":"MWR THEATRE"
+  },
+  {
+    "code":"S-G-USAX-------",
+    "name":"REPLACEMENT HOLDING UNIT"
+  },
+  {
+    "code":"S-G-USAXC------",
+    "name":"RHU CORPS"
+  },
+  {
+    "code":"S-G-USAXT------",
+    "name":"RHU THEATRE"
+  },
+  {
+    "code":"S-G-USM--------",
+    "name":"MEDICAL"
+  },
+  {
+    "code":"S-G-USMC-------",
+    "name":"MEDICAL CORPS"
+  },
+  {
+    "code":"S-G-USMD-------",
+    "name":"MEDICAL DENTAL"
+  },
+  {
+    "code":"S-G-USMDC------",
+    "name":"MEDICAL DENTAL CORPS"
+  },
+  {
+    "code":"S-G-USMDT------",
+    "name":"MEDICAL DENTAL THEATRE"
+  },
+  {
+    "code":"S-G-USMM-------",
+    "name":"MEDICAL TREATMENT FACILITY"
+  },
+  {
+    "code":"S-G-USMMC------",
+    "name":"MEDICAL TREATMENT FACILITY"
+  },
+  {
+    "code":"S-G-USMMT------",
+    "name":"MEDICAL TREATMENT FACILITY"
+  },
+  {
+    "code":"S-G-USMP-------",
+    "name":"MEDICAL PSYCHOLOGICAL"
+  },
+  {
+    "code":"S-G-USMPC------",
+    "name":"MEDICAL PSYCHOLOGICAL"
+  },
+  {
+    "code":"S-G-USMPT------",
+    "name":"MEDICAL PSYCHOLOGICAL"
+  },
+  {
+    "code":"S-G-USMT-------",
+    "name":"MEDICAL THEATRE"
+  },
+  {
+    "code":"S-G-USMV-------",
+    "name":"MEDICAL VETERINARY"
+  },
+  {
+    "code":"S-G-USMVC------",
+    "name":"MEDICAL VETERINARY CORPS"
+  },
+  {
+    "code":"S-G-USMVT------",
+    "name":"MEDICAL VETERINARY THEATRE"
+  },
+  {
+    "code":"S-G-USS--------",
+    "name":"SUPPLY"
+  },
+  {
+    "code":"S-G-USS1-------",
+    "name":"SUPPLY CLASS I"
+  },
+  {
+    "code":"S-G-USS1C------",
+    "name":"SUPPLY CLASS I CORPS"
+  },
+  {
+    "code":"S-G-USS1T------",
+    "name":"SUPPLY CLASS I THEATRE"
+  },
+  {
+    "code":"S-G-USS2-------",
+    "name":"SUPPLY CLASS II"
+  },
+  {
+    "code":"S-G-USS2C------",
+    "name":"SUPPLY CLASS II CORPS"
+  },
+  {
+    "code":"S-G-USS2T------",
+    "name":"SUPPLY CLASS II THEATRE"
+  },
+  {
+    "code":"S-G-USS3-------",
+    "name":"SUPPLY CLASS III"
+  },
+  {
+    "code":"S-G-USS3A------",
+    "name":"SUPPLY CLASS III AVIATION"
+  },
+  {
+    "code":"S-G-USS3AC-----",
+    "name":"SUPPLY CLASS III AVIATION"
+  },
+  {
+    "code":"S-G-USS3AT-----",
+    "name":"SUPPLY CLASS III AVIATION"
+  },
+  {
+    "code":"S-G-USS3C------",
+    "name":"SUPPLY CLASS III CORPS"
+  },
+  {
+    "code":"S-G-USS3T------",
+    "name":"SUPPLY CLASS III THEATRE"
+  },
+  {
+    "code":"S-G-USS4-------",
+    "name":"SUPPLY CLASS IV"
+  },
+  {
+    "code":"S-G-USS4C------",
+    "name":"SUPPLY CLASS IV CORPS"
+  },
+  {
+    "code":"S-G-USS4T------",
+    "name":"SUPPLY CLASS IV THEATRE"
+  },
+  {
+    "code":"S-G-USS5-------",
+    "name":"SUPPLY CLASS V"
+  },
+  {
+    "code":"S-G-USS5C------",
+    "name":"SUPPLY CLASS V CORPS"
+  },
+  {
+    "code":"S-G-USS5T------",
+    "name":"SUPPLY CLASS V THEATRE"
+  },
+  {
+    "code":"S-G-USS6-------",
+    "name":"SUPPLY CLASS VI"
+  },
+  {
+    "code":"S-G-USS6C------",
+    "name":"SUPPLY CLASS VI CORPS"
+  },
+  {
+    "code":"S-G-USS6T------",
+    "name":"SUPPLY CLASS VI THEATRE"
+  },
+  {
+    "code":"S-G-USS7-------",
+    "name":"SUPPLY CLASS VII"
+  },
+  {
+    "code":"S-G-USS7C------",
+    "name":"SUPPLY CLASS VII CORPS"
+  },
+  {
+    "code":"S-G-USS7T------",
+    "name":"SUPPLY CLASS VII THEATRE"
+  },
+  {
+    "code":"S-G-USS8-------",
+    "name":"SUPPLY CLASS VIII"
+  },
+  {
+    "code":"S-G-USS8C------",
+    "name":"SUPPLY CLASS VIII CORPS"
+  },
+  {
+    "code":"S-G-USS8T------",
+    "name":"SUPPLY CLASS VIII THEATRE"
+  },
+  {
+    "code":"S-G-USS9-------",
+    "name":"SUPPLY CLASS IX"
+  },
+  {
+    "code":"S-G-USS9C------",
+    "name":"SUPPLY CLASS IX CORPS"
+  },
+  {
+    "code":"S-G-USS9T------",
+    "name":"SUPPLY CLASS IX THEATRE"
+  },
+  {
+    "code":"S-G-USSC-------",
+    "name":"SUPPLY CORPS"
+  },
+  {
+    "code":"S-G-USSL-------",
+    "name":"SUPPLY LAUNDRY/BATH"
+  },
+  {
+    "code":"S-G-USSLC------",
+    "name":"SUPPLY LAUNDRY/BATH CORPS"
+  },
+  {
+    "code":"S-G-USSLT------",
+    "name":"SUPPLY LAUNDRY/BATH"
+  },
+  {
+    "code":"S-G-USST-------",
+    "name":"SUPPLY THEATRE"
+  },
+  {
+    "code":"S-G-USSW-------",
+    "name":"SUPPLY WATER"
+  },
+  {
+    "code":"S-G-USSWC------",
+    "name":"SUPPLY WATER CORPS"
+  },
+  {
+    "code":"S-G-USSWP------",
+    "name":"SUPPLY WATER PURIFICATION"
+  },
+  {
+    "code":"S-G-USSWPC-----",
+    "name":"SUPPLY WATER PURIFICATION"
+  },
+  {
+    "code":"S-G-USSWPT-----",
+    "name":"SUPPLY WATER PURIFICATION"
+  },
+  {
+    "code":"S-G-USSWT------",
+    "name":"SUPPLY WATER THEATRE"
+  },
+  {
+    "code":"S-G-USSX-------",
+    "name":"SUPPLY CLASS X"
+  },
+  {
+    "code":"S-G-USSXC------",
+    "name":"SUPPLY CLASS X CORPS"
+  },
+  {
+    "code":"S-G-USSXT------",
+    "name":"SUPPLY CLASS X THEATRE"
+  },
+  {
+    "code":"S-G-UST--------",
+    "name":"TRANSPORTATION"
+  },
+  {
+    "code":"S-G-USTA-------",
+    "name":"APOD/APOE"
+  },
+  {
+    "code":"S-G-USTAC------",
+    "name":"APOD/APOE CORPS"
+  },
+  {
+    "code":"S-G-USTAT------",
+    "name":"APOD/APOE THEATRE"
+  },
+  {
+    "code":"S-G-USTC-------",
+    "name":"TRANSPORTATION CORPS"
+  },
+  {
+    "code":"S-G-USTI-------",
+    "name":"MISSILE"
+  },
+  {
+    "code":"S-G-USTIC------",
+    "name":"MISSILE CORPS"
+  },
+  {
+    "code":"S-G-USTIT------",
+    "name":"MISSILE THEATRE"
+  },
+  {
+    "code":"S-G-USTM-------",
+    "name":"MOVEMENT CONTROL"
+  },
+  {
+    "code":"S-G-USTMC------",
+    "name":"MCC CORPS"
+  },
+  {
+    "code":"S-G-USTMT------",
+    "name":"MCC THEATRE"
+  },
+  {
+    "code":"S-G-USTR-------",
+    "name":"RAILHEAD"
+  },
+  {
+    "code":"S-G-USTRC------",
+    "name":"RAILHEAD CORPS"
+  },
+  {
+    "code":"S-G-USTRT------",
+    "name":"RAILHEAD THEATRE"
+  },
+  {
+    "code":"S-G-USTS-------",
+    "name":"SPOD/SPOE"
+  },
+  {
+    "code":"S-G-USTSC------",
+    "name":"SPOD/SPOE CORPS"
+  },
+  {
+    "code":"S-G-USTST------",
+    "name":"SPOD/SPOE THEATRE"
+  },
+  {
+    "code":"S-G-USTT-------",
+    "name":"TRANSPORTATION THEATRE"
+  },
+  {
+    "code":"S-G-USX--------",
+    "name":"MAINTENANCE"
+  },
+  {
+    "code":"S-G-USXBDR-----",
+    "name":"BATTLE DAMAGE REPAIR"
+  },
+  {
+    "code":"S-G-USXC-------",
+    "name":"MAINTENANCE CORPS"
+  },
+  {
+    "code":"S-G-USXE-------",
+    "name":"ELECTRO-OPTICAL"
+  },
+  {
+    "code":"S-G-USXEC------",
+    "name":"ELECTRO-OPTICAL CORPS"
+  },
+  {
+    "code":"S-G-USXEP------",
+    "name":"ENVIRONMENTAL PROTECTION"
+  },
+  {
+    "code":"S-G-USXET------",
+    "name":"ELECTRO-OPTICAL THEATRE"
+  },
+  {
+    "code":"S-G-USXH-------",
+    "name":"MAINTENANCE HEAVY"
+  },
+  {
+    "code":"S-G-USXHC------",
+    "name":"MAINTENANCE HEAVY CORPS"
+  },
+  {
+    "code":"S-G-USXHT------",
+    "name":"MAINTENANCE HEAVY THEATRE"
+  },
+  {
+    "code":"S-G-USXO-------",
+    "name":"ORDINANCE"
+  },
+  {
+    "code":"S-G-USXOC------",
+    "name":"ORDINANCE CORPS"
+  },
+  {
+    "code":"S-G-USXOM------",
+    "name":"ORDINANCE MISSILE"
+  },
+  {
+    "code":"S-G-USXOMC-----",
+    "name":"ORDINANCE MISSILE CORPS"
+  },
+  {
+    "code":"S-G-USXOMT-----",
+    "name":"ORDINANCE MISSILE THEATRE"
+  },
+  {
+    "code":"S-G-USXOT------",
+    "name":"ORDINANCE THEATRE"
+  },
+  {
+    "code":"S-G-USXP-------",
+    "name":"PIPELINE"
+  },
+  {
+    "code":"S-G-USXPM------",
+    "name":"PREVENTIVE MAINTANANCE"
+  },
+  {
+    "code":"S-G-USXR-------",
+    "name":"MAINTENANCE RECOVERY"
+  },
+  {
+    "code":"S-G-USXRC------",
+    "name":"MAINTENANCE RECOVERY"
+  },
+  {
+    "code":"S-G-USXRT------",
+    "name":"MAINTENANCE RECOVERY"
+  },
+  {
+    "code":"S-G-USXT-------",
+    "name":"MAINTENANCE THEATRE"
+  },
+  {
+    "code":"S-G-UU---------",
+    "name":"COMBAT SUPPORT"
+  },
+  {
+    "code":"S-G-UUA--------",
+    "name":"COMBAT SUPPORT CBRN"
+  },
+  {
+    "code":"S-G-UUAB-------",
+    "name":"BIOLOGICAL"
+  },
+  {
+    "code":"S-G-UUABR------",
+    "name":"RECON EQUIPPED"
+  },
+  {
+    "code":"S-G-UUAC-------",
+    "name":"CHEMICAL"
+  },
+  {
+    "code":"S-G-UUACC------",
+    "name":"SMOKE/DECON"
+  },
+  {
+    "code":"S-G-UUACCK-----",
+    "name":"MECHANIZED SMOKE/DECON"
+  },
+  {
+    "code":"S-G-UUACCM-----",
+    "name":"MOTORIZED SMOKE/DECON"
+  },
+  {
+    "code":"S-G-UUACR------",
+    "name":"CHEMICAL RECON"
+  },
+  {
+    "code":"S-G-UUACRS-----",
+    "name":"CHEMICAL WHEELED ARMOURED"
+  },
+  {
+    "code":"S-G-UUACRW-----",
+    "name":"CHEMICAL WHEELED ARMOURED"
+  },
+  {
+    "code":"S-G-UUACS------",
+    "name":"SMOKE"
+  },
+  {
+    "code":"S-G-UUACSA-----",
+    "name":"ARMOUR SMOKE"
+  },
+  {
+    "code":"S-G-UUACSM-----",
+    "name":"MOTORIZED SMOKE"
+  },
+  {
+    "code":"S-G-UUAD-------",
+    "name":"DECONTAMINATION"
+  },
+  {
+    "code":"S-G-UUAN-------",
+    "name":"NUCLEAR"
+  },
+  {
+    "code":"S-G-UUD--------",
+    "name":"DRILLING"
+  },
+  {
+    "code":"S-G-UUE--------",
+    "name":"EXPLOSIVE ORDINANCE"
+  },
+  {
+    "code":"S-G-UUI--------",
+    "name":"INFORMATION WARFARE UNIT"
+  },
+  {
+    "code":"S-G-UUL--------",
+    "name":"LAW ENFORCEMENT UNIT"
+  },
+  {
+    "code":"S-G-UULC-------",
+    "name":"CIVILIAN LAW ENFORCEMENT"
+  },
+  {
+    "code":"S-G-UULD-------",
+    "name":"CENTRAL INTELLIGENCE"
+  },
+  {
+    "code":"S-G-UULF-------",
+    "name":"SECURITY POLICE (AIR)"
+  },
+  {
+    "code":"S-G-UULM-------",
+    "name":"MILITARY POLICE"
+  },
+  {
+    "code":"S-G-UULS-------",
+    "name":"SHORE PATROL"
+  },
+  {
+    "code":"S-G-UUM--------",
+    "name":"MILITARY INTELLIGENCE"
+  },
+  {
+    "code":"S-G-UUMA-------",
+    "name":"AERIAL EXPLOITATION"
+  },
+  {
+    "code":"S-G-UUMC-------",
+    "name":"COUNTER INTELLIGENCE"
+  },
+  {
+    "code":"S-G-UUMJ-------",
+    "name":"JOINT INTELLIGENCE CENTRE"
+  },
+  {
+    "code":"S-G-UUMMO------",
+    "name":"METEOROLOGICAL"
+  },
+  {
+    "code":"S-G-UUMO-------",
+    "name":"OPERATIONS"
+  },
+  {
+    "code":"S-G-UUMQ-------",
+    "name":"INTERROGATION"
+  },
+  {
+    "code":"S-G-UUMR-------",
+    "name":"SURVEILLANCE"
+  },
+  {
+    "code":"S-G-UUMRG------",
+    "name":"GROUND SURVEILLANCE RADAR"
+  },
+  {
+    "code":"S-G-UUMRS------",
+    "name":"SENSOR"
+  },
+  {
+    "code":"S-G-UUMRSS-----",
+    "name":"SENSOR SCM"
+  },
+  {
+    "code":"S-G-UUMRX------",
+    "name":"GROUND STATION MODULE"
+  },
+  {
+    "code":"S-G-UUMS-------",
+    "name":"SIGNAL INTELLIGENCE (SIGINT)"
+  },
+  {
+    "code":"S-G-UUMSE------",
+    "name":"ELECTRONIC WARFARE"
+  },
+  {
+    "code":"S-G-UUMSEA-----",
+    "name":"ARMOURED WHEELED VEHICLE"
+  },
+  {
+    "code":"S-G-UUMSEC-----",
+    "name":"CORPS"
+  },
+  {
+    "code":"S-G-UUMSED-----",
+    "name":"DIRECTION FINDING"
+  },
+  {
+    "code":"S-G-UUMSEI-----",
+    "name":"INTERCEPT"
+  },
+  {
+    "code":"S-G-UUMSEJ-----",
+    "name":"JAMMING"
+  },
+  {
+    "code":"S-G-UUMSET-----",
+    "name":"THEATRE"
+  },
+  {
+    "code":"S-G-UUMT-------",
+    "name":"TACTICAL EXPLOIT"
+  },
+  {
+    "code":"S-G-UUS--------",
+    "name":"SIGNAL UNIT"
+  },
+  {
+    "code":"S-G-UUSA-------",
+    "name":"AREA"
+  },
+  {
+    "code":"S-G-UUSC-------",
+    "name":"COMMUNICATION CONFIGURED"
+  },
+  {
+    "code":"S-G-UUSCL------",
+    "name":"LARGE COMMUNICATION"
+  },
+  {
+    "code":"S-G-UUSF-------",
+    "name":"FORWARD COMMUNICATIONS"
+  },
+  {
+    "code":"S-G-UUSM-------",
+    "name":"MULTIPLE SUBSCRIBER ELEMENT"
+  },
+  {
+    "code":"S-G-UUSML------",
+    "name":"LARGE EXTENSION NODE"
+  },
+  {
+    "code":"S-G-UUSMN------",
+    "name":"NODE CENTRE"
+  },
+  {
+    "code":"S-G-UUSMS------",
+    "name":"SMALL EXTENSION NODE"
+  },
+  {
+    "code":"S-G-UUSO-------",
+    "name":"COMMAND OPERATIONS"
+  },
+  {
+    "code":"S-G-UUSR-------",
+    "name":"RADIO UNIT"
+  },
+  {
+    "code":"S-G-UUSRS------",
+    "name":"TACTICAL SATELLITE"
+  },
+  {
+    "code":"S-G-UUSRT------",
+    "name":"TELETYPE CENTRE"
+  },
+  {
+    "code":"S-G-UUSRW------",
+    "name":"RELAY"
+  },
+  {
+    "code":"S-G-UUSS-------",
+    "name":"SIGNAL SUPPORT"
+  },
+  {
+    "code":"S-G-UUSW-------",
+    "name":"TELEPHONE SWITCH"
+  },
+  {
+    "code":"S-G-UUSX-------",
+    "name":"ELECTRONIC RANGING"
+  },
+  {
+    "code":"S-G-UUT--------",
+    "name":"''"
+  },
+  {
+    "code":"S-G-UUX--------",
+    "name":"LANDING SUPPORT"
+  },
+  {
+    "code":"S-P------------",
+    "name":"SPACE TRACK"
+  },
+  {
+    "code":"S-P-S----------",
+    "name":"SATELLITE"
+  },
+  {
+    "code":"S-P-T----------",
+    "name":"SPACE STATION"
+  },
+  {
+    "code":"S-P-V----------",
+    "name":"CREWED SPACE VEHICLE"
+  },
+  {
+    "code":"S-S------------",
+    "name":"SEA SURFACE TRACK"
+  },
+  {
+    "code":"S-S-C----------",
+    "name":"COMBATANT"
+  },
+  {
+    "code":"S-S-CA---------",
+    "name":"AMPHIBIOUS WARFARE SHIP"
+  },
+  {
+    "code":"S-S-CALA-------",
+    "name":"ASSAULT VESSEL"
+  },
+  {
+    "code":"S-S-CALC-------",
+    "name":"LANDING CRAFT"
+  },
+  {
+    "code":"S-S-CALS-------",
+    "name":"LANDING SHIP"
+  },
+  {
+    "code":"S-S-CH---------",
+    "name":"HOVERCRAFT"
+  },
+  {
+    "code":"S-S-CL---------",
+    "name":"LINE"
+  },
+  {
+    "code":"S-S-CLBB-------",
+    "name":"BATTLESHIP"
+  },
+  {
+    "code":"S-S-CLCC-------",
+    "name":"CRUISER"
+  },
+  {
+    "code":"S-S-CLCV-------",
+    "name":"CARRIER"
+  },
+  {
+    "code":"S-S-CLDD-------",
+    "name":"DESTROYER"
+  },
+  {
+    "code":"S-S-CLFF-------",
+    "name":"FRIGATE/CORVETTE"
+  },
+  {
+    "code":"S-S-CM---------",
+    "name":"MINE WARFARE VESSEL"
+  },
+  {
+    "code":"S-S-CMMA-------",
+    "name":"MCM SUPPORT"
+  },
+  {
+    "code":"S-S-CMMD-------",
+    "name":"MCM DRONE"
+  },
+  {
+    "code":"S-S-CMMH-------",
+    "name":"MINEHUNTER"
+  },
+  {
+    "code":"S-S-CMML-------",
+    "name":"MINELAYER"
+  },
+  {
+    "code":"S-S-CMMS-------",
+    "name":"MINESWEEPER"
+  },
+  {
+    "code":"S-S-CP---------",
+    "name":"PATROL"
+  },
+  {
+    "code":"S-S-CPSB-------",
+    "name":"ANTI SUBMARINE WARFARE"
+  },
+  {
+    "code":"S-S-CPSU-------",
+    "name":"ANTI SURFACE WARFARE"
+  },
+  {
+    "code":"S-S-E----------",
+    "name":"EMERGENCY"
+  },
+  {
+    "code":"S-S-ED---------",
+    "name":"DITCHED AIRCRAFT"
+  },
+  {
+    "code":"S-S-EP---------",
+    "name":"PERSON IN WATER"
+  },
+  {
+    "code":"S-S-EV---------",
+    "name":"DISTRESSED VESSEL"
+  },
+  {
+    "code":"S-S-G----------",
+    "name":"NAVY GROUP"
+  },
+  {
+    "code":"S-S-GC---------",
+    "name":"CONVOY"
+  },
+  {
+    "code":"S-S-GE---------",
+    "name":"NAVY TASK ELEMENT"
+  },
+  {
+    "code":"S-S-GG---------",
+    "name":"NAVY TASK GROUP"
+  },
+  {
+    "code":"S-S-GT---------",
+    "name":"NAVY TASK FORCE"
+  },
+  {
+    "code":"S-S-GU---------",
+    "name":"NAVY TASK UNIT"
+  },
+  {
+    "code":"S-S-N----------",
+    "name":"NONCOMBATANT"
+  },
+  {
+    "code":"S-S-NFT--------",
+    "name":"FLEET SUPPORT, TUG, OCEAN"
+  },
+  {
+    "code":"S-S-NH---------",
+    "name":"HOVERCRAFT"
+  },
+  {
+    "code":"S-S-NI---------",
+    "name":"INTELLIGENCE"
+  },
+  {
+    "code":"S-S-NM---------",
+    "name":"HOSPITAL SHIP"
+  },
+  {
+    "code":"S-S-NR---------",
+    "name":"UNDERWAY REPLENISHMENT"
+  },
+  {
+    "code":"S-S-NRA--------",
+    "name":"UNDERWAY REPLENISHMENT,"
+  },
+  {
+    "code":"S-S-NRO--------",
+    "name":"UNDERWAY REPLENISHMENT,"
+  },
+  {
+    "code":"S-S-NS---------",
+    "name":"SERVICE & SUPPORT HARBOUR"
+  },
+  {
+    "code":"S-S-NTS--------",
+    "name":"SUBMARINE TENDER"
+  },
+  {
+    "code":"S-S-O----------",
+    "name":"OWN TRACK"
+  },
+  {
+    "code":"S-S-X----------",
+    "name":"NON MILITARY"
+  },
+  {
+    "code":"S-S-XF---------",
+    "name":"FISHING"
+  },
+  {
+    "code":"S-S-XFDF-------",
+    "name":"DRIFTER"
+  },
+  {
+    "code":"S-S-XFDR-------",
+    "name":"DREDGE"
+  },
+  {
+    "code":"S-S-XFTR-------",
+    "name":"TRAWLER"
+  },
+  {
+    "code":"S-S-XH---------",
+    "name":"HOVERCRAFT"
+  },
+  {
+    "code":"S-S-XL---------",
+    "name":"LAW ENFORCEMENT VESSEL"
+  },
+  {
+    "code":"S-S-XM---------",
+    "name":"MERCHANT"
+  },
+  {
+    "code":"S-S-XMC--------",
+    "name":"CARGO"
+  },
+  {
+    "code":"S-S-XMD-------D",
+    "name":"REDGE"
+  },
+  {
+    "code":"S-S-XME--------",
+    "name":"ROLL ON-ROLL OFF"
+  },
+  {
+    "code":"S-S-XMF--------",
+    "name":"FERRY"
+  },
+  {
+    "code":"S-S-XMH--------",
+    "name":"HAZARDOUS MATERIALS"
+  },
+  {
+    "code":"S-S-XMO--------",
+    "name":"OILER/TANKER"
+  },
+  {
+    "code":"S-S-XMP--------",
+    "name":"PASSENGER"
+  },
+  {
+    "code":"S-S-XMT-------T",
+    "name":"UG"
+  },
+  {
+    "code":"S-S-XR---------",
+    "name":"LEISURE CRAFT"
+  },
+  {
+    "code":"S-S-Z----------",
+    "name":"HAZARD"
+  },
+  {
+    "code":"S-S-ZI---------",
+    "name":"ICEBERG"
+  },
+  {
+    "code":"S-S-ZM---------",
+    "name":"SEA MINELIKE"
+  },
+  {
+    "code":"S-S-ZN---------",
+    "name":"NAVIGATIONAL"
+  },
+  {
+    "code":"S-U------------",
+    "name":"SUBSURFACE TRACK"
+  },
+  {
+    "code":"S-U-N----------",
+    "name":"NON-SUBMARINE"
+  },
+  {
+    "code":"S-U-NA---------",
+    "name":"SEA ANOMALY"
+  },
+  {
+    "code":"S-U-NB---------",
+    "name":"BOTTOM RETURN/NOMBO"
+  },
+  {
+    "code":"S-U-NBR--------",
+    "name":"SEABED ROCK/STONE, OBSTACLE,"
+  },
+  {
+    "code":"S-U-NBS--------",
+    "name":"SEABED INSTALLATION/"
+  },
+  {
+    "code":"S-U-NBW--------",
+    "name":"WRECK"
+  },
+  {
+    "code":"S-U-ND---------",
+    "name":"DIVER"
+  },
+  {
+    "code":"S-U-NM---------",
+    "name":"MARINE LIFE"
+  },
+  {
+    "code":"S-U-S----------",
+    "name":"SUBMARINE"
+  },
+  {
+    "code":"S-U-SC---------",
+    "name":"CONVENTIONAL PROPULSION"
+  },
+  {
+    "code":"S-U-SN---------",
+    "name":"NUCLEAR PROPULSION"
+  },
+  {
+    "code":"S-U-SO---------",
+    "name":"OTHER SUBMERSIBLE"
+  },
+  {
+    "code":"S-U-W----------",
+    "name":"UNDERWATER WEAPON"
+  },
+  {
+    "code":"S-U-WD---------",
+    "name":"UNDERWATER DECOY"
+  },
+  {
+    "code":"S-U-WDM--------",
+    "name":"SEA MINE DECOY"
+  },
+  {
+    "code":"S-U-WM---------",
+    "name":"SEA MINE"
+  },
+  {
+    "code":"S-U-WMD--------",
+    "name":"SEA MINE DEALT"
+  },
+  {
+    "code":"S-U-WMF--------",
+    "name":"SEA MINE (FLOATING)"
+  },
+  {
+    "code":"S-U-WMFD-------",
+    "name":"SEA MINE (FLOATING) DEALT"
+  },
+  {
+    "code":"S-U-WMG--------",
+    "name":"SEA MINE (GROUND)"
+  },
+  {
+    "code":"S-U-WMGD-------",
+    "name":"SEA MINE (GROUND) DEALT"
+  },
+  {
+    "code":"S-U-WMM--------",
+    "name":"SEA MINE (MOORED)"
+  },
+  {
+    "code":"S-U-WMMD-------",
+    "name":"SEA MINE (MOORED DEALT"
+  },
+  {
+    "code":"S-U-WMO--------",
+    "name":"SEA MINE (IN OTHER POSITION)"
+  },
+  {
+    "code":"S-U-WMOD-------",
+    "name":"SEA MINE (IN OTHER POSITION)"
+  },
+  {
+    "code":"S-U-WT---------",
+    "name":"TORPEDO"
+  },
+  {
+    "code":"S-U-WV---------",
+    "name":"DRONE (UUV)"
+  }
+]

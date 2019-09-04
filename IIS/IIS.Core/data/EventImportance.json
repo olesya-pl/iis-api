@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Негайна доповідь",
+    "code": "critical",
+    "sortOrder": 40
+  },
+  {
+    "name": "Важливе",
+    "code": "important",
+    "sortOrder": 30
+  },
+  {
+    "name": "Середня важливість",
+    "code": "normal",
+    "sortOrder": 20
+  },
+  {
+    "name": "Звичайне",
+    "code": "low",
+    "sortOrder": 10
+  }
+]
