@@ -86,13 +86,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 var shortName = GetAttr(node, "shortName");
                 if (baseCode != null && shortName != null)
                     return $"{baseCode} ({shortName})";
-                return shortName ?? name;
+                return baseCode ?? shortName;
             }
 
             if (type == "Person")
             {
                 var arr = new[] {GetAttr(node, "secondName"), GetAttr(node, "firstName"), GetAttr(node, "fatherName")};
-                return string.Join(" ", arr.Where(string.IsNullOrWhiteSpace));
+                return string.Join(" ", arr.Where(s => !string.IsNullOrWhiteSpace(s)));
             }
 
             return name;
