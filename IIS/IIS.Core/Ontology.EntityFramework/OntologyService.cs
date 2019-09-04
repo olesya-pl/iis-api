@@ -232,7 +232,7 @@ namespace IIS.Core.Ontology.EntityFramework
             }
             else throw new Exception("Unsupported.");
 
-            foreach (var relatedNode in ctxNode.OutgoingRelations)
+            foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived))
             {
                 var mapped = MapNode(relatedNode.Node, ontology);
                 node.AddNode(mapped);

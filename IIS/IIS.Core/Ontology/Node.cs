@@ -22,7 +22,7 @@ namespace IIS.Core.Ontology
             UpdatedAt = updatedAt == default ? DateTime.UtcNow : updatedAt; // todo: remove stubs
         }
 
-        public void AddNode(Node node)
+        public virtual void AddNode(Node node)
         {
             _nodes.Add(node);
         }
@@ -86,6 +86,22 @@ namespace IIS.Core.Ontology
             : base(id, type, createdAt, updatedAt)
         {
 
+        }
+
+        public override void AddNode(Node node)
+        {
+            var relationType = (RelationType)node.Type;
+            if (relationType is EmbeddingRelationType)
+            {
+                var embeddingRelationType = (EmbeddingRelationType)relationType;
+                if (embeddingRelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                {
+                    var existingNode = Nodes.SingleOrDefault(e => e.Type == relationType);
+                    if (existingNode != null) throw new Exception($"Relation {relationType} supports single value only.");
+                }
+            }
+
+            base.AddNode(node);
         }
     }
 
