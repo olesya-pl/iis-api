@@ -20,7 +20,7 @@ namespace IIS.Core.GraphQL.Common
             [GraphQLNonNullType]
             public IEnumerable<T> GetItems([Parent] IEnumerable<T> parent, [GraphQLNonNullType] PaginationInput pagination)
             {
-                return pagination.Apply(parent);
+                return parent.Skip(pagination.Offset()).Take(pagination.PageSize);
             }
         }
     }
