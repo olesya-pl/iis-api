@@ -32,7 +32,7 @@ namespace IIS.Core
         {
             Configuration = configuration;
         }
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -44,6 +44,7 @@ namespace IIS.Core
                 .UseNpgsql(connectionString)
                 .EnableSensitiveDataLogging(),
                 ServiceLifetime.Scoped);
+            services.AddHttpContextAccessor();
             services.AddTransient<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyTypesService, OntologyTypesService>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
@@ -84,9 +85,9 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             app.UseDeveloperExceptionPage();
-            
+
             app.UseMiddleware<OptionsMiddleware>();
-            
+
             app.UseGraphQL();
             app.UsePlayground();
 
@@ -116,7 +117,7 @@ namespace IIS.Core
             context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
 
             if (context.Request.Method == "OPTIONS")
-            {    
+            {
                 context.Response.StatusCode = 200;
                 return context.Response.WriteAsync("OK");
             }

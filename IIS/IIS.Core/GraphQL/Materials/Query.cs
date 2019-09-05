@@ -14,10 +14,15 @@ namespace IIS.Core.GraphQL.Materials
     public class Query
     {
 
-        [GraphQLType(typeof(NonNullType<CollectionType<Material>>))]
-        public async Task<IEnumerable<Material>> GetMaterials([Service] IMaterialService materialService)
+//        [GraphQLType(typeof(NonNullType<CollectionType<Material>>))]
+        public async Task<IEnumerable<Material>> GetMaterials(
+            [Service] IMaterialService materialService,
+            [GraphQLNonNullType] PaginationInput pagination,
+            [GraphQLType(typeof(IdType))] Guid? parentId = null,
+            [GraphQLType(typeof(IdType))] Guid? nodeId = null)
         {
-            var materials = await materialService.GetMaterialsAsync();
+            var materials = await materialService.GetMaterialsAsync(pagination.PageSize,
+                pagination.Offset(), parentId, nodeId);
             return materials.Select(m => m.ToView());
         }
 

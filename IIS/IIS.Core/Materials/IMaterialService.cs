@@ -9,6 +9,6 @@ namespace IIS.Core.Materials
         Task SaveAsync(Materials.Material material);
         Task SaveAsync(Materials.Material material, Guid? parentId);
         Task<Materials.Material> GetMaterialAsync(Guid id);
-        Task<IEnumerable<Materials.Material>> GetMaterialsAsync(Guid? parentId = null);
+        Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset, Guid? parentId = null, Guid? nodeId = null);
     }
 }

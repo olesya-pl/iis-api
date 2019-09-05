@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.Files;
+using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Materials;
 using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
@@ -19,9 +20,11 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<Data> Data { get; set; }
 
         [GraphQLNonNullType]
-        public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialService materialService)
+        public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialService materialService,
+            [GraphQLNonNullType] PaginationInput pagination)
         {
-            var materials = await materialService.GetMaterialsAsync(Id);
+            var materials = await materialService.GetMaterialsAsync(pagination.PageSize,
+                pagination.Offset());
             return materials.Select(m => m.ToView()).ToList();
         }
 

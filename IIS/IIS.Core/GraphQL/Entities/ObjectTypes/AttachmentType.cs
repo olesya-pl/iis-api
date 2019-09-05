@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.Files;
+using Microsoft.AspNetCore.Http;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
@@ -44,10 +45,10 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             }
 
             [GraphQLNonNullType]
-            public string GetUrl([Parent] Guid fileId)
+            public string GetUrl([Parent] Guid fileId, [Service] IHttpContextAccessor contextAccessor)
             {
-                // todo
-                return $"http://dummy.net/{fileId}";
+                var request = contextAccessor.HttpContext.Request;
+                return $"{request.Scheme}://{request.Host.Value}/api/files/{fileId}"; // todo: change hardcoded files api
             }
         }
     }
