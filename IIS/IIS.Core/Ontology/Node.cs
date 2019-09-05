@@ -54,7 +54,7 @@ namespace IIS.Core.Ontology
 
         // For single or multiple relations
         public Relation GetRelation(RelationType relationType, Guid targetId) =>
-            GetRelations(relationType).SingleOrDefault(r => r.Target.Id == targetId);
+            GetRelations(relationType).SingleOrDefault(r => r.Id == targetId);
 
         public override string ToString()
         {
