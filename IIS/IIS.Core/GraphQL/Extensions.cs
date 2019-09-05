@@ -91,5 +91,7 @@ namespace IIS.Core.GraphQL
         {
             return (TValue) context.ContextData.GetOrDefault(key);
         }
+
+        public static int Offset(this PaginationInput pagination) => pagination.Page * pagination.PageSize - pagination.PageSize;
     }
 }

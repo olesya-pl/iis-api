@@ -155,29 +155,33 @@ namespace IIS.Core.Ontology.EntityFramework
             node.UpdatedAt = DateTime.UtcNow;
         }
 
-        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<Type> types, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<Type> types, int limit, int offset = 0,
+            CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             var derived = types.SelectMany(e => ontology.GetChildTypes(e)).Select(e => e.Id)
                 .Concat(types.Select(e => e.Id)).Distinct().ToArray();
 
-            var nodes = await GetNodesInternalAsync(ontology, derived, cancellationToken);
+            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, cancellationToken);
             return nodes;
         }
 
-        public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, int limit, int offset = 0,
+            CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             var derived = ontology.GetChildTypes(type).Select(e => e.Id)
                 .Concat(new[] { type.Id }).Distinct().ToArray();
 
-            var nodes = await GetNodesInternalAsync(ontology, derived, cancellationToken);
+            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, cancellationToken);
             return nodes;
         }
 
-        private async Task<IEnumerable<Node>> GetNodesInternalAsync(Ontology ontology, Guid[] derived, CancellationToken cancellationToken)
+        private async Task<IEnumerable<Node>> GetNodesInternalAsync(Ontology ontology, Guid[] derived,
+            int limit, int offset = 0, CancellationToken cancellationToken = default)
         {
             var ctxNodes = await _context.Nodes.Where(e => derived.Contains(e.TypeId) && !e.IsArchived)
+                .Skip(offset).Take(limit)
                 .ToArrayAsync(cancellationToken);
             // prefetch +1 level
             var nodeIds = ctxNodes.Select(e => e.Id).ToArray();

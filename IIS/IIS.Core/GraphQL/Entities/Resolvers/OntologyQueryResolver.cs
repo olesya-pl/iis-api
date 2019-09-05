@@ -42,7 +42,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var ontologyService = ctx.Service<IOntologyService>();
             var pagination = ctx.Argument<PaginationInput>("pagination");
-            var list = await ontologyService.GetNodesByTypeAsync(type); // Direct type
+            var limit = pagination.PageSize;
+            var offset = pagination.Offset();
+            var list = await ontologyService.GetNodesByTypeAsync(type, limit, offset); // Direct type
             if (pagination != null)
                 list = pagination.Apply(list);
             return list.OfType<Entity>();
@@ -188,7 +190,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (filter?.Types != null)
                 types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
 
-            var nodes = await ontologyService.GetNodesAsync(types);
+            var limit = pagination.PageSize;
+            var offset = pagination.Offset();
+            var nodes = await ontologyService.GetNodesAsync(types, limit, offset);
             var entities = nodes.OfType<Entity>();
             if (pagination != null)
                 entities = pagination.Apply(entities);
