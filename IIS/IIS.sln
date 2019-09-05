@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS", "IIS\IIS.csproj", "{6B1F0A87-5B02-440C-BADC-50097DA960D2}"
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Search", "IIS.Search\IIS.Search.csproj", "{8352AC01-3055-43E3-8535-2217455926D0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIS.Core", "IIS.Core\IIS.Core.csproj", "{A4DD868F-7142-4461-B197-C7B87C7C1BBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmlJsonUploader", "EmlJsonUploader\EmlJsonUploader.csproj", "{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,5 +43,9 @@ Global
 		{A4DD868F-7142-4461-B197-C7B87C7C1BBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4DD868F-7142-4461-B197-C7B87C7C1BBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4DD868F-7142-4461-B197-C7B87C7C1BBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

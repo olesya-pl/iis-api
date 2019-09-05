@@ -40,6 +40,6 @@ namespace IIS.Core.GraphQL.Materials
     public class Data
     {
         [GraphQLNonNullType] public string Type { get; set; }
-        [GraphQLNonNullType] public string Text { get; set; }
+        public string Text { get; set; }
     }
 }
