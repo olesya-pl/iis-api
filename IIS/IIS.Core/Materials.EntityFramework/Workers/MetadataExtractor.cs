@@ -60,15 +60,24 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             var type = ontology.GetEntityType("EmailSign");
             var relationType = type.GetProperty("value");
             var features = new List<Materials.MaterialFeature>();
-            foreach (var node in view.Features.Nodes)
+            await _context.Semaphore.WaitAsync();
+            try
             {
-                var feat = ToDomain(node);
-                feat = await MapToNodeDirect(feat, type, relationType);
-                features.Add(feat);
-                _context.Add(ToDal(feat, info.Id));
+                foreach (var node in view.Features.Nodes)
+                {
+                    var feat = ToDomain(node);
+                    feat = await MapToNodeDirect(feat, type, relationType);
+                    features.Add(feat);
+                    _context.Add(ToDal(feat, info.Id));
+                }
+
+                await CreateRelations(features, type);
+                await _context.SaveChangesAsync();
             }
-            await CreateRelations(features, type);
-            await _context.SaveChangesAsync();
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
         // uses hardcoded EntityType and RelationType

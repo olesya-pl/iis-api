@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLNonNullType] PaginationInput pagination)
         {
             var materials = await materialService.GetMaterialsAsync(pagination.PageSize,
-                pagination.Offset());
+                pagination.Offset(), Id);
             return materials.Select(m => m.ToView()).ToList();
         }
 

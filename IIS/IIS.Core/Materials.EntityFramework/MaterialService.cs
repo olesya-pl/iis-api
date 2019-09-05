@@ -54,13 +54,13 @@ namespace IIS.Core.Materials.EntityFramework
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset, Guid? parentId = null, Guid? nodeId = null)
+        public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset, Guid? parentId = null, IEnumerable<Guid> nodeIds = null)
         {
             IEnumerable<Material> materials;
             await _context.Semaphore.WaitAsync();
             try
             {
-                if (nodeId == null)
+                if (nodeIds == null)
                 {
                     IQueryable<Material> materialsQ = _context.Materials
                         .Include(m => m.Infos)
@@ -72,10 +72,11 @@ namespace IIS.Core.Materials.EntityFramework
                 }
                 else
                 {
+                    var nodeIdsArr = nodeIds.ToArray();
                     var idsQ = _context.MaterialFeatures
                         .Include(e => e.Info)
                         .ThenInclude(e => e.Material)
-                        .Where(e => e.NodeId == nodeId)
+                        .Where(e => nodeIdsArr.Contains(e.NodeId))
                         .Select(e => e.Info.Material.Id)
                         .Distinct();
                     var materialsIds = idsQ.Skip(offset).Take(limit);
