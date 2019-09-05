@@ -156,30 +156,32 @@ namespace IIS.Core.Ontology.EntityFramework
         }
 
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<Type> types, int limit, int offset = 0,
-            CancellationToken cancellationToken = default)
+            string suggestion = null, CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             var derived = types.SelectMany(e => ontology.GetChildTypes(e)).Select(e => e.Id)
                 .Concat(types.Select(e => e.Id)).Distinct().ToArray();
 
-            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, cancellationToken);
+            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, suggestion, cancellationToken);
             return nodes;
         }
 
         public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, int limit, int offset = 0,
-            CancellationToken cancellationToken = default)
+            string suggestion = null, CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             var derived = ontology.GetChildTypes(type).Select(e => e.Id)
                 .Concat(new[] { type.Id }).Distinct().ToArray();
 
-            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, cancellationToken);
+            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, suggestion, cancellationToken);
             return nodes;
         }
 
         private async Task<IEnumerable<Node>> GetNodesInternalAsync(Ontology ontology, Guid[] derived,
-            int limit, int offset = 0, CancellationToken cancellationToken = default)
+            int limit, int offset = 0, string suggestion = null, CancellationToken cancellationToken = default)
         {
+            if (suggestion != null)
+                return await GetNodesInternalWithSuggestionAsync(ontology, derived, limit, offset, suggestion, cancellationToken);
             var ctxNodes = await _context.Nodes.Where(e => derived.Contains(e.TypeId) && !e.IsArchived)
                 .Skip(offset).Take(limit)
                 .ToArrayAsync(cancellationToken);
@@ -200,6 +202,22 @@ namespace IIS.Core.Ontology.EntityFramework
             var nodes = ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
 
             return nodes;
+        }
+
+        private async Task<IEnumerable<Node>> GetNodesInternalWithSuggestionAsync(Ontology ontology, Guid[] derived,
+            int limit, int offset, string suggestion, CancellationToken cancellationToken = default)
+        {
+            var relationsQ = _context.Relations
+                .Include(e => e.Node)
+                .Include(e => e.SourceNode)
+                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
+                .Where(e => derived.Contains(e.SourceNode.TypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
+            if (suggestion != null)
+                relationsQ = relationsQ.Where(e => e.TargetNode.Attribute.Value.Contains(suggestion));
+            var ctxNodes = await relationsQ.Select(e => e.SourceNode).Distinct()
+                .Skip(offset).Take(limit).ToArrayAsync(cancellationToken);
+
+            return ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
         }
 
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)

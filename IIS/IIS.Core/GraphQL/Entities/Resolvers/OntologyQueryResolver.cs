@@ -42,9 +42,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var ontologyService = ctx.Service<IOntologyService>();
             var pagination = ctx.Argument<PaginationInput>("pagination");
+            var filter = ctx.Argument<FilterInput>("filter");
             var limit = pagination.PageSize;
             var offset = pagination.Offset();
-            var list = await ontologyService.GetNodesByTypeAsync(type, limit, offset); // Direct type
+            var list = await ontologyService.GetNodesByTypeAsync(type, limit, offset, filter?.Suggestion ?? filter?.SearchQuery); // Direct type
             return list.OfType<Entity>();
         }
 
@@ -190,7 +191,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             var limit = pagination.PageSize;
             var offset = pagination.Offset();
-            var nodes = await ontologyService.GetNodesAsync(types, limit, offset);
+            var nodes = await ontologyService.GetNodesAsync(types, limit, offset, filter?.Suggestion ?? filter?.SearchQuery);
             var entities = nodes.OfType<Entity>();
             return entities;
         }
