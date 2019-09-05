@@ -16,14 +16,14 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly OntologyContext _context;
         private readonly IFileService _fileService;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyTypesService _ontologyTypesService;
+        private readonly IOntologyProvider _ontologyProvider;
 
-        public MaterialService(OntologyContext context, IFileService fileService, IOntologyService ontologyService, IOntologyTypesService ontologyTypesService)
+        public MaterialService(OntologyContext context, IFileService fileService, IOntologyService ontologyService, IOntologyProvider ontologyProvider)
         {
             _context = context;
             _fileService = fileService;
             _ontologyService = ontologyService;
-            _ontologyTypesService = ontologyTypesService;
+            _ontologyProvider = ontologyProvider;
         }
 
         public async Task SaveAsync(Materials.Material material)
@@ -48,7 +48,7 @@ namespace IIS.Core.Materials.EntityFramework
             foreach (var info in material.Infos)
                 _context.Add(Map(info, material.Id));
             // todo: put message to rabbit instead of calling another service directly
-            await new MetadataExtractor(_context, this, _ontologyService, _ontologyTypesService)
+            await new MetadataExtractor(_context, this, _ontologyService, _ontologyProvider)
                 .ExtractInfo(material);
             // end
             await _context.SaveChangesAsync();

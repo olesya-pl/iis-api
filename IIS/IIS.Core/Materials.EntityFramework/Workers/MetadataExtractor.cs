@@ -17,14 +17,14 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         private readonly OntologyContext _context;
         private readonly IMaterialService _materialService;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyTypesService _ontologyTypesService;
+        private readonly IOntologyProvider _ontologyProvider;
 
-        public MetadataExtractor(OntologyContext context, IMaterialService materialService, IOntologyService ontologyService, IOntologyTypesService ontologyTypesService)
+        public MetadataExtractor(OntologyContext context, IMaterialService materialService, IOntologyService ontologyService, IOntologyProvider ontologyProvider)
         {
             _context = context;
             _materialService = materialService;
             _ontologyService = ontologyService;
-            _ontologyTypesService = ontologyTypesService;
+            _ontologyProvider = ontologyProvider;
         }
 
         public async Task ExtractInfo(Materials.Material material)
@@ -44,6 +44,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers
 
         // ----- features ----- //
 
+
+
         private async Task ExtractFeatures(Guid materialId)
         {
             var material = await _materialService.GetMaterialAsync(materialId);
@@ -54,7 +56,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         private async Task ExtractFeatures(Materials.MaterialInfo info)
         {
             var view = info.Data.ToObject<Metadata>();
-            var type = _ontologyTypesService.GetEntityType("EmailSign");
+            var ontology = await _ontologyProvider.GetOntologyAsync();
+            var type = ontology.GetEntityType("EmailSign");
             var relationType = type.GetProperty("value");
             var features = new List<Materials.MaterialFeature>();
             foreach (var node in view.Features.Nodes)
@@ -115,11 +118,10 @@ namespace IIS.Core.Materials.EntityFramework.Workers
 
         private async Task<EmbeddingRelationType> GetRelationType(string name, Guid entityTypeId)
         {
-            var type = _ontologyTypesService.Types.OfType<EmbeddingRelationType>().SingleOrDefault(t => t.Name == name);
-            if (type != null) return type;
-            // kill me for this
+            // todo: change direct db access
+            var ct = _context.Types.SingleOrDefault(e => e.Name == name);
+            if (ct != null) return new EmbeddingRelationType(ct.Id, ct.Name, EmbeddingOptions.Multiple);
             var rt = new EmbeddingRelationType(Guid.NewGuid(), name, EmbeddingOptions.Multiple);
-            ((List<Ontology.Type>)_ontologyTypesService.Types).Add(rt);
             var ctxType = new IIS.Core.Ontology.EntityFramework.Context.Type
             {
                 Id = rt.Id, Kind = Kind.Relation, Name = name, Meta = "{}", Title = name,
