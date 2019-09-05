@@ -93,24 +93,24 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                         foreach (var uv in list)
                         {
                             var uvdict = (Dictionary<string, object>) uv; // RelationTo_U_Entity
-                            var id = InputExtensions.ParseGuid(uvdict["id"]); // considering this is an target entity id
-                            var relation = node.GetRelation(embed, id);
+                            var relationId = InputExtensions.ParseGuid(uvdict["id"]); // this is NOT target entity id, but relation id
+                            var relation = node.GetRelation(embed, relationId);
                             if (relation == null)
                                 throw new Exception(
-                                    $"There is no relation from {node.Type} {node.Id} to {embed.Name} of type {embed.TargetType} with id {id}");
+                                    $"There is no relation from {node.Type} {node.Id} to {embed.Name} of type {embed.TargetType} with id {relationId}");
                             if (embed.IsEntityType)
                             {
                                 if (uvdict.ContainsKey("target"))
                                 {
                                     var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
                                     var type = _typesService.GetEntityType(typeName);
-                                    await UpdateEntity(type, id, targetValue);
+                                    await UpdateEntity(type, relation.Target.Id, targetValue);
                                 }
                                 else
                                 {
                                     // todo: look at it again and refactor
                                     var targetId = InputExtensions.ParseGuid(uvdict["targetId"]); // just check
-                                    var targetRelation = node.GetRelation(embed, id);
+                                    var targetRelation = node.GetRelation(embed, relationId);
                                     node.RemoveNode(targetRelation);
                                     var newRel = await _mutationCreateResolver.CreateSingleProperty(embed, uvdict);
                                     node.AddNode(newRel);
