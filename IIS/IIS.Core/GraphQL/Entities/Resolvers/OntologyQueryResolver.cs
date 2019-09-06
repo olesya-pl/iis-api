@@ -8,7 +8,12 @@ using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.EntityFramework.Context;
+using Microsoft.EntityFrameworkCore;
 using Attribute = IIS.Core.Ontology.Attribute;
+using EmbeddingOptions = IIS.Core.Ontology.EmbeddingOptions;
+using Node = IIS.Core.Ontology.Node;
+using Relation = IIS.Core.Ontology.Relation;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -194,6 +199,35 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var nodes = await ontologyService.GetNodesAsync(types, limit, offset, filter?.Suggestion ?? filter?.SearchQuery);
             var entities = nodes.OfType<Entity>();
             return entities;
+        }
+
+        [Obsolete]
+        public async Task<IEnumerable<Entity>> ResolveIncomingRelations(IResolverContext ctx)
+        {
+            var nodeId = ctx.Parent<Node>().Id;
+            var pagination = ctx.Argument<PaginationInput>("pagination");
+            var ontologyContext = ctx.Service<OntologyContext>();
+            var ontologyService = ctx.Service<IOntologyService>();
+            await ontologyContext.Semaphore.WaitAsync();
+            List<Guid> sourceIds;
+            try
+            {
+                var sourceQ = ontologyContext.Relations
+                    .Where(e => e.TargetNodeId == nodeId)
+                    .Select(e => e.SourceNodeId);
+                if (pagination != null)
+                    sourceQ = sourceQ.Skip(pagination.Offset()).Take(pagination.PageSize);
+                sourceIds = await sourceQ.ToListAsync();
+            }
+            finally
+            {
+                ontologyContext.Semaphore.Release();
+            }
+
+            var nodes = new List<Node>();
+            foreach (var sourceId in sourceIds)
+                nodes.Add(await ontologyService.LoadNodesAsync(sourceId, null));
+            return nodes.OfType<Entity>().ToList();
         }
     }
 }

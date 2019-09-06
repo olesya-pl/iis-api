@@ -79,7 +79,8 @@ namespace IIS.Core.GraphQL
         protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor)
         {
             var typesToPopulate = _ontologyTypesService.EntityTypes
-                .Where(t => t.CreateMeta().ExposeOnApi != false).ToList();
+//                .Where(t => t.CreateMeta().ExposeOnApi != false)
+                .ToList();
             _populator.PopulateFields(descriptor, typesToPopulate, Operation.Read);
             if (typesToPopulate.Count == 0) return;
             ConfigureAllEntitiesQuery(descriptor);
@@ -96,8 +97,8 @@ namespace IIS.Core.GraphQL
 
         protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor)
         {
-            var typesToPopulate = _ontologyTypesService.EntityTypes
-                .Where(t => t.CreateMeta().ExposeOnApi != false);
+            var typesToPopulate = _ontologyTypesService.EntityTypes;
+//                .Where(t => t.CreateMeta().ExposeOnApi != false);
             typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
             _populator.PopulateFields(descriptor, typesToPopulate,
                 Operation.Create, Operation.Update, Operation.Delete);

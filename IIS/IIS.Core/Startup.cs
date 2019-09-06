@@ -60,13 +60,12 @@ namespace IIS.Core
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyQueryResolver, GraphQL.Entities.Resolvers.OntologyQueryResolver>();
             services.AddSingleton<GraphQL.Entities.TypeRepository>(); // For HotChocolate ontology types creation. Should have same lifetime as GraphQL schema
-            var schema = services.BuildServiceProvider().GetService<GraphQL.ISchemaProvider>().GetSchema();
             // Here it hits the fan. Removed AddGraphQL() method and stripped it to submethods because of IncludeExceptionDetails.
             // todo: remake graphql engine registration in DI
 //            services.AddGraphQL(schema);
             QueryExecutionBuilder.BuildDefault(services);
             services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions {IncludeExceptionDetails = true});
-            services.AddSingleton<ISchema>(schema)
+            services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
                 .AddSingleton<IBatchQueryExecutor, BatchQueryExecutor>()
                 .AddSingleton<IIdSerializer, IdSerializer>()
                 .AddJsonQueryResultSerializer()
