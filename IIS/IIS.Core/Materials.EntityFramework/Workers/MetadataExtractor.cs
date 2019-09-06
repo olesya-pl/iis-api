@@ -57,21 +57,22 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         {
             var view = info.Data.ToObject<Metadata>();
             var ontology = await _ontologyProvider.GetOntologyAsync();
-            var type = ontology.GetEntityType("EmailSign");
-            var relationType = type.GetProperty("value");
             var features = new List<Materials.MaterialFeature>();
             await _context.Semaphore.WaitAsync();
             try
             {
                 foreach (var node in view.Features.Nodes)
                 {
+                    var type = ontology.GetEntityType(node.Type)
+                               ?? throw new ArgumentException($"EntityType {node.Type} does not exist");
+                    var relationType = type.GetProperty("value");
                     var feat = ToDomain(node);
                     feat = await MapToNodeDirect(feat, type, relationType);
                     features.Add(feat);
                     _context.Add(ToDal(feat, info.Id));
                 }
 
-                await CreateRelations(features, type);
+                await CreateRelations(features);
                 await _context.SaveChangesAsync();
             }
             finally
@@ -109,23 +110,28 @@ namespace IIS.Core.Materials.EntityFramework.Workers
 
         // ----- Relation creation ----- //
 
-        private string GetName(string rel1, string rel2) => $"EmailSign_{rel1}_{rel2}";
+        private string GetName(Materials.MaterialFeature feat1, Materials.MaterialFeature feat2)
+        {
+            if (feat1.Node.Type.Id == feat2.Node.Type.Id)
+                return $"{feat1.Node.Type.Name}_{feat1.Relation}_{feat2.Relation}";
+            return $"{feat1.Node.Type.Name}_{feat1.Relation}_{feat2.Node.Type.Name}_{feat2.Relation}";
+        }
 
-        private async Task CreateRelations(List<Materials.MaterialFeature> features, EntityType type)
+        private async Task CreateRelations(List<Materials.MaterialFeature> features)
         {
             foreach (var feat1 in features)
             {
                 foreach (var feat2 in features)
                 {
                     if (feat1.Relation == feat2.Relation) continue;
-                    var rname = GetName(feat1.Relation, feat2.Relation);
-                    var rtype = await GetRelationType(rname, type.Id);
+                    var rname = GetName(feat1, feat2);
+                    var rtype = await GetRelationType(rname, feat1.Node.Type.Id, feat2.Node.Type.Id);
                     await SaveRelation(feat1.Node, feat2.Node, rtype);
                 }
             }
         }
 
-        private async Task<EmbeddingRelationType> GetRelationType(string name, Guid entityTypeId)
+        private async Task<EmbeddingRelationType> GetRelationType(string name, Guid sourceTypeId, Guid targetTypeId)
         {
             // todo: change direct db access
             var ct = _context.Types.SingleOrDefault(e => e.Name == name);
@@ -139,7 +145,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             {
                 Id = rt.Id, Kind = RelationKind.Embedding,
                 EmbeddingOptions = Ontology.EntityFramework.Context.EmbeddingOptions.Multiple,
-                SourceTypeId = entityTypeId, TargetTypeId = entityTypeId,
+                SourceTypeId = sourceTypeId, TargetTypeId = targetTypeId,
             };
             _context.Add(ctxType);
             await _context.SaveChangesAsync();
