@@ -206,14 +206,21 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var nodeId = ctx.Parent<Node>().Id;
             var pagination = ctx.Argument<PaginationInput>("pagination");
+            var typesArg = ctx.Argument<IEnumerable<string>>("types");
             var ontologyContext = ctx.Service<OntologyContext>();
             var ontologyService = ctx.Service<IOntologyService>();
+            var ontologyProvider = ctx.Service<IOntologyProvider>();
+            var ontology = await ontologyProvider.GetOntologyAsync();
+            var typesIds = ontology.EntityTypes.Where(et => typesArg.Contains(et.Name)).Select(et => et.Id);
+
+
             await ontologyContext.Semaphore.WaitAsync();
             List<Guid> sourceIds;
             try
             {
                 var sourceQ = ontologyContext.Relations
-                    .Where(e => e.TargetNodeId == nodeId)
+                    .Include(e => e.SourceNode)
+                    .Where(e => e.TargetNodeId == nodeId && typesIds.Contains(e.SourceNode.TypeId))
                     .Select(e => e.SourceNodeId);
                 if (pagination != null)
                     sourceQ = sourceQ.Skip(pagination.Offset()).Take(pagination.PageSize);

@@ -34,6 +34,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
             d.Field("_incomingRelations").Type<NonNullType<ListType<EntityInterface>>>()
                 .Argument("pagination", ad => ad.Type<InputObjectType<PaginationInput>>())
+                .Argument("types", ad => ad.Type<NonNullType<ListType<NonNullType<StringType>>>>())
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveIncomingRelations(ctx));
         }
 
