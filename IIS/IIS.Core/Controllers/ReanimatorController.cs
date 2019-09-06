@@ -26,12 +26,26 @@ namespace IIS.Core.Controllers
         //private readonly QueueReanimator _reanimator;
         private OntologyContext _context;
         private Seeder _seeder;
+        private Ontology.EntityFramework.OntologyProvider _ontologyProvider;
 
-        public ReanimatorController(ILegacyOntologyProvider legacyOntologyProvider, Seeder seeder, OntologyContext context)
+        public ReanimatorController(ILegacyOntologyProvider legacyOntologyProvider, Ontology.IOntologyProvider ontologyProvider, Seeder seeder, OntologyContext context)
         {
             _legacyOntologyProvider = legacyOntologyProvider;
             _seeder = seeder;
             _context = context;
+            _ontologyProvider = (Ontology.EntityFramework.OntologyProvider)ontologyProvider;
+        }
+
+        [HttpGet]
+        [Route("/api/test")]
+        public async Task<IActionResult> Test(CancellationToken cancellationToken)
+        {
+            var tasks = Enumerable.Range(1, 10)
+                .Select(e => _ontologyProvider.GetOntologyAsync(cancellationToken));
+            
+            var data = await Task.WhenAll(tasks);
+
+            return Ok();
         }
 
         [HttpGet]

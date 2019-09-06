@@ -123,5 +123,10 @@ namespace IIS.Legacy.EntityFramework
                 nodes.Add(unionType); // replace with union type
             }
         }
+
+        public async Task InvalidateAsync()
+        {
+            await Task.CompletedTask;
+        }
     }
 }

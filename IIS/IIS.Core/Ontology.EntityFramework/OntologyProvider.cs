@@ -5,97 +5,131 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
     public class OntologyProvider : IOntologyProvider
     {
-        private readonly IMemoryCache _cache;
-        private readonly OntologyContext _context;
-        private Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
+        private readonly ContextFactory _contextFactory;
+        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
+        private Ontology _ontology;
 
-        public OntologyProvider(OntologyContext context, IMemoryCache cache)
+        public OntologyProvider(ContextFactory contextFactory)
         {
-            _context = context;
-            _cache = cache;
+            _contextFactory = contextFactory;
         }
 
-        // todo: ensure thread safe
-        private static Ontology _ontology;
         public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
-            if (_ontology != null) return _ontology;
-
-            var types = await _context.Types.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                .Include(e => e.IncomingRelations).ThenInclude(e => e.Type)
-                .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
-                .Include(e => e.AttributeType)
-                .ToArrayAsync(cancellationToken);
-            var result = types.Select(MapType).ToList();
-
-            // todo: refactor
-            result.AddRange(_types.Values.Where(e => e is RelationType));
-
-            _ontology = new Ontology(result);
-
-            return _ontology;
-        }
-
-        private Type MapType(Context.Type type)
-        {
-            if (_types.ContainsKey(type.Id))
-                return _types[type.Id];
-
-            if (type.Kind == Kind.Attribute)
+            // ReaderWriterLockSlim is used to allow multiple concurrent reads and only one exclusive write.
+            // Class member can be replaced with some distributed cache
+            return await Task.Run(() =>
             {
-                var attributeType = type.AttributeType;
-                var attr = new AttributeType(type.Id, type.Name, MapScalarType(attributeType.ScalarType));
-                _types.Add(type.Id, attr);
-                FillProperties(type, attr);
-                return attr;
-            }
-            if (type.Kind == Kind.Entity)
-            {
-                var entity = new EntityType(type.Id, type.Name, type.IsAbstract);
-                _types.Add(type.Id, entity);
-                FillProperties(type, entity);
-                foreach (var outgoingRelation in type.OutgoingRelations)
+                _locker.EnterReadLock();
+                try
                 {
-                    var relation = MapRelation(outgoingRelation);
-                    entity.AddType(relation);
+                    // Try to hit in cache
+                    if (_ontology != null) return _ontology;
                 }
-                return entity;
-            }
-            throw new Exception("Unsupported type.");
+                finally
+                {
+                    _locker.ExitReadLock();
+                }
+
+                _locker.EnterWriteLock();
+                try
+                {
+                    // Double check
+                    if (_ontology != null) return _ontology;
+
+                    // Query primary source and update the cache
+                    using (var context = _contextFactory.CreateContext())
+                    {
+                        var types = context.Types.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
+                            .Include(e => e.IncomingRelations).ThenInclude(e => e.Type)
+                            .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
+                            .Include(e => e.AttributeType)
+                            .ToArray();
+                        var relationTypes = default(IEnumerable<Type>);
+                        var result = types.Select(e => MapType(e, out relationTypes)).ToList();
+                        // todo: refactor
+                        result.AddRange(relationTypes);
+
+                        _ontology = new Ontology(result);
+                    }
+                    
+                    return _ontology;
+                }
+                finally
+                {
+                    _locker.ExitWriteLock();
+                }
+            }, cancellationToken);
         }
 
-        private Type MapRelation(Context.RelationType relationType)
+        private Type MapType(Context.Type ctxType, out IEnumerable<Type> relationTypes)
         {
-            if (_types.ContainsKey(relationType.Id))
-                return _types[relationType.Id];
+            Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
+            
+            var types = mapType(ctxType);
+            relationTypes = _types.Values.Where(e => e is RelationType);
+            return types;
 
-            var type = relationType.Type;
-            var relation = default(RelationType);
-            if (relationType.Kind == RelationKind.Embedding)
+            Type mapType(Context.Type type)
             {
-                relation = new EmbeddingRelationType(type.Id, type.Name, Map(relationType.EmbeddingOptions));
-                FillProperties(type, relation);
-                _types.Add(type.Id, relation);
-                var target = MapType(relationType.TargetType);
-                relation.AddType(target);
-            }
-            if (relationType.Kind == RelationKind.Inheritance)
-            {
-                relation = new InheritanceRelationType(type.Id);
-                FillProperties(type, relation);
-                _types.Add(type.Id, relation);
-                var target = MapType(relationType.TargetType);
-                relation.AddType(target);
+                if (_types.ContainsKey(type.Id))
+                    return _types[type.Id];
+
+                if (type.Kind == Kind.Attribute)
+                {
+                    var attributeType = type.AttributeType;
+                    var attr = new AttributeType(type.Id, type.Name, MapScalarType(attributeType.ScalarType));
+                    _types.Add(type.Id, attr);
+                    FillProperties(type, attr);
+                    return attr;
+                }
+                if (type.Kind == Kind.Entity)
+                {
+                    var entity = new EntityType(type.Id, type.Name, type.IsAbstract);
+                    _types.Add(type.Id, entity);
+                    FillProperties(type, entity);
+                    foreach (var outgoingRelation in type.OutgoingRelations)
+                    {
+                        var relation = mapRelation(outgoingRelation);
+                        entity.AddType(relation);
+                    }
+                    return entity;
+                }
+                throw new Exception("Unsupported type.");
             }
 
-            return relation;
+            Type mapRelation(Context.RelationType relationType)
+            {
+                if (_types.ContainsKey(relationType.Id))
+                    return _types[relationType.Id];
+
+                var type = relationType.Type;
+                var relation = default(RelationType);
+                if (relationType.Kind == RelationKind.Embedding)
+                {
+                    relation = new EmbeddingRelationType(type.Id, type.Name, Map(relationType.EmbeddingOptions));
+                    FillProperties(type, relation);
+                    _types.Add(type.Id, relation);
+                    var target = mapType(relationType.TargetType);
+                    relation.AddType(target);
+                }
+                if (relationType.Kind == RelationKind.Inheritance)
+                {
+                    relation = new InheritanceRelationType(type.Id);
+                    FillProperties(type, relation);
+                    _types.Add(type.Id, relation);
+                    var target = mapType(relationType.TargetType);
+                    relation.AddType(target);
+                }
+
+                return relation;
+            }
         }
 
         private static void FillProperties(Context.Type type, Type ontologyType)

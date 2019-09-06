@@ -44,8 +44,9 @@ namespace IIS.Core
                 .UseNpgsql(connectionString)
                 .EnableSensitiveDataLogging(),
                 ServiceLifetime.Scoped);
+
             services.AddHttpContextAccessor();
-            services.AddTransient<IOntologyProvider, OntologyProvider>();
+            services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyTypesService, OntologyTypesService>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
@@ -54,6 +55,7 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService>();
 
             services.AddTransient<Seeder>();
+            services.AddTransient(e => new ContextFactory(connectionString));
 
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
