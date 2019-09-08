@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Flee.PublicTypes;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
@@ -9,6 +10,7 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework.Context;
+using IIS.Core.Ontology.Meta;
 using Microsoft.EntityFrameworkCore;
 using Attribute = IIS.Core.Ontology.Attribute;
 using EmbeddingOptions = IIS.Core.Ontology.EmbeddingOptions;
@@ -62,47 +64,43 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var parent = ctx.Parent<Node>();
             var ontologyService = ctx.Service<IOntologyService>();
             var node = await ontologyService.LoadNodesAsync(parent.Id, new[] {relationType});
-            var stub = ResolveComputedAttributeStub(relationType, node);
-            if (stub != null) return stub;
+            var computed = ResolveComputedAttribute(relationType, node);
+            if (computed != null) return computed;
             var relation = node.GetRelation(relationType);
             if (relation == null) return null;
             return await ResolveAttributeValue(ctx, relation.AttributeTarget);
         }
 
-        [Obsolete] // Todo: implement computed relations and delete this
-        private string ResolveComputedAttributeStub(EmbeddingRelationType relationType, Node node)
+        public static class HelperFunctions
         {
-            if (relationType.Name != "title") return null;
-            var type = node.Type.Name;
-            if (node.Type.AllParents.All(p => p.Name != "ObjectOfStudy"))
-                return null;
-            var name = GetAttr(node, "name");
-
-            if (type == "Infrastructure" || type == "MilitaryMachinery" || type == "Subdivision")
+            public static string Join(params object[] values)
             {
-                var shortName = GetAttr(node, "shortName");
-                if (shortName != null && name != null)
-                    return $"{shortName} ({name})";
-                return shortName ?? name;
+                return string.Join(' ', values.Where(v => v != null));
             }
 
-            if (type == "MilitaryBase")
+            public static string FullTitle(object first, object second)
             {
-                var baseCode = GetAttr(node, "baseCode");
-
-                var shortName = GetAttr(node, "shortName");
-                if (baseCode != null && shortName != null)
-                    return $"{baseCode} ({shortName})";
-                return baseCode ?? shortName;
+                if (first != null && second != null)
+                    return $"{first} ({second})";
+                return (first ?? second)?.ToString();
             }
+        }
 
-            if (type == "Person")
-            {
-                var arr = new[] {GetAttr(node, "secondName"), GetAttr(node, "firstName"), GetAttr(node, "fatherName")};
-                return string.Join(" ", arr.Where(s => !string.IsNullOrWhiteSpace(s)));
-            }
-
-            return name;
+        private object ResolveComputedAttribute(EmbeddingRelationType relationType, Node node)
+        {
+            var formula = (relationType.CreateMeta() as AttributeRelationMeta)?.Formula;
+            if (formula == null) return null;
+            formula = formula.Replace("entity.", ""); // remove prefix from existing formulas, remove later
+            formula = formula.Replace("h.", ""); // remove prefix from existing formulas, remove later
+            ExpressionContext context = new ExpressionContext();
+            context.Imports.AddType(typeof(HelperFunctions));
+            context.Variables.ResolveVariableType += (sender, args)
+                => { args.VariableType = typeof(object); };
+            context.Variables.ResolveVariableValue += (sender, args)
+                => { args.VariableValue = node.GetAttributeValue(args.VariableName); };
+            IDynamicExpression eDynamic = context.CompileDynamic(formula);
+            var result = eDynamic.Evaluate();
+            return result;
         }
 
         private string GetAttr(Node node, string attrName) => node.GetAttributeValue(attrName) as string;
