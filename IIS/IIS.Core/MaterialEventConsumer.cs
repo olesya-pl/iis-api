@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
+using IIS.Core.Ontology.EntityFramework;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -23,14 +24,16 @@ namespace IIS.Core.GSM.Consumer
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
-        //private readonly IFileService _fileService;
         private readonly FileServiceFactory _fileServiceFactory;
+        private readonly ContextFactory _contextFactory;
 
-        public MaterialEventConsumer(IConnectionFactory connectionFactory, ILoggerFactory loggerFactory, FileServiceFactory fileServiceFactory)
+        public MaterialEventConsumer(IConnectionFactory connectionFactory, ILoggerFactory loggerFactory,
+            FileServiceFactory fileServiceFactory, ContextFactory contextFactory)
         {
             _logger = loggerFactory.CreateLogger<MaterialEventConsumer>();
             _connectionFactory = connectionFactory;
             _fileServiceFactory = fileServiceFactory;
+            _contextFactory = contextFactory;
 
             while (true)
             {
@@ -78,9 +81,20 @@ namespace IIS.Core.GSM.Consumer
                         _logger.LogInformation("*************************** JOB FAILED **********************************");
                     }
                     var data = JObject.Parse("{ 'transcription': '" + mlResponse["transcription"][0][0].Value<string>() + "' }");
-                    var materialInfo = new MaterialInfo(eventData.Id, data, "ML", "GSM", "xz");
-                    // todo: save ML results to db
-
+                    using(var context = _contextFactory.CreateContext())
+                    {
+                        var mi = new Materials.EntityFramework.MaterialInfo
+                        {
+                            Id = Guid.NewGuid(),
+                            Data = data?.ToString(),
+                            MaterialId = eventData.Id,
+                            Source = "ML",
+                            SourceType = "GSM",
+                            SourceVersion = "xz"
+                        };
+                        context.Add(mi);
+                        context.SaveChanges();
+                    }
                     _channel.BasicAck(ea.DeliveryTag, false);
                     _logger.LogInformation("*************************** JOB DONE **********************************");
                 }
