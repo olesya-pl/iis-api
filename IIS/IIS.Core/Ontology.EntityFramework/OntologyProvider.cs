@@ -51,12 +51,13 @@ namespace IIS.Core.Ontology.EntityFramework
                             .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
                             .Include(e => e.AttributeType)
                             .ToArray();
-                        var relationTypes = default(IEnumerable<Type>);
-                        var result = types.Select(e => MapType(e, out relationTypes)).ToList();
+                        var result = types.Select(e => MapType(e)).ToList();
+                        var relationTypes = _types.Values.Where(e => e is RelationType);
                         // todo: refactor
                         result.AddRange(relationTypes);
 
                         _ontology = new Ontology(result);
+                        _types.Clear();
                     }
                     
                     return _ontology;
@@ -67,13 +68,10 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }, cancellationToken);
         }
-
-        private Type MapType(Context.Type ctxType, out IEnumerable<Type> relationTypes)
+        private Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
+        private Type MapType(Context.Type ctxType)
         {
-            Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
-            
             var types = mapType(ctxType);
-            relationTypes = _types.Values.Where(e => e is RelationType);
             return types;
 
             Type mapType(Context.Type type)
