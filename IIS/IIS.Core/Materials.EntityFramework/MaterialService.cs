@@ -116,6 +116,26 @@ namespace IIS.Core.Materials.EntityFramework
             return await MapAsync(material);
         }
 
+        public async Task SaveAsync(Guid materialId, Materials.MaterialInfo materialInfo)
+        {
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                var mi = new MaterialInfo
+                {
+                    Id = materialInfo.Id, Data = materialInfo.Data?.ToString(), MaterialId = materialId,
+                    Source = materialInfo.Source, SourceType = materialInfo.SourceType,
+                    SourceVersion = materialInfo.SourceVersion
+                };
+                _context.Add(mi);
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
         // Todo: think about enumerable.Select(MapAsync) trouble
         private async Task<Materials.Material> MapAsync(Material material)
         {
