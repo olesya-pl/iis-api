@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.Files;
+using IIS.Core.GSM.Producer;
 using IIS.Core.Materials.EntityFramework.Workers;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework.Context;
@@ -17,13 +18,16 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IFileService _fileService;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyProvider _ontologyProvider;
+        private readonly IMaterialEventProducer _eventProducer;
 
-        public MaterialService(OntologyContext context, IFileService fileService, IOntologyService ontologyService, IOntologyProvider ontologyProvider)
+        public MaterialService(OntologyContext context, IFileService fileService, IOntologyService ontologyService,
+            IOntologyProvider ontologyProvider, IMaterialEventProducer eventProducer)
         {
             _context = context;
             _fileService = fileService;
             _ontologyService = ontologyService;
             _ontologyProvider = ontologyProvider;
+            _eventProducer = eventProducer;
         }
 
         public async Task SaveAsync(Materials.Material material)
@@ -52,6 +56,7 @@ namespace IIS.Core.Materials.EntityFramework
                 .ExtractInfo(material);
             // end
             await _context.SaveChangesAsync();
+            _eventProducer.SendMaterialAddedEventAsync(new MaterialAddedEvent { Id = material.Id });
         }
 
         public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset, Guid? parentId = null, IEnumerable<Guid> nodeIds = null)

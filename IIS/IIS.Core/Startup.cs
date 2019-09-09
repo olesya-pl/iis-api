@@ -8,6 +8,8 @@ using HotChocolate.Execution.Configuration;
 using HotChocolate.Types.Relay;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
+using IIS.Core.GSM.Consumer;
+using IIS.Core.GSM.Producer;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Ontology;
@@ -21,6 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQ.Client;
 
 namespace IIS.Core
 {
@@ -56,6 +59,7 @@ namespace IIS.Core
 
             services.AddTransient<Seeder>();
             services.AddTransient(e => new ContextFactory(connectionString));
+            services.AddTransient(e => new FileServiceFactory(connectionString));
 
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
@@ -76,6 +80,19 @@ namespace IIS.Core
             // end of graphql engine registration
             services.AddDataLoaderRegistry();
 
+            var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
+            var factory = new ConnectionFactory
+            {
+                HostName = mq.Host,
+                UserName = mq.Username,
+                Password = mq.Password,
+                RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
+            };
+            services.AddTransient<IConnectionFactory>(s => factory);
+            
+            services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
+            services.AddHostedService<MaterialEventConsumer>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -95,6 +112,13 @@ namespace IIS.Core
 
             app.UseMvc();
         }
+    }
+
+    public class MqConfiguration
+    {
+        public string Host { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
 
     public class OptionsMiddleware

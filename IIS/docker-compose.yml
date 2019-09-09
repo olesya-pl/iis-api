@@ -25,6 +25,20 @@ services:
             - ../data_storage/postgres-data:/var/lib/postgresql/data
         restart: always
   
+    mq:
+        container_name: iis.mq
+        image: rabbitmq:latest
+        ports:
+            - 4369:4369
+            - 5671:5671
+            - 5672:5672
+            - 25672:25672
+        networks:
+            - iis-network
+        volumes:
+            - ../data_storage/rabbitmq-data:/var/lib/rabbitmq
+        restart: always
+
 networks:
   iis-network:
     external: false
