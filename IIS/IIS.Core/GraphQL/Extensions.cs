@@ -25,6 +25,8 @@ namespace IIS.Core.GraphQL
 
         public static IOutputType WrapOutputType(this IOutputType type, EmbeddingRelationType relationType)
         {
+            if (relationType.IsComputed())
+                return type;
             switch (relationType.EmbeddingOptions)
             {
                 case EmbeddingOptions.Optional:

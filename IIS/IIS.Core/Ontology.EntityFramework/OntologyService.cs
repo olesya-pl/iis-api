@@ -249,6 +249,36 @@ namespace IIS.Core.Ontology.EntityFramework
             }
         }
 
+        public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationTypeIds, CancellationToken cancellationToken = default)
+        {
+            await _context.Semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                var nodes = await _context.Nodes.Where(e => nodeIds.Contains(e.Id)).ToListAsync(cancellationToken);
+                var nodesDict = nodes.ToDictionary(n => n.Id); // leave nodes list to preserve db order
+
+                var relationsQ = _context.Relations
+                    .Include(e => e.Node)
+                    .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
+                    .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
+                if (relationTypeIds != null)
+                    relationsQ = relationsQ.Where(e => relationTypeIds.Contains(e.Node.TypeId));
+                var relations = await relationsQ.ToListAsync(cancellationToken);
+
+                foreach (var node in nodesDict.Values)
+                    node.OutgoingRelations = new List<Context.Relation>();
+                foreach (var relation in relations)
+                    nodesDict[relation.SourceNodeId].OutgoingRelations.Add(relation);
+
+                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+                return nodes.Select(n => MapNode(n, ontology)).ToList();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
         private Node MapNode(Context.Node ctxNode, Ontology ontology)
         {
             return MapNode(ctxNode, ontology, new List<Node>());
@@ -259,26 +289,26 @@ namespace IIS.Core.Ontology.EntityFramework
             var m = mappedNodes.SingleOrDefault(e => e.Id == ctxNode.Id);
             if (m != null) return m;
 
-            var type = ontology.GetType(ctxNode.TypeId);
+            var type = ontology.GetType(ctxNode.TypeId)
+                       ?? throw new ArgumentException($"Ontology type with id {ctxNode.TypeId} was not found.");
             Node node;
-            if (type is AttributeType)
+            if (type is AttributeType attrType)
             {
-                var attrType = (AttributeType)type;
                 var value = AttributeType.ParseValue(ctxNode.Attribute.Value, attrType.ScalarTypeEnum);
                 node = new Attribute(ctxNode.Id, attrType, value, ctxNode.CreatedAt, ctxNode.UpdatedAt);
             }
-            else if (type is EntityType)
+            else if (type is EntityType entityType)
             {
-                node = new Entity(ctxNode.Id, (EntityType)type, ctxNode.CreatedAt, ctxNode.UpdatedAt);
+                node = new Entity(ctxNode.Id, entityType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
                 mappedNodes.Add(node);
             }
-            else if (type is EmbeddingRelationType)
+            else if (type is EmbeddingRelationType relationType)
             {
-                node = new Relation(ctxNode.Id, (EmbeddingRelationType)type, ctxNode.CreatedAt, ctxNode.UpdatedAt);
+                node = new Relation(ctxNode.Id, relationType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
                 var target = MapNode(ctxNode.Relation.TargetNode, ontology, mappedNodes);
                 node.AddNode(target);
             }
-            else throw new Exception("Unsupported.");
+            else throw new Exception($"Node mapping does not support ontology type {type.GetType()}.");
 
             foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived))
             {

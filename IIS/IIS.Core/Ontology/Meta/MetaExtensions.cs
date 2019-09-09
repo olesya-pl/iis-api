@@ -55,6 +55,11 @@ namespace IIS.Core.Ontology.Meta
             return CreateMeta<EntityRelationMeta>(type, converter);
         }
 
+        public static bool IsComputed(this EmbeddingRelationType type)
+        {
+            return (type.CreateMeta() as AttributeRelationMeta)?.Formula != null;
+        }
+
         // ugly quick solution to validate existing ontology meta
         public static void ValidateMeta(this IEnumerable<Type> ontologyTypes)
         {

@@ -97,7 +97,7 @@ namespace IIS.Core.Ontology
                 if (embeddingRelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
                     var existingNode = Nodes.SingleOrDefault(e => e.Type == relationType);
-                    if (existingNode != null) throw new Exception($"Relation {relationType} supports single value only.");
+                    if (existingNode != null) throw new Exception($"Relation '{relationType.Name}' supports single value only.");
                 }
             }
 

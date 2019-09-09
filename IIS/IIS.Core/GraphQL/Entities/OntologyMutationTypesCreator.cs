@@ -55,6 +55,8 @@ namespace IIS.Core.GraphQL.Entities
         {
             IInputType type = null;
 
+            if (relationType.IsComputed()) return;
+
             if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Create))
                 type = TypeRepository.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)
                     .WrapInputType(relationType);

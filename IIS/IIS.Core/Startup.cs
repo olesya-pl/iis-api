@@ -74,6 +74,7 @@ namespace IIS.Core
                 .AddJsonArrayResponseStreamSerializer()
                 .AddGraphQLSubscriptions();
             // end of graphql engine registration
+            services.AddDataLoaderRegistry();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
