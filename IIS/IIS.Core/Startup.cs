@@ -45,7 +45,8 @@ namespace IIS.Core
             var connectionString = Configuration.GetConnectionString("db");
             services.AddDbContext<OntologyContext>(b => b
                 .UseNpgsql(connectionString)
-                .EnableSensitiveDataLogging(),
+                //.EnableSensitiveDataLogging()
+                ,
                 ServiceLifetime.Scoped);
 
             services.AddHttpContextAccessor();
@@ -89,9 +90,12 @@ namespace IIS.Core
                 RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
             };
             services.AddTransient<IConnectionFactory>(s => factory);
-            
+
+            var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
+            services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
             services.AddHostedService<MaterialEventConsumer>();
+            
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

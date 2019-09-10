@@ -38,9 +38,13 @@ def main():
     source = args.source if isabs(args.source) else join(getcwd(), args.source)
 
     for intercept_name in list_intercepts(source):
-        media_id = upload_media(intercept_name, source, args.uri)
-        response = upload_meta(intercept_name, source, args.uri, media_id)
-        print(response)
+        try:
+            media_id = upload_media(intercept_name, source, args.uri)
+            response = upload_meta(intercept_name, source, args.uri, media_id)
+            print(response)
+        except Exception:
+            print("FAIL. ", intercept_name, " всрався. Moving next item...")
+            continue
 
 
 def list_intercepts(source):

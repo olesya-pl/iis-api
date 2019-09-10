@@ -1,9 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
-using IIS.Core.Materials;
 using IIS.Core.Ontology.EntityFramework;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,6 +17,7 @@ namespace IIS.Core.GSM.Consumer
         private struct MaterialAddedEvent
         {
             public Guid Id;
+            public Guid MaterialId;
         }
         private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
@@ -26,14 +25,17 @@ namespace IIS.Core.GSM.Consumer
         private readonly ILogger _logger;
         private readonly FileServiceFactory _fileServiceFactory;
         private readonly ContextFactory _contextFactory;
+        private readonly IGsmTranscriber _gsmTranscriber;
+
 
         public MaterialEventConsumer(IConnectionFactory connectionFactory, ILoggerFactory loggerFactory,
-            FileServiceFactory fileServiceFactory, ContextFactory contextFactory)
+            FileServiceFactory fileServiceFactory, ContextFactory contextFactory, IGsmTranscriber gsmTranscriber)
         {
             _logger = loggerFactory.CreateLogger<MaterialEventConsumer>();
             _connectionFactory = connectionFactory;
             _fileServiceFactory = fileServiceFactory;
             _contextFactory = contextFactory;
+            _gsmTranscriber = gsmTranscriber;
 
             while (true)
             {
@@ -42,7 +44,7 @@ namespace IIS.Core.GSM.Consumer
                     _connection = _connectionFactory.CreateConnection();
                     break;
                 }
-                catch (BrokerUnreachableException e)
+                catch (BrokerUnreachableException)
                 {
                     var timeout = 5000;
                     _logger.LogError($"Attempting to connect again in {timeout / 1000} sec.");
@@ -52,7 +54,7 @@ namespace IIS.Core.GSM.Consumer
 
             _channel = _connection.CreateModel();
 
-            _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
+            //_connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
         }
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -61,54 +63,11 @@ namespace IIS.Core.GSM.Consumer
 
             stoppingToken.ThrowIfCancellationRequested();
 
-            var gsmConsumer = new EventingBasicConsumer(_channel);
-            gsmConsumer.Received += (ch, ea) =>
+            var gsmConsumer = new EventingBasicConsumer(_channel);//new AsyncEventingBasicConsumer(_channel);
+            gsmConsumer.Received += (sender, ea) =>
             {
-                try
-                {
-                    // received message  
-                    var message = System.Text.Encoding.UTF8.GetString(ea.Body);
-                    var json = JObject.Parse(message);
-                    var eventData = json.ToObject<MaterialAddedEvent>();
-                    _logger.LogInformation("***************** MESSAGE RECEIVED ********************" + message);
-                    var fileService = _fileServiceFactory.CreateService();
-                    var file = fileService.GetFileAsync(eventData.Id);
-                    // todo: send to ML service
-                    var mlResponse = JObject.Parse("{ 'status': 'OK', 'transcription': [['Mock bla bla']] }");
-                    if (mlResponse["status"].Value<string>() != "OK")
-                    {
-                        _channel.BasicNack(ea.DeliveryTag, false, false);
-                        _logger.LogInformation("*************************** JOB FAILED **********************************");
-                    }
-                    var data = JObject.Parse("{ 'transcription': '" + mlResponse["transcription"][0][0].Value<string>() + "' }");
-                    using(var context = _contextFactory.CreateContext())
-                    {
-                        var mi = new Materials.EntityFramework.MaterialInfo
-                        {
-                            Id = Guid.NewGuid(),
-                            Data = data?.ToString(),
-                            MaterialId = eventData.Id,
-                            Source = "ML",
-                            SourceType = "GSM",
-                            SourceVersion = "xz"
-                        };
-                        context.Add(mi);
-                        context.SaveChanges();
-                    }
-                    _channel.BasicAck(ea.DeliveryTag, false);
-                    _logger.LogInformation("*************************** JOB DONE **********************************");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "");
-                    throw;
-                }
+                GsmConsumer_Received(sender, ea).Wait(stoppingToken);
             };
-
-            //consumer.Shutdown += OnConsumerShutdown;
-            //consumer.Registered += OnConsumerRegistered;
-            //consumer.Unregistered += OnConsumerUnregistered;
-            //consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
 
             _channel.BasicConsume(queue: "gsm",
                                  autoAck: false,
@@ -117,11 +76,50 @@ namespace IIS.Core.GSM.Consumer
             await Task.CompletedTask;
         }
 
-        private void OnConsumerConsumerCancelled(object sender, ConsumerEventArgs e) { }
-        private void OnConsumerUnregistered(object sender, ConsumerEventArgs e) { }
-        private void OnConsumerRegistered(object sender, ConsumerEventArgs e) { }
-        private void OnConsumerShutdown(object sender, ShutdownEventArgs e) { }
-        private void RabbitMQ_ConnectionShutdown(object sender, ShutdownEventArgs e) { }
+        private async Task GsmConsumer_Received(object sender, BasicDeliverEventArgs ea)
+        {
+            try
+            {
+                // received message  
+                var message = System.Text.Encoding.UTF8.GetString(ea.Body);
+                var json = JObject.Parse(message);
+                var eventData = json.ToObject<MaterialAddedEvent>();
+                _logger.LogInformation("***************** MESSAGE RECEIVED ********************" + message);
+                var fileService = _fileServiceFactory.CreateService();
+                var file = await fileService.GetFileAsync(eventData.Id);
+                var mlResponse = await _gsmTranscriber.TranscribeAsync(file);
+                if (mlResponse["status"].Value<string>() != "OK")
+                {
+                    _channel.BasicNack(ea.DeliveryTag, false, false);
+                    _logger.LogInformation("*************************** JOB FAILED **********************************");
+                }
+                else
+                {
+                    var data = JObject.Parse("{ 'transcription': '" + mlResponse["transcription"][0][0].Value<string>() + "' }");
+                    using (var context = _contextFactory.CreateContext())
+                    {
+                        var mi = new Materials.EntityFramework.MaterialInfo
+                        {
+                            Id = Guid.NewGuid(),
+                            Data = data?.ToString(),
+                            MaterialId = eventData.MaterialId,
+                            Source = "ML",
+                            SourceType = "GSM",
+                            SourceVersion = "xz"
+                        };
+                        context.Add(mi);
+                        await context.SaveChangesAsync();
+                    }
+                    _channel.BasicAck(ea.DeliveryTag, false);
+                    _logger.LogInformation("*************************** JOB DONE **********************************");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "");
+                throw;
+            }
+        }
 
         public override void Dispose()
         {

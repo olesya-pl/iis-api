@@ -56,7 +56,7 @@ namespace IIS.Core.Materials.EntityFramework
                 .ExtractInfo(material);
             // end
             await _context.SaveChangesAsync();
-            _eventProducer.SendMaterialAddedEventAsync(new MaterialAddedEvent { Id = material.Id });
+            _eventProducer.SendMaterialAddedEventAsync(new MaterialAddedEvent { Id = material.File.Id, MaterialId = material.Id });
         }
 
         public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset,
