@@ -88,9 +88,9 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLType(typeof(JsonScalarType))] public JObject Meta => Source.Meta;
 
         [GraphQLType(typeof(JsonScalarType))]
-        public JObject FormField => (JObject) Source.Meta["formField"]; // Source.CreateMeta().FormField;
+        public JObject FormField => (JObject) Source.Meta?["formField"]; // Source.CreateMeta().FormField;
 
-        [GraphQLType(typeof(JsonScalarType))] public JObject Validation => (JObject) Source.Meta["validation"];
+        [GraphQLType(typeof(JsonScalarType))] public JObject Validation => (JObject) Source.Meta?["validation"];
     }
 
     public class EntityAttributePrimitive : EntityAttributeBase
