@@ -20,10 +20,12 @@ namespace IIS.Core.GraphQL.DataLoaders
         protected override async Task<IReadOnlyList<Result<Node>>> FetchAsync(IReadOnlyList<Tuple<Guid, EmbeddingRelationType>> keys, CancellationToken cancellationToken)
         {
             var nodeIds = keys.Select(k => k.Item1).ToArray();
-            var relationTypeIds = keys.All(k => k.Item2 != null) ? keys.Select(k => k.Item2.Id).Distinct().ToArray() : null;
-            var nodes = await _ontologyService.LoadNodesAsync(nodeIds, relationTypeIds, cancellationToken);
+            var relationTypes = keys.All(k => k.Item2 != null)
+                ? keys.GroupBy(k => k.Item2.Id).Select(g => g.First().Item2).ToArray()
+                : null;
+            var nodes = await _ontologyService.LoadNodesAsync(nodeIds, relationTypes, cancellationToken);
             var nodesDict = nodes.ToDictionary(n => n.Id);
-            return nodeIds.Select(id => (Result<Node>)nodesDict[id]).ToList();
+            return nodeIds.Select(id => (Result<Node>)nodesDict.GetOrDefault(id)).ToList();
         }
     }
 }

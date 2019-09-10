@@ -1,6 +1,6 @@
 namespace IIS.Core.Ontology.Meta
 {
-    
+
     public class RelationMetaBase : IMeta
     {
         public int? SortOrder { get; set; }
@@ -23,19 +23,20 @@ namespace IIS.Core.Ontology.Meta
         public string Formula { get; set; }
         public string Format { get; set; }
     }
-    
+
     // Describes virtual inversed relation
     public class InversedRelationMeta : RelationMetaBase
     {
         public string Code { get; set; }
+        public string Title { get; set; }
         public bool Editable { get; set; }
     }
-    
+
     public enum EntityOperation
     {
         Create, Update, Delete
     }
-    
+
     public class FormField
     {
         public string Type { get; set; }

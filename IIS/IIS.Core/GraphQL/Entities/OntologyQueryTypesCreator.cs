@@ -54,15 +54,6 @@ namespace IIS.Core.GraphQL.Entities
             {
                 fd.Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntityRelation(ctx, relationType));
             }
-
-            // todo: Move inversed relations to domain
-            var meta = relationType.CreateMeta() as EntityRelationMeta;
-            var inversed = meta?.Inversed;
-            if (inversed != null)
-                objectTypeDescriptor.Field(inversed.Code ?? relationType.GetFieldName() + "Inversed").Type(type)
-                    .Description("Inversed relation resolvers and wrapping are not implemented.")
-                    .Resolver(ctx => null); // todo: remove stub from IIS-4140
-//                    .ResolverNotImplemented();
         }
 
         private void OnRelation(EntityType entityType, IGrouping<string, EmbeddingRelationType> relationTypeGroup,

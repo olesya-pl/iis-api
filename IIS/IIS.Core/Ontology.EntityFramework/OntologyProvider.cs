@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
+using IIS.Core.Ontology.Meta;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
@@ -59,7 +60,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         _ontology = new Ontology(result);
                         _types.Clear();
                     }
-                    
+
                     return _ontology;
                 }
                 finally
@@ -116,6 +117,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     _types.Add(type.Id, relation);
                     var target = mapType(relationType.TargetType);
                     relation.AddType(target);
+                    addInversedRelation(relation, _types[relationType.SourceTypeId]);
                 }
                 if (relationType.Kind == RelationKind.Inheritance)
                 {
@@ -127,6 +129,19 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
 
                 return relation;
+            }
+
+            void addInversedRelation(RelationType relation, Type sourceType)
+            {
+                if (!(relation is EmbeddingRelationType ert) || !ert.HasInversed())
+                    return;
+                var meta = ert.GetInversed();
+                var result = new EmbeddingRelationType(Guid.NewGuid(), meta.Code, EmbeddingOptions.Multiple, true);
+                result.Title = meta.Title ?? meta.Code;
+                result.AddType(sourceType); // link to source type
+                result.AddType(ert); // link to original direct relation type
+                _types.Add(result.Id, result);
+                ert.TargetType.AddType(result);
             }
         }
 

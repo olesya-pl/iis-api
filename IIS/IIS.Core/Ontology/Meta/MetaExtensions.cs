@@ -55,10 +55,15 @@ namespace IIS.Core.Ontology.Meta
             return CreateMeta<EntityRelationMeta>(type, converter);
         }
 
-        public static bool IsComputed(this EmbeddingRelationType type)
-        {
-            return (type.CreateMeta() as AttributeRelationMeta)?.Formula != null;
-        }
+        public static bool IsComputed(this EmbeddingRelationType type) => type.GetComputed() != null;
+
+        public static string GetComputed(this EmbeddingRelationType type)
+            => (type.CreateMeta() as AttributeRelationMeta)?.Formula;
+
+        public static bool HasInversed(this EmbeddingRelationType type) => type.GetInversed() != null;
+
+        public static InversedRelationMeta GetInversed(this EmbeddingRelationType type)
+            => (type.CreateMeta() as EntityRelationMeta)?.Inversed;
 
         // ugly quick solution to validate existing ontology meta
         public static void ValidateMeta(this IEnumerable<Type> ontologyTypes)

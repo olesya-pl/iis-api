@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace IIS.Core.Ontology.EntityFramework
@@ -249,26 +250,44 @@ namespace IIS.Core.Ontology.EntityFramework
             }
         }
 
-        public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationTypeIds, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds,
+            IEnumerable<EmbeddingRelationType> relationTypes, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
             {
                 var nodes = await _context.Nodes.Where(e => nodeIds.Contains(e.Id)).ToListAsync(cancellationToken);
-                var nodesDict = nodes.ToDictionary(n => n.Id); // leave nodes list to preserve db order
 
-                var relationsQ = _context.Relations
-                    .Include(e => e.Node)
-                    .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                    .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
-                if (relationTypeIds != null)
-                    relationsQ = relationsQ.Where(e => relationTypeIds.Contains(e.Node.TypeId));
-                var relations = await relationsQ.ToListAsync(cancellationToken);
+                if (relationTypes == null)
+                {
+                    var relations = await GetDirectRelationsQuery(nodeIds, null).ToListAsync(cancellationToken);
+                    FillRelations(nodes, relations);
+                }
+                else
+                {
+                    var directIds = relationTypes.Where(r => !r.IsInversed).Select(r => r.Id).ToArray();
+                    var inversedIds = relationTypes.Where(r => r.IsInversed).Select(r => r.DirectRelationType.Id).ToArray();
+                    var relations = new List<Context.Relation>();
+                    if (directIds.Length > 0)
+                    {
+                        var result = await GetDirectRelationsQuery(nodeIds, directIds).ToListAsync(cancellationToken);
+                        relations.AddRange(result);
+                    }
 
-                foreach (var node in nodesDict.Values)
-                    node.OutgoingRelations = new List<Context.Relation>();
-                foreach (var relation in relations)
-                    nodesDict[relation.SourceNodeId].OutgoingRelations.Add(relation);
+                    if (inversedIds.Length > 0)
+                    {
+                        var result = await GetInversedRelationsQuery(nodeIds, inversedIds).ToListAsync(cancellationToken);
+                        var map = relationTypes.Where(r => r.IsInversed).ToDictionary(r => r.DirectRelationType.Id, r => r.Id);
+                        foreach (var rel in result)
+                        {
+                            rel.Node.TypeId = map[rel.Node.TypeId]; // substitute type with inversed
+                            (rel.TargetNodeId, rel.SourceNodeId) = (rel.SourceNodeId, rel.TargetNodeId); // replace source with target
+                            (rel.TargetNode, rel.SourceNode) = (rel.SourceNode, rel.TargetNode);
+                        }
+                        relations.AddRange(result);
+                    }
+                    FillRelations(nodes, relations);
+                }
 
                 var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
                 return nodes.Select(n => MapNode(n, ontology)).ToList();
@@ -278,6 +297,38 @@ namespace IIS.Core.Ontology.EntityFramework
                 _context.Semaphore.Release();
             }
         }
+
+        private IQueryable<Context.Relation> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
+        {
+            var relationsQ = _context.Relations
+                .Include(e => e.Node)
+                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
+                .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
+            if (relationIds != null)
+                relationsQ = relationsQ.Where(e => relationIds.Contains(e.Node.TypeId));
+            return relationsQ;
+        }
+
+        private IQueryable<Context.Relation> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
+        {
+            var relationsQ = _context.Relations
+                .Include(e => e.Node)
+                .Include(e => e.SourceNode).ThenInclude(e => e.Attribute)
+                .Where(e => nodeIds.Contains(e.TargetNodeId) && !e.Node.IsArchived);
+            if (relationIds != null)
+                relationsQ = relationsQ.Where(e => relationIds.Contains(e.Node.TypeId));
+            return relationsQ;
+        }
+
+        private void FillRelations(List<Context.Node> nodes, List<Context.Relation> relations)
+        {
+            var nodesDict = nodes.ToDictionary(n => n.Id);
+            foreach (var node in nodesDict.Values)
+                node.OutgoingRelations = new List<Context.Relation>();
+            foreach (var relation in relations)
+                nodesDict[relation.SourceNodeId].OutgoingRelations.Add(relation);
+        }
+
 
         private Node MapNode(Context.Node ctxNode, Ontology ontology)
         {

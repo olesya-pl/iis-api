@@ -7,6 +7,7 @@ namespace IIS.Core.Ontology
     public enum EmbeddingOptions { Optional, Required, Multiple }
     public class EmbeddingRelationType : RelationType
     {
+        public bool IsInversed { get; }
         public EmbeddingOptions EmbeddingOptions { get; }
 
         // Embedding relation can have single attribute or single entity as a node
@@ -16,11 +17,13 @@ namespace IIS.Core.Ontology
         public IEnumerable<RelationType> RelationTypes => RelatedTypes.OfType<RelationType>();
         public bool IsAttributeType => RelatedTypes.OfType<AttributeType>().Any();
         public bool IsEntityType => RelatedTypes.OfType<EntityType>().Any();
+        public EmbeddingRelationType DirectRelationType => RelatedTypes.OfType<EmbeddingRelationType>().Single();
 
-        public EmbeddingRelationType(Guid id, string name, EmbeddingOptions embeddingOptions)
+        public EmbeddingRelationType(Guid id, string name, EmbeddingOptions embeddingOptions, bool isInversed = false)
             : base(id, name)
         {
             EmbeddingOptions = embeddingOptions;
+            IsInversed = isInversed;
         }
     }
 }
