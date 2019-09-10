@@ -19,10 +19,11 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMaterialService materialService,
             [GraphQLNonNullType] PaginationInput pagination,
             [GraphQLType(typeof(IdType))] Guid? parentId = null,
-            IEnumerable<Guid> nodeIds = null)
+            IEnumerable<Guid> nodeIds = null,
+            IEnumerable<string> types = null)
         {
             var materials = await materialService.GetMaterialsAsync(pagination.PageSize,
-                pagination.Offset(), parentId, nodeIds);
+                pagination.Offset(), parentId, nodeIds, types);
             return materials.Select(m => m.ToView());
         }
 

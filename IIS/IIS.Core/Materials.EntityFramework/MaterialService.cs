@@ -59,21 +59,22 @@ namespace IIS.Core.Materials.EntityFramework
             _eventProducer.SendMaterialAddedEventAsync(new MaterialAddedEvent { Id = material.Id });
         }
 
-        public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset, Guid? parentId = null, IEnumerable<Guid> nodeIds = null)
+        public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset,
+            Guid? parentId = null, IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
             IEnumerable<Material> materials;
             await _context.Semaphore.WaitAsync();
             try
             {
+                IQueryable<Material> materialsQ;
                 if (nodeIds == null)
                 {
-                    IQueryable<Material> materialsQ = _context.Materials
+                    materialsQ = _context.Materials
                         .Include(m => m.Infos)
                         .ThenInclude(m => m.Features);
                     if (parentId != null)
                         materialsQ = materialsQ.Where(e => e.ParentId == parentId);
                     materialsQ = materialsQ.Skip(offset).Take(limit);
-                    materials = await materialsQ.ToArrayAsync();
                 }
                 else
                 {
@@ -85,12 +86,16 @@ namespace IIS.Core.Materials.EntityFramework
                         .Select(e => e.Info.Material.Id)
                         .Distinct();
                     var materialsIds = idsQ.Skip(offset).Take(limit);
-                    var materialsQ = _context.Materials
+                    materialsQ = _context.Materials
                         .Include(m => m.Infos)
                         .ThenInclude(m => m.Features)
                         .Where(m => materialsIds.Contains(m.Id));
-                    materials = await materialsQ.ToArrayAsync();
                 }
+
+                if (types == null)
+                    materialsQ = materialsQ.Where(e => types.Contains(e.Type));
+
+                materials = await materialsQ.ToArrayAsync();
             }
             finally
             {
