@@ -78,8 +78,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type
 
-        // TODO: change Editable to return false for computed attributes and inversed relations
-        [GraphQLNonNullType] public bool Editable => Source.Name != "title" && Source.Name != "parent";
+        [GraphQLNonNullType] public bool Editable => !(Source.IsInversed || Source.IsComputed());
 
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;

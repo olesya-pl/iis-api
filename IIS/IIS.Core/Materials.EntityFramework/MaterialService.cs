@@ -92,7 +92,7 @@ namespace IIS.Core.Materials.EntityFramework
                         .Where(m => materialsIds.Contains(m.Id));
                 }
 
-                if (types == null)
+                if (types != null)
                     materialsQ = materialsQ.Where(e => types.Contains(e.Type));
 
                 materials = await materialsQ.ToArrayAsync();
