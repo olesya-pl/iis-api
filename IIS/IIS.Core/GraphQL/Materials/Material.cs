@@ -8,6 +8,7 @@ using IIS.Core.Files;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Materials;
+using Newtonsoft.Json.Linq;
 using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 
 namespace IIS.Core.GraphQL.Materials
@@ -18,6 +19,8 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLIgnore] public Guid? FileId { get; set; }
         [GraphQLNonNullType] public Metadata Metadata { get; set; }
         public IEnumerable<Data> Data { get; set; }
+        [GraphQLType(typeof(ListType<JsonScalarType>))]
+        public IEnumerable<JObject> Transcriptions { get; set; }
 
         [GraphQLNonNullType]
         public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialService materialService,

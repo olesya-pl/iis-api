@@ -23,7 +23,8 @@ namespace IIS.Core.GraphQL.Materials
                 Id = material.Id,
                 Metadata = material.Metadata.ToObject<Metadata>(),
                 Data = material.Data.ToObject<IEnumerable<Data>>(),
-                FileId = material.File?.Id
+                FileId = material.File?.Id,
+                Transcriptions = material.Infos.Select(e => e.Data)
             };
         }
 
