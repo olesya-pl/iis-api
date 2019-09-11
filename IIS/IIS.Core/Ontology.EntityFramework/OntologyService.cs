@@ -291,11 +291,22 @@ namespace IIS.Core.Ontology.EntityFramework
                         var map = relationTypes.Where(r => r.IsInversed).ToDictionary(r => r.DirectRelationType.Id, r => r.Id);
                         foreach (var rel in result)
                         {
-                            rel.Node.TypeId = map[rel.Node.TypeId]; // substitute type with inversed
-                            (rel.TargetNodeId, rel.SourceNodeId) = (rel.SourceNodeId, rel.TargetNodeId); // replace source with target
-                            (rel.TargetNode, rel.SourceNode) = (rel.SourceNode, rel.TargetNode);
+                            var r = new Context.Relation
+                            {
+                                Id = rel.Id,
+                                TargetNodeId = rel.SourceNodeId,
+                                TargetNode = rel.SourceNode,
+                                SourceNodeId = rel.TargetNodeId,
+                                SourceNode = rel.TargetNode
+                            };
+                            r.Node = new Context.Node
+                            {
+                                Id = rel.Id,
+                                TypeId = map[rel.Node.TypeId],
+                                Relation = r
+                            };
+                            relations.Add(r);
                         }
-                        relations.AddRange(result);
                     }
                     FillRelations(nodes, relations);
                 }
