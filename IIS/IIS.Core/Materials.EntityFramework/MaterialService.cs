@@ -74,6 +74,8 @@ namespace IIS.Core.Materials.EntityFramework
                         .ThenInclude(m => m.Features);
                     if (parentId != null)
                         materialsQ = materialsQ.Where(e => e.ParentId == parentId);
+                    if (types != null)
+                        materialsQ = materialsQ.Where(e => types.Contains(e.Type));
                     materialsQ = materialsQ.Skip(offset).Take(limit);
                 }
                 else
@@ -82,18 +84,17 @@ namespace IIS.Core.Materials.EntityFramework
                     var idsQ = _context.MaterialFeatures
                         .Include(e => e.Info)
                         .ThenInclude(e => e.Material)
-                        .Where(e => nodeIdsArr.Contains(e.NodeId))
-                        .Select(e => e.Info.Material.Id)
+                        .Where(e => nodeIdsArr.Contains(e.NodeId));
+                    if (types != null)
+                        idsQ = idsQ.Where(e => types.Contains(e.Info.Material.Type));
+                    var idsDist = idsQ.Select(e => e.Info.Material.Id)
                         .Distinct();
-                    var materialsIds = idsQ.Skip(offset).Take(limit);
+                    var materialsIds = idsDist.Skip(offset).Take(limit);
                     materialsQ = _context.Materials
                         .Include(m => m.Infos)
                         .ThenInclude(m => m.Features)
                         .Where(m => materialsIds.Contains(m.Id));
                 }
-
-                if (types != null)
-                    materialsQ = materialsQ.Where(e => types.Contains(e.Type));
 
                 materials = await materialsQ.ToArrayAsync();
             }

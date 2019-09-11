@@ -14,7 +14,7 @@ namespace IIS.Core.GraphQL.Materials
     public class Query
     {
 
-//        [GraphQLType(typeof(NonNullType<CollectionType<Material>>))]
+        [GraphQLType(typeof(MaterialWrapperType))]
         public async Task<IEnumerable<Material>> GetMaterials(
             [Service] IMaterialService materialService,
             [GraphQLNonNullType] PaginationInput pagination,
@@ -31,6 +31,22 @@ namespace IIS.Core.GraphQL.Materials
         {
             var material = await materialService.GetMaterialAsync(materialId);
             return material?.ToView();
+        }
+    }
+
+    public class MaterialWrapperType : ObjectType<IEnumerable<Material>>
+    {
+        protected override void Configure(IObjectTypeDescriptor<IEnumerable<Material>> descriptor)
+        {
+            descriptor.Name("MaterialWrapper");
+            descriptor.BindFieldsExplicitly().Include<Resolvers>();
+        }
+
+        public class Resolvers
+        {
+            public int Count => 0;
+            [GraphQLType(typeof(NonNullType<ListType<NonNullType<ObjectType<Material>>>>))]
+            public IEnumerable<Material> Items([Parent] IEnumerable<Material> parent) => parent;
         }
     }
 }
