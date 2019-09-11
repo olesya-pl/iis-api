@@ -62,9 +62,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<object> ResolveAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType)
         {
             var parent = ctx.Parent<Node>();
-            var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
+            var dl = ctx.DataLoader<NodeDataLoader>();
+            var node = await dl.LoadAsync(Tuple.Create(parent.Id, relationType), default);
             if (relationType.IsComputed())
-                return ResolveComputedAttribute(relationType, node);
+                return await ResolveComputedAttribute(dl, relationType, node);
             var relation = node.GetRelation(relationType);
             if (relation == null) return null;
             return await ResolveAttributeValue(ctx, relation.AttributeTarget);
@@ -85,19 +86,33 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        private object ResolveComputedAttribute(EmbeddingRelationType relationType, Node node)
+        private async Task<object> ResolveComputedAttribute(NodeDataLoader dl, EmbeddingRelationType relationType, Node node)
         {
             var formula = (relationType.CreateMeta() as AttributeRelationMeta)?.Formula;
             if (formula == null) return null;
             formula = formula.Replace("entity.", ""); // remove prefix from existing formulas, remove later
             formula = formula.Replace("h.", ""); // remove prefix from existing formulas, remove later
+            var variablesList = new List<string>();
             ExpressionContext context = new ExpressionContext();
             context.Imports.AddType(typeof(HelperFunctions));
             context.Variables.ResolveVariableType += (sender, args)
-                => { args.VariableType = typeof(object); };
-            context.Variables.ResolveVariableValue += (sender, args)
-                => { args.VariableValue = node.GetAttributeValue(args.VariableName); };
+                =>
+            {
+                args.VariableType = typeof(object);
+                variablesList.Add(args.VariableName);
+            };
+
             IDynamicExpression eDynamic = context.CompileDynamic(formula);
+            var dlArgs = variablesList.Select(v => Tuple.Create(node.Id, node.Type.AllProperties.Single(p => p.Name == v)));
+            var nodes = await dl.LoadAsync(default, dlArgs.ToArray());
+            var resultDict = variablesList.Zip(nodes, (s, n) => new {Key = s, Value = n})
+                .ToDictionary(o => o.Key, o => ((Relation)o.Value.Nodes.Where(n => n.Type.Name == o.Key).Single()).AttributeTarget.Value);
+            context.Variables.ResolveVariableValue += (sender, args)
+                =>
+            {
+//                args.VariableValue = node.GetAttributeValue(args.VariableName);
+                args.VariableValue = resultDict[args.VariableName];
+            };
             var result = eDynamic.Evaluate();
             return result;
         }
