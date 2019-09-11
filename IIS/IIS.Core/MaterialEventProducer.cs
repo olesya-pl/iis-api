@@ -10,7 +10,7 @@ namespace IIS.Core.GSM.Producer
 {
     public struct MaterialAddedEvent
     {
-        public Guid Id;
+        public Guid FileId;
         public Guid MaterialId;
     }
 

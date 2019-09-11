@@ -43,6 +43,9 @@ namespace IIS.Core.Materials.EntityFramework
                 if (file == null) throw new ArgumentException($"File with guid {material.File.Id} was not found");
                 if (!file.IsTemporary) throw new ArgumentException($"File with guid {material.File.Id} is already used");
                 await _fileService.MarkFilePermanentAsync(file.Id);
+                // todo: implement correct file type - material type compatibility checking
+                if (material.Type == "cell.voice" && file.ContentType.StartsWith("audio/"))
+                    throw new ArgumentException($"Unable to attach {file.ContentType} file to {material.Type} material");
             }
             if (parentId.HasValue && GetMaterialAsync(parentId.Value) == null)
                 throw new ArgumentException($"Material with guid {parentId.Value} does not exist");
@@ -51,12 +54,15 @@ namespace IIS.Core.Materials.EntityFramework
                 await SaveAsync(child, material.Id);
             foreach (var info in material.Infos)
                 _context.Add(Map(info, material.Id));
+            await _context.SaveChangesAsync();
             // todo: put message to rabbit instead of calling another service directly
             await new MetadataExtractor(_context, this, _ontologyService, _ontologyProvider)
                 .ExtractInfo(material);
             // end
-            await _context.SaveChangesAsync();
-            _eventProducer.SendMaterialAddedEventAsync(new MaterialAddedEvent { Id = material.File.Id, MaterialId = material.Id });
+            // todo: multiple queues for different material types
+            if (material.File != null && material.Type == "cell.voice")
+                _eventProducer.SendMaterialAddedEventAsync(
+                    new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
         }
 
         public async Task<IEnumerable<Materials.Material>> GetMaterialsAsync(int limit, int offset,

@@ -16,7 +16,7 @@ namespace IIS.Core.GSM.Consumer
     {
         private struct MaterialAddedEvent
         {
-            public Guid Id;
+            public Guid FileId;
             public Guid MaterialId;
         }
         private readonly IConnectionFactory _connectionFactory;
@@ -56,7 +56,7 @@ namespace IIS.Core.GSM.Consumer
 
             //_connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
         }
-        
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _channel.QueueDeclare("gsm", true, false);
@@ -80,13 +80,13 @@ namespace IIS.Core.GSM.Consumer
         {
             try
             {
-                // received message  
+                // received message
                 var message = System.Text.Encoding.UTF8.GetString(ea.Body);
                 var json = JObject.Parse(message);
                 var eventData = json.ToObject<MaterialAddedEvent>();
                 _logger.LogInformation("***************** MESSAGE RECEIVED ********************" + message);
                 var fileService = _fileServiceFactory.CreateService();
-                var file = await fileService.GetFileAsync(eventData.Id);
+                var file = await fileService.GetFileAsync(eventData.FileId);
                 var mlResponse = await _gsmTranscriber.TranscribeAsync(file);
                 if (mlResponse["status"].Value<string>() != "OK")
                 {
