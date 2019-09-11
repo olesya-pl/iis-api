@@ -9,14 +9,17 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     public class MutationDeleteResolver
     {
         private readonly IOntologyService _ontologyService;
+        private readonly IOntologyProvider _ontologyProvider;
 
-        public MutationDeleteResolver(IOntologyService ontologyService)
+        public MutationDeleteResolver(IOntologyService ontologyService, IOntologyProvider ontologyProvider)
         {
             _ontologyService = ontologyService;
+            _ontologyProvider = ontologyProvider;
         }
 
         public MutationDeleteResolver(IResolverContext ctx)
         {
+            _ontologyProvider = ctx.Service<IOntologyProvider>();
             _ontologyService = ctx.Service<IOntologyService>();
         }
 
@@ -31,8 +34,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var node = (Entity) await _ontologyService.LoadNodesAsync(id, null); // load only type
             if (node == null)
                 throw new QueryException($"Entity with id {id} was not found");
-            //if (node.Type.Name != typeName)
-            //    throw new QueryException($"Entity with id {id} is of type {node.Type.Name}, not of type {typeName}");
+            var ontology = await _ontologyProvider.GetOntologyAsync();
+            var type = ontology.GetEntityType(typeName);
+            if (node.Type.IsSubtypeOf(type))
+                throw new QueryException($"Entity with id {id} is of type {node.Type.Name}, not of type {type.Name}");
             await _ontologyService.RemoveNodeAsync(node);
             return node;
         }
