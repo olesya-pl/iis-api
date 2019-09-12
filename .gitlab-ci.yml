@@ -5,8 +5,8 @@ stages:
 build_job:
   stage: build
   script:
-    - cd IIS/ && sh ./startup
-    - ls
+    - cd IIS 
+    - dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/core
   artifacts:
     paths:
     - IIS/publish
