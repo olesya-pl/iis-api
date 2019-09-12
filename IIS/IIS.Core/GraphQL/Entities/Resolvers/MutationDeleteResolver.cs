@@ -36,7 +36,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 throw new QueryException($"Entity with id {id} was not found");
             var ontology = await _ontologyProvider.GetOntologyAsync();
             var type = ontology.GetEntityType(typeName);
-            if (type.IsAssignableFrom(node.Type))
+            if (!type.IsAssignableFrom(node.Type))
                 throw new QueryException($"Entity with id {id} is of type {node.Type.Name}, not of type {type.Name}");
             await _ontologyService.RemoveNodeAsync(node);
             return node;
