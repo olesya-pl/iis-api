@@ -15,13 +15,16 @@ build_job:
   tags:
     - ci
     
-deploy_dev:
-  stage: deploy
-  script:
-    - cd /home/gitlab-runner/ansible
-    - "ansible-playbook app_api_net_dev.yml --extra-vars \"HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job\""
+#deploy_dev:
+#  stage: deploy
+#  variables:
+#    GIT_STRATEGY: none
+#    GIT_CHECKOUT: "false"
+#  script:
+#    - cd /home/gitlab-runner/ansible
+#    - "ansible-playbook app_api_net_dev.yml --extra-vars \"HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job\""
     
-  tags:
-    - ansible
-  only: 
-    - master  
+#  tags:
+ #   - ansible
+ # only: 
+ #   - master  
