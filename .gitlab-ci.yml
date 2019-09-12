@@ -23,4 +23,5 @@ deploy_dev:
     
   tags:
     - ansible
-  only: master  
+  only: 
+    - master  
