@@ -55,6 +55,8 @@ namespace IIS.Core.Ontology
             return false;
         }
 
+        public bool IsAssignableFrom(Type type) => type == this || type.IsSubtypeOf(this);
+
         public void AddType(Type type)
         {
             _relatedTypes.Add(type);
