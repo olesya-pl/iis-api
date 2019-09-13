@@ -9,13 +9,16 @@ namespace IIS.Core.Ontology.Odysseys
         public OntologyBuildContext BuildPersonTypes(OntologyBuildContext ctx)
         {
             // Attributes - title and meta omitted
+            var name = ctx.CreateBuilder().WithName("Name").IsAttribute().HasValueOf(ScalarType.String);
+            var code = ctx.CreateBuilder().WithName("Code").IsAttribute().HasValueOf(ScalarType.String);
             var firstName = ctx.CreateBuilder().WithName("FirstName").IsAttribute().HasValueOf(ScalarType.String);
             var secondName = ctx.CreateBuilder().WithName("SecondName").IsAttribute().HasValueOf(ScalarType.String);
             var fatherName = ctx.CreateBuilder().WithName("FatherName").IsAttribute().HasValueOf(ScalarType.String);
             var photo = ctx.CreateBuilder().WithName("Photo").IsAttribute().HasValueOf(ScalarType.File);
             var birthDate = ctx.CreateBuilder().WithName("BirthDate").IsAttribute().HasValueOf(ScalarType.DateTime);
-            var birthPlace = ctx.CreateBuilder().WithName("BirthPlace").IsAttribute().HasValueOf(ScalarType.String); // Address?
+            var date = ctx.CreateBuilder().WithName("Date").IsAttribute().HasValueOf(ScalarType.DateTime);
             var attachment = ctx.CreateBuilder().WithName("Attachment").IsAttribute().HasValueOf(ScalarType.File);
+
 
             // Signs
             var value = ctx.CreateBuilder().WithName("Value").IsAttribute().HasValueOf(ScalarType.String);
@@ -37,12 +40,17 @@ namespace IIS.Core.Ontology.Odysseys
                     .WithName("HomePhoneSign")
                     .Is(phoneSign)
                 ;
+            var customPhoneSign = ctx.CreateBuilder().IsEntity()
+                    .WithName("CustomPhoneSign")
+                    .Is(phoneSign)
+                    .HasOptional(name, "phoneType")
+                ;
             var emailSign = ctx.CreateBuilder().IsEntity()
                     .WithName("EmailSign")
                     .Is(sign)
                 ;
-            var ipnSign = ctx.CreateBuilder().IsEntity()
-                    .WithName("IPN")
+            var taxId = ctx.CreateBuilder().IsEntity()
+                    .WithName("TaxId")
                     .Is(sign)
                 ;
             var socialNetworksSign = ctx.CreateBuilder().IsEntity()
@@ -55,18 +63,21 @@ namespace IIS.Core.Ontology.Odysseys
             var address = ctx.CreateBuilder().IsEntity()
                     .WithName("Address")
                     .HasRequired(ctx, b =>
+                        b.WithName("ZipCode").IsAttribute().HasValueOf(ScalarType.String))
+                    .HasRequired(ctx, b =>
                         b.WithName("Region").IsAttribute().HasValueOf(ScalarType.String))
                     .HasRequired(ctx, b =>
                         b.WithName("City").IsAttribute().HasValueOf(ScalarType.String))
                     .HasRequired(ctx, b =>
                         b.WithName("Street").IsAttribute().HasValueOf(ScalarType.String))
                     .HasRequired(ctx, b =>
-                        b.WithName("House").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("Building").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("Office").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("Apartment").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
                         b.WithName("Coordinates").IsAttribute().HasValueOf(ScalarType.Geo))
                 ;
+
 
             // Enums
             var allowanceForm = ctx.CreateBuilder().IsEntity()
@@ -74,6 +85,37 @@ namespace IIS.Core.Ontology.Odysseys
                     .HasRequired(value)
                 ;
 
+            var permitState = ctx.CreateBuilder().IsEntity()
+                    .WithName("PermitState")
+                    .HasRequired(value)
+                ;
+
+            var country = ctx.CreateBuilder().IsEntity()
+                    .WithName("Country")
+                    .HasRequired(name)
+                ;
+
+            var passport = ctx.CreateBuilder().IsEntity()
+                    .WithName("Passport")
+                    .HasRequired(code)
+                    .HasRequired(ctx, b =>
+                        b.WithName("IssueInfo").IsAttribute().HasValueOf(ScalarType.String))
+                ;
+
+            var citizenship = ctx.CreateBuilder().IsEntity()
+                    .WithName("Citizenship")
+                    .HasRequired(country)
+                    .HasOptional(taxId)
+                    .HasMultiple(passport)
+                ;
+
+
+            // Work in
+            var workIn = ctx.CreateBuilder().IsEntity()
+                .WithName("WorkIn")
+                .HasRequired("Company")
+                .HasOptional(ctx, d =>
+                    d.WithName("JobPosition").IsAttribute().HasValueOf(ScalarType.String));
 
 
             // Entities
@@ -86,26 +128,11 @@ namespace IIS.Core.Ontology.Odysseys
                     .HasRequired(birthDate)
                     .HasRequired(address, "BirthPlace")
                     .HasRequired(address, "RegistrationPlace")
+                    .HasRequired(address, "LivingPlace")
                     .HasMultiple(phoneSign)
-                ;
-
-            var uaPassport = ctx.CreateBuilder().IsEntity()
-                    .WithName("UaPassport")
-                    .HasRequired(ctx, b =>
-                        b.WithName("PassportCode").IsAttribute().HasValueOf(ScalarType.String))
-                    .HasRequired(ctx, b =>
-                        b.WithName("IssuedBy").IsAttribute().HasValueOf(ScalarType.String))
-                ;
-
-            var uaCitizen = ctx.CreateBuilder().IsEntity()
-                .WithName("UaCitizen")
-                .Is(person)
-                .HasOptional(ipnSign)
-                .HasRequired(uaPassport);
-
-            var secretCarrier = ctx.CreateBuilder().IsEntity()
-                    .WithName("SecretCarrier")
-                    .Is(uaCitizen)
+                    .HasMultiple(citizenship)
+                // ... secret carrier
+                    .HasMultiple(workIn)
                     .HasRequired(allowanceForm)
                     .HasRequired(attachment, "ScanForm5")
                     .HasRequired(attachment, "AnswerRules")
@@ -113,6 +140,21 @@ namespace IIS.Core.Ontology.Odysseys
                     .HasRequired(attachment, "Form8")
                 ;
 
+
+            var permit = ctx.CreateBuilder().IsEntity()
+                .WithName("Permit")
+                .HasRequired(person)
+                .HasRequired(code)
+                .HasRequired(date, "IssueDate")
+                .HasRequired(date, "EndDate")
+                .HasRequired(allowanceForm)
+                .HasRequired(workIn)
+                .HasRequired(permitState) // computed?
+                .HasRequired("Company", "SBU"); // restrictions?
+
+
+            // ------ STUBS ------ //
+            ctx.CreateBuilder().IsEntity().WithName("Company").HasRequired(name);
 
             return ctx;
         }
