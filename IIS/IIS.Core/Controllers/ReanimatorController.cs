@@ -141,6 +141,11 @@ namespace IIS.Core.Controllers
                     .To("Address")
                 )
                 ;
+            // todo: Replace this address from person ontology
+            buildContext.CreateBuilder()
+                .WithName("Address")
+                .IsEntity()
+                ;
 
             var ontology = buildContext.BuildOntology();
 

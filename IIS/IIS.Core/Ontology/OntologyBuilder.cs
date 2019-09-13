@@ -6,32 +6,21 @@ namespace IIS.Core.Ontology
 {
     public class OntologyBuilder : IAttributeBuilder, IRelationBuilder, ITypeBuilder
     {
+        private readonly Dictionary<string, OntologyBuilder> Builders;
+
         private enum Kind { Attribute, Entity, Abstraction, Relation }
-        private struct Relation
-        {
-            public string TargetName;
-            public string RelationName;
-            public EmbeddingOptions EmbeddingOptions;
-            public JObject Meta;
-            public string Title;
-        }
         private Type _builtType;
         private event EventHandler<EventArgs> TypeBuilt;
         private bool _isBuilding;
 
-        public string Name => _name;
-        private string _name;
+        public string Name { get; private set; }
         private string _title;
         private JObject _meta;
         private List<string> _parents = new List<string>();
         private List<string> _children = new List<string>();
-        //private List<Action<ITypeBuilder>> _relatedBuilders = new List<Action<ITypeBuilder>>();
-        private List<Relation> _childNodes = new List<Relation>();
         private Kind _kind;
         private ScalarType _scalarType;
         private EmbeddingOptions _embeddingOptions;
-
-        private readonly Dictionary<string, OntologyBuilder> Builders;
 
         public OntologyBuilder(Dictionary<string, OntologyBuilder> builders)
         {
@@ -41,7 +30,7 @@ namespace IIS.Core.Ontology
         // Type
         public ITypeBuilder WithName(string name)
         {
-            _name = name;
+            Name = name;
             Builders[name] = this;
             return this;
         }
@@ -70,19 +59,6 @@ namespace IIS.Core.Ontology
             buildAction(builder);
             Builders[builder.Name] = builder;
             _parents.Add(builder.Name);
-            return this;
-        }
-
-        public ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null, string title = null)
-        {
-            _childNodes.Add(new Relation
-            {
-                TargetName = targetName,
-                RelationName = relationName,
-                EmbeddingOptions = EmbeddingOptions.Required,
-                Meta = meta,
-                Title = title
-            });
             return this;
         }
 
@@ -126,30 +102,40 @@ namespace IIS.Core.Ontology
             return this;
         }
 
-        public ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null, string title = null)
+        [Obsolete]
+        public ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null, string title = null)
         {
-            _childNodes.Add(new Relation
-            {
-                TargetName = targetName,
-                RelationName = relationName,
-                EmbeddingOptions = EmbeddingOptions.Optional,
-                Meta = meta,
-                Title = title
-            });
-            return this;
+            return Has(EmbeddingOptions.Required, b => b
+                .WithName(relationName)
+                .WithTitle(title)
+                .WithMeta(meta)
+                .IsRelation()
+                .To(targetName)
+            );
         }
 
+        [Obsolete]
+        public ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null, string title = null)
+        {
+            return Has(EmbeddingOptions.Optional, b => b
+                .WithName(relationName)
+                .WithTitle(title)
+                .WithMeta(meta)
+                .IsRelation()
+                .To(targetName)
+            );
+        }
+
+        [Obsolete]
         public ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null, string title = null)
         {
-            _childNodes.Add(new Relation
-            {
-                TargetName = targetName,
-                RelationName = relationName,
-                EmbeddingOptions = EmbeddingOptions.Multiple,
-                Meta = meta,
-                Title = title
-            });
-            return this;
+            return Has(EmbeddingOptions.Multiple, b => b
+                .WithName(relationName)
+                .WithTitle(title)
+                .WithMeta(meta)
+                .IsRelation()
+                .To(targetName)
+            );
         }
 
         public ITypeBuilder IsAbstraction()
@@ -176,7 +162,6 @@ namespace IIS.Core.Ontology
             return this;
         }
 
-        // Attr
         public IAttributeBuilder HasValueOf(ScalarType scalarType)
         {
             _scalarType = scalarType;
@@ -192,19 +177,19 @@ namespace IIS.Core.Ontology
             var type = default(Type);
             if (_kind == Kind.Attribute)
             {
-                type = new AttributeType(Guid.NewGuid(), _name, _scalarType);
+                type = new AttributeType(Guid.NewGuid(), Name, _scalarType);
             }
             else if (_kind == Kind.Abstraction)
             {
-                type = new EntityType(Guid.NewGuid(), _name, true);
+                type = new EntityType(Guid.NewGuid(), Name, true);
             }
             else if (_kind == Kind.Entity)
             {
-                type = new EntityType(Guid.NewGuid(), _name, false);
+                type = new EntityType(Guid.NewGuid(), Name, false);
             }
             else if (_kind == Kind.Relation)
             {
-                type = new EmbeddingRelationType(Guid.NewGuid(), _name, _embeddingOptions, false);
+                type = new EmbeddingRelationType(Guid.NewGuid(), Name, _embeddingOptions, false);
             }
 
             type.Title = _title;
@@ -224,38 +209,28 @@ namespace IIS.Core.Ontology
 
             foreach (var child in _children)
             {
-                var childType = Builders[child].Build();
-                type.AddType(childType);
+                var targetBuilder = Builders[child];
+                if (targetBuilder._isBuilding)
+                {
+                    targetBuilder.TypeBuilt += (sender, e) =>
+                    {
+                        var builder = (OntologyBuilder)sender;
+                        var childType = builder.Build();
+                        type.AddType(childType);
+                    };
+                }
+                else
+                {
+                    var childType = targetBuilder.Build();
+                    type.AddType(childType);
+                }
+
+                
             }
 
-            //foreach (var child in _childNodes)
-            //{
-            //    var targetBuilder = Builders[child.TargetName];
-            //    var relationName = child.RelationName ?? child.TargetName.ToLower();
-            //    if (targetBuilder._isBuilding)
-            //    {
-            //        targetBuilder.TypeBuilt += (sender, e) =>
-            //        {
-            //            var builder = (OntologyBuilder)sender;
-            //            var targetType = builder.Build();
-            //            var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-            //            { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
-            //            embedding.AddType(targetType);
-            //            type.AddType(embedding);
-            //        };
-            //    }
-            //    else
-            //    {
-            //        var targetType = targetBuilder.Build();
-            //        var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-            //        { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
-            //        embedding.AddType(targetType);
-            //        type.AddType(embedding);
-            //    }
-            //}
             _isBuilding = false;
             _builtType = type;
-            //TypeBuilt?.Invoke(this, EventArgs.Empty);
+            TypeBuilt?.Invoke(this, EventArgs.Empty);
 
             return type;
         }

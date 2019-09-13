@@ -11,13 +11,13 @@ namespace IIS.Core.Ontology
 
         ITypeBuilder Is(string name);
         ITypeBuilder Is(Action<ITypeBuilder> buildAction);
-
+        [Obsolete]
         ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null, string title = null);
         ITypeBuilder HasRequired(Action<ITypeBuilder> buildAction);
-
+        [Obsolete]
         ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null, string title = null);
         ITypeBuilder HasOptional(Action<ITypeBuilder> buildAction);
-
+        [Obsolete]
         ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null, string title = null);
         ITypeBuilder HasMultiple(Action<ITypeBuilder> buildAction);
 
