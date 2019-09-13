@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
@@ -120,25 +121,13 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]
         public EntityType Target => new EntityType(Source.EntityType);
 
-        [GraphQLNonNullType]
-        [GraphQLDeprecated("Legacy version which is emulated for union types.")]
-        public IEnumerable<EntityType> To([Service] IOntologyTypesService typesService)
-        {
-            if (typesService.GetEntityType(Source.EntityType.Name) != null)
-                return new[] {new EntityType(Source.EntityType)};
-            // Only if entity type was not found in ontology root elements,
-            // emulate old union behavior, and create response of all child types
-            // todo: maybe we should get rid of this behaviour and change response type to single element (parent type)
-            var children = typesService.GetChildTypes(Source.EntityType);
-            return children.Select(t => new EntityType(t));
-        }
-
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
-        public IEnumerable<EntityType> TargetTypes([Service] IOntologyTypesService typesService,
+        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyProvider ontologyProvider,
             bool? concreteTypes = false)
         {
-            var types = typesService.GetChildTypes(Source.EntityType)?.OfType<Core.Ontology.EntityType>();
+            var ontology = await ontologyProvider.GetOntologyAsync();
+            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<Core.Ontology.EntityType>();
             if (types == null)
                 types = new[] {Source.EntityType};
             else

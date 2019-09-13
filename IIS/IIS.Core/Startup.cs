@@ -50,9 +50,8 @@ namespace IIS.Core
                 ServiceLifetime.Scoped);
 
             services.AddHttpContextAccessor();
-//            services.AddSingleton<IOntologyProvider, OntologyProvider>(); // return this after seeding db
-            services.AddSingleton<IOntologyProvider, Ontology.Odysseys.PersonSeeder>();
-            services.AddTransient<IOntologyTypesService, OntologyTypesService>();
+            services.AddSingleton<IOntologyProvider, OntologyProvider>();
+            services.AddTransient<Ontology.Odysseys.PersonSeeder>(); // Odysseys types seeder
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<OntologyTypeSaver>();
