@@ -16,15 +16,15 @@ namespace IIS.Core.GraphQL
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly TypeRepository _typeRepository;
-        private readonly IOntologyTypesService _ontologyTypesService;
+        private readonly Core.Ontology.Ontology _ontology;
         private readonly IOntologyFieldPopulator _populator;
 
-        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyTypesService ontologyTypesService, IOntologyFieldPopulator populator)
+        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyProvider ontologyProvider, IOntologyFieldPopulator populator)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
-            _ontologyTypesService = ontologyTypesService;
             _populator = populator;
+            _ontology = ontologyProvider.GetOntologyAsync().Result; // todo: refactor GetSchema to async
         }
 
         public ISchema GetSchema()
@@ -44,8 +44,9 @@ namespace IIS.Core.GraphQL
             builder.AddMutationType(d =>
             {
                 d.Name("MutationType");
-                d.Include<DummyMutation>();
+                d.Include<SeederMutation>();
                 d.Include<Materials.Mutation>();
+                d.Include<DummyMutation>();
                 if (ontologyRegistered)
                     ConfigureOntologyMutation(d);
             });
@@ -78,7 +79,7 @@ namespace IIS.Core.GraphQL
 
         protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor)
         {
-            var typesToPopulate = _ontologyTypesService.EntityTypes
+            var typesToPopulate = _ontology.EntityTypes
 //                .Where(t => t.CreateMeta().ExposeOnApi != false)
                 .ToList();
             _populator.PopulateFields(descriptor, typesToPopulate, Operation.Read);
@@ -97,7 +98,7 @@ namespace IIS.Core.GraphQL
 
         protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor)
         {
-            var typesToPopulate = _ontologyTypesService.EntityTypes;
+            var typesToPopulate = _ontology.EntityTypes;
 //                .Where(t => t.CreateMeta().ExposeOnApi != false);
             typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
             _populator.PopulateFields(descriptor, typesToPopulate,

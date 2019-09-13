@@ -13,15 +13,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly MutationCreateResolver _mutationCreateResolver;
         private readonly MutationDeleteResolver _mutationDeleteResolver;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyTypesService _typesService;
+        private readonly IOntologyProvider _ontologyProvider;
 
         public MutationUpdateResolver(MutationCreateResolver mutationCreateResolver,
-            MutationDeleteResolver mutationDeleteResolver, IOntologyTypesService typesService,
+            MutationDeleteResolver mutationDeleteResolver, IOntologyProvider ontologyProvider,
             IOntologyService ontologyService)
         {
             _mutationCreateResolver = mutationCreateResolver;
             _mutationDeleteResolver = mutationDeleteResolver;
-            _typesService = typesService;
+            _ontologyProvider = ontologyProvider;
             _ontologyService = ontologyService;
         }
 
@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             _mutationCreateResolver = new MutationCreateResolver(ctx);
             _mutationDeleteResolver = new MutationDeleteResolver(ctx);
-            _typesService = ctx.Service<IOntologyTypesService>();
+            _ontologyProvider = ctx.Service<IOntologyProvider>();
             _ontologyService = ctx.Service<IOntologyService>();
         }
 
@@ -38,7 +38,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var id = ctx.Argument<Guid>("id");
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _typesService.GetEntityType(typeName);
+            var ontology = await _ontologyProvider.GetOntologyAsync();
+            var type = ontology.GetEntityType(typeName);
             return await UpdateEntity(type, id, data);
         }
 
@@ -103,7 +104,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                                 if (uvdict.ContainsKey("target"))
                                 {
                                     var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
-                                    var type = _typesService.GetEntityType(typeName);
+                                    var ontology = await _ontologyProvider.GetOntologyAsync();
+                                    var type = ontology.GetEntityType(typeName);
                                     await UpdateEntity(type, relation.Target.Id, targetValue);
                                 }
                                 else
@@ -175,7 +177,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     var target = (Dictionary<string, object>) dictTarget;
                     var (key, v) = target.Single(); // todo: throw correct exception
-                    var type = _typesService.GetEntityType(key);
+                    var ontology = await _ontologyProvider.GetOntologyAsync();
+                    var type = ontology.GetEntityType(key);
 //                    return await CreateEntity(type, (Dictionary<string, object>) v);
                 }
 

@@ -12,8 +12,8 @@ using InheritanceRelationType = IIS.Core.Ontology.InheritanceRelationType;
 using ORelationType = IIS.Core.Ontology.RelationType;
 using System.Linq;
 using System.Collections.Generic;
+using IIS.Core.Ontology.Seeding;
 using Microsoft.EntityFrameworkCore;
-using Attribute = IIS.Core.Ontology.EntityFramework.Context.Attribute;
 using Type = IIS.Core.Ontology.EntityFramework.Context.Type;
 
 namespace IIS.Core.Controllers
@@ -42,7 +42,7 @@ namespace IIS.Core.Controllers
         {
             var tasks = Enumerable.Range(1, 10)
                 .Select(e => _ontologyProvider.GetOntologyAsync(cancellationToken));
-            
+
             var data = await Task.WhenAll(tasks);
 
             return Ok();
@@ -66,7 +66,7 @@ namespace IIS.Core.Controllers
         {
             //if (_context.Nodes.Any()) return Ok("Cannot seed database because it is not empty. Clear db explicitly via /api/clear");
 
-            await _seeder.Seed(cancellationToken);
+            await _seeder.Seed("contour", cancellationToken);
 
             return Ok("Seeded");
         }

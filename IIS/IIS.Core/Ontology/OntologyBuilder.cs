@@ -151,12 +151,14 @@ namespace IIS.Core.Ontology
             _scalarType = scalarType;
             return this;
         }
-        
+
         public Type Build()
         {
             if (_builtType != null) return _builtType;
 
             _isBuilding = true;
+            if (_name == null)
+                throw new BuildException("Cannot build type without name");
 
             var type = default(Type);
             if (_kind == Kind.Attribute)
@@ -171,6 +173,7 @@ namespace IIS.Core.Ontology
             {
                 type = new EntityType(Guid.NewGuid(), _name, false);
             }
+            else throw new BuildException("Type kind was not specified");
 
             type.Title = _title;
             type.Meta = _meta;
@@ -200,7 +203,8 @@ namespace IIS.Core.Ontology
 
             foreach (var child in _childNodes)
             {
-                var targetBuilder = Builders[child.TargetName];
+                if (!Builders.TryGetValue(child.TargetName, out var targetBuilder))
+                    throw new BuildException($"There is no type registered with code '{child.TargetName}'");
                 var relationName = child.RelationName ?? child.TargetName.ToLower();
                 if (targetBuilder._isBuilding)
                 {

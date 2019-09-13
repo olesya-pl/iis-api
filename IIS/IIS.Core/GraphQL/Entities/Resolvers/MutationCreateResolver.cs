@@ -13,12 +13,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         private readonly IFileService _fileService;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyTypesService _typesService;
+        private readonly IOntologyProvider _ontologyProvider;
 
-        public MutationCreateResolver(IOntologyTypesService typesService, IOntologyService ontologyService,
+        public MutationCreateResolver(IOntologyProvider ontologyProvider, IOntologyService ontologyService,
             IFileService fileService)
         {
-            _typesService = typesService;
+            _ontologyProvider = ontologyProvider;
             _ontologyService = ontologyService;
             _fileService = fileService;
         }
@@ -26,7 +26,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public MutationCreateResolver(IResolverContext ctx)
         {
             _fileService = ctx.Service<IFileService>();
-            _typesService = ctx.Service<IOntologyTypesService>();
+            _ontologyProvider = ctx.Service<IOntologyProvider>();
             _ontologyService = ctx.Service<IOntologyService>();
         }
 
@@ -34,7 +34,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _typesService.GetEntityType(typeName);
+            var ontology = await _ontologyProvider.GetOntologyAsync();
+            var type = ontology.GetEntityType(typeName);
             var entity = await CreateEntity(type, data);
 
             return entity;
@@ -122,7 +123,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (props.TryGetValue("target", out var dictTarget))
                 {
                     var (typeName, unionData) = InputExtensions.ParseInputUnion(dictTarget);
-                    var type = _typesService.GetEntityType(typeName);
+                    var ontology = await _ontologyProvider.GetOntologyAsync();
+                    var type = ontology.GetEntityType(typeName);
                     return await CreateEntity(type, unionData);
                 }
 

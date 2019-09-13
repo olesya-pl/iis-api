@@ -9,8 +9,9 @@ namespace IIS.Core.Ontology.Meta
 {
     public static class MetaExtensions
     {
-        public static JsonSerializer CreateSerializer() =>
-            new JsonSerializer {MissingMemberHandling = MissingMemberHandling.Error, NullValueHandling = NullValueHandling.Ignore};
+        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+            {MissingMemberHandling = MissingMemberHandling.Error, NullValueHandling = NullValueHandling.Ignore};
+        public static JsonSerializer CreateSerializer() => JsonSerializer.Create(SerializerSettings);
 
         public static TMeta CreateMeta<TMeta>(Type type, JsonConverter typeConverter) where TMeta : IMeta
         {
@@ -64,6 +65,8 @@ namespace IIS.Core.Ontology.Meta
 
         public static InversedRelationMeta GetInversed(this EmbeddingRelationType type)
             => (type.CreateMeta() as EntityRelationMeta)?.Inversed;
+
+        public static JObject Serialize(this IMeta meta) => JObject.FromObject(meta, CreateSerializer());
 
         // ugly quick solution to validate existing ontology meta
         public static void ValidateMeta(this IEnumerable<Type> ontologyTypes)

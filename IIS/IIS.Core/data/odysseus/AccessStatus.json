@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Діючий",
+    "code": "valid"
+  },
+  {
+    "name": "Скасований",
+    "code": "canceled"
+  },
+  {
+    "name": "Завершений",
+    "code": "expired"
+  }
+]

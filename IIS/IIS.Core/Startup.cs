@@ -51,14 +51,14 @@ namespace IIS.Core
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
-            services.AddTransient<IOntologyTypesService, OntologyTypesService>();
+            services.AddTransient<Ontology.Seeding.Odysseus.TypeSeeder>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IMaterialService, MaterialService>();
 
-            services.AddTransient<Seeder>();
+            services.AddTransient<Ontology.Seeding.Seeder>();
             services.AddTransient(e => new ContextFactory(connectionString));
             services.AddTransient(e => new FileServiceFactory(connectionString));
 
@@ -95,7 +95,7 @@ namespace IIS.Core
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
             services.AddHostedService<MaterialEventConsumer>();
-            
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

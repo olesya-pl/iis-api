@@ -4,10 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using IIS.Core.Ontology;
 using Newtonsoft.Json.Linq;
 
-namespace IIS.Core
+namespace IIS.Core.Ontology.Seeding
 {
     public class Seeder
     {
@@ -20,20 +19,20 @@ namespace IIS.Core
             _ontologyService = ontologyService;
         }
 
-        public async Task Seed(CancellationToken cancellationToken)
+        public async Task Seed(string subdir, CancellationToken cancellationToken = default)
         {
             var first = new List<Node>();
             var nodes = new List<Node>();
 
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-            var path = Path.Combine(Environment.CurrentDirectory, "data");
+            var path = Path.Combine(Environment.CurrentDirectory, "data", subdir);
             var fileNames = Directory.EnumerateFiles(path);
             foreach (var fileName in fileNames)
             {
                 var typeName = new FileInfo(fileName).Name.Replace(".json", "");
                 // tmp hardcode
                 //if (typeName == "EventType") continue;
-                
+
                 using (var reader = new StreamReader(File.OpenRead(fileName)))
                 {
                     var content = reader.ReadToEnd();
@@ -56,7 +55,7 @@ namespace IIS.Core
             }
         }
 
-        private Entity Map(JObject jObject, Ontology.Ontology ontology, string typeName, List<Node> first)
+        private Entity Map(JObject jObject, Core.Ontology.Ontology ontology, string typeName, List<Node> first)
         {
             var type = ontology.GetEntityType(typeName);
             var entity = new Entity(Guid.NewGuid(), type);
@@ -103,7 +102,7 @@ namespace IIS.Core
                 {
                     var relation = new Relation(Guid.NewGuid(), relationType);
                     var jValue = (JValue)jProperty.Value;
-                    var attribute = new Ontology.Attribute(Guid.NewGuid(), (AttributeType)relationType.TargetType, jValue.Value);
+                    var attribute = new Core.Ontology.Attribute(Guid.NewGuid(), (AttributeType)relationType.TargetType, jValue.Value);
                     relation.AddNode(attribute);
                     entity.AddNode(relation);
                 }

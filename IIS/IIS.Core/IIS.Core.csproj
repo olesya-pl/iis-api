@@ -42,12 +42,4 @@
     <Compile Remove="Legacy\OntologyRepository.cs" />
     <Compile Remove="Legacy\SchemaRepository.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Update="data\Corps.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="data\Country.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 </Project>

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Планова",
+      "code": "planned"
+  },
+  {
+    "name": "Позапланова",
+      "code": "notplanned"
+  }
+]

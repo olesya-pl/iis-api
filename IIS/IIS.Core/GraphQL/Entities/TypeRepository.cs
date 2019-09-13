@@ -21,11 +21,11 @@ namespace IIS.Core.GraphQL.Entities
     {
         private readonly OntologyQueryTypesCreator _creator;
         private readonly OntologyMutationTypesCreator[] _mutators;
-        private readonly IOntologyTypesService _ontologyTypesService;
+        private readonly Core.Ontology.Ontology _ontology;
 
-        public TypeRepository(IOntologyTypesService ontologyTypesService)
+        public TypeRepository(IOntologyProvider ontologyProvider)
         {
-            _ontologyTypesService = ontologyTypesService;
+            _ontology = ontologyProvider.GetOntologyAsync().Result; // todo: refactor to async
             _creator = new OntologyQueryTypesCreator(this);
             _mutators = new OntologyMutationTypesCreator[]
             {
@@ -37,7 +37,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
-            var entityTypes = _ontologyTypesService.EntityTypes.ToList();
+            var entityTypes = _ontology.EntityTypes.ToList();
             if (entityTypes.Count == 0)
                 throw new OntologyTypesException("There are no entity types to register on graphql schema");
 
@@ -57,7 +57,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public IEnumerable<Type> GetChildTypes(Type parent)
         {
-            return _ontologyTypesService.GetChildTypes(parent);
+            return _ontology.GetChildTypes(parent);
         }
 
         private OntologyMutationTypesCreator GetMutator(Operation operation)

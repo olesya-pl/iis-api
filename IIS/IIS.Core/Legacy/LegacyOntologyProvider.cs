@@ -33,6 +33,8 @@ namespace IIS.Legacy.EntityFramework
 
         public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
+            if (_connectionString == null)
+                throw new ArgumentException("There is no db-legacy connection string configured.");
             var opts = new DbContextOptionsBuilder().UseNpgsql(_connectionString).Options;
             var contourContext = new ContourContext(opts);
             var attributes = await contourContext.Attributes.ToListAsync();
