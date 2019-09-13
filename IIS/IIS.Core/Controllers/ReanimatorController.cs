@@ -40,10 +40,109 @@ namespace IIS.Core.Controllers
         [Route("/api/test")]
         public async Task<IActionResult> Test(CancellationToken cancellationToken)
         {
-            var tasks = Enumerable.Range(1, 10)
-                .Select(e => _ontologyProvider.GetOntologyAsync(cancellationToken));
-            
-            var data = await Task.WhenAll(tasks);
+            var buildContext = new Ontology.OntologyBuildContext();
+
+            // Enum
+            buildContext.CreateBuilder()
+                .WithName("Enum")
+                .IsAbstraction()
+                .HasRequired(b => b
+                    .WithName("name")
+                    .IsRelation()
+                    .To(b1 => b1
+                        .WithName("Name")
+                        .IsAttribute()
+                        .HasValueOf(Ontology.ScalarType.String)
+                    )
+                )
+                ;
+            // Organization
+            buildContext.CreateBuilder()
+                .WithName("Organization")
+                .IsEntity()
+                // Code
+                .HasRequired(b => b
+                    .WithName("code")
+                    .IsRelation()
+                    .To(b1 => b1
+                        .WithName("Code")
+                        .IsAttribute()
+                        .HasValueOf(Ontology.ScalarType.Integer)
+                    )
+                )
+                // Name
+                .HasRequired(b => b
+                    .WithName("name")
+                    .IsRelation()
+                    .To(b1 => b1
+                        .WithName("OrganizationName")
+                        .IsAttribute()
+                        .HasValueOf(Ontology.ScalarType.String)
+                    )
+                )
+                // Tags
+                .HasMultiple(b => b
+                    .WithName("tags")
+                    .IsRelation()
+                    .To(b1 => b1
+                        .WithName("Tag")
+                        .IsEntity()
+                        .Is("Enum")
+                    )
+                )
+                // Ownership
+                .HasRequired(b => b
+                    .WithName("ownership")
+                    .IsRelation()
+                    .To(b1 => b1
+                        .WithName("Ownership")
+                        .IsEntity()
+                        .Is("Enum")
+                    )
+                )
+                // Legal status
+                .HasRequired(b => b
+                    .WithName("legalStatus")
+                    .IsRelation()
+                    .To(b1 => b1
+                        .WithName("LegalStatus")
+                        .IsEntity()
+                        .Is("Enum")
+                    )
+                )
+                // Actual address
+                .HasRequired(b => b
+                    .WithName("actualAddress")
+                    .IsRelation()
+                    .To("Address")
+                )
+                // Legal address
+                .HasRequired(b => b
+                    .WithName("legalAddress")
+                    .IsRelation()
+                    .To("Address")
+                )
+                // Branches
+                .HasMultiple(b => b
+                    .WithName("branchAddresses")
+                    .IsRelation()
+                    .To("Address")
+                )
+                // Secret facility
+                .HasRequired(b => b
+                    .WithName("secretFacilityAddress")
+                    .IsRelation()
+                    .To("Address")
+                )
+                // Secret facility archive
+                .HasRequired(b => b
+                    .WithName("secretFacilityArchiveAddress")
+                    .IsRelation()
+                    .To("Address")
+                )
+                ;
+
+            var ontology = buildContext.BuildOntology();
 
             return Ok();
         }
