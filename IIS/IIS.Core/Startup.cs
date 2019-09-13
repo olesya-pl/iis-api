@@ -50,7 +50,8 @@ namespace IIS.Core
                 ServiceLifetime.Scoped);
 
             services.AddHttpContextAccessor();
-            services.AddSingleton<IOntologyProvider, OntologyProvider>();
+//            services.AddSingleton<IOntologyProvider, OntologyProvider>(); // return this after seeding db
+            services.AddSingleton<IOntologyProvider, Ontology.Odysseys.PersonSeeder>();
             services.AddTransient<IOntologyTypesService, OntologyTypesService>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
@@ -95,7 +96,7 @@ namespace IIS.Core
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
             services.AddHostedService<MaterialEventConsumer>();
-            
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
