@@ -30,3 +30,17 @@ deploy_dev:
     - ansible
   only: 
     - master  
+
+deploy_od:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+    GIT_CHECKOUT: "false"
+  script:
+    - cd /home/gitlab-runner/ansible
+    - "ansible-playbook app_api_net_dev.yml --extra-vars \"HOST=od-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job\""
+    
+  tags:
+    - od
+  only: 
+    - master  
