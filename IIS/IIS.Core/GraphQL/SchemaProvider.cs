@@ -16,30 +16,30 @@ namespace IIS.Core.GraphQL
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly TypeRepository _typeRepository;
-        private readonly Core.Ontology.Ontology _ontology;
+        private readonly IOntologyProvider _ontologyProvider;
         private readonly IOntologyFieldPopulator _populator;
 
         public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyProvider ontologyProvider, IOntologyFieldPopulator populator)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
+            _ontologyProvider = ontologyProvider;
             _populator = populator;
-            _ontology = ontologyProvider.GetOntologyAsync().Result; // todo: refactor GetSchema to async
         }
 
         public ISchema GetSchema()
         {
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
             RegisterTypes(builder);
-            var ontologyRegistered = TryRegisterOntologyTypes(builder, _typeRepository);
+            var ontology = TryRegisterOntologyTypes(builder);
             builder.AddQueryType(d =>
             {
                 d.Name("QueryType");
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
                 d.Include<Users.Query>();
-                if (ontologyRegistered)
-                    ConfigureOntologyQuery(d);
+                if (ontology != null)
+                    ConfigureOntologyQuery(d, ontology);
             });
             builder.AddMutationType(d =>
             {
@@ -47,8 +47,8 @@ namespace IIS.Core.GraphQL
                 d.Include<SeederMutation>();
                 d.Include<Materials.Mutation>();
                 d.Include<DummyMutation>();
-                if (ontologyRegistered)
-                    ConfigureOntologyMutation(d);
+                if (ontology != null)
+                    ConfigureOntologyMutation(d, ontology);
             });
             return builder.Create();
         }
@@ -60,26 +60,27 @@ namespace IIS.Core.GraphQL
                 .AddType<EntityTypes.EntityAttributeRelation>();
         }
 
-        public static bool TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder, TypeRepository repository)
+        public Core.Ontology.Ontology TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder)
         {
             try
             {
-                repository.InitializeTypes();
-                foreach (var type in repository.AllTypes)
+                var ontology = _ontologyProvider.GetOntologyAsync().Result; // todo: refactor GetSchema to async
+                _typeRepository.InitializeTypes();
+                foreach (var type in _typeRepository.AllTypes)
                     schemaBuilder.AddType(type);
-                return true;
+                return ontology;
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine("Unable to register ontology types");
                 Console.Error.WriteLine(ex);
-                return false;
+                return null;
             }
         }
 
-        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor)
+        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, Core.Ontology.Ontology ontology)
         {
-            var typesToPopulate = _ontology.EntityTypes
+            var typesToPopulate = ontology.EntityTypes
 //                .Where(t => t.CreateMeta().ExposeOnApi != false)
                 .ToList();
             _populator.PopulateFields(descriptor, typesToPopulate, Operation.Read);
@@ -96,9 +97,9 @@ namespace IIS.Core.GraphQL
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().GetAllEntities(ctx));
         }
 
-        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor)
+        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, Core.Ontology.Ontology ontology)
         {
-            var typesToPopulate = _ontology.EntityTypes;
+            var typesToPopulate = ontology.EntityTypes;
 //                .Where(t => t.CreateMeta().ExposeOnApi != false);
             typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
             _populator.PopulateFields(descriptor, typesToPopulate,
