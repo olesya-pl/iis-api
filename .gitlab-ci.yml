@@ -6,7 +6,7 @@ build_job:
   stage: build
   script:
     - cd IIS 
-    - dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/core
+    - dotnet publish IIS.Core/IIS.Core.csproj -o ../publish/core --version-suffix $(git rev-parse --short HEAD)/$(date --iso-8601=seconds)
   artifacts:
     paths:
     - IIS/publish
