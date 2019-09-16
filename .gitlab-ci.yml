@@ -41,6 +41,6 @@ deploy_od:
     - "ansible-playbook app_api_net_dev.yml --extra-vars \"HOST=od-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job\""
     
   tags:
-    - od
+    - ansible
   only: 
     - master  
