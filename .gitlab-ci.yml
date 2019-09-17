@@ -23,6 +23,7 @@ build_job:
     GIT_STRATEGY: none
     GIT_CHECKOUT: "false"
   before_script:
+    - ls
     - cd /home/gitlab-runner/ansible
   tags:
     - ansible
