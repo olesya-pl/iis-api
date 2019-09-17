@@ -25,7 +25,6 @@ build_job:
   before_script:
     - PROJECT_PATH=$(pwd)
     - cd /home/gitlab-runner/ansible
-  dependencies: []
   tags:
     - ansible
   only: 
