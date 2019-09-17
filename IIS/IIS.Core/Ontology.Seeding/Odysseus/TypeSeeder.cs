@@ -154,18 +154,14 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(photo)
                     .HasMultiple(ctx, b =>
                         b.WithName("OrganizationTag").IsEntity().Is(tag))
-                    .HasRequired(ctx, b =>
-                        b.WithName("Ownership").IsEntity().Is(enumEntity))
-                    .HasRequired(ctx, b =>
-                        b.WithName("LegalStatus").IsEntity().Is(enumEntity))
+                    .HasRequired(propertyOwnership)
+//                    .HasRequired(ctx, b =>
+//                        b.WithName("LegalStatus").IsEntity().Is(enumEntity))
                     .HasRequired(address, "LocatedAt")
                     .HasRequired(address, "RegisteredAt")
                     .HasOptional(address, "BranchAddress")
                     .HasOptional(address, "secretFacilityAddress")
                     .HasOptional(address, "secretFacilityArchiveAddress")
-                    .HasOptional("OrganizationSpecialPermit", "AccessToStateSecret",
-                        new EntityRelationMeta {
-                            Inversed = new InversedRelationMeta { Code="owner", Title = "Власник"}})
                 ;
 
 
@@ -180,7 +176,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Person
             var person = ctx.CreateBuilder().IsEntity()
                     .WithName("Person")
-                    .HasRequired(name, "FullName", new AttributeRelationMeta{Formula = "Join(SecondName, FirstName, FatherName)"})
+                    .HasRequired(name, "FullName", CreateComputed("Join(secondName, firstName, fatherName)"))
                     .HasRequired(firstName)
                     .HasRequired(secondName)
                     .HasRequired(fatherName)
@@ -198,32 +194,41 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(attachment, "AnswerRules")
                     .HasOptional(attachment, "Autobiography")
                     .HasOptional(attachment, "Form8")
-                    .HasOptional("SpecialPermit", "AccessToStateSecret",
-                        new EntityRelationMeta {
-                            Inversed = new InversedRelationMeta { Code="owner", Title = "Власник"}})
                 ;
 
 
-            // Permit
-            var permit = ctx.CreateBuilder().IsEntity()
-                    .WithName("SpecialPermit")
-//                    .HasRequired(person)
-                    .HasRequired(code)
+            // Permits
+            var acccess = ctx.CreateBuilder().IsEntity()
+                    .WithName("Access")
+                    .HasRequired(person, "Person",
+                        CreateInversed("Access", "Допуск"))
                     .HasRequired(date, "IssueDate")
                     .HasRequired(date, "EndDate")
                     .HasRequired(accessLevel)
-//                    .HasRequired(workIn)
+                    .HasRequired(workIn)
                     .HasRequired(accessStatus) // computed?
-                    .HasRequired(organization, "SBU") // restrictions?
                 ;
 
             var organizationPermit = ctx.CreateBuilder().IsEntity()
-                    .WithName("OrganizationSpecialPermit")
-                    .Is(permit)
-                    .HasRequired(number, "IssuedNumber")
+                    .WithName("SpecialPermit")
+                    .HasRequired(organization, "Organization",
+                        CreateInversed("SpecialPermit", "Спецдозвiл"))
+                    .HasRequired(number, "IssueNumber")
+                    .HasRequired(date, "IssueDate")
+                    .HasRequired(date, "EndDate")
+                    .HasRequired(accessLevel)
+                    .HasRequired(specialPermitStatus) // computed?
+                    .HasRequired(organization, "SBU") // restrictions?
                 ;
 
         }
+
+        private EntityRelationMeta CreateInversed(string code, string title = null, bool multiple = false) =>
+            new EntityRelationMeta { Multiple = multiple,
+                Inversed = new InversedRelationMeta { Code = code, Title = title }};
+
+        private AttributeRelationMeta CreateComputed(string formula) =>
+            new AttributeRelationMeta { Formula = formula };
 
         public Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
