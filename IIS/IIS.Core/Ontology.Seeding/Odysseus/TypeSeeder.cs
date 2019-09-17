@@ -19,6 +19,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var birthDate = ctx.CreateBuilder().WithName("BirthDate").IsAttribute().HasValueOf(ScalarType.DateTime);
             var date = ctx.CreateBuilder().WithName("Date").IsAttribute().HasValueOf(ScalarType.DateTime);
             var attachment = ctx.CreateBuilder().WithName("Attachment").IsAttribute().HasValueOf(ScalarType.File);
+            var website = ctx.CreateBuilder().WithName("Website").IsAttribute().HasValueOf(ScalarType.String);
 
 
             // Signs
@@ -147,19 +148,21 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var organization = ctx.CreateBuilder()
                     .WithName("Organization")
                     .IsEntity()
-                    .HasRequired(code)
+                    .HasRequired(taxId)
                     .HasRequired(name)
+                    .HasOptional(website)
+                    .HasOptional(photo)
                     .HasMultiple(ctx, b =>
                         b.WithName("OrganizationTag").IsEntity().Is(tag))
                     .HasRequired(ctx, b =>
                         b.WithName("Ownership").IsEntity().Is(enumEntity))
                     .HasRequired(ctx, b =>
                         b.WithName("LegalStatus").IsEntity().Is(enumEntity))
-                    .HasRequired(address, "ActualAddress")
-                    .HasRequired(address, "LegalAddress")
-                    .HasRequired(address, "BranchAddress")
-                    .HasRequired(address, "secretFacilityAddress")
-                    .HasRequired(address, "secretFacilityArchiveAddress")
+                    .HasRequired(address, "LocatedAt")
+                    .HasRequired(address, "RegisteredAt")
+                    .HasOptional(address, "BranchAddress")
+                    .HasOptional(address, "secretFacilityAddress")
+                    .HasOptional(address, "secretFacilityArchiveAddress")
                 ;
 
 
@@ -187,11 +190,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(citizenship)
                 // ... secret carrier
                     .HasMultiple(workIn)
-                    .HasRequired(accessLevel)
-                    .HasRequired(attachment, "ScanForm5")
-                    .HasRequired(attachment, "AnswerRules")
-                    .HasRequired(attachment, "Autobiography")
-                    .HasRequired(attachment, "Form8")
+                    .HasOptional(accessLevel)
+                    .HasOptional(attachment, "ScanForm5")
+                    .HasOptional(attachment, "AnswerRules")
+                    .HasOptional(attachment, "Autobiography")
+                    .HasOptional(attachment, "Form8")
                 ;
 
 

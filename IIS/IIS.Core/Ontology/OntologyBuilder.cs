@@ -175,7 +175,7 @@ namespace IIS.Core.Ontology
             }
             else throw new BuildException("Type kind was not specified");
 
-            type.Title = _title;
+            type.Title = _title ?? _name;
             type.Meta = _meta;
             // todo: make configurable
             var now = DateTime.UtcNow;
