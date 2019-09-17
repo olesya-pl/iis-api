@@ -163,6 +163,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(address, "BranchAddress")
                     .HasOptional(address, "secretFacilityAddress")
                     .HasOptional(address, "secretFacilityArchiveAddress")
+                    .HasOptional("OrganizationSpecialPermit", "AccessToStateSecret",
+                        new EntityRelationMeta {
+                            Inversed = new InversedRelationMeta { Code="owner", Title = "Власник"}})
                 ;
 
 
@@ -190,25 +193,35 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(citizenship)
                 // ... secret carrier
                     .HasMultiple(workIn)
-                    .HasOptional(accessLevel)
+//                    .HasOptional(accessLevel)
                     .HasOptional(attachment, "ScanForm5")
                     .HasOptional(attachment, "AnswerRules")
                     .HasOptional(attachment, "Autobiography")
                     .HasOptional(attachment, "Form8")
+                    .HasOptional("SpecialPermit", "AccessToStateSecret",
+                        new EntityRelationMeta {
+                            Inversed = new InversedRelationMeta { Code="owner", Title = "Власник"}})
                 ;
 
 
             // Permit
             var permit = ctx.CreateBuilder().IsEntity()
-                .WithName("SpecialPermit")
-                .HasRequired(person)
-                .HasRequired(code)
-                .HasRequired(date, "IssueDate")
-                .HasRequired(date, "EndDate")
-                .HasRequired(accessLevel)
-                .HasRequired(workIn)
-                .HasRequired(accessStatus) // computed?
-                .HasRequired(organization, "SBU"); // restrictions?
+                    .WithName("SpecialPermit")
+//                    .HasRequired(person)
+                    .HasRequired(code)
+                    .HasRequired(date, "IssueDate")
+                    .HasRequired(date, "EndDate")
+                    .HasRequired(accessLevel)
+//                    .HasRequired(workIn)
+                    .HasRequired(accessStatus) // computed?
+                    .HasRequired(organization, "SBU") // restrictions?
+                ;
+
+            var organizationPermit = ctx.CreateBuilder().IsEntity()
+                    .WithName("OrganizationSpecialPermit")
+                    .Is(permit)
+                    .HasRequired(number, "IssuedNumber")
+                ;
 
         }
 

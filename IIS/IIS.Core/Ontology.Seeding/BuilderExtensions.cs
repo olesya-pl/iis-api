@@ -18,6 +18,19 @@ namespace IIS.Core.Ontology.Seeding
             builder.HasMultiple(((OntologyBuilder) propertyBuilder).Name, relationName, meta?.Serialize(), title);
 
 
+        public static ITypeBuilder HasRequired(this ITypeBuilder builder, string propertyName,
+            string relationName = null, RelationMetaBase meta = null, string title = null) =>
+            builder.HasRequired(propertyName, relationName, meta?.Serialize(), title);
+
+        public static ITypeBuilder HasOptional(this ITypeBuilder builder, string propertyName,
+            string relationName = null, RelationMetaBase meta = null, string title = null) =>
+            builder.HasOptional(propertyName, relationName, meta?.Serialize(), title);
+
+        public static ITypeBuilder HasMultiple(this ITypeBuilder builder, string propertyName,
+            string relationName = null, RelationMetaBase meta = null, string title = null) =>
+            builder.HasMultiple(propertyName, relationName, meta?.Serialize(), title);
+
+
         public static ITypeBuilder Is(this ITypeBuilder builder, ITypeBuilder propertyBuilder) =>
             builder.Is(((OntologyBuilder) propertyBuilder).Name);
 

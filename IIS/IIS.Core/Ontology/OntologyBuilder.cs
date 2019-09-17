@@ -205,7 +205,8 @@ namespace IIS.Core.Ontology
             {
                 if (!Builders.TryGetValue(child.TargetName, out var targetBuilder))
                     throw new BuildException($"There is no type registered with code '{child.TargetName}'");
-                var relationName = child.RelationName ?? child.TargetName.ToLower();
+                var relationName = child.RelationName ?? child.TargetName;
+                relationName = relationName.ToLowerCamelcase();
                 if (targetBuilder._isBuilding)
                 {
                     targetBuilder.TypeBuilt += (sender, e) =>
