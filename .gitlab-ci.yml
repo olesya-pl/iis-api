@@ -24,6 +24,7 @@ deploy_dev:
     GIT_CHECKOUT: "false"
   script:
     - cd /home/gitlab-runner/ansible
+    - echo $CI_COMMIT_REF_NAME
     - "ansible-playbook app_api_net_dev.yml --extra-vars \"HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job\""
     
   tags:
@@ -38,6 +39,7 @@ deploy_od:
     GIT_CHECKOUT: "false"
   script:
     - cd /home/gitlab-runner/ansible
+    - echo $CI_COMMIT_REF_NAME
     - "ansible-playbook app_api_net_dev_od.yml --extra-vars \"HOST=od-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job\""
     
   tags:
