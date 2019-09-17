@@ -24,8 +24,7 @@ deploy_dev:
     GIT_CHECKOUT: "false"
   script:
     - cd /home/gitlab-runner/ansible
-    - env
-    - "ansible-playbook app_api_net_dev.yml --extra-vars \"HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job\""
+    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME job_name=build_job"
     
   tags:
     - ansible
