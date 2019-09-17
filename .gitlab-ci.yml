@@ -33,10 +33,10 @@ build_job:
 deploy_dev:
   extends: .deploy
   script:
-    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME"
+    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev artifacts_path=."
 
 deploy_od:
   extends: .deploy
   stage: deploy
   script:
-    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev tag_name=$CI_COMMIT_REF_NAME"
+    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev artifacts_path=."
