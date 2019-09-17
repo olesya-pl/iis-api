@@ -19,6 +19,7 @@ build_job:
     
 .deploy:
   stage: deploy
+  parallel: 2
   variables:
     GIT_STRATEGY: none
     GIT_CHECKOUT: "false"
@@ -34,10 +35,10 @@ build_job:
 deploy_dev:
   extends: .deploy
   script:
-    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME"
+    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev job_id=$CI_JOB_ID"
 
 deploy_od:
   extends: .deploy
   stage: deploy
   script:
-    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev tag_name=$CI_COMMIT_REF_NAME"
+    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev job_id=$CI_JOB_ID"
