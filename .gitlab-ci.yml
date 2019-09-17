@@ -34,10 +34,10 @@ build_job:
 deploy_dev:
   extends: .deploy
   script:
-    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev job_id=$CI_JOB_ID"
+    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev artifacts_path=$PROJECT_PATH"
 
 deploy_od:
   extends: .deploy
   stage: deploy
   script:
-    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev job_id=$CI_JOB_ID"
+    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev artifacts_path=$PROJECT_PATH"
