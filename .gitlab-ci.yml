@@ -19,7 +19,6 @@ build_job:
     
 .deploy:
   stage: deploy
-  parallel: 2
   variables:
     GIT_STRATEGY: none
     GIT_CHECKOUT: "false"
