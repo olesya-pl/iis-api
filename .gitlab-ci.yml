@@ -25,6 +25,7 @@ build_job:
   before_script:
     - PROJECT_PATH=$(pwd)
     - cd /home/gitlab-runner/ansible
+  dependencies: []
   tags:
     - ansible
   only: 
@@ -33,10 +34,10 @@ build_job:
 deploy_dev:
   extends: .deploy
   script:
-    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev artifacts_path=$PROJECT_PATH"
+    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev tag_name=$CI_COMMIT_REF_NAME"
 
 deploy_od:
   extends: .deploy
   stage: deploy
   script:
-    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev artifacts_path=$PROJECT_PATH"
+    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev tag_name=$CI_COMMIT_REF_NAME"
