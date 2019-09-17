@@ -10,6 +10,7 @@ using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Core.Ontology.Meta;
 using Microsoft.EntityFrameworkCore;
@@ -64,42 +65,16 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
             if (relationType.IsComputed())
-                return ResolveComputedAttribute(relationType, node);
+            {
+                var computedResolver = ctx.Service<IComputedPropertyResolver>();
+                var dependencies = computedResolver.GetRequiredFields(relationType).Select(s => parent.Type.GetProperty(s));
+                var result = await ctx.DataLoader<MultipleNodeDataLoader>()
+                    .LoadAsync(Tuple.Create(parent.Id, dependencies), default);
+                return computedResolver.Resolve(relationType, result);
+            }
             var relation = node.GetRelation(relationType);
             if (relation == null) return null;
             return await ResolveAttributeValue(ctx, relation.AttributeTarget);
-        }
-
-        public static class HelperFunctions
-        {
-            public static string Join(params object[] values)
-            {
-                return string.Join(' ', values.Where(v => v != null));
-            }
-
-            public static string FullTitle(object first, object second)
-            {
-                if (first != null && second != null)
-                    return $"{first} ({second})";
-                return (first ?? second)?.ToString();
-            }
-        }
-
-        private object ResolveComputedAttribute(EmbeddingRelationType relationType, Node node)
-        {
-            var formula = (relationType.CreateMeta() as AttributeRelationMeta)?.Formula;
-            if (formula == null) return null;
-            formula = formula.Replace("entity.", ""); // remove prefix from existing formulas, remove later
-            formula = formula.Replace("h.", ""); // remove prefix from existing formulas, remove later
-            ExpressionContext context = new ExpressionContext();
-            context.Imports.AddType(typeof(HelperFunctions));
-            context.Variables.ResolveVariableType += (sender, args)
-                => { args.VariableType = typeof(object); };
-            context.Variables.ResolveVariableValue += (sender, args)
-                => { args.VariableValue = node.GetAttributeValue(args.VariableName); };
-            IDynamicExpression eDynamic = context.CompileDynamic(formula);
-            var result = eDynamic.Evaluate();
-            return result;
         }
 
         // resolve multiple entity-[attribute] relation

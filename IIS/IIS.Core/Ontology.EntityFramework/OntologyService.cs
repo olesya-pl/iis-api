@@ -258,17 +258,6 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 var nodes = await _context.Nodes.Where(e => nodeIds.Contains(e.Id)).ToListAsync(cancellationToken);
 
-                // todo: Remove this shit - it fixes computed attribute problems by including all non-multiple relations
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-                if (relationTypes != null)
-                {
-                    var types = nodes.Select(n => n.TypeId).Distinct().Select(id => ontology.GetType(id));
-                    var singles = types.SelectMany(t =>
-                        t.AllProperties.Where(p => p.EmbeddingOptions != EmbeddingOptions.Multiple));
-                    relationTypes = relationTypes.Concat(singles);
-                }
-                // end
-
                 if (relationTypes == null)
                 {
                     var relations = await GetDirectRelationsQuery(nodeIds, null).ToListAsync(cancellationToken);
@@ -311,7 +300,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     FillRelations(nodes, relations);
                 }
 
-//                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
                 return nodes.Select(n => MapNode(n, ontology)).ToList();
             }
             finally

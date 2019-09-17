@@ -7,6 +7,32 @@ namespace IIS.Core.Ontology
     {
         public ScalarType ScalarTypeEnum { get; }
 
+        public override System.Type ClrType
+        {
+            get
+            {
+                switch (ScalarTypeEnum)
+                {
+                    case ScalarType.String:
+                        return typeof(string);
+                    case ScalarType.Integer:
+                        return typeof(int);
+                    case ScalarType.Decimal:
+                        return typeof(decimal);
+                    case ScalarType.Boolean:
+                        return typeof(bool);
+                    case ScalarType.DateTime:
+                        return typeof(DateTime);
+                    case ScalarType.Geo:
+                        return typeof(JObject);
+                    case ScalarType.File:
+                        return typeof(Guid);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
         public AttributeType(Guid id, string name, ScalarType scalarType)
             : base(id, name)
         {

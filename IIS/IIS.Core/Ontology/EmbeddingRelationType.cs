@@ -8,6 +8,9 @@ namespace IIS.Core.Ontology
     public class EmbeddingRelationType : RelationType
     {
         public bool IsInversed { get; }
+
+        public override System.Type ClrType => typeof(Relation);
+
         public EmbeddingOptions EmbeddingOptions { get; }
 
         // Embedding relation can have single attribute or single entity as a node

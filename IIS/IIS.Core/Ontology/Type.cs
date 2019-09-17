@@ -10,6 +10,8 @@ namespace IIS.Core.Ontology
         private readonly List<Type> _relatedTypes = new List<Type>();
         public IEnumerable<Type> RelatedTypes => _relatedTypes;
 
+        public abstract System.Type ClrType { get; }
+
         public Guid Id { get; }
         public string Name { get; }
         public string Title { get; set; }

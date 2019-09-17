@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.InputTypes.Mutations;
 using IIS.Core.Ontology;
@@ -25,7 +26,7 @@ namespace IIS.Core.GraphQL.Entities
             var configure = new Action<IInputObjectTypeDescriptor>(d =>
             {
                 d?.Name(MutatorInputType.GetName(Operation, type.Name));
-                foreach (var attr in type.AllProperties)
+                foreach (var attr in type.AllProperties.Where(p => !(p.IsInversed || p.IsComputed())))
                     OnRelation(attr, d);
             });
             configure(null); // Ensure creation of types before descriptor is called
@@ -54,8 +55,6 @@ namespace IIS.Core.GraphQL.Entities
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type = null;
-
-            if (relationType.IsComputed() || relationType.IsInversed) return;
 
             if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Create))
                 type = TypeRepository.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)

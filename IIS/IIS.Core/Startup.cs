@@ -13,6 +13,7 @@ using IIS.Core.GSM.Producer;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Legacy.EntityFramework;
@@ -61,6 +62,7 @@ namespace IIS.Core
             services.AddTransient<Ontology.Seeding.Seeder>();
             services.AddTransient(e => new ContextFactory(connectionString));
             services.AddTransient(e => new FileServiceFactory(connectionString));
+            services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
