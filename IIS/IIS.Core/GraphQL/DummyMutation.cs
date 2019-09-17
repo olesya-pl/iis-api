@@ -55,6 +55,7 @@ namespace IIS.Core.GraphQL
             if (cancellationToken.IsCancellationRequested)
                 return "Task cancelled";
             return "Task completed";
+            // dummy commit
         }
     }
 
