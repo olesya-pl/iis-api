@@ -136,7 +136,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 if (!(relation is EmbeddingRelationType ert) || !ert.HasInversed())
                     return;
                 var meta = ert.GetInversed();
-                var result = new EmbeddingRelationType(Guid.NewGuid(), meta.Code, EmbeddingOptions.Multiple, true);
+//                var embeddingOptions = EmbeddingOptions.Multiple; // All inversed relations without validation are multiple
+                var embeddingOptions = meta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
+                var result = new EmbeddingRelationType(Guid.NewGuid(), meta.Code, embeddingOptions, true);
                 result.Title = meta.Title ?? meta.Code;
                 result.AddType(sourceType); // link to source type
                 result.AddType(ert); // link to original direct relation type
