@@ -32,10 +32,6 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedAt(ctx));
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveUpdatedAt(ctx));
             d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
-            d.Field("_incomingRelations").Type<NonNullType<ListType<EntityInterface>>>()
-                .Argument("pagination", ad => ad.Type<InputObjectType<PaginationInput>>())
-                .Argument("types", ad => ad.Type<NonNullType<ListType<NonNullType<StringType>>>>())
-                .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveIncomingRelations(ctx));
         }
 
         protected void OnRelation(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor = null)

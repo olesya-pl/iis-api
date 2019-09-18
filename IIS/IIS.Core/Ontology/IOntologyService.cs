@@ -7,6 +7,7 @@ namespace IIS.Core.Ontology
 {
     public interface IOntologyService
     {
+        Task<int> GetNodesCountAsync(IEnumerable<Type> types, NodeFilter filter, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<Type> types, NodeFilter filter, CancellationToken cancellationToken = default);
 
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);

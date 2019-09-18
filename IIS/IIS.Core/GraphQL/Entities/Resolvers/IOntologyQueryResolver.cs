@@ -13,7 +13,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         ObjectType ResolveAbstractType(IResolverContext context, object resolverResult);
         Task<Guid> ResolveId(IResolverContext ctx);
         Task<Entity> ResolveEntity(IResolverContext ctx, EntityType type);
-        Task<IEnumerable<Entity>> ResolveEntityList(IResolverContext ctx, EntityType type);
+        Task<Tuple<IEnumerable<EntityType>, NodeFilter>> ResolveEntityList(IResolverContext ctx, EntityType type);
         Task<object> ResolveAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType);
         Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType);
         Task<object> ResolveMultipleAttributeRelationTarget(IResolverContext ctx);
@@ -22,7 +22,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
-        Task<IEnumerable<Entity>> GetAllEntities(IResolverContext ctx);
-        Task<IEnumerable<Entity>> ResolveIncomingRelations(IResolverContext ctx);
+        Task<Tuple<IEnumerable<EntityType>, NodeFilter>>  GetAllEntities(IResolverContext ctx);
     }
 }

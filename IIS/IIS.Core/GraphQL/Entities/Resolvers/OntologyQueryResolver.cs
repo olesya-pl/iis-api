@@ -46,12 +46,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node as Entity; // return null if node was not entity
         }
 
-        public async Task<IEnumerable<Entity>> ResolveEntityList(IResolverContext ctx, EntityType type)
+        public async Task<Tuple<IEnumerable<EntityType>, NodeFilter>> ResolveEntityList(IResolverContext ctx, EntityType type)
         {
-            var ontologyService = ctx.Service<IOntologyService>();
             var nf = ctx.CreateNodeFilter(type);
-            var list = await ontologyService.GetNodesAsync(new [] {type}, nf);
-            return list.OfType<Entity>();
+            return Tuple.Create((IEnumerable<EntityType>) new[] {type}, nf);
         }
 
         // ----- Relations to attributes ----- //
@@ -149,7 +147,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ------ All entities ----- //
 
-        public async Task<IEnumerable<Entity>> GetAllEntities(IResolverContext ctx)
+        public async Task<Tuple<IEnumerable<EntityType>, NodeFilter>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
             var ontologyService = ctx.Service<IOntologyService>();
@@ -160,45 +158,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (filter?.Types != null)
                 types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
 
-            var nodes = await ontologyService.GetNodesAsync(types, ctx.CreateNodeFilter());
-            var entities = nodes.OfType<Entity>();
-            return entities;
-        }
-
-        [Obsolete]
-        public async Task<IEnumerable<Entity>> ResolveIncomingRelations(IResolverContext ctx)
-        {
-            var nodeId = ctx.Parent<Node>().Id;
-            var pagination = ctx.Argument<PaginationInput>("pagination");
-            var typesArg = ctx.Argument<IEnumerable<string>>("types");
-            var ontologyContext = ctx.Service<OntologyContext>();
-            var ontologyService = ctx.Service<IOntologyService>();
-            var ontologyProvider = ctx.Service<IOntologyProvider>();
-            var ontology = await ontologyProvider.GetOntologyAsync();
-            var typesIds = ontology.EntityTypes.Where(et => typesArg.Contains(et.Name)).Select(et => et.Id);
-
-
-            await ontologyContext.Semaphore.WaitAsync();
-            List<Guid> sourceIds;
-            try
-            {
-                var sourceQ = ontologyContext.Relations
-                    .Include(e => e.SourceNode)
-                    .Where(e => e.TargetNodeId == nodeId && typesIds.Contains(e.SourceNode.TypeId))
-                    .Select(e => e.SourceNodeId);
-                if (pagination != null)
-                    sourceQ = sourceQ.Skip(pagination.Offset()).Take(pagination.PageSize);
-                sourceIds = await sourceQ.ToListAsync();
-            }
-            finally
-            {
-                ontologyContext.Semaphore.Release();
-            }
-
-            var nodes = new List<Node>();
-            foreach (var sourceId in sourceIds)
-                nodes.Add(await ontologyService.LoadNodesAsync(sourceId, null));
-            return nodes.OfType<Entity>().ToList();
+            return Tuple.Create(types, ctx.CreateNodeFilter());
         }
     }
 }

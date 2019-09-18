@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
+using IIS.Core.Ontology;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
@@ -20,15 +22,22 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
             descriptor.Name($"{_itemsTypeName}Collection");
-            descriptor.Field("meta")
-                .Deprecated("Use direct count property - get rid of useless meta")
-                .Type<NonNullType<ObjectType<CollectionMeta>>>()
-                .Resolver(ctx => new CollectionMeta(ctx.Parent<ICollection>().Count));
-            descriptor.Field("count")
-                .Resolver(ctx => ctx.Parent<IEnumerable<object>>().Count());
+            descriptor.Field("count").Type<IntType>()
+                .Resolver(async ctx =>
+                {
+                    var (types, filter) = ctx.Parent<Tuple<IEnumerable<EntityType>, NodeFilter>>();
+                    var service = ctx.Service<IOntologyService>();
+                    return await service.GetNodesCountAsync(types, filter);
+                });
             descriptor.Field("items")
                 .Type(new NonNullType(new ListType(new NonNullType(_itemsType))))
-                .Resolver(ctx => ctx.Parent<object>());
+                .Resolver(async ctx =>
+                {
+                    var (types, filter) = ctx.Parent<Tuple<IEnumerable<EntityType>, NodeFilter>>();
+                    var service = ctx.Service<IOntologyService>();
+                    var nodes = await service.GetNodesAsync(types, filter);
+                    return nodes.Cast<Entity>();
+                });
         }
     }
 }
