@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HotChocolate.Resolvers;
 using IIS.Core.Files;
+using IIS.Core.GraphQL.Common;
+using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.Ontology;
 using Type = IIS.Core.Ontology.Type;
 
@@ -40,6 +43,36 @@ namespace IIS.Core.GraphQL.Entities
             if (!targetType.IsAssignableFrom(existingNode.Type))
                 throw new ArgumentException($"Received node is not of type {targetType.Name}");
             return existingNode;
+        }
+
+        public static NodeFilter CreateNodeFilter(this IResolverContext ctx)
+        {
+            var pagination = ctx.Argument<PaginationInput>("pagination");
+            var filter = ctx.Argument<FilterInput>("filter");
+            return new NodeFilter {Limit = pagination.PageSize, Offset = pagination.Offset(),
+                Suggestion = filter?.Suggestion ?? filter?.SearchQuery};
+        }
+
+        public static NodeFilter CreateNodeFilter(this IResolverContext ctx, EntityType criteriaType)
+        {
+            var criteria = ctx.Argument<Dictionary<string, object>>("criteria");
+            var result = ctx.CreateNodeFilter();
+
+            if (criteria == null)
+                return result;
+
+            if (criteria.ContainsKey(CriteriaInputType.ANY_OF_CRITERIA_FIELD))
+            {
+                result.AnyOfCriteria = (bool)criteria[CriteriaInputType.ANY_OF_CRITERIA_FIELD];
+                criteria.Remove(CriteriaInputType.ANY_OF_CRITERIA_FIELD);
+            }
+            foreach (var (key, value) in criteria)
+            {
+                var relationType = criteriaType.GetProperty(key)
+                                   ?? throw new ArgumentException($"Property {key} was not found on type {criteriaType.Name}");
+                result.SearchCriteria.Add(Tuple.Create(relationType, value.ToString()));
+            }
+            return result;
         }
 
         public static async Task<Guid> ProcessFileInput(IFileService fileService, object value)

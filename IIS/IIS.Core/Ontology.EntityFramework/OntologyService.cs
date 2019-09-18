@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace IIS.Core.Ontology.EntityFramework
@@ -156,33 +156,23 @@ namespace IIS.Core.Ontology.EntityFramework
             node.UpdatedAt = DateTime.UtcNow;
         }
 
-        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<Type> types, int limit, int offset = 0,
-            string suggestion = null, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<Type> types, NodeFilter filter, CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             var derived = types.SelectMany(e => ontology.GetChildTypes(e)).Select(e => e.Id)
                 .Concat(types.Select(e => e.Id)).Distinct().ToArray();
 
-            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, suggestion, cancellationToken);
-            return nodes;
-        }
-
-        public async Task<IEnumerable<Node>> GetNodesByTypeAsync(Type type, int limit, int offset = 0,
-            string suggestion = null, CancellationToken cancellationToken = default)
-        {
-            var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-            var derived = ontology.GetChildTypes(type).Select(e => e.Id)
-                .Concat(new[] { type.Id }).Distinct().ToArray();
-
-            var nodes = await GetNodesInternalAsync(ontology, derived, limit, offset, suggestion, cancellationToken);
-            return nodes;
+            if (filter.Suggestion != null)
+                return await GetNodesInternalWithSuggestionAsync(ontology, derived, filter.Limit, filter.Offset, filter.Suggestion, cancellationToken);
+            if (filter.SearchCriteria.Count > 0)
+                return await GetNodesInternalWithCriteriaAsync(ontology, derived, filter.Limit, filter.Offset,
+                    filter.SearchCriteria, filter.AnyOfCriteria, cancellationToken);
+            return await GetNodesInternalAsync(ontology, derived, filter.Limit, filter.Offset, cancellationToken);
         }
 
         private async Task<IEnumerable<Node>> GetNodesInternalAsync(Ontology ontology, Guid[] derived,
-            int limit, int offset = 0, string suggestion = null, CancellationToken cancellationToken = default)
+            int limit, int offset, CancellationToken cancellationToken = default)
         {
-            if (suggestion != null)
-                return await GetNodesInternalWithSuggestionAsync(ontology, derived, limit, offset, suggestion, cancellationToken);
             var ctxNodes = await _context.Nodes.Where(e => derived.Contains(e.TypeId) && !e.IsArchived)
                 .Skip(offset).Take(limit)
                 .ToArrayAsync(cancellationToken);
@@ -217,6 +207,52 @@ namespace IIS.Core.Ontology.EntityFramework
                 relationsQ = relationsQ.Where(e => e.TargetNode.Attribute.Value.Contains(suggestion));
             var ctxNodes = await relationsQ.Select(e => e.SourceNode).Distinct()
                 .Skip(offset).Take(limit).ToArrayAsync(cancellationToken);
+
+            return ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
+        }
+
+        private async Task<IEnumerable<Node>> GetNodesInternalWithCriteriaAsync(Ontology ontology, Guid[] derived,
+            int limit, int offset, List<Tuple<EmbeddingRelationType, string>> criteria, bool anyOfCriteria,
+            CancellationToken cancellationToken = default)
+        {
+            var relationsQ = _context.Relations
+//                .Include(e => e.Node)
+                .Include(e => e.SourceNode)
+//                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
+                .Where(e => derived.Contains(e.SourceNode.TypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
+
+//            Expression<Func<Context.Relation, bool>> GetPredicate(Tuple<EmbeddingRelationType, string> c)
+//            {
+//                var (relation, value) = c;
+//                return e => e.Node.TypeId == relation.Id && e.TargetNode.Attribute.Value.Contains(value);
+//            }
+
+            var predicate = PredicateBuilder.New<Context.Relation>(false);
+            foreach (var c in criteria)
+            {
+                var (relation, value) = c;
+                predicate.Or(e => e.Node.TypeId == relation.Id && e.TargetNode.Attribute.Value.Contains(value));
+            }
+
+            relationsQ = relationsQ.Where(predicate);
+
+            Context.Node[] ctxNodes;
+            if (anyOfCriteria)
+            {
+                ctxNodes = await relationsQ.Select(e => e.SourceNode).Distinct()
+                    .Skip(offset).Take(limit)
+                    .ToArrayAsync(cancellationToken);
+            }
+            else
+            {
+                var nodeIds = await relationsQ
+                    .GroupBy(e => e.SourceNodeId)
+                    .Where(g => g.Count() == criteria.Count)
+                    .Select(g => g.Key).ToArrayAsync(cancellationToken);
+                ctxNodes = await _context.Nodes.Where(e => nodeIds.Contains(e.Id))
+                    .Skip(offset).Take(limit)
+                    .ToArrayAsync(cancellationToken);
+            }
 
             return ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
         }

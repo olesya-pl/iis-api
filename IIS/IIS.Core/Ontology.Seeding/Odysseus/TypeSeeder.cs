@@ -20,6 +20,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var date = ctx.CreateBuilder().WithName("Date").IsAttribute().HasValueOf(ScalarType.DateTime);
             var attachment = ctx.CreateBuilder().WithName("Attachment").IsAttribute().HasValueOf(ScalarType.File);
             var website = ctx.CreateBuilder().WithName("Website").IsAttribute().HasValueOf(ScalarType.String);
+            var text = ctx.CreateBuilder().WithName("Text").IsAttribute().HasValueOf(ScalarType.String);
 
 
             // Signs
@@ -99,6 +100,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .Is(enumEntity)
                 ;
 
+            var applyToAccessLevel = ctx.CreateBuilder().IsEntity() // seeded
+                    .WithName("ApplyToAccessLevel")
+                    .WithTitle("Форма, на яку подаеться")
+                    .HasRequired(number)
+                    .HasRequired(ctx, b => b
+                        .WithName("Years").IsAttribute().HasValueOf(ScalarType.Integer))
+                    .Is(enumEntity)
+                ;
+
             var specialPermitStatus = ctx.CreateBuilder().IsEntity() // seeded
                     .WithName("SpecialPermitStatus")
                     .Is(enumEntity)
@@ -127,6 +137,22 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var country = ctx.CreateBuilder().IsEntity() // seeded
                     .WithName("Country")
                     .Is(enumEntity)
+                ;
+
+            // Family relations
+            var familyRelationKind = ctx.CreateBuilder().IsEntity() // seeded
+                    .WithName("FamilyRelationKind")
+                    .WithTitle("Ступень родинного зв’язку")
+                    .Is(enumEntity)
+                ;
+            var familyRelationInfo = ctx.CreateBuilder().IsEntity()
+                    .WithName("FamilyRelationInfo")
+                    .HasRequired(familyRelationKind)
+                    .HasRequired(text, "FullName", title: "Прізвище, ім’я та по батькові")
+                    .HasRequired(text, "DateAndPlaceOfBirth", title: "Дата та місце народження, громадянство")
+                    .HasRequired(text, "WorkPlaceAndPosition", title:"Місце роботи (служби, роботи), посада")
+                    .HasRequired(text, "LiveIn", title: "Місце проживання")
+                    .HasOptional("person", "personLink")
                 ;
 
             // Entities
@@ -189,7 +215,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(citizenship)
                 // ... secret carrier
                     .HasMultiple(workIn)
-//                    .HasOptional(accessLevel)
+                    .HasOptional(applyToAccessLevel)
                     .HasOptional(attachment, "ScanForm5")
                     .HasOptional(attachment, "AnswerRules")
                     .HasOptional(attachment, "Autobiography")
@@ -201,19 +227,19 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var acccess = ctx.CreateBuilder().IsEntity()
                     .WithName("Access")
                     .HasRequired(person, "Person",
-                        CreateInversed("Access", "Допуск"))
+                        CreateInversed("access", "Допуск"))
                     .HasRequired(date, "IssueDate")
                     .HasRequired(date, "EndDate")
                     .HasRequired(accessLevel)
-                    .HasRequired(workIn)
+//                    .HasRequired(workIn)
                     .HasRequired(accessStatus) // computed?
                 ;
 
             var organizationPermit = ctx.CreateBuilder().IsEntity()
                     .WithName("SpecialPermit")
                     .HasRequired(organization, "Organization",
-                        CreateInversed("SpecialPermit", "Спецдозвiл"))
-                    .HasRequired(number, "IssueNumber")
+                        CreateInversed("specialPermit", "Спецдозвiл"))
+                    .HasRequired(code, "IssueNumber")
                     .HasRequired(date, "IssueDate")
                     .HasRequired(date, "EndDate")
                     .HasRequired(accessLevel)

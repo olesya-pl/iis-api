@@ -49,11 +49,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<IEnumerable<Entity>> ResolveEntityList(IResolverContext ctx, EntityType type)
         {
             var ontologyService = ctx.Service<IOntologyService>();
-            var pagination = ctx.Argument<PaginationInput>("pagination");
-            var filter = ctx.Argument<FilterInput>("filter");
-            var limit = pagination.PageSize;
-            var offset = pagination.Offset();
-            var list = await ontologyService.GetNodesByTypeAsync(type, limit, offset, filter?.Suggestion ?? filter?.SearchQuery); // Direct type
+            var nf = ctx.CreateNodeFilter(type);
+            var list = await ontologyService.GetNodesAsync(new [] {type}, nf);
             return list.OfType<Entity>();
         }
 
@@ -155,7 +152,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<IEnumerable<Entity>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
-            var pagination = ctx.Argument<PaginationInput>("pagination");
             var ontologyService = ctx.Service<IOntologyService>();
             var ontologyProvider = ctx.Service<IOntologyProvider>();
 
@@ -164,9 +160,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (filter?.Types != null)
                 types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
 
-            var limit = pagination.PageSize;
-            var offset = pagination.Offset();
-            var nodes = await ontologyService.GetNodesAsync(types, limit, offset, filter?.Suggestion ?? filter?.SearchQuery);
+            var nodes = await ontologyService.GetNodesAsync(types, ctx.CreateNodeFilter());
             var entities = nodes.OfType<Entity>();
             return entities;
         }

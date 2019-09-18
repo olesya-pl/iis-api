@@ -19,6 +19,7 @@
     <PackageReference Include="HotChocolate" Version="11.0.0-preview.2" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.2" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.2" />
+    <PackageReference Include="LinqKit.Core" Version="1.1.16" />
     <PackageReference Include="Microsoft.AspNetCore.App">
       <PrivateAssets Condition="'%(PackageReference.Version)' == ''">all</PrivateAssets>
       <Publish Condition="'%(PackageReference.Version)' == ''">true</Publish>

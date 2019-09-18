@@ -28,7 +28,6 @@ namespace IIS.Core.Ontology.Meta
     public class InversedRelationMeta : RelationMetaBase
     {
         public string Code { get; set; }
-        public string Title { get; set; }
         public bool Editable { get; set; }
     }
 
