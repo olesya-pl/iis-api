@@ -221,17 +221,14 @@ namespace IIS.Core.Ontology.EntityFramework
 //                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Where(e => derived.Contains(e.SourceNode.TypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
 
-//            Expression<Func<Context.Relation, bool>> GetPredicate(Tuple<EmbeddingRelationType, string> c)
-//            {
-//                var (relation, value) = c;
-//                return e => e.Node.TypeId == relation.Id && e.TargetNode.Attribute.Value.Contains(value);
-//            }
-
             var predicate = PredicateBuilder.New<Context.Relation>(false);
             foreach (var c in criteria)
             {
                 var (relation, value) = c;
-                predicate.Or(e => e.Node.TypeId == relation.Id && e.TargetNode.Attribute.Value.Contains(value));
+                if (relation.IsAttributeType)
+                    predicate.Or(e => e.Node.TypeId == relation.Id && e.TargetNode.Attribute.Value.Contains(value));
+                else
+                    predicate.Or(e => e.Node.TypeId == relation.Id && e.TargetNodeId == Guid.Parse(value));
             }
 
             relationsQ = relationsQ.Where(predicate);

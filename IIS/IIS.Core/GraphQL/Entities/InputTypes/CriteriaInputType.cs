@@ -19,8 +19,14 @@ namespace IIS.Core.GraphQL.Entities.InputTypes
         protected override void Configure(IInputObjectTypeDescriptor descriptor)
         {
             descriptor.Name($"{_type.Name}CriteriaInput");
-            foreach (var property in _type.AllProperties.Where(p => p.IsAttributeType && !p.IsComputed() && !p.IsInversed))
-                descriptor.Field(property.Name).Type<StringType>();
+//            foreach (var property in _type.AllProperties.Where(p => p.IsAttributeType && !p.IsComputed() && !p.IsInversed))
+            foreach (var property in _type.AllProperties.Where(p => !p.IsComputed() && !p.IsInversed))
+            {
+                if (property.IsAttributeType)
+                    descriptor.Field(property.Name).Type<StringType>();
+                else
+                    descriptor.Field(property.Name).Type<IdType>();
+            }
             descriptor.Field(ANY_OF_CRITERIA_FIELD).Type<BooleanType>().DefaultValue(false);
         }
     }

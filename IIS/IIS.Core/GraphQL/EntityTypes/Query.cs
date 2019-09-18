@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using IIS.Core.Ontology;
@@ -23,6 +24,8 @@ namespace IIS.Core.GraphQL.EntityTypes
                     types = new List<Type>();
                 else
                     types = ontology.GetChildTypes(et);
+                if (filter.ConcreteTypes)
+                    types = types.OfType<Core.Ontology.EntityType>().Where(t => t.IsAbstract);
             }
             else
             {

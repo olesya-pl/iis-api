@@ -227,7 +227,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var acccess = ctx.CreateBuilder().IsEntity()
                     .WithName("Access")
                     .HasRequired(person, "Person",
-                        CreateInversed("access", "Допуск"))
+                        CreateInversed("Access", "Допуск"))
                     .HasRequired(date, "IssueDate")
                     .HasRequired(date, "EndDate")
                     .HasRequired(accessLevel)
@@ -238,7 +238,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var organizationPermit = ctx.CreateBuilder().IsEntity()
                     .WithName("SpecialPermit")
                     .HasRequired(organization, "Organization",
-                        CreateInversed("specialPermit", "Спецдозвiл"))
+                        CreateInversed("SpecialPermit", "Спецдозвiл"))
                     .HasRequired(code, "IssueNumber")
                     .HasRequired(date, "IssueDate")
                     .HasRequired(date, "EndDate")
@@ -251,7 +251,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
         private EntityRelationMeta CreateInversed(string code, string title = null, bool multiple = false) =>
             new EntityRelationMeta { Multiple = multiple,
-                Inversed = new InversedRelationMeta { Code = code, Title = title }};
+                Inversed = new InversedRelationMeta { Code = code.ToLowerCamelcase(), Title = title }};
 
         private AttributeRelationMeta CreateComputed(string formula) =>
             new AttributeRelationMeta { Formula = formula };

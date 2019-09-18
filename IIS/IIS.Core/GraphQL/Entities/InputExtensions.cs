@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HotChocolate.Execution;
 using HotChocolate.Resolvers;
 using IIS.Core.Files;
 using IIS.Core.GraphQL.Common;
@@ -70,7 +71,12 @@ namespace IIS.Core.GraphQL.Entities
             {
                 var relationType = criteriaType.GetProperty(key)
                                    ?? throw new ArgumentException($"Property {key} was not found on type {criteriaType.Name}");
-                result.SearchCriteria.Add(Tuple.Create(relationType, value.ToString()));
+                if (value == null)
+                    throw new QueryException($"Can not accept null as value for relation {criteriaType.Name}.{relationType.Name}");
+                var strVal = value.ToString();
+                if (relationType.IsEntityType && !Guid.TryParse(strVal, out _))
+                    throw new QueryException($"Could not parse value '{strVal}' as GUID for relation {criteriaType.Name}.{relationType.Name}");
+                result.SearchCriteria.Add(Tuple.Create(relationType, strVal));
             }
             return result;
         }

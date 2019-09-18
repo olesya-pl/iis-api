@@ -32,7 +32,13 @@ namespace IIS.Core.Controllers
         {
             var fi = await _fileService.GetFileAsync(id);
             if (fi == null) return NotFound();
-            return File(fi.Contents, fi.ContentType, fi.Name);
+            var cd = new System.Net.Mime.ContentDisposition // Always inline file
+            {
+                FileName = fi.Name,
+                Inline = true
+            };
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(fi.Contents, fi.ContentType);
         }
 
         [HttpGet(nameof(FlushTemporary))]
