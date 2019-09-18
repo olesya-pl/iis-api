@@ -152,7 +152,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasRequired(text, "DateAndPlaceOfBirth", title: "Дата та місце народження, громадянство")
                     .HasRequired(text, "WorkPlaceAndPosition", title:"Місце роботи (служби, роботи), посада")
                     .HasRequired(text, "LiveIn", title: "Місце проживання")
-                    .HasOptional("person", "personLink")
+                    .HasOptional("Person", "PersonLink")
                 ;
 
             // Entities
