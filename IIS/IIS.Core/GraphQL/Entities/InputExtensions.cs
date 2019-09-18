@@ -56,17 +56,14 @@ namespace IIS.Core.GraphQL.Entities
 
         public static NodeFilter CreateNodeFilter(this IResolverContext ctx, EntityType criteriaType)
         {
-            var criteria = ctx.Argument<Dictionary<string, object>>("criteria");
+            var criteria = ctx.Argument<IDictionary<string, object>>("criteria");
             var result = ctx.CreateNodeFilter();
 
             if (criteria == null)
                 return result;
 
-            if (criteria.ContainsKey(CriteriaInputType.ANY_OF_CRITERIA_FIELD))
-            {
-                result.AnyOfCriteria = (bool)criteria[CriteriaInputType.ANY_OF_CRITERIA_FIELD];
-                criteria.Remove(CriteriaInputType.ANY_OF_CRITERIA_FIELD);
-            }
+            result.AnyOfCriteria = TryRemoveFromDictionary<bool>(criteria, CriteriaInputType.ANY_OF_CRITERIA_FIELD);
+            result.ExactMatch = TryRemoveFromDictionary<bool>(criteria, CriteriaInputType.EXACT_MATCH_CRITERIA_FIELD);
             foreach (var (key, value) in criteria)
             {
                 var relationType = criteriaType.GetProperty(key)
@@ -78,6 +75,15 @@ namespace IIS.Core.GraphQL.Entities
                     throw new QueryException($"Could not parse value '{strVal}' as GUID for relation {criteriaType.Name}.{relationType.Name}");
                 result.SearchCriteria.Add(Tuple.Create(relationType, strVal));
             }
+            return result;
+        }
+
+        private static T TryRemoveFromDictionary<T>(IDictionary<string, object> dict, string key)
+        {
+            if (!dict.ContainsKey(key))
+                return default;
+            var result = (T)dict[key];
+            dict.Remove(key);
             return result;
         }
 

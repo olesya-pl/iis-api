@@ -166,7 +166,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 return await GetNodesInternalWithSuggestionAsync(ontology, derived, filter.Limit, filter.Offset, filter.Suggestion, cancellationToken);
             if (filter.SearchCriteria.Count > 0)
                 return await GetNodesInternalWithCriteriaAsync(ontology, derived, filter.Limit, filter.Offset,
-                    filter.SearchCriteria, filter.AnyOfCriteria, cancellationToken);
+                    filter.SearchCriteria, filter.AnyOfCriteria, filter.ExactMatch, cancellationToken);
             return await GetNodesInternalAsync(ontology, derived, filter.Limit, filter.Offset, cancellationToken);
         }
 
@@ -204,7 +204,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Where(e => derived.Contains(e.SourceNode.TypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
             if (suggestion != null)
-                relationsQ = relationsQ.Where(e => e.TargetNode.Attribute.Value.Contains(suggestion));
+                relationsQ = relationsQ.Where(e =>
+                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
             var ctxNodes = await relationsQ.Select(e => e.SourceNode).Distinct()
                 .Skip(offset).Take(limit).ToArrayAsync(cancellationToken);
 
@@ -212,23 +213,25 @@ namespace IIS.Core.Ontology.EntityFramework
         }
 
         private async Task<IEnumerable<Node>> GetNodesInternalWithCriteriaAsync(Ontology ontology, Guid[] derived,
-            int limit, int offset, List<Tuple<EmbeddingRelationType, string>> criteria, bool anyOfCriteria,
+            int limit, int offset, List<Tuple<EmbeddingRelationType, string>> criteria,
+            bool anyOfCriteria, bool exactMatch,
             CancellationToken cancellationToken = default)
         {
             var relationsQ = _context.Relations
-//                .Include(e => e.Node)
                 .Include(e => e.SourceNode)
-//                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Where(e => derived.Contains(e.SourceNode.TypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
 
             var predicate = PredicateBuilder.New<Context.Relation>(false);
             foreach (var c in criteria)
             {
                 var (relation, value) = c;
-                if (relation.IsAttributeType)
-                    predicate.Or(e => e.Node.TypeId == relation.Id && e.TargetNode.Attribute.Value.Contains(value));
-                else
+                if (relation.IsEntityType)
                     predicate.Or(e => e.Node.TypeId == relation.Id && e.TargetNodeId == Guid.Parse(value));
+                else if (exactMatch)
+                    predicate.Or(e => e.Node.TypeId == relation.Id && e.TargetNode.Attribute.Value == value);
+                else
+                    predicate.Or(e => e.Node.TypeId == relation.Id
+                                      && EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{value}%"));
             }
 
             relationsQ = relationsQ.Where(predicate);

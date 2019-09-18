@@ -8,6 +8,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes
     public class CriteriaInputType : InputObjectType
     {
         public static string ANY_OF_CRITERIA_FIELD = "_anyOf";
+        public static string EXACT_MATCH_CRITERIA_FIELD = "_exactMatch";
 
         private readonly EntityType _type;
 
@@ -28,6 +29,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes
                     descriptor.Field(property.Name).Type<IdType>();
             }
             descriptor.Field(ANY_OF_CRITERIA_FIELD).Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(EXACT_MATCH_CRITERIA_FIELD).Type<BooleanType>().DefaultValue(false);
         }
     }
 }
