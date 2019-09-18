@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL.EntityTypes
                 else
                     types = ontology.GetChildTypes(et);
                 if (filter.ConcreteTypes)
-                    types = types.OfType<Core.Ontology.EntityType>().Where(t => t.IsAbstract);
+                    types = types.OfType<Core.Ontology.EntityType>().Where(t => !t.IsAbstract);
             }
             else
             {
