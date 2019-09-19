@@ -11,6 +11,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Attributes - title and meta omitted
             var name = ctx.CreateBuilder().WithName("Name").IsAttribute().HasValueOf(ScalarType.String);
             var code = ctx.CreateBuilder().WithName("Code").IsAttribute().HasValueOf(ScalarType.String);
+            var taxId = ctx.CreateBuilder().WithName("TaxId").IsAttribute().HasValueOf(ScalarType.String);
             var number = ctx.CreateBuilder().WithName("Number").IsAttribute().HasValueOf(ScalarType.Integer);
             var firstName = ctx.CreateBuilder().WithName("FirstName").IsAttribute().HasValueOf(ScalarType.String);
             var secondName = ctx.CreateBuilder().WithName("SecondName").IsAttribute().HasValueOf(ScalarType.String);
@@ -52,10 +53,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("EmailSign")
                     .Is(sign)
                 ;
-            var taxId = ctx.CreateBuilder().IsEntity()
-                    .WithName("TaxId")
-                    .Is(sign)
-                ;
             var socialNetworksSign = ctx.CreateBuilder().IsEntity()
                     .WithName("SocialNetworkSign")
                     .Is(sign)
@@ -89,61 +86,36 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasRequired(code)
                     .HasRequired(name)
                 ;
-            var tag = ctx.CreateBuilder().IsEntity()
-                    .WithName("Tag")
+            var tag = ctx.CreateEnum("Tag")
                     .IsAbstraction()
-                    .Is(enumEntity)
                 ;
-            var accessLevel = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("AccessLevel")
+            var accessLevel = ctx.CreateEnum("AccessLevel") // seeded
                     .HasRequired(number)
-                    .Is(enumEntity)
                 ;
-
-            var applyToAccessLevel = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("ApplyToAccessLevel")
+            var applyToAccessLevel = ctx.CreateEnum("ApplyToAccessLevel") // seeded
                     .WithTitle("Форма, на яку подаеться")
                     .HasRequired(number)
                     .HasRequired(ctx, b => b
                         .WithName("Years").IsAttribute().HasValueOf(ScalarType.Integer))
-                    .Is(enumEntity)
                 ;
-
-            var specialPermitStatus = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("SpecialPermitStatus")
-                    .Is(enumEntity)
+            var specialPermitStatus = ctx.CreateEnum("SpecialPermitStatus") // seeded
                 ;
-
-            var accessStatus = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("AccessStatus")
-                    .Is(enumEntity)
+            var accessStatus = ctx.CreateEnum("AccessStatus") // seeded
                 ;
-
-            var controlType = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("ControlType")
-                    .Is(enumEntity)
+            var controlType = ctx.CreateEnum("ControlType") // seeded
                 ;
-
-            var propertyOwnership = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("PropertyOwnership")
-                    .Is(enumEntity)
+            var legalForm = ctx.CreateEnum("LegalForm") // seeded
                 ;
-
-            var sanctionAccessConclusion = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("SanctionAccessConclusion")
-                    .Is(enumEntity)
+            var propertyOwnership = ctx.CreateEnum("PropertyOwnership") // seeded
                 ;
-
-            var country = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("Country")
-                    .Is(enumEntity)
+            var sanctionAccessConclusion = ctx.CreateEnum("SanctionAccessConclusion") // seeded
+                ;
+            var country = ctx.CreateEnum("Country") // seeded
                 ;
 
             // Family relations
-            var familyRelationKind = ctx.CreateBuilder().IsEntity() // seeded
-                    .WithName("FamilyRelationKind")
+            var familyRelationKind = ctx.CreateEnum("FamilyRelationKind") // seeded
                     .WithTitle("Ступень родинного зв’язку")
-                    .Is(enumEntity)
                 ;
             var familyRelationInfo = ctx.CreateBuilder().IsEntity()
                     .WithName("FamilyRelationInfo")
@@ -181,13 +153,20 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(ctx, b =>
                         b.WithName("OrganizationTag").IsEntity().Is(tag))
                     .HasRequired(propertyOwnership)
-//                    .HasRequired(ctx, b =>
-//                        b.WithName("LegalStatus").IsEntity().Is(enumEntity))
-                    .HasRequired(address, "LocatedAt")
+                    .HasRequired(legalForm)
+                    .HasRequired(address, "LocatedAt") // Address kind?
                     .HasRequired(address, "RegisteredAt")
                     .HasOptional(address, "BranchAddress")
-                    .HasOptional(address, "secretFacilityAddress")
-                    .HasOptional(address, "secretFacilityArchiveAddress")
+                    .HasOptional(address, "SecretFacilityAddress")
+                    .HasOptional(address, "SecretFacilityArchiveAddress")
+                    .HasOptional(attachment, "RSOCreationRequest")
+                    // ... edit
+                    .HasMultiple("Person", "Beneficiary", title: "Засновнки (бенефіциари)")
+                    .HasOptional("Person", "Head", title: "Керівник")
+                    .HasOptional(attachment, "StatuteOnEPARSS", title: "Положення про СРСД")
+                    .HasOptional(attachment, "HeadOrganization",
+                        CreateInversed("ChildOrganizations", "Дочірні організаціі", true),
+                        "Відомча підпорядкованість")
                 ;
 
 
@@ -220,6 +199,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(attachment, "AnswerRules")
                     .HasOptional(attachment, "Autobiography")
                     .HasOptional(attachment, "Form8")
+                    .HasMultiple(familyRelationInfo, "FamilyRelations")
                 ;
 
 

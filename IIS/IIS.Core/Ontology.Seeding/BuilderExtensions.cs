@@ -46,5 +46,8 @@ namespace IIS.Core.Ontology.Seeding
         public static ITypeBuilder HasMultiple(this ITypeBuilder builder, OntologyBuildContext context,
             Func<ITypeBuilder, ITypeBuilder> descriptor) =>
             builder.HasMultiple(descriptor(context.CreateBuilder()));
+
+        public static ITypeBuilder CreateEnum(this OntologyBuildContext ctx, string enumName) =>
+            ctx.CreateBuilder().IsEntity().Is("Enum").WithName(enumName);
     }
 }
