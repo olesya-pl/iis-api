@@ -57,7 +57,12 @@ namespace IIS.Core
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IMaterialProvider, MaterialProvider>();
             services.AddTransient<IMaterialService, MaterialService>();
+
+            // material processors
+            services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
+            services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
             services.AddTransient<Ontology.Seeding.Seeder>();
             services.AddTransient(e => new ContextFactory(connectionString));

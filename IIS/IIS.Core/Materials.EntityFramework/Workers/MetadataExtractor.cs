@@ -12,22 +12,22 @@ using Node = IIS.Core.Ontology.Node;
 
 namespace IIS.Core.Materials.EntityFramework.Workers
 {
-    public class MetadataExtractor
+    public class MetadataExtractor : IMaterialProcessor
     {
         private readonly OntologyContext _context;
-        private readonly IMaterialService _materialService;
+        private readonly IMaterialProvider _materialProvider;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyProvider _ontologyProvider;
 
-        public MetadataExtractor(OntologyContext context, IMaterialService materialService, IOntologyService ontologyService, IOntologyProvider ontologyProvider)
+        public MetadataExtractor(OntologyContext context, IMaterialProvider materialProvider, IOntologyService ontologyService, IOntologyProvider ontologyProvider)
         {
             _context = context;
-            _materialService = materialService;
+            _materialProvider = materialProvider;
             _ontologyService = ontologyService;
             _ontologyProvider = ontologyProvider;
         }
 
-        public async Task ExtractInfo(Materials.Material material)
+        public async Task ExtractInfoAsync(Materials.Material material)
         {
             await _context.Semaphore.WaitAsync();
             try
@@ -48,7 +48,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
 
         private async Task ExtractFeatures(Guid materialId)
         {
-            var material = await _materialService.GetMaterialAsync(materialId);
+            var material = await _materialProvider.GetMaterialAsync(materialId);
             foreach (var info in material.Infos)
                 await ExtractFeatures(info);
         }

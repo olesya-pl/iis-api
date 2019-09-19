@@ -23,10 +23,10 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<JObject> Transcriptions { get; set; }
 
         [GraphQLNonNullType]
-        public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialService materialService,
+        public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialProvider materialProvider,
             [GraphQLNonNullType] PaginationInput pagination)
         {
-            var materials = await materialService.GetMaterialsAsync(pagination.PageSize,
+            var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
                 pagination.Offset(), Id);
             return materials.Select(m => m.ToView()).ToList();
         }

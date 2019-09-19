@@ -16,20 +16,20 @@ namespace IIS.Core.GraphQL.Materials
 
         [GraphQLType(typeof(MaterialWrapperType))]
         public async Task<IEnumerable<Material>> GetMaterials(
-            [Service] IMaterialService materialService,
+            [Service] IMaterialProvider materialProvider,
             [GraphQLNonNullType] PaginationInput pagination,
             [GraphQLType(typeof(IdType))] Guid? parentId = null,
             IEnumerable<Guid> nodeIds = null,
             IEnumerable<string> types = null)
         {
-            var materials = await materialService.GetMaterialsAsync(pagination.PageSize,
+            var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
                 pagination.Offset(), parentId, nodeIds, types);
             return materials.Select(m => m.ToView());
         }
 
-        public async Task<Material> GetMaterial([Service] IMaterialService materialService, [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
+        public async Task<Material> GetMaterial([Service] IMaterialProvider materialProvider, [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
         {
-            var material = await materialService.GetMaterialAsync(materialId);
+            var material = await materialProvider.GetMaterialAsync(materialId);
             return material?.ToView();
         }
     }
