@@ -30,7 +30,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var sign = ctx.CreateBuilder().IsEntity()
                     .WithName("Sign")
                     .IsAbstraction()
-                    .HasRequired(value)
+                    .HasOptional(value)
                 ;
             var phoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("PhoneSign")
@@ -62,15 +62,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Address
             var address = ctx.CreateBuilder().IsEntity()
                     .WithName("Address")
-                    .HasRequired(ctx, b =>
+                    .HasOptional(ctx, b =>
                         b.WithName("ZipCode").IsAttribute().HasValueOf(ScalarType.String))
-                    .HasRequired(ctx, b =>
+                    .HasOptional(ctx, b =>
                         b.WithName("Region").IsAttribute().HasValueOf(ScalarType.String))
-                    .HasRequired(ctx, b =>
+                    .HasOptional(ctx, b =>
                         b.WithName("City").IsAttribute().HasValueOf(ScalarType.String))
-                    .HasRequired(ctx, b =>
+                    .HasOptional(ctx, b =>
                         b.WithName("Street").IsAttribute().HasValueOf(ScalarType.String))
-                    .HasRequired(ctx, b =>
+                    .HasOptional(ctx, b =>
                         b.WithName("Building").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
                         b.WithName("Apartment").IsAttribute().HasValueOf(ScalarType.String))
@@ -83,19 +83,19 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var enumEntity = ctx.CreateBuilder().IsEntity()
                     .WithName("Enum")
                     .IsAbstraction()
-                    .HasRequired(code)
-                    .HasRequired(name)
+                    .HasOptional(code)
+                    .HasOptional(name)
                 ;
             var tag = ctx.CreateEnum("Tag")
                     .IsAbstraction()
                 ;
             var accessLevel = ctx.CreateEnum("AccessLevel") // seeded
-                    .HasRequired(number)
+                    .HasOptional(number)
                 ;
             var applyToAccessLevel = ctx.CreateEnum("ApplyToAccessLevel") // seeded
                     .WithTitle("Форма, на яку подаеться")
-                    .HasRequired(number)
-                    .HasRequired(ctx, b => b
+                    .HasOptional(number)
+                    .HasOptional(ctx, b => b
                         .WithName("Years").IsAttribute().HasValueOf(ScalarType.Integer))
                 ;
             var specialPermitStatus = ctx.CreateEnum("SpecialPermitStatus") // seeded
@@ -119,25 +119,25 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 ;
             var familyRelationInfo = ctx.CreateBuilder().IsEntity()
                     .WithName("FamilyRelationInfo")
-                    .HasRequired(familyRelationKind)
-                    .HasRequired(text, "FullName", title: "Прізвище, ім’я та по батькові")
-                    .HasRequired(text, "DateAndPlaceOfBirth", title: "Дата та місце народження, громадянство")
-                    .HasRequired(text, "WorkPlaceAndPosition", title:"Місце роботи (служби, роботи), посада")
-                    .HasRequired(text, "LiveIn", title: "Місце проживання")
+                    .HasOptional(familyRelationKind)
+                    .HasOptional(text, "FullName", title: "Прізвище, ім’я та по батькові")
+                    .HasOptional(text, "DateAndPlaceOfBirth", title: "Дата та місце народження, громадянство")
+                    .HasOptional(text, "WorkPlaceAndPosition", title:"Місце роботи (служби, роботи), посада")
+                    .HasOptional(text, "LiveIn", title: "Місце проживання")
                     .HasOptional("Person", "PersonLink")
                 ;
 
             // Entities
             var passport = ctx.CreateBuilder().IsEntity()
                     .WithName("Passport")
-                    .HasRequired(code)
+                    .HasOptional(code)
                     .HasOptional(ctx, b =>
                         b.WithName("IssueInfo").IsAttribute().HasValueOf(ScalarType.String))
                 ;
 
             var citizenship = ctx.CreateBuilder().IsEntity()
                     .WithName("Citizenship")
-                    .HasRequired(country)
+                    .HasOptional(country)
                     .HasOptional(taxId)
                     .HasMultiple(passport)
                 ;
@@ -146,16 +146,16 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var organization = ctx.CreateBuilder()
                     .WithName("Organization")
                     .IsEntity()
-                    .HasRequired(taxId)
-                    .HasRequired(name)
+                    .HasOptional(taxId)
+                    .HasOptional(name)
                     .HasOptional(website)
                     .HasOptional(photo)
                     .HasMultiple(ctx, b =>
                         b.WithName("OrganizationTag").IsEntity().Is(tag))
-                    .HasRequired(propertyOwnership)
-                    .HasRequired(legalForm)
-                    .HasRequired(address, "LocatedAt") // Address kind?
-                    .HasRequired(address, "RegisteredAt")
+                    .HasOptional(propertyOwnership)
+                    .HasOptional(legalForm)
+                    .HasOptional(address, "LocatedAt") // Address kind?
+                    .HasOptional(address, "RegisteredAt")
                     .HasOptional(address, "BranchAddress")
                     .HasOptional(address, "SecretFacilityAddress")
                     .HasOptional(address, "SecretFacilityArchiveAddress")
@@ -173,7 +173,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Work in
             var workIn = ctx.CreateBuilder().IsEntity()
                 .WithName("WorkIn")
-                .HasRequired(organization)
+                .HasOptional(organization)
                 .HasOptional(ctx, d =>
                     d.WithName("JobPosition").IsAttribute().HasValueOf(ScalarType.String));
 
@@ -181,19 +181,19 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Person
             var person = ctx.CreateBuilder().IsEntity()
                     .WithName("Person")
-                    .HasRequired(name, "FullName", CreateComputed("Join(secondName, firstName, fatherName)"))
-                    .HasRequired(firstName)
-                    .HasRequired(secondName)
-                    .HasRequired(fatherName)
+                    .HasOptional(name, "FullName", CreateComputed("Join(secondName, firstName, fatherName)"))
+                    .HasOptional(firstName)
+                    .HasOptional(secondName)
+                    .HasOptional(fatherName)
                     .HasOptional(photo)
-                    .HasRequired(birthDate)
-                    .HasRequired(address, "BirthPlace")
-                    .HasRequired(address, "RegistrationPlace")
-                    .HasRequired(address, "LivingPlace")
+                    .HasOptional(birthDate)
+                    .HasOptional(address, "BirthPlace")
+                    .HasOptional(address, "RegistrationPlace")
+                    .HasOptional(address, "LivingPlace")
                     .HasMultiple(phoneSign)
 //                    .HasMultiple(citizenship)
                     .HasOptional(taxId)
-                    .HasRequired(passport)
+                    .HasOptional(passport)
                 // ... secret carrier
                     .HasMultiple(workIn)
                     .HasOptional(applyToAccessLevel)
@@ -208,25 +208,25 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Permits
             var acccess = ctx.CreateBuilder().IsEntity()
                     .WithName("Access")
-                    .HasRequired(person, "Person",
+                    .HasOptional(person, "Person",
                         CreateInversed("Access", "Допуск"))
-                    .HasRequired(date, "IssueDate")
-                    .HasRequired(date, "EndDate")
-                    .HasRequired(accessLevel)
-//                    .HasRequired(workIn)
-                    .HasRequired(accessStatus) // computed?
+                    .HasOptional(date, "IssueDate")
+                    .HasOptional(date, "EndDate")
+                    .HasOptional(accessLevel)
+//                    .HasOptional(workIn)
+                    .HasOptional(accessStatus) // computed?
                 ;
 
             var organizationPermit = ctx.CreateBuilder().IsEntity()
                     .WithName("SpecialPermit")
-                    .HasRequired(organization, "Organization",
+                    .HasOptional(organization, "Organization",
                         CreateInversed("SpecialPermit", "Спецдозвiл"))
-                    .HasRequired(code, "IssueNumber")
-                    .HasRequired(date, "IssueDate")
-                    .HasRequired(date, "EndDate")
-                    .HasRequired(accessLevel)
-                    .HasRequired(specialPermitStatus) // computed?
-                    .HasRequired(organization, "SBU") // restrictions?
+                    .HasOptional(code, "IssueNumber")
+                    .HasOptional(date, "IssueDate")
+                    .HasOptional(date, "EndDate")
+                    .HasOptional(accessLevel)
+                    .HasOptional(specialPermitStatus) // computed?
+                    .HasOptional(organization, "SBU") // restrictions?
                 ;
 
         }
