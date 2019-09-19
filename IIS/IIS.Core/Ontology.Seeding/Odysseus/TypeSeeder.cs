@@ -164,7 +164,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple("Person", "Beneficiary", title: "Засновнки (бенефіциари)")
                     .HasOptional("Person", "Head", title: "Керівник")
                     .HasOptional(attachment, "StatuteOnEPARSS", title: "Положення про СРСД")
-                    .HasOptional(attachment, "HeadOrganization",
+                    .HasOptional("Organization", "HeadOrganization",
                         CreateInversed("ChildOrganizations", "Дочірні організаціі", true),
                         "Відомча підпорядкованість")
                 ;
@@ -230,8 +230,8 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
         }
 
         private EntityRelationMeta CreateInversed(string code, string title = null, bool multiple = false) =>
-            new EntityRelationMeta { Multiple = multiple,
-                Inversed = new InversedRelationMeta { Code = code.ToLowerCamelcase(), Title = title }};
+            new EntityRelationMeta {
+                Inversed = new InversedRelationMeta { Code = code.ToLowerCamelcase(), Title = title, Multiple = multiple }};
 
         private AttributeRelationMeta CreateComputed(string formula) =>
             new AttributeRelationMeta { Formula = formula };
