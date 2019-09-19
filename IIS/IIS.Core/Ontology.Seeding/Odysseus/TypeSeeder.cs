@@ -9,52 +9,59 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
         public void CreateBuilders(OntologyBuildContext ctx)
         {
             // Attributes - title and meta omitted
-            var name = ctx.CreateBuilder().WithName("Name").IsAttribute().HasValueOf(ScalarType.String);
-            var code = ctx.CreateBuilder().WithName("Code").IsAttribute().HasValueOf(ScalarType.String);
-            var taxId = ctx.CreateBuilder().WithName("TaxId").IsAttribute().HasValueOf(ScalarType.String);
-            var number = ctx.CreateBuilder().WithName("Number").IsAttribute().HasValueOf(ScalarType.Integer);
-            var firstName = ctx.CreateBuilder().WithName("FirstName").IsAttribute().HasValueOf(ScalarType.String);
-            var secondName = ctx.CreateBuilder().WithName("SecondName").IsAttribute().HasValueOf(ScalarType.String);
-            var fatherName = ctx.CreateBuilder().WithName("FatherName").IsAttribute().HasValueOf(ScalarType.String);
-            var photo = ctx.CreateBuilder().WithName("Photo").IsAttribute().HasValueOf(ScalarType.File);
-            var birthDate = ctx.CreateBuilder().WithName("BirthDate").IsAttribute().HasValueOf(ScalarType.DateTime);
-            var date = ctx.CreateBuilder().WithName("Date").IsAttribute().HasValueOf(ScalarType.DateTime);
-            var attachment = ctx.CreateBuilder().WithName("Attachment").IsAttribute().HasValueOf(ScalarType.File);
-            var website = ctx.CreateBuilder().WithName("Website").IsAttribute().HasValueOf(ScalarType.String);
-            var text = ctx.CreateBuilder().WithName("Text").IsAttribute().HasValueOf(ScalarType.String);
+            var name = ctx.CreateBuilder().WithName("Name").WithTitle("Назва").IsAttribute().HasValueOf(ScalarType.String);
+            var code = ctx.CreateBuilder().WithName("Code").WithTitle("Код").IsAttribute().HasValueOf(ScalarType.String);
+            var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Код ЄДРПОУ").IsAttribute().HasValueOf(ScalarType.String);
+            var number = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.Integer);
+            var firstName = ctx.CreateBuilder().WithName("FirstName").WithTitle("Ім’я").IsAttribute().HasValueOf(ScalarType.String);
+            var secondName = ctx.CreateBuilder().WithName("SecondName").WithTitle("Прізвище").IsAttribute().HasValueOf(ScalarType.String);
+            var fatherName = ctx.CreateBuilder().WithName("FatherName").WithTitle("По батькові").IsAttribute().HasValueOf(ScalarType.String);
+            var photo = ctx.CreateBuilder().WithName("Photo").WithTitle("Фото").IsAttribute().HasValueOf(ScalarType.File);
+            var birthDate = ctx.CreateBuilder().WithName("BirthDate").WithTitle("Дата народження").IsAttribute().HasValueOf(ScalarType.DateTime);
+            var date = ctx.CreateBuilder().WithName("Date").IsAttribute().WithTitle("Дата").HasValueOf(ScalarType.DateTime);
+            var attachment = ctx.CreateBuilder().WithName("Attachment").WithTitle("Додані файли").IsAttribute().HasValueOf(ScalarType.File);
+            var website = ctx.CreateBuilder().WithName("Website").WithTitle("Офіційний сайт").IsAttribute().HasValueOf(ScalarType.String);
+            var text = ctx.CreateBuilder().WithName("Text").WithTitle("Текст").IsAttribute().HasValueOf(ScalarType.String);
 
 
             // Signs
-            var value = ctx.CreateBuilder().WithName("Value").IsAttribute().HasValueOf(ScalarType.String);
+            var value = ctx.CreateBuilder().WithName("Value").WithTitle("Значення").IsAttribute().HasValueOf(ScalarType.String);
 
             var sign = ctx.CreateBuilder().IsEntity()
                     .WithName("Sign")
+                    .WithTitle("Ознака")
                     .IsAbstraction()
                     .HasOptional(value)
                 ;
             var phoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("PhoneSign")
+                    .WithTitle("Телефон")
                     .Is(sign)
                 ;
             var cellPhoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("CellPhoneSign")
+                    .WithTitle("Мобільний телефон")
                     .Is(phoneSign)
                 ;
             var homePhoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("HomePhoneSign")
+                    .WithTitle("Стаціонарний телефон")
                     .Is(phoneSign)
                 ;
             var customPhoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("CustomPhoneSign")
+                    .WithTitle("Персоналізований телефон")
                     .Is(phoneSign)
                     .HasOptional(name, "phoneType")
                 ;
             var emailSign = ctx.CreateBuilder().IsEntity()
                     .WithName("EmailSign")
+                    .WithTitle("Електронна пошта")
                     .Is(sign)
                 ;
             var socialNetworksSign = ctx.CreateBuilder().IsEntity()
                     .WithName("SocialNetworkSign")
+                    .WithTitle("Соціальна мережа")
                     .Is(sign)
                 ;
 
@@ -63,54 +70,67 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var address = ctx.CreateBuilder().IsEntity()
                     .WithName("Address")
                     .HasOptional(ctx, b =>
-                        b.WithName("ZipCode").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("ZipCode").WithTitle("Поштовий індекс").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("Region").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("Region").WithTitle("Регіон").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("City").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("City").WithTitle("Місто").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("Street").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("Street").WithTitle("Вулиця").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("Building").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("Building").WithTitle("Будинок").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("Apartment").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("Apartment").WithTitle("Квартира").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("Coordinates").IsAttribute().HasValueOf(ScalarType.Geo))
+                        b.WithName("Coordinates").WithTitle("Координати").IsAttribute().HasValueOf(ScalarType.Geo))
                 ;
 
 
             // Enums
             var enumEntity = ctx.CreateBuilder().IsEntity()
                     .WithName("Enum")
+                    .WithTitle("Перелік")
                     .IsAbstraction()
                     .HasOptional(code)
                     .HasOptional(name)
                 ;
             var tag = ctx.CreateEnum("Tag")
+                    .WithTitle("Тег")
                     .IsAbstraction()
                 ;
             var accessLevel = ctx.CreateEnum("AccessLevel") // seeded
+                    .WithTitle("Рівень доступу")
                     .HasOptional(number)
                 ;
             var applyToAccessLevel = ctx.CreateEnum("ApplyToAccessLevel") // seeded
                     .WithTitle("Форма, на яку подаеться")
                     .HasOptional(number)
                     .HasOptional(ctx, b => b
-                        .WithName("Years").IsAttribute().HasValueOf(ScalarType.Integer))
+                        .WithName("Years")
+                        .WithTitle("Строк дії")
+                        .IsAttribute()
+                        .HasValueOf(ScalarType.Integer))
                 ;
             var specialPermitStatus = ctx.CreateEnum("SpecialPermitStatus") // seeded
+                .WithTitle("Статус спецдозволу")
                 ;
             var accessStatus = ctx.CreateEnum("AccessStatus") // seeded
+                .WithTitle("Статус допуску")
                 ;
             var controlType = ctx.CreateEnum("ControlType") // seeded
+                .WithTitle("Тип перевірки")
                 ;
             var legalForm = ctx.CreateEnum("LegalForm") // seeded
+                .WithTitle("Організаційно-правова форма")
                 ;
             var propertyOwnership = ctx.CreateEnum("PropertyOwnership") // seeded
+                .WithTitle("Форма власності")
                 ;
             var sanctionAccessConclusion = ctx.CreateEnum("SanctionAccessConclusion") // seeded
+                .WithTitle("Заходи реагування")
                 ;
             var country = ctx.CreateEnum("Country") // seeded
+                .WithTitle("Країна")
                 ;
 
             // Family relations
@@ -119,6 +139,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 ;
             var familyRelationInfo = ctx.CreateBuilder().IsEntity()
                     .WithName("FamilyRelationInfo")
+                    .WithTitle("Родинні зв’язки")
                     .HasOptional(familyRelationKind)
                     .HasOptional(text, "FullName", title: "Прізвище, ім’я та по батькові")
                     .HasOptional(text, "DateAndPlaceOfBirth", title: "Дата та місце народження, громадянство")
@@ -130,13 +151,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Entities
             var passport = ctx.CreateBuilder().IsEntity()
                     .WithName("Passport")
+                    .WithTitle("Паспорт")
                     .HasOptional(code)
                     .HasOptional(ctx, b =>
-                        b.WithName("IssueInfo").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("IssueInfo").WithTitle("Відомості про порушення").IsAttribute().HasValueOf(ScalarType.String))
                 ;
 
             var citizenship = ctx.CreateBuilder().IsEntity()
                     .WithName("Citizenship")
+                    .WithTitle("Громадянство")
                     .HasOptional(country)
                     .HasOptional(taxId)
                     .HasMultiple(passport)
@@ -145,13 +168,14 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Organization
             var organization = ctx.CreateBuilder()
                     .WithName("Organization")
+                    .WithTitle("Огранізація")
                     .IsEntity()
                     .HasOptional(taxId)
                     .HasOptional(name)
                     .HasOptional(website)
                     .HasOptional(photo)
                     .HasMultiple(ctx, b =>
-                        b.WithName("OrganizationTag").IsEntity().Is(tag))
+                        b.WithName("OrganizationTag").WithTitle("Теги").IsEntity().Is(tag))
                     .HasOptional(propertyOwnership)
                     .HasOptional(legalForm)
                     .HasOptional(address, "LocatedAt") // Address kind?
@@ -173,14 +197,16 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Work in
             var workIn = ctx.CreateBuilder().IsEntity()
                 .WithName("WorkIn")
+                .WithTitle("Поточне місце роботи")
                 .HasOptional(organization)
                 .HasOptional(ctx, d =>
-                    d.WithName("JobPosition").IsAttribute().HasValueOf(ScalarType.String));
+                    d.WithName("JobPosition").WithTitle("Посада").IsAttribute().HasValueOf(ScalarType.String));
 
 
             // Person
             var person = ctx.CreateBuilder().IsEntity()
                     .WithName("Person")
+                    .WithTitle("Особа")
                     .HasOptional(name, "FullName", CreateComputed("Join(secondName, firstName, fatherName)"))
                     .HasOptional(firstName)
                     .HasOptional(secondName)
@@ -208,6 +234,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Permits
             var acccess = ctx.CreateBuilder().IsEntity()
                     .WithName("Access")
+                    .WithTitle("Допуск")
                     .HasOptional(person, "Person",
                         CreateInversed("Access", "Допуск"))
                     .HasOptional(date, "IssueDate")
@@ -219,6 +246,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var organizationPermit = ctx.CreateBuilder().IsEntity()
                     .WithName("SpecialPermit")
+                    .WithTitle("Спецдозвіл")
                     .HasOptional(organization, "Organization",
                         CreateInversed("SpecialPermit", "Спецдозвiл"))
                     .HasOptional(code, "IssueNumber")
