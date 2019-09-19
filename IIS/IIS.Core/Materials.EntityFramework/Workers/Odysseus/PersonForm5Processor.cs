@@ -28,6 +28,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var data = material.Data;
             var entity = await GetEntity(data);
             var form = GetForm(data);
+            ProcessPerson(entity, form);
         }
 
         private string ExtractTextOfDataType(JArray data, string dataType)
@@ -38,7 +39,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                    ?? throw new ArgumentException($"Can not find {dataType} text id");
         }
 
-        private async Task<Node> GetEntity(JArray data)
+        private async Task<Entity> GetEntity(JArray data)
         {
             var entityIdText = ExtractTextOfDataType(data, ENTITY_TYPE);
             if (!Guid.TryParse(entityIdText, out var personId))
@@ -49,7 +50,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var type = ontology.GetEntityType(ENTITY_TYPE);
             if (entity.Type.IsSubtypeOf(type))
                 throw new ArgumentException($"Entity with id {personId} is {entity.Type.Name}, not {ENTITY_TYPE}");
-            return entity;
+            return (Entity)entity;
         }
 
         private JObject GetForm(JArray data)
@@ -63,6 +64,13 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             {
                 throw new ArgumentException($"Expected to find inlined json in text of data {FORM_DATA_TYPE}, received json parse exception: {e.Message}", e);
             }
+        }
+
+        private void ProcessPerson(Entity person, JObject form)
+        {
+//            var familyRelations = person.Type.GetProperty("FamilyRelations");
+//            person.GetAttributeValue("FamilyRelations");
+            // todo: finish person processing
         }
     }
 }

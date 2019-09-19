@@ -39,15 +39,12 @@ namespace IIS.Core.Ontology
             return attribute?.Value;
         }
 
-        public Entity GetEntity(string relationName)
-        {
-            var relation = Nodes.SingleOrDefault(e => e.Type.Name == relationName);
-            var entity = relation?.Nodes.OfType<Entity>().Single();
-            return entity;
-        }
-
         public IEnumerable<Relation> GetRelations(RelationType relationType) =>
             Nodes.OfType<Relation>().Where(r => r.Type.Name == relationType.Name);
+
+        public EmbeddingRelationType GetRelationType(string relationTypeName) =>
+            Type.GetProperty(relationTypeName) ??
+            throw new ArgumentException($"Relation with name {relationTypeName} does not exist");
 
         // Only single relations
         public Relation GetRelation(RelationType relationType) => GetRelations(relationType).SingleOrDefault();
@@ -103,12 +100,77 @@ namespace IIS.Core.Ontology
 
             base.AddNode(node);
         }
+
+        public object GetProperty(string relationName)
+        {
+            var embed = GetRelationType(relationName);
+            var nodes = GetRelations(embed).Select(r => r.Target);
+            if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
+            {
+                if (embed.IsAttributeType)
+                    return nodes.Cast<Attribute>().Select(a => a.Value).ToList();
+                return nodes.ToList();
+            }
+            var node = nodes.SingleOrDefault();
+            if (node != null && embed.IsAttributeType)
+                return ((Attribute) node).Value;
+            return node;
+        }
+
+        public void SetProperty(string relationName, object value)
+        {
+            var embed = GetRelationType(relationName);
+            var existingRelations = GetRelations(embed).ToList();
+            List<object> targets;
+            if (value == null)
+            {
+                targets = new List<object>(); // empty list of targets
+            }
+            else if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
+            {
+                if (!(value is IEnumerable<object> enumerable))
+                    throw new ArgumentException($"Can not assign single value to multiple relation {Type.Name}.{embed.Name}");
+                targets = enumerable.ToList();
+            }
+            else
+            {
+                targets = new List<object>{ value }; // Wrap single value in list
+            }
+
+            if (embed.IsAttributeType && targets.Any(e => e is Node))
+                throw new ArgumentException($"Unable to set Node value to attribute {Type.Name}.{embed.Name}");
+            if (embed.IsEntityType && targets.Any(e => !(e is Entity)))
+                throw new ArgumentException($"Unable to set non-Entity value to attribute {Type.Name}.{embed.Name}");
+
+            var targetNodes = embed.IsAttributeType
+                ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.AttributeType, t))
+                : targets.Cast<Node>();
+            var newRelations = targetNodes.Select(n => new Relation(Guid.NewGuid(), embed) {Target = n});
+
+            foreach (var r in existingRelations)
+                RemoveNode(r);
+            foreach (var r in newRelations)
+                AddNode(r);
+        }
     }
 
     public class Relation : Node
     {
-        public Node Target => Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(RelationType))
-                              ?? throw new Exception("Relation does not have a target.");
+        public Node Target
+        {
+            get
+            {
+                return Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(RelationType))
+                       ?? throw new Exception("Relation does not have a target.");
+            }
+            set
+            {
+                var currentValue = Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(RelationType));
+                if (currentValue != null)
+                    RemoveNode(currentValue);
+                AddNode(value);
+            }
+        }
 
         public Attribute AttributeTarget => Nodes.OfType<Attribute>().Single();
         public Entity EntityTarget => Nodes.OfType<Entity>().Single();
