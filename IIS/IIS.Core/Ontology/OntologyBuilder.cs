@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using IIS.Core.Ontology.Meta;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -217,6 +218,9 @@ namespace IIS.Core.Ontology
                         { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
                         embedding.AddType(targetType);
                         type.AddType(embedding);
+                        // todo: remove quickfix
+                        StubEntityOperations(embedding);
+                        //end
                     };
                 }
                 else
@@ -226,6 +230,9 @@ namespace IIS.Core.Ontology
                     { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
                     embedding.AddType(targetType);
                     type.AddType(embedding);
+                    // todo: remove quickfix
+                    StubEntityOperations(embedding);
+                    //end
                 }
             }
             _isBuilding = false;
@@ -233,6 +240,16 @@ namespace IIS.Core.Ontology
             TypeBuilt?.Invoke(this, EventArgs.Empty);
 
             return type;
+        }
+
+        private void StubEntityOperations(EmbeddingRelationType embedding)
+        {
+            if (embedding.IsEntityType && embedding.Meta == null)
+                embedding.Meta = new EntityRelationMeta
+                    {
+                        AcceptsEntityOperations = new[] {EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete}
+                    }
+                    .Serialize();
         }
     }
 }

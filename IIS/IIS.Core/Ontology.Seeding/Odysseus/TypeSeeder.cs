@@ -131,7 +131,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var passport = ctx.CreateBuilder().IsEntity()
                     .WithName("Passport")
                     .HasRequired(code)
-                    .HasRequired(ctx, b =>
+                    .HasOptional(ctx, b =>
                         b.WithName("IssueInfo").IsAttribute().HasValueOf(ScalarType.String))
                 ;
 
@@ -191,7 +191,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasRequired(address, "RegistrationPlace")
                     .HasRequired(address, "LivingPlace")
                     .HasMultiple(phoneSign)
-                    .HasMultiple(citizenship)
+//                    .HasMultiple(citizenship)
+                    .HasOptional(taxId)
+                    .HasRequired(passport)
                 // ... secret carrier
                     .HasMultiple(workIn)
                     .HasOptional(applyToAccessLevel)
@@ -231,6 +233,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
         private EntityRelationMeta CreateInversed(string code, string title = null, bool multiple = false) =>
             new EntityRelationMeta {
+                AcceptsEntityOperations = new[] {EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete},
                 Inversed = new InversedRelationMeta { Code = code.ToLowerCamelcase(), Title = title, Multiple = multiple }};
 
         private AttributeRelationMeta CreateComputed(string formula) =>
