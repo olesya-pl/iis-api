@@ -85,6 +85,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
         private async Task Process24(Entity person, Form5 form)
         {
+            if (form.Question24 == null) throw new ArgumentException("Question 24 was not found");
             if (form.Question24 == null) return;
             var familyRelationsType = person.Type.GetProperty("familyRelations").EntityType;
 

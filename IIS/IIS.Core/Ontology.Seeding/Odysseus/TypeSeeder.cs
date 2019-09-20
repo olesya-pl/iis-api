@@ -52,7 +52,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("CustomPhoneSign")
                     .WithTitle("Інший телефон")
                     .Is(phoneSign)
-                    .HasOptional(name, "phoneType")
+//                    .HasOptional(name, "phoneType")
                 ;
             var emailSign = ctx.CreateBuilder().IsEntity()
                     .WithName("EmailSign")
@@ -104,7 +104,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(number)
                 ;
             var applyToAccessLevel = ctx.CreateEnum("ApplyToAccessLevel") // seeded
-                    .WithTitle("Форма, на яку подаеться")
+                    .WithTitle("Форма, на яку подається")
                     .HasOptional(number)
                     .HasOptional(ctx, b => b
                         .WithName("Years")
