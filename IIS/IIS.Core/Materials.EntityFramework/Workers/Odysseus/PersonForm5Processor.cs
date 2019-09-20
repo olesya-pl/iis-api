@@ -15,7 +15,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         public const string FORM_DATA_TYPE = "form5";
 
         private readonly IOntologyProvider _ontologyProvider;
-        private IOntologyService _ontologyService;
+        private readonly IOntologyService _ontologyService;
 
         public PersonForm5Processor(IOntologyProvider ontologyProvider, IOntologyService ontologyService)
         {
@@ -73,20 +73,31 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             // todo: finish person processing
             var formObject = form.ToObject<Form5>();
             // question24 - family
+            await Process3(person, formObject);
             await Process24(person, formObject);
+            await Process25(person, formObject);
+            await Process26(person, formObject);
+            await Process28(person, formObject);
         }
 
-        private void Process3(Entity person, Form5 form)
+        private async Task Process3(Entity person, Form5 form)
         {
             var item = form.Question3;
-            if (item == null) return;
-
+            if (item == null) throw new ArgumentException("Question 3 was not found");
+            person.SetProperty("birthDate", item.BirthDate);
+            var address = person.GetRelationType("birthPlace").EntityType;
+            var node = new Entity(Guid.NewGuid(), address);
+            node.SetProperty("zipCode", item.PostalCode);
+            node.SetProperty("region", item.Region);
+            node.SetProperty("subregion", item.Subregion);
+            node.SetProperty("city", item.City);
+            person.SetProperty("birthPlace", address);
+            await _ontologyService.SaveNodeAsync(node);
         }
 
         private async Task Process24(Entity person, Form5 form)
         {
             if (form.Question24 == null) throw new ArgumentException("Question 24 was not found");
-            if (form.Question24 == null) return;
             var familyRelationsType = person.Type.GetProperty("familyRelations").EntityType;
 
             var nodes = new List<Entity>();
@@ -104,6 +115,71 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 //            await Task.WhenAll(nodes.Select(n => _ontologyService.SaveNodeAsync(n)));
             foreach (var node in nodes)
                 await _ontologyService.SaveNodeAsync(node);
+        }
+
+        private async Task Process25(Entity person, Form5 form)
+        {
+            async Task assignAddress(string propertyName, Address address)
+            {
+                var type = person.GetRelationType(propertyName).EntityType;
+                var node = new Entity(Guid.NewGuid(), type);
+                node.SetProperty("zipCode", address.Index);
+                node.SetProperty("region", address.Region);
+                node.SetProperty("city", address.City);
+                node.SetProperty("subregion", address.Subregion);
+                node.SetProperty("street", address.Street);
+                node.SetProperty("building", address.House);
+                node.SetProperty("apartment", address.Flat);
+                person.SetProperty(propertyName, node);
+                await _ontologyService.SaveNodeAsync(node);
+            }
+
+            var item = form.Question25;
+            if (item == null) throw new ArgumentException("Question 25 was not found");
+            await assignAddress("registrationPlace", item.RegistrationAddress);
+            await assignAddress("livingPlace", item.LivingAddress);
+        }
+
+        private async Task Process26(Entity person, Form5 form)
+        {
+            async Task assignSigns(string propertyName, IEnumerable<FormEntity> signs)
+            {
+                var type = person.GetRelationType(propertyName).EntityType;
+                var nodes = new List<Entity>();
+                foreach (var sign in signs)
+                {
+                    var node = new Entity(Guid.NewGuid(), type);
+                    node.SetProperty("value", sign.Name);
+                    nodes.Add(node);
+                }
+
+                foreach (var node in nodes)
+                    await _ontologyService.SaveNodeAsync(node);
+
+                person.SetProperty(propertyName, nodes);
+            }
+
+            var item = form.Question26;
+            if (item == null) throw new ArgumentException("Question 26 was not found");
+            await assignSigns("phoneSign", item.Phones);
+            await assignSigns("emailSign", item.Emails);
+            await assignSigns("socialNetworkSign", item.Accounts);
+        }
+
+        private async Task Process28(Entity person, Form5 form)
+        {
+            var item = form.Question28;
+            if (item == null) throw new ArgumentException("Question 28 was not found");
+
+            var passport = (Entity) person.GetProperty("passport");
+            if (passport == null)
+            {
+                passport = new Entity(Guid.NewGuid(), person.GetRelationType("passport").EntityType);
+                person.SetProperty("passport", passport);
+            }
+            passport.SetProperty("issueInfo", item.IssuedBy);
+            passport.SetProperty("issueDate", item.DateOfIssue);
+            await _ontologyService.SaveNodeAsync(passport);
         }
 
 

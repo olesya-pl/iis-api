@@ -77,6 +77,8 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(ctx, b =>
                         b.WithName("City").WithTitle("Населений пункт").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
+                        b.WithName("Subregion").WithTitle("Район").IsAttribute().HasValueOf(ScalarType.String))
+                    .HasOptional(ctx, b =>
                         b.WithName("Street").WithTitle("Вулиця").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
                         b.WithName("Building").WithTitle("Будинок").IsAttribute().HasValueOf(ScalarType.String))
