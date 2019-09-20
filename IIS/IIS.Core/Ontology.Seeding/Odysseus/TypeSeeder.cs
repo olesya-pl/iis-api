@@ -153,9 +153,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var passport = ctx.CreateBuilder().IsEntity()
                     .WithName("Passport")
                     .WithTitle("Паспорт")
-                    .HasOptional(code)
+                    .HasOptional(code, title:"Серія та номер")
                     .HasOptional(ctx, b =>
-                        b.WithName("IssueInfo").WithTitle("Відомості про порушення").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("IssueInfo").WithTitle("Ким виданий").IsAttribute().HasValueOf(ScalarType.String))
+                    .HasOptional(ctx, b =>
+                        b.WithName("IssueDate").WithTitle("Дата видачі").IsAttribute().HasValueOf(ScalarType.DateTime))
                 ;
 
             var citizenship = ctx.CreateBuilder().IsEntity()
