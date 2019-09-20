@@ -70,11 +70,9 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
         private async Task ProcessPerson(Entity person, JObject form)
         {
-            // todo: finish person processing
             var formObject = form.ToObject<Form5>();
-            // question24 - family
             await Process3(person, formObject);
-            await Process24(person, formObject);
+//            await Process24(person, formObject);
             await Process25(person, formObject);
             await Process26(person, formObject);
             await Process28(person, formObject);
@@ -91,7 +89,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             node.SetProperty("region", item.Region);
             node.SetProperty("subregion", item.Subregion);
             node.SetProperty("city", item.City);
-            person.SetProperty("birthPlace", address);
+            person.SetProperty("birthPlace", node);
             await _ontologyService.SaveNodeAsync(node);
         }
 
@@ -140,16 +138,22 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             await assignAddress("livingPlace", item.LivingAddress);
         }
 
+        private static string StripPrefix(string text, string prefix)
+        {
+            return text.StartsWith(prefix) ? text.Substring(prefix.Length) : text;
+        }
+
         private async Task Process26(Entity person, Form5 form)
         {
-            async Task assignSigns(string propertyName, IEnumerable<FormEntity> signs)
+            async Task assignSigns(string propertyName, IEnumerable<SignEntity> signs)
             {
                 var type = person.GetRelationType(propertyName).EntityType;
                 var nodes = new List<Entity>();
                 foreach (var sign in signs)
                 {
+                    // todo: type mapping
                     var node = new Entity(Guid.NewGuid(), type);
-                    node.SetProperty("value", sign.Name);
+                    node.SetProperty("value", sign.Value);
                     nodes.Add(node);
                 }
 
@@ -197,9 +201,9 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
             public class Question26Item
             {
-                public IEnumerable<FormEntity> Phones { get; set; }
-                public IEnumerable<FormEntity> Emails { get; set; }
-                public IEnumerable<FormEntity> Accounts { get; set; }
+                public IEnumerable<SignEntity> Phones { get; set; }
+                public IEnumerable<SignEntity> Emails { get; set; }
+                public IEnumerable<SignEntity> Accounts { get; set; }
             }
 
             public class Question28Item
@@ -247,6 +251,13 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         {
             public Guid Id { get; set; }
             public string Name { get; set; }
+            [JsonProperty("__typename")]
+            public string Typename { get; set; }
+        }
+
+        public class SignEntity
+        {
+            public string Value { get; set; }
             [JsonProperty("__typename")]
             public string Typename { get; set; }
         }

@@ -190,8 +190,12 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(address, "SecretFacilityArchiveAddress", title: "Архів РСО")
                     .HasOptional(attachment, "RSOCreationRequest", title: "Вмотивований запит на створення РСО")
                     // ... edit
-                    .HasMultiple("Person", "Beneficiary", title: "Засновнки (бенефіциари)")
-                    .HasOptional("Person", "Head", title: "Керівник")
+                    .HasMultiple("Person", "Beneficiary",
+                        EmptyRelationMeta(),
+                        title: "Засновнки (бенефіциари)")
+                    .HasOptional("Person", "Head",
+                        EmptyRelationMeta(),
+                        title: "Керівник")
                     .HasOptional(attachment, "StatuteOnEPARSS", title: "Положення про СРСД")
                     .HasOptional("Organization", "HeadOrganization",
                         CreateInversed("ChildOrganizations", "Філії", true),
@@ -265,18 +269,19 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(date, "EndDate", title: "Дата завершення дії")
                     .HasOptional(accessLevel)
                     .HasOptional(specialPermitStatus) // computed?
-                    .HasOptional(organization, "SBU") // restrictions?
+                    .HasOptional(organization, "SBU", EmptyRelationMeta()) // restrictions?
                 ;
 
         }
 
         private EntityRelationMeta CreateInversed(string code, string title = null, bool multiple = false) =>
             new EntityRelationMeta {
-                AcceptsEntityOperations = new[] {EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete},
                 Inversed = new InversedRelationMeta { Code = code.ToLowerCamelcase(), Title = title, Multiple = multiple }};
 
         private AttributeRelationMeta CreateComputed(string formula) =>
             new AttributeRelationMeta { Formula = formula };
+
+        private EntityRelationMeta EmptyRelationMeta() => new EntityRelationMeta();
 
         public Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
