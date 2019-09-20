@@ -79,7 +79,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type
 
-        [GraphQLNonNullType] public bool Editable => !(Source.IsInversed || Source.IsComputed());
+        public bool Editable => !(Source.IsInversed || Source.IsComputed());
         public bool IsInversed => Source.IsInversed;
         public bool IsComputed => Source.IsComputed();
 
@@ -117,7 +117,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(ListType<NonNullType<StringType>>))]
         public IEnumerable<string> AcceptsEntityOperations =>
-            MetaObject.AcceptsEntityOperations?.Select(e => e.ToString());
+            MetaObject.AcceptsEntityOperations?.Select(e => e.ToString().ToLower());
 
         [GraphQLNonNullType]
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]

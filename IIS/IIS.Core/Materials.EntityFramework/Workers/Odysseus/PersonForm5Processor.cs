@@ -48,7 +48,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                          ?? throw new ArgumentException($"{ENTITY_TYPE} with id {personId} was not found");
             var ontology = await _ontologyProvider.GetOntologyAsync();
             var type = ontology.GetEntityType(ENTITY_TYPE);
-            if (entity.Type.IsSubtypeOf(type))
+            if (!entity.Type.IsSubtypeOf(type))
                 throw new ArgumentException($"Entity with id {personId} is {entity.Type.Name}, not {ENTITY_TYPE}");
             return (Entity)entity;
         }
