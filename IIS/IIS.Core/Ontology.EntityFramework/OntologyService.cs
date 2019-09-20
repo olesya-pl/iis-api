@@ -194,10 +194,10 @@ namespace IIS.Core.Ontology.EntityFramework
             var derived = types.SelectMany(e => ontology.GetChildTypes(e)).Select(e => e.Id)
                 .Concat(types.Select(e => e.Id)).Distinct().ToArray();
 
+            if (filter.SearchCriteria.Count > 0)
+                return await GetNodesInternalWithCriteriaAsync(derived, filter.SearchCriteria, filter.AnyOfCriteria, filter.ExactMatch, filter.Suggestion, cancellationToken);
             if (filter.Suggestion != null)
                 return GetNodesInternalWithSuggestion(derived, filter.Suggestion);
-            if (filter.SearchCriteria.Count > 0)
-                return await GetNodesInternalWithCriteriaAsync(derived, filter.SearchCriteria, filter.AnyOfCriteria, filter.ExactMatch, cancellationToken);
             return GetNodesInternal(derived);
         }
 
@@ -219,6 +219,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private async Task<IQueryable<Context.Node>> GetNodesInternalWithCriteriaAsync(Guid[] derived,
             List<Tuple<EmbeddingRelationType, string>> criteria, bool anyOfCriteria, bool exactMatch,
+            string suggestion,
             CancellationToken cancellationToken = default)
         {
             var relationsQ = _context.Relations
@@ -239,6 +240,10 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             relationsQ = relationsQ.Where(predicate);
+
+            if (suggestion != null)
+                relationsQ = relationsQ.Where(e =>
+                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
 
             Context.Node[] ctxNodes;
             if (anyOfCriteria)
