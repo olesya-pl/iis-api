@@ -11,7 +11,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Attributes - title and meta omitted
             var name = ctx.CreateBuilder().WithName("Name").WithTitle("Назва").IsAttribute().HasValueOf(ScalarType.String);
             var code = ctx.CreateBuilder().WithName("Code").WithTitle("Код").IsAttribute().HasValueOf(ScalarType.String);
-            var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Код ЄДРПОУ").IsAttribute().HasValueOf(ScalarType.String);
+            var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Податковий ідентифікатор").IsAttribute().HasValueOf(ScalarType.String);
             var number = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.Integer);
             var firstName = ctx.CreateBuilder().WithName("FirstName").WithTitle("Ім’я").IsAttribute().HasValueOf(ScalarType.String);
             var secondName = ctx.CreateBuilder().WithName("SecondName").WithTitle("Прізвище").IsAttribute().HasValueOf(ScalarType.String);
@@ -171,7 +171,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("Organization")
                     .WithTitle("Суб'єкт")
                     .IsEntity()
-                    .HasOptional(taxId)
+                    .HasOptional(taxId, title: "Код ЄДРПОУ")
                     .HasOptional(name)
                     .HasOptional(website)
                     .HasOptional(photo)
@@ -197,14 +197,16 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             // Work in
             var workIn = ctx.CreateBuilder().IsEntity()
-                .WithName("WorkIn")
-                .WithTitle("Місце роботи")
-                .HasOptional(organization)
-                .HasOptional(ctx, d =>
-                    d.WithName("JobPosition").WithTitle("Посада").IsAttribute().HasValueOf(ScalarType.String));
+                    .WithName("WorkIn")
+                    .WithTitle("Місце роботи")
+                    .HasOptional(organization)
+                    .HasOptional(ctx, d =>
+                        d.WithName("JobPosition").WithTitle("Посада").IsAttribute().HasValueOf(ScalarType.String))
+                    .HasOptional(text, "Subdivision", title: "Підрозділ")
+                ;
 
 
-            // Person
+                // Person
             var person = ctx.CreateBuilder().IsEntity()
                     .WithName("Person")
                     .WithTitle("Особа")
@@ -218,17 +220,21 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(address, "RegistrationPlace", title: "Місце реєстрації")
                     .HasOptional(address, "LivingPlace", title: "Місце фактичного проживання")
                     .HasMultiple(phoneSign)
+                    .HasMultiple(emailSign)
+                    .HasMultiple(socialNetworksSign)
 //                    .HasMultiple(citizenship)
-                    .HasOptional(taxId)
+                    .HasOptional(taxId, "ІПН")
                     .HasOptional(passport)
-                // ... secret carrier
-                    .HasMultiple(workIn)
+                    // ... secret carrier
+                    .HasMultiple(workIn, "PastEmployments", title: "Останні місця роботи")
+                    .HasOptional(workIn)
+                    .HasOptional(text, "SecretCarrierAssignment", title:"Призначення на посаду державного експерта з питаннь таємниць")
                     .HasOptional(applyToAccessLevel)
                     .HasOptional(attachment, "ScanForm5", title: "Скан переліку питань (форма 5)")
                     .HasOptional(attachment, "AnswerRules", title: "Правила надання відповідей")
                     .HasOptional(attachment, "Autobiography", title: "Автобіографія")
                     .HasOptional(attachment, "Form8", title: "Форма 8")
-                    .HasMultiple(familyRelationInfo, "FamilyRelations", title: "Ступінь родинного зв’язку")
+                    .HasMultiple(familyRelationInfo, "FamilyRelations", title: "Родинні зв'язки")
                 ;
 
 
