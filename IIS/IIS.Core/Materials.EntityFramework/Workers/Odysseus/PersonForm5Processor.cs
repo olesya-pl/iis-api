@@ -72,7 +72,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         {
             var formObject = form.ToObject<Form5>();
             await Process3(person, formObject);
-//            await Process24(person, formObject);
+            await Process24(person, formObject);
             await Process25(person, formObject);
             await Process26(person, formObject);
             await Process28(person, formObject);
@@ -110,7 +110,6 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 nodes.Add(node);
             }
             person.SetProperty("familyRelations", nodes);
-//            await Task.WhenAll(nodes.Select(n => _ontologyService.SaveNodeAsync(n)));
             foreach (var node in nodes)
                 await _ontologyService.SaveNodeAsync(node);
         }
@@ -145,14 +144,27 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
         private async Task Process26(Entity person, Form5 form)
         {
+            var ontology = await _ontologyProvider.GetOntologyAsync();
             async Task assignSigns(string propertyName, IEnumerable<SignEntity> signs)
             {
                 var type = person.GetRelationType(propertyName).EntityType;
                 var nodes = new List<Entity>();
                 foreach (var sign in signs)
                 {
-                    // todo: type mapping
-                    var node = new Entity(Guid.NewGuid(), type);
+                    var targetTypeName = StripPrefix("Entity", sign.Typename);
+                    EntityType targetType;
+                    if (targetTypeName == type.Name)
+                    {
+                        targetType = type;
+                    }
+                    else
+                    {
+                        targetType = ontology.GetEntityType(targetTypeName)
+                                     ?? throw new ArgumentException($"Type {targetTypeName} was not found");
+                        if (!targetType.IsSubtypeOf(type))
+                            throw new ArgumentException($"{targetTypeName} is not subtype of {type.Name}");
+                    }
+                    var node = new Entity(Guid.NewGuid(), targetType);
                     node.SetProperty("value", sign.Value);
                     nodes.Add(node);
                 }
