@@ -45,18 +45,18 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 ;
             var homePhoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("HomePhoneSign")
-                    .WithTitle("Стаціонарний телефон")
+                    .WithTitle("Домашній телефон")
                     .Is(phoneSign)
                 ;
             var customPhoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("CustomPhoneSign")
-                    .WithTitle("Персоналізований телефон")
+                    .WithTitle("Інший телефон")
                     .Is(phoneSign)
                     .HasOptional(name, "phoneType")
                 ;
             var emailSign = ctx.CreateBuilder().IsEntity()
                     .WithName("EmailSign")
-                    .WithTitle("Електронна пошта")
+                    .WithTitle("Електронна скринька")
                     .Is(sign)
                 ;
             var socialNetworksSign = ctx.CreateBuilder().IsEntity()
@@ -69,12 +69,13 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Address
             var address = ctx.CreateBuilder().IsEntity()
                     .WithName("Address")
+                    .WithTitle("Адреса")
                     .HasOptional(ctx, b =>
-                        b.WithName("ZipCode").WithTitle("Поштовий індекс").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("ZipCode").WithTitle("Індекс").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("Region").WithTitle("Регіон").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("Region").WithTitle("Область").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
-                        b.WithName("City").WithTitle("Місто").IsAttribute().HasValueOf(ScalarType.String))
+                        b.WithName("City").WithTitle("Населений пункт").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
                         b.WithName("Street").WithTitle("Вулиця").IsAttribute().HasValueOf(ScalarType.String))
                     .HasOptional(ctx, b =>
@@ -135,7 +136,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             // Family relations
             var familyRelationKind = ctx.CreateEnum("FamilyRelationKind") // seeded
-                    .WithTitle("Ступень родинного зв’язку")
+                    .WithTitle("Ступінь родинного зв’язку")
                 ;
             var familyRelationInfo = ctx.CreateBuilder().IsEntity()
                     .WithName("FamilyRelationInfo")
@@ -168,7 +169,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Organization
             var organization = ctx.CreateBuilder()
                     .WithName("Organization")
-                    .WithTitle("Огранізація")
+                    .WithTitle("Суб'єкт")
                     .IsEntity()
                     .HasOptional(taxId)
                     .HasOptional(name)
@@ -178,18 +179,18 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         b.WithName("OrganizationTag").WithTitle("Теги").IsEntity().Is(tag))
                     .HasOptional(propertyOwnership)
                     .HasOptional(legalForm)
-                    .HasOptional(address, "LocatedAt") // Address kind?
-                    .HasOptional(address, "RegisteredAt")
-                    .HasOptional(address, "BranchAddress")
-                    .HasOptional(address, "SecretFacilityAddress")
-                    .HasOptional(address, "SecretFacilityArchiveAddress")
-                    .HasOptional(attachment, "RSOCreationRequest")
+                    .HasOptional(address, "LocatedAt", title: "Фактична адреса") // Address kind?
+                    .HasOptional(address, "RegisteredAt", title: "Юридична адреса")
+                    .HasOptional(address, "BranchAddress", title: "Філія")
+                    .HasOptional(address, "SecretFacilityAddress", title: "РСО")
+                    .HasOptional(address, "SecretFacilityArchiveAddress", title: "Архів РСО")
+                    .HasOptional(attachment, "RSOCreationRequest", title: "Вмотивований запит на створення РСО")
                     // ... edit
                     .HasMultiple("Person", "Beneficiary", title: "Засновнки (бенефіциари)")
                     .HasOptional("Person", "Head", title: "Керівник")
                     .HasOptional(attachment, "StatuteOnEPARSS", title: "Положення про СРСД")
                     .HasOptional("Organization", "HeadOrganization",
-                        CreateInversed("ChildOrganizations", "Дочірні організаціі", true),
+                        CreateInversed("ChildOrganizations", "Філії", true),
                         "Відомча підпорядкованість")
                 ;
 
@@ -197,7 +198,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // Work in
             var workIn = ctx.CreateBuilder().IsEntity()
                 .WithName("WorkIn")
-                .WithTitle("Поточне місце роботи")
+                .WithTitle("Місце роботи")
                 .HasOptional(organization)
                 .HasOptional(ctx, d =>
                     d.WithName("JobPosition").WithTitle("Посада").IsAttribute().HasValueOf(ScalarType.String));
@@ -213,9 +214,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(fatherName)
                     .HasOptional(photo)
                     .HasOptional(birthDate)
-                    .HasOptional(address, "BirthPlace")
-                    .HasOptional(address, "RegistrationPlace")
-                    .HasOptional(address, "LivingPlace")
+                    .HasOptional(address, "BirthPlace", title: "Місце народження")
+                    .HasOptional(address, "RegistrationPlace", title: "Місце реєстрації")
+                    .HasOptional(address, "LivingPlace", title: "Місце фактичного проживання")
                     .HasMultiple(phoneSign)
 //                    .HasMultiple(citizenship)
                     .HasOptional(taxId)
@@ -223,11 +224,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 // ... secret carrier
                     .HasMultiple(workIn)
                     .HasOptional(applyToAccessLevel)
-                    .HasOptional(attachment, "ScanForm5")
-                    .HasOptional(attachment, "AnswerRules")
-                    .HasOptional(attachment, "Autobiography")
-                    .HasOptional(attachment, "Form8")
-                    .HasMultiple(familyRelationInfo, "FamilyRelations")
+                    .HasOptional(attachment, "ScanForm5", title: "Скан переліку питань (форма 5)")
+                    .HasOptional(attachment, "AnswerRules", title: "Правила надання відповідей")
+                    .HasOptional(attachment, "Autobiography", title: "Автобіографія")
+                    .HasOptional(attachment, "Form8", title: "Форма 8")
+                    .HasMultiple(familyRelationInfo, "FamilyRelations", title: "Ступінь родинного зв’язку")
                 ;
 
 
@@ -237,8 +238,8 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle("Допуск")
                     .HasOptional(person, "Person",
                         CreateInversed("Access", "Допуск"))
-                    .HasOptional(date, "IssueDate")
-                    .HasOptional(date, "EndDate")
+                    .HasOptional(date, "IssueDate", title: "Дата видачі")
+                    .HasOptional(date, "EndDate", title: "Дата завершення дії")
                     .HasOptional(accessLevel)
 //                    .HasOptional(workIn)
                     .HasOptional(accessStatus) // computed?
@@ -249,9 +250,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle("Спецдозвіл")
                     .HasOptional(organization, "Organization",
                         CreateInversed("SpecialPermit", "Спецдозвiл"))
-                    .HasOptional(code, "IssueNumber")
-                    .HasOptional(date, "IssueDate")
-                    .HasOptional(date, "EndDate")
+                    .HasOptional(code, "IssueNumber", title: "Номер спецдозволу")
+                    .HasOptional(date, "IssueDate", title: "Дата видачі")
+                    .HasOptional(date, "EndDate", title: "Дата завершення дії")
                     .HasOptional(accessLevel)
                     .HasOptional(specialPermitStatus) // computed?
                     .HasOptional(organization, "SBU") // restrictions?
