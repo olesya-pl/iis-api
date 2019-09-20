@@ -80,6 +80,16 @@ namespace IIS.Core.Controllers
             return Ok("Migration has been applied.");
         }
 
+        [HttpGet]
+        [Route("/api/cleartypes")]
+        public async Task<IActionResult> ClearTypes(CancellationToken cancellationToken)
+        {
+            _context.Types.RemoveRange(await _context.Types.ToArrayAsync(cancellationToken));
+            _context.AttributeTypes.RemoveRange(await _context.AttributeTypes.ToArrayAsync(cancellationToken));
+            _context.RelationTypes.RemoveRange(await _context.RelationTypes.ToArrayAsync(cancellationToken));
+            return Ok("Migration has been applied.");
+        }
+
         public async Task<IActionResult> Get()
         {
             throw new NotImplementedException("Broken Reanimators type conversion because of relation model change. Use Graphql mutation 'migrateTypes'.");

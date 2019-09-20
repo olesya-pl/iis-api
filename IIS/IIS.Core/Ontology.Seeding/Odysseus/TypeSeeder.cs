@@ -223,7 +223,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(emailSign)
                     .HasMultiple(socialNetworksSign)
 //                    .HasMultiple(citizenship)
-                    .HasOptional(taxId, "ІПН")
+                    .HasOptional(taxId, title: "ІПН")
                     .HasOptional(passport)
                     // ... secret carrier
                     .HasMultiple(workIn, "PastEmployments", title: "Останні місця роботи")
