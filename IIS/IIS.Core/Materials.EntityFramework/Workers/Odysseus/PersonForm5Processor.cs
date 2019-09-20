@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
@@ -28,7 +29,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var data = material.Data;
             var entity = await GetEntity(data);
             var form = GetForm(data);
-            ProcessPerson(entity, form);
+            await ProcessPerson(entity, form);
+            await _ontologyService.SaveNodeAsync(entity);
         }
 
         private string ExtractTextOfDataType(JArray data, string dataType)
@@ -66,11 +68,123 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             }
         }
 
-        private void ProcessPerson(Entity person, JObject form)
+        private async Task ProcessPerson(Entity person, JObject form)
         {
-//            var familyRelations = person.Type.GetProperty("FamilyRelations");
-//            person.GetAttributeValue("FamilyRelations");
             // todo: finish person processing
+            var formObject = form.ToObject<Form5>();
+            // question24 - family
+            await Process24(person, formObject);
+        }
+
+        private void Process3(Entity person, Form5 form)
+        {
+            var item = form.Question3;
+            if (item == null) return;
+
+        }
+
+        private async Task Process24(Entity person, Form5 form)
+        {
+            if (form.Question24 == null) return;
+            var familyRelationsType = person.Type.GetProperty("familyRelations").EntityType;
+
+            var nodes = new List<Entity>();
+            foreach (var item in form.Question24)
+            {
+                var node = new Entity(Guid.NewGuid(), familyRelationsType);
+                node.SetProperty("familyRelationKind", item.FamilyRelationKind?.Id);
+                node.SetProperty("fullName", item.FullName);
+                node.SetProperty("dateAndPlaceOfBirth", item.DateAndPlaceOfBirth);
+                node.SetProperty("workPlaceAndPosition", item.WorkPlaceAndPosition);
+                node.SetProperty("liveIn", item.LiveIn);
+                nodes.Add(node);
+            }
+            person.SetProperty("familyRelations", nodes);
+//            await Task.WhenAll(nodes.Select(n => _ontologyService.SaveNodeAsync(n)));
+            foreach (var node in nodes)
+                await _ontologyService.SaveNodeAsync(node);
+        }
+
+
+        class Form5
+        {
+            public class Question24Item
+            {
+                [JsonProperty("kinship")]
+                public FormEntity FamilyRelationKind { get; set; }
+                public string FullName { get; set; }
+                public string DateAndPlaceOfBirth { get; set; }
+                public string WorkPlaceAndPosition { get; set; }
+                public string LiveIn { get; set; }
+            }
+
+            public class Question26Item
+            {
+                public IEnumerable<FormEntity> Phones { get; set; }
+                public IEnumerable<FormEntity> Emails { get; set; }
+                public IEnumerable<FormEntity> Accounts { get; set; }
+            }
+
+            public class Question28Item
+            {
+                public DateTime DateOfIssue { get; set; }
+                public string IssuedBy { get; set; }
+            }
+
+            public class Question3Item
+            {
+                public DateTime BirthDate { get; set; }
+                public FormEntity BirthCountry { get; set; }
+                public string PostalCode { get; set; }
+                public string Region { get; set; }
+                public string Subregion { get; set; }
+                public string City { get; set; }
+            }
+
+            public class Question25Item
+            {
+                [JsonExtensionData]
+                public IDictionary<string, JToken> Extension { get; set; }
+
+                public Address GetAddressWithPrefix(string prefix)
+                {
+                    var pairs = Extension.Where(t => t.Key.StartsWith(prefix));
+                    var jo = new JObject();
+                    foreach (var (key, value) in pairs)
+                        jo.Add(key.Substring(prefix.Length), value);
+                    return jo.ToObject<Address>();
+                }
+
+                public Address RegistrationAddress => GetAddressWithPrefix("registration");
+                public Address LivingAddress => GetAddressWithPrefix("living");
+            }
+
+            public Question3Item Question3 { get; set; }
+            public IEnumerable<Question24Item> Question24 { get; set; }
+            public Question25Item Question25 { get; set; }
+            public Question26Item Question26 { get; set; }
+            public Question28Item Question28 { get; set; }
+        }
+
+        public class FormEntity
+        {
+            public Guid Id { get; set; }
+            public string Name { get; set; }
+            [JsonProperty("__typename")]
+            public string Typename { get; set; }
+        }
+
+        public class Address
+        {
+            public FormEntity Country { get; set; }
+            public string Index { get; set; }
+            public string Region { get; set; }
+            public string Subregion { get; set; }
+            public string City { get; set; }
+            public string Street { get; set; }
+            public string House { get; set; }
+            public string Corpus { get; set; }
+            public string Flat { get; set; }
         }
     }
 }

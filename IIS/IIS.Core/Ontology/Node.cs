@@ -139,12 +139,14 @@ namespace IIS.Core.Ontology
 
             if (embed.IsAttributeType && targets.Any(e => e is Node))
                 throw new ArgumentException($"Unable to set Node value to attribute {Type.Name}.{embed.Name}");
-            if (embed.IsEntityType && targets.Any(e => !(e is Entity)))
-                throw new ArgumentException($"Unable to set non-Entity value to attribute {Type.Name}.{embed.Name}");
+            if (embed.IsEntityType && targets.Any(e => !(e is Entity || e is Guid)))
+                throw new ArgumentException($"Unable to set non-Entity and non-Guid value to attribute {Type.Name}.{embed.Name}");
 
             var targetNodes = embed.IsAttributeType
                 ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.AttributeType, t))
-                : targets.Cast<Node>();
+                : targets.Select(t => t is Guid guid
+                    ? new Entity(guid, embed.EntityType) // Convert guids to node instances
+                    : t).Cast<Node>();
             var newRelations = targetNodes.Select(n => new Relation(Guid.NewGuid(), embed) {Target = n});
 
             foreach (var r in existingRelations)

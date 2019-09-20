@@ -127,8 +127,9 @@ namespace IIS.Core.Ontology.EntityFramework
 
         Context.Node MapEntity(Entity entity)
         {
-            var existing = _context.Nodes.Local.Single(e => e.Id == entity.Id);
-            return existing;
+            return _context.Nodes.Local.SingleOrDefault(e => e.Id == entity.Id)
+                   ?? _context.Nodes.Single(e => e.Id == entity.Id);
+
         }
 
         Context.Relation MapRelation(Relation relation)
