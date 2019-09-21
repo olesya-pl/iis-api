@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Тор Secret",
+        "code": "1"
+    },
+    {
+        "name": "Secret",
+        "code": "2"
+    },
+    {
+        "name": "Confidential",
+        "code": "3"
+    },
+    {
+        "name": "Restricted",
+        "code": "4"
+    }
+]

@@ -13,6 +13,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var code = ctx.CreateBuilder().WithName("Code").WithTitle("Код").IsAttribute().HasValueOf(ScalarType.String);
             var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Податковий ідентифікатор").IsAttribute().HasValueOf(ScalarType.String);
             var number = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.Integer);
+            var count = ctx.CreateBuilder().WithName("Count").WithTitle("Кількість").IsAttribute().HasValueOf(ScalarType.Integer);
             var firstName = ctx.CreateBuilder().WithName("FirstName").WithTitle("Ім’я").IsAttribute().HasValueOf(ScalarType.String);
             var secondName = ctx.CreateBuilder().WithName("SecondName").WithTitle("Прізвище").IsAttribute().HasValueOf(ScalarType.String);
             var fatherName = ctx.CreateBuilder().WithName("FatherName").WithTitle("По батькові").IsAttribute().HasValueOf(ScalarType.String);
@@ -44,6 +45,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("PhoneSign")
                     .WithTitle("Телефон")
                     .Is(sign)
+                    .IsAbstraction()
                 ;
             var cellPhoneSign = ctx.CreateBuilder().IsEntity()
                     .WithName("CellPhoneSign")
@@ -104,6 +106,10 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(code)
                     .HasOptional(name)
                 ;
+            var abstractAccessLevel = ctx.CreateEnum("AbstractAccessLevel")
+                    .WithTitle("Рівень доступу")
+                    .IsAbstraction()
+                ;
             var tag = ctx.CreateEnum("Tag")
                     .WithTitle("Тег")
                     .IsAbstraction()
@@ -111,6 +117,14 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var accessLevel = ctx.CreateEnum("AccessLevel") // seeded
                     .WithTitle("Рівень доступу")
                     .HasOptional(number)
+                    .Is(abstractAccessLevel)
+                ;
+            var ussrAccessLevel = ctx.CreateEnum("UssrAccessLevel") // seeded
+                    .WithTitle("Рівень доступу СРСР")
+                    .Is(abstractAccessLevel)
+                ;
+            var natoAccessLevel = ctx.CreateEnum("NatoAccessLevel")
+                    .WithTitle("Рівень доступу НАТО")
                 ;
             var applyToAccessLevel = ctx.CreateEnum("ApplyToAccessLevel") // seeded
                     .WithTitle("Форма, на яку подається")
@@ -177,6 +191,87 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(passport)
                 ;
 
+            var license = ctx.CreateBuilder().IsEntity()
+                    .WithName("License")
+                    .WithTitle("Ліцензія")
+                    .HasOptional(number, "LicenseNumber", title: "Номер ліцензіі")
+                    .HasOptional(number, "ApprovalNumber", title: "Номер рішення")
+                    .HasOptional(attachment, "Scan", title: "Скан ліцензії")
+                    .HasOptional(text, "ActivityType", title: "Вид діяльності")
+                    .HasOptional(dateRange, "ValidRange", title: "Термін дії")
+                ;
+
+            // organization tabs
+            var listOfPositions = ctx.CreateBuilder().IsEntity()
+                    .WithName("ListOfPositions")
+                    .WithTitle("Штат")
+                    .HasMultiple(text, "Position", title: "Посада")
+                    .HasOptional(attachment, "OriginalDocument", title: "Оригінал документа")
+                ;
+
+            var mcci = ctx.CreateBuilder().IsEntity()
+                    .WithName("Mcci")
+                    .WithTitle("МНСІ")
+                    .HasOptional(abstractAccessLevel, "Category", title: "Категорія")
+                    .HasOptional(count)
+                ;
+
+            var mciNato = ctx.CreateBuilder().IsEntity()
+                    .WithName("MciNato")
+                    .WithTitle("МНІ НАТО")
+                    .HasOptional(natoAccessLevel, "Category", title: "Категорія")
+                    .HasOptional(count)
+                ;
+
+            var mcciSpecialCommunications = ctx.CreateBuilder().IsEntity()
+                    .WithName("McciSpecialCommunications")
+                    .WithTitle("МНСІ органів спецзв’язку")
+                    .HasOptional(accessLevel, "Category", title: "Категорія")
+                    .HasOptional(count)
+                ;
+
+            var srddw = ctx.CreateBuilder().IsEntity()
+                    .WithName("Srddw")
+                    .WithTitle("НДДКР")
+                    .HasOptional(text, "CypherName", title: "Шифр роботи")
+                    .HasOptional(text, "FullName", title: "Повна назва роботи")
+                    .HasOptional(text, "WorkBasis", title: "Підстава для виконання роботи")
+                    .HasOptional(text, "Customer", title: "Замовник роботи")
+                    .HasOptional("Organization", "Contractor",
+                        EmptyRelationMeta(),
+                        title: "Виконавець роботи")
+                    .HasMultiple("Organization", "CoContractor",
+                        EmptyRelationMeta(),
+                        title: "Співвиконавець (співвиконавці)")
+                    .HasOptional(accessLevel, "SecretLevel", title: "Ступінь секретності роботи")
+                    .HasOptional(date, "StartDate", title: "Дата початку роботи")
+                    .HasOptional(date, "EndDate", title: "Дата завершення роботи")
+                    .HasOptional(attachment, "PssActivitiesPlan", title: "План заходів ОДТ по НДДКР")
+                    .HasMultiple("Person", "Accessors",
+                        EmptyRelationMeta(),
+                        title: "Список осіб, допущених до роботи")
+                    .HasOptional(ctx, b =>
+                        b.WithName("State").WithTitle("Стан").IsAttribute().HasValueOf(ScalarType.Boolean))
+                    .HasOptional(ctx, b =>
+                        b.IsEntity().WithName("Stage").WithTitle("Етапи НДДКР")
+                            .HasOptional(name)
+                            .HasOptional(dateRange))
+                    .HasOptional("Stage", "CurrentStage",
+                        EmptyRelationMeta(),
+                        title: "Поточний етап")
+                ;
+
+            var operationalData = ctx.CreateBuilder().IsEntity()
+                    .WithName("OperationalData")
+                    .WithTitle("Оперативні дані")
+                    .HasOptional(number)
+                    .HasOptional(date)
+                    .HasOptional(text, "Source", title: "Джерело")
+                    .HasOptional(text, "Content", title: "Зміст")
+                    .HasOptional(text, "Comment", title: "Примітка")
+                    .HasOptional(attachment)
+                ;
+
             // Organization
             var organization = ctx.CreateBuilder()
                     .WithName("Organization")
@@ -208,8 +303,12 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         CreateInversed("ChildOrganizations", "Філії", true),
                         "Відомча підпорядкованість")
                     // ... next tabs
-                    .HasOptional("ListOfPositions")
-                    .HasMultiple("License")
+                    .HasOptional(listOfPositions)
+                    .HasMultiple(license)
+                    .HasMultiple(mcci)
+                    .HasMultiple(mciNato)
+                    .HasMultiple(mcciSpecialCommunications)
+                    .HasMultiple(srddw)
                 ;
 
 
@@ -282,25 +381,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(organization, "SBU", EmptyRelationMeta()) // restrictions?
                     .HasOptional(attachment, "Scan", title: "Скан спецдозволу")
                     .HasOptional(attachment, "ScanOfAct", title: "Акт перевірки")
-                ;
-
-            var license = ctx.CreateBuilder().IsEntity()
-                    .WithName("License")
-                    .WithTitle("Ліцензія")
-                    .HasOptional(number, "LicenseNumber", title: "Номер ліцензіі")
-                    .HasOptional(number, "ApprovalNumber", title: "Номер рішення")
-                    .HasOptional(attachment, "Scan", title: "Скан ліцензії")
-                    .HasOptional(text, "ActivityType", title: "Вид діяльності")
-                    .HasOptional(dateRange, "ValidRange", title: "Термін дії")
-                ;
-
-            // organization tabs
-
-            var listOfPositions = ctx.CreateBuilder().IsEntity()
-                    .WithName("ListOfPositions")
-                    .WithTitle("Штат")
-                    .HasMultiple(text, "Position", title: "Посада")
-                    .HasOptional(attachment, "OriginalDocument", title: "Оригінал документа")
                 ;
 
 
