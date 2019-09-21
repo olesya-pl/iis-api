@@ -118,6 +118,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         {
             async Task assignAddress(string propertyName, Address address)
             {
+                if (address == null) return;
                 var type = person.GetRelationType(propertyName).EntityType;
                 var node = new Entity(Guid.NewGuid(), type);
                 node.SetProperty("zipCode", address.Index);
@@ -147,6 +148,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var ontology = await _ontologyProvider.GetOntologyAsync();
             async Task assignSigns(string propertyName, IEnumerable<SignEntity> signs)
             {
+                if (signs == null) return;
                 var type = person.GetRelationType(propertyName).EntityType;
                 var nodes = new List<Entity>();
                 foreach (var sign in signs)
@@ -178,8 +180,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var item = form.Question26;
             if (item == null) throw new ArgumentException("Question 26 was not found");
             await assignSigns("phoneSign", item.Phones);
-            await assignSigns("emailSign", item.Emails);
-            await assignSigns("socialNetworkSign", item.Accounts);
+            await assignSigns("emailSign", item.EmailSign);
+            await assignSigns("socialNetworkSign", item.SocialNetworkSign);
         }
 
         private async Task Process28(Entity person, Form5 form)
@@ -214,8 +216,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             public class Question26Item
             {
                 public IEnumerable<SignEntity> Phones { get; set; }
-                public IEnumerable<SignEntity> Emails { get; set; }
-                public IEnumerable<SignEntity> Accounts { get; set; }
+                public IEnumerable<SignEntity> EmailSign { get; set; }
+                public IEnumerable<SignEntity> SocialNetworkSign { get; set; }
             }
 
             public class Question28Item
