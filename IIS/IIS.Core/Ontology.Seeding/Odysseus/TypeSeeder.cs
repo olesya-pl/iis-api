@@ -23,6 +23,13 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var website = ctx.CreateBuilder().WithName("Website").WithTitle("Офіційний сайт").IsAttribute().HasValueOf(ScalarType.String);
             var text = ctx.CreateBuilder().WithName("Text").WithTitle("Текст").IsAttribute().HasValueOf(ScalarType.String);
 
+            var dateRange = ctx.CreateBuilder().IsEntity()
+                    .WithName("DateRange")
+                    .WithTitle("Проміжок часу")
+                    .HasOptional(date, "StartDate", title: "Початок")
+                    .HasOptional(date, "EndDate", title: "Кінець")
+                ;
+
 
             // Signs
             var value = ctx.CreateBuilder().WithName("Value").WithTitle("Значення").IsAttribute().HasValueOf(ScalarType.String);
@@ -200,6 +207,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional("Organization", "HeadOrganization",
                         CreateInversed("ChildOrganizations", "Філії", true),
                         "Відомча підпорядкованість")
+                    // ... next tabs
+                    .HasOptional("ListOfPositions")
+                    .HasMultiple("License")
                 ;
 
 
@@ -270,7 +280,29 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(accessLevel)
                     .HasOptional(specialPermitStatus) // computed?
                     .HasOptional(organization, "SBU", EmptyRelationMeta()) // restrictions?
+                    .HasOptional(attachment, "Scan", title: "Скан спецдозволу")
+                    .HasOptional(attachment, "ScanOfAct", title: "Акт перевірки")
                 ;
+
+            var license = ctx.CreateBuilder().IsEntity()
+                    .WithName("License")
+                    .WithTitle("Ліцензія")
+                    .HasOptional(number, "LicenseNumber", title: "Номер ліцензіі")
+                    .HasOptional(number, "ApprovalNumber", title: "Номер рішення")
+                    .HasOptional(attachment, "Scan", title: "Скан ліцензії")
+                    .HasOptional(text, "ActivityType", title: "Вид діяльності")
+                    .HasOptional(dateRange, "ValidRange", title: "Термін дії")
+                ;
+
+            // organization tabs
+
+            var listOfPositions = ctx.CreateBuilder().IsEntity()
+                    .WithName("ListOfPositions")
+                    .WithTitle("Штат")
+                    .HasMultiple(text, "Position", title: "Посада")
+                    .HasOptional(attachment, "OriginalDocument", title: "Оригінал документа")
+                ;
+
 
         }
 
