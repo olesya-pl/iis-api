@@ -381,6 +381,8 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(organization, "SBU", EmptyRelationMeta()) // restrictions?
                     .HasOptional(attachment, "Scan", title: "Скан спецдозволу")
                     .HasOptional(attachment, "ScanOfAct", title: "Акт перевірки")
+                    .HasMultiple("Person", "CommitteeMembers", title: "Члени комісії")
+                    .HasOptional("Person", "CommitteeHead", title: "Голова комісії")
                 ;
 
 
