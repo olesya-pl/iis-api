@@ -151,7 +151,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 var nodes = new List<Entity>();
                 foreach (var sign in signs)
                 {
-                    var targetTypeName = StripPrefix("Entity", sign.Typename);
+                    var targetTypeName = StripPrefix(sign.Typename, "Entity");
                     EntityType targetType;
                     if (targetTypeName == type.Name)
                     {
