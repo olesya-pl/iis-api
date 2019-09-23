@@ -87,7 +87,7 @@ namespace IIS.Core.GraphQL.Entities
             {
                 type = TypeRepository.GetRelationPatchType(relationType);
             }
-            else if (relationType.AcceptsOperation(EntityOperation.Update))
+            else if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Update))
             {
                 type = TypeRepository.GetEntityRelationToInputType(Operation.Update, relationType.EntityType)
                     .WrapInputType(relationType);
