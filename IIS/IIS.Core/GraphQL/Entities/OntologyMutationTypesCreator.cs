@@ -82,18 +82,24 @@ namespace IIS.Core.GraphQL.Entities
         protected override void OnRelation(EmbeddingRelationType relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
+            IInputType type;
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
             {
-                var type = TypeRepository.GetRelationPatchType(relationType);
-                objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+                type = TypeRepository.GetRelationPatchType(relationType);
+            }
+            else if (relationType.AcceptsOperation(EntityOperation.Update))
+            {
+                type = TypeRepository.GetEntityRelationToInputType(Operation.Update, relationType.EntityType)
+                    .WrapInputType(relationType);
             }
             else
             {
-                var type = relationType.IsAttributeType
+                type = relationType.IsAttributeType
                     ? TypeRepository.GetInputAttributeType(relationType.AttributeType)
                     : TypeRepository.GetType<EntityRelationInputType>();
-                objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+
             }
+            objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
         }
     }
 
