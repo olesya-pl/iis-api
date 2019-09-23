@@ -157,5 +157,12 @@ namespace IIS.Core.GraphQL.Entities
             return GetOrCreate(name, () =>
                 new RelationPatchType(relationType, this));
         }
+
+        public SingularRelationPatchType GetSingularRelationPatchType(EmbeddingRelationType relationType)
+        {
+            var name = RelationPatchType.GetName(relationType);
+            return GetOrCreate(name, () =>
+                new SingularRelationPatchType(relationType, this));
+        }
     }
 }

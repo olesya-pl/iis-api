@@ -22,7 +22,7 @@ namespace IIS.Core.Ontology.Meta
 
         public static IMeta CreateMeta(this Type type)
         {
-            if (type?.Meta == null)
+            if (type?.MetaSource == null)
                 return null;
             if (type is AttributeType attributeType)
                 return attributeType.CreateMeta();
@@ -59,12 +59,12 @@ namespace IIS.Core.Ontology.Meta
         public static bool IsComputed(this EmbeddingRelationType type) => type.GetComputed() != null;
 
         public static string GetComputed(this EmbeddingRelationType type)
-            => (type.CreateMeta() as AttributeRelationMeta)?.Formula;
+            => (type.Meta as AttributeRelationMeta)?.Formula;
 
         public static bool HasInversed(this EmbeddingRelationType type) => type.GetInversed() != null;
 
         public static InversedRelationMeta GetInversed(this EmbeddingRelationType type)
-            => (type.CreateMeta() as EntityRelationMeta)?.Inversed;
+            => (type.Meta as EntityRelationMeta)?.Inversed;
 
         public static JObject Serialize(this IMeta meta) => JObject.FromObject(meta, CreateSerializer());
 
@@ -87,7 +87,7 @@ namespace IIS.Core.Ontology.Meta
             {
                 Console.Error.WriteLine($"{type.Name} - {type.GetType()}");
                 Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(type.Meta);
+                Console.Error.WriteLine(type.MetaSource);
             }
         }
 
@@ -101,8 +101,8 @@ namespace IIS.Core.Ontology.Meta
             var meta = new JObject();
             var hierarchy = type.AllParents.Concat(new[] {type});
             foreach (var t in hierarchy)
-                if (t.Meta != null)
-                    meta.Merge(t.Meta, settings);
+                if (t.MetaSource != null)
+                    meta.Merge(t.MetaSource, settings);
             return meta;
         }
     }

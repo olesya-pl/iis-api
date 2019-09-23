@@ -24,7 +24,7 @@ namespace IIS.Core.Ontology.ComputedProperties
 
         private string GetFormula(EmbeddingRelationType relationType)
         {
-            var formula = (relationType.CreateMeta() as AttributeRelationMeta)?.Formula;
+            var formula = (relationType.Meta as AttributeRelationMeta)?.Formula;
             if (formula == null)
                 throw new ArgumentException($"No formula found in computed property {relationType.Name}");
             return CleanFormula(formula);

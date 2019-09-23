@@ -11,9 +11,9 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
     public class RelationPatchType : InputObjectType
     {
         private readonly string _typeName;
-        private readonly IType _createType;
+        private readonly IInputType _createType;
+        private readonly IInputType _updateType;
         private readonly EmbeddingRelationType _relationType;
-        private readonly IType _updateType;
 
         public RelationPatchType(EmbeddingRelationType relationType, TypeRepository typeRepository)
         {
@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
                 return relationType.AttributeType.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
-                var ops = ((EntityRelationMeta) relationType.CreateMeta()).AcceptsEntityOperations;
+                var ops = relationType.GetOperations();
                 if (ops == null || ops.Length == 0)
                     return "EntityRelationInput";
                 return $"{OntologyObjectType.GetName(relationType.EntityType)}_{GetAbbreviation(ops)}";
@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             throw new ArgumentException(nameof(relationType));
         }
 
-        private static string GetAbbreviation(EntityOperation[] ops)
+        public static string GetAbbreviation(EntityOperation[] ops)
         {
             return ops == null ? null : new string(ops.Select(o => o.ToString()[0]).ToArray());
         }
@@ -72,14 +72,14 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 
         protected void SetDescription(IInputObjectTypeDescriptor d)
         {
-            var meta = _relationType.CreateMeta();
+            var meta = _relationType.Meta;
             if (_relationType.IsAttributeType)
             {
                 d.Description($"Patch array of {_typeName} attribute.");
             }
             else
             {
-                var ops = (meta as EntityRelationMeta)?.AcceptsEntityOperations;
+                var ops = _relationType.GetOperations();
                 var description = $"Patch array of {_relationType.EntityType.Name} entity type.";
                 if (ops != null)
                     description += $" Accepts entity operations: {string.Join(", ", ops)}";

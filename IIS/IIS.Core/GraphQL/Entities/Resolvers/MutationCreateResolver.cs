@@ -104,11 +104,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.Geo)
+                else if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
-                // Convert object value to string and parse
-                return new Attribute(Guid.NewGuid(), embed.AttributeType,
-                    AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum));
+                else
+                    value = AttributeType.ParseValue((string) value, embed.AttributeType.ScalarTypeEnum);
+                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
             }
 
             if (embed.IsEntityType)

@@ -60,10 +60,16 @@ namespace IIS.Core.GraphQL
             return relationType.Name;
         }
 
+        public static EntityOperation[] GetOperations(this EmbeddingRelationType relationType)
+        {
+            return ((EntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations
+                   ?? ((EntityMeta) relationType.TargetType.Meta)?.AcceptsEmbeddedOperations;
+        }
+
         public static bool AcceptsOperation(this EmbeddingRelationType relationType, EntityOperation operation)
         {
-            return ((EntityRelationMeta) relationType.CreateMeta()).AcceptsEntityOperations?.Contains(operation) ==
-                   true;
+            var ops = relationType.GetOperations();
+            return ops?.Contains(operation) == true;
         }
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d)

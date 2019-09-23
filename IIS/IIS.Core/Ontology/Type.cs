@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using IIS.Core.Ontology.Meta;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -15,7 +16,8 @@ namespace IIS.Core.Ontology
         public Guid Id { get; }
         public string Name { get; }
         public string Title { get; set; }
-        public JObject Meta { get; set; }
+        public IMeta Meta { get; set; }
+        public JObject MetaSource { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
@@ -64,5 +66,10 @@ namespace IIS.Core.Ontology
 
         public EmbeddingRelationType GetProperty(string typeName) =>
             AllProperties.SingleOrDefault(p => p.Name == typeName);
+
+        public override string ToString()
+        {
+            return $"{GetType()} '{Name}'";
+        }
     }
 }

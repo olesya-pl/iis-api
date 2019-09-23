@@ -1,0 +1,81 @@
+using System;
+using HotChocolate.Types;
+using IIS.Core.GraphQL.Entities.ObjectTypes;
+using IIS.Core.Ontology;
+using IIS.Core.Ontology.Meta;
+
+namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
+{
+    public class SingularRelationPatchType : InputObjectType
+    {
+        private readonly string _typeName;
+        private readonly IInputType _createType;
+        private readonly IInputType _updateType;
+        private readonly EmbeddingRelationType _relationType;
+
+        public SingularRelationPatchType(EmbeddingRelationType relationType, TypeRepository typeRepository)
+        {
+            _relationType = relationType;
+            _typeName = GetName(relationType);
+            if (relationType.IsAttributeType)
+            {
+                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeType);
+                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.AttributeType);
+            }
+            else if (relationType.IsEntityType)
+            {
+                _createType = relationType.AcceptsOperation(EntityOperation.Create)
+                    ? typeRepository.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)
+                    : null;
+                _updateType = relationType.AcceptsOperation(EntityOperation.Update)
+                    ? new SingularRelationPatchUpdateWrapperType(_typeName,
+                        typeRepository.GetEntityUnionInputType(Operation.Update, relationType.EntityType))
+                    : null;
+            }
+        }
+
+        protected override void Configure(IInputObjectTypeDescriptor d)
+        {
+            d.Name($"SingleInput_{_typeName}");
+            if (_createType == null)
+                d.Field("create").Type<ListType<NonNullType<EntityRelationInputType>>>();
+            else
+                d.Field("create").Type(_createType);
+            if (_updateType != null)
+                d.Field("update").Type(_updateType);
+        }
+
+        public static string GetName(EmbeddingRelationType relationType)
+        {
+            if (relationType.IsAttributeType)
+                return relationType.AttributeType.ScalarTypeEnum.ToString();
+            if (relationType.IsEntityType)
+            {
+                var ops = relationType.GetOperations();
+                if (ops == null || ops.Length == 0)
+                    return "EntityRelationInput";
+                return $"{OntologyObjectType.GetName(relationType.EntityType)}_{RelationPatchType.GetAbbreviation(ops)}";
+            }
+
+            throw new ArgumentException(nameof(relationType));
+        }
+    }
+
+    public class SingularRelationPatchUpdateWrapperType : InputObjectType
+    {
+        private readonly EntityUnionInputType _inputType;
+        private readonly string _typeName;
+
+        public SingularRelationPatchUpdateWrapperType(string typeName, EntityUnionInputType inputType)
+        {
+            _typeName = typeName;
+            _inputType = inputType;
+        }
+
+        protected override void Configure(IInputObjectTypeDescriptor descriptor)
+        {
+            descriptor.Name(_typeName + "_UpdateInput");
+            descriptor.Field("target").Type(new NonNullType(_inputType));
+        }
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using System;
+using IIS.Core.Ontology.Meta;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -7,16 +8,15 @@ namespace IIS.Core.Ontology
     {
         ITypeBuilder WithName(string name);
         ITypeBuilder WithTitle(string name);
-        ITypeBuilder WithMeta(JObject meta);
+        ITypeBuilder WithMeta(IMeta meta);
         ITypeBuilder Is(string name);
-        ITypeBuilder Is(Type type);
         ITypeBuilder Is(Action<ITypeBuilder> buildAction);
-        ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null, string title = null);
-        ITypeBuilder HasRequired(Type type);
-        ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null, string title = null);
-        ITypeBuilder HasOptional(Type type);
-        ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null, string title = null);
-        ITypeBuilder HasMultiple(Type type);
+        ITypeBuilder HasRequired(string targetName);
+        ITypeBuilder HasOptional(string targetName);
+        ITypeBuilder HasMultiple(string targetName);
+        ITypeBuilder HasRequired(Action<IRelationBuilder> relationDescriptor);
+        ITypeBuilder HasOptional(Action<IRelationBuilder> relationDescriptor);
+        ITypeBuilder HasMultiple(Action<IRelationBuilder> relationDescriptor);
         ITypeBuilder IsAbstraction();
         ITypeBuilder IsEntity();
         IAttributeBuilder IsAttribute();
@@ -26,5 +26,13 @@ namespace IIS.Core.Ontology
     public interface IAttributeBuilder : ITypeBuilder
     {
         IAttributeBuilder HasValueOf(ScalarType name);
+    }
+
+    public interface IRelationBuilder
+    {
+        IRelationBuilder WithName(string name);
+        IRelationBuilder WithTitle(string title);
+        IRelationBuilder WithMeta<T>(Action<T> descriptor) where T : RelationMetaBase, new();
+        IRelationBuilder Target(string targetName);
     }
 }

@@ -87,18 +87,23 @@ namespace IIS.Core.GraphQL.Entities
             {
                 type = TypeRepository.GetRelationPatchType(relationType);
             }
-            else if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Update))
-            {
-                type = TypeRepository.GetEntityRelationToInputType(Operation.Update, relationType.EntityType)
-                    .WrapInputType(relationType);
-            }
             else
             {
                 type = relationType.IsAttributeType
                     ? TypeRepository.GetInputAttributeType(relationType.AttributeType)
-                    : TypeRepository.GetType<EntityRelationInputType>();
-
+                    : TypeRepository.GetSingularRelationPatchType(relationType);
             }
+//            else if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Update))
+//            {
+//                type = TypeRepository.GetEntityRelationToInputType(Operation.Update, relationType.EntityType)
+//                    .WrapInputType(relationType);
+//            }
+//            else
+//            {
+//                type = relationType.IsAttributeType
+//                    ? TypeRepository.GetInputAttributeType(relationType.AttributeType)
+//                    : TypeRepository.GetType<EntityRelationInputType>();
+//            }
             objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IIS.Core.Ontology.Meta;
 using Microsoft.AspNetCore.Hosting;
 
 namespace IIS.Core.Ontology.EntityFramework
@@ -48,7 +49,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var result = new Context.Type();
             result.Name = type.Name;
             result.Title = type.Title;
-            result.Meta = type.Meta?.ToString();
+            result.Meta = type.Meta?.Serialize().ToString();
             result.IsArchived = false;
             result.IsAbstract = false;
             // Filling specific properties for different types

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using IIS.Core.Ontology.Meta;
 
 namespace IIS.Core.Ontology
 {
@@ -10,6 +11,8 @@ namespace IIS.Core.Ontology
         public bool IsInversed { get; }
 
         public override System.Type ClrType => typeof(Relation);
+
+        public RelationMetaBase EmbeddingMeta => (RelationMetaBase) base.Meta;
 
         public EmbeddingOptions EmbeddingOptions { get; }
 
@@ -27,6 +30,11 @@ namespace IIS.Core.Ontology
         {
             EmbeddingOptions = embeddingOptions;
             IsInversed = isInversed;
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType()} '{Name}' to {TargetType}";
         }
     }
 }

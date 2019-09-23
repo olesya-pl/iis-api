@@ -8,12 +8,12 @@ namespace IIS.Core.Ontology
     public class OntologyBuilder : IAttributeBuilder, ITypeBuilder
     {
         private enum Kind { Attribute, Entity, Abstraction }
-        private struct Relation
+        internal struct Relation
         {
             public string TargetName;
             public string RelationName;
             public EmbeddingOptions EmbeddingOptions;
-            public JObject Meta;
+            public IMeta Meta;
             public string Title;
         }
         private Type _builtType;
@@ -23,7 +23,7 @@ namespace IIS.Core.Ontology
         public string Name => _name;
         private string _name;
         private string _title;
-        private JObject _meta;
+        private IMeta _meta;
         private List<string> _parents = new List<string>();
         private List<Action<ITypeBuilder>> _parentBuilders = new List<Action<ITypeBuilder>>();
         private List<Relation> _childNodes = new List<Relation>();
@@ -31,6 +31,13 @@ namespace IIS.Core.Ontology
         private ScalarType _scalarType;
 
         private readonly Dictionary<string, OntologyBuilder> Builders;
+
+        private OntologyBuilder GetBuilder(string name)
+        {
+            if (!Builders.TryGetValue(name, out var targetBuilder))
+                throw new BuildException($"There is no type registered with code '{name}' while trying to build type '{_name}'");
+            return targetBuilder;
+        }
 
         public OntologyBuilder(Dictionary<string, OntologyBuilder> builders)
         {
@@ -51,7 +58,7 @@ namespace IIS.Core.Ontology
             return this;
         }
 
-        public ITypeBuilder WithMeta(JObject meta)
+        public ITypeBuilder WithMeta(IMeta meta)
         {
             _meta = meta;
             return this;
@@ -63,70 +70,46 @@ namespace IIS.Core.Ontology
             return this;
         }
 
-        public ITypeBuilder Is(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
         public ITypeBuilder Is(Action<ITypeBuilder> buildAction)
         {
             _parentBuilders.Add(buildAction);
             return this;
         }
 
-        public ITypeBuilder HasRequired(string targetName, string relationName = null, JObject meta = null, string title = null)
+        private ITypeBuilder HasRelation(EmbeddingOptions options, string targetName, string relationName = null, IMeta meta = null, string title = null)
         {
             _childNodes.Add(new Relation
             {
                 TargetName = targetName,
                 RelationName = relationName,
-                EmbeddingOptions = EmbeddingOptions.Required,
+                EmbeddingOptions = options,
                 Meta = meta,
                 Title = title
             });
             return this;
         }
 
-        public ITypeBuilder HasRequired(Type type)
+        private ITypeBuilder HasRelation(EmbeddingOptions options, Action<IRelationBuilder> relationDescriptor)
         {
-            throw new NotImplementedException();
-        }
-
-        public ITypeBuilder HasOptional(string targetName, string relationName = null, JObject meta = null, string title = null)
-        {
-            _childNodes.Add(new Relation
-            {
-                TargetName = targetName,
-                RelationName = relationName,
-                EmbeddingOptions = EmbeddingOptions.Optional,
-                Meta = meta,
-                Title = title
-            });
+            var builder = new RelationBuilder();
+            builder.WithOptions(options);
+            relationDescriptor(builder);
+            _childNodes.Add(builder.Build());
             return this;
         }
 
-        public ITypeBuilder HasOptional(Type type)
-        {
-            throw new NotImplementedException();
-        }
+        public ITypeBuilder HasRequired(string targetName) => HasRelation(EmbeddingOptions.Required, targetName);
 
-        public ITypeBuilder HasMultiple(string targetName, string relationName = null, JObject meta = null, string title = null)
-        {
-            _childNodes.Add(new Relation
-            {
-                TargetName = targetName,
-                RelationName = relationName,
-                EmbeddingOptions = EmbeddingOptions.Multiple,
-                Meta = meta,
-                Title = title
-            });
-            return this;
-        }
+        public ITypeBuilder HasOptional(string targetName) => HasRelation(EmbeddingOptions.Optional, targetName);
 
-        public ITypeBuilder HasMultiple(Type type)
-        {
-            throw new NotImplementedException();
-        }
+        public ITypeBuilder HasMultiple(string targetName) => HasRelation(EmbeddingOptions.Multiple, targetName);
+
+        public ITypeBuilder HasRequired(Action<IRelationBuilder> relationDescriptor) => HasRelation(EmbeddingOptions.Required, relationDescriptor);
+
+        public ITypeBuilder HasOptional(Action<IRelationBuilder> relationDescriptor) => HasRelation(EmbeddingOptions.Optional, relationDescriptor);
+
+        public ITypeBuilder HasMultiple(Action<IRelationBuilder> relationDescriptor) => HasRelation(EmbeddingOptions.Multiple, relationDescriptor);
+
 
         public ITypeBuilder IsAbstraction()
         {
@@ -196,43 +179,36 @@ namespace IIS.Core.Ontology
 
             foreach (var parent in _parents)
             {
-                var targetType = Builders[parent].Build();
+                var targetType = GetBuilder(parent).Build();
                 var inheritance = new InheritanceRelationType(Guid.NewGuid()) { CreatedAt = now, UpdatedAt = now };
                 inheritance.AddType(targetType);
                 type.AddType(inheritance);
             }
 
-            foreach (var child in _childNodes)
+            void buildRelation(Relation child, OntologyBuilder targetTypeBuilder)
             {
-                if (!Builders.TryGetValue(child.TargetName, out var targetBuilder))
-                    throw new BuildException($"There is no type registered with code '{child.TargetName}' while trying to build type '{_name}'");
                 var relationName = child.RelationName ?? child.TargetName;
                 relationName = relationName.ToLowerCamelcase();
+                var targetType = targetTypeBuilder.Build();
+                var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
+                    { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
+                embedding.AddType(targetType);
+                type.AddType(embedding);
+            }
+
+            foreach (var child in _childNodes)
+            {
+                var targetBuilder = GetBuilder(child.TargetName);
                 if (targetBuilder._isBuilding)
                 {
                     targetBuilder.TypeBuilt += (sender, e) =>
                     {
-                        var builder = (OntologyBuilder)sender;
-                        var targetType = builder.Build();
-                        var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-                        { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
-                        embedding.AddType(targetType);
-                        type.AddType(embedding);
-                        // todo: remove quickfix
-                        StubEntityOperations(embedding);
-                        //end
+                        buildRelation(child, (OntologyBuilder)sender);
                     };
                 }
                 else
                 {
-                    var targetType = targetBuilder.Build();
-                    var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
-                    { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
-                    embedding.AddType(targetType);
-                    type.AddType(embedding);
-                    // todo: remove quickfix
-                    StubEntityOperations(embedding);
-                    //end
+                    buildRelation(child, targetBuilder);
                 }
             }
             _isBuilding = false;
@@ -242,14 +218,48 @@ namespace IIS.Core.Ontology
             return type;
         }
 
-        private void StubEntityOperations(EmbeddingRelationType embedding)
+        internal class RelationBuilder : IRelationBuilder
         {
-            if (embedding.IsEntityType && embedding.Meta == null)
-                embedding.Meta = new EntityRelationMeta
-                    {
-                        AcceptsEntityOperations = new[] {EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete}
-                    }
-                    .Serialize();
+            private Relation _relation;
+
+            public RelationBuilder()
+            {
+                _relation = new Relation();
+            }
+
+            public IRelationBuilder WithName(string name)
+            {
+                _relation.RelationName = name;
+                return this;
+            }
+
+            public IRelationBuilder WithTitle(string title)
+            {
+                _relation.Title = title;
+                return this;
+            }
+
+            public IRelationBuilder WithMeta<T>(Action<T> descriptor) where T : RelationMetaBase, new()
+            {
+                if (_relation.Meta == null) _relation.Meta = new T();
+                if (!(_relation.Meta is T typedMeta)) throw new ArgumentException($"Type of this relation meta was already set to {_relation.Meta.GetType()}");
+                descriptor(typedMeta);
+                return this;
+            }
+
+            public IRelationBuilder Target(string targetName)
+            {
+                _relation.TargetName = targetName;
+                return this;
+            }
+
+            internal IRelationBuilder WithOptions(EmbeddingOptions options)
+            {
+                _relation.EmbeddingOptions = options;
+                return this;
+            }
+
+            internal Relation Build() => _relation;
         }
     }
 }

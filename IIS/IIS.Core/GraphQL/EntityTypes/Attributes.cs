@@ -7,6 +7,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OScalarType = IIS.Core.Ontology.ScalarType;
 
@@ -63,7 +64,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public EntityAttributeBase(EmbeddingRelationType source)
         {
             Source = source;
-            MetaObject = Source.CreateMeta();
+            MetaObject = Source.EmbeddingMeta;
         }
 
         protected EmbeddingRelationType Source { get; }
@@ -85,14 +86,30 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
-        public string Format => Source.Meta?.Value<string>("format");
+        public string Format => ((AttributeRelationMeta)MetaObject)?.Format;
 
-        [GraphQLType(typeof(JsonScalarType))] public JObject Meta => Source.Meta;
+        [GraphQLType(typeof(JsonScalarType))] public JObject Meta => Source.Meta.Serialize();
 
         [GraphQLType(typeof(JsonScalarType))]
-        public JObject FormField => (JObject) Source.Meta?["formField"]; // Source.CreateMeta().FormField;
+        public JObject FormField
+        {
+            get
+            {
+                var ff = MetaObject?.FormField;
+                if (ff == null) return null;
+                return JObject.FromObject(ff);
+            }
+        }
 
-        [GraphQLType(typeof(JsonScalarType))] public JObject Validation => (JObject) Source.Meta?["validation"];
+        [GraphQLType(typeof(JsonScalarType))] public JObject Validation
+        {
+            get
+            {
+                var validation = MetaObject?.Validation;
+                if (validation == null) return null;
+                return JObject.FromObject(validation);
+            }
+        }
     }
 
     public class EntityAttributePrimitive : EntityAttributeBase
@@ -117,7 +134,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(ListType<NonNullType<StringType>>))]
         public IEnumerable<string> AcceptsEntityOperations =>
-            MetaObject.AcceptsEntityOperations?.Select(e => e.ToString().ToLower());
+            Source.GetOperations()?.Select(e => e.ToString().ToLower());
 
         [GraphQLNonNullType]
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]

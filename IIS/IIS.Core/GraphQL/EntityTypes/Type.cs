@@ -53,7 +53,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
             var props = Source.AllProperties;
             if (sort == true)
-                props = props.OrderBy(a => a.CreateMeta().SortOrder);
+                props = props.OrderBy(a => a.EmbeddingMeta.SortOrder);
             return props.Select(CreateEntityAttribute);
         }
 

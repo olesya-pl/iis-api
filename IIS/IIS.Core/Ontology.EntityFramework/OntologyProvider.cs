@@ -56,6 +56,8 @@ namespace IIS.Core.Ontology.EntityFramework
                         var relationTypes = _types.Values.Where(e => e is RelationType);
                         // todo: refactor
                         result.AddRange(relationTypes);
+                        foreach (var type in result)
+                            type.Meta = type.CreateMeta();
 
                         _ontology = new Ontology(result);
                         _types.Clear();
@@ -150,7 +152,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private static void FillProperties(Context.Type type, Type ontologyType)
         {
             ontologyType.Title = type.Title;
-            ontologyType.Meta = type.Meta == null ? null : JObject.Parse(type.Meta);
+            ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
             //ontologyType.TypeMeta = ontologyType.CreateMeta(); // todo: remake meta creation
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;

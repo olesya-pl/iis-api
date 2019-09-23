@@ -66,13 +66,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 case EmbeddingOptions.Optional:
                 case EmbeddingOptions.Required:
-                    await UpdateSingleProperty(node, embed, value, node.GetRelation(embed));
+                    await UpdateSingleProperty(node, embed, value);
                     break;
                 case EmbeddingOptions.Multiple:
                     await UpdateMultipleProperties(node, embed, value);
                     break;
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException(nameof(embed));
             }
         }
 
@@ -93,41 +93,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     case "update":
                         foreach (var uv in list)
                         {
-                            var uvdict = (Dictionary<string, object>) uv; // RelationTo_U_Entity
-                            var relationId = InputExtensions.ParseGuid(uvdict["id"]); // this is NOT target entity id, but relation id
-                            var relation = node.GetRelation(embed, relationId);
-                            if (relation == null)
-                                throw new Exception(
-                                    $"There is no relation from {node.Type} {node.Id} to {embed.Name} of type {embed.TargetType} with id {relationId}");
-                            if (embed.IsEntityType)
-                            {
-                                if (uvdict.ContainsKey("target"))
-                                {
-                                    var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
-                                    var ontology = await _ontologyProvider.GetOntologyAsync();
-                                    var type = ontology.GetEntityType(typeName);
-                                    await UpdateEntity(type, relation.Target.Id, targetValue);
-                                }
-                                else
-                                {
-                                    // todo: look at it again and refactor
-                                    var targetId = InputExtensions.ParseGuid(uvdict["targetId"]); // just check
-                                    var targetRelation = node.GetRelation(embed, relationId);
-                                    node.RemoveNode(targetRelation);
-                                    var newRel = await _mutationCreateResolver.CreateSingleProperty(embed, uvdict);
-                                    node.AddNode(newRel);
-                                }
-                            }
-                            else if (embed.IsAttributeType)
-                            {
-                                var attrvalue = uvdict["value"];
-                                await UpdateSingleProperty(node, embed, attrvalue, relation);
-                            }
-                            else
-                            {
-                                throw new ArgumentOutOfRangeException();
-                            }
-
+                            await ApplyUpdate(node, embed, uv);
                             break;
                         }
 
@@ -150,6 +116,79 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
+        protected async Task ApplyUpdate(Node node, EmbeddingRelationType embed, object uv)
+        {
+            var uvdict = (Dictionary<string, object>) uv; // RelationTo_U_Entity
+            Relation relation;
+            if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
+            {
+                var relationId = InputExtensions.ParseGuid(uvdict["id"]); // this is NOT target entity id, but relation id
+                relation = node.GetRelation(embed, relationId);
+                if (relation == null)
+                    throw new Exception($"There is no relation from {node.Type.Name} {node.Id} to {embed.Name} of type {embed.TargetType.Name} with id {relationId}");
+            }
+            else
+            {
+                relation = node.GetRelation(embed);
+                if (relation == null)
+                    throw new Exception($"There is no relation from {node.Type.Name} {node.Id} to {embed.Name} of type {embed.TargetType.Name}");
+            }
+
+            if (embed.IsEntityType)
+            {
+                if (uvdict.ContainsKey("target"))
+                {
+                    var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
+                    var ontology = await _ontologyProvider.GetOntologyAsync();
+                    var type = ontology.GetEntityType(typeName);
+                    await UpdateEntity(type, relation.Target.Id, targetValue);
+                }
+                else // targetId only
+                {
+                    // todo: look at it again and refactor
+                    var targetId = InputExtensions.ParseGuid(uvdict["targetId"]); // just check
+//                    var targetRelation = node.GetRelation(embed, relation.Id);
+                    node.RemoveNode(relation);
+                    var newRel = await _mutationCreateResolver.CreateSingleProperty(embed, uvdict);
+                    node.AddNode(newRel);
+                }
+            }
+            else if (embed.IsAttributeType)
+            {
+                var attrvalue = uvdict["value"];
+                await UpdateSingleProperty(node, embed, attrvalue, relation);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        protected virtual async Task UpdateSingleProperty(Node node, EmbeddingRelationType embed, object value)
+        {
+            var existingRelation = node.GetRelation(embed);
+            if (value == null || embed.IsAttributeType) // skip parsing internal structure
+            {
+                await UpdateSingleProperty(node, embed, value, existingRelation);
+                return;
+            }
+            var patch = (Dictionary<string, object>) value;
+            if (patch.Count != 1)
+                throw new ArgumentException($"Expected to find exactly one element at Single Patch input '{embed.Name}'");
+            var (action, inputObject) = patch.Single();
+            switch (action)
+            {
+                case "create":
+                    await UpdateSingleProperty(node, embed, inputObject, existingRelation);
+                    break;
+                case "update":
+                    await ApplyUpdate(node, embed, inputObject);
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown single patch object property: {action}");
+            }
+        }
+
         protected virtual async Task UpdateSingleProperty(Node node, EmbeddingRelationType embed, object value,
             Relation relation)
         {
@@ -157,35 +196,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 node.RemoveNode(relation);
             if (value != null)
                 node.AddNode(await _mutationCreateResolver.CreateSingleProperty(embed, value));
-        }
-
-        protected virtual async Task<Node> CreateNode(EmbeddingRelationType embed, object value) // attribute or entity
-        {
-            if (embed.IsAttributeType)
-                return new Attribute(Guid.NewGuid(), embed.AttributeType,
-                    AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum));
-            if (embed.IsEntityType)
-            {
-                var props = (Dictionary<string, object>) value;
-                if (props.TryGetValue("targetId", out var strTargetId))
-                {
-                    var targetId = Guid.Parse((string) strTargetId);
-                    return await _ontologyService.LoadNodeOfType(targetId, embed.TargetType);
-                }
-
-                if (props.TryGetValue("target", out var dictTarget))
-                {
-                    var target = (Dictionary<string, object>) dictTarget;
-                    var (key, v) = target.Single(); // todo: throw correct exception
-                    var ontology = await _ontologyProvider.GetOntologyAsync();
-                    var type = ontology.GetEntityType(key);
-//                    return await CreateEntity(type, (Dictionary<string, object>) v);
-                }
-
-                throw new ArgumentException("Incorrect arguments for Entity creation. ");
-            }
-
-            throw new ArgumentException(nameof(embed));
         }
     }
 }
