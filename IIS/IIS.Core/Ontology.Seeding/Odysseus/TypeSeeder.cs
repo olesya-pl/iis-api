@@ -309,6 +309,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(mciNato)
                     .HasMultiple(mcciSpecialCommunications)
                     .HasMultiple(srddw)
+                    .HasOptional("SpecialPermit")
                 ;
 
 
@@ -352,6 +353,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(attachment, "Autobiography", title: "Автобіографія")
                     .HasOptional(attachment, "Form8", title: "Форма 8")
                     .HasMultiple(familyRelationInfo, "FamilyRelations", title: "Родинні зв'язки")
+                    .HasOptional("Access")
                 ;
 
 
@@ -359,8 +361,8 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var acccess = ctx.CreateBuilder().IsEntity()
                     .WithName("Access")
                     .WithTitle("Допуск")
-                    .HasOptional(person, "Person",
-                        CreateInversed("Access", "Допуск"))
+//                    .HasOptional(person, "Person",
+//                        CreateInversed("Access", "Допуск"))
                     .HasOptional(date, "IssueDate", title: "Дата видачі")
                     .HasOptional(date, "EndDate", title: "Дата завершення дії")
                     .HasOptional(accessLevel)
@@ -371,8 +373,8 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var organizationPermit = ctx.CreateBuilder().IsEntity()
                     .WithName("SpecialPermit")
                     .WithTitle("Спецдозвіл")
-                    .HasOptional(organization, "Organization",
-                        CreateInversed("SpecialPermit", "Спецдозвiл"))
+//                    .HasOptional(organization, "Organization",
+//                        CreateInversed("SpecialPermit", "Спецдозвiл"))
                     .HasOptional(code, "IssueNumber", title: "Номер спецдозволу")
                     .HasOptional(date, "IssueDate", title: "Дата видачі")
                     .HasOptional(date, "EndDate", title: "Дата завершення дії")

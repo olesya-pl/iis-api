@@ -205,7 +205,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         {
             public class Question24Item
             {
-                [JsonProperty("kinship")]
+//                [JsonProperty("kinship")]
                 public FormEntity FamilyRelationKind { get; set; }
                 public string FullName { get; set; }
                 public string DateAndPlaceOfBirth { get; set; }
