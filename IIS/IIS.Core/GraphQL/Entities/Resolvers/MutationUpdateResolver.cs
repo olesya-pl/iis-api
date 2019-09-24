@@ -162,8 +162,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         protected virtual async Task<Node> CreateNode(EmbeddingRelationType embed, object value) // attribute or entity
         {
             if (embed.IsAttributeType)
-                return new Attribute(Guid.NewGuid(), embed.AttributeType,
-                    AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum));
+                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
             if (embed.IsEntityType)
             {
                 var props = (Dictionary<string, object>) value;

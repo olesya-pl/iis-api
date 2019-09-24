@@ -120,7 +120,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Attribute = new Context.Attribute
                 {
                     Id = attribute.Id,
-                    Value = AttributeType.ValueToString(attribute.Value, default)
+                    Value = AttributeType.ValueToString(attribute.Value, ((AttributeType)attribute.Type).ScalarTypeEnum)
                 }
             };
         }

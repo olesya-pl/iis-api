@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -24,7 +26,7 @@ namespace IIS.Core.Ontology
                     case ScalarType.DateTime:
                         return typeof(DateTime);
                     case ScalarType.Geo:
-                        return typeof(JObject);
+                        return typeof(Dictionary<string, object>);
                     case ScalarType.File:
                         return typeof(Guid);
                     default:
@@ -46,7 +48,7 @@ namespace IIS.Core.Ontology
                 || value is decimal && ScalarTypeEnum == ScalarType.Decimal
                 || value is string && ScalarTypeEnum == ScalarType.String
                 || value is DateTime && ScalarTypeEnum == ScalarType.DateTime
-                || value is JObject && ScalarTypeEnum == ScalarType.Geo
+                || value is Dictionary<string, object> && ScalarTypeEnum == ScalarType.Geo
                 || value is Guid && ScalarTypeEnum == ScalarType.File;
         }
 
@@ -60,7 +62,7 @@ namespace IIS.Core.Ontology
                 case ScalarType.Integer: return int.Parse(value);
                 case ScalarType.String: return value;
                 //case ScalarType.Json: return JObject.Parse(value);
-                case ScalarType.Geo: return JObject.Parse(value);
+                case ScalarType.Geo: return JsonConvert.DeserializeObject<Dictionary<string, object>>(value);
                 case ScalarType.File: return Guid.Parse(value);
                 default: throw new NotImplementedException();
             }
@@ -68,6 +70,8 @@ namespace IIS.Core.Ontology
 
         public static string ValueToString(object value, ScalarType scalarType)
         {
+            if (scalarType == ScalarType.Geo)
+                return JsonConvert.SerializeObject((Dictionary<string, object>)value);
             return value.ToString();
         }
 
