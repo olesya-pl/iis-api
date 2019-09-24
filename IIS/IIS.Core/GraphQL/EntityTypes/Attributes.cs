@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
-        public string Format => ((AttributeRelationMeta)MetaObject)?.Format;
+        public string Format => (MetaObject as AttributeRelationMeta)?.Format;
 
         [GraphQLType(typeof(JsonScalarType))] public JObject Meta => Source.Meta.Serialize();
 
