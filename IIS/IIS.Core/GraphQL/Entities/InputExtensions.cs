@@ -2,12 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GeoJSON.Net.Converters;
+using GeoJSON.Net.Geometry;
 using HotChocolate.Execution;
 using HotChocolate.Resolvers;
 using IIS.Core.Files;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.Ontology;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.Entities
@@ -100,9 +104,17 @@ namespace IIS.Core.GraphQL.Entities
 
         public static object ProcessGeoInput(object value)
         {
-            // todo: implement validation - just json or use geo lib?
-            // seems like validation is not happening if json scalar is inside other object
-            return value;
+            try
+            {
+                var dict = (Dictionary<string, object>) value;
+                var jo = JObject.FromObject(dict);
+                JsonConvert.DeserializeObject<IGeometryObject>(jo.ToString(), new GeometryConverter());
+                return value;
+            }
+            catch (Exception e)
+            {
+                throw new QueryException("Unable to convert input json to GeoJson: " + e.Message);
+            }
         }
     }
 }
