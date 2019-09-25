@@ -173,6 +173,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var (action, inputObject) = patch.Single();
             switch (action)
             {
+                case "target":
+                case "targetId":
+                    await UpdateSingleProperty(node, embed, patch, existingRelation); // pass full object to CreateSingleProperty
+                    break;
                 case "create":
                     await UpdateSingleProperty(node, embed, inputObject, existingRelation);
                     break;
