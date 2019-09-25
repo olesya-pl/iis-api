@@ -422,7 +422,8 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             var ctxNode = _context.Nodes.Local.Single(n => n.Id == node.Id);
 
-            foreach (var relation in ctxNode.IncomingRelations)
+            var incomingRelations = _context.Relations.Where(r => r.TargetNodeId == node.Id && r.Node.IsArchived);
+            foreach (var relation in incomingRelations)
                 Archive(relation.Node);
 
             Archive(ctxNode);
