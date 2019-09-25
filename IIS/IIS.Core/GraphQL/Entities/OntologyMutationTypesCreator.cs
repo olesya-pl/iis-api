@@ -84,15 +84,13 @@ namespace IIS.Core.GraphQL.Entities
         {
             IInputType type;
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
-            {
                 type = TypeRepository.GetRelationPatchType(relationType);
-            }
+            else if (relationType.IsAttributeType)
+                type = TypeRepository.GetInputAttributeType(relationType.AttributeType);
+            else if (relationType.AcceptsOperation(EntityOperation.Update))
+                type = TypeRepository.GetSingularRelationPatchType(relationType);
             else
-            {
-                type = relationType.IsAttributeType
-                    ? TypeRepository.GetInputAttributeType(relationType.AttributeType)
-                    : TypeRepository.GetSingularRelationPatchType(relationType);
-            }
+                type = TypeRepository.GetType<EntityRelationInputType>();
 //            else if (relationType.IsEntityType && relationType.AcceptsOperation(EntityOperation.Update))
 //            {
 //                type = TypeRepository.GetEntityRelationToInputType(Operation.Update, relationType.EntityType)

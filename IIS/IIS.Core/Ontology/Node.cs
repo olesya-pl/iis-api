@@ -47,11 +47,17 @@ namespace IIS.Core.Ontology
             throw new ArgumentException($"Relation with name {relationTypeName} does not exist");
 
         // Only single relations
-        public Relation GetRelation(RelationType relationType) => GetRelations(relationType).SingleOrDefault();
+        public Relation GetRelation(EmbeddingRelationType relationType) =>
+            GetRelations(relationType).SingleOrDefault()
+            ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name}");
+
+        public Relation GetRelationOrDefault(EmbeddingRelationType relationType) =>
+            GetRelations(relationType).SingleOrDefault();
 
         // For single or multiple relations
-        public Relation GetRelation(RelationType relationType, Guid targetId) =>
-            GetRelations(relationType).SingleOrDefault(r => r.Id == targetId);
+        public Relation GetRelation(EmbeddingRelationType relationType, Guid relationId) =>
+            GetRelations(relationType).SingleOrDefault(r => r.Id == relationId)
+            ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name} with id {relationId}");
 
         public override string ToString()
         {

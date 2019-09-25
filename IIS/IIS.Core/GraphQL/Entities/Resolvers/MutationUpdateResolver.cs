@@ -46,6 +46,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private async Task<Entity> UpdateEntity(EntityType type, Guid id, Dictionary<string, object> properties)
         {
             var node = (Entity) await _ontologyService.LoadNodesAsync(id, null);
+            if (node == null)
+                throw new ArgumentException($"There is no entity with id {id}");
             if (!type.IsAssignableFrom(node.Type)) // no direct checking of types - we can update child as its base type
                 throw new ArgumentException($"Type {node.Type.Name} can not be updated as {type.Name}");
 
@@ -102,11 +104,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                         foreach (var dv in list)
                         {
                             var id = InputExtensions.ParseGuid(dv);
-                            // todo: maybe we should delete only relation? Or relation with entity?
-                            //await _mutationDeleteResolver.DeleteEntity(id, embed.TargetType.Name);
                             var relation = node.GetRelation(embed, id);
                             node.RemoveNode(relation);
-                            // todo: real deletion of entity/attribute is not implemented currently
                         }
 
                         break;
@@ -124,14 +123,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 var relationId = InputExtensions.ParseGuid(uvdict["id"]); // this is NOT target entity id, but relation id
                 relation = node.GetRelation(embed, relationId);
-                if (relation == null)
-                    throw new Exception($"There is no relation from {node.Type.Name} {node.Id} to {embed.Name} of type {embed.TargetType.Name} with id {relationId}");
             }
             else
             {
                 relation = node.GetRelation(embed);
-                if (relation == null)
-                    throw new Exception($"There is no relation from {node.Type.Name} {node.Id} to {embed.Name} of type {embed.TargetType.Name}");
             }
 
             if (embed.IsEntityType)
@@ -166,7 +161,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         protected virtual async Task UpdateSingleProperty(Node node, EmbeddingRelationType embed, object value)
         {
-            var existingRelation = node.GetRelation(embed);
+            var existingRelation = node.GetRelationOrDefault(embed);
             if (value == null || embed.IsAttributeType) // skip parsing internal structure
             {
                 await UpdateSingleProperty(node, embed, value, existingRelation);

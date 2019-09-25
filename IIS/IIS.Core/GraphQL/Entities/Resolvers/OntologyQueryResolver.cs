@@ -67,7 +67,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     .LoadAsync(Tuple.Create(parent.Id, dependencies), default);
                 return computedResolver.Resolve(relationType, result);
             }
-            var relation = node.GetRelation(relationType);
+            var relation = node.GetRelationOrDefault(relationType);
             if (relation == null) return null;
             return await ResolveAttributeValue(ctx, relation.AttributeTarget);
         }
