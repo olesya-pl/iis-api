@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         {
             d.Name($"SingleInput_{_typeName}");
             if (_createType == null)
-                d.Field("create").Type<ListType<NonNullType<EntityRelationInputType>>>();
+                d.Field("create").Type<EntityRelationInputType>();
             else
                 d.Field("create").Type(_createType);
             if (_updateType != null)

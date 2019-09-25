@@ -132,9 +132,10 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         public override string Type => "relation";
 
-        [GraphQLType(typeof(ListType<NonNullType<StringType>>))]
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<StringType>>>))]
         public IEnumerable<string> AcceptsEntityOperations =>
-            Source.GetOperations()?.Select(e => e.ToString().ToLower());
+            (Source.GetOperations()?? new EntityOperation[]{})
+                .Select(e => e.ToString().ToLower());
 
         [GraphQLNonNullType]
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]

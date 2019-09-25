@@ -62,8 +62,10 @@ namespace IIS.Core.GraphQL
 
         public static EntityOperation[] GetOperations(this EmbeddingRelationType relationType)
         {
-            return ((EntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations
-                   ?? ((EntityMeta) relationType.TargetType.Meta)?.AcceptsEmbeddedOperations;
+            return ((EntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations // check relation meta
+                   ?? ((EntityMeta) relationType.TargetType.Meta)?.AcceptsEmbeddedOperations // check target meta
+                   ?? relationType.TargetType.AllParents.Reverse().Select(t => t.Meta as EntityMeta) // check target parents meta
+                       .FirstOrDefault()?.AcceptsEmbeddedOperations;
         }
 
         public static bool AcceptsOperation(this EmbeddingRelationType relationType, EntityOperation operation)
