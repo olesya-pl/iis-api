@@ -167,6 +167,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var sanctionAccessConclusion = ctx.CreateEnum("SanctionAccessConclusion") // seeded
                 .WithTitle("Заходи реагування")
                 ;
+            var operationalDataSource = ctx.CreateEnum("OperationalDataSource") // seeded
+                    .WithTitle("Джерела оперативної інформації")
+                ;
             var country = ctx.CreateEnum("Country") // seeded
                 .WithTitle("Країна")
                 ;
@@ -318,7 +321,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .AcceptEmbeddedOperations()
                     .HasOptional(number)
                     .HasOptional(date)
-                    .HasOptional(text, "Source",  "Джерело")
+                    .HasOptional(operationalDataSource, "Source",  "Джерело")
                     .HasOptional(text, "Content",  "Зміст")
                     .HasOptional(text, "Comment",  "Примітка")
                     .HasOptional(attachment)
@@ -388,6 +391,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(r => r
                         .Target("SpecialPermit")
                         .WithFormFieldType("form"))
+                    .HasMultiple(operationalData)
                 ;
 
 
@@ -442,6 +446,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(attachment, "Form8",  "Форма 8")
                     .HasMultiple(familyRelationInfo, "FamilyRelations",  "Родинні зв'язки")
                     .HasOptional("Access")
+                    .HasMultiple(operationalData)
                     .HasOptional("PersonProfile")
                 ;
 

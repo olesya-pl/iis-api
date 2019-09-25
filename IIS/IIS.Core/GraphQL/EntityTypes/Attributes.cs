@@ -97,7 +97,9 @@ namespace IIS.Core.GraphQL.EntityTypes
             {
                 var ff = MetaObject?.FormField;
                 if (ff == null) return null;
-                return JObject.FromObject(ff);
+                var jo = JObject.FromObject(ff);
+                jo.KeysToLowerCamelcase();
+                return jo;
             }
         }
 
@@ -107,7 +109,9 @@ namespace IIS.Core.GraphQL.EntityTypes
             {
                 var validation = MetaObject?.Validation;
                 if (validation == null) return null;
-                return JObject.FromObject(validation);
+                var jo = JObject.FromObject(validation);
+                jo.KeysToLowerCamelcase();
+                return jo;
             }
         }
     }
