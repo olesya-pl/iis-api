@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using IIS.Core.Ontology.Meta;
 using Newtonsoft.Json.Linq;
 
@@ -7,6 +9,8 @@ namespace IIS.Core.Ontology
 {
     public class OntologyBuilder : IAttributeBuilder, ITypeBuilder
     {
+        private static readonly Regex NameRegex = new Regex("^[_a-zA-Z][_a-zA-Z0-9]*$");
+
         private enum Kind { Attribute, Entity, Abstraction }
         internal struct Relation
         {
@@ -48,6 +52,8 @@ namespace IIS.Core.Ontology
         public ITypeBuilder WithName(string name)
         {
             _name = name;
+            if (Builders.ContainsKey(name))
+                throw new BuildException($"Builder with name '{name}' is already created");
             Builders.Add(name, this);
             return this;
         }
@@ -143,6 +149,8 @@ namespace IIS.Core.Ontology
             _isBuilding = true;
             if (_name == null)
                 throw new BuildException("Cannot build type without name");
+            if (!NameRegex.IsMatch(_name))
+                throw new BuildException($"Type name '{_name}' is not valid");
 
             var type = default(Type);
             if (_kind == Kind.Attribute)
@@ -157,7 +165,7 @@ namespace IIS.Core.Ontology
             {
                 type = new EntityType(Guid.NewGuid(), _name, false);
             }
-            else throw new BuildException("Type kind was not specified");
+            else throw new BuildException($"Type '{_name}' kind was not specified");
 
             type.Title = _title ?? _name;
             type.Meta = _meta;
@@ -185,11 +193,16 @@ namespace IIS.Core.Ontology
                 type.AddType(inheritance);
             }
 
+            var createdProperties = new HashSet<string>();
             void buildRelation(Relation child, OntologyBuilder targetTypeBuilder)
             {
                 var relationName = child.RelationName ?? child.TargetName;
                 relationName = relationName.ToLowerCamelcase();
                 var targetType = targetTypeBuilder.Build();
+                if (!NameRegex.IsMatch(relationName))
+                    throw new BuildException($"Relation name '{relationName}' is not valid");
+                if (!createdProperties.Add(relationName))
+                    throw new BuildException($"Type {_name} has duplicate property '{relationName}'");
                 var embedding = new EmbeddingRelationType(Guid.NewGuid(), relationName, child.EmbeddingOptions)
                     { Meta = child.Meta, CreatedAt = now, UpdatedAt = now, Title = child.Title };
                 embedding.AddType(targetType);

@@ -5,11 +5,10 @@ using IIS.Core.Ontology.Meta;
 
 namespace IIS.Core.Ontology.Seeding.Odysseus
 {
-    public class TypeSeeder : IOntologyProvider
+    public partial class TypeSeeder : IOntologyProvider
     {
         public void CreateBuilders(OntologyBuildContext ctx)
         {
-            // Attributes - title and meta omitted
             var name = ctx.CreateBuilder().WithName("Name").WithTitle("Назва").IsAttribute().HasValueOf(ScalarType.String);
             var code = ctx.CreateBuilder().WithName("Code").WithTitle("Код").IsAttribute().HasValueOf(ScalarType.String);
             var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Податковий ідентифікатор").IsAttribute().HasValueOf(ScalarType.String);
@@ -443,6 +442,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(attachment, "Form8",  "Форма 8")
                     .HasMultiple(familyRelationInfo, "FamilyRelations",  "Родинні зв'язки")
                     .HasOptional("Access")
+                    .HasOptional("PersonProfile")
                 ;
 
 
@@ -483,6 +483,14 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithName( "CommitteeHead")
                         .WithTitle("Голова комісії"))
                 ;
+
+
+            var personProfile = ctx.CreateBuilder().IsEntity()
+                    .WithName("PersonProfile")
+                    .WithTitle("Профайл людини")
+                ;
+
+            CreatePersonProfile(ctx, personProfile);
         }
 
         public Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
