@@ -14,8 +14,8 @@ build_job:
     
   tags:
     - ci
-  only: 
-    - master
+#  only: 
+#    - master
     
 .deploy:
   stage: deploy
@@ -26,8 +26,8 @@ build_job:
     - cd /home/gitlab-runner/ansible
   tags:
     - ansible
-  only: 
-    - master  
+#  only: 
+#    - master  
     
 deploy_dev:
   extends: .deploy
