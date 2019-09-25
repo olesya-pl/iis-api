@@ -107,7 +107,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 else if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
-                    value = AttributeType.ParseValue((string) value, embed.AttributeType.ScalarTypeEnum);
+                    // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
+                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum);
                 return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
             }
 
