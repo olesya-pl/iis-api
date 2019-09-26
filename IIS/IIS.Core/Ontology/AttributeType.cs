@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using IIS.Core.Lib;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
 {
@@ -62,7 +62,7 @@ namespace IIS.Core.Ontology
                 case ScalarType.Integer: return int.Parse(value);
                 case ScalarType.String: return value;
                 //case ScalarType.Json: return JObject.Parse(value);
-                case ScalarType.Geo: return JsonConvert.DeserializeObject<Dictionary<string, object>>(value);
+                case ScalarType.Geo: return JsonConvert.DeserializeObject<Dictionary<string, object>>(value, new DictionaryConverter());
                 case ScalarType.File: return Guid.Parse(value);
                 default: throw new NotImplementedException();
             }
