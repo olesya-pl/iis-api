@@ -39,3 +39,8 @@ deploy_od:
   stage: deploy
   script:
     - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev artifacts_path=$CI_PROJECT_DIR"
+    
+  environment:
+    name: stage
+    url: http://192.168.88.82
+
