@@ -34,3 +34,7 @@ deploy_dev:
   stage: deploy
   script:
     - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=envtest artifacts_path=$CI_PROJECT_DIR"
+  environment:
+    name: stage
+    url: http://192.168.88.82
+
