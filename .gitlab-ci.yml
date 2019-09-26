@@ -37,4 +37,4 @@ deploy_dev:
   environment:
     name: stage
     url: http://192.168.88.82
-
+  when: manual
