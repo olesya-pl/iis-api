@@ -252,6 +252,12 @@ namespace IIS.Core.Ontology
                 return this;
             }
 
+            public IRelationBuilder WithMeta(RelationMetaBase meta)
+            {
+                _relation.Meta = meta;
+                return this;
+            }
+
             public IRelationBuilder WithMeta<T>(Action<T> descriptor) where T : RelationMetaBase, new()
             {
                 if (_relation.Meta == null) _relation.Meta = new T();

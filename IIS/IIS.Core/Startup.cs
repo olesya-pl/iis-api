@@ -53,7 +53,7 @@ namespace IIS.Core
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<Ontology.Seeding.Odysseus.TypeSeeder>();
-//            services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>(); // Legacy provider is not compatible with new builder
+            services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();

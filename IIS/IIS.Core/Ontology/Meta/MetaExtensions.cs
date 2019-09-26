@@ -13,6 +13,13 @@ namespace IIS.Core.Ontology.Meta
             {MissingMemberHandling = MissingMemberHandling.Error, NullValueHandling = NullValueHandling.Ignore};
         public static JsonSerializer CreateSerializer() => JsonSerializer.Create(SerializerSettings);
 
+        public static TMeta CreateMeta<TMeta>(JObject jo, JsonConverter typeConverter) where TMeta : IMeta
+        {
+            var js = CreateSerializer();
+            js.Converters.Add(typeConverter);
+            return jo.ToObject<TMeta>(js);
+        }
+
         public static TMeta CreateMeta<TMeta>(Type type, JsonConverter typeConverter) where TMeta : IMeta
         {
             var js = CreateSerializer();
@@ -67,29 +74,6 @@ namespace IIS.Core.Ontology.Meta
             => (type.Meta as EntityRelationMeta)?.Inversed;
 
         public static JObject Serialize(this IMeta meta) => JObject.FromObject(meta, CreateSerializer());
-
-        // ugly quick solution to validate existing ontology meta
-        public static void ValidateMeta(this IEnumerable<Type> ontologyTypes)
-        {
-            foreach (var type in ontologyTypes)
-                ValidateMeta(type);
-        }
-
-        public static void ValidateMeta(Type type)
-        {
-            try
-            {
-                var meta = type.CreateMeta();
-                foreach (var node in type.RelatedTypes)
-                    meta = node.CreateMeta();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"{type.Name} - {type.GetType()}");
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(type.MetaSource);
-            }
-        }
 
         public static JObject GetFullMeta(this Type type)
         {

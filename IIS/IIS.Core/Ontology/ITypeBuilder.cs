@@ -32,6 +32,7 @@ namespace IIS.Core.Ontology
     {
         IRelationBuilder WithName(string name);
         IRelationBuilder WithTitle(string title);
+        IRelationBuilder WithMeta(RelationMetaBase meta);
         IRelationBuilder WithMeta<T>(Action<T> descriptor) where T : RelationMetaBase, new();
         IRelationBuilder Target(string targetName);
     }
