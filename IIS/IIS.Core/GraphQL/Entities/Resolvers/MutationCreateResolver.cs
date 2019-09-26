@@ -43,6 +43,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public async Task<Entity> CreateEntity(EntityType type, Dictionary<string, object> properties)
         {
+            if (properties == null)
+                throw new ArgumentException($"{type.Name} creation ex nihilo is allowed only to God.");
             var node = new Entity(Guid.NewGuid(), type);
             foreach (var (key, value) in properties)
             {
