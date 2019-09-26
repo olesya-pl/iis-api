@@ -67,7 +67,7 @@ namespace IIS.Core.Ontology.Seeding
             builder.WithMeta<AttributeRelationMeta>(m => { m.Formula = formula; });
 
         public static IRelationBuilder WithFormFieldType(this IRelationBuilder builder, string formFieldType) =>
-            builder.WithMeta<AttributeRelationMeta>(m => m.FormField = new FormField {Type = formFieldType});
+            builder.WithMeta<EntityRelationMeta>(m => m.FormField = new FormField {Type = formFieldType});
 
 
         public static IRelationBuilder HasInversed(this IRelationBuilder builder, Action<InversedRelationBuilder> inversedDescriptor)

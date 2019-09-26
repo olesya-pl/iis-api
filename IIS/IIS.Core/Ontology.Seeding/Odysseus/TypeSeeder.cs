@@ -38,7 +38,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithName("EndDate")
                         .WithTitle("Кінець")
                     )
-                ;
+                ; // all incoming relations - form-field type: "dateRange"
 
 
             // Signs
@@ -224,18 +224,36 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(number, "ApprovalNumber",  "Номер рішення")
                     .HasOptional(attachment, "Scan",  "Скан ліцензії")
                     .HasOptional(text, "ActivityType",  "Вид діяльності")
-                    .HasOptional(dateRange, "ValidRange",  "Термін дії")
+                    .HasOptional(r => r
+                        .Target(dateRange)
+                        .WithName("ValidRange")
+                        .WithTitle("Термін дії")
+                        .WithFormFieldType("dateRange")
+                    )
                 ;
 
             // organization tabs
+            var listOfPositionsItem = ctx.CreateBuilder().IsEntity()
+                    .WithName("ListOfPositionsItem")
+                    .AcceptEmbeddedOperations()
+                    .HasOptional(r => r
+                            .Target(text)
+                            .WithName("Position")
+                            .WithTitle("Посада")
+                    )
+                    .HasOptional(r => r
+                            .Target(number)
+                            .WithName("Count")
+                            .WithTitle("Кількість")
+                    )
+                ;
+
             var listOfPositions = ctx.CreateBuilder().IsEntity()
                     .WithName("ListOfPositions")
                     .WithTitle("Штат")
                     .AcceptEmbeddedOperations()
                     .HasMultiple(r => r
-                        .Target(text)
-                        .WithName("Position")
-                        .WithTitle("Посада")
+                        .Target(listOfPositionsItem)
 //                        .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField {Type = "table"})
                         .WithFormFieldType("table")
                     )
@@ -271,7 +289,10 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle("Етапи НДДКР")
                     .AcceptEmbeddedOperations()
                     .HasOptional(name)
-                    .HasOptional(dateRange)
+                    .HasOptional(r => r
+                        .Target(dateRange)
+                        .WithFormFieldType("dateRange")
+                    )
                 ;
 
             var srddw = ctx.CreateBuilder().IsEntity()
@@ -319,7 +340,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("OperationalData")
                     .WithTitle("Оперативні дані")
                     .AcceptEmbeddedOperations()
-                    .HasOptional(number)
                     .HasOptional(date)
                     .HasOptional(operationalDataSource, "Source",  "Джерело")
                     .HasOptional(text, "Content",  "Зміст")
@@ -384,14 +404,19 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .Target(mciNato)
                         .WithFormFieldType("table"))
                     .HasMultiple(r => r
-                        .Target(mcciSpecialCommunications).WithFormFieldType("table"))
+                        .Target(mcciSpecialCommunications)
+                        .WithFormFieldType("table"))
                     .HasMultiple(r => r
                         .Target(srddw)
                         .WithFormFieldType("form"))
                     .HasOptional(r => r
                         .Target("SpecialPermit")
                         .WithFormFieldType("form"))
-                    .HasMultiple(operationalData)
+                    .HasMultiple(r => r
+                        .Target(operationalData)
+                        .WithMeta<EntityRelationMeta>(m =>
+                            m.FormField = new FormField {Type = "table", HasIndexColumn = true})
+                    )
                 ;
 
 
@@ -400,9 +425,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("WorkIn")
                     .WithTitle("Місце роботи")
                     .AcceptEmbeddedOperations()
-                    .HasOptional(organization)
-                    .HasOptional(ctx, d =>
-                        d.WithName("JobPosition").WithTitle("Посада").IsAttribute().HasValueOf(ScalarType.String))
+                    .HasOptional(r => r
+                        .Target(organization)
+                        .HasInversed(ir => ir
+                            .WithName("Employees")
+                            .WithTitle("Працівники")
+                            .IsMultiple()
+                        )
+                    )
+                    .HasOptional(text, "JobPosition", "Посада")
                     .HasOptional(text, "Subdivision",  "Підрозділ")
                 ;
 
@@ -423,9 +454,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(fatherName)
                     .HasOptional(photo)
                     .HasOptional(birthDate)
-                    .HasOptional(address, "BirthPlace",  "Місце народження")
-                    .HasOptional(address, "RegistrationPlace",  "Місце реєстрації")
-                    .HasOptional(address, "LivingPlace",  "Місце фактичного проживання")
+                    .HasOptional(address, "BirthPlace", "Місце народження")
+                    .HasOptional(address, "RegistrationPlace", "Місце реєстрації")
+                    .HasOptional(address, "LivingPlace", "Місце фактичного проживання")
                     .HasMultiple(phoneSign)
                     .HasMultiple(emailSign)
                     .HasMultiple(socialNetworksSign)
@@ -436,17 +467,24 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     )
                     .HasOptional(passport)
                     // ... secret carrier
-                    .HasMultiple(workIn, "PastEmployments",  "Останні місця роботи")
-                    .HasOptional(workIn)
+//                    .HasMultiple(workIn, "PastEmployments",  "Останні місця роботи")
+                    .HasOptional(r => r
+                        .Target(workIn)
+                        .HasInversed(ir => { })
+                    )
                     .HasOptional(text, "SecretCarrierAssignment", "Призначення на посаду державного експерта з питаннь таємниць")
                     .HasOptional(applyToAccessLevel)
-                    .HasOptional(attachment, "ScanForm5",  "Скан переліку питань (форма 5)")
-                    .HasOptional(attachment, "AnswerRules",  "Правила надання відповідей")
-                    .HasOptional(attachment, "Autobiography",  "Автобіографія")
-                    .HasOptional(attachment, "Form8",  "Форма 8")
-                    .HasMultiple(familyRelationInfo, "FamilyRelations",  "Родинні зв'язки")
+                    .HasOptional(attachment, "ScanForm5", "Скан переліку питань (форма 5)")
+                    .HasOptional(attachment, "AnswerRules", "Правила надання відповідей")
+                    .HasOptional(attachment, "Autobiography", "Автобіографія")
+                    .HasOptional(attachment, "Form8", "Форма 8")
+                    .HasMultiple(familyRelationInfo, "FamilyRelations", "Родинні зв'язки")
                     .HasOptional("Access")
-                    .HasMultiple(operationalData)
+                    .HasMultiple(r => r
+                        .Target(operationalData)
+                        .WithMeta<EntityRelationMeta>(m =>
+                            m.FormField = new FormField {Type = "table", HasIndexColumn = true})
+                    )
                     .HasOptional("PersonProfile")
                 ;
 

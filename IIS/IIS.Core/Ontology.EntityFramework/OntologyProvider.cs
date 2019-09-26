@@ -56,8 +56,6 @@ namespace IIS.Core.Ontology.EntityFramework
                         var relationTypes = _types.Values.Where(e => e is RelationType);
                         // todo: refactor
                         result.AddRange(relationTypes);
-                        foreach (var type in result)
-                            type.Meta = type.CreateMeta();
 
                         _ontology = new Ontology(result);
                         _types.Clear();
@@ -88,6 +86,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     var attr = new AttributeType(type.Id, type.Name, MapScalarType(attributeType.ScalarType));
                     _types.Add(type.Id, attr);
                     FillProperties(type, attr);
+                    attr.Meta = attr.CreateMeta(); // todo: refactor meta creation
                     return attr;
                 }
                 if (type.Kind == Kind.Entity)
@@ -95,11 +94,12 @@ namespace IIS.Core.Ontology.EntityFramework
                     var entity = new EntityType(type.Id, type.Name, type.IsAbstract);
                     _types.Add(type.Id, entity);
                     FillProperties(type, entity);
-                    foreach (var outgoingRelation in type.OutgoingRelations)
-                    {
-                        var relation = mapRelation(outgoingRelation);
-                        entity.AddType(relation);
-                    }
+                    // Process relation inheritance first
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance))
+                        entity.AddType(mapRelation(outgoingRelation));
+                    entity.Meta = entity.CreateMeta(); // todo: refactor. Creates meta with all parent types meta
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance))
+                        entity.AddType(mapRelation(outgoingRelation));
                     return entity;
                 }
                 throw new Exception("Unsupported type.");
@@ -119,16 +119,19 @@ namespace IIS.Core.Ontology.EntityFramework
                     _types.Add(type.Id, relation);
                     var target = mapType(relationType.TargetType);
                     relation.AddType(target);
+                    relation.Meta = relation.CreateMeta(); // todo: refactor meta creation
                     addInversedRelation(relation, _types[relationType.SourceTypeId]);
                 }
-                if (relationType.Kind == RelationKind.Inheritance)
+                else if (relationType.Kind == RelationKind.Inheritance)
                 {
                     relation = new InheritanceRelationType(type.Id);
                     FillProperties(type, relation);
                     _types.Add(type.Id, relation);
                     var target = mapType(relationType.TargetType);
                     relation.AddType(target);
+                    relation.Meta = relation.CreateMeta(); // todo: refactor meta creation
                 }
+                else throw new ArgumentException("Unsupported relation kind");
 
                 return relation;
             }
@@ -140,8 +143,10 @@ namespace IIS.Core.Ontology.EntityFramework
                 var meta = ert.GetInversed();
 //                var embeddingOptions = EmbeddingOptions.Multiple; // All inversed relations without validation are multiple
                 var embeddingOptions = meta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
-                var result = new EmbeddingRelationType(Guid.NewGuid(), meta.Code, embeddingOptions, true);
-                result.Title = meta.Title ?? meta.Code;
+                var name = meta.Code ?? sourceType.Name.ToLowerCamelcase();
+                var title = meta.Title ?? sourceType.Title ?? name;
+                var result = new EmbeddingRelationType(Guid.NewGuid(), name, embeddingOptions, true);
+                result.Title = title;
                 result.AddType(sourceType); // link to source type
                 result.AddType(ert); // link to original direct relation type
                 _types.Add(result.Id, result);
@@ -153,7 +158,6 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             ontologyType.Title = type.Title;
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
-            //ontologyType.TypeMeta = ontologyType.CreateMeta(); // todo: remake meta creation
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;
         }
