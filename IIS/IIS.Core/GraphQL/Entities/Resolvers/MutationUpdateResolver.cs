@@ -94,10 +94,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                         break;
                     case "update":
                         foreach (var uv in list)
-                        {
                             await ApplyUpdate(node, embed, uv);
-                            break;
-                        }
 
                         break;
                     case "delete":
