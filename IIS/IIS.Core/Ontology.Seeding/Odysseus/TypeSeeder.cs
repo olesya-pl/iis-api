@@ -11,7 +11,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
         {
             var name = ctx.CreateBuilder().WithName("Name").WithTitle("Назва").IsAttribute().HasValueOf(ScalarType.String);
             var code = ctx.CreateBuilder().WithName("Code").WithTitle("Код").IsAttribute().HasValueOf(ScalarType.String);
-            var codeNumber = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.String);
             var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Податковий ідентифікатор").IsAttribute().HasValueOf(ScalarType.String);
             var number = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.Integer);
             var count = ctx.CreateBuilder().WithName("Count").WithTitle("Кількість").IsAttribute().HasValueOf(ScalarType.Integer);
@@ -506,7 +505,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("SpecialPermit")
                     .WithTitle("Спецдозвіл")
                     .AcceptEmbeddedOperations()
-                    .HasOptional(codeNumber, "IssueNumber",  "Номер спецдозволу")
+                    .HasOptional(code, "IssueNumber",  "Номер спецдозволу")
                     .HasOptional(date, "IssueDate",  "Дата видачі")
                     .HasOptional(date, "EndDate",  "Дата завершення дії")
                     .HasOptional(accessLevel)
@@ -539,7 +538,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var legalActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("LegalActArticle")
                     .WithTitle(null)
-                    .HasOptional(codeNumber)
+                    .HasOptional(code, "Number", null)
                     .HasOptional(text, "Content", null)
                     .HasOptional(r => r
                         .Target(legalAct)
@@ -548,8 +547,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 ;
 
             var legalDocument = ctx.CreateBuilder().IsEntity()
+                    .WithName("LegalDocument")
+                    .WithTitle(null)
+                    .AcceptEmbeddedOperations()
                     .HasOptional(date)
-                    .HasOptional(codeNumber)
+                    .HasOptional(code, "Number", null)
                     .HasOptional(attachment, "Original", null)
                     .HasOptional(text, "Content", null)
                 ;
@@ -626,7 +628,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle(null)
                     .Is(personSanction)
                     .HasOptional(text, "InvestigateBody", null)
-                    .HasOptional(codeNumber, "URPINumber", null)
+                    .HasOptional(code, "URPINumber", null)
                     .HasMultiple(legalActArticle, "BreachedArticles", null)
                     .HasOptional(text, "Description", null)
                     .HasOptional(legalDocument, "Resolution", null)

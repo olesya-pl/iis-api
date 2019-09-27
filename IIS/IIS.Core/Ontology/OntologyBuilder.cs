@@ -211,6 +211,8 @@ namespace IIS.Core.Ontology
 
             foreach (var child in _childNodes)
             {
+                if (child.TargetName == null)
+                    throw new BuildException($"Found relation with null target on builder '{_name}'");
                 var targetBuilder = GetBuilder(child.TargetName);
                 if (targetBuilder._isBuilding)
                 {
