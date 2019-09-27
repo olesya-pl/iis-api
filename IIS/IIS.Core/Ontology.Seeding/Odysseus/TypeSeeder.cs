@@ -11,6 +11,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
         {
             var name = ctx.CreateBuilder().WithName("Name").WithTitle("Назва").IsAttribute().HasValueOf(ScalarType.String);
             var code = ctx.CreateBuilder().WithName("Code").WithTitle("Код").IsAttribute().HasValueOf(ScalarType.String);
+            var codeNumber = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.String);
             var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Податковий ідентифікатор").IsAttribute().HasValueOf(ScalarType.String);
             var number = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.Integer);
             var count = ctx.CreateBuilder().WithName("Count").WithTitle("Кількість").IsAttribute().HasValueOf(ScalarType.Integer);
@@ -490,7 +491,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
 
             // Permits
-            var acccess = ctx.CreateBuilder().IsEntity()
+            var access = ctx.CreateBuilder().IsEntity()
                     .WithName("Access")
                     .WithTitle("Допуск")
                     .AcceptEmbeddedOperations()
@@ -505,7 +506,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("SpecialPermit")
                     .WithTitle("Спецдозвіл")
                     .AcceptEmbeddedOperations()
-                    .HasOptional(code, "IssueNumber",  "Номер спецдозволу")
+                    .HasOptional(codeNumber, "IssueNumber",  "Номер спецдозволу")
                     .HasOptional(date, "IssueDate",  "Дата видачі")
                     .HasOptional(date, "EndDate",  "Дата завершення дії")
                     .HasOptional(accessLevel)
@@ -525,6 +526,181 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .Target("Person")
                         .WithName( "CommitteeHead")
                         .WithTitle("Голова комісії"))
+                ;
+
+            // ----- Sanctions and vetting procedures ----- //
+
+            var legalAct = ctx.CreateBuilder().IsEntity()
+                    .WithName("LegalAct")
+                    .WithTitle(null)
+                    .HasRequired(name)
+                ;
+
+            var legalActArticle = ctx.CreateBuilder().IsEntity()
+                    .WithName("LegalActArticle")
+                    .WithTitle(null)
+                    .HasOptional(codeNumber)
+                    .HasOptional(text, "Content", null)
+                    .HasOptional(r => r
+                        .Target(legalAct)
+                        .HasInversed(ir => ir.IsMultiple())
+                    )
+                ;
+
+            var legalDocument = ctx.CreateBuilder().IsEntity()
+                    .HasOptional(date)
+                    .HasOptional(codeNumber)
+                    .HasOptional(attachment, "Original", null)
+                    .HasOptional(text, "Content", null)
+                ;
+
+            var sanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("Sanction")
+                    .WithTitle(null)
+                    .IsAbstraction()
+                    .HasOptional(organization, "SSUSubdivision", null) // validation required
+                    .HasOptional(organizationPermit)
+                ;
+
+            // organization sanctions
+            var informingSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("InformingSanction")
+                    .WithTitle(null)
+                    .Is(sanction)
+                    .HasOptional(legalDocument, "Inform", null)
+                    .HasOptional(legalDocument, "Answer", null)
+                ;
+
+            var finalOrganizationSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("FinalOrganizationSanction")
+                    .WithTitle(null)
+                    .Is(sanction)
+                    .IsAbstraction()
+                    .HasOptional(legalDocument, "Decree", null)
+                    .HasOptional(legalActArticle, "BreachedArticles", null)
+                    .HasOptional(text, "BreachInfo", null)
+                ;
+
+            var terminationSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("TerminationSanction")
+                    .WithTitle(null)
+                    .Is(finalOrganizationSanction)
+                ;
+
+            var cancellationSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("CancellationSanction")
+                    .WithTitle(null)
+                    .Is(finalOrganizationSanction)
+                ;
+
+            // person sanctions
+            var disciplinarySanctionKind = ctx.CreateEnum("DisciplinarySanctionKind")
+                    .WithTitle(null)
+                ;
+
+            var personSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("PersonSanction")
+                    .WithTitle(null)
+                    .IsAbstraction()
+                    .HasOptional(person, "person", null)
+                    .HasOptional(access)
+                ;
+
+            var disciplinaryPersonSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("DisciplinaryPersonSanction")
+                    .WithTitle(null)
+                    .Is(personSanction)
+                    .HasOptional(legalDocument, "Report", null)
+                    .HasOptional(disciplinarySanctionKind)
+                ;
+
+            var investigationPersonSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("InvestigationPersonSanction")
+                    .WithTitle(null)
+                    .Is(personSanction)
+                    .HasMultiple(sanction)
+                ;
+
+            var criminalPersonSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("CriminalPersonSanction")
+                    .WithTitle(null)
+                    .Is(personSanction)
+                    .HasOptional(text, "InvestigateBody", null)
+                    .HasOptional(codeNumber, "URPINumber", null)
+                    .HasMultiple(legalActArticle, "BreachedArticles", null)
+                    .HasOptional(text, "Description", null)
+                    .HasOptional(legalDocument, "Resolution", null)
+                    .HasOptional(organization, "Court", null)
+                ;
+
+            var reportPersonSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("ReportPersonSanction")
+                    .WithTitle(null)
+                    .Is(personSanction)
+                    .HasOptional(person, "DrawnUpBy", null)
+                    .HasOptional(legalDocument, "Report", null)
+                    .HasOptional(legalActArticle, "BreachedArticles", null)
+                    .HasOptional(text, "Description", null)
+                    .HasOptional(legalDocument, "Resolution", null)
+                    .HasOptional(legalActArticle, "ResolutionArticles", null)
+                ;
+
+            var finalPersonSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("FinalPersonSanction")
+                    .WithTitle(null)
+                    .Is(personSanction)
+                    .IsAbstraction()
+                    .HasOptional(legalDocument, "Decree", null)
+                    .HasOptional(legalActArticle, "BreachedArticles", null)
+                    .HasOptional(text, "BreachInfo", null)
+                ;
+
+            var terminationPersonSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("TerminationPersonSanction")
+                    .WithTitle(null)
+                    .Is(finalPersonSanction)
+                ;
+
+            var cancellationPersonSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("CancellationPersonSanction")
+                    .WithTitle(null)
+                    .Is(finalPersonSanction)
+                ;
+
+            // sanctions end
+
+            var vettingProcedureType = ctx.CreateEnum("VettingProcedureType")
+                    .WithTitle(null)
+                ;
+
+            var vettingProcedureKind = ctx.CreateEnum("VettingProcedureKind")
+                    .WithTitle(null)
+                ;
+
+
+            var vettingProcedure = ctx.CreateBuilder().IsEntity()
+                    .WithName("VettingProcedure")
+                    .WithTitle(null)
+                    .HasOptional(legalDocument, "Order", null)
+                    .HasOptional(vettingProcedureType)
+                    .HasOptional(vettingProcedureKind)
+                    .HasOptional(r => r
+                        .Target(dateRange)
+                        .WithName("Duration")
+                        .WithTitle(null)
+                        .WithFormFieldType("dateRange")
+                    )
+                    .HasOptional(r => r
+                        .Target(dateRange)
+                        .WithName("CheckPeriod")
+                        .WithTitle(null)
+                        .WithFormFieldType("dateRange")
+                    )
+                    .HasOptional(organization, "SSUSubdivision", null)
+                    .HasOptional(legalDocument, "InspectionAct", null)
+                    .HasMultiple(sanction)
+                    .HasOptional(person, "CommitteeHead", null)
+                    .HasMultiple(person, "CommitteeMembers", null)
                 ;
 
 
