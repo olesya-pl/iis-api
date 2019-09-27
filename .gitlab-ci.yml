@@ -10,7 +10,7 @@ build_job:
   artifacts:
     paths:
     - IIS/publish
-    expire_in: 1 week
+    expire_in: 1 month
     
   tags:
     - ci
