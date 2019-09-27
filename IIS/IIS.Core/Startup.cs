@@ -54,6 +54,7 @@ namespace IIS.Core
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<Ontology.Seeding.Odysseus.TypeSeeder>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
+            services.AddTransient<ILegacyMigrator, LegacyMigrator>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();

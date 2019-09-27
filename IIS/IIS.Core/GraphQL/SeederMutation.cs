@@ -37,6 +37,12 @@ namespace IIS.Core.GraphQL
             return "Legacy types migrated";
         }
 
+        [GraphQLDescription("Used to migrate entities from old NodeJS database to new structure.")]
+        public async Task<string> MigrateLegacyEntities([Service] ILegacyMigrator migrator)
+        {
+            await migrator.Migrate();
+            return "Legacy entities migrated";
+        }
 
         public async Task<string> FillOdysseusTypes(
             [Service] TypeSeeder seeder,
