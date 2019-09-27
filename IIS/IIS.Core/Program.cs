@@ -14,7 +14,9 @@ namespace IIS.Core
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var webHost = CreateWebHostBuilder(args).Build();
+            if (new ConsoleUtilities(webHost.Services).ProcessArguments()) // do not start webserver if utilities were started
+                webHost.Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

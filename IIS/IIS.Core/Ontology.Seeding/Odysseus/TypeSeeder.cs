@@ -5,7 +5,7 @@ using IIS.Core.Ontology.Meta;
 
 namespace IIS.Core.Ontology.Seeding.Odysseus
 {
-    public partial class TypeSeeder : IOntologyProvider
+    public partial class TypeSeeder
     {
         public void CreateBuilders(OntologyBuildContext ctx)
         {

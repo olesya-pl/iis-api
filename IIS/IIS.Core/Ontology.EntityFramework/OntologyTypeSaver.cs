@@ -10,13 +10,11 @@ namespace IIS.Core.Ontology.EntityFramework
     public class OntologyTypeSaver
     {
         private Context.OntologyContext _ontologyContext;
-        private readonly IApplicationLifetime _applicationLifetime;
         private Dictionary<Guid, Context.Type> _types = new Dictionary<Guid, Context.Type>();
 
         public OntologyTypeSaver(Context.OntologyContext ontologyContext, IApplicationLifetime applicationLifetime)
         {
             _ontologyContext = ontologyContext;
-            _applicationLifetime = applicationLifetime;
         }
 
         public void ClearTypes()
@@ -36,7 +34,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
             _ontologyContext.AddRange(_types.Values);
             _ontologyContext.SaveChanges();
-            _applicationLifetime.StopApplication();
         }
 
         private Context.Type SaveType(Type type, Type relationSource = null)

@@ -69,6 +69,20 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }, cancellationToken);
         }
+
+        public void Invalidate()
+        {
+            _locker.EnterWriteLock();
+            try
+            {
+                _ontology = null;
+            }
+            finally
+            {
+                _locker.ExitWriteLock();
+            }
+        }
+
         private Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
         private Type MapType(Context.Type ctxType)
         {

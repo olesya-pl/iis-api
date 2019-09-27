@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -90,6 +91,7 @@ namespace IIS.Core
             services.AddDataLoaderRegistry();
 
             var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
+            if (mq == null) throw new Exception("mq config not found");
             var factory = new ConnectionFactory
             {
                 HostName = mq.Host,
