@@ -45,7 +45,6 @@ namespace IIS.Core.GraphQL
             builder.AddMutationType(d =>
             {
                 d.Name("MutationType");
-                d.Include<SeederMutation>();
                 d.Include<Materials.Mutation>();
                 d.Include<DummyMutation>();
                 if (ontology != null)
