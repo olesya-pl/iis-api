@@ -698,7 +698,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithTitle(null)
                         .WithFormFieldType("dateRange")
                     )
-                    .HasOptional(organization, "SSUSubdivision", null)
+//                    .HasOptional(organization, "SSUSubdivision", null)
+                    .HasOptional(r => r
+                        .Target(organization)
+                        .WithName("SSUSubdivision")
+                        .WithTitle(null)
+                        .HasInversed(ir => ir
+                            .IsMultiple()
+                        )
+                    )
                     .HasOptional(legalDocument, "InspectionAct", null)
                     .HasMultiple(sanction)
                     .HasOptional(person, "CommitteeHead", null)
