@@ -485,7 +485,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithMeta<EntityRelationMeta>(m =>
                             m.FormField = new FormField {Type = "table", HasIndexColumn = true})
                     )
-                    .HasOptional("PersonProfile")
                     .HasOptional("PersonControl")
                 ;
 
@@ -750,13 +749,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 ;
 
 
-            var personProfile = ctx.CreateBuilder().IsEntity()
-                    .WithName("PersonProfile")
-                    .WithTitle("Профайл людини")
-                    .AcceptEmbeddedOperations()
-                ;
+//            var personProfile = ctx.CreateBuilder().IsEntity()
+//                    .WithName("PersonProfile")
+//                    .WithTitle("Профайл людини")
+//                    .AcceptEmbeddedOperations()
+//                ;
+//            CreatePersonProfile(ctx, personProfile);
+//            person.HasOptional(personProfile);
 
-            CreatePersonProfile(ctx, personProfile);
+            CreatePersonProfile(ctx, person);
         }
 
         public Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
