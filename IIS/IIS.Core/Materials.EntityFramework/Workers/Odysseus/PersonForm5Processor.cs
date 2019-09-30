@@ -34,6 +34,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var entity = await GetEntity(data, material.Id);
             var form = GetForm(data);
             await ProcessPerson(entity, form);
+            await _ontologyContext.SaveChangesAsync();
             await _ontologyService.SaveNodeAsync(entity);
         }
 
@@ -43,6 +44,13 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                           ?? throw new ArgumentException($"Can not find data with type '{dataType}'");
             return element.Value<string>("Text")
                    ?? throw new ArgumentException($"Can not find {dataType} text id");
+        }
+
+        private JObject ExtractObjectOfDataType(JArray data, string dataType)
+        {
+            var element = data.SingleOrDefault(t => t.Value<string>("Type") == dataType)
+                          ?? throw new ArgumentException($"Can not find data with type '{dataType}'");
+            return element as JObject;
         }
 
         private async Task<Entity> GetEntity(JArray data, Guid materialId)
@@ -61,7 +69,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var info = new MaterialInfo
             {
                 Id = Guid.NewGuid(),
-                Data = data.ToString(),
+                Data = ExtractObjectOfDataType(data, ENTITY_TYPE).ToString(),
                 MaterialId = materialId,
                 Source = GetType().FullName,
                 SourceType = nameof(PersonForm5Processor),
@@ -78,7 +86,6 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             };
             _ontologyContext.Add(info);
             _ontologyContext.Add(feature);
-            await _ontologyContext.SaveChangesAsync();
 
             return (Entity)entity;
         }
