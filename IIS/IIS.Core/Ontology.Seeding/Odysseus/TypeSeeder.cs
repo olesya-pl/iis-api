@@ -23,6 +23,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var attachment = ctx.CreateBuilder().WithName("Attachment").WithTitle("Додані файли").IsAttribute().HasValueOf(ScalarType.File);
             var website = ctx.CreateBuilder().WithName("Website").WithTitle("Офіційний сайт").IsAttribute().HasValueOf(ScalarType.String);
             var text = ctx.CreateBuilder().WithName("Text").WithTitle("Текст").IsAttribute().HasValueOf(ScalarType.String);
+            var boolean = ctx.CreateBuilder().WithName("Boolean").WithTitle("Булево").IsAttribute().HasValueOf(ScalarType.Boolean);
 
             var dateRange = ctx.CreateBuilder().IsEntity()
                     .WithName("DateRange")
