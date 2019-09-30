@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
+using IIS.Core.Ontology.EntityFramework.Context;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -16,18 +18,20 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
         private readonly IOntologyProvider _ontologyProvider;
         private readonly IOntologyService _ontologyService;
+        private readonly OntologyContext _ontologyContext;
 
-        public PersonForm5Processor(IOntologyProvider ontologyProvider, IOntologyService ontologyService)
+        public PersonForm5Processor(IOntologyProvider ontologyProvider, IOntologyService ontologyService, OntologyContext ontologyContext)
         {
             _ontologyProvider = ontologyProvider;
             _ontologyService = ontologyService;
+            _ontologyContext = ontologyContext;
         }
 
         public async Task ExtractInfoAsync(Materials.Material material)
         {
             if (material.Type != MATERIAL_TYPE) return;
             var data = material.Data;
-            var entity = await GetEntity(data);
+            var entity = await GetEntity(data, material.Id);
             var form = GetForm(data);
             await ProcessPerson(entity, form);
             await _ontologyService.SaveNodeAsync(entity);
@@ -41,7 +45,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                    ?? throw new ArgumentException($"Can not find {dataType} text id");
         }
 
-        private async Task<Entity> GetEntity(JArray data)
+        private async Task<Entity> GetEntity(JArray data, Guid materialId)
         {
             var entityIdText = ExtractTextOfDataType(data, ENTITY_TYPE);
             if (!Guid.TryParse(entityIdText, out var personId))
@@ -52,6 +56,30 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var type = ontology.GetEntityType(ENTITY_TYPE);
             if (!entity.Type.IsSubtypeOf(type))
                 throw new ArgumentException($"Entity with id {personId} is {entity.Type.Name}, not {ENTITY_TYPE}");
+
+            // save mapping
+            var info = new MaterialInfo
+            {
+                Id = Guid.NewGuid(),
+                Data = data.ToString(),
+                MaterialId = materialId,
+                Source = GetType().FullName,
+                SourceType = nameof(PersonForm5Processor),
+                SourceVersion = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    .InformationalVersion,
+            };
+            var feature = new MaterialFeature
+            {
+                Id = Guid.NewGuid(),
+                MaterialInfoId = info.Id,
+                NodeId = entity.Id,
+                Relation = ENTITY_TYPE,
+                Value = entityIdText,
+            };
+            _ontologyContext.Add(info);
+            _ontologyContext.Add(feature);
+            await _ontologyContext.SaveChangesAsync();
+
             return (Entity)entity;
         }
 
