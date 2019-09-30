@@ -529,21 +529,33 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             // ----- Sanctions and vetting procedures ----- //
 
-            var legalAct = ctx.CreateBuilder().IsEntity()
-                    .WithName("LegalAct")
-                    .WithTitle(null)
-                    .HasRequired(name)
-                ;
+//            var legalAct = ctx.CreateBuilder().IsEntity()
+//                    .WithName("LegalAct")
+//                    .WithTitle(null)
+//                    .HasRequired(name)
+//                ;
 
             var legalActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("LegalActArticle")
                     .WithTitle(null)
                     .HasOptional(code, "Number", null)
                     .HasOptional(text, "Content", null)
-                    .HasOptional(r => r
-                        .Target(legalAct)
-                        .HasInversed(ir => ir.IsMultiple())
-                    )
+//                    .HasOptional(r => r
+//                        .Target(legalAct)
+//                        .HasInversed(ir => ir.IsMultiple())
+//                    )
+                ;
+
+            var criminalActArticle = ctx.CreateBuilder().IsEntity()
+                    .WithName("CriminalActArticle")
+                    .WithTitle(null)
+                    .Is(legalActArticle)
+                ;
+
+            var administrativeActArticle = ctx.CreateBuilder().IsEntity()
+                    .WithName("AdministrativeActArticle")
+                    .WithTitle(null)
+                    .Is(legalActArticle)
                 ;
 
             var legalDocument = ctx.CreateBuilder().IsEntity()
@@ -560,23 +572,28 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("Sanction")
                     .WithTitle(null)
                     .IsAbstraction()
-                    .HasOptional(organization, "SSUSubdivision", null) // validation required
-                    .HasOptional(organizationPermit)
                 ;
 
             // organization sanctions
+            var organizationSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("OrganizationSanction")
+                    .WithTitle(null)
+                    .Is(sanction)
+                    .IsAbstraction()
+                ;
+
             var informingSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("InformingSanction")
                     .WithTitle(null)
-                    .Is(sanction)
+                    .Is(organizationSanction)
                     .HasOptional(legalDocument, "Inform", null)
                     .HasOptional(legalDocument, "Answer", null)
                 ;
 
-            var finalOrganizationSanction = ctx.CreateBuilder().IsEntity()
-                    .WithName("FinalOrganizationSanction")
+            var organizationPermitSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("OrganizationPermitSanction")
                     .WithTitle(null)
-                    .Is(sanction)
+                    .Is(organizationSanction)
                     .IsAbstraction()
                     .HasOptional(legalDocument, "Decree", null)
                     .HasOptional(legalActArticle, "BreachedArticles", null)
@@ -586,13 +603,13 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var terminationSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("TerminationSanction")
                     .WithTitle(null)
-                    .Is(finalOrganizationSanction)
+                    .Is(organizationPermitSanction)
                 ;
 
             var cancellationSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("CancellationSanction")
                     .WithTitle(null)
-                    .Is(finalOrganizationSanction)
+                    .Is(organizationPermitSanction)
                 ;
 
             // person sanctions
@@ -698,10 +715,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithTitle(null)
                         .WithFormFieldType("dateRange")
                     )
-//                    .HasOptional(organization, "SSUSubdivision", null)
                     .HasOptional(r => r
                         .Target(organization)
-                        .WithName("SSUSubdivision")
+                        .WithName("ConductedBy")
                         .WithTitle(null)
                         .HasInversed(ir => ir
                             .IsMultiple()
@@ -711,6 +727,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasMultiple(sanction)
                     .HasOptional(person, "CommitteeHead", null)
                     .HasMultiple(person, "CommitteeMembers", null)
+                    .HasOptional(organizationPermit)
                 ;
 
 

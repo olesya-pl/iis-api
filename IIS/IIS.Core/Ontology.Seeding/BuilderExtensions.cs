@@ -28,6 +28,17 @@ namespace IIS.Core.Ontology.Seeding
 
 
 
+        public static ITypeBuilder HasRequired(this ITypeBuilder builder, string targetName, string name, string title) =>
+            builder.HasRequired(r => r.Target(targetName).WithName(name).WithTitle(title));
+
+        public static ITypeBuilder HasOptional(this ITypeBuilder builder, string targetName, string name, string title) =>
+            builder.HasOptional(r => r.Target(targetName).WithName(name).WithTitle(title));
+
+        public static ITypeBuilder HasMultiple(this ITypeBuilder builder, string targetName, string name, string title) =>
+            builder.HasMultiple(r => r.Target(targetName).WithName(name).WithTitle(title));
+
+
+
         public static ITypeBuilder Is(this ITypeBuilder builder, ITypeBuilder propertyBuilder) =>
             builder.Is(((OntologyBuilder) propertyBuilder).Name);
 
