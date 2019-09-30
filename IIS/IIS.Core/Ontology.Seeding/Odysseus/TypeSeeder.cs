@@ -473,7 +473,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .HasInversed(ir => { })
                     )
                     .HasOptional(text, "SecretCarrierAssignment", "Призначення на посаду державного експерта з питаннь таємниць")
-                    .HasOptional(applyToAccessLevel)
                     .HasOptional(attachment, "ScanForm5", "Скан переліку питань (форма 5)")
                     .HasOptional(attachment, "AnswerRules", "Правила надання відповідей")
                     .HasOptional(attachment, "Autobiography", "Автобіографія")
@@ -728,6 +727,21 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(person, "CommitteeHead", null)
                     .HasMultiple(person, "CommitteeMembers", null)
                     .HasOptional(organizationPermit)
+                ;
+
+            // Person Control
+            var personControl = ctx.CreateBuilder().IsEntity()
+                    .WithName("PersonControl")
+                    .WithTitle(null)
+                    .HasOptional(attachment, "RequestAttachment", "Вмотивований запит")
+                    .HasOptional(applyToAccessLevel)
+                    .HasOptional(r => r
+                        .Target(ctx.CreateEnum("PersonCheckResult"))
+                        .WithName("CheckResult")
+                        .WithTitle("Резолюція по кандидату")
+                    )
+                    .HasOptional(attachment, "ResultAttachment", "Розпорядження (результат)")
+                    .HasOptional(date, "Date", "Дата розпорядження")
                 ;
 
 
