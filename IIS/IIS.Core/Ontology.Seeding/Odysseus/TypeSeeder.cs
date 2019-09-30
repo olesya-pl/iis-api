@@ -485,6 +485,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                             m.FormField = new FormField {Type = "table", HasIndexColumn = true})
                     )
                     .HasOptional("PersonProfile")
+                    .HasOptional("PersonControl")
                 ;
 
 
@@ -571,6 +572,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("Sanction")
                     .WithTitle(null)
                     .IsAbstraction()
+                    .AcceptEmbeddedOperations()
                 ;
 
             // organization sanctions
@@ -699,6 +701,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var vettingProcedure = ctx.CreateBuilder().IsEntity()
                     .WithName("VettingProcedure")
                     .WithTitle(null)
+                    .AcceptEmbeddedOperations()
                     .HasOptional(legalDocument, "Order", null)
                     .HasOptional(vettingProcedureType)
                     .HasOptional(vettingProcedureKind)
@@ -733,6 +736,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var personControl = ctx.CreateBuilder().IsEntity()
                     .WithName("PersonControl")
                     .WithTitle(null)
+                    .AcceptEmbeddedOperations()
                     .HasOptional(attachment, "RequestAttachment", "Вмотивований запит")
                     .HasOptional(applyToAccessLevel)
                     .HasOptional(r => r
@@ -748,6 +752,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var personProfile = ctx.CreateBuilder().IsEntity()
                     .WithName("PersonProfile")
                     .WithTitle("Профайл людини")
+                    .AcceptEmbeddedOperations()
                 ;
 
             CreatePersonProfile(ctx, personProfile);
