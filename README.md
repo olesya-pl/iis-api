@@ -23,6 +23,7 @@ If any action was found, web server would not start. To override this behaviour,
 * `clear-types` Deletes all types from database.
 * `migrate-legacy-types` Migrates types from NodeJS database. Drops all types and entities.
 * `migrate-legacy-entities` Migrates entities from NodeJS database.
+* `migrate-legacy-files` Migrates all Files from NodeJS database with blob content.
 * `fill-odysseus-types` Fills Odysseus ontology. Drops all types and entities.
 * `seed-contour-data` Seeds Contour enums from files.
 * `seed-odysseus-data` Seeds Odysseus enums from files.

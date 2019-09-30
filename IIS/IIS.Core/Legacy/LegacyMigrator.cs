@@ -1,9 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using IIS.Core.Files.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using N = IIS.Core.Ontology;
 using Attribute = IIS.Core.Ontology.EntityFramework.Context.Attribute;
 
@@ -21,22 +23,28 @@ namespace IIS.Legacy.EntityFramework
             _connectionString = configuration.GetConnectionString("db-legacy");
             _ontologyContext = ontologyContext;
             _ontologyProvider = ontologyProvider;
+
         }
 
         private N.Ontology _ontology;
         private DateTime _now;
 
-        public async Task Migrate(CancellationToken cancellationToken = default)
+        private void Init()
         {
             if (_connectionString == null)
                 throw new ArgumentException("There is no db-legacy connection string configured.");
             var opts = new DbContextOptionsBuilder().UseNpgsql(_connectionString).Options;
             _contourContext = new ContourContext(opts);
-            _ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+
             _now = DateTime.UtcNow;
             _contourContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             _ontologyContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
 
+        public async Task Migrate(CancellationToken cancellationToken = default)
+        {
+            Init();
+            _ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             await DropEntities(cancellationToken);
             await MigrateEntities(cancellationToken);
             await MigrateRelations(cancellationToken);
@@ -171,20 +179,48 @@ namespace IIS.Legacy.EntityFramework
 
         private Node Map(OAttributeValue oAttributeValue)
         {
+            var attributeType = GetAttributeType(oAttributeValue);
+            var value = attributeType.ScalarTypeEnum == N.ScalarType.File
+                ? MapFileValue(oAttributeValue.Value)
+                : oAttributeValue.Value;
             var result = new Node
             {
                 Id = oAttributeValue.Id,
                 CreatedAt = oAttributeValue.CreatedAt,
                 UpdatedAt = oAttributeValue.CreatedAt,
                 IsArchived = oAttributeValue.DeletedAt != null,
-                TypeId = GetAttributeType(oAttributeValue).Id,
+                TypeId = attributeType.Id,
                 Attribute = new Attribute
                 {
                     Id = oAttributeValue.Id,
-                    Value = oAttributeValue.Value
+                    Value = value
                 }
             };
             return result;
+        }
+
+        private string MapFileValue(string legacyValue)
+        {
+            return JObject.Parse(legacyValue).GetValue("fileId")?.Value<string>();
+        }
+
+        public async Task MigrateFiles(CancellationToken cancellationToken = default)
+        {
+            Init();
+            foreach (var oFile in _contourContext.TemporaryFiles)
+            {
+                _ontologyContext.Add(new File
+                {
+                    Id = oFile.Id,
+                    Contents = oFile.File,
+                    ContentType = oFile.Type,
+                    Name = oFile.Title,
+                    IsTemporary = false,
+                    UploadTime = oFile.CreatedAt.GetValueOrDefault(),
+                });
+            }
+
+            await _ontologyContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

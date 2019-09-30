@@ -23,6 +23,7 @@ namespace IIS.Core
             _actions.Add("clear-types", ClearTypes);
             _actions.Add("migrate-legacy-types", MigrateLegacyTypes);
             _actions.Add("migrate-legacy-entities", MigrateLegacyEntities);
+            _actions.Add("migrate-legacy-files", MigrateLegacyFiles);
             _actions.Add("fill-odysseus-types", FillOdysseusTypes);
             _actions.Add("seed-contour-data", SeedContourData);
             _actions.Add("seed-odysseus-data", SeedOdysseusData);
@@ -75,6 +76,12 @@ namespace IIS.Core
         public void MigrateLegacyEntities()
         {
             _serviceProvider.GetService<ILegacyMigrator>().Migrate().Wait();
+            Console.WriteLine("Legacy entities migrated");
+        }
+
+        public void MigrateLegacyFiles()
+        {
+            _serviceProvider.GetService<ILegacyMigrator>().MigrateFiles().Wait();
             Console.WriteLine("Legacy entities migrated");
         }
 

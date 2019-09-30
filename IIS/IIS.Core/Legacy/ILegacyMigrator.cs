@@ -6,5 +6,6 @@ namespace IIS.Legacy.EntityFramework
     public interface ILegacyMigrator
     {
         Task Migrate(CancellationToken cancellationToken = default);
+        Task MigrateFiles(CancellationToken cancellationToken = default);
     }
 }
