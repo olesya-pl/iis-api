@@ -485,7 +485,12 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithMeta<EntityRelationMeta>(m =>
                             m.FormField = new FormField {Type = "table", HasIndexColumn = true})
                     )
-                    .HasOptional("PersonControl")
+                    .HasOptional(r => r
+                        .Target("PersonControl")
+                        .WithMeta<EntityRelationMeta>(m =>
+                            m.FormField = new FormField { Type = "radioGroup", RadioType = "radioButton" }
+                        )
+                    )
                 ;
 
 
