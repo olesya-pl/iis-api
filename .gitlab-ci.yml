@@ -32,7 +32,7 @@ build_job:
 deploy_dev:
   extends: .deploy
   script:
-    - ansible-playbook app_api_net_dev.yml --extra-vars "HOST=contour-dev artifacts_path=$CI_PROJECT_DIR"
+    - ansible-playbook app_api_net.yml --extra-vars "HOST=contour-dev artifacts_path=$CI_PROJECT_DIR env_file=appsettings.Staging.json_web_dev.j2"
   environment:
     name: dev_contour
     url: http://contour-dev-01.contour.net
@@ -41,7 +41,7 @@ deploy_dev:
 deploy_od:
   extends: .deploy
   script:
-    - ansible-playbook app_api_net_dev_od.yml --extra-vars "HOST=od-dev artifacts_path=$CI_PROJECT_DIR"
+    - ansible-playbook app_api_net.yml --extra-vars "HOST=od-dev artifacts_path=$CI_PROJECT_DIR env_file=appsettings.Staging.json_web_dev_od.j2"
   environment:
     name: dev_odysseus
     url: http://od-dev.contour.net
