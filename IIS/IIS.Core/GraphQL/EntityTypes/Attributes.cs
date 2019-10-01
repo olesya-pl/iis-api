@@ -128,9 +128,12 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(EmbeddingRelationType source) : base(source)
+        public EntityAttributeRelation(EmbeddingRelationType source, Ontology.Ontology ontology) : base(source)
         {
+            _ontology = ontology;
         }
+
+        private Ontology.Ontology _ontology;
 
         protected new EntityRelationMeta MetaObject => (EntityRelationMeta) base.MetaObject;
 
@@ -143,7 +146,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType]
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]
-        public EntityType Target => new EntityType(Source.EntityType);
+        public EntityType Target => new EntityType(Source.EntityType, _ontology);
 
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
@@ -158,7 +161,7 @@ namespace IIS.Core.GraphQL.EntityTypes
                 types = types.Union(new[] {Source.EntityType});
             if (concreteTypes == true)
                 types = types.Where(t => !t.IsAbstract);
-            return types.Select(t => new EntityType(t));
+            return types.Select(t => new EntityType(t, _ontology));
         }
     }
 }

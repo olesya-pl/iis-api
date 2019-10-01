@@ -21,6 +21,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithFormFieldType("radioComment")
                     )
                     .HasOptional("Attachment", null, "Підтвердження")
+                    .AcceptEmbeddedOperations()
                 ;
 
             profile

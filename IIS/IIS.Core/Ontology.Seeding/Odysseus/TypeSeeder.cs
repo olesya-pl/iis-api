@@ -604,13 +604,13 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 ;
 
             var terminationSanction = ctx.CreateBuilder().IsEntity()
-                    .WithName("TerminationSanction")
+                    .WithName("SpecialPermitTerminationSanction")
                     .WithTitle(null)
                     .Is(organizationPermitSanction)
                 ;
 
             var cancellationSanction = ctx.CreateBuilder().IsEntity()
-                    .WithName("CancellationSanction")
+                    .WithName("SpecialPermitCancellationSanction")
                     .WithTitle(null)
                     .Is(organizationPermitSanction)
                 ;
@@ -621,6 +621,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 ;
 
             var personSanction = ctx.CreateBuilder().IsEntity()
+                    .Is(sanction)
                     .WithName("PersonSanction")
                     .WithTitle(null)
                     .IsAbstraction()
@@ -728,7 +729,10 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         )
                     )
                     .HasOptional(legalDocument, "InspectionAct", null)
-                    .HasMultiple(sanction)
+                    .HasMultiple(r => r
+                        .Target(sanction)
+                        .WithFormFieldType("form")
+                    )
                     .HasOptional(person, "CommitteeHead", null)
                     .HasMultiple(person, "CommitteeMembers", null)
                     .HasOptional(organizationPermit)

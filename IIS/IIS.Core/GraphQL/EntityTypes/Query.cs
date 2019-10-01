@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             {
                 types = ontology.EntityTypes;
             }
-            return new EntityTypeCollection(types);
+            return new EntityTypeCollection(types, ontology);
         }
 
         public async Task<EntityType> GetEntityType([Service]IOntologyProvider ontologyProvider,
@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
             var ontology = await ontologyProvider.GetOntologyAsync();
             var type = ontology.GetEntityType(code);
-            return type == null ? null : new EntityType(type);
+            return type == null ? null : new EntityType(type, ontology);
         }
     }
 }
