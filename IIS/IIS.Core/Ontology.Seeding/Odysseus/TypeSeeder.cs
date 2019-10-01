@@ -487,9 +487,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     )
                     .HasOptional(r => r
                         .Target("PersonControl")
-                        .WithMeta<EntityRelationMeta>(m =>
-                            m.FormField = new FormField { Type = "radioGroup", RadioType = "radioButton" }
-                        )
                     )
                 ;
 
@@ -748,6 +745,9 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .Target(ctx.CreateEnum("PersonCheckResult"))
                         .WithName("CheckResult")
                         .WithTitle("Резолюція по кандидату")
+                        .WithMeta<EntityRelationMeta>(m =>
+                            m.FormField = new FormField { Type = "radioGroup", RadioType = "radioButton" }
+                        )
                     )
                     .HasOptional(attachment, "ResultAttachment", "Розпорядження (результат)")
                     .HasOptional(date, "Date", "Дата розпорядження")

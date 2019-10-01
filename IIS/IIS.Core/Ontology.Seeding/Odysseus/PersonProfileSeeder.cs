@@ -1,3 +1,5 @@
+using IIS.Core.Ontology.Meta;
+
 namespace IIS.Core.Ontology.Seeding.Odysseus
 {
     public partial class TypeSeeder
@@ -13,7 +15,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var textAttachmentForm = ctx.CreateBuilder().IsEntity()
                     .WithName("TextAttachmentForm")
                     .WithTitle(null)
-                    .HasOptional("Text", null, "Коментар")
+                    .HasOptional(ra => ra
+                        .Target("Text")
+                        .WithTitle("Коментар")
+                        .WithFormFieldType("radioComment")
+                    )
                     .HasOptional("Attachment", null, "Підтвердження")
                 ;
 
@@ -23,7 +29,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithName("ReasonToGetAccess")
                         .WithTitle("14. Пункт «Номенклатури посад працівників СРСД, перебування на яких потребує оформлення допуску та надання доступу до державної таємниці» (або факт потреби у роботі з секретною інформацією без урахування номенклатури посад, із посиланням на дату) – вмотивований запит у зв’язку із оформленням допуску до державної таємниці.")
                         // null name is acceptible ONLY if there are NO same types in answers
-                        .HasOptional("Text", null, "За номенклатурою посад")
+                        .HasOptional("Text", "nomenclatureNumber", "Пункт номенклатури посад")
                         .HasOptional("Attachment", null, "Вмотивований запит")
                         .HasOptional("Date", null, "Дата вмотивованого запиту")
                     )
@@ -34,10 +40,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithName("WrittenObligation")
                         .WithTitle("15. Взяття особою письмового зобов’язання у зв’язку з доступом до державної таємниці у межах ст. 27 Закону України «Про державну таємницю» - повідомлення СРСД та фотокартка з Інтернет-ресурсів.")
                         // Multiple file attributes - we should give each one a name
-                        .HasOptional("Text", null, "Коментар")
+                        .HasOptional(ra => ra
+                            .Target("Text")
+                            .WithTitle("Коментар")
+                            .WithFormFieldType("radioComment")
+                        )
                         .HasOptional("Attachment", "message", "Повідомлення СРСД")
                         .HasOptional("Attachment", "photo", "Фотокартка з інтернет-ресурсів")
                     )
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target(ctx.CreateBuilder().IsEntity().Is(profileQuestion)
@@ -46,35 +57,37 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .HasOptional("Attachment", null, "Лист СРСД")
                         .HasOptional("Date", null, "Дата фактичного надання")
                     )
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target(textAttachmentForm)
                     .WithName("AccessToCryptoProtection")
                     .WithTitle("17. Доступ до засобів криптографічного захисту секретної інформації (шифри тощо).")
-
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target(textAttachmentForm)
                     .WithName("AccessToBackupManagementPoints")
                     .WithTitle("18. Доступ до запасних пунктів управління. ")
-
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target(textAttachmentForm)
                     .WithName("AccessToResearchWork")
                     .WithTitle("19. Доступ до секретних науково-дослідних та дослідно-конструкторських робіт, а також – проведення інших наукових досліджень (захист дисертації тощо). ")
-
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target(textAttachmentForm)
                     .WithName("AccessToSpecialReserachWork")
                     .WithTitle("20. Доступ до особливих робіт (ядерних установок, ядерних матеріалів, радіоактивних відходів, інших джерел іонізуючого випромінювання).")
-
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target(textAttachmentForm)
                     .WithName("AccessToOfficeInformation")
                     .WithTitle("21.  Наявність доступу до службової інформації – повідомлення підприємства, установи чи організації. ")
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target("Text")
@@ -98,6 +111,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .HasOptional("Attachment")
                         .HasOptional("Country")
                     )
+                    .WithMeta<EntityRelationMeta>(m => m.FormField = new FormField { Type = "form", Layout = "inline" })
                 )
                 .HasOptional(r => r
                     .Target(ctx.CreateBuilder().IsEntity().IsEntity()
