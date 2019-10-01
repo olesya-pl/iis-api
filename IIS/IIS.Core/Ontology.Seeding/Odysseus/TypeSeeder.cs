@@ -141,7 +141,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var natoAccessLevel = ctx.CreateEnum("NatoAccessLevel")
                     .WithTitle("Рівень доступу НАТО")
                 ;
-            var applyToAccessLevel = ctx.CreateEnum("ApplyToAccessLevel") // seeded
+            ctx.CreateEnum("AccessLevelForm") // seeded
                     .WithTitle("Форма, на яку подається")
                     .HasOptional(number)
                     .HasOptional(ctx, b => b
@@ -498,7 +498,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .AcceptEmbeddedOperations()
                     .HasOptional(date, "IssueDate",  "Дата видачі")
                     .HasOptional(date, "EndDate",  "Дата завершення дії")
-                    .HasOptional(accessLevel)
+                    .HasOptional("AccessLevelForm")
 //                    .HasOptional(workIn)
                     .HasOptional(accessStatus) // computed?
                 ;
@@ -589,8 +589,16 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("InformingSanction")
                     .WithTitle(null)
                     .Is(organizationSanction)
-                    .HasOptional(legalDocument, "Inform", null)
-                    .HasOptional(legalDocument, "Answer", null)
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Inform")
+                        .WithFormFieldType("form")
+                    )
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Answer")
+                        .WithFormFieldType("form")
+                    )
                 ;
 
             var organizationPermitSanction = ctx.CreateBuilder().IsEntity()
@@ -744,7 +752,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle(null)
                     .AcceptEmbeddedOperations()
                     .HasOptional(attachment, "RequestAttachment", "Вмотивований запит")
-                    .HasOptional(applyToAccessLevel)
+                    .HasOptional("AccessLevelForm")
                     .HasOptional(r => r
                         .Target(ctx.CreateEnum("PersonCheckResult"))
                         .WithName("CheckResult")
