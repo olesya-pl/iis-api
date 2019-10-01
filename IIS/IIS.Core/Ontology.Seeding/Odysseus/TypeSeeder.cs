@@ -428,6 +428,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .AcceptEmbeddedOperations()
                     .HasOptional(r => r
                         .Target(organization)
+                        .WithTitle("Поточне місце роботи")
                         .HasInversed(ir => ir
                             .WithName("Employees")
                             .WithTitle("Працівники")
