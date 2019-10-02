@@ -608,8 +608,16 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle(null)
                     .Is(organizationSanction)
                     .IsAbstraction()
-                    .HasOptional(legalDocument, "Decree", null)
-                    .HasOptional(legalActArticle, "BreachedArticles", null)
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Decree")
+                        .WithFormFieldType("form")
+                    )
+                    .HasMultiple(r => r
+                        .Target(legalActArticle)
+                        .WithName("BreachedArticles")
+                        .WithFormFieldType("popup")
+                    )
                     .HasOptional(text, "BreachInfo", null)
                 ;
 
@@ -664,7 +672,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .Is(personSanction)
                     .HasOptional(text, "InvestigateBody", null)
                     .HasOptional(code, "URPINumber", null)
-                    .HasMultiple(legalActArticle, "BreachedArticles", null)
+                    .HasMultiple(r => r
+                        .Target(legalActArticle)
+                        .WithName("BreachedArticles")
+                        .WithFormFieldType("popup")
+                    )
                     .HasOptional(text, "Description", null)
                     .HasOptional(r => r
                         .Target(legalDocument)
@@ -684,14 +696,22 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithName("Report")
                         .WithFormFieldType("form")
                     )
-                    .HasOptional(legalActArticle, "BreachedArticles", null)
+                    .HasMultiple(r => r
+                        .Target(legalActArticle)
+                        .WithName("BreachedArticles")
+                        .WithFormFieldType("popup")
+                    )
                     .HasOptional(text, "Description", null)
                     .HasOptional(r => r
                         .Target(legalDocument)
                         .WithName("Resolution")
                         .WithFormFieldType("form")
                     )
-                    .HasOptional(legalActArticle, "ResolutionArticles", null)
+                    .HasMultiple(r => r
+                        .Target(legalActArticle)
+                        .WithName("ResolutionArticles")
+                        .WithFormFieldType("popup")
+                    )
                 ;
 
             var finalPersonSanction = ctx.CreateBuilder().IsEntity()
@@ -704,7 +724,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithName("Decree")
                         .WithFormFieldType("form")
                     )
-                    .HasOptional(legalActArticle, "BreachedArticles", null)
+                    .HasMultiple(r => r
+                        .Target(legalActArticle)
+                        .WithName("BreachedArticles")
+                        .WithFormFieldType("popup")
+                    )
                     .HasOptional(text, "BreachInfo", null)
                 ;
 

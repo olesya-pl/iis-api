@@ -1,0 +1,146 @@
+[
+    {
+      "code": "militaryTag",
+      "name": "Військові"
+    },
+    {
+      "code": "civilTag",
+      "name": "Цивільні"
+    },
+    {
+      "code": "criticalInfrastructureFacilityTag",
+      "name": "Об’єкт критичної інфраструктури (ОКІ)"
+    },
+    {
+      "code": "vulnerableToTerrorismFacilityTag",
+      "name": "Об’єкт, уразливий у терористичному відношенні"
+    },
+    {
+      "code": "stateOwnershipTag",
+      "name": "Державна форма власності"
+    },
+    {
+      "code": "privateOwnershipTag",
+      "name": "Приватна форма власності"
+    },
+    {
+      "code": "publicAuthorityTag",
+      "name": "Орган державної влади"
+    },
+    {
+      "code": "localGovernmentTag",
+      "name": "Орган місцевого самоврядування"
+    },
+    {
+      "code": "industrialEnterpriseTag",
+      "name": "Промислове підприємство"
+    },
+    {
+      "code": "medicalFacilityTag",
+      "name": "Медзаклад"
+    },
+    {
+      "code": "ministryOfInternalAffairsTag",
+      "name": "МВС"
+    },
+    {
+      "code": "nationalPoliceTag",
+      "name": "Нацполіція"
+    },
+    {
+      "code": "prosecutorsOfficeTag",
+      "name": "Прокуратура"
+    },
+    {
+      "code": "courtTag",
+      "name": "Суд"
+    },
+    {
+      "code": "taxAuthorityTag",
+      "name": "Податковий орган"
+    },
+    {
+      "code": "customsTag",
+      "name": "Митниця"
+    },
+    {
+      "code": "penaltyInstitutionTag",
+      "name": "Установа виконання покарань"
+    },
+    {
+      "code": "stateTaxServiceTag",
+      "name": "ДПС"
+    },
+    {
+      "code": "stateMigrationServiceTag",
+      "name": "ДМС"
+    },
+    {
+      "code": "armedForcesTag",
+      "name": "ЗСУ"
+    },
+    {
+      "code": "nationalGuardTag",
+      "name": "Національна гвардія"
+    },
+    {
+      "code": "stateSpecialCommunicationsTag",
+      "name": "Держспецзв’язок"
+    },
+    {
+      "code": "stateEmergencyServiceTag",
+      "name": "ДСНС"
+    },
+    {
+      "code": "schoolTag",
+      "name": "Навчальний заклад"
+    },
+    {
+      "code": "scientificInstitutionTag",
+      "name": "Наукова установа"
+    },
+    {
+      "code": "bankingFinancialInstitutionsTag",
+      "name": "Банківська, фінансова установа"
+    },
+    {
+      "code": "nationalAntiCorruptionBureauTag",
+      "name": "НАБУ"
+    },
+    {
+      "code": "stateInvestigationBureauTag",
+      "name": "ДБР"
+    },
+    {
+      "code": "externalIntelligenceServiceTag",
+      "name": "СЗР"
+    },
+    {
+      "code": "ministryTag",
+      "name": "Міністерство"
+    },
+    {
+      "code": "diplomaticEstablishmentTag",
+      "name": "Дипломатична установа"
+    },
+    {
+      "code": "militaryContingent",
+      "name": "Військовий контингент"
+    },
+    {
+      "code": "secretServiceTag",
+      "name": "СБУ"
+    },
+    {
+      "code": "researchCustomerTag",
+      "name": "Замовник НДДКР"
+    },
+    {
+      "code": "researchPerformerTag",
+      "name": "Виконавець НДДКР"
+    },
+    {
+      "code": "researchCoPerformerTag",
+      "name": "Співвиконавець НДДКР"
+    }
+]
