@@ -1,16 +1,16 @@
 [
   {
-    "number": 1,
+    "number": "1",
     "name": "Цілком таємно",
       "code": "1"
   },
   {
-    "number": 2,
+    "number": "2",
     "name": "Таємно",
       "code": "2"
   },
   {
-    "number": 3,
+    "number": "3",
     "name": "Особливої важливості",
       "code": "3"
   }

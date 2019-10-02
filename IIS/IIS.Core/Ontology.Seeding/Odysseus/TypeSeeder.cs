@@ -12,7 +12,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var name = ctx.CreateBuilder().WithName("Name").WithTitle("Назва").IsAttribute().HasValueOf(ScalarType.String);
             var code = ctx.CreateBuilder().WithName("Code").WithTitle("Код").IsAttribute().HasValueOf(ScalarType.String);
             var taxId = ctx.CreateBuilder().WithName("TaxId").WithTitle("Податковий ідентифікатор").IsAttribute().HasValueOf(ScalarType.String);
-            var number = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.Integer);
+            var number = ctx.CreateBuilder().WithName("Number").WithTitle("Номер").IsAttribute().HasValueOf(ScalarType.String);
             var count = ctx.CreateBuilder().WithName("Count").WithTitle("Кількість").IsAttribute().HasValueOf(ScalarType.Integer);
             var firstName = ctx.CreateBuilder().WithName("FirstName").WithTitle("Ім’я").IsAttribute().HasValueOf(ScalarType.String);
             var secondName = ctx.CreateBuilder().WithName("SecondName").WithTitle("Прізвище").IsAttribute().HasValueOf(ScalarType.String);
@@ -541,7 +541,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             var legalActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("LegalActArticle")
                     .WithTitle(null)
-                    .HasOptional(code, "Number", null)
+                    .HasOptional(number)
                     .HasOptional(text, "Content", null)
 //                    .HasOptional(r => r
 //                        .Target(legalAct)
@@ -566,7 +566,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle(null)
                     .AcceptEmbeddedOperations()
                     .HasOptional(date)
-                    .HasOptional(code, "Number", null)
+                    .HasOptional(number)
                     .HasOptional(attachment, "Original", null)
                     .HasOptional(text, "Content", null)
                 ;
