@@ -8,8 +8,8 @@ You can run it in detached mode or use tools like supervisor to start/stop servi
 web is on port 5000 by default.
 replication is on port 5500. Look at console output to find out which port is used.
 
-To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html) or `pm2`. 
-To change configuration find `IIS/publish/replication/appsettings.${ENV}.json` file and `IIS/publish/web/appsettings.${ENV}.json`. 
+To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html) or `pm2`.
+To change configuration find `IIS/publish/replication/appsettings.${ENV}.json` file and `IIS/publish/web/appsettings.${ENV}.json`.
 `${ENV}` is env name and equals to the value of env variable `ASPNETCORE_ENVIRONMENT` (in our case `Staging`)
 
 ##### Command-line usage:
@@ -29,3 +29,12 @@ If any action was found, web server would not start. To override this behaviour,
 * `seed-odysseus-data` Seeds Odysseus enums from files.
 * `apply-ef-migrations` Applies Entity Framework migrations to db, creates if it does not exist.
 * `help` Displays this list in console.
+
+## Migrate entities from Node.js db
+
+1. Inside `appsettings.Staging.json` specify `db-legacy` with parameters to Node.js database
+2. `db` setting should point to destination database (for .NET)
+3. inside `publish/core` (or `publish/web`) run
+   ```sh
+   ASPNETCORE_ENVIRONMENT=Staging dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,migrate-legacy-types,seed-contour-data,migrate-legacy-entities
+   ```

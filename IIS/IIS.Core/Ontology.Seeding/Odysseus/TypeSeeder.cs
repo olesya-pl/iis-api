@@ -418,6 +418,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithMeta<EntityRelationMeta>(m =>
                             m.FormField = new FormField {Type = "table", HasIndexColumn = true})
                     )
+                    .HasMultiple("VettingProcedure")
                 ;
 
 
@@ -642,7 +643,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("DisciplinaryPersonSanction")
                     .WithTitle(null)
                     .Is(personSanction)
-                    .HasOptional(legalDocument, "Report", null)
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Report")
+                        .WithFormFieldType("form")
+                    )
                     .HasOptional(disciplinarySanctionKind)
                 ;
 
@@ -661,7 +666,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(code, "URPINumber", null)
                     .HasMultiple(legalActArticle, "BreachedArticles", null)
                     .HasOptional(text, "Description", null)
-                    .HasOptional(legalDocument, "Resolution", null)
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Resolution")
+                        .WithFormFieldType("form")
+                    )
                     .HasOptional(organization, "Court", null)
                 ;
 
@@ -670,10 +679,18 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle(null)
                     .Is(personSanction)
                     .HasOptional(person, "DrawnUpBy", null)
-                    .HasOptional(legalDocument, "Report", null)
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Report")
+                        .WithFormFieldType("form")
+                    )
                     .HasOptional(legalActArticle, "BreachedArticles", null)
                     .HasOptional(text, "Description", null)
-                    .HasOptional(legalDocument, "Resolution", null)
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Resolution")
+                        .WithFormFieldType("form")
+                    )
                     .HasOptional(legalActArticle, "ResolutionArticles", null)
                 ;
 
@@ -682,7 +699,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle(null)
                     .Is(personSanction)
                     .IsAbstraction()
-                    .HasOptional(legalDocument, "Decree", null)
+                    .HasOptional(r => r
+                        .Target(legalDocument)
+                        .WithName("Decree")
+                        .WithFormFieldType("form")
+                    )
                     .HasOptional(legalActArticle, "BreachedArticles", null)
                     .HasOptional(text, "BreachInfo", null)
                 ;
@@ -702,26 +723,25 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // sanctions end
 
             var vettingProcedureType = ctx.CreateEnum("VettingProcedureType")
-                    .WithTitle(null)
+                    .WithTitle("Тип перевірки")
                 ;
 
             var vettingProcedureKind = ctx.CreateEnum("VettingProcedureKind")
-                    .WithTitle(null)
+                    .WithTitle("Вид перевірки")
                 ;
 
 
             var vettingProcedure = ctx.CreateBuilder().IsEntity()
                     .WithName("VettingProcedure")
-                    .WithTitle(null)
+                    .WithTitle("Перевірка")
                     .AcceptEmbeddedOperations()
-                    .HasOptional(legalDocument, "Order", null)
-                    .HasOptional(vettingProcedureType)
-                    .HasOptional(vettingProcedureKind)
-                    .HasOptional(r => r
-                        .Target(dateRange)
-                        .WithName("Duration")
-                        .WithTitle(null)
-                        .WithFormFieldType("dateRange")
+                    .HasRequired(r => r
+                        .Target(number)
+                        .WithTitle("Номер припису")
+                    )
+                    .HasRequired(r => r
+                        .Target(date)
+                        .WithTitle("Дата припису")
                     )
                     .HasOptional(r => r
                         .Target(dateRange)
@@ -729,22 +749,29 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithTitle(null)
                         .WithFormFieldType("dateRange")
                     )
+                    .HasRequired(vettingProcedureType)
+                    .HasRequired(vettingProcedureKind)
+                    .HasOptional(r => r
+                        .Target(dateRange)
+                        .WithName("Duration")
+                        .WithTitle("Тривалість перевірки")
+                        .WithFormFieldType("dateRange")
+                    )
+                    .HasOptional(person, "CommitteeHead", "Голова комісії")
+                    .HasMultiple(person, "CommitteeMembers", "Члени комісії")
                     .HasOptional(r => r
                         .Target(organization)
                         .WithName("ConductedBy")
-                        .WithTitle(null)
-                        .HasInversed(ir => ir
-                            .IsMultiple()
-                        )
+                        .WithTitle("Орган / підрозділ СБУ")
                     )
-                    .HasOptional(legalDocument, "InspectionAct", null)
+                    .HasOptional(r => r
+                        .Target(attachment)
+                        .WithTitle("Акт перевірки")
+                    )
                     .HasMultiple(r => r
                         .Target(sanction)
                         .WithFormFieldType("form")
                     )
-                    .HasOptional(person, "CommitteeHead", null)
-                    .HasMultiple(person, "CommitteeMembers", null)
-                    .HasOptional(organizationPermit)
                 ;
 
             // Person Control
