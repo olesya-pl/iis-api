@@ -144,6 +144,7 @@ namespace IIS.Legacy.EntityFramework
 
                 var unionName = $"{source.Name}_{relation.Name}";
                 var unionType = new EntityType(Guid.NewGuid(), unionName, true);
+                unionType.Title = unionName;
                 foreach (var child in info.Union)
                 {
                     var childType = entities[child.Target.Code];

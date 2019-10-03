@@ -574,7 +574,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var sanction = ctx.CreateBuilder().IsEntity()
                     .WithName("Sanction")
-                    .WithTitle(null)
+                    .WithTitle("Санкція")
                     .IsAbstraction()
                     .AcceptEmbeddedOperations()
                 ;
@@ -582,78 +582,83 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // organization sanctions
             var organizationSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("OrganizationSanction")
-                    .WithTitle(null)
+                    .WithTitle("Санкція до організацій")
                     .Is(sanction)
                     .IsAbstraction()
                 ;
 
             var informingSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("InformingSanction")
-                    .WithTitle(null)
+                    .WithTitle("Інформування")
                     .Is(organizationSanction)
                     .HasOptional(r => r
                         .Target(legalDocument)
                         .WithName("Inform")
+                        .WithTitle("Інформування")
                         .WithFormFieldType("form")
                     )
                     .HasOptional(r => r
                         .Target(legalDocument)
                         .WithName("Answer")
+                        .WithTitle("Відповідь")
                         .WithFormFieldType("form")
                     )
                 ;
 
             var organizationPermitSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("OrganizationPermitSanction")
-                    .WithTitle(null)
+                    .WithTitle("Санкції до Спецдозволу")
                     .Is(organizationSanction)
                     .IsAbstraction()
                     .HasOptional(r => r
                         .Target(legalDocument)
                         .WithName("Decree")
+                        .WithTitle("Розпорядження")
                         .WithFormFieldType("form")
                     )
                     .HasMultiple(r => r
                         .Target(legalActArticle)
                         .WithName("BreachedArticles")
+                        .WithTitle("Порушено вимоги НПА")
                         .WithFormFieldType("popup")
                     )
-                    .HasOptional(text, "BreachInfo", null)
+                    .HasOptional(text, "BreachInfo", "Відомості про порушення")
                 ;
 
-            var terminationSanction = ctx.CreateBuilder().IsEntity()
-                    .WithName("SpecialPermitTerminationSanction")
-                    .WithTitle(null)
+            var suspensionSanction = ctx.CreateBuilder().IsEntity()
+                    .WithName("SpecialPermitSuspensionSanction")
+                    .WithTitle("Зупинення спецдозволу")
                     .Is(organizationPermitSanction)
                 ;
 
             var cancellationSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("SpecialPermitCancellationSanction")
-                    .WithTitle(null)
+                    .WithTitle("Скасування спецдозволу")
                     .Is(organizationPermitSanction)
                 ;
 
             // person sanctions
             var disciplinarySanctionKind = ctx.CreateEnum("DisciplinarySanctionKind")
-                    .WithTitle(null)
+                    .WithTitle("Вид дисциплінарної відповідальністі")
                 ;
 
             var personSanction = ctx.CreateBuilder().IsEntity()
                     .Is(sanction)
                     .WithName("PersonSanction")
-                    .WithTitle(null)
+                    .WithTitle("Санкція по людині")
                     .IsAbstraction()
-                    .HasOptional(person, "person", null)
+                    .HasOptional(person, "person", "Секретоносій")
                     .HasOptional(access)
                 ;
 
             var disciplinaryPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("DisciplinaryPersonSanction")
-                    .WithTitle(null)
+                    .WithTitle("Дисциплінарна відповідальність")
                     .Is(personSanction)
                     .HasOptional(r => r
                         .Target(legalDocument)
                         .WithName("Report")
+                        .WithTitle("Протокол")
                         .WithFormFieldType("form")
                     )
                     .HasOptional(disciplinarySanctionKind)
@@ -661,57 +666,58 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var investigationPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("InvestigationPersonSanction")
-                    .WithTitle(null)
+                    .WithTitle("Службове розслідування")
                     .Is(personSanction)
-                    .HasMultiple(sanction)
+                    .HasMultiple(r => r
+                        .Target(sanction)
+                        .WithTitle("Заходи реагування")
+                    )
                 ;
 
             var criminalPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("CriminalPersonSanction")
-                    .WithTitle(null)
+                    .WithTitle("Кримінальне провадження")
                     .Is(personSanction)
-                    .HasOptional(text, "InvestigateBody", null)
-                    .HasOptional(code, "URPINumber", null)
+                    .HasOptional(code, "URPINumber", "Номер в ЄРДР")
+                    .HasOptional(date, "RegistrationDate", "Дата реєстрації")
                     .HasMultiple(r => r
                         .Target(legalActArticle)
                         .WithName("BreachedArticles")
+                        .WithTitle("Статті КК України")
                         .WithFormFieldType("popup")
                     )
-                    .HasOptional(text, "Description", null)
+                    .HasOptional(text, "Description", "Сутність кримінального порушення")
                     .HasOptional(r => r
                         .Target(legalDocument)
                         .WithName("Resolution")
                         .WithFormFieldType("form")
                     )
-                    .HasOptional(organization, "Court", null)
+                    .HasOptional(organization, "Court", "Суд, який розглядає матеріали КП")
+                    .HasOptional(attachment, "judgment", "Вирок/ухвала/покарання")
                 ;
 
             var reportPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("ReportPersonSanction")
-                    .WithTitle(null)
+                    .WithTitle("Протокол")
                     .Is(personSanction)
-                    .HasOptional(person, "DrawnUpBy", null)
-                    .HasOptional(r => r
-                        .Target(legalDocument)
-                        .WithName("Report")
-                        .WithFormFieldType("form")
-                    )
+                    .HasRequired(number, null, "Номер протоколу")
+                    .HasRequired(date, "RegistrationDate", "Дата реєстрації")
+                    .HasOptional(person, "DrawnUpBy", "Склав")
                     .HasMultiple(r => r
                         .Target(legalActArticle)
                         .WithName("BreachedArticles")
+                        .WithTitle("Порушено вимоги НПА")
                         .WithFormFieldType("popup")
                     )
-                    .HasOptional(text, "Description", null)
-                    .HasOptional(r => r
-                        .Target(legalDocument)
-                        .WithName("Resolution")
-                        .WithFormFieldType("form")
-                    )
+                    .HasOptional(text, "Description", "Сутність адмінправопорушення")
                     .HasMultiple(r => r
                         .Target(legalActArticle)
                         .WithName("ResolutionArticles")
+                        .WithTitle("Статті КУпАП за якою притягнуто до відповідальності")
                         .WithFormFieldType("popup")
                     )
+                    .HasOptional(organization, "Court", "Суд, який розглядає матеріали КП")
+                    .HasRequired(attachment, "judgment", "Рішення суду")
                 ;
 
             var finalPersonSanction = ctx.CreateBuilder().IsEntity()
@@ -732,15 +738,15 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(text, "BreachInfo", null)
                 ;
 
-            var terminationPersonSanction = ctx.CreateBuilder().IsEntity()
-                    .WithName("TerminationPersonSanction")
-                    .WithTitle(null)
+            ctx.CreateBuilder().IsEntity()
+                    .WithName("SuspensionPersonSanction")
+                    .WithTitle("Зупинення спецдозволу")
                     .Is(finalPersonSanction)
                 ;
 
             var cancellationPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("CancellationPersonSanction")
-                    .WithTitle(null)
+                    .WithTitle("Скасування допуска")
                     .Is(finalPersonSanction)
                 ;
 
@@ -770,7 +776,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(r => r
                         .Target(dateRange)
                         .WithName("CheckPeriod")
-                        .WithTitle(null)
+                        .WithTitle("Період діяльності, який перевіряється")
                         .WithFormFieldType("dateRange")
                     )
                     .HasRequired(vettingProcedureType)
