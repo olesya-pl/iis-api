@@ -648,7 +648,10 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle("Санкція по людині")
                     .IsAbstraction()
                     .HasOptional(person, "person", "Секретоносій")
-                    .HasOptional(access)
+                    .HasOptional(r => r
+                        .Target("InvestigationPersonSanction")
+                        .WithTitle("Службове розслідування")
+                    )
                 ;
 
             var disciplinaryPersonSanction = ctx.CreateBuilder().IsEntity()
@@ -664,14 +667,26 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(disciplinarySanctionKind)
                 ;
 
+            var simpleDoc = ctx.CreateBuilder().IsEntity()
+                .WithName("SimpleDocument")
+                .HasRequired(number, null, "Номер")
+                .HasRequired(date, null, "Дата реєстрації")
+            ;
+
+            var sanctionConclusion = ctx.CreateBuilder().IsEntity()
+                .WithName("SanctionConslusion")
+                .HasRequired(number, null, "Номер")
+                .HasRequired(date, null, "Дата реєстрації")
+                .HasRequired(attachment, null, "Оригінал")
+            ;
+
             var investigationPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("InvestigationPersonSanction")
                     .WithTitle("Службове розслідування")
                     .Is(personSanction)
-                    .HasMultiple(r => r
-                        .Target(sanction)
-                        .WithTitle("Заходи реагування")
-                    )
+                    .HasRequired(simpleDoc, "reason", "Підстава (№ акта)")
+                    .HasRequired(simpleDoc, "decree", "Наказ про проведення службового розслідування:")
+                    .HasRequired(sanctionConclusion, "conclusion", "Висновок за результатами розслідування")
                 ;
 
             var criminalPersonSanction = ctx.CreateBuilder().IsEntity()
@@ -693,7 +708,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithFormFieldType("form")
                     )
                     .HasOptional(organization, "Court", "Суд, який розглядає матеріали КП")
-                    .HasOptional(attachment, "judgment", "Вирок/ухвала/покарання")
+                    .HasRequired(attachment, "judgment", "Вирок/ухвала/покарання")
                 ;
 
             var reportPersonSanction = ctx.CreateBuilder().IsEntity()

@@ -15,7 +15,8 @@ namespace IIS.Core.Ontology
             Types = types;
         }
 
-        public EntityType GetEntityType(string name) => EntityTypes.SingleOrDefault(e => e.Name == name);
+        // TODO: revert it back
+        public EntityType GetEntityType(string name) => EntityTypes.Where(e => e.Name == name).First();
 
         public Type GetType(Guid id) => Types.SingleOrDefault(e => e.Id == id);
 
