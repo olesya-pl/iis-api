@@ -155,11 +155,12 @@ namespace IIS.Core
             context.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "authorization,content-type" });
             context.Response.Headers.Add("Access-Control-Allow-Methods", new[] { "GET, POST, PUT, DELETE, OPTIONS" });
             context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
+            context.Response.Headers.Add("Access-Control-Max-Age", new[] { "600" });
 
             if (context.Request.Method == "OPTIONS")
             {
-                context.Response.StatusCode = 200;
-                return context.Response.WriteAsync("OK");
+                context.Response.StatusCode = 204;
+                return context.Response.WriteAsync("");
             }
 
             return _next.Invoke(context);

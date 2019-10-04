@@ -173,6 +173,7 @@ namespace IIS.Core.Ontology
             var now = DateTime.UtcNow;
             type.CreatedAt = now;
             type.UpdatedAt = now;
+            _builtType = type;
 
             //foreach (var buildAction in _parentBuilders)
             //{
@@ -227,7 +228,7 @@ namespace IIS.Core.Ontology
                 }
             }
             _isBuilding = false;
-            _builtType = type;
+            // TODO: get rid of this dirty shit...
             TypeBuilt?.Invoke(this, EventArgs.Empty);
 
             return type;

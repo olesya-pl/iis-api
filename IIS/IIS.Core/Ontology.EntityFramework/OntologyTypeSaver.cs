@@ -49,6 +49,8 @@ namespace IIS.Core.Ontology.EntityFramework
             result.Meta = type.Meta?.Serialize().ToString();
             result.IsArchived = false;
             result.IsAbstract = false;
+            _types.Add(type.Id, result); // Add to created types cache
+
             // Filling specific properties for different types
             if (type is EntityType et)
             {
@@ -86,8 +88,6 @@ namespace IIS.Core.Ontology.EntityFramework
                 result.RelationType.SourceType = SaveType(relationSource);
             }
             else throw new NotImplementedException();
-
-            _types.Add(type.Id, result); // Add to created types cache
 
             foreach (var node in type.RelatedTypes.OfType<RelationType>()) // saving only relation nodes
                 SaveType(node, type);

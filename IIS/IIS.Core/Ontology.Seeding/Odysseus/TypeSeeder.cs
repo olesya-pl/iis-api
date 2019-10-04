@@ -303,7 +303,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(text, "CypherName",  "Шифр роботи")
                     .HasOptional(text, "FullName",  "Повна назва роботи")
                     .HasOptional(text, "WorkBasis",  "Підстава для виконання роботи")
-                    .HasOptional(text, "Customer",  "Замовник роботи")
+                    .HasOptional("Organization", "Customer",  "Замовник роботи")
                     .HasOptional(r => r
                         .Target("Organization")
                         .WithName("Contractor")
@@ -367,7 +367,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(legalForm)
                     .HasOptional(address, "LocatedAt",  "Фактична адреса") // Address kind?
                     .HasOptional(address, "RegisteredAt",  "Юридична адреса")
-                    .HasOptional(address, "BranchAddress",  "Філія")
+                    .HasMultiple(address, "BranchAddress",  "Філія")
                     .HasOptional(address, "SecretFacilityAddress",  "РСО")
                     .HasOptional(address, "SecretFacilityArchiveAddress",  "Архів РСО")
                     .HasOptional(attachment, "RSOCreationRequest",  "Вмотивований запит на створення РСО")
