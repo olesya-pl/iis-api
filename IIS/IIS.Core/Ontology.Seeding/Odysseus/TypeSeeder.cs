@@ -647,7 +647,16 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("PersonSanction")
                     .WithTitle("Санкція по людині")
                     .IsAbstraction()
-                    .HasOptional(person, "person", "Секретоносій")
+                    .HasOptional(r => r
+                        .Target(person)
+                        .WithName("person")
+                        .WithTitle("Секретоносій")
+                        .HasInversed(ir => ir
+                            .WithName("sanctions")
+                            .WithTitle("Заходи впливу до секретоносія")
+                            .IsMultiple()
+                        )
+                    )
                     .HasOptional(r => r
                         .Target("InvestigationPersonSanction")
                         .WithTitle("Службове розслідування")
@@ -671,6 +680,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 .WithName("SimpleDocument")
                 .HasRequired(number, null, "Номер")
                 .HasRequired(date, null, "Дата реєстрації")
+                .AcceptEmbeddedOperations()
             ;
 
             var sanctionConclusion = ctx.CreateBuilder().IsEntity()
@@ -678,15 +688,31 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 .HasRequired(number, null, "Номер")
                 .HasRequired(date, null, "Дата реєстрації")
                 .HasRequired(attachment, null, "Оригінал")
+                .AcceptEmbeddedOperations()
             ;
 
             var investigationPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("InvestigationPersonSanction")
                     .WithTitle("Службове розслідування")
                     .Is(personSanction)
-                    .HasRequired(simpleDoc, "reason", "Підстава (№ акта)")
-                    .HasRequired(simpleDoc, "decree", "Наказ про проведення службового розслідування:")
-                    .HasRequired(sanctionConclusion, "conclusion", "Висновок за результатами розслідування")
+                    .HasRequired(r => r
+                        .Target(simpleDoc)
+                        .WithName("reason")
+                        .WithTitle("Підстава (№ акта)")
+                        .WithFormFieldType("form")
+                    )
+                    .HasRequired(r => r
+                        .Target(simpleDoc)
+                        .WithName("decree")
+                        .WithTitle("Наказ про проведення службового розслідування:")
+                        .WithFormFieldType("form")
+                    )
+                    .HasRequired(r => r
+                        .Target(sanctionConclusion)
+                        .WithName("conclusion")
+                        .WithTitle("Висновок за результатами розслідування")
+                        .WithFormFieldType("form")
+                    )
                 ;
 
             var criminalPersonSanction = ctx.CreateBuilder().IsEntity()
