@@ -541,7 +541,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var legalActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("LegalActArticle")
-                    .WithTitle(null)
+                    .WithTitle("НПА")
                     .HasOptional(number)
                     .HasOptional(text, "Content", null)
 //                    .HasOptional(r => r
@@ -552,13 +552,13 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var criminalActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("CriminalActArticle")
-                    .WithTitle(null)
+                    .WithTitle("Кримінальний кодекс")
                     .Is(legalActArticle)
                 ;
 
             var administrativeActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("AdministrativeActArticle")
-                    .WithTitle(null)
+                    .WithTitle("КУпАП")
                     .Is(legalActArticle)
                 ;
 
@@ -703,7 +703,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     )
                     .HasRequired(r => r
                         .Target(simpleDoc)
-                        .WithName("decree")
+                        .WithName("order")
                         .WithTitle("Наказ про проведення службового розслідування:")
                         .WithFormFieldType("form")
                     )
