@@ -196,7 +196,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     )
                     .WithFormFieldType("table")
                 )
-                .HasOptional(r => r
+                .HasMultiple(r => r
                     .Target(ctx.CreateBuilder().IsEntity()
                         .WithName("ThirdPartyInterest")
                         .WithTitle("37. Зацікавленість секретонсієм з боку третіх осіб – офіційна (заяви, скарги чи інші звернення) чи оперативна інформація (запит на отримання інформації про особу).")

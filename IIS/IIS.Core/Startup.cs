@@ -160,7 +160,7 @@ namespace IIS.Core
             if (context.Request.Method == "OPTIONS")
             {
                 context.Response.StatusCode = 204;
-                return context.Response.WriteAsync("");
+                return Task.FromResult(context.Response);
             }
 
             return _next.Invoke(context);

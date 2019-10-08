@@ -236,6 +236,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // organization tabs
             var listOfPositionsItem = ctx.CreateBuilder().IsEntity()
                     .WithName("ListOfPositionsItem")
+                    .WithTitle(null)
                     .AcceptEmbeddedOperations()
                     .HasOptional(r => r
                             .Target(text)
@@ -334,6 +335,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .Target(stage)
                         .WithName("CurrentStage")
                         .WithTitle("Поточний етап")
+                        .WithMeta<EntityRelationMeta>(m => m.AcceptsEntityOperations = new EntityOperation[0])
                     )
                 ;
 
@@ -660,6 +662,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(r => r
                         .Target("InvestigationPersonSanction")
                         .WithTitle("Службове розслідування")
+                        .WithMeta<EntityRelationMeta>(m => m.AcceptsEntityOperations = new EntityOperation[0])
                     )
                 ;
 

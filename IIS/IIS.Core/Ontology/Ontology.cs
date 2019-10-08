@@ -16,7 +16,17 @@ namespace IIS.Core.Ontology
         }
 
         // TODO: revert it back
-        public EntityType GetEntityType(string name) => EntityTypes.Where(e => e.Name == name).First();
+        public EntityType GetEntityType(string name)
+        {
+            try
+            {
+                return EntityTypes.Where(e => e.Name == name).First();
+            }
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException($"Type '{name}' does not exist");
+            }
+        }
 
         public Type GetType(Guid id) => Types.SingleOrDefault(e => e.Id == id);
 
