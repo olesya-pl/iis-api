@@ -214,7 +214,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
             var item = form.Question26;
             if (item == null) throw new ArgumentException("Question 26 was not found");
-            await assignSigns("phoneSign", item.Phones);
+            await assignSigns("phoneSign", item.PhoneSign);
             await assignSigns("emailSign", item.EmailSign);
             await assignSigns("socialNetworkSign", item.SocialNetworkSign);
         }
@@ -225,10 +225,14 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             if (item == null) throw new ArgumentException("Question 28 was not found");
 
             var passport = (Entity) person.GetProperty("passport");
+            var passportType = person.GetRelationType("passport").EntityType;
             if (passport == null)
             {
-                passport = new Entity(Guid.NewGuid(), person.GetRelationType("passport").EntityType);
+                passport = new Entity(Guid.NewGuid(), passportType);
                 person.SetProperty("passport", passport);
+            } else {
+                var node = await _ontologyService.LoadNodesAsync(passport.Id, null);
+                passport = (Entity)node;
             }
             passport.SetProperty("issueInfo", item.IssuedBy);
             passport.SetProperty("issueDate", item.DateOfIssue);
@@ -249,7 +253,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
             public class Question26Item
             {
-                public IEnumerable<SignEntity> Phones { get; set; }
+                public IEnumerable<SignEntity> PhoneSign { get; set; }
                 public IEnumerable<SignEntity> EmailSign { get; set; }
                 public IEnumerable<SignEntity> SocialNetworkSign { get; set; }
             }
@@ -263,7 +267,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             public class Question3Item
             {
                 public DateTime BirthDate { get; set; }
-                public FormEntity BirthCountry { get; set; }
+                public FormEntity Country { get; set; }
                 public string ZipCode { get; set; }
                 public string Region { get; set; }
                 public string Subregion { get; set; }
