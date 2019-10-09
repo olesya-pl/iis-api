@@ -236,7 +236,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // organization tabs
             var listOfPositionsItem = ctx.CreateBuilder().IsEntity()
                     .WithName("ListOfPositionsItem")
-                    .WithTitle(null)
+                    .WithTitle("")
                     .AcceptEmbeddedOperations()
                     .HasOptional(r => r
                             .Target(text)
@@ -566,7 +566,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var legalDocument = ctx.CreateBuilder().IsEntity()
                     .WithName("LegalDocument")
-                    .WithTitle(null)
+                    .WithTitle("")
                     .AcceptEmbeddedOperations()
                     .HasOptional(date)
                     .HasOptional(number)

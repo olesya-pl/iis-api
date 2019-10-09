@@ -234,8 +234,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 var node = await _ontologyService.LoadNodesAsync(passport.Id, null);
                 passport = (Entity)node;
             }
-            passport.SetProperty("issueInfo", item.IssuedBy);
-            passport.SetProperty("issueDate", item.DateOfIssue);
+            passport.SetProperty("issueInfo", item.IssueInfo);
+            passport.SetProperty("issueDate", item.IssueDate);
             await _ontologyService.SaveNodeAsync(passport);
         }
 
@@ -260,8 +260,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
             public class Question28Item
             {
-                public DateTime DateOfIssue { get; set; }
-                public string IssuedBy { get; set; }
+                public DateTime IssueDate { get; set; }
+                public string IssueInfo { get; set; }
             }
 
             public class Question3Item
