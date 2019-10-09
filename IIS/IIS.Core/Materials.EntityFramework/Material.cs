@@ -13,7 +13,7 @@ namespace IIS.Core.Materials.EntityFramework
         public string Data { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }
-
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
         public virtual Material Parent { get; set; }
         public virtual ICollection<Material> Children { get; set; }
         public virtual File File { get; set; }

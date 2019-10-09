@@ -43,22 +43,18 @@ namespace IIS.Core.Materials.EntityFramework
                 else
                 {
                     var nodeIdsArr = nodeIds.ToArray();
-                    var idsQ = _context.MaterialFeatures
-                        .Include(e => e.Info)
-                        .ThenInclude(e => e.Material)
-                        .Where(e => nodeIdsArr.Contains(e.NodeId));
-                    if (types != null)
-                        idsQ = idsQ.Where(e => types.Contains(e.Info.Material.Type));
-                    var idsDist = idsQ.Select(e => e.Info.Material.Id)
-                        .Distinct();
-                    var materialsIds = idsDist.Skip(offset).Take(limit);
                     materialsQ = _context.Materials
                         .Include(m => m.Infos)
                         .ThenInclude(m => m.Features)
-                        .Where(m => materialsIds.Contains(m.Id));
+                        .Where(m => m.Infos.Any(i => i.Features.Any(f => nodeIdsArr.Contains(f.NodeId))))
+                        .OrderByDescending(m => m.CreatedDate)
+                        .Skip(offset)
+                        .Take(limit)
+                    ;
                 }
 
-                materials = await materialsQ.ToArrayAsync();
+                materials = await materialsQ
+                    .ToArrayAsync();
             }
             finally
             {
