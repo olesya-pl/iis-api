@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials.EntityFramework;
@@ -27,6 +27,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<Material> Materials { get; set; }
         public virtual DbSet<MaterialInfo> MaterialInfos { get; set; }
         public virtual DbSet<MaterialFeature> MaterialFeatures { get; set; }
+        public virtual DbSet<Report.EntityFramework.Report> Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
