@@ -95,8 +95,11 @@ namespace IIS.Core
 
         public void SeedContourData()
         {
-            _serviceProvider.GetService<Seeder>().Seed("contour").Wait();
-            Console.WriteLine("Contour data seeded");
+            using(var scope = _serviceProvider.CreateScope())
+            {
+                scope.ServiceProvider.GetService<Seeder>().Seed("contour").Wait();
+                Console.WriteLine("Contour data seeded");
+            }
         }
 
         public void SeedOdysseusData()
