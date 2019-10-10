@@ -10,7 +10,7 @@ namespace IIS.Core.GraphQL.Reports
         private IList<T> _items = new List<T>();
 
         public GraphQLCollection() { }
-        public GraphQLCollection(IList<T> list)
+        public GraphQLCollection(IList<T> list, int totalRecordsCount)
         {
             if (list is null)
             {
@@ -18,9 +18,10 @@ namespace IIS.Core.GraphQL.Reports
             }
 
             _items = list;
+            Count = totalRecordsCount;
         }
         public void Add(T element) => _items.Add(element);
-        public int Count => _items.Count;
+        public int Count { get; set; }
         [GraphQLNonNullType]
         public IEnumerable<T> GetItems() => _items;
 
