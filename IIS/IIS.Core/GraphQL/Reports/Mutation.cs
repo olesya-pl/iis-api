@@ -35,12 +35,12 @@ namespace IIS.Core.GraphQL.Reports
             return new Report(reportInDb.Id, reportInDb.Title, reportInDb.Recipient, reportInDb.CreatedAt);
         }
 
-        public async Task DeleteReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid reportId)
+        public async Task<int> DeleteReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid reportId)
         {
             var report = new Core.Report.EntityFramework.Report { Id = reportId };
             context.Reports.Attach(report);
             context.Reports.Remove(report);
-            context.SaveChanges();
+            return await context.SaveChangesAsync();
         }
     }
 }
