@@ -36,5 +36,5 @@ If any action was found, web server would not start. To override this behaviour,
 2. `db` setting should point to destination database (for .NET)
 3. inside `publish/core` (or `publish/web`) run
    ```sh
-   ASPNETCORE_ENVIRONMENT=Staging dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,migrate-legacy-types,seed-contour-data,migrate-legacy-entities
+   ASPNETCORE_ENVIRONMENT=Staging dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,migrate-legacy-types,seed-contour-data,migrate-legacy-entities,migrate-legacy-files
    ```

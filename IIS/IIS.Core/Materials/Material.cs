@@ -16,6 +16,8 @@ namespace IIS.Core.Materials
         public FileInfo File { get; set; }
         public ICollection<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
 
+        public DateTime CreatedDate { get; }
+
         public Material(Guid id, JObject metadata, JArray data, string type, string source)
         {
             Id = id;
@@ -23,6 +25,7 @@ namespace IIS.Core.Materials
             Data = data;
             Type = type;
             Source = source;
+            CreatedDate = DateTime.Now;
         }
     }
 }

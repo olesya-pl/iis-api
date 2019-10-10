@@ -120,7 +120,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             person.SetProperty("birthDate", item.BirthDate);
             var address = person.GetRelationType("birthPlace").EntityType;
             var node = new Entity(Guid.NewGuid(), address);
-            node.SetProperty("zipCode", item.PostalCode);
+            node.SetProperty("zipCode", item.ZipCode);
             node.SetProperty("region", item.Region);
             node.SetProperty("subregion", item.Subregion);
             node.SetProperty("city", item.City);
@@ -156,21 +156,21 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 if (address == null) return;
                 var type = person.GetRelationType(propertyName).EntityType;
                 var node = new Entity(Guid.NewGuid(), type);
-                node.SetProperty("zipCode", address.Index);
+                node.SetProperty("zipCode", address.ZipCode);
                 node.SetProperty("region", address.Region);
                 node.SetProperty("city", address.City);
                 node.SetProperty("subregion", address.Subregion);
                 node.SetProperty("street", address.Street);
                 node.SetProperty("building", address.House);
-                node.SetProperty("apartment", address.Flat);
+                node.SetProperty("apartment", address.Apartment);
                 person.SetProperty(propertyName, node);
                 await _ontologyService.SaveNodeAsync(node);
             }
 
             var item = form.Question25;
             if (item == null) throw new ArgumentException("Question 25 was not found");
-            await assignAddress("registrationPlace", item.RegistrationAddress);
-            await assignAddress("livingPlace", item.LivingAddress);
+            await assignAddress("registrationPlace", item.RegistrationPlace);
+            await assignAddress("livingPlace", item.LivingPlace);
         }
 
         private static string StripPrefix(string text, string prefix)
@@ -214,7 +214,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
             var item = form.Question26;
             if (item == null) throw new ArgumentException("Question 26 was not found");
-            await assignSigns("phoneSign", item.Phones);
+            await assignSigns("phoneSign", item.PhoneSign);
             await assignSigns("emailSign", item.EmailSign);
             await assignSigns("socialNetworkSign", item.SocialNetworkSign);
         }
@@ -225,13 +225,17 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             if (item == null) throw new ArgumentException("Question 28 was not found");
 
             var passport = (Entity) person.GetProperty("passport");
+            var passportType = person.GetRelationType("passport").EntityType;
             if (passport == null)
             {
-                passport = new Entity(Guid.NewGuid(), person.GetRelationType("passport").EntityType);
+                passport = new Entity(Guid.NewGuid(), passportType);
                 person.SetProperty("passport", passport);
+            } else {
+                var node = await _ontologyService.LoadNodesAsync(passport.Id, null);
+                passport = (Entity)node;
             }
-            passport.SetProperty("issueInfo", item.IssuedBy);
-            passport.SetProperty("issueDate", item.DateOfIssue);
+            passport.SetProperty("issueInfo", item.IssueInfo);
+            passport.SetProperty("issueDate", item.IssueDate);
             await _ontologyService.SaveNodeAsync(passport);
         }
 
@@ -240,7 +244,6 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         {
             public class Question24Item
             {
-//                [JsonProperty("kinship")]
                 public FormEntity FamilyRelationKind { get; set; }
                 public string FullName { get; set; }
                 public string DateAndPlaceOfBirth { get; set; }
@@ -250,22 +253,22 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
             public class Question26Item
             {
-                public IEnumerable<SignEntity> Phones { get; set; }
+                public IEnumerable<SignEntity> PhoneSign { get; set; }
                 public IEnumerable<SignEntity> EmailSign { get; set; }
                 public IEnumerable<SignEntity> SocialNetworkSign { get; set; }
             }
 
             public class Question28Item
             {
-                public DateTime DateOfIssue { get; set; }
-                public string IssuedBy { get; set; }
+                public DateTime IssueDate { get; set; }
+                public string IssueInfo { get; set; }
             }
 
             public class Question3Item
             {
                 public DateTime BirthDate { get; set; }
-                public FormEntity BirthCountry { get; set; }
-                public string PostalCode { get; set; }
+                public FormEntity Country { get; set; }
+                public string ZipCode { get; set; }
                 public string Region { get; set; }
                 public string Subregion { get; set; }
                 public string City { get; set; }
@@ -276,17 +279,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 [JsonExtensionData]
                 public IDictionary<string, JToken> Extension { get; set; }
 
-                public Address GetAddressWithPrefix(string prefix)
-                {
-                    var pairs = Extension.Where(t => t.Key.StartsWith(prefix));
-                    var jo = new JObject();
-                    foreach (var (key, value) in pairs)
-                        jo.Add(key.Substring(prefix.Length), value);
-                    return jo.ToObject<Address>();
-                }
-
-                public Address RegistrationAddress => GetAddressWithPrefix("registration");
-                public Address LivingAddress => GetAddressWithPrefix("living");
+                public Address RegistrationPlace { get; set; }
+                public Address LivingPlace { get; set; }
             }
 
             public Question3Item Question3 { get; set; }
@@ -314,14 +308,14 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         public class Address
         {
             public FormEntity Country { get; set; }
-            public string Index { get; set; }
+            public string ZipCode { get; set; }
             public string Region { get; set; }
             public string Subregion { get; set; }
             public string City { get; set; }
             public string Street { get; set; }
             public string House { get; set; }
             public string Corpus { get; set; }
-            public string Flat { get; set; }
+            public string Apartment { get; set; }
         }
     }
 }

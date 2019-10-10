@@ -10,5 +10,9 @@
   {
     "name": "Завершений",
     "code": "expired"
+  },
+  {
+    "name": "Відмовлено",
+    "code": "rejected"
   }
 ]

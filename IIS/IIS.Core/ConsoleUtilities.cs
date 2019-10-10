@@ -33,7 +33,7 @@ namespace IIS.Core
 
         public ConsoleUtilities(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider.CreateScope().ServiceProvider;
             _configuration = _serviceProvider.GetService<IConfiguration>();
             FillActions();
         }
@@ -110,7 +110,10 @@ namespace IIS.Core
 
         public void ApplyEfMigrations()
         {
-            _serviceProvider.GetService<OntologyContext>().Database.Migrate();
+            _serviceProvider
+                .GetRequiredService<OntologyContext>()
+                .Database
+                .Migrate();
             Console.WriteLine("Migration has been applied.");
         }
 
@@ -127,7 +130,9 @@ namespace IIS.Core
             if (!_actions.TryGetValue(actionName, out var action))
                 Console.WriteLine($"Unrecognized action: {actionName}");
             else
+            {
                 action();
+            }
         }
     }
 }

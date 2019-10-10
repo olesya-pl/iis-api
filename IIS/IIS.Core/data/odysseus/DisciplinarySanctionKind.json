@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Неповна службова відповідність",
+    "code": "incompleteServiceCompliance"
+  },
+  {
+    "name": "Сувора догана",
+    "code": "strictReprimand"
+  }
+]

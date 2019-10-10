@@ -236,6 +236,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
             // organization tabs
             var listOfPositionsItem = ctx.CreateBuilder().IsEntity()
                     .WithName("ListOfPositionsItem")
+                    .WithTitle("")
                     .AcceptEmbeddedOperations()
                     .HasOptional(r => r
                             .Target(text)
@@ -303,7 +304,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(text, "CypherName",  "Шифр роботи")
                     .HasOptional(text, "FullName",  "Повна назва роботи")
                     .HasOptional(text, "WorkBasis",  "Підстава для виконання роботи")
-                    .HasOptional(text, "Customer",  "Замовник роботи")
+                    .HasOptional("Organization", "Customer",  "Замовник роботи")
                     .HasOptional(r => r
                         .Target("Organization")
                         .WithName("Contractor")
@@ -334,6 +335,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .Target(stage)
                         .WithName("CurrentStage")
                         .WithTitle("Поточний етап")
+                        .WithMeta<EntityRelationMeta>(m => m.AcceptsEntityOperations = new EntityOperation[0])
                     )
                 ;
 
@@ -367,7 +369,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(legalForm)
                     .HasOptional(address, "LocatedAt",  "Фактична адреса") // Address kind?
                     .HasOptional(address, "RegisteredAt",  "Юридична адреса")
-                    .HasOptional(address, "BranchAddress",  "Філія")
+                    .HasMultiple(address, "BranchAddress",  "Філія")
                     .HasOptional(address, "SecretFacilityAddress",  "РСО")
                     .HasOptional(address, "SecretFacilityArchiveAddress",  "Архів РСО")
                     .HasOptional(attachment, "RSOCreationRequest",  "Вмотивований запит на створення РСО")
@@ -541,7 +543,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var legalActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("LegalActArticle")
-                    .WithTitle(null)
+                    .WithTitle("НПА")
                     .HasOptional(number)
                     .HasOptional(text, "Content", null)
 //                    .HasOptional(r => r
@@ -552,19 +554,19 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
 
             var criminalActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("CriminalActArticle")
-                    .WithTitle(null)
+                    .WithTitle("Кримінальний кодекс")
                     .Is(legalActArticle)
                 ;
 
             var administrativeActArticle = ctx.CreateBuilder().IsEntity()
                     .WithName("AdministrativeActArticle")
-                    .WithTitle(null)
+                    .WithTitle("КУпАП")
                     .Is(legalActArticle)
                 ;
 
             var legalDocument = ctx.CreateBuilder().IsEntity()
                     .WithName("LegalDocument")
-                    .WithTitle(null)
+                    .WithTitle("")
                     .AcceptEmbeddedOperations()
                     .HasOptional(date)
                     .HasOptional(number)
@@ -647,10 +649,20 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithName("PersonSanction")
                     .WithTitle("Санкція по людині")
                     .IsAbstraction()
-                    .HasOptional(person, "person", "Секретоносій")
+                    .HasOptional(r => r
+                        .Target(person)
+                        .WithName("person")
+                        .WithTitle("Секретоносій")
+                        .HasInversed(ir => ir
+                            .WithName("sanctions")
+                            .WithTitle("Заходи впливу до секретоносія")
+                            .IsMultiple()
+                        )
+                    )
                     .HasOptional(r => r
                         .Target("InvestigationPersonSanction")
                         .WithTitle("Службове розслідування")
+                        .WithMeta<EntityRelationMeta>(m => m.AcceptsEntityOperations = new EntityOperation[0])
                     )
                 ;
 
@@ -671,6 +683,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 .WithName("SimpleDocument")
                 .HasRequired(number, null, "Номер")
                 .HasRequired(date, null, "Дата реєстрації")
+                .AcceptEmbeddedOperations()
             ;
 
             var sanctionConclusion = ctx.CreateBuilder().IsEntity()
@@ -678,15 +691,31 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                 .HasRequired(number, null, "Номер")
                 .HasRequired(date, null, "Дата реєстрації")
                 .HasRequired(attachment, null, "Оригінал")
+                .AcceptEmbeddedOperations()
             ;
 
             var investigationPersonSanction = ctx.CreateBuilder().IsEntity()
                     .WithName("InvestigationPersonSanction")
                     .WithTitle("Службове розслідування")
                     .Is(personSanction)
-                    .HasRequired(simpleDoc, "reason", "Підстава (№ акта)")
-                    .HasRequired(simpleDoc, "decree", "Наказ про проведення службового розслідування:")
-                    .HasRequired(sanctionConclusion, "conclusion", "Висновок за результатами розслідування")
+                    .HasRequired(r => r
+                        .Target(simpleDoc)
+                        .WithName("reason")
+                        .WithTitle("Підстава (№ акта)")
+                        .WithFormFieldType("form")
+                    )
+                    .HasRequired(r => r
+                        .Target(simpleDoc)
+                        .WithName("order")
+                        .WithTitle("Наказ про проведення службового розслідування:")
+                        .WithFormFieldType("form")
+                    )
+                    .HasRequired(r => r
+                        .Target(sanctionConclusion)
+                        .WithName("conclusion")
+                        .WithTitle("Висновок за результатами розслідування")
+                        .WithFormFieldType("form")
+                    )
                 ;
 
             var criminalPersonSanction = ctx.CreateBuilder().IsEntity()
