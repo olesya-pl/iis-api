@@ -13,8 +13,10 @@ namespace IIS.Core.GraphQL.Reports
         [GraphQLNonNullType]
         public async Task<GraphQLCollection<Report>> GetReportList([Service] OntologyContext context, [GraphQLNonNullType] PaginationInput pagination)
         {
-            var result = await context.Reports.Skip(pagination.Offset()).Take(pagination.PageSize).Select(row => new Report(row.Id, row.Title, row.Recipient, row.CreatedAt)).ToListAsync();
-            return new GraphQLCollection<Report>(result);
+            var query = context.Reports.Skip(pagination.Offset()).Take(pagination.PageSize);
+            var result = await query.Select(row => new Report(row.Id, row.Title, row.Recipient, row.CreatedAt)).ToListAsync();
+            var totalCount = await context.Reports.CountAsync();
+            return new GraphQLCollection<Report>(result, totalCount);
         }
     }
 }
