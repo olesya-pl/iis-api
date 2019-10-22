@@ -1,5 +1,4 @@
 using System.Threading;
-using System.Threading.Tasks;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials.EntityFramework;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +27,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<MaterialInfo> MaterialInfos { get; set; }
         public virtual DbSet<MaterialFeature> MaterialFeatures { get; set; }
         public virtual DbSet<Report.EntityFramework.Report> Reports { get; set; }
+        public virtual DbSet<Report.EntityFramework.ReportEvents> ReportEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,6 +77,19 @@ namespace IIS.Core.Ontology.EntityFramework.Context
                 .WithOne(p => p.Attribute)
                 .HasForeignKey<Attribute>(p => p.Id)
                 ;
+
+            modelBuilder.Entity<Report.EntityFramework.ReportEvents>()
+                .HasKey(pt => new { pt.ReportId, pt.EventId });
+
+            modelBuilder.Entity<Report.EntityFramework.ReportEvents>()
+                .HasOne(p => p.Report)
+                .WithMany(p => p.ReportEvents)
+                .HasForeignKey(p => p.ReportId);
+
+            modelBuilder.Entity<Report.EntityFramework.ReportEvents>()
+                .HasOne(p => p.Node)
+                .WithMany(p => p.ReportEvents)
+                .HasForeignKey(p => p.EventId);
 
             // ----- materials ----- //
 
