@@ -86,11 +86,6 @@ namespace IIS.Core.Ontology.EntityFramework.Context
                 .WithMany(p => p.ReportEvents)
                 .HasForeignKey(p => p.ReportId);
 
-            modelBuilder.Entity<Report.EntityFramework.ReportEvents>()
-                .HasOne(p => p.Node)
-                .WithMany(p => p.ReportEvents)
-                .HasForeignKey(p => p.EventId);
-
             // ----- materials ----- //
 
             var material = modelBuilder.Entity<Material>();
