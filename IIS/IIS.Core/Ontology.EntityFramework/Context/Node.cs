@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace IIS.Core.Ontology.EntityFramework.Context
@@ -17,6 +17,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
 
         public virtual Attribute Attribute { get; set; }
         public virtual Relation Relation { get; set; }
+        public ICollection<Report.EntityFramework.ReportEvents> ReportEvents { get; internal set; }
     }
 
     public class Relation
