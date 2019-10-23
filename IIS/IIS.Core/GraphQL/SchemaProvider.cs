@@ -9,6 +9,7 @@ using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Microsoft.Extensions.Configuration;
 
 namespace IIS.Core.GraphQL
 {
@@ -18,13 +19,15 @@ namespace IIS.Core.GraphQL
         private readonly TypeRepository _typeRepository;
         private readonly IOntologyProvider _ontologyProvider;
         private readonly IOntologyFieldPopulator _populator;
+        private readonly IConfiguration _configuration;
 
-        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyProvider ontologyProvider, IOntologyFieldPopulator populator)
+        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyProvider ontologyProvider, IOntologyFieldPopulator populator, IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
             _ontologyProvider = ontologyProvider;
             _populator = populator;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public ISchema GetSchema()
@@ -38,7 +41,10 @@ namespace IIS.Core.GraphQL
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
                 d.Include<Users.Query>();
-                d.Include<Reports.Query>();
+                if (_configuration.GetValue<bool>("reportsAvailable", true))
+                {
+                    d.Include<Reports.Query>(); 
+                }
                 d.Include<HealthcheckQuery>();
                 if (ontology != null)
                     ConfigureOntologyQuery(d, ontology);
@@ -47,7 +53,10 @@ namespace IIS.Core.GraphQL
             {
                 d.Name("MutationType");
                 d.Include<Materials.Mutation>();
-                d.Include<Reports.Mutation>();
+                if (_configuration.GetValue<bool>("reportsAvailable", true))
+                {
+                    d.Include<Reports.Mutation>(); 
+                }
                 d.Include<DummyMutation>();
                 if (ontology != null)
                     ConfigureOntologyMutation(d, ontology);
