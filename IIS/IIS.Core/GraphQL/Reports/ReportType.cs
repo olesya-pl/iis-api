@@ -3,6 +3,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
+using System;
 using System.Linq;
 
 namespace IIS.Core.GraphQL.Reports
@@ -16,11 +17,15 @@ namespace IIS.Core.GraphQL.Reports
 
         public ReportType(TypeRepository typeRepository, [Service] IOntologyProvider ontologyProvider)
         {
-            _typeRepository = typeRepository ?? throw new System.ArgumentNullException(nameof(typeRepository));
+            _typeRepository   = typeRepository ?? throw new System.ArgumentNullException(nameof(typeRepository));
             _ontologyProvider = ontologyProvider;
 
             var ontology = _ontologyProvider.GetOntologyAsync().Result;
-            type = ontology.GetEntityType("Event");
+            type = ontology.GetEntityTypeOrNull("Event");
+
+            if (type == null)
+                throw new InvalidOperationException("Cannot find required type 'Event' in database. Add type to database or disable reports in configuration file using reportsAvailable : false");
+
             objectType = _typeRepository.GetOntologyType(type);
         }
 

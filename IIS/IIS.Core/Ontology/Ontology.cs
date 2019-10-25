@@ -27,6 +27,8 @@ namespace IIS.Core.Ontology
             return type;
         }
 
+        public EntityType GetEntityTypeOrNull(string name) => EntityTypes.SingleOrDefault(e => e.Name == name);
+
         public Type GetType(Guid id) => Types.SingleOrDefault(e => e.Id == id);
 
         public IEnumerable<Type> GetChildTypes(Type type) => EntityTypes.Where(etype => etype.IsSubtypeOf(type));

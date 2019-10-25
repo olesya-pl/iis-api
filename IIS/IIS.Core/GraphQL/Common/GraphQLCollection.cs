@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace IIS.Core.GraphQL.Reports
+namespace IIS.Core.GraphQL.Common
 {
     public class GraphQLCollection<T> : IEnumerable<T>
     {

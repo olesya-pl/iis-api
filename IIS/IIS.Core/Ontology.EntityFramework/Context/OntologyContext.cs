@@ -28,6 +28,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<MaterialFeature> MaterialFeatures { get; set; }
         public virtual DbSet<Report.EntityFramework.Report> Reports { get; set; }
         public virtual DbSet<Report.EntityFramework.ReportEvents> ReportEvents { get; set; }
+        public virtual DbSet<Users.EntityFramework.User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -90,6 +91,9 @@ namespace IIS.Core.Ontology.EntityFramework.Context
                 .HasOne(p => p.Node)
                 .WithMany(p => p.ReportEvents)
                 .HasForeignKey(p => p.EventId);
+            modelBuilder.Entity<Users.EntityFramework.User>()
+                .HasIndex(p => p.UserName)
+                .IsUnique(true);
 
             // ----- materials ----- //
 

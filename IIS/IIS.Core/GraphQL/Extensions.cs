@@ -102,5 +102,20 @@ namespace IIS.Core.GraphQL
         {
             return (TValue) context.ContextData.GetOrDefault(key);
         }
+
+        public static IQueryable<T> GetPage<T>(this IQueryable<T> query, PaginationInput pagination)
+        {
+            if (query is null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            if (pagination is null)
+            {
+                throw new ArgumentNullException(nameof(pagination));
+            }
+
+            return query.Skip(pagination.Offset()).Take(pagination.PageSize);
+        }
     }
 }

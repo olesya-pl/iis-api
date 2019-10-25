@@ -14,7 +14,7 @@ namespace IIS.Core.GraphQL.Reports
         [GraphQLNonNullType]
         public async Task<GraphQLCollection<Report>> GetReportList([Service] OntologyContext context, [GraphQLNonNullType] PaginationInput pagination)
         {
-            var query = context.Reports.Skip(pagination.Offset()).Take(pagination.PageSize).Include(r => r.ReportEvents);
+            var query = context.Reports.GetPage(pagination).Include(r => r.ReportEvents);
             var result = await query.Select(row => new Report(row)).ToListAsync();
             var totalCount = await context.Reports.CountAsync();
             return new GraphQLCollection<Report>(result, totalCount);
