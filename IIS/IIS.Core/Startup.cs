@@ -1,11 +1,17 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Interceptors;
 using HotChocolate.AspNetCore.Subscriptions;
+using HotChocolate.Configuration;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Batching;
 using HotChocolate.Execution.Configuration;
+using HotChocolate.Language;
 using HotChocolate.Types.Relay;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
@@ -18,13 +24,17 @@ using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Legacy.EntityFramework;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
 
 namespace IIS.Core
@@ -78,8 +88,63 @@ namespace IIS.Core
             services.AddSingleton<GraphQL.Entities.TypeRepository>(); // For HotChocolate ontology types creation. Should have same lifetime as GraphQL schema
             // Here it hits the fan. Removed AddGraphQL() method and stripped it to submethods because of IncludeExceptionDetails.
             // todo: remake graphql engine registration in DI
-//            services.AddGraphQL(schema);
-            QueryExecutionBuilder.BuildDefault(services);
+            //services.AddGraphQL(schema);
+
+          
+            var anonimAcccess = new HashSet<string> { "login", "IntrospectionQuery" };
+            QueryExecutionBuilder.New()
+                .Use(next => context =>
+                {
+                    Task Error(string error)
+                    {
+                        var errorBuilder = new ErrorBuilder();
+                        var errorObject = errorBuilder.SetMessage(error).Build();
+                        context.Result =  QueryResult.CreateError(errorObject);;
+                        return Task.CompletedTask;
+                    }
+
+                    var qd = context.Request.Query as QueryDocument;
+                    if (qd == null)
+                        return Error("Internal server error. context.Request.Query is not QueryDocument");
+                    if (qd.Document == null)
+                        return Error("Internal server error. context.Request.Query.Document is null");
+                    if (qd.Document.Definitions.Count != 1)
+                        return Error("Internal server error. Document.Definitions.Count must be 1");
+
+                    var odn = qd.Document.Definitions[0] as OperationDefinitionNode;
+                    if (odn.SelectionSet?.Selections.Count != 1)
+                        return Error("Internal server error. SelectionSet?.Selections.Count != 1");
+
+                    if (!(odn.SelectionSet.Selections[0] is FieldNode fn))
+                        return Error("Internal server error. Selections[0] is not FieldNode ");
+                    
+                    if (!anonimAcccess.Contains(fn.Name.Value))
+                    {
+                        var httpContext = (HttpContext)context.ContextData["HttpContext"];
+                        if (!httpContext.Request.Headers.TryGetValue("Authorization", out var value))
+                        {
+                            return Error("User not authorized");
+                        }
+
+                        var headerValueParts = value.ToString().Split(' ');
+                        var token = headerValueParts.Length == 1 ? headerValueParts[0] : headerValueParts[1];
+                        var (success, message) = TokenHelper.ValidateToken(token, new TokenValidationParameters
+                        {
+                            ValidIssuer = Configuration.GetValue<string>("ValidIssuer"),
+                            ValidAudience = Configuration.GetValue<string>("ValidateAudience"),
+                            IssuerSigningKey = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("IssuerSigningKey")),
+                            ValidateIssuerSigningKey = true,
+                            ValidateAudience = true
+                        });
+
+                        if (!success)
+                            return Error(message);
+                    }
+
+                    return next(context);
+                })
+                .UseDefaultPipeline().Populate(services);
+
             services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions {IncludeExceptionDetails = true});
             services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
                 .AddSingleton<IBatchQueryExecutor, BatchQueryExecutor>()
@@ -106,8 +171,32 @@ namespace IIS.Core
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
             services.AddHostedService<MaterialEventConsumer>();
 
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration.GetValue<string>("ValidIssuer"),
+ 
+                        ValidateAudience         = true,
+                        ValidAudience            = Configuration.GetValue<string>("ValidateAudience"),
+                        ValidateLifetime         = true,
+                        IssuerSigningKey         = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("IssuerSigningKey")),
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                var filter = new AuthorizeFilter(policy);
+                config.Filters.Add(filter);
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -122,8 +211,10 @@ namespace IIS.Core
             app.UseMiddleware<OptionsMiddleware>();
 
             app.UseGraphQL();
-            app.UsePlayground();
 
+            app.UsePlayground();
+            app.UseAuthentication();
+            
             app.UseMvc();
         }
     }

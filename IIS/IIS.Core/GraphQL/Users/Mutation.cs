@@ -1,10 +1,11 @@
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.Ontology.EntityFramework.Context;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,10 +14,12 @@ namespace IIS.Core.GraphQL.Users
     public class Mutation
     {
         private IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public Mutation(IConfiguration configuration)
+        public Mutation(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<User> CreateUser([Service] OntologyContext context, [GraphQLNonNullType] User user)
@@ -32,7 +35,7 @@ namespace IIS.Core.GraphQL.Users
                 IsBlocked    = user.IsBlocked,
                 Name         = user.Name,
                 UserName     = user.Username,
-                PasswordHash = GetPasswordHashAsBase64String(user.Password)
+                PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password)
             });
             await context.SaveChangesAsync();
             user.Id = userId;
@@ -49,7 +52,7 @@ namespace IIS.Core.GraphQL.Users
 
             userInDb.IsBlocked    = user.IsBlocked;
             userInDb.Name         = user.Name;
-            userInDb.PasswordHash = GetPasswordHashAsBase64String(user.Password);
+            userInDb.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
 
             await context.SaveChangesAsync();
 
@@ -66,12 +69,6 @@ namespace IIS.Core.GraphQL.Users
             await context.SaveChangesAsync();
 
             return new User(dbUser);
-        }
-
-        private string GetPasswordHashAsBase64String(string password)
-        {
-            var salt = _configuration.GetValue<string>("salt");
-            return Hasher.ComputeHash(password + salt);
         }
     }
 }

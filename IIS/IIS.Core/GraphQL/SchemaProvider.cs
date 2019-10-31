@@ -54,6 +54,7 @@ namespace IIS.Core.GraphQL
                 d.Name("MutationType");
                 d.Include<Materials.Mutation>();
                 d.Include<Users.Mutation>();
+                d.Include<Users.LoginResolver>();
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
                     d.Include<Reports.Mutation>(); 

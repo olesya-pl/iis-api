@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,6 +16,12 @@ namespace IIS.Core
                 var generatedHashString = Convert.ToBase64String(generatedHash);
                 return generatedHashString;
             }
+        }
+
+        public static string GetPasswordHashAsBase64String(this IConfiguration configuration, string password)
+        {
+            var salt = configuration.GetValue<string>("salt");
+            return ComputeHash(password + salt);
         }
     }
 }
