@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
-using HotChocolate.AspNetCore.Interceptors;
 using HotChocolate.AspNetCore.Subscriptions;
-using HotChocolate.Configuration;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Batching;
 using HotChocolate.Execution.Configuration;
@@ -91,64 +88,11 @@ namespace IIS.Core
             //services.AddGraphQL(schema);
 
 
-            var anonimAcccess = new HashSet<string> { "login", "IntrospectionQuery" };
+            var publiclyAccesible = new HashSet<string> { "login", "__schema" };
             QueryExecutionBuilder.New()
-                .Use(next => context =>
-                {
-                    if (!Configuration.GetValue<bool>("useAuthentication"))
-                    {
-                        return next(context);
-                    }
-
-                    Task Error(string error)
-                    {
-                        var errorBuilder = new ErrorBuilder();
-                        var errorObject = errorBuilder.SetMessage(error).Build();
-                        context.Result =  QueryResult.CreateError(errorObject);;
-                        return Task.CompletedTask;
-                    }
-
-                    var qd = context.Request.Query as QueryDocument;
-                    if (qd == null)
-                        return Error("Internal server error. context.Request.Query is not QueryDocument");
-                    if (qd.Document == null)
-                        return Error("Internal server error. context.Request.Query.Document is null");
-                    if (qd.Document.Definitions.Count != 1)
-                        return Error("Internal server error. Document.Definitions.Count must be 1");
-
-                    var odn = qd.Document.Definitions[0] as OperationDefinitionNode;
-                    if (odn.SelectionSet?.Selections.Count != 1)
-                        return Error("Internal server error. SelectionSet?.Selections.Count != 1");
-
-                    if (!(odn.SelectionSet.Selections[0] is FieldNode fn))
-                        return Error("Internal server error. Selections[0] is not FieldNode ");
-
-                    if (!anonimAcccess.Contains(fn.Name.Value))
-                    {
-                        var httpContext = (HttpContext)context.ContextData["HttpContext"];
-                        if (!httpContext.Request.Headers.TryGetValue("Authorization", out var value))
-                        {
-                            return Error("User not authorized");
-                        }
-
-                        var headerValueParts = value.ToString().Split(' ');
-                        var token = headerValueParts.Length == 1 ? headerValueParts[0] : headerValueParts[1];
-                        var (success, message) = TokenHelper.ValidateToken(token, new TokenValidationParameters
-                        {
-                            ValidIssuer = Configuration.GetValue<string>("ValidIssuer"),
-                            ValidAudience = Configuration.GetValue<string>("ValidateAudience"),
-                            IssuerSigningKey = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("IssuerSigningKey")),
-                            ValidateIssuerSigningKey = true,
-                            ValidateAudience = true
-                        });
-
-                        if (!success)
-                            return Error(message);
-                    }
-
-                    return next(context);
-                })
-                .UseDefaultPipeline().Populate(services);
+                .Use(next => context => _authenticate(context, next, publiclyAccesible))
+                .UseDefaultPipeline()
+                .Populate(services);
 
             services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions {IncludeExceptionDetails = true});
             services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
@@ -184,12 +128,12 @@ namespace IIS.Core
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = Configuration.GetValue<string>("ValidIssuer"),
+                        ValidIssuer = Configuration.GetValue<string>("jwt:issuer"),
 
                         ValidateAudience         = true,
-                        ValidAudience            = Configuration.GetValue<string>("ValidateAudience"),
+                        ValidAudience            = Configuration.GetValue<string>("jwt:audience"),
                         ValidateLifetime         = true,
-                        IssuerSigningKey         = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("IssuerSigningKey")),
+                        IssuerSigningKey         = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("jwt:signingKey")),
                         ValidateIssuerSigningKey = true,
                     };
                 });
@@ -204,6 +148,56 @@ namespace IIS.Core
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
+        private Task _authenticate(IQueryContext context, QueryDelegate next, HashSet<string> publiclyAccesible)
+        {
+            // TODO: remove this method when hotchocolate will allow to add attribute for authentication
+            Task Error(string message, string code)
+            {
+                var error = ErrorBuilder
+                    .New()
+                    .SetMessage(message)
+                    .SetCode(code)
+                    .Build();
+                context.Result = QueryResult.CreateError(error);
+                return Task.CompletedTask;
+            }
+
+            var qd = context.Request.Query as QueryDocument;
+            if (qd == null || qd.Document == null)
+                throw new InvalidOperationException("Cannot find query in document");
+
+            var odn = qd.Document.Definitions[0] as OperationDefinitionNode;
+            if (odn.SelectionSet?.Selections.Count != 1)
+                throw new InvalidOperationException("Does not support multiple selections in query");
+
+            var fieldNode = (FieldNode)odn.SelectionSet.Selections[0];
+
+            if (!publiclyAccesible.Contains(fieldNode.Name.Value))
+            {
+                var httpContext = (HttpContext)context.ContextData["HttpContext"];
+                if (!httpContext.Request.Headers.TryGetValue("Authorization", out var value))
+                {
+                    return Error("You are not authenticated", "UNAUTHENTICATED");
+                }
+
+                var headerValueParts = value.ToString().Split(' ');
+                var token = headerValueParts.Length == 1 ? headerValueParts[0] : headerValueParts[1];
+                var (success, message) = TokenHelper.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidIssuer = Configuration.GetValue<string>("jwt:issuer"),
+                    ValidAudience = Configuration.GetValue<string>("jwt:audience"),
+                    IssuerSigningKey = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("jwt:signingKey")),
+                    ValidateIssuerSigningKey = true,
+                    ValidateAudience = true
+                });
+
+                if (!success)
+                    return Error(message, "UNAUTHENTICATED");
+            }
+
+            return next(context);
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, OntologyContext context)
         {
@@ -214,14 +208,35 @@ namespace IIS.Core
 
             app.UseMiddleware<OptionsMiddleware>();
             app.UseGraphQL();
+
             app.UsePlayground();
-
-            if (Configuration.GetValue<bool>("useAuthentication"))
-            {
-                app.UseAuthentication();
-            }
-
+            app.UseAuthentication();
             app.UseMvc();
+
+            SeedData(context);
+        }
+
+        private void SeedData(OntologyContext context)
+        {
+            var defaultUserName = Configuration.GetValue<string>("defaultUserName");
+            var defaultPassword = Configuration.GetValue<string>("defaultPassword");
+
+            if (!string.IsNullOrWhiteSpace(defaultUserName) && !string.IsNullOrWhiteSpace(defaultPassword))
+            {
+                var admin = context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == defaultUserName.ToUpperInvariant());
+                if (admin == null)
+                {
+                    context.Users.Add(new Core.Users.EntityFramework.User
+                    {
+                        Id = Guid.NewGuid(),
+                        IsBlocked = false,
+                        Name = defaultUserName,
+                        Username = defaultUserName,
+                        PasswordHash = Configuration.GetPasswordHashAsBase64String(defaultPassword)
+                    });
+                    context.SaveChanges();
+                }
+            }
         }
     }
 

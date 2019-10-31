@@ -92,7 +92,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
                 .WithMany(p => p.ReportEvents)
                 .HasForeignKey(p => p.EventId);
             modelBuilder.Entity<Users.EntityFramework.User>()
-                .HasIndex(p => p.UserName)
+                .HasIndex(p => p.Username)
                 .IsUnique(true);
 
             // ----- materials ----- //

@@ -2,7 +2,7 @@ namespace IIS.Core.GraphQL.Users
 {
     public class LoginResponse
     {
-        public User   CurrentUser { get; set; }
+        public User   User { get; set; }
         public string Token       { get; set; }
     }
 }

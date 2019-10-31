@@ -27,7 +27,7 @@ namespace IIS.Core
                     new SigningCredentials(GetSymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256));
             return _securityTokenHandler.WriteToken(token);
         }
-        public static string NewToken(IConfiguration configuration) => NewToken(configuration.GetValue<string>("ValidIssuer"), configuration.GetValue<string>("ValidateAudience"), configuration.GetValue<string>("IssuerSigningKey"), configuration.GetValue<TimeSpan>("TokenLifeTime"));
+        public static string NewToken(IConfiguration configuration) => NewToken(configuration.GetValue<string>("jwt:issuer"), configuration.GetValue<string>("jwt:audience"), configuration.GetValue<string>("jwt:signingKey"), configuration.GetValue<TimeSpan>("jwt:lifeTime"));
         public static (bool, string) ValidateToken(string token, TokenValidationParameters validationParameters)
         {
             if (_securityTokenHandler.CanReadToken(token))

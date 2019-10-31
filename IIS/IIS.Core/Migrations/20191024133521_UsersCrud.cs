@@ -12,7 +12,7 @@ namespace IIS.Core.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    UserName = table.Column<string>(nullable: true),
+                    Username = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<string>(nullable: true),
                     IsBlocked = table.Column<bool>(nullable: false)
@@ -21,12 +21,16 @@ namespace IIS.Core.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                 });
+            migrationBuilder.CreateIndex(table: "Users",
+                column: "Username",
+                unique: true,
+                name: "users_username_idx");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Users");
+            migrationBuilder.DropIndex(name: "users_username_idx");
+            migrationBuilder.DropTable(name: "Users");
         }
     }
 }

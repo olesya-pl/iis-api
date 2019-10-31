@@ -1,7 +1,4 @@
-using HotChocolate;
 using IIS.Core.Ontology.EntityFramework.Context;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -20,20 +17,17 @@ namespace IIS.Core.GraphQL.Users
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public LoginResponse Login([Required] string login, [Required] string password)
+        public LoginResponse Login([Required] string username, [Required] string password)
         {
             var hash = _configuration.GetPasswordHashAsBase64String(password);
-            var user = _context.Users.SingleOrDefault(u => u.UserName.ToUpperInvariant() == login.ToUpperInvariant() && u.PasswordHash == hash);
+            var user = _context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == username.ToUpperInvariant() && u.PasswordHash == hash);
 
-            if (user == null)
-                throw new InvalidOperationException($"User with {login} and specified password not found");
-
-            if (user.IsBlocked)
-                throw new InvalidOperationException($"Account {login} blocked");
+            if (user == null || user.IsBlocked)
+                throw new InvalidOperationException($"Wrong username or password");
 
             return new LoginResponse
             {
-                CurrentUser = new User(user),
+                User = new User(user),
                 Token = TokenHelper.NewToken(_configuration)
             };
         }
