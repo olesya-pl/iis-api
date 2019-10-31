@@ -215,7 +215,11 @@ namespace IIS.Core
             app.UseMiddleware<OptionsMiddleware>();
             app.UseGraphQL();
             app.UsePlayground();
-            app.UseAuthentication();
+
+            if (Configuration.GetValue<bool>("useAuthentication"))
+            {
+                app.UseAuthentication();
+            }
 
             app.UseMvc();
         }

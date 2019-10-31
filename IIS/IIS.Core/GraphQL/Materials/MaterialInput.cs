@@ -20,7 +20,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLNonNullType] public string Type { get; set; }
         [GraphQLNonNullType] public string Source { get; set; }
         public DateTime? Date { get; set; }
-        [GraphQLNonNullType] public Features Features { get; set; }
+        public Features Features { get; set; }
     }
 
     public class Features
