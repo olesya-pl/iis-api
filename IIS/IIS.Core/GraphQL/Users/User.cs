@@ -1,12 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using HotChocolate;
+using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.Users
 {
     public class User
     {
-        [GraphQLNonNullType]
+        [GraphQLType(typeof(NonNullType<IdType>))]
         public string Id { get; set; }
 
         [GraphQLNonNullType]

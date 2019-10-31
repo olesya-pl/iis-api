@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Users
             return new User(user);
         }
 
-        public async Task<User> UpdateUser([Service] OntologyContext context, [GraphQLNonNullType] string id, [GraphQLNonNullType] UserInput data)
+        public async Task<User> UpdateUser([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] string id, [GraphQLNonNullType] UserInput data)
         {
             //TODO: should not be able to block yourself
             Validator.ValidateObject(data, new ValidationContext(data), true);
