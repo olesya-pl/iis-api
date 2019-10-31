@@ -29,20 +29,20 @@ namespace IIS.Core.GraphQL.Reports
             return new Report(report);
         }
 
-        public async Task<Report> UpdateReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid reportId, [GraphQLNonNullType] ReportInput data)
+        public async Task<Report> UpdateReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] ReportInput data)
         {
-            var reportInDb = context.Reports.Find(reportId);
+            var reportInDb = context.Reports.Find(id);
             if (reportInDb == null)
-                throw new InvalidOperationException($"Cannot find report with id = {reportId}");
+                throw new InvalidOperationException($"Cannot find report with id = {id}");
             reportInDb.Recipient = data.Recipient;
             reportInDb.Title     = data.Title;
             await context.SaveChangesAsync();
             return new Report(reportInDb);
         }
 
-        public async Task<DeleteEntityReportResponse> DeleteReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid reportId)
+        public async Task<DeleteEntityReportResponse> DeleteReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var report = context.Reports.Include(r => r.ReportEvents).Single(r => r.Id == reportId);
+            var report = context.Reports.Include(r => r.ReportEvents).Single(r => r.Id == id);
             context.Reports.Remove(report);
             await context.SaveChangesAsync();
             return new DeleteEntityReportResponse
@@ -53,7 +53,7 @@ namespace IIS.Core.GraphQL.Reports
 
         public async Task<Report> UpdateReportEvents([Service]                                  IResolverContext  ctx,
                                                      [Service]                                  OntologyContext   context,
-                                                     [GraphQLType(typeof(NonNullType<IdType>))] Guid              reportId,
+                                                     [GraphQLType(typeof(NonNullType<IdType>))] Guid              id,
                                                      [GraphQLNonNullType]                       UpdateReportData  data)
         {
             var forAdd    = new HashSet<Guid>(data.AddEvents);
@@ -63,21 +63,21 @@ namespace IIS.Core.GraphQL.Reports
             forRemove.ExceptWith(data.AddEvents);
 
             var loader =  ctx.DataLoader<NodeDataLoader>();
-            context.ReportEvents.AddRange(forAdd.Select(id => new Core.Report.EntityFramework.ReportEvents
+            context.ReportEvents.AddRange(forAdd.Select(eventId => new Core.Report.EntityFramework.ReportEvents
             {
-                EventId  = id,
-                ReportId = reportId
+                EventId  = eventId,
+                ReportId = id
             }));
 
-            context.ReportEvents.RemoveRange(context.ReportEvents.Where(re => re.ReportId == reportId && forRemove.Contains(re.EventId)));
+            context.ReportEvents.RemoveRange(context.ReportEvents.Where(re => re.ReportId == id && forRemove.Contains(re.EventId)));
             await context.SaveChangesAsync();
 
             var report = await context.Reports
                 .Include(r => r.ReportEvents)
-                .SingleOrDefaultAsync(r => r.Id == reportId);
+                .SingleOrDefaultAsync(r => r.Id == id);
 
             if (report == null)
-                throw new InvalidOperationException($"Cannot find report with id = {reportId}");
+                throw new InvalidOperationException($"Cannot find report with id = {id}");
 
             return new Report(report);
         }
