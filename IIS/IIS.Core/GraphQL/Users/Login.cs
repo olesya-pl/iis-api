@@ -32,6 +32,12 @@ namespace IIS.Core.GraphQL.Users
             };
         }
 
-        public string RefreshToken() => TokenHelper.NewToken(_configuration);
+        public LoginResponse RefreshToken() {
+            return new LoginResponse
+            {
+                User = null,
+                Token = TokenHelper.NewToken(_configuration)
+            };
+        }
     }
 }
