@@ -46,7 +46,7 @@ namespace IIS.Core.GraphQL.Users
         {
             //TODO: should not be able to block yourself
             Validator.ValidateObject(data, new ValidationContext(data), true);
-            var user = context.Users.Find(id);
+            var user = await context.Users.FindAsync(Guid.Parse(id));
             if (user == null)
                 throw new InvalidOperationException($"Cannot find user with id = {id}");
 

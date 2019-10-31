@@ -5,10 +5,8 @@ namespace IIS.Core.GraphQL.Users
 {
     public class UserInput
     {
-        [GraphQLNonNullType]
         public string Name { get; set; }
 
-        [GraphQLNonNullType]
         public string Username { get; set; }
         public bool IsBlocked { get; set; }
 
