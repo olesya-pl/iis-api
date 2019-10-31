@@ -90,11 +90,16 @@ namespace IIS.Core
             // todo: remake graphql engine registration in DI
             //services.AddGraphQL(schema);
 
-          
+
             var anonimAcccess = new HashSet<string> { "login", "IntrospectionQuery" };
             QueryExecutionBuilder.New()
                 .Use(next => context =>
                 {
+                    if (!Configuration.GetValue<bool>("useAuthentication"))
+                    {
+                        return next(context);
+                    }
+
                     Task Error(string error)
                     {
                         var errorBuilder = new ErrorBuilder();
@@ -117,7 +122,7 @@ namespace IIS.Core
 
                     if (!(odn.SelectionSet.Selections[0] is FieldNode fn))
                         return Error("Internal server error. Selections[0] is not FieldNode ");
-                    
+
                     if (!anonimAcccess.Contains(fn.Name.Value))
                     {
                         var httpContext = (HttpContext)context.ContextData["HttpContext"];
@@ -180,7 +185,7 @@ namespace IIS.Core
                     {
                         ValidateIssuer = true,
                         ValidIssuer = Configuration.GetValue<string>("ValidIssuer"),
- 
+
                         ValidateAudience         = true,
                         ValidAudience            = Configuration.GetValue<string>("ValidateAudience"),
                         ValidateLifetime         = true,
@@ -206,15 +211,12 @@ namespace IIS.Core
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseDeveloperExceptionPage();
 
             app.UseMiddleware<OptionsMiddleware>();
-
             app.UseGraphQL();
-
             app.UsePlayground();
             app.UseAuthentication();
-            
+
             app.UseMvc();
         }
     }
