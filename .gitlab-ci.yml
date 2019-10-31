@@ -22,8 +22,11 @@ build_job:
   variables:
     GIT_STRATEGY: none
     GIT_CHECKOUT: "false"
-  before_script:
+  script:
     - cd /home/gitlab-runner/ansible
+    - ansible-playbook app_api_net.yml --extra-vars "HOST=$DEPLOYMENT_HOST artifacts_path=$CI_PROJECT_DIR env_file=$ANSIBLE_ENV_FILE"
+    - rm -rf $CI_PROJECT_DIR/*
+
   tags:
     - ansible
   only: 
@@ -31,8 +34,9 @@ build_job:
     
 deploy_dev:
   extends: .deploy
-  script:
-    - ansible-playbook app_api_net.yml --extra-vars "HOST=contour-dev artifacts_path=$CI_PROJECT_DIR env_file=web_dev"
+  variables:
+    DEPLOYMENT_HOST: contour-dev
+    ANSIBLE_ENV_FILE: web_dev
   environment:
     name: dev_contour
     url: http://contour-dev-01.contour.net
@@ -40,8 +44,9 @@ deploy_dev:
 
 deploy_od:
   extends: .deploy
-  script:
-    - ansible-playbook app_api_net.yml --extra-vars "HOST=od-dev artifacts_path=$CI_PROJECT_DIR env_file=web_dev_od"
+  variables:
+    DEPLOYMENT_HOST: od-dev
+    ANSIBLE_ENV_FILE: web_dev_od
   environment:
     name: dev_odysseus
     url: http://od-dev.contour.net
