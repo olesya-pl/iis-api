@@ -81,5 +81,21 @@ namespace IIS.Core.GraphQL.Reports
 
             return new Report(report);
         }
+
+        public async Task<Report> CopyReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] CopyReportInput report)
+        {
+            var existingReport = context.Reports.Include(r => r.ReportEvents).SingleOrDefault(u => u.Id == id);
+            if (existingReport == null)
+                throw new InvalidOperationException($"Cannot find report with id  = {id}");
+
+            var newReport = new Core.Report.EntityFramework.Report(existingReport, Guid.NewGuid(), DateTime.Now);
+
+            newReport.Title = report.Title ?? newReport.Title;
+            newReport.Recipient = report.Recipient ?? newReport.Recipient;
+
+            context.Reports.Add(newReport);
+            await context.SaveChangesAsync();
+            return new Report(newReport);
+        }
     }
 }
