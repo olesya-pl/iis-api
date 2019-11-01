@@ -82,7 +82,7 @@ namespace IIS.Core.GraphQL.Reports
             return new Report(report);
         }
 
-        public async Task<Report> CopyReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] CopyReportInput report)
+        public async Task<Report> CopyReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] CopyReportInput data)
         {
             var existingReport = context.Reports.Include(r => r.ReportEvents).SingleOrDefault(u => u.Id == id);
             if (existingReport == null)
@@ -90,8 +90,8 @@ namespace IIS.Core.GraphQL.Reports
 
             var newReport = new Core.Report.EntityFramework.Report(existingReport, Guid.NewGuid(), DateTime.Now);
 
-            newReport.Title = report.Title ?? newReport.Title;
-            newReport.Recipient = report.Recipient ?? newReport.Recipient;
+            newReport.Title = data.Title ?? newReport.Title;
+            newReport.Recipient = data.Recipient ?? newReport.Recipient;
 
             context.Reports.Add(newReport);
             await context.SaveChangesAsync();
