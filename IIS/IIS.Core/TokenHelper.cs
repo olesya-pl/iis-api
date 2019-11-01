@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
+using System.Security.Authentication;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 namespace IIS.Core
@@ -28,22 +27,19 @@ namespace IIS.Core
             return _securityTokenHandler.WriteToken(token);
         }
         public static string NewToken(IConfiguration configuration) => NewToken(configuration.GetValue<string>("jwt:issuer"), configuration.GetValue<string>("jwt:audience"), configuration.GetValue<string>("jwt:signingKey"), configuration.GetValue<TimeSpan>("jwt:lifeTime"));
-        public static (bool, string) ValidateToken(string token, TokenValidationParameters validationParameters)
+        public static void ValidateToken(string token, TokenValidationParameters validationParameters)
         {
-            if (_securityTokenHandler.CanReadToken(token))
-            {
-                try
-                {
-                    _securityTokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-                    return (true, "success");
-                }
-                catch (SecurityTokenException e)
-                {
-                    return (false, e.Message);
-                }
-            }
+            if (!_securityTokenHandler.CanReadToken(token))
+                throw new AuthenticationException("Unable to read token");
 
-            return (false, "Can't read JWT token");
+            try
+            {
+                _securityTokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+            }
+            catch (SecurityTokenException e)
+            {
+                throw new AuthenticationException(e.Message);
+            }
         }
 
         public static JwtSecurityToken ReadToken(string token) => _securityTokenHandler.ReadJwtToken(token);

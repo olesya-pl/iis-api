@@ -91,7 +91,19 @@ namespace IIS.Core
 
             var publiclyAccesible = new HashSet<string> { "login", "__schema" };
             QueryExecutionBuilder.New()
-                .Use(next => context => _authenticate(context, next, publiclyAccesible))
+                .Use(next => context =>
+                {
+                    try
+                    {
+                        _authenticate(context, publiclyAccesible);
+                    }
+                    catch (Exception e)
+                    {
+                        context.Exception = e;
+                    }
+
+                    return next(context);
+                })
                 .UseDefaultPipeline()
                 .AddErrorFilter<AppErrorFilter>()
                 .Populate(services);
@@ -122,35 +134,10 @@ namespace IIS.Core
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
             services.AddHostedService<MaterialEventConsumer>();
 
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = Configuration.GetValue<string>("jwt:issuer"),
-
-                        ValidateAudience         = true,
-                        ValidAudience            = Configuration.GetValue<string>("jwt:audience"),
-                        ValidateLifetime         = true,
-                        IssuerSigningKey         = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("jwt:signingKey")),
-                        ValidateIssuerSigningKey = true,
-                    };
-                });
-
-            services.AddMvc(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                var filter = new AuthorizeFilter(policy);
-                config.Filters.Add(filter);
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
-        private Task _authenticate(IQueryContext context, QueryDelegate next, HashSet<string> publiclyAccesible)
+        private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {
             // TODO: remove this method when hotchocolate will allow to add attribute for authentication
             var qd = context.Request.Query as QueryDocument;
@@ -171,7 +158,7 @@ namespace IIS.Core
 
                 var headerValueParts = value.ToString().Split(' ');
                 var token = headerValueParts.Length == 1 ? headerValueParts[0] : headerValueParts[1];
-                var (success, message) = TokenHelper.ValidateToken(token, new TokenValidationParameters
+                TokenHelper.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidIssuer = Configuration.GetValue<string>("jwt:issuer"),
                     ValidAudience = Configuration.GetValue<string>("jwt:audience"),
@@ -179,12 +166,7 @@ namespace IIS.Core
                     ValidateIssuerSigningKey = true,
                     ValidateAudience = true
                 });
-
-                if (!success)
-                    throw new AuthenticationException();
             }
-
-            return next(context);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -197,9 +179,7 @@ namespace IIS.Core
 
             app.UseMiddleware<OptionsMiddleware>();
             app.UseGraphQL();
-
             app.UsePlayground();
-            // app.UseAuthentication();
             app.UseMvc();
 
             SeedData(context);

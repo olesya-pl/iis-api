@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IIS.Core.Controllers
 {
+    // TODO: protect files with authentication check
     [Route("api/{controller}")]
     [ApiController]
     public class FilesController : Controller
