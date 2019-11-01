@@ -53,8 +53,12 @@ namespace IIS.Core.Materials.EntityFramework
                 _context.Add(Map(info, material.Id));
             await _context.SaveChangesAsync();
             // todo: put message to rabbit instead of calling another service directly
-            foreach (var processor in _materialProcessors)
-                await processor.ExtractInfoAsync(material);
+
+            if (material.Metadata.SelectToken("Features.Nodes") != null)
+            {
+                foreach (var processor in _materialProcessors)
+                    await processor.ExtractInfoAsync(material);
+            }
             // end
             // todo: multiple queues for different material types
             if (material.File != null && material.Type == "cell.voice")
