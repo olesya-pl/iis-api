@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Authentication;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -92,6 +93,7 @@ namespace IIS.Core
             QueryExecutionBuilder.New()
                 .Use(next => context => _authenticate(context, next, publiclyAccesible))
                 .UseDefaultPipeline()
+                .AddErrorFilter<AppErrorFilter>()
                 .Populate(services);
 
             services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions {IncludeExceptionDetails = true});
@@ -151,17 +153,6 @@ namespace IIS.Core
         private Task _authenticate(IQueryContext context, QueryDelegate next, HashSet<string> publiclyAccesible)
         {
             // TODO: remove this method when hotchocolate will allow to add attribute for authentication
-            Task Error(string message, string code)
-            {
-                var error = ErrorBuilder
-                    .New()
-                    .SetMessage(message)
-                    .SetCode(code)
-                    .Build();
-                context.Result = QueryResult.CreateError(error);
-                return Task.CompletedTask;
-            }
-
             var qd = context.Request.Query as QueryDocument;
             if (qd == null || qd.Document == null)
                 throw new InvalidOperationException("Cannot find query in document");
@@ -176,9 +167,7 @@ namespace IIS.Core
             {
                 var httpContext = (HttpContext)context.ContextData["HttpContext"];
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var value))
-                {
-                    return Error("You are not authenticated", "UNAUTHENTICATED");
-                }
+                    throw new AuthenticationException();
 
                 var headerValueParts = value.ToString().Split(' ');
                 var token = headerValueParts.Length == 1 ? headerValueParts[0] : headerValueParts[1];
@@ -192,7 +181,7 @@ namespace IIS.Core
                 });
 
                 if (!success)
-                    return Error(message, "UNAUTHENTICATED");
+                    throw new AuthenticationException();
             }
 
             return next(context);
@@ -210,7 +199,7 @@ namespace IIS.Core
             app.UseGraphQL();
 
             app.UsePlayground();
-            app.UseAuthentication();
+            // app.UseAuthentication();
             app.UseMvc();
 
             SeedData(context);
@@ -276,6 +265,26 @@ namespace IIS.Core
             }
 
             return _next.Invoke(context);
+        }
+    }
+
+    class AppErrorFilter : IErrorFilter
+    {
+        public IError OnError(IError error)
+        {
+            if (error.Exception is InvalidOperationException || error.Exception is InvalidCredentialException)
+            {
+
+                return error.WithCode("BAD_REQUEST")
+                    .WithMessage(error.Exception.Message);
+            }
+
+            if (error.Exception is AuthenticationException)
+            {
+                return error.WithCode("UNAUTHENTICATED");
+            }
+
+            return error;
         }
     }
 }

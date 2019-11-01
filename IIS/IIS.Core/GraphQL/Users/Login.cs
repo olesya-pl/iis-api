@@ -3,6 +3,9 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using HotChocolate.Resolvers;
+using System.Security.Authentication;
+using Microsoft.AspNetCore.Http;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -23,7 +26,7 @@ namespace IIS.Core.GraphQL.Users
             var user = _context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == username.ToUpperInvariant() && u.PasswordHash == hash);
 
             if (user == null || user.IsBlocked)
-                throw new InvalidOperationException($"Wrong username or password");
+                throw new InvalidCredentialException($"Wrong username or password");
 
             return new LoginResponse
             {
