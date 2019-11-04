@@ -65,6 +65,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
                 {
                     var type = ontology.GetEntityType(node.Type)
                                ?? throw new ArgumentException($"EntityType {node.Type} does not exist");
+                    // TODO: should work with any entity type. Currently works only with entities which has value
                     var relationType = type.GetProperty("value");
                     var feat = ToDomain(node);
                     feat = await MapToNodeDirect(feat, type, relationType);
