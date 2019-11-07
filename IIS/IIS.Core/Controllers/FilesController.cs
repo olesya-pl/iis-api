@@ -35,7 +35,7 @@ namespace IIS.Core.Controllers
             if (fi == null) return NotFound();
             var cd = new System.Net.Mime.ContentDisposition // Always inline file
             {
-                FileName = fi.Name,
+                FileName = Uri.EscapeDataString(fi.Name),
                 Inline = true
             };
             Response.Headers.Add("Content-Disposition", cd.ToString());
