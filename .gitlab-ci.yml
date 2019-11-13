@@ -24,7 +24,7 @@ build_job:
     GIT_CHECKOUT: "false"
   script:
     - cd /home/gitlab-runner/ansible
-    - ansible-playbook app_api_net.yml --extra-vars "HOST=$DEPLOYMENT_HOST artifacts_path=$CI_PROJECT_DIR env_file=$ANSIBLE_ENV_FILE"
+    - ansible-playbook app_api_net.yml --extra-vars "HOST=$DEPLOYMENT_HOST artifacts_path=$CI_PROJECT_DIR env_file=$ANSIBLE_ENV_FILE tag_name=$TAG_NAME"
     - rm -rf $CI_PROJECT_DIR/*
 
   tags:
