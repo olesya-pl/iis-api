@@ -21,7 +21,7 @@ namespace IIS.Core.GraphQL.Reports
             _ontologyProvider = ontologyProvider;
 
             var ontology = _ontologyProvider.GetOntologyAsync().Result;
-            type = ontology.GetEntityTypeOrNull("Event");
+            type = ontology.GetTypeOrNull<EntityType>("Event");
 
             if (type == null)
                 throw new InvalidOperationException("Cannot find required type 'Event' in database. Add type to database or disable reports in configuration file using reportsAvailable : false");

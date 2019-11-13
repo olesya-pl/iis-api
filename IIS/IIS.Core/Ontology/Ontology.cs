@@ -15,10 +15,15 @@ namespace IIS.Core.Ontology
             Types = types;
         }
 
-        // TODO: revert it back
         public EntityType GetEntityType(string name)
         {
-            var type = EntityTypes.SingleOrDefault(e => e.Name == name);
+            // TODO: this method is redundant and can be removed
+            return GetType<EntityType>(name);
+        }
+
+        public T GetType<T>(string name) where T: Type
+        {
+            var type = GetTypeOrNull<T>(name);
 
             if (type == null) {
                 throw new ArgumentException($"Type '{name}' does not exist");
@@ -27,7 +32,17 @@ namespace IIS.Core.Ontology
             return type;
         }
 
-        public EntityType GetEntityTypeOrNull(string name) => EntityTypes.SingleOrDefault(e => e.Name == name);
+        public T GetTypeOrNull<T>(string name) where T: Type
+        {
+            return Types.OfType<T>().SingleOrDefault(type => type.Name == name);
+        }
+
+        public IEnumerable<T> GetTypes<T>(string name) where T: Type
+        {
+            // TODO: remove this method. There should not be types with the same name
+            //       this is a temporary hack while we have relations with the same name but different Source/Target
+            return Types.OfType<T>().Where(type => type.Name == name);
+        }
 
         public Type GetType(Guid id) => Types.SingleOrDefault(e => e.Id == id);
 

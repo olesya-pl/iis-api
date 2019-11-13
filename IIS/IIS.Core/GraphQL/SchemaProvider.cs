@@ -8,7 +8,6 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.Meta;
 using Microsoft.Extensions.Configuration;
 
 namespace IIS.Core.GraphQL
@@ -43,7 +42,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Users.Query>();
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
-                    d.Include<Reports.Query>(); 
+                    d.Include<Reports.Query>();
                 }
                 d.Include<HealthcheckQuery>();
                 if (ontology != null)
@@ -57,7 +56,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Users.LoginResolver>();
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
-                    d.Include<Reports.Mutation>(); 
+                    d.Include<Reports.Mutation>();
                 }
                 d.Include<DummyMutation>();
                 if (ontology != null)
