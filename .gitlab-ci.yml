@@ -50,5 +50,13 @@ deploy_od:
   environment:
     name: dev_odysseus
     url: http://od-dev.contour.net
-      
-  
+
+deploy_qa:
+  extends: .deploy
+  variables:
+    DEPLOYMENT_HOST: qa-app
+    ANSIBLE_ENV_FILE: web_qa
+  environment:
+    name: qa_contour
+    url: http://qa-app.contour.net
+  when: manual
