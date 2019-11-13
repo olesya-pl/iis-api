@@ -16,8 +16,8 @@ build_job:
     - ci
   only: 
     - master
-    - v*
-    - sprint.*
+    - /^v*$/
+    - /^sprint.*$/
     
 .deploy:
   stage: deploy
