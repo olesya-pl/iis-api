@@ -29,6 +29,8 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<Report.EntityFramework.Report> Reports { get; set; }
         public virtual DbSet<Report.EntityFramework.ReportEvents> ReportEvents { get; set; }
         public virtual DbSet<Users.EntityFramework.User> Users { get; set; }
+        public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsQuery> AnalyticsQuery { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -94,6 +96,8 @@ namespace IIS.Core.Ontology.EntityFramework.Context
             modelBuilder.Entity<Users.EntityFramework.User>()
                 .HasIndex(p => p.Username)
                 .IsUnique(true);
+            modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQuery>()
+                .HasOne(a => a.Creator);
 
             // ----- materials ----- //
 

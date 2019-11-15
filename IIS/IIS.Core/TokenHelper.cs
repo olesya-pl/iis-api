@@ -11,7 +11,7 @@ namespace IIS.Core
 {
     public static class TokenHelper
     {
-        static string CLAIM_TYPE_UID = "uid";
+        public static string CLAIM_TYPE_UID = "uid";
 
         public static SymmetricSecurityKey GetSymmetricSecurityKey(string key)
         {
@@ -43,7 +43,7 @@ namespace IIS.Core
             );
         }
 
-        public static JwtSecurityToken ValidateToken(string token, IConfiguration config)
+        public static TokenPayload ValidateToken(string token, IConfiguration config)
         {
             if (!_securityTokenHandler.CanReadToken(token))
                 throw new AuthenticationException("Unable to read token");
@@ -59,7 +59,7 @@ namespace IIS.Core
                 };
 
                 _securityTokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-                return validatedToken as JwtSecurityToken;
+                return TokenPayload.From(validatedToken as JwtSecurityToken);
             }
             catch (SecurityTokenException e)
             {
@@ -68,5 +68,21 @@ namespace IIS.Core
         }
 
         public static JwtSecurityToken ReadToken(string token) => _securityTokenHandler.ReadJwtToken(token);
+    }
+
+    public class TokenPayload
+    {
+        public readonly Guid UserId;
+
+        static public TokenPayload From(JwtSecurityToken token)
+        {
+            var userId = Guid.Parse(token.Payload[TokenHelper.CLAIM_TYPE_UID] as string);
+            return new TokenPayload(userId);
+        }
+
+        public TokenPayload(Guid userId)
+        {
+            UserId = userId;
+        }
     }
 }

@@ -40,6 +40,8 @@ namespace IIS.Core.GraphQL
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
                 d.Include<Users.Query>();
+                d.Include<AnalyticsQuery.Query>();
+
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
                     d.Include<Reports.Query>();
@@ -54,6 +56,8 @@ namespace IIS.Core.GraphQL
                 d.Include<Materials.Mutation>();
                 d.Include<Users.Mutation>();
                 d.Include<Users.LoginResolver>();
+                d.Include<AnalyticsQuery.Mutation>();
+
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
                     d.Include<Reports.Mutation>();
