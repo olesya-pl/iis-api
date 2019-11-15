@@ -3,9 +3,12 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using HotChocolate;
 using HotChocolate.Resolvers;
+using HotChocolate.Execution;
 using System.Security.Authentication;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -31,15 +34,26 @@ namespace IIS.Core.GraphQL.Users
             return new LoginResponse
             {
                 User = new User(user),
-                Token = TokenHelper.NewToken(_configuration)
+                Token = TokenHelper.NewToken(_configuration, user.Id)
             };
         }
 
-        public LoginResponse RefreshToken() {
+        public async Task<LoginResponse> RefreshToken(IResolverContext ctx) {
+            var token = ctx.ContextData["token"] as JwtSecurityToken;
+
+            if (token == null)
+                throw new NullReferenceException("Expected to have \"token\" in context's data.");
+
+            // TODO: user should be found lazily only if client requests it
+            var user = await _context.Users.FindAsync(Guid.Parse(token.Payload["uid"] as string));
+
+            if (user == null)
+                throw new InvalidCredentialException($"Invalid JWT token. Please re-login");
+
             return new LoginResponse
             {
-                User = null,
-                Token = TokenHelper.NewToken(_configuration)
+                User = new User(user),
+                Token = TokenHelper.NewToken(_configuration, Guid.NewGuid())
             };
         }
     }

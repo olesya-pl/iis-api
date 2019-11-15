@@ -58,7 +58,6 @@ namespace IIS.Core.GraphQL
                 {
                     d.Include<Reports.Mutation>();
                 }
-                d.Include<DummyMutation>();
                 if (ontology != null)
                     ConfigureOntologyMutation(d, ontology);
             });

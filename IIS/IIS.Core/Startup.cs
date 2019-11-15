@@ -99,7 +99,18 @@ namespace IIS.Core
                     }
                     catch (Exception e)
                     {
+                        if (!(e is AuthenticationException) && !(e is InvalidOperationException))
+                            throw e;
+
+                        var errorHandler = context.Services.GetService<IErrorHandler>();
+                        var error = ErrorBuilder.New()
+                            .SetMessage(e.Message)
+                            .SetException(e)
+                            .Build();
                         context.Exception = e;
+                        context.Result = QueryResult.CreateError(errorHandler.Handle(error));
+
+                        return Task.FromResult(context);
                     }
 
                     return next(context);
@@ -153,23 +164,14 @@ namespace IIS.Core
             if (!publiclyAccesible.Contains(fieldNode.Name.Value))
             {
                 var httpContext = (HttpContext)context.ContextData["HttpContext"];
-                if (!httpContext.Request.Headers.TryGetValue("Authorization", out var value))
-                    throw new AuthenticationException();
+                if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
+                    throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var headerValueParts = value.ToString().Split(' ');
-                var token = headerValueParts.Length == 1 ? headerValueParts[0] : headerValueParts[1];
-                TokenHelper.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidIssuer = Configuration.GetValue<string>("jwt:issuer"),
-                    ValidAudience = Configuration.GetValue<string>("jwt:audience"),
-                    IssuerSigningKey = TokenHelper.GetSymmetricSecurityKey(Configuration.GetValue<string>("jwt:signingKey")),
-                    ValidateIssuerSigningKey = true,
-                    ValidateAudience = true
-                });
+                var validatedToken = TokenHelper.ValidateToken(token, Configuration);
+                context.ContextData.Add("token", validatedToken);
             }
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, OntologyContext context)
         {
             if (env.IsDevelopment())
