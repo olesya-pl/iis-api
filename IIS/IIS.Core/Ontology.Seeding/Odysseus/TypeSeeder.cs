@@ -244,7 +244,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                             .WithTitle("Посада")
                     )
                     .HasOptional(r => r
-                            .Target(number)
+                            .Target(count)
                             .WithName("Count")
                             .WithTitle("Кількість")
                     )
