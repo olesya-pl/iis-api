@@ -75,7 +75,7 @@ namespace IIS.Core.Ontology {
             return new Expr(chunks[0], chunks[1], operation: operation);
         }
 
-        public string ToSQL()
+        public (string, Dictionary<string, object>) ToSQL()
         {
             var generator = new SQLGenerator(_matchQuery, _groups, _aggregation);
             return generator.Generate();
@@ -104,6 +104,7 @@ namespace IIS.Core.Ontology {
                 { "AstRelation", "Relations" },
                 { "AstAttribute", "Attributes" },
             };
+            private Dictionary<string, object> _sqlParams = new Dictionary<string, object>();
 
             private Dictionary<ScalarType, string> _dataTypesToSqlTypes = new Dictionary<ScalarType, string>() {
                 { ScalarType.Integer, "integer" },
@@ -119,16 +120,16 @@ namespace IIS.Core.Ontology {
                 _agg = agg;
             }
 
-            public string Generate() {
-                // TODO: generate SQL using some QueryBuilder functionality
+            public (string, Dictionary<string, object>) Generate() {
                 var matches = _genMatches();
                 var groups = _genGroups();
-
-                return $@"
+                var sql = $@"
                   SELECT {_genAgg()}, {groups}
                   FROM {matches}
                   GROUP BY {groups}
                 ";
+
+                return (sql, _sqlParams);
             }
 
             private string _genAgg()
@@ -232,15 +233,18 @@ namespace IIS.Core.Ontology {
 
                 if (node.TypeIds != null)
                 {
-                    conditions.Add($"{conditionsAlias}.\"TypeId\" IN ('{string.Join("','", node.TypeIds)}')");
+                    var paramName = $"{conditionsAlias}_typeIds";
+                    _sqlParams.Add(paramName, node.TypeIds);
+                    conditions.Add($"{conditionsAlias}.\"TypeId\" IN (@{paramName})");
                 }
 
                 conditions.Add($"{conditionsAlias}.\"IsArchived\" = false");
 
                 if (node is AnalyticsQueryParser.AstAttribute attr && attr.Conditions != null)
                 {
-                    var value = (string)attr.Conditions["Value"];
-                    conditions.Add($"{alias}.\"Value\" = '{value}'");
+                    var paramName = $"{alias}_value";
+                    _sqlParams.Add(paramName, (string)attr.Conditions["Value"]);
+                    conditions.Add($"{alias}.\"Value\" = @{paramName}");
                 }
 
                 return string.Join(" AND ", conditions);
