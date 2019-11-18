@@ -3,15 +3,17 @@ using System;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20191118125245_AnalyticsQueryChangeTitleLength")]
+    partial class AnalyticsQueryChangeTitleLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -19,18 +21,10 @@ namespace IIS.Core.Migrations
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("IIS.Core.Analytics.EntityFramework.AnalyticsIndicator", b =>
+            modelBuilder.Entity("IIS.Core.Analytics.EntityFramework.AnalyticsCriteria", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(200);
-
-                    b.Property<Guid?>("ParentId");
-
-                    b.Property<string>("Query");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -38,9 +32,7 @@ namespace IIS.Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("AnalyticsIndicators");
+                    b.ToTable("AnalyticsCriteria");
                 });
 
             modelBuilder.Entity("IIS.Core.Analytics.EntityFramework.AnalyticsQuery", b =>
@@ -319,13 +311,6 @@ namespace IIS.Core.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("IIS.Core.Analytics.EntityFramework.AnalyticsIndicator", b =>
-                {
-                    b.HasOne("IIS.Core.Analytics.EntityFramework.AnalyticsIndicator", "Parent")
-                        .WithMany()
-                        .HasForeignKey("ParentId");
                 });
 
             modelBuilder.Entity("IIS.Core.Analytics.EntityFramework.AnalyticsQuery", b =>

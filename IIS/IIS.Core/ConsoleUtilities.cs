@@ -6,6 +6,7 @@ using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Core.Ontology.Seeding;
 using IIS.Core.Ontology.Seeding.Odysseus;
 using IIS.Legacy.EntityFramework;
+using IIS.Core.Analytics.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -104,8 +105,72 @@ namespace IIS.Core
 
         public void SeedOdysseusData()
         {
-            _serviceProvider.GetService<Seeder>().Seed("odysseus").Wait();
+            // _serviceProvider.GetService<Seeder>().Seed("odysseus").Wait();
+            _seedOdysseusAnalyticsIndicators();
             Console.WriteLine("Odysseus data seeded");
+        }
+
+        private void _seedOdysseusAnalyticsIndicators()
+        {
+            var b = new AnalyticsIndicatorBuilder();
+            var root = b.NewIndicator(title: "Підрозділи СБУ", code: "sbu")
+                .AddChild(
+                    b.NewIndicator(title: "Орган/підрозділ СБУ", code: "sbu")
+                        .AddChild(
+                            b.NewIndicator(title: "Кількість працівників", code: "amountOfWorkers")
+                                .AddChild(b.NewIndicator(title: "За штатом", code: "byStaff"))
+                                .AddChild(b.NewIndicator(title: "Фактична", code: "real"))
+                        )
+                        .AddChild(
+                            b.NewIndicator(title: "Допуск до ДТ", code: "accessToStateSecrets")
+                                .AddChild(b.NewIndicator(title: "Всього надано", code: "provided"))
+                                .AddChild(b.NewIndicator(title: "Форма 1", code: "levelForm1"))
+                                .AddChild(b.NewIndicator(title: "Форма 2", code: "levelForm2"))
+                                .AddChild(b.NewIndicator(title: "Форма 3", code: "levelForm3"))
+                        )
+                        .AddChild(
+                            b.NewIndicator(title: "Перевірки", code: "vettingProcedures")
+                                .AddChild(b.NewIndicator(title: "Всі проведені", code: "all"))
+                                .AddChild(b.NewIndicator(title: "Комплексні", code: "complex"))
+                                .AddChild(b.NewIndicator(title: "Тематичні", code: "thematic"))
+                                .AddChild(b.NewIndicator(title: "Контрольні", code: "control"))
+                        )
+                        .AddChild(
+                            b.NewIndicator(title: "Заходи впливу", code: "sanctions")
+                                .AddChild(
+                                    b.NewIndicator(title: "Всі СРСД", code: "organization")
+                                        .AddChild(b.NewIndicator(title: "Інформування", code: "organization"))
+                                        .AddChild(b.NewIndicator(title: "Зупинення спецдозволу", code: "specialPermitSuspensionSanction"))
+                                        .AddChild(b.NewIndicator(title: "Скасування спецдозволу", code: "specialPermitCancellationSanction"))
+                                )
+                                .AddChild(
+                                    b.NewIndicator(title: "Секретоносій", code: "person")
+                                        .AddChild(b.NewIndicator(title: "Дисциплінарна відповідальність", code: "disciplinaryPersonSanction"))
+                                        .AddChild(b.NewIndicator(title: "Протокол", code: "reportPersonSanction"))
+                                        .AddChild(b.NewIndicator(title: "Скасування допуска", code: "cancellationPersonSanction"))
+                                        .AddChild(b.NewIndicator(title: "Службове розслідування", code: "investigationPersonSanction"))
+                                        .AddChild(b.NewIndicator(title: "Кримінальне провадження", code: "criminalPersonSanction"))
+                                )
+                        )
+                )
+                .AddChild(
+                    b.NewIndicator(title: "НДДКР", code: "srddw")
+                        .AddChild(b.NewIndicator(title: "Всі НДДКР", code: "all"))
+                        .AddChild(b.NewIndicator(title: "Т", code: "secret"))
+                        .AddChild(b.NewIndicator(title: "ЦТ", code: "absoluteSecret"))
+                        .AddChild(b.NewIndicator(title: "ОВ", code: "veryImportant"))
+                )
+                .AddChild(
+                    b.NewIndicator(title: "СРСД", code: "organizations")
+                        .AddChild(b.NewIndicator(title: "Всі СРСД", code: "all"))
+                        .AddChild(b.NewIndicator(title: "Військові", code: "military"))
+                        .AddChild(b.NewIndicator(title: "Цивільні", code: "civil"))
+                )
+            ;
+            var ctx = _serviceProvider.GetRequiredService<OntologyContext>();
+            ctx.AnalyticsIndicators.AddRange(b.Indicators);
+            ctx.SaveChanges();
+            Console.WriteLine("Done analytics indicators");
         }
 
         public void ApplyEfMigrations()
@@ -132,6 +197,18 @@ namespace IIS.Core
             else
             {
                 action();
+            }
+        }
+
+        class AnalyticsIndicatorBuilder
+        {
+            public List<AnalyticsIndicator> Indicators = new List<AnalyticsIndicator>();
+
+            public AnalyticsIndicator NewIndicator(string title, string code)
+            {
+                var indicator = new AnalyticsIndicator(Guid.NewGuid(), title, code);
+                Indicators.Add(indicator);
+                return indicator;
             }
         }
     }

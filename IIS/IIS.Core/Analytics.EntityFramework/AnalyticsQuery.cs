@@ -9,7 +9,7 @@ namespace IIS.Core.Analytics.EntityFramework
         public Guid Id { get; set; }
 
         [Required]
-        [MaxLength(50)]
+        [MaxLength(500)]
         public string Title { get; set; }
 
         [MaxLength(1000)]

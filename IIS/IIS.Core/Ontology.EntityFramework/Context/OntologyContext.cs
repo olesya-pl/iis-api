@@ -30,6 +30,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<Report.EntityFramework.ReportEvents> ReportEvents { get; set; }
         public virtual DbSet<Users.EntityFramework.User> Users { get; set; }
         public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsQuery> AnalyticsQuery { get; set; }
+        public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsIndicator> AnalyticsIndicators { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -97,7 +98,11 @@ namespace IIS.Core.Ontology.EntityFramework.Context
                 .HasIndex(p => p.Username)
                 .IsUnique(true);
             modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQuery>()
-                .HasOne(a => a.Creator);
+                .HasOne(q => q.Creator);
+
+            var anaylyticsIndicator = modelBuilder.Entity<IIS.Core.Analytics.EntityFramework.AnalyticsIndicator>();
+            anaylyticsIndicator.HasOne(i => i.Parent);
+            anaylyticsIndicator.Property(i => i.ParentId).IsRequired(false);
 
             // ----- materials ----- //
 
