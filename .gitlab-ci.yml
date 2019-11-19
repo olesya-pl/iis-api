@@ -26,7 +26,7 @@ build_job:
     GIT_CHECKOUT: "false"
   script:
     - cd /home/gitlab-runner/ansible
-    - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE' -e 'artifacts_path=$CI_PROJECT_DIR'
+    - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE' -e "artifacts_path=$CI_PROJECT_DIR"
     - rm -rf $CI_PROJECT_DIR/*
 
   tags:
