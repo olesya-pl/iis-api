@@ -1,126 +1,126 @@
 [
     {
-      "code": "militaryTag",
+      "code": "military",
       "name": "Військові"
     },
     {
-      "code": "civilTag",
+      "code": "civil",
       "name": "Цивільні"
     },
     {
-      "code": "criticalInfrastructureFacilityTag",
+      "code": "criticalInfrastructureFacility",
       "name": "Об’єкт критичної інфраструктури (ОКІ)"
     },
     {
-      "code": "vulnerableToTerrorismFacilityTag",
+      "code": "vulnerableToTerrorismFacility",
       "name": "Об’єкт, уразливий у терористичному відношенні"
     },
     {
-      "code": "stateOwnershipTag",
+      "code": "stateOwnership",
       "name": "Державна форма власності"
     },
     {
-      "code": "privateOwnershipTag",
+      "code": "privateOwnership",
       "name": "Приватна форма власності"
     },
     {
-      "code": "publicAuthorityTag",
+      "code": "publicAuthority",
       "name": "Орган державної влади"
     },
     {
-      "code": "localGovernmentTag",
+      "code": "localGovernment",
       "name": "Орган місцевого самоврядування"
     },
     {
-      "code": "industrialEnterpriseTag",
+      "code": "industrialEnterprise",
       "name": "Промислове підприємство"
     },
     {
-      "code": "medicalFacilityTag",
+      "code": "medicalFacility",
       "name": "Медзаклад"
     },
     {
-      "code": "ministryOfInternalAffairsTag",
+      "code": "ministryOfInternalAffairs",
       "name": "МВС"
     },
     {
-      "code": "nationalPoliceTag",
+      "code": "nationalPolice",
       "name": "Нацполіція"
     },
     {
-      "code": "prosecutorsOfficeTag",
+      "code": "prosecutorsOffice",
       "name": "Прокуратура"
     },
     {
-      "code": "courtTag",
+      "code": "court",
       "name": "Суд"
     },
     {
-      "code": "taxAuthorityTag",
+      "code": "taxAuthority",
       "name": "Податковий орган"
     },
     {
-      "code": "customsTag",
+      "code": "customs",
       "name": "Митниця"
     },
     {
-      "code": "penaltyInstitutionTag",
+      "code": "penaltyInstitution",
       "name": "Установа виконання покарань"
     },
     {
-      "code": "stateTaxServiceTag",
+      "code": "stateTaxService",
       "name": "ДПС"
     },
     {
-      "code": "stateMigrationServiceTag",
+      "code": "stateMigrationService",
       "name": "ДМС"
     },
     {
-      "code": "armedForcesTag",
+      "code": "armedForces",
       "name": "ЗСУ"
     },
     {
-      "code": "nationalGuardTag",
+      "code": "nationalGuard",
       "name": "Національна гвардія"
     },
     {
-      "code": "stateSpecialCommunicationsTag",
+      "code": "stateSpecialCommunications",
       "name": "Держспецзв’язок"
     },
     {
-      "code": "stateEmergencyServiceTag",
+      "code": "stateEmergencyService",
       "name": "ДСНС"
     },
     {
-      "code": "schoolTag",
+      "code": "school",
       "name": "Навчальний заклад"
     },
     {
-      "code": "scientificInstitutionTag",
+      "code": "scientificInstitution",
       "name": "Наукова установа"
     },
     {
-      "code": "bankingFinancialInstitutionsTag",
+      "code": "bankingFinancialInstitutions",
       "name": "Банківська, фінансова установа"
     },
     {
-      "code": "nationalAntiCorruptionBureauTag",
+      "code": "nationalAntiCorruptionBureau",
       "name": "НАБУ"
     },
     {
-      "code": "stateInvestigationBureauTag",
+      "code": "stateInvestigationBureau",
       "name": "ДБР"
     },
     {
-      "code": "externalIntelligenceServiceTag",
+      "code": "externalIntelligenceService",
       "name": "СЗР"
     },
     {
-      "code": "ministryTag",
+      "code": "ministry",
       "name": "Міністерство"
     },
     {
-      "code": "diplomaticEstablishmentTag",
+      "code": "diplomaticEstablishment",
       "name": "Дипломатична установа"
     },
     {
@@ -128,19 +128,23 @@
       "name": "Військовий контингент"
     },
     {
-      "code": "secretServiceTag",
+      "code": "secretService",
       "name": "СБУ"
     },
     {
-      "code": "researchCustomerTag",
+      "code": "researchCustomer",
       "name": "Замовник НДДКР"
     },
     {
-      "code": "researchPerformerTag",
+      "code": "researchPerformer",
       "name": "Виконавець НДДКР"
     },
     {
-      "code": "researchCoPerformerTag",
+      "code": "researchCoPerformer",
       "name": "Співвиконавець НДДКР"
+    },
+    {
+      "code": "dotl",
+      "name": "Підрозділ ДОТЛ"
     }
 ]
