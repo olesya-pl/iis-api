@@ -10,7 +10,7 @@ or `dotnet IIS.Replication.dll server.urls=http://localhost:${PORT}/` where any 
 
 To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html).
 
-## Helthcheck endpoint
+## Healthcheck endpoint
 
 Healthcheck is available at `/api/server-health` and returns information about version and service availability. Currently it shows information about database, elasticsearch and RabbitMQ connection status. Is used to monitor server health by monitoring tools.
 
