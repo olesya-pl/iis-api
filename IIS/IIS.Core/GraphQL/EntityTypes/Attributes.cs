@@ -56,7 +56,6 @@ namespace IIS.Core.GraphQL.EntityTypes
         string Format { get; }
         [GraphQLType(typeof(JsonScalarType))] JObject FormField { get; }
         [GraphQLType(typeof(JsonScalarType))] JObject Validation { get; }
-        [GraphQLType(typeof(JsonScalarType))] JObject Meta { get; }
     }
 
     public abstract class EntityAttributeBase : IEntityAttribute
@@ -87,8 +86,6 @@ namespace IIS.Core.GraphQL.EntityTypes
         public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
         public string Format => (MetaObject as AttributeRelationMeta)?.Format;
-
-        [GraphQLType(typeof(JsonScalarType))] public JObject Meta => Source.Meta.Serialize();
 
         [GraphQLType(typeof(JsonScalarType))]
         public JObject FormField
