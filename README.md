@@ -1,25 +1,32 @@
-0. Install dotnet-sdk-2.2.105 on machine.
-1. Run `cd IIS/ && sh ./startup` bash script. Services will be published to IIS/publish folder.
-2. Setup configuration env `export ASPNETCORE_ENVIRONMENT=Staging`
-3. Go to `cd IIS/publish/web` folder and run `dotnet IIS.Web.dll`
-4. Go to `cd IIS/publish/replication` folder and run `dotnet IIS.Replication.dll`
-or `dotnet IIS.Replication.dll server.urls=http://localhost:PORT/` where any PORT can be assigned.
-You can run it in detached mode or use tools like supervisor to start/stop services.
-web is on port 5000 by default.
-replication is on port 5500. Look at console output to find out which port is used.
+# Integration Information System API
 
-To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html) or `pm2`.
-To change configuration find `IIS/publish/replication/appsettings.${ENV}.json` file and `IIS/publish/web/appsettings.${ENV}.json`.
-`${ENV}` is env name and equals to the value of env variable `ASPNETCORE_ENVIRONMENT` (in our case `Staging`)
+## Install
 
-##### Command-line usage:
-`dotnet IIS.Core.dll --iis-actions action1,action2 [--iis-run-server true]`
+1. Install dotnet-sdk-2.2.105 on machine.
+2. Run `cd IIS/IIS.Core` and `dotnet publish IIS.Core.csproj -o ../publish/core`. Services will be published to IIS/publish folder.
+3. Configure application by changing `appsettings.${ASPNETCORE_ENVIRONMENT}.json` file, where `ASPNETCORE_ENVIRONMENT` is an env variable (e.g., `export ASPNETCORE_ENVIRONMENT=Staging`)
+4. Go to `cd IIS/publish/core` folder and run `dotnet IIS.Core.dll`
+or `dotnet IIS.Replication.dll server.urls=http://localhost:${PORT}/` where any `PORT` is a variable which contains server port number. By default app starts at `localhost:5000` port
+
+To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html).
+
+## Helthcheck endpoint
+
+Healthcheck is available at `/api/server-health` and returns information about version and service availability. Currently it shows information about database, elasticsearch and RabbitMQ connection status. Is used to monitor server health by monitoring tools.
+
+## CLI utils
+
+There are several CLI actions which help to setup database and ontology:
+
+```sh
+dotnet IIS.Core.dll --iis-actions action1,action2,...,actionN
+```
 
 You may specify multiple actions separated with comma, actions will run in the same order they were specified.
 
-If any action was found, web server would not start. To override this behaviour, you may add `--iis-run-server true`.
+If `--iis-actions` option is specified, application server doesn't start. To override this behaviour, you may add `--iis-run-server true`.
 
-###### List of actions:
+### List of actions:
 * `clear-types` Deletes all types from database.
 * `migrate-legacy-types` Migrates types from NodeJS database. Drops all types and entities.
 * `migrate-legacy-entities` Migrates entities from NodeJS database.
