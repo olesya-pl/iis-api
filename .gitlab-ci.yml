@@ -16,6 +16,8 @@ build_job:
     - ci
   only: 
     - master
+    - /^v.+$/
+    - /^sprint\..+$/
     
 .deploy:
   stage: deploy
