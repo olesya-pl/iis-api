@@ -26,7 +26,7 @@ build_job:
     GIT_CHECKOUT: "false"
   script:
     - cd /home/gitlab-runner/ansible
-    - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE'
+    - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE' -e 'artifacts_path=$CI_PROJECT_DIR'
     - rm -rf $CI_PROJECT_DIR/*
 
   tags:
@@ -54,9 +54,26 @@ deploy_od:
 deploy_qa:
   extends: .deploy
   variables:
-    DEPLOYMENT_HOST: qa-app
-    ANSIBLE_ENV_FILE: web_qa
+    DEPLOYMENT_FILE: qa_con.yml
   environment:
     name: qa_contour
     url: http://qa-app.contour.net
+  when: manual
+  
+deploy_stage:
+  extends: .deploy
+  variables:
+    DEPLOYMENT_FILE: stage_con.yml
+  environment:
+    name: stage_contour
+    url: http://192.168.88.164
+  when: manual
+  
+deploy_stage_od:
+  extends: .deploy
+  variables:
+    DEPLOYMENT_FILE: stage_od.yml
+  environment:
+    name: stage_odysseus
+    url: http://stage-app.odysseus.lcl
   when: manual
