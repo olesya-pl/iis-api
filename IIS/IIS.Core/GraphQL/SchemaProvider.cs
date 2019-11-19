@@ -47,7 +47,6 @@ namespace IIS.Core.GraphQL
                 {
                     d.Include<Reports.Query>();
                 }
-                d.Include<HealthcheckQuery>();
                 if (ontology != null)
                     ConfigureOntologyQuery(d, ontology);
             });
