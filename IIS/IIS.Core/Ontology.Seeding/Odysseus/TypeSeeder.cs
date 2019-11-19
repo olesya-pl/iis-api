@@ -424,6 +424,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasRequired(r => r
                         .Target("Organization")
                         .WithName("dotl")
+                        .WithTitle("Орган / підрозділ СБУ")
                     );
                 ;
 
