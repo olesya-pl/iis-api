@@ -25,10 +25,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         [GraphQLNonNullType]
         public DateTime UpdatedAt { get; set; }
-
-        private Guid _creatorId { get; set; }
-        private Guid _lastUpdaterId { get; set; }
-        public RootAnalyticsQueryIndicator RootIndicator { get; set; }
+        private IIS.Core.Analytics.EntityFramework.AnalyticsQuery _query { get; set; }
 
         public AnalyticsQuery(IIS.Core.Analytics.EntityFramework.AnalyticsQuery query)
         {
@@ -37,20 +34,18 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             Description = query.Description;
             CreatedAt = query.CreatedAt;
             UpdatedAt = query.UpdatedAt;
-            RootIndicator = new RootAnalyticsQueryIndicator(query.RootIndicator);
-            _creatorId = query.CreatorId;
-            _lastUpdaterId = query.LastUpdaterId;
+            _query = query;
         }
 
         public async Task<User> GetCreator([Service] OntologyContext context)
         {
-            var user = await context.Users.FindAsync(_creatorId);
+            var user = await context.Users.FindAsync(_query.CreatorId);
             return new User(user);
         }
 
         public async Task<User> GetLastUpdater([Service] OntologyContext context)
         {
-            var user = await context.Users.FindAsync(_lastUpdaterId);
+            var user = await context.Users.FindAsync(_query.LastUpdaterId);
             return new User(user);
         }
 
@@ -63,6 +58,19 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
                 .ToListAsync();
 
             return list.Select(i => new AnalyticsQueryIndicator(i));
+        }
+
+        [GraphQLNonNullType]
+        public async Task<RootAnalyticsQueryIndicator> GetRootIndicator([Service] OntologyContext context)
+        {
+            var rootIndicator = _query.RootIndicator;
+
+            if (rootIndicator == null)
+            {
+                rootIndicator = await context.AnalyticsIndicators.FindAsync(_query.RootIndicatorId);
+            }
+
+            return new RootAnalyticsQueryIndicator(rootIndicator);
         }
     }
 }

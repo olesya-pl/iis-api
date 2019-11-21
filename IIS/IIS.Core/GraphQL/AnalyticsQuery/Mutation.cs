@@ -5,6 +5,8 @@ using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -21,7 +23,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<AnalyticsQuery> CreateAnalyticsQuery(IResolverContext ctx, [Service] OntologyContext context, [GraphQLNonNullType] AnalyticsQueryInput data)
+        public async Task<AnalyticsQuery> CreateAnalyticsQuery(IResolverContext ctx, [Service] OntologyContext context, [GraphQLNonNullType] CreateAnalyticsQueryInput data)
         {
             Validator.ValidateObject(data, new ValidationContext(data), true);
 
@@ -32,41 +34,75 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
                 CreatedAt = DateTime.UtcNow
             };
             _mapInputToModel(data, query);
+            _tryToToggleIndicators(context, query, data);
 
             context.AnalyticsQuery.Add(query);
             await context.SaveChangesAsync();
             return new AnalyticsQuery(query);
         }
 
-        public async Task<AnalyticsQuery> UpdateAnalyticsQuery(IResolverContext ctx, [Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] string id, [GraphQLNonNullType] AnalyticsQueryInput data)
+        public async Task<AnalyticsQuery> UpdateAnalyticsQuery(IResolverContext ctx, [Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] UpdateAnalyticsQueryInput data)
         {
             Validator.ValidateObject(data, new ValidationContext(data), true);
-            var query = await context.AnalyticsQuery.FindAsync(Guid.Parse(id));
+            var query = await context.AnalyticsQuery.FindAsync(id);
             if (query == null)
                 throw new InvalidOperationException($"Cannot find analytics query with id = {id}");
 
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
             _mapInputToModel(data, query);
+            _tryToToggleIndicators(context, query, data);
             query.LastUpdaterId = tokenPayload.UserId;
             await context.SaveChangesAsync();
 
             return new AnalyticsQuery(query);
         }
 
-        private void _mapInputToModel(AnalyticsQueryInput data, Core.Analytics.EntityFramework.AnalyticsQuery query)
+        private void _mapInputToModel(IAnalyticsQueryInput data, Core.Analytics.EntityFramework.AnalyticsQuery query)
         {
             query.UpdatedAt = DateTime.UtcNow;
-            query.Title = data.Title;
+
+            if (data.Title != null)
+            {
+                query.Title = data.Title;
+            }
 
             if (data.Description != null)
             {
                 query.Description = data.Description;
             }
+
+            if (data.RootIndicatorId != Guid.Empty)
+            {
+                query.RootIndicatorId = data.RootIndicatorId;
+            }
+        }
+
+        private void _tryToToggleIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query,  IAnalyticsQueryInput data)
+        {
+            var ToRemove = new HashSet<Guid>(data.RemoveIndicators);
+
+            foreach (var input in data.AddIndicators)
+            {
+                if (ToRemove.Contains(input.Id))
+                    throw new InvalidOperationException($"\"removeIndicators\" contains ids from \"addIndicators\" array");
+
+                ctx.AnalyticsQueryIndicators.Add(new Core.Analytics.EntityFramework.AnalyticsQueryIndicator
+                {
+                    IndicatorId = input.Id,
+                    QueryId = query.Id,
+                    Title = input.Title,
+                    SortOrder = input.SortOrder
+                });
+            }
+
+            if (ToRemove.Any())
+            {
+                ctx.AnalyticsQueryIndicators.RemoveRange(ctx.AnalyticsQueryIndicators.Where(i => ToRemove.Contains(i.Id)));
+            }
         }
 
         public async Task<AnalyticsQuery> DeleteAnalyticsQuery([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            //TODO: should not be able to delete yourself
             var query = await context.AnalyticsQuery.FindAsync(id);
             if (query == null)
                 throw new InvalidOperationException($"Analytics query with id = {id} not found");

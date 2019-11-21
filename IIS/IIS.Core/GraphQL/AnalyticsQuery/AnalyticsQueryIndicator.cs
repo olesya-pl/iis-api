@@ -3,8 +3,6 @@ using HotChocolate;
 using HotChocolate.Types;
 using System.Threading.Tasks;
 using IIS.Core.Analytics.EntityFramework;
-using Newtonsoft.Json.Linq;
-using IIS.Core.GraphQL.Scalars;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
 {
