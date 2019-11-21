@@ -31,6 +31,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<Users.EntityFramework.User> Users { get; set; }
         public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsQuery> AnalyticsQuery { get; set; }
         public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsIndicator> AnalyticsIndicators { get; set; }
+        public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsQueryIndicator> AnalyticsQueryIndicators { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -99,6 +100,14 @@ namespace IIS.Core.Ontology.EntityFramework.Context
                 .IsUnique(true);
             modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQuery>()
                 .HasOne(q => q.Creator);
+
+            modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQueryIndicator>()
+                .HasOne(i => i.Query)
+                .WithMany(i => i.Indicators);
+
+            modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQueryIndicator>()
+                .HasOne(i => i.Indicator)
+                .WithMany(i => i.QueryIndicators);
 
             var anaylyticsIndicator = modelBuilder.Entity<IIS.Core.Analytics.EntityFramework.AnalyticsIndicator>();
             anaylyticsIndicator.HasOne(i => i.Parent);

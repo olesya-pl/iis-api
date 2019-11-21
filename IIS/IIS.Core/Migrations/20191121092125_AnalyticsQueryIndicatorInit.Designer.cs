@@ -3,15 +3,17 @@ using System;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20191121092125_AnalyticsQueryIndicatorInit")]
+    partial class AnalyticsQueryIndicatorInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,8 +59,6 @@ namespace IIS.Core.Migrations
 
                     b.Property<Guid>("LastUpdaterId");
 
-                    b.Property<Guid>("RootIndicatorId");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(500);
@@ -70,8 +70,6 @@ namespace IIS.Core.Migrations
                     b.HasIndex("CreatorId");
 
                     b.HasIndex("LastUpdaterId");
-
-                    b.HasIndex("RootIndicatorId");
 
                     b.ToTable("AnalyticsQuery");
                 });
@@ -85,9 +83,9 @@ namespace IIS.Core.Migrations
 
                     b.Property<Guid>("QueryId");
 
-                    b.Property<int>("SortOrder");
-
                     b.Property<string>("Title");
+
+                    b.Property<int>("sortOrder");
 
                     b.HasKey("Id");
 
@@ -364,11 +362,6 @@ namespace IIS.Core.Migrations
                     b.HasOne("IIS.Core.Users.EntityFramework.User", "LastUpdater")
                         .WithMany()
                         .HasForeignKey("LastUpdaterId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("IIS.Core.Analytics.EntityFramework.AnalyticsIndicator", "RootIndicator")
-                        .WithMany()
-                        .HasForeignKey("RootIndicatorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

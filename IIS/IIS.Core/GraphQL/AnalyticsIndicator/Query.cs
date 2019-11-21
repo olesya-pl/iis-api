@@ -6,6 +6,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
+using IIS.Core.Analytics.EntityFramework;
 
 namespace IIS.Core.GraphQL.AnalyticsIndicator
 {
@@ -20,24 +21,10 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
             return new GraphQLCollection<AnalyticsIndicator>(await list.ToListAsync(), await list.CountAsync());
         }
 
-        public async Task<GraphQLCollection<AnalyticsIndicator>> GetAnalyticsIndicatorList([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid parentId)
+        public async Task<GraphQLCollection<AnalyticsIndicator>> GetAnalyticsIndicatorList([Service] IAnalyticsRepository repository, [GraphQLType(typeof(NonNullType<IdType>))] Guid parentId)
         {
-            // TODO: better to use QueryBuilder because escaping is Postgres specific
-            var list = await context.AnalyticsIndicators
-                .FromSql(@"
-                    WITH RECURSIVE children AS (
-                        SELECT *
-                        FROM ""AnalyticsIndicators""
-                        WHERE ""ParentId"" = {0}
-                        UNION
-                        SELECT i.*
-                        FROM ""AnalyticsIndicators"" i
-                          INNER JOIN children c ON c.""Id"" = i.""ParentId""
-                    )
-                    SELECT * FROM children
-                ", parentId)
-                .Select(i => new AnalyticsIndicator(i))
-                .ToListAsync();
+            var children = await repository.GetAllChildrenAsync(parentId);
+            var list = children.Select(i => new AnalyticsIndicator(i)).ToList();
 
             return new GraphQLCollection<AnalyticsIndicator>(list, list.Count);
         }

@@ -4,6 +4,9 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Users;
 using IIS.Core.Ontology.EntityFramework.Context;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
 {
@@ -25,6 +28,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         private Guid _creatorId { get; set; }
         private Guid _lastUpdaterId { get; set; }
+        public RootAnalyticsQueryIndicator RootIndicator { get; set; }
 
         public AnalyticsQuery(IIS.Core.Analytics.EntityFramework.AnalyticsQuery query)
         {
@@ -33,6 +37,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             Description = query.Description;
             CreatedAt = query.CreatedAt;
             UpdatedAt = query.UpdatedAt;
+            RootIndicator = new RootAnalyticsQueryIndicator(query.RootIndicator);
             _creatorId = query.CreatorId;
             _lastUpdaterId = query.LastUpdaterId;
         }
@@ -47,6 +52,17 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         {
             var user = await context.Users.FindAsync(_lastUpdaterId);
             return new User(user);
+        }
+
+        public async Task<IEnumerable<AnalyticsQueryIndicator>> GetIndicators([Service] OntologyContext context)
+        {
+            var list = await context.AnalyticsQueryIndicators
+                .Include(i => i.Indicator)
+                .Where(i => i.QueryId.ToString() == Id)
+                .OrderBy(i => i.SortOrder)
+                .ToListAsync();
+
+            return list.Select(i => new AnalyticsQueryIndicator(i));
         }
     }
 }

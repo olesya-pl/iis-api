@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace IIS.Core.Analytics.EntityFramework
@@ -21,6 +22,8 @@ namespace IIS.Core.Analytics.EntityFramework
         public Guid? ParentId { get; set; }
 
         public virtual AnalyticsIndicator Parent { get; set; }
+
+        public virtual ICollection<AnalyticsQueryIndicator> QueryIndicators { get; set; }
 
         public AnalyticsIndicator(Guid id, string title, string code)
         {

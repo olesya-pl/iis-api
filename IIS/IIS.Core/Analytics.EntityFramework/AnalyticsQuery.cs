@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using IIS.Core.Users.EntityFramework;
 
@@ -25,8 +26,15 @@ namespace IIS.Core.Analytics.EntityFramework
         [Required]
         public Guid LastUpdaterId { get; set; }
 
+        [Required]
+        public Guid RootIndicatorId { get; set; }
+
         public virtual User Creator { get; set; }
 
         public virtual User LastUpdater { get; set; }
+
+        public virtual AnalyticsIndicator RootIndicator { get; set; }
+
+        public virtual ICollection<AnalyticsQueryIndicator> Indicators { get; set; } = new List<AnalyticsQueryIndicator>();
     }
 }

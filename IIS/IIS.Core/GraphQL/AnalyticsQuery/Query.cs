@@ -13,7 +13,10 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     {
         public async Task<AnalyticsQuery> GetAnalyticsQuery([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var query = await context.AnalyticsQuery.FindAsync(id);
+            var query = await context.AnalyticsQuery
+                .Include(q => q.RootIndicator)
+                .SingleOrDefaultAsync(q => q.Id == id);
+
             if (query == null)
                 throw new InvalidOperationException($"Cannot find analytics query with id \"{id}\"");
 
@@ -22,7 +25,11 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public async Task<GraphQLCollection<AnalyticsQuery>> GetAnalyticsQueryList([Service] OntologyContext context, [GraphQLNonNullType] PaginationInput pagination)
         {
-            var queries = context.AnalyticsQuery.GetPage(pagination).Select(q => new AnalyticsQuery(q));
+            var queries = context.AnalyticsQuery
+                .GetPage(pagination)
+                .Include(q => q.RootIndicator)
+                .Select(q => new AnalyticsQuery(q));
+
             return new GraphQLCollection<AnalyticsQuery>(await queries.ToListAsync(), await context.AnalyticsQuery.CountAsync());
         }
     }

@@ -34,6 +34,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
+using IIS.Core.Analytics.EntityFramework;
 
 namespace IIS.Core
 {
@@ -69,6 +70,7 @@ namespace IIS.Core
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IMaterialProvider, MaterialProvider>();
             services.AddTransient<IMaterialService, MaterialService>();
+            services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
