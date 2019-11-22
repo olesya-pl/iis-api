@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types;
+using System.Threading.Tasks;
 
 namespace IIS.Core.GraphQL.AnalyticsIndicator
 {
@@ -27,6 +28,26 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
             {
                 ParentId = indicator.ParentId.ToString();
             }
+        }
+
+        [GraphQLType(typeof(AnyType))]
+        public async Task<string[]> GetValues()
+        {
+            // TODO: remove mocked data and execute query instead
+            if (ParentId == null)
+                return new string[] {
+                    "УСБУ у Вінницькій області",
+                    "УСБУ у Волинській області",
+                    "УСБУ в Дніпропетровській області",
+                    "УСБУ в Житомирській області"
+                };
+
+            return new string[] {
+                "5",
+                "6",
+                "7",
+                "8"
+            };
         }
     }
 }

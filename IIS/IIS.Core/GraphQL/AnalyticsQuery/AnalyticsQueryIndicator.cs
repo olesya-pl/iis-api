@@ -34,21 +34,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         [GraphQLType(typeof(AnyType))]
         public async Task<string[]> GetValues()
         {
-            // TODO: remove mocked data and execute query instead
-            if (Indicator.ParentId == null)
-                return new string[] {
-                    "УСБУ у Вінницькій області",
-                    "УСБУ у Волинській області",
-                    "УСБУ в Дніпропетровській області",
-                    "УСБУ в Житомирській області"
-                };
-
-            return new string[] {
-                "5",
-                "6",
-                "7",
-                "8"
-            };
+            return await Indicator.GetValues();
         }
     }
 }

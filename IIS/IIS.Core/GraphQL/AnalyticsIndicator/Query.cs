@@ -28,5 +28,15 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
 
             return new GraphQLCollection<AnalyticsIndicator>(list, list.Count);
         }
+
+        public async Task<AnalyticsIndicator> GetAnalyticsIndicator([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
+        {
+            var indicator = await context.AnalyticsIndicators.FindAsync(id);
+
+            if (indicator == null)
+                throw new InvalidOperationException($"Cannot find analytics indicator with id \"{id}\"");
+
+            return new AnalyticsIndicator(indicator);
+        }
     }
 }
