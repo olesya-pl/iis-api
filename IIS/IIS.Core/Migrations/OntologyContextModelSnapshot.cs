@@ -57,8 +57,6 @@ namespace IIS.Core.Migrations
 
                     b.Property<Guid>("LastUpdaterId");
 
-                    b.Property<Guid>("RootIndicatorId");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(500);
@@ -70,8 +68,6 @@ namespace IIS.Core.Migrations
                     b.HasIndex("CreatorId");
 
                     b.HasIndex("LastUpdaterId");
-
-                    b.HasIndex("RootIndicatorId");
 
                     b.ToTable("AnalyticsQuery");
                 });
@@ -364,11 +360,6 @@ namespace IIS.Core.Migrations
                     b.HasOne("IIS.Core.Users.EntityFramework.User", "LastUpdater")
                         .WithMany()
                         .HasForeignKey("LastUpdaterId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("IIS.Core.Analytics.EntityFramework.AnalyticsIndicator", "RootIndicator")
-                        .WithMany()
-                        .HasForeignKey("RootIndicatorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

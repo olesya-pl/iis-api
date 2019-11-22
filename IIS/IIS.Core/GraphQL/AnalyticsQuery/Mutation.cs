@@ -70,16 +70,13 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             {
                 query.Description = data.Description;
             }
-
-            if (data.RootIndicatorId != Guid.Empty)
-            {
-                query.RootIndicatorId = data.RootIndicatorId;
-            }
         }
 
         private void _tryToToggleIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query,  IAnalyticsQueryInput data)
         {
             var ToRemove = new HashSet<Guid>(data.RemoveIndicators);
+
+            // TODO: validate if addIndicators has the same root Indicator
 
             foreach (var input in data.AddIndicators)
             {

@@ -48,7 +48,6 @@ namespace IIS.Core.Analytics.EntityFramework
                         FROM ""AnalyticsIndicators"" i
                           INNER JOIN children c
                                   ON c.""ParentId"" = i.""Id""
-                                 AND i.""ParentId"" is NOT NULL
                     )
                     SELECT * FROM children
                     ORDER BY level DESC

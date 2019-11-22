@@ -16,7 +16,6 @@ namespace IIS.Core.Analytics.EntityFramework
         [MaxLength(1000)]
         public string Description { get; set; }
 
-
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
@@ -26,14 +25,9 @@ namespace IIS.Core.Analytics.EntityFramework
         [Required]
         public Guid LastUpdaterId { get; set; }
 
-        [Required]
-        public Guid RootIndicatorId { get; set; }
-
         public virtual User Creator { get; set; }
 
         public virtual User LastUpdater { get; set; }
-
-        public virtual AnalyticsIndicator RootIndicator { get; set; }
 
         public virtual ICollection<AnalyticsQueryIndicator> Indicators { get; set; } = new List<AnalyticsQueryIndicator>();
     }

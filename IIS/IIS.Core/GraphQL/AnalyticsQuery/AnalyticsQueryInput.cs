@@ -10,7 +10,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     {
         string Title { get; set; }
         string Description { get; set; }
-        Guid RootIndicatorId { get; set; }
         IEnumerable<AnalyticsQueryIndicatorInput> AddIndicators { get; set; }
         IEnumerable<Guid> RemoveIndicators { get; set; }
     }
@@ -20,9 +19,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         [GraphQLNonNullType]
         public string Title { get; set; }
         public string Description { get; set; }
-
-        [GraphQLType(typeof(NonNullType<IdType>))]
-        public Guid RootIndicatorId { get; set; }
 
         public IEnumerable<AnalyticsQueryIndicatorInput> AddIndicators { get; set; } = Enumerable.Empty<AnalyticsQueryIndicatorInput>();
 
@@ -34,9 +30,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     {
         public string Title { get; set; }
         public string Description { get; set; }
-
-        [GraphQLType(typeof(IdType))]
-        public Guid RootIndicatorId { get; set; }
 
         public IEnumerable<AnalyticsQueryIndicatorInput> AddIndicators { get; set; } = Enumerable.Empty<AnalyticsQueryIndicatorInput>();
 

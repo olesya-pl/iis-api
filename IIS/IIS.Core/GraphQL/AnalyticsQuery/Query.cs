@@ -14,7 +14,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         public async Task<AnalyticsQuery> GetAnalyticsQuery([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
             var query = await context.AnalyticsQuery
-                .Include(q => q.RootIndicator)
                 .SingleOrDefaultAsync(q => q.Id == id);
 
             if (query == null)
@@ -27,7 +26,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         {
             var queries = context.AnalyticsQuery
                 .GetPage(pagination)
-                .Include(q => q.RootIndicator)
                 .Select(q => new AnalyticsQuery(q));
 
             return new GraphQLCollection<AnalyticsQuery>(await queries.ToListAsync(), await context.AnalyticsQuery.CountAsync());

@@ -26,6 +26,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         [GraphQLNonNullType]
         public DateTime UpdatedAt { get; set; }
         private IIS.Core.Analytics.EntityFramework.AnalyticsQuery _query { get; set; }
+        private IEnumerable<IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator> _indicators { get; set; }
 
         public AnalyticsQuery(IIS.Core.Analytics.EntityFramework.AnalyticsQuery query)
         {
@@ -51,26 +52,35 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public async Task<IEnumerable<AnalyticsQueryIndicator>> GetIndicators([Service] OntologyContext context)
         {
-            var list = await context.AnalyticsQueryIndicators
-                .Include(i => i.Indicator)
-                .Where(i => i.QueryId.ToString() == Id)
-                .OrderBy(i => i.SortOrder)
-                .ToListAsync();
-
-            return list.Select(i => new AnalyticsQueryIndicator(i));
+            var indicators = await _getQueryIndicators(context);
+            return indicators.Select(i => new AnalyticsQueryIndicator(i));
         }
 
-        [GraphQLNonNullType]
-        public async Task<RootAnalyticsQueryIndicator> GetRootIndicator([Service] OntologyContext context)
+        public async Task<AnalyticsQueryIndicator> GetRootIndicator([Service] OntologyContext context, [Service] IIS.Core.Analytics.EntityFramework.IAnalyticsRepository repository)
         {
-            var rootIndicator = _query.RootIndicator;
+            var queryIndicators = await _getQueryIndicators(context);
+            var queryIndicator = _indicators.FirstOrDefault();
 
-            if (rootIndicator == null)
+            if (queryIndicator == null)
+                return null;
+
+            var rootIndicator = await repository.getRootAsync(queryIndicator.IndicatorId);
+
+            return new AnalyticsQueryIndicator(rootIndicator);
+        }
+
+        private async Task<IEnumerable<IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator>> _getQueryIndicators(OntologyContext context)
+        {
+            if (_indicators == null)
             {
-                rootIndicator = await context.AnalyticsIndicators.FindAsync(_query.RootIndicatorId);
+                _indicators = await context.AnalyticsQueryIndicators
+                    .Include(i => i.Indicator)
+                    .Where(i => i.QueryId.ToString() == Id)
+                    .OrderBy(i => i.SortOrder)
+                    .ToListAsync();
             }
 
-            return new RootAnalyticsQueryIndicator(rootIndicator);
+            return _indicators;
         }
     }
 }
