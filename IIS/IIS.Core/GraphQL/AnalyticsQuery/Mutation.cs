@@ -29,6 +29,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
             var query = new Core.Analytics.EntityFramework.AnalyticsQuery {
+                Id = Guid.NewGuid(),
                 CreatorId = tokenPayload.UserId,
                 LastUpdaterId = tokenPayload.UserId,
                 CreatedAt = DateTime.UtcNow

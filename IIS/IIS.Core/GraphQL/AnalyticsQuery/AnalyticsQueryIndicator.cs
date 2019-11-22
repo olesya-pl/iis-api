@@ -30,11 +30,5 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             Title = indicator.Title;
             Indicator = new AnalyticsIndicator.AnalyticsIndicator(indicator);
         }
-
-        [GraphQLType(typeof(AnyType))]
-        public async Task<string[]> GetValues()
-        {
-            return await Indicator.GetValues();
-        }
     }
 }
