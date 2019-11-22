@@ -56,7 +56,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             return indicators.Select(i => new AnalyticsQueryIndicator(i));
         }
 
-        public async Task<AnalyticsQueryIndicator> GetRootIndicator([Service] OntologyContext context, [Service] IIS.Core.Analytics.EntityFramework.IAnalyticsRepository repository)
+        public async Task<AnalyticsIndicator.AnalyticsIndicator> GetRootIndicator([Service] OntologyContext context, [Service] IIS.Core.Analytics.EntityFramework.IAnalyticsRepository repository)
         {
             var queryIndicators = await _getQueryIndicators(context);
             var queryIndicator = _indicators.FirstOrDefault();
@@ -66,7 +66,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
             var rootIndicator = await repository.getRootAsync(queryIndicator.IndicatorId);
 
-            return new AnalyticsQueryIndicator(rootIndicator);
+            return new AnalyticsIndicator.AnalyticsIndicator(rootIndicator);
         }
 
         private async Task<IEnumerable<IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator>> _getQueryIndicators(OntologyContext context)
