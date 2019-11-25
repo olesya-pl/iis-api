@@ -23,12 +23,5 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             Title = queryIndicator.Title ?? queryIndicator.Indicator.Title;
             Indicator = new AnalyticsIndicator.AnalyticsIndicator(queryIndicator.Indicator);
         }
-
-        public AnalyticsQueryIndicator(IIS.Core.Analytics.EntityFramework.AnalyticsIndicator indicator)
-        {
-            Id = indicator.Id.ToString();
-            Title = indicator.Title;
-            Indicator = new AnalyticsIndicator.AnalyticsIndicator(indicator);
-        }
     }
 }

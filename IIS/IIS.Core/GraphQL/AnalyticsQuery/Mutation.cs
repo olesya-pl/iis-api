@@ -35,7 +35,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
                 CreatedAt = DateTime.UtcNow
             };
             _mapInputToModel(data, query);
-            _tryToToggleIndicators(context, query, data);
+            _tryToAddIndicators(context, query, data.Indicators);
 
             context.AnalyticsQuery.Add(query);
             await context.SaveChangesAsync();
@@ -51,7 +51,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
             _mapInputToModel(data, query);
-            _tryToToggleIndicators(context, query, data);
+            _tryToToggleIndicators(context, query, data.Indicators);
             query.LastUpdaterId = tokenPayload.UserId;
             await context.SaveChangesAsync();
 
@@ -73,28 +73,37 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             }
         }
 
-        private void _tryToToggleIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query,  IAnalyticsQueryInput data)
+        private void _tryToAddIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query,  IEnumerable<CreateAnalyticsQueryIndicatorInput> indicators)
         {
-            var ToRemove = new HashSet<Guid>(data.RemoveIndicators);
-
-            // TODO: validate if addIndicators has the same root Indicator
-
-            foreach (var input in data.AddIndicators)
+            if (indicators == null)
             {
-                if (ToRemove.Contains(input.Id))
-                    throw new InvalidOperationException($"\"removeIndicators\" contains ids from \"addIndicators\" array");
+                return;
+            }
 
+            _addQueryIndicators(ctx, query.Id, indicators);
+        }
+
+        private void _addQueryIndicators(OntologyContext ctx, Guid queryId, IEnumerable<CreateAnalyticsQueryIndicatorInput> indicators)
+        {
+            foreach (var input in indicators)
+            {
                 ctx.AnalyticsQueryIndicators.Add(new Core.Analytics.EntityFramework.AnalyticsQueryIndicator
                 {
-                    IndicatorId = input.Id,
-                    QueryId = query.Id,
+                    IndicatorId = input.IndicatorId,
+                    QueryId = queryId,
                     Title = input.Title,
                     SortOrder = input.SortOrder
                 });
             }
+        }
 
-            if (ToRemove.Any())
+        private void _tryToToggleIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query, AnalyticsQueryIndicatorsInput data)
+        {
+            _tryToAddIndicators(ctx, query, data.Create);
+
+            if (data.Delete != null && data.Delete.Any())
             {
+                var ToRemove = new HashSet<Guid>(data.Delete);
                 ctx.AnalyticsQueryIndicators.RemoveRange(ctx.AnalyticsQueryIndicators.Where(i => ToRemove.Contains(i.Id)));
             }
         }

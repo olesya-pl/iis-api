@@ -12,7 +12,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 {
     public class AnalyticsQuery
     {
-
         [GraphQLType(typeof(NonNullType<IdType>))]
         public string Id { get; set; }
 

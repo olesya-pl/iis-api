@@ -10,8 +10,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     {
         string Title { get; set; }
         string Description { get; set; }
-        IEnumerable<AnalyticsQueryIndicatorInput> AddIndicators { get; set; }
-        IEnumerable<Guid> RemoveIndicators { get; set; }
     }
 
     public class CreateAnalyticsQueryInput : IAnalyticsQueryInput
@@ -19,30 +17,32 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         [GraphQLNonNullType]
         public string Title { get; set; }
         public string Description { get; set; }
-
-        public IEnumerable<AnalyticsQueryIndicatorInput> AddIndicators { get; set; } = Enumerable.Empty<AnalyticsQueryIndicatorInput>();
-
-        [GraphQLType(typeof(ListType<NonNullType<IdType>>))]
-        public IEnumerable<Guid> RemoveIndicators { get; set; } = Enumerable.Empty<Guid>();
+        public IEnumerable<CreateAnalyticsQueryIndicatorInput> Indicators { get; set; } = Enumerable.Empty<CreateAnalyticsQueryIndicatorInput>();
     }
 
     public class UpdateAnalyticsQueryInput : IAnalyticsQueryInput
     {
         public string Title { get; set; }
         public string Description { get; set; }
-
-        public IEnumerable<AnalyticsQueryIndicatorInput> AddIndicators { get; set; } = Enumerable.Empty<AnalyticsQueryIndicatorInput>();
-
-        public IEnumerable<Guid> RemoveIndicators { get; set; } = Enumerable.Empty<Guid>();
+        public AnalyticsQueryIndicatorsInput Indicators { get; set; }
     }
 
-    public class AnalyticsQueryIndicatorInput
+    public class AnalyticsQueryIndicatorsInput
+    {
+        public IEnumerable<CreateAnalyticsQueryIndicatorInput> Create { get; set; } = Enumerable.Empty<CreateAnalyticsQueryIndicatorInput>();
+
+        [GraphQLType(typeof(ListType<NonNullType<IdType>>))]
+        public IEnumerable<Guid> Delete { get; set; } = Enumerable.Empty<Guid>();
+    }
+
+    public class CreateAnalyticsQueryIndicatorInput
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
-        public Guid Id { get; set; }
+        public Guid IndicatorId { get; set; }
 
         public string Title { get; set; }
 
+        [GraphQLNonNullType]
         public int SortOrder { get; set; }
     }
 }
