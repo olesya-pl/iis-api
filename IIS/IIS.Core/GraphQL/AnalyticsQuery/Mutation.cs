@@ -9,6 +9,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
 {
@@ -51,7 +52,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
             _mapInputToModel(data, query);
-            _tryToToggleIndicators(context, query, data.Indicators);
+            await _tryToToggleIndicators(context, query, data.Indicators);
             query.LastUpdaterId = tokenPayload.UserId;
             await context.SaveChangesAsync();
 
@@ -97,14 +98,39 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             }
         }
 
-        private void _tryToToggleIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query, AnalyticsQueryIndicatorsInput data)
+        private async Task _tryToToggleIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query, AnalyticsQueryIndicatorsInput patch)
         {
-            _tryToAddIndicators(ctx, query, data.Create);
+            if (patch == null)
+                return;
 
-            if (data.Delete != null && data.Delete.Any())
+            _tryToAddIndicators(ctx, query, patch.Create);
+            await _tryToUpdateIndicators(ctx, query, patch.Update);
+
+            if (patch.Delete != null && patch.Delete.Any())
             {
-                var ToRemove = new HashSet<Guid>(data.Delete);
-                ctx.AnalyticsQueryIndicators.RemoveRange(ctx.AnalyticsQueryIndicators.Where(i => ToRemove.Contains(i.Id)));
+                ctx.AnalyticsQueryIndicators.RemoveRange(ctx.AnalyticsQueryIndicators.Where(i => patch.Delete.Contains(i.Id)));
+            }
+        }
+
+        private async Task _tryToUpdateIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query, IEnumerable<UpdateAnalyticsQueryIndicatorInput> indicatorsInput)
+        {
+            if (indicatorsInput == null)
+                return;
+
+            var ids = indicatorsInput.Select(i => i.Id);
+            var analyticsQueries = await ctx.AnalyticsQueryIndicators
+                .Where(q => ids.Contains(q.Id))
+                .ToDictionaryAsync(q => q.Id);
+
+            foreach (var input in indicatorsInput)
+            {
+                analyticsQueries.TryGetValue(input.Id, out var analyticsQuery);
+
+                if (analyticsQuery == null)
+                    throw new InvalidOperationException($"Trying to update non existing analytics query with id '{input.Id}'");
+
+                analyticsQuery.Title = input.Title ?? analyticsQuery.Title;
+                analyticsQuery.SortOrder = input.SortOrder ?? analyticsQuery.SortOrder;
             }
         }
 

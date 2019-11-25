@@ -31,6 +31,8 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     {
         public IEnumerable<CreateAnalyticsQueryIndicatorInput> Create { get; set; } = Enumerable.Empty<CreateAnalyticsQueryIndicatorInput>();
 
+        public IEnumerable<UpdateAnalyticsQueryIndicatorInput> Update { get; set; } = Enumerable.Empty<UpdateAnalyticsQueryIndicatorInput>();
+
         [GraphQLType(typeof(ListType<NonNullType<IdType>>))]
         public IEnumerable<Guid> Delete { get; set; } = Enumerable.Empty<Guid>();
     }
@@ -44,5 +46,15 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         [GraphQLNonNullType]
         public int SortOrder { get; set; }
+    }
+
+    public class UpdateAnalyticsQueryIndicatorInput
+    {
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public Guid Id { get; set; }
+
+        public string Title { get; set; }
+
+        public int? SortOrder { get; set; }
     }
 }
