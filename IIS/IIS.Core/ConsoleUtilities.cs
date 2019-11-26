@@ -110,7 +110,7 @@ namespace IIS.Core
 
         public void SeedOdysseusData()
         {
-            // _serviceProvider.GetService<Seeder>().Seed(Path.Combine("odysseus", "entities")).Wait();
+            _serviceProvider.GetService<Seeder>().Seed(Path.Combine("odysseus", "entities")).Wait();
             _seedOdysseusAnalyticsIndicators();
             Console.WriteLine("Odysseus data seeded");
         }
