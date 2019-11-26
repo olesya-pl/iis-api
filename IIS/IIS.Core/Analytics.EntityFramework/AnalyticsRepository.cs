@@ -88,6 +88,8 @@ namespace IIS.Core.Analytics.EntityFramework
                 }
             }
 
+            ctx.Dispose();
+
             return results;
         }
     }
