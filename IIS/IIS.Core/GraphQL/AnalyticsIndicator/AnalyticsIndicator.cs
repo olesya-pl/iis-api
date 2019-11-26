@@ -38,6 +38,9 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
         [GraphQLType(typeof(AnyType))]
         public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> GetValues([Service] IOntologyProvider ontologyProvider, [Service] IAnalyticsRepository repository)
         {
+            if (_indicator.Query == null)
+                return null;
+
             var ontology = await ontologyProvider.GetOntologyAsync();
             var query = _getIndicatorQuery(ontology);
             return await repository.calcAsync(query);
@@ -45,9 +48,6 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
 
         private AnalyticsQueryBuilder _getIndicatorQuery(Ontology.Ontology ontology)
         {
-            if (_indicator.Query == null)
-                throw new InvalidOperationException($"Analytics Indicator \"{Title}\" is not configured");
-
             AnalyticsQueryBuilderConfig config;
             try {
                 config = JObject.Parse(_indicator.Query).ToObject<AnalyticsQueryBuilderConfig>();
