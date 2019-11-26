@@ -13,7 +13,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     public class AnalyticsQuery
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [GraphQLNonNullType]
         public string Title { get; set; }
@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public AnalyticsQuery(IIS.Core.Analytics.EntityFramework.AnalyticsQuery query)
         {
-            Id = query.Id.ToString();
+            Id = query.Id;
             Title = query.Title;
             Description = query.Description;
             CreatedAt = query.CreatedAt;
@@ -74,7 +74,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             {
                 _indicators = await context.AnalyticsQueryIndicators
                     .Include(i => i.Indicator)
-                    .Where(i => i.QueryId.ToString() == Id)
+                    .Where(i => i.QueryId == Id)
                     .OrderBy(i => i.SortOrder)
                     .ToListAsync();
             }

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace IIS.Core.Ontology {
-    class AnalyticsQueryBuilder
+    public class AnalyticsQueryBuilder
     {
         private AnalyticsQueryParser _queryParser;
         private AnalyticsQueryParser.Ast _matchQuery;
         private List<Expr> _groups;
         private Expr _aggregation;
+
+        private Expr[] _select;
 
         private List<Expr> _conditions;
 
@@ -21,6 +23,29 @@ namespace IIS.Core.Ontology {
         public static AnalyticsQueryBuilder From(Ontology ontology)
         {
             return new AnalyticsQueryBuilder(ontology);
+        }
+
+        public AnalyticsQueryBuilder Load(AnalyticsQueryBuilderConfig config)
+        {
+            if (config.Match != null)
+            {
+                foreach (var condition in config.Match)
+                    Match(condition);
+            }
+
+            if (config.Select != null)
+                Select(config.Select);
+
+            if (config.Sum != null)
+                Sum(config.Sum);
+
+            if (config.Count != null)
+                Count(config.Count);
+
+            if (config.GroupBy != null)
+                GroupBy(config.GroupBy);
+
+            return this;
         }
 
         public AnalyticsQueryBuilder Match(string query)
@@ -55,10 +80,12 @@ namespace IIS.Core.Ontology {
             return this;
         }
 
-        public AnalyticsQueryBuilder Where(string expr, params object[] value)
+        public AnalyticsQueryBuilder Select(params string[] exprs)
         {
-            var parsedExpr = _parseExpr(expr);
+            _select = new Expr[exprs.Length];
 
+            for (var i = 0; i< exprs.Length; i++)
+                _select[i] = _parseExpr(exprs[i]);
 
             return this;
         }
@@ -77,7 +104,7 @@ namespace IIS.Core.Ontology {
 
         public (string, Dictionary<string, object>) ToSQL()
         {
-            var generator = new SQLGenerator(_matchQuery, _groups, _aggregation);
+            var generator = new SQLGenerator(_matchQuery, _groups, _aggregation, _select);
             return generator.Generate();
         }
 
@@ -98,6 +125,7 @@ namespace IIS.Core.Ontology {
             private readonly AnalyticsQueryParser.Ast _ast;
             private readonly List<Expr> _groups;
             private readonly Expr _agg;
+            private readonly Expr[] _select;
             private Dictionary<string, string> _refToAlias = new Dictionary<string, string>();
             private Dictionary<string, string> _tables = new Dictionary<string, string>() {
                 { "AstNode", "Nodes" },
@@ -113,27 +141,48 @@ namespace IIS.Core.Ontology {
                 { ScalarType.DateTime, "datetime" }
             };
 
-            public SQLGenerator(AnalyticsQueryParser.Ast ast, List<Expr> groups, Expr agg)
+            public SQLGenerator(AnalyticsQueryParser.Ast ast, List<Expr> groups, Expr agg, Expr[] select)
             {
                 _ast = ast;
                 _groups = groups;
                 _agg = agg;
+                _select = select;
             }
 
             public (string, Dictionary<string, object>) Generate() {
                 var matches = _genMatches();
                 var groups = _genGroups();
-                var sql = $@"
-                  SELECT {_genAgg()}, {groups}
-                  FROM {matches}
-                  GROUP BY {groups}
-                ";
+                var selectFields = new List<string> { _genSelect(), groups, _genAgg() };
+                var select = string.Join(',', selectFields.Where(part => part != null));
+                var sql = $"SELECT {select} FROM {matches}";
+
+                if (groups != null)
+                    sql += $"\nGROUP BY {groups}";
 
                 return (sql, _sqlParams);
             }
 
+            private string _genSelect()
+            {
+                if (_select == null)
+                    return null;
+
+                var fields = new string[_select.Length];
+
+                for (var i = 0; i < fields.Length; i++)
+                {
+                    var fieldExpr = _select[i];
+                    fields[i] = $@"""{fieldExpr.Ref}"".""{fieldExpr.Field}""";
+                }
+
+                return string.Join(',', fields);
+            }
+
             private string _genAgg()
             {
+                if (_agg == null)
+                    return null;
+
                 var alias = _refToAlias[_agg.Ref];
                 var node = _ast.nodeByRef(_agg.Ref);
                 var field = $"\"{_agg.Field}\"";
@@ -148,18 +197,21 @@ namespace IIS.Core.Ontology {
                     }
                 }
 
-                return $"{_agg.Op}({alias}.{field})";
+                return $"{_agg.Op}(\"{alias}\".{field})";
             }
 
             private string _genGroups()
             {
+                if (_groups == null)
+                    return null;
+
                 var groups = new string[_groups.Count];
 
                 for (var i = 0; i < _groups.Count; i++)
                 {
                     var expr = _groups[i];
                     var exprAlias = _refToAlias[expr.Ref];
-                    groups[i] = $"{exprAlias}.\"{expr.Field}\"";
+                    groups[i] = $"\"{exprAlias}\".\"{expr.Field}\"";
                 }
 
                 return string.Join(',', groups);
@@ -192,7 +244,7 @@ namespace IIS.Core.Ontology {
             private (string, string, string) _genFullNodeJoin(AnalyticsQueryParser.AstNode node, int index, string joinType)
             {
                 var (table, alias) = _tableAndAliasFor(node, index);
-                var sql = $"{joinType} \"{table}\" AS {alias}";
+                var sql = $"{joinType} \"{table}\" AS \"{alias}\"";
 
                 if (node.Prev != null)
                 {
@@ -201,13 +253,13 @@ namespace IIS.Core.Ontology {
                     if (node is AnalyticsQueryParser.AstRelation rel)
                     {
                         var fieldName = rel.IsDirect ? "SourceNodeId" : "TargetNodeId";
-                        sql += $" ON {alias}.\"{fieldName}\" = {prevAlias}.\"Id\"";
+                        sql += $" ON \"{alias}\".\"{fieldName}\" = \"{prevAlias}\".\"Id\"";
                     }
                     else
                     {
                         var prevRel = (AnalyticsQueryParser.AstRelation)node.Prev;
                         var fieldName = prevRel.IsDirect ? "TargetNodeId" : "SourceNodeId";
-                        sql += $" ON {alias}.\"Id\" = {prevAlias}.\"{fieldName}\"";
+                        sql += $" ON \"{alias}\".\"Id\" = \"{prevAlias}\".\"{fieldName}\"";
                     }
                 }
 
@@ -216,7 +268,7 @@ namespace IIS.Core.Ontology {
                 if (_isRequireNodesTable(node))
                 {
                     conditionsAlias = $"{alias}_node";
-                    sql += $"\nINNER JOIN \"{_tables["AstNode"]}\" {conditionsAlias} ON {conditionsAlias}.\"Id\" = {alias}.\"Id\"";
+                    sql += $"\nINNER JOIN \"{_tables["AstNode"]}\" \"{conditionsAlias}\" ON \"{conditionsAlias}\".\"Id\" = \"{alias}\".\"Id\"";
                 }
 
                 if (node.Name != null)
@@ -233,18 +285,24 @@ namespace IIS.Core.Ontology {
 
                 if (node.TypeIds != null)
                 {
-                    var paramName = $"{conditionsAlias}_typeIds";
-                    _sqlParams.Add(paramName, node.TypeIds);
-                    conditions.Add($"{conditionsAlias}.\"TypeId\" IN (@{paramName})");
+                    var paramName = $"@{conditionsAlias}_typeIds";
+                    var paramNames = new string[node.TypeIds.Length];
+
+                    for (var i = 0; i < node.TypeIds.Length; i++)
+                    {
+                        paramNames[i] = $"{paramName}{i}";
+                        _sqlParams.Add(paramNames[i], node.TypeIds[i]);
+                    }
+                    conditions.Add($"\"{conditionsAlias}\".\"TypeId\" IN ({string.Join(',', paramNames)})");
                 }
 
-                conditions.Add($"{conditionsAlias}.\"IsArchived\" = false");
+                conditions.Add($"\"{conditionsAlias}\".\"IsArchived\" = false");
 
                 if (node is AnalyticsQueryParser.AstAttribute attr && attr.Conditions != null)
                 {
-                    var paramName = $"{alias}_value";
+                    var paramName = $"@{alias}_value";
                     _sqlParams.Add(paramName, (string)attr.Conditions["Value"]);
-                    conditions.Add($"{alias}.\"Value\" = @{paramName}");
+                    conditions.Add($"\"{alias}\".\"Value\" = {paramName}");
                 }
 
                 return string.Join(" AND ", conditions);
@@ -269,5 +327,14 @@ namespace IIS.Core.Ontology {
                 return rootSql + '\n' + sql + $"\nWHERE {_genNodeConditions(node, conditionsAlias, alias)}";
             }
         }
+    }
+
+    public class AnalyticsQueryBuilderConfig
+    {
+        public string[] Match { get; set; }
+        public string[] Select { get; set; }
+        public string[] GroupBy { get; set; }
+        public string Sum { get; set; }
+        public string Count { get; set; }
     }
 }

@@ -1,18 +1,22 @@
-using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
+using IIS.Core.Ontology.EntityFramework;
 
 namespace IIS.Core.Analytics.EntityFramework
 {
     public class AnalyticsRepository : IAnalyticsRepository
     {
         private OntologyContext _dbCtx;
-        public AnalyticsRepository(OntologyContext ctx)
+        private ContextFactory _ctxFactory;
+
+        public AnalyticsRepository(OntologyContext ctx, ContextFactory contextFactory)
         {
             _dbCtx = ctx;
+            _ctxFactory = contextFactory;
         }
 
         public async Task<IEnumerable<AnalyticsIndicator>> GetAllChildrenAsync(Guid parentId)
@@ -31,6 +35,7 @@ namespace IIS.Core.Analytics.EntityFramework
                     )
                     SELECT * FROM children
                 ", parentId)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -53,7 +58,49 @@ namespace IIS.Core.Analytics.EntityFramework
                     ORDER BY level DESC
                     LIMIT 1
                 ", childId)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsQueryBuilder query)
+        {
+            var ctx = _ctxFactory.CreateContext();
+            var (sql, sqlParams) = query.ToSQL();
+            List<AnalyticsQueryIndicatorResult> results;
+
+            using (var command = ctx.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = sql;
+                foreach (var param in sqlParams)
+                {
+                    var parameter = command.CreateParameter();
+                    parameter.Value = param.Value;
+                    parameter.ParameterName = param.Key;
+                    command.Parameters.Add(parameter);
+                }
+
+                await ctx.Database.OpenConnectionAsync();
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    results = new List<AnalyticsQueryIndicatorResult>();
+                    while (reader.Read())
+                        results.Add(new AnalyticsQueryIndicatorResult(reader.GetGuid(0), reader[1]));
+                }
+            }
+
+            return results;
+        }
+    }
+
+    public class AnalyticsQueryIndicatorResult
+    {
+        public Guid Id { get; set; }
+        public object Value { get; set; }
+
+        public AnalyticsQueryIndicatorResult(Guid id, object value)
+        {
+            Id = id;
+            Value = value;
         }
     }
 }

@@ -53,12 +53,11 @@ namespace IIS.Core
         {
             services.AddMemoryCache();
 
-            var connectionString = Configuration.GetConnectionString("db");
-            services.AddDbContext<OntologyContext>(b => b
-                .UseNpgsql(connectionString)
-                //.EnableSensitiveDataLogging()
-                ,
-                ServiceLifetime.Scoped);
+            var dbConnectionString = Configuration.GetConnectionString("db");
+            services.AddDbContext<OntologyContext>(options => options
+                .UseNpgsql(dbConnectionString)
+                // .EnableSensitiveDataLogging()
+            );
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
@@ -77,8 +76,8 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
             services.AddTransient<Ontology.Seeding.Seeder>();
-            services.AddTransient(e => new ContextFactory(connectionString));
-            services.AddTransient(e => new FileServiceFactory(connectionString));
+            services.AddTransient(e => new ContextFactory(dbConnectionString));
+            services.AddTransient(e => new FileServiceFactory(dbConnectionString));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
