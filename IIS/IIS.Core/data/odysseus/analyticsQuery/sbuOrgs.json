@@ -1,0 +1,7 @@
+{
+    "Match": [
+        "(sbu:Organization)-[:organizationTag]->(:OrganizationTag)-[:code]->@(:Code { \"Value\": \"dotl\" })",
+        "(sbu)-[:name]->@(sbuName:Name)"
+    ],
+    "Select": ["sbu.Id", "sbuName.Value"]
+}

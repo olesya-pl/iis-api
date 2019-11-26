@@ -17,9 +17,6 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
         [GraphQLNonNullType]
         public string Title { get; set; }
 
-        [GraphQLNonNullType]
-        public string Code { get; set; }
-
         [GraphQLType(typeof(IdType))]
         public string ParentId { get; set; }
 
@@ -29,7 +26,6 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
         {
             Id = indicator.Id.ToString();
             Title = indicator.Title;
-            Code = indicator.Code;
 
             if (indicator.ParentId != null)
             {

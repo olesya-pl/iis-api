@@ -24,10 +24,6 @@ namespace IIS.Core.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(200);
-
                     b.Property<Guid?>("ParentId");
 
                     b.Property<string>("Query");

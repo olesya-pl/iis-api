@@ -1,0 +1,8 @@
+{
+    "Match": [
+      "@(c:Count)<-[:count]-(:ListOfPositionsItem)<-[:listOfPositionsItem]-(:ListOfPositions)<-[:listOfPositions]-(o:Organization)",
+      "(o)-[:organizationTag]->(:OrganizationTag)-[:code]->@(:Code { \"Value\": \"dotl\"})"
+    ],
+    "GroupBy": ["o.Id"],
+    "Sum": "c.Value"
+}

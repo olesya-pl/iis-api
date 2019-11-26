@@ -1,0 +1,9 @@
+{
+    "Match": [
+      "(o:Organization)-[:vettingProcedure]->(vp:VettingProcedure)",
+      "(vp)-[:conductedBy]->(sbu:Organization)",
+      "(vp)-[:vettingProcedureKind]->(:VettingProcedureKind)-[:code]->@(:Code { \"Value\": \"complex\" })"
+    ],
+    "GroupBy": ["sbu.Id"],
+    "Count": "vp.Id"
+}

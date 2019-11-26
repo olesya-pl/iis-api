@@ -1,0 +1,8 @@
+{
+    "Match": [
+      "(o:Organization)-[:srddw]->(s:Srddw)",
+      "(o)-[:dotl]->(sbu:Organization)"
+    ],
+    "GroupBy": ["sbu.Id"],
+    "Count": "s.Id"
+}

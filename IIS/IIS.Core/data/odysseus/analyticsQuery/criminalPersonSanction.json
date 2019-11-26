@@ -1,0 +1,9 @@
+{
+    "Match": [
+      "(o:Organization)-[:vettingProcedure]->(vp:VettingProcedure)",
+      "(vp)-[:conductedBy]->(sbu:Organization)",
+      "(vp)-[:sanction]->(s:CriminalPersonSanction)"
+    ],
+    "GroupBy": ["sbu.Id"],
+    "Count": "s.Id"
+}

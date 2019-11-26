@@ -13,10 +13,6 @@ namespace IIS.Core.Analytics.EntityFramework
         [MaxLength(200)]
         public string Title { get; set; }
 
-        [Required]
-        [MaxLength(200)]
-        public string Code { get; set; }
-
         public string Query { get; set; }
 
         public Guid? ParentId { get; set; }
@@ -25,11 +21,10 @@ namespace IIS.Core.Analytics.EntityFramework
 
         public virtual ICollection<AnalyticsQueryIndicator> QueryIndicators { get; set; }
 
-        public AnalyticsIndicator(Guid id, string title, string code)
+        public AnalyticsIndicator(Guid id, string title)
         {
             Id = id;
             Title = title;
-            Code = code;
         }
 
         public AnalyticsIndicator AddChild(AnalyticsIndicator indicator)

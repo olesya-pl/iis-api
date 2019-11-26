@@ -1,0 +1,8 @@
+{
+    "Match": [
+      "(o:Organization)-[:organizationTag]->(:OrganizationTag)-[:code]->@(:Code { \"Value\": \"civil\"})",
+      "(o)-[:dotl]->(sbu:Organization)"
+    ],
+    "GroupBy": ["sbu.Id"],
+    "Count": "o.Id"
+}

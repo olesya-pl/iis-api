@@ -1,0 +1,9 @@
+{
+    "Match": [
+      "(person:Person)-[:workIn]->(:WorkIn)-[:organization]->(o:Organization)",
+      "(o)-[:dotl]->(sbu:Organization)",
+      "(person)-[:access]->(a:Access)-[:accessStatus]->(:AccessStatus)-[:code]->@(:Code { \"Value\": \"valid\" })"
+    ],
+    "GroupBy": ["sbu.Id"],
+    "Count": "a.Id"
+}

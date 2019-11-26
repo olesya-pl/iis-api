@@ -13,7 +13,6 @@ namespace IIS.Core.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Title = table.Column<string>(maxLength: 200, nullable: false),
-                    Code = table.Column<string>(maxLength: 200, nullable: false),
                     Query = table.Column<string>(nullable: true),
                     ParentId = table.Column<Guid>(nullable: true)
                 },
