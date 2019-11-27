@@ -64,33 +64,33 @@ namespace IIS.Core.Analytics.EntityFramework
 
         public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsQueryBuilder query)
         {
-            var ctx = _ctxFactory.CreateContext();
-            var (sql, sqlParams) = query.ToSQL();
-            List<AnalyticsQueryIndicatorResult> results;
-
-            using (var command = ctx.Database.GetDbConnection().CreateCommand())
+            using (var ctx = _ctxFactory.CreateContext())
             {
-                command.CommandText = sql;
-                foreach (var param in sqlParams)
+                var (sql, sqlParams) = query.ToSQL();
+                List<AnalyticsQueryIndicatorResult> results;
+
+                using (var command = ctx.Database.GetDbConnection().CreateCommand())
                 {
-                    var parameter = command.CreateParameter();
-                    parameter.Value = param.Value;
-                    parameter.ParameterName = param.Key;
-                    command.Parameters.Add(parameter);
+                    command.CommandText = sql;
+                    foreach (var param in sqlParams)
+                    {
+                        var parameter = command.CreateParameter();
+                        parameter.Value = param.Value;
+                        parameter.ParameterName = param.Key;
+                        command.Parameters.Add(parameter);
+                    }
+
+                    ctx.Database.OpenConnection();
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        results = new List<AnalyticsQueryIndicatorResult>();
+                        while (reader.Read())
+                            results.Add(new AnalyticsQueryIndicatorResult(reader.GetGuid(0), reader[1]));
+                    }
                 }
 
-                await ctx.Database.OpenConnectionAsync();
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    results = new List<AnalyticsQueryIndicatorResult>();
-                    while (reader.Read())
-                        results.Add(new AnalyticsQueryIndicatorResult(reader.GetGuid(0), reader[1]));
-                }
+                return results;
             }
-
-            ctx.Dispose();
-
-            return results;
         }
     }
 
