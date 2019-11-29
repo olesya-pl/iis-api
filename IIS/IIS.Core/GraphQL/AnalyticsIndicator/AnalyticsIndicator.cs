@@ -48,9 +48,27 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
 
         private AnalyticsQueryBuilder _getIndicatorQuery(Ontology.Ontology ontology)
         {
+            var query = @"
+                {
+                    ""Match"": [
+                        ""(o:Organization)-[:srddw]->(s:Srddw)"",
+                        ""(o)-[:dotl]->(sbu:Organization)"",
+                        ""(s)-[:startDate]->@(startDate:Date)""
+                    ],
+                    ""GroupBy"": [""sbu.Id""],
+                    ""Count"": ""s.Id"",
+                    ""Conditions"": [
+                        {
+                            ""Field"": ""startDate.Value"",
+                            ""Op"": "">"",
+                            ""Value"": ""2019-10-11T10:12:00""
+                        }
+                    ]
+                }
+            ";
             AnalyticsQueryBuilderConfig config;
             try {
-                config = JObject.Parse(_indicator.Query).ToObject<AnalyticsQueryBuilderConfig>();
+                config = JObject.Parse(query).ToObject<AnalyticsQueryBuilderConfig>();
             } catch {
                 throw new InvalidOperationException($"Query of \"{Title}\" analytics Indicator is invalid");
             }
