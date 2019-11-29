@@ -38,6 +38,8 @@ namespace IIS.Core.Ontology.Meta
         Create, Update, Delete
     }
 
+    // TODO: this should be an anonymous object, something like JObject
+    //       different clients will have different UI components and their configuration cannot be statically described in code!
     public class FormField
     {
         public string Type { get; set; }
@@ -46,5 +48,6 @@ namespace IIS.Core.Ontology.Meta
         public bool HasIndexColumn { get; set; }
         public string RadioType { get; set; }
         public string Layout { get; set; }
+        public string Icon { get; set; }
     }
 }
