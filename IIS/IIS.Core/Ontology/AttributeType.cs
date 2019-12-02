@@ -70,9 +70,17 @@ namespace IIS.Core.Ontology
 
         public static string ValueToString(object value, ScalarType scalarType)
         {
-            if (scalarType == ScalarType.Geo)
-                return JsonConvert.SerializeObject((Dictionary<string, object>)value);
-            return value.ToString();
+            switch (scalarType)
+            {
+                case ScalarType.Geo:
+                    return JsonConvert.SerializeObject((Dictionary<string, object>)value);
+                case ScalarType.DateTime:
+                    if (value == null)
+                        return null;
+                    return ((DateTime)value).ToUniversalTime().ToString("o");
+                default:
+                    return value.ToString();
+            }
         }
 
     }

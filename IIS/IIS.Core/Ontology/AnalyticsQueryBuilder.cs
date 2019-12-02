@@ -51,7 +51,7 @@ namespace IIS.Core.Ontology {
             if (config.Conditions != null)
             {
                 foreach (var condition in config.Conditions)
-                    Where(condition.Field, condition.Op, condition.Value);
+                    Where(condition[0], condition[1], condition[2]);
             }
 
             return this;
@@ -384,10 +384,22 @@ namespace IIS.Core.Ontology {
                     var condition = _conditions[i];
                     var paramName = $"@condition{i}";
                     conditions[i] = _stringifyExpr(condition.Expr, castType: true) + condition.Op + $" {paramName}";
-                    _sqlParams.Add(paramName, condition.Value);
+                    _sqlParams.Add(paramName, _castValue(condition));
                 }
 
                 return string.Join(" AND ", conditions);
+            }
+
+            private object _castValue(ConditionExpr condition)
+            {
+                var node = _ast.nodeByRef(condition.Expr.Ref);
+
+                if (!(node is AnalyticsQueryParser.AstAttribute) || node.Type == null)
+                    return condition.Value;
+
+                var attrType = (AttributeType)node.Type;
+
+                return AttributeType.ParseValue(condition.Value.ToString(), attrType.ScalarTypeEnum);
             }
         }
     }
@@ -400,13 +412,6 @@ namespace IIS.Core.Ontology {
         public string Sum { get; set; }
         public string Count { get; set; }
 
-        public Condition[] Conditions { get; set; }
-
-        public class Condition
-        {
-            public string Field { get; set; }
-            public string Op { get; set; }
-            public object Value { get; set; }
-        }
+        public string[][] Conditions { get; set; }
     }
 }
