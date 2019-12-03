@@ -99,9 +99,9 @@ namespace IIS.Core.Analytics.EntityFramework
         public Guid Id { get; set; }
         public object Value { get; set; }
 
-        public AnalyticsQueryIndicatorResult(Guid id, object value)
+        public AnalyticsQueryIndicatorResult(Guid entityId, object value)
         {
-            Id = id;
+            Id = entityId;
             Value = value;
         }
     }

@@ -36,17 +36,17 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
         }
 
         [GraphQLType(typeof(AnyType))]
-        public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> GetValues([Service] IOntologyProvider ontologyProvider, [Service] IAnalyticsRepository repository)
+        public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> GetValues([Service] IOntologyProvider ontologyProvider, [Service] IAnalyticsRepository repository, DateTime? from, DateTime? to)
         {
             if (_indicator.Query == null)
                 return null;
 
             var ontology = await ontologyProvider.GetOntologyAsync();
-            var query = _getIndicatorQuery(ontology);
+            var query = _getIndicatorQuery(ontology, from, to);
             return await repository.calcAsync(query);
         }
 
-        private AnalyticsQueryBuilder _getIndicatorQuery(Ontology.Ontology ontology)
+        private AnalyticsQueryBuilder _getIndicatorQuery(Ontology.Ontology ontology, DateTime? fromDate, DateTime? toDate)
         {
             AnalyticsQueryBuilderConfig config;
             try {
@@ -55,7 +55,15 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
                 throw new InvalidOperationException($"Query of \"{Title}\" analytics Indicator is invalid");
             }
 
-            return AnalyticsQueryBuilder.From(ontology).Load(config);
+            var query = AnalyticsQueryBuilder.From(ontology).Load(config);
+
+            if (config.startDateField != null && fromDate != null)
+                query.Where(config.startDateField, ">=", fromDate);
+
+            if (config.endDateField != null && toDate != null)
+                query.Where(config.endDateField, "<=", toDate);
+
+            return query;
         }
     }
 }

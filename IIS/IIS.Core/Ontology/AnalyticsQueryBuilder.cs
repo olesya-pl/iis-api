@@ -377,6 +377,7 @@ namespace IIS.Core.Ontology {
 
             private string _genWhere()
             {
+
                 var conditions = new string[_conditions.Length];
 
                 for (var i = 0; i < _conditions.Length; i++)
@@ -411,7 +412,8 @@ namespace IIS.Core.Ontology {
         public string[] GroupBy { get; set; }
         public string Sum { get; set; }
         public string Count { get; set; }
-
         public string[][] Conditions { get; set; }
+        public string startDateField { get; set; }
+        public string endDateField { get; set; }
     }
 }
