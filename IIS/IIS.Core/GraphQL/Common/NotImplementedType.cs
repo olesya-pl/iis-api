@@ -36,5 +36,10 @@ namespace IIS.Core.GraphQL.Common
         {
             throw new NotImplementedException();
         }
+
+        public override bool TrySerialize(object value, out object serialized)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
