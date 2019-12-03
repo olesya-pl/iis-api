@@ -1,9 +1,11 @@
 {
-    "Match": [
-      "(o:Organization)-[:vettingProcedure]->(vp:VettingProcedure)",
-      "(vp)-[:conductedBy]->(sbu:Organization)",
-      "(vp)-[:sanction]->(s:ReportPersonSanction)"
-    ],
-    "GroupBy": ["sbu.Id"],
-    "Count": "s.Id"
+  "StartDateField": "date.Value",
+  "Match": [
+    "(o:Organization)-[:vettingProcedure]->(vp:VettingProcedure)",
+    "(vp)-[:conductedBy]->(sbu:Organization)",
+    "(vp)-[:sanction]->(s:ReportPersonSanction)",
+    "(s)-[:registrationDate]->@(date:Date)"
+  ],
+  "GroupBy": ["sbu.Id"],
+  "Count": "s.Id"
 }

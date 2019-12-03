@@ -5,6 +5,7 @@ using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using IIS.Core.Ontology.EntityFramework;
+using Newtonsoft.Json;
 
 namespace IIS.Core.Analytics.EntityFramework
 {
@@ -12,11 +13,13 @@ namespace IIS.Core.Analytics.EntityFramework
     {
         private OntologyContext _dbCtx;
         private ContextFactory _ctxFactory;
+        private IOntologyProvider _ontologyProvider;
 
-        public AnalyticsRepository(OntologyContext ctx, ContextFactory contextFactory)
+        public AnalyticsRepository(OntologyContext ctx, ContextFactory contextFactory, IOntologyProvider ontologyProvider)
         {
             _dbCtx = ctx;
             _ctxFactory = contextFactory;
+            _ontologyProvider = ontologyProvider;
         }
 
         public async Task<IEnumerable<AnalyticsIndicator>> GetAllChildrenAsync(Guid parentId)
@@ -91,6 +94,34 @@ namespace IIS.Core.Analytics.EntityFramework
 
                 return results;
             }
+        }
+
+        public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsIndicator indicator, DateTime? fromDate, DateTime? toDate)
+        {
+            var query = await BuildQuery(indicator, fromDate, toDate);
+            return await calcAsync(query);
+        }
+
+        public async Task<AnalyticsQueryBuilder> BuildQuery(AnalyticsIndicator indicator, DateTime? fromDate, DateTime? toDate)
+        {
+            AnalyticsQueryBuilderConfig config;
+            try {
+                config = JsonConvert.DeserializeObject<AnalyticsQueryBuilderConfig>(indicator.Query);
+            } catch {
+                throw new InvalidOperationException($"Query of \"{indicator.Title}\" analytics Indicator is invalid");
+            }
+
+            var ontology = await _ontologyProvider.GetOntologyAsync();
+            var finalQuery = AnalyticsQueryBuilder.From(ontology).Load(config);
+            var (startDateField, endDateField) = (config.StartDateField, config.EndDateField ?? config.StartDateField);
+
+            if (startDateField != null && fromDate != null)
+                finalQuery.Where(startDateField, ">=", fromDate);
+
+            if (endDateField != null && toDate != null)
+                finalQuery.Where(endDateField, "<=", toDate);
+
+            return finalQuery;
         }
     }
 

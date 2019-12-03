@@ -25,10 +25,19 @@ namespace IIS.Core.Analytics.EntityFramework
         [Required]
         public Guid LastUpdaterId { get; set; }
 
+        public IEnumerable<DateRange> DateRanges { get; set; }
+
         public virtual User Creator { get; set; }
 
         public virtual User LastUpdater { get; set; }
 
         public virtual ICollection<AnalyticsQueryIndicator> Indicators { get; set; } = new List<AnalyticsQueryIndicator>();
+
+        public class DateRange {
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public string Color { get; set; }
+        }
     }
+
 }

@@ -1,7 +1,11 @@
+using System.Collections.Generic;
 using System.Threading;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
+
 
 namespace IIS.Core.Ontology.EntityFramework.Context
 {
@@ -98,8 +102,16 @@ namespace IIS.Core.Ontology.EntityFramework.Context
             modelBuilder.Entity<Users.EntityFramework.User>()
                 .HasIndex(p => p.Username)
                 .IsUnique(true);
-            modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQuery>()
-                .HasOne(q => q.Creator);
+
+            var analiticsQuery = modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQuery>();
+
+            analiticsQuery.HasOne(q => q.Creator);
+            analiticsQuery.Property(q => q.DateRanges)
+                .HasColumnType("jsonb")
+                .HasConversion(new ValueConverter<IEnumerable<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>, string>(
+                    dateRanges => JsonConvert.SerializeObject(dateRanges),
+                    value => JsonConvert.DeserializeObject<IEnumerable<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>>(value)
+                ));
 
             modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQueryIndicator>()
                 .HasOne(i => i.Query)

@@ -6,24 +6,36 @@ using System.Collections.Generic;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
 {
-    public interface IAnalyticsQueryInput
+    public abstract class AnalyticsQueryInput
     {
-        string Title { get; set; }
-        string Description { get; set; }
+        public virtual string Title { get; set; }
+        public string Description { get; set; }
+
+        [GraphQLType(typeof(ListType<NonNullType<InputObjectType<DateRangeInput>>>))]
+        public IEnumerable<DateRangeInput> DateRanges { get; set; } = Enumerable.Empty<DateRangeInput>();
     }
 
-    public class CreateAnalyticsQueryInput : IAnalyticsQueryInput
+    public class DateRangeInput
     {
         [GraphQLNonNullType]
-        public string Title { get; set; }
-        public string Description { get; set; }
+        public DateTime StartDate { get; set; }
+
+        [GraphQLNonNullType]
+        public DateTime EndDate { get; set; }
+
+        [GraphQLNonNullType]
+        public string Color { get; set; }
+    }
+
+    public class CreateAnalyticsQueryInput : AnalyticsQueryInput
+    {
+        [GraphQLNonNullType]
+        public override string Title { get; set; }
         public IEnumerable<CreateAnalyticsQueryIndicatorInput> Indicators { get; set; } = Enumerable.Empty<CreateAnalyticsQueryIndicatorInput>();
     }
 
-    public class UpdateAnalyticsQueryInput : IAnalyticsQueryInput
+    public class UpdateAnalyticsQueryInput : AnalyticsQueryInput
     {
-        public string Title { get; set; }
-        public string Description { get; set; }
         public AnalyticsQueryIndicatorsInput Indicators { get; set; }
     }
 

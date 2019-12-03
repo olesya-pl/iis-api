@@ -413,7 +413,7 @@ namespace IIS.Core.Ontology {
         public string Sum { get; set; }
         public string Count { get; set; }
         public string[][] Conditions { get; set; }
-        public string startDateField { get; set; }
-        public string endDateField { get; set; }
+        public string StartDateField { get; set; }
+        public string EndDateField { get; set; }
     }
 }

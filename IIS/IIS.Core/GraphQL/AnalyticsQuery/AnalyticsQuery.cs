@@ -22,6 +22,9 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         [GraphQLNonNullType]
         public DateTime CreatedAt { get; set; }
 
+        [GraphQLType(typeof(ListType<NonNullType<ObjectType<DateRange>>>))]
+        public IEnumerable<DateRange> DateRanges { get; set; }
+
         [GraphQLNonNullType]
         public DateTime UpdatedAt { get; set; }
         private IIS.Core.Analytics.EntityFramework.AnalyticsQuery _query { get; set; }
@@ -34,21 +37,25 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             Description = query.Description;
             CreatedAt = query.CreatedAt;
             UpdatedAt = query.UpdatedAt;
+            DateRanges = query.DateRanges != null ? query.DateRanges.Select(r => new DateRange(r)) : null;
             _query = query;
         }
 
+        [GraphQLNonNullType]
         public async Task<User> GetCreator([Service] OntologyContext context)
         {
             var user = await context.Users.FindAsync(_query.CreatorId);
             return new User(user);
         }
 
+        [GraphQLNonNullType]
         public async Task<User> GetLastUpdater([Service] OntologyContext context)
         {
             var user = await context.Users.FindAsync(_query.LastUpdaterId);
             return new User(user);
         }
 
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<ObjectType<AnalyticsQueryIndicator>>>>))]
         public async Task<IEnumerable<AnalyticsQueryIndicator>> GetIndicators([Service] OntologyContext context)
         {
             var indicators = await _getQueryIndicators(context);
@@ -80,6 +87,25 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             }
 
             return _indicators;
+        }
+    }
+
+    public class DateRange
+    {
+        [GraphQLNonNullType]
+        public DateTime StartDate { get; set; }
+
+        [GraphQLNonNullType]
+        public DateTime EndDate { get; set; }
+
+        [GraphQLNonNullType]
+        public string Color { get; set; }
+
+        public DateRange(IIS.Core.Analytics.EntityFramework.AnalyticsQuery.DateRange range)
+        {
+            StartDate = range.StartDate;
+            EndDate = range.EndDate;
+            Color = range.Color;
         }
     }
 }

@@ -1,10 +1,12 @@
 {
-    "Match": [
-      "(person:Person)-[:workIn]->(:WorkIn)-[:organization]->(o:Organization)",
-      "(o)-[:dotl]->(sbu:Organization)",
-      "(person)-[:access]->(a:Access)-[:accessStatus]->(:AccessStatus)-[:code]->@(:Code { \"Value\": \"valid\" })",
-      "(a)-[:accessLevelForm]->(:AccessLevelForm)-[:number]->@(:Number { \"Value\": \"2\" })"
-    ],
-    "GroupBy": ["sbu.Id"],
-    "Count": "a.Id"
+  "StartDateField": "date.Value",
+  "Match": [
+    "(person:Person)-[:workIn]->(:WorkIn)-[:organization]->(o:Organization)",
+    "(o)-[:dotl]->(sbu:Organization)",
+    "(person)-[:access]->(a:Access)-[:accessStatus]->(:AccessStatus)-[:code]->@(:Code { \"Value\": \"valid\" })",
+    "(a)-[:accessLevelForm]->(:AccessLevelForm)-[:number]->@(:Number { \"Value\": \"2\" })",
+    "(person)-[:personControl]->(:PersonControl)-[:date]->@(date:Date)"
+  ],
+  "GroupBy": ["sbu.Id"],
+  "Count": "a.Id"
 }

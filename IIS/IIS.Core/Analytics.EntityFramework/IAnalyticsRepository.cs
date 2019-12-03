@@ -10,5 +10,7 @@ namespace IIS.Core.Analytics.EntityFramework
         Task<AnalyticsIndicator> getRootAsync(Guid childId);
         Task<IEnumerable<AnalyticsIndicator>> GetAllChildrenAsync(Guid parentId);
         Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsQueryBuilder query);
+        Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsIndicator indicator, DateTime? fromDate, DateTime? toDate);
+        Task<AnalyticsQueryBuilder> BuildQuery(AnalyticsIndicator indicator, DateTime? from, DateTime? to);
     }
 }

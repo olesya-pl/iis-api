@@ -59,19 +59,22 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             return new AnalyticsQuery(query);
         }
 
-        private void _mapInputToModel(IAnalyticsQueryInput data, Core.Analytics.EntityFramework.AnalyticsQuery query)
+        private void _mapInputToModel(AnalyticsQueryInput data, Core.Analytics.EntityFramework.AnalyticsQuery query)
         {
             query.UpdatedAt = DateTime.UtcNow;
 
             if (data.Title != null)
-            {
                 query.Title = data.Title;
-            }
 
             if (data.Description != null)
-            {
                 query.Description = data.Description;
-            }
+
+            if (data.DateRanges != null)
+                query.DateRanges = data.DateRanges.Select(range => new Core.Analytics.EntityFramework.AnalyticsQuery.DateRange {
+                    StartDate = range.StartDate,
+                    EndDate = range.EndDate,
+                    Color = range.Color
+                });
         }
 
         private void _tryToAddIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query,  IEnumerable<CreateAnalyticsQueryIndicatorInput> indicators)
