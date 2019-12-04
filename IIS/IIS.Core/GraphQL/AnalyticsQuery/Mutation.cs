@@ -93,7 +93,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
                     IndicatorId = input.IndicatorId,
                     QueryId = queryId,
                     Title = input.Title,
-                    SortOrder = input.SortOrder
+                    SortOrder = input.SortOrder ?? 1 // TODO: make SortOrder to be required field
                 });
             }
         }

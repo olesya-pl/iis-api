@@ -44,8 +44,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public string Title { get; set; }
 
-        [GraphQLNonNullType]
-        public int SortOrder { get; set; }
+        public int? SortOrder { get; set; }
     }
 
     public class UpdateAnalyticsQueryIndicatorInput
