@@ -10,12 +10,9 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     {
         public virtual string Title { get; set; }
         public string Description { get; set; }
-
-        [GraphQLType(typeof(ListType<NonNullType<InputObjectType<DateRangeInput>>>))]
-        public IEnumerable<DateRangeInput> DateRanges { get; set; } = Enumerable.Empty<DateRangeInput>();
     }
 
-    public class DateRangeInput
+    public class CreateAnalyticsQueryDateRangeInput
     {
         [GraphQLNonNullType]
         public DateTime StartDate { get; set; }
@@ -27,16 +24,37 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         public string Color { get; set; }
     }
 
+    public class UpdateAnalyticsQueryDateRangeInput
+    {
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public int Id { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Color { get; set; }
+    }
+
     public class CreateAnalyticsQueryInput : AnalyticsQueryInput
     {
         [GraphQLNonNullType]
         public override string Title { get; set; }
         public IEnumerable<CreateAnalyticsQueryIndicatorInput> Indicators { get; set; } = Enumerable.Empty<CreateAnalyticsQueryIndicatorInput>();
+        [GraphQLType(typeof(ListType<NonNullType<InputObjectType<CreateAnalyticsQueryDateRangeInput>>>))]
+        public IEnumerable<CreateAnalyticsQueryDateRangeInput> DateRanges { get; set; } = Enumerable.Empty<CreateAnalyticsQueryDateRangeInput>();
     }
 
     public class UpdateAnalyticsQueryInput : AnalyticsQueryInput
     {
         public AnalyticsQueryIndicatorsInput Indicators { get; set; }
+        public AnalyticsQueryDateRangeInput DateRanges { get; set; }
+    }
+
+    public class AnalyticsQueryDateRangeInput {
+        public IEnumerable<CreateAnalyticsQueryDateRangeInput> Create { get; set; } = Enumerable.Empty<CreateAnalyticsQueryDateRangeInput>();
+
+        public IEnumerable<UpdateAnalyticsQueryDateRangeInput> Update { get; set; } = Enumerable.Empty<UpdateAnalyticsQueryDateRangeInput>();
+
+        [GraphQLType(typeof(ListType<NonNullType<IdType>>))]
+        public IEnumerable<int> Delete { get; set; } = Enumerable.Empty<int>();
     }
 
     public class AnalyticsQueryIndicatorsInput

@@ -92,6 +92,9 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
     public class DateRange
     {
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public int Id { get; set; }
+
         [GraphQLNonNullType]
         public DateTime StartDate { get; set; }
 
@@ -103,6 +106,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public DateRange(IIS.Core.Analytics.EntityFramework.AnalyticsQuery.DateRange range)
         {
+            Id = range.Id;
             StartDate = range.StartDate;
             EndDate = range.EndDate;
             Color = range.Color;

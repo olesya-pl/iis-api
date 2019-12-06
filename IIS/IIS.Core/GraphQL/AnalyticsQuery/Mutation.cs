@@ -69,12 +69,51 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             if (data.Description != null)
                 query.Description = data.Description;
 
-            if (data.DateRanges != null)
-                query.DateRanges = data.DateRanges.Select(range => new Core.Analytics.EntityFramework.AnalyticsQuery.DateRange {
-                    StartDate = range.StartDate,
-                    EndDate = range.EndDate,
-                    Color = range.Color
-                });
+            if (data is CreateAnalyticsQueryInput createInput && createInput.DateRanges != null)
+            {
+                _addAnalyticsDateRange(createInput.DateRanges, query);
+            }
+            else if (data is UpdateAnalyticsQueryInput updateInput && updateInput.DateRanges != null)
+            {
+                _addAnalyticsDateRange(updateInput.DateRanges.Create, query);
+
+                if (updateInput.DateRanges.Delete != null)
+                {
+                    var ids = new HashSet<int>(updateInput.DateRanges.Delete);
+                    query.DateRanges = query.DateRanges.Where(range => !ids.Contains(range.Id)).ToList();
+                }
+
+                if (updateInput.DateRanges.Update != null)
+                {
+                    foreach (var patch in updateInput.DateRanges.Update)
+                    {
+                        var range = query.DateRanges.Find(_ => _.Id == patch.Id);
+
+                        if (range == null)
+                            throw new InvalidOperationException($"Unable to update non-existing date range with Id '{patch.Id}'");
+
+                        range.StartDate = patch.StartDate ?? range.StartDate;
+                        range.EndDate = patch.EndDate ?? range.EndDate;
+                        range.Color = patch.Color ?? range.Color;
+                    }
+                }
+            }
+        }
+
+        private void _addAnalyticsDateRange(IEnumerable<CreateAnalyticsQueryDateRangeInput> dateRanges, Core.Analytics.EntityFramework.AnalyticsQuery query)
+        {
+            if (dateRanges == null)
+                return;
+
+            var lastId = query.DateRanges.Any() ? query.DateRanges.Last().Id : 0;
+            var analyticsDateRanges = dateRanges.Select(range => new Core.Analytics.EntityFramework.AnalyticsQuery.DateRange
+            {
+                Id = ++lastId,
+                StartDate = range.StartDate,
+                EndDate = range.EndDate,
+                Color = range.Color
+            });
+            query.DateRanges.AddRange(analyticsDateRanges);
         }
 
         private void _tryToAddIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query,  IEnumerable<CreateAnalyticsQueryIndicatorInput> indicators)

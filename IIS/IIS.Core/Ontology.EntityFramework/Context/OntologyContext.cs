@@ -108,9 +108,9 @@ namespace IIS.Core.Ontology.EntityFramework.Context
             analiticsQuery.HasOne(q => q.Creator);
             analiticsQuery.Property(q => q.DateRanges)
                 .HasColumnType("jsonb")
-                .HasConversion(new ValueConverter<IEnumerable<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>, string>(
+                .HasConversion(new ValueConverter<List<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>, string>(
                     dateRanges => JsonConvert.SerializeObject(dateRanges),
-                    value => JsonConvert.DeserializeObject<IEnumerable<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>>(value)
+                    value => JsonConvert.DeserializeObject<List<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>>(value)
                 ));
 
             modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQueryIndicator>()
