@@ -40,7 +40,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             {
                 var valuesForDateRange = await repository.calcAsync(indicator, dateRange.StartDate, dateRange.EndDate);
                 var item = new AnalyticsIndicatorDateRangeValue {
-                    DateRange = new DateTime[] { dateRange.StartDate, dateRange.EndDate },
+                    DateRange = new IIS.Core.GraphQL.AnalyticsQuery.DateRange(dateRange),
                     Values = valuesForDateRange.Select(value => new AnalyticsIndicatorValue(value))
                 };
                 list.Add(item);
@@ -51,7 +51,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     }
     public class AnalyticsIndicatorDateRangeValue
     {
-        public IEnumerable<DateTime> DateRange { get; set; }
+        public IIS.Core.GraphQL.AnalyticsQuery.DateRange DateRange { get; set; }
         public IEnumerable<AnalyticsIndicatorValue> Values { get; set; } = new List<AnalyticsIndicatorValue>();
     }
 }
