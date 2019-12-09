@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using IIS.Core;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ namespace IIS.Legacy.EntityFramework
 
         public LegacyMigrator(IConfiguration configuration, OntologyContext ontologyContext, N.IOntologyProvider ontologyProvider)
         {
-            _connectionString = configuration.GetConnectionString("db-legacy");
+            _connectionString = configuration.GetConnectionString("db-legacy", "DB_LEGACY_");
             _ontologyContext = ontologyContext;
             _ontologyProvider = ontologyProvider;
 

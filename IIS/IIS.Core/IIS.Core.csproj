@@ -5,6 +5,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
+    <UserSecretsId>7fbdec57-37c4-4ac5-bbe0-b67a05e1794d</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -14,6 +15,9 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="2.2.4" />
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="2.2.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="2.2.0" />
     <PackageReference Include="Flee" Version="1.2.2" />
     <PackageReference Include="GeoJSON.Net" Version="1.1.72" />
     <PackageReference Include="HotChocolate" Version="11.0.0-preview.58" />

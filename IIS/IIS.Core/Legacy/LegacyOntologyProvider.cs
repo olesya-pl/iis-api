@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using IIS.Core;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ namespace IIS.Legacy.EntityFramework
 
         public LegacyOntologyProvider(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("db-legacy");
+            _connectionString = configuration.GetConnectionString("db-legacy", "DB_LEGACY_");
         }
 
         public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)

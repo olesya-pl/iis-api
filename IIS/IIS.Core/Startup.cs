@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Security.Authentication;
 using HotChocolate;
@@ -35,6 +36,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
 using IIS.Core.Analytics.EntityFramework;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Newtonsoft.Json;
 
 namespace IIS.Core
 {
@@ -53,10 +57,10 @@ namespace IIS.Core
         {
             services.AddMemoryCache();
 
-            var dbConnectionString = Configuration.GetConnectionString("db");
+            var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
             services.AddDbContext<OntologyContext>(options => options
                 .UseNpgsql(dbConnectionString)
-                // .EnableSensitiveDataLogging()
+            // .EnableSensitiveDataLogging()
             );
 
             services.AddHttpContextAccessor();
@@ -120,7 +124,7 @@ namespace IIS.Core
                 .AddErrorFilter<AppErrorFilter>()
                 .Populate(services);
 
-            services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions {IncludeExceptionDetails = true});
+            services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions { IncludeExceptionDetails = true });
             services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
                 .AddSingleton<IBatchQueryExecutor, BatchQueryExecutor>()
                 .AddSingleton<IIdSerializer, IdSerializer>()
@@ -135,11 +139,25 @@ namespace IIS.Core
             var factory = new ConnectionFactory
             {
                 HostName = mq.Host,
-                UserName = mq.Username,
-                Password = mq.Password,
                 RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
             };
+            if (mq.Username != null)
+            {
+                factory.UserName = mq.Username;
+            }
+            if (mq.Password != null)
+            {
+                factory.Password = mq.Password;
+            }
+
             services.AddTransient<IConnectionFactory>(s => factory);
+
+            string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}";
+            EsConfiguration es = Configuration.GetSection("es").Get<EsConfiguration>();
+            services.AddHealthChecks()
+                .AddNpgSql(dbConnectionString)
+                .AddRabbitMQ(mqString)
+                .AddElasticsearch(es.Host);
 
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
@@ -183,9 +201,36 @@ namespace IIS.Core
             app.UseMiddleware<OptionsMiddleware>();
             app.UseGraphQL();
             app.UsePlayground();
+            app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
             app.UseMvc();
 
             SeedData(context);
+        }
+
+        private static async Task ReportHealthCheck(HttpContext c, HealthReport r)
+        {
+            //c.Response.ContentType = MediaTypeNames.Application.Json;
+            c.Response.ContentType = "application/health+json";
+            var result = JsonConvert.SerializeObject(
+                new
+                {
+                    version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
+                    availability = r.Entries.Select(e =>
+                        new {
+                            description = e.Key,
+                            status = e.Value.Status.ToString(),
+                            responseTime = e.Value.Duration.TotalMilliseconds
+                        }),
+                    totalResponseTime = r.TotalDuration.TotalMilliseconds
+                },
+                Formatting.Indented);
+
+            if (r.Entries.Any(x => x.Value.Status != HealthStatus.Healthy))
+            {
+                c.Response.StatusCode = 503;
+            }
+
+            await c.Response.WriteAsync(result);
         }
 
         private void SeedData(OntologyContext context)
@@ -269,5 +314,10 @@ namespace IIS.Core
 
             return error;
         }
+    }
+
+    public class EsConfiguration
+    {
+        public string Host { get; set; }
     }
 }
