@@ -156,8 +156,8 @@ namespace IIS.Core
             EsConfiguration es = Configuration.GetSection("es").Get<EsConfiguration>();
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
-                .AddRabbitMQ(mqString)
-                .AddElasticsearch(es.Host);
+                .AddRabbitMQ(mqString);
+                //.AddElasticsearch(es.Host);
 
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
