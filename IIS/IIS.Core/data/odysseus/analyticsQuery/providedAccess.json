@@ -1,0 +1,11 @@
+{
+  "StartDateField": "date.Value",
+  "Match": [
+    "(person:Person)-[:workIn]->(:WorkIn)-[:organization]->(o:Organization)",
+    "(o)-[:dotl]->(sbu:Organization)",
+    "(person)-[:access]->(a:Access)-[:accessStatus]->(:AccessStatus)-[:code]->@(:Code { \"Value\": \"valid\" })",
+    "(person)-[:personControl]->(:PersonControl)-[:date]->@(date:Date)"
+  ],
+  "GroupBy": ["sbu.Id"],
+  "Count": "a.Id"
+}

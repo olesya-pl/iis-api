@@ -1,7 +1,11 @@
+using System.Collections.Generic;
 using System.Threading;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
+
 
 namespace IIS.Core.Ontology.EntityFramework.Context
 {
@@ -31,6 +35,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
         public virtual DbSet<Users.EntityFramework.User> Users { get; set; }
         public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsQuery> AnalyticsQuery { get; set; }
         public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsIndicator> AnalyticsIndicators { get; set; }
+        public virtual DbSet<Core.Analytics.EntityFramework.AnalyticsQueryIndicator> AnalyticsQueryIndicators { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -97,8 +102,24 @@ namespace IIS.Core.Ontology.EntityFramework.Context
             modelBuilder.Entity<Users.EntityFramework.User>()
                 .HasIndex(p => p.Username)
                 .IsUnique(true);
-            modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQuery>()
-                .HasOne(q => q.Creator);
+
+            var analiticsQuery = modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQuery>();
+
+            analiticsQuery.HasOne(q => q.Creator);
+            analiticsQuery.Property(q => q.DateRanges)
+                .HasColumnType("jsonb")
+                .HasConversion(new ValueConverter<List<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>, string>(
+                    dateRanges => JsonConvert.SerializeObject(dateRanges),
+                    value => JsonConvert.DeserializeObject<List<Core.Analytics.EntityFramework.AnalyticsQuery.DateRange>>(value)
+                ));
+
+            modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQueryIndicator>()
+                .HasOne(i => i.Query)
+                .WithMany(i => i.Indicators);
+
+            modelBuilder.Entity<Core.Analytics.EntityFramework.AnalyticsQueryIndicator>()
+                .HasOne(i => i.Indicator)
+                .WithMany(i => i.QueryIndicators);
 
             var anaylyticsIndicator = modelBuilder.Entity<IIS.Core.Analytics.EntityFramework.AnalyticsIndicator>();
             anaylyticsIndicator.HasOne(i => i.Parent);

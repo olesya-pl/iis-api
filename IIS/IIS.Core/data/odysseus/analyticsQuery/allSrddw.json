@@ -1,0 +1,10 @@
+{
+  "StartDateField": "date.Value",
+  "Match": [
+    "(o:Organization)-[:srddw]->(s:Srddw)",
+    "(o)-[:dotl]->(sbu:Organization)",
+    "(s)-[:startDate]->@(date:Date)"
+  ],
+  "GroupBy": ["sbu.Id"],
+  "Count": "s.Id"
+}

@@ -24,10 +24,6 @@ namespace IIS.Core.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(200);
-
                     b.Property<Guid?>("ParentId");
 
                     b.Property<string>("Query");
@@ -52,6 +48,9 @@ namespace IIS.Core.Migrations
 
                     b.Property<Guid>("CreatorId");
 
+                    b.Property<string>("DateRanges")
+                        .HasColumnType("jsonb");
+
                     b.Property<string>("Description")
                         .HasMaxLength(1000);
 
@@ -70,6 +69,28 @@ namespace IIS.Core.Migrations
                     b.HasIndex("LastUpdaterId");
 
                     b.ToTable("AnalyticsQuery");
+                });
+
+            modelBuilder.Entity("IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("IndicatorId");
+
+                    b.Property<Guid>("QueryId");
+
+                    b.Property<int>("SortOrder");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IndicatorId");
+
+                    b.HasIndex("QueryId");
+
+                    b.ToTable("AnalyticsQueryIndicators");
                 });
 
             modelBuilder.Entity("IIS.Core.Files.EntityFramework.File", b =>
@@ -338,6 +359,19 @@ namespace IIS.Core.Migrations
                     b.HasOne("IIS.Core.Users.EntityFramework.User", "LastUpdater")
                         .WithMany()
                         .HasForeignKey("LastUpdaterId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator", b =>
+                {
+                    b.HasOne("IIS.Core.Analytics.EntityFramework.AnalyticsIndicator", "Indicator")
+                        .WithMany("QueryIndicators")
+                        .HasForeignKey("IndicatorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("IIS.Core.Analytics.EntityFramework.AnalyticsQuery", "Query")
+                        .WithMany("Indicators")
+                        .HasForeignKey("QueryId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

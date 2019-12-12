@@ -176,9 +176,9 @@ namespace IIS.Core.Ontology {
                 Type = type;
             }
 
-            public virtual string[] TypeIds
+            public virtual Guid[] TypeIds
             {
-                get { return Type == null ? null : new string[] { Type.Id.ToString() }; }
+                get { return Type == null ? null : new Guid[] { Type.Id }; }
             }
         }
 
@@ -187,9 +187,9 @@ namespace IIS.Core.Ontology {
 
             public readonly IEnumerable<RelationType> Types;
 
-            public override string[] TypeIds
+            public override Guid[] TypeIds
             {
-                get { return Types.Select(type => type.Id.ToString()).ToArray(); }
+                get { return Types.Select(type => type.Id).ToArray(); }
             }
 
             public AstRelation(IEnumerable<RelationType> types, bool isDirect): base(null) {

@@ -1,32 +1,60 @@
+using System;
 using HotChocolate;
 using HotChocolate.Types;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using IIS.Core.Analytics.EntityFramework;
 
 namespace IIS.Core.GraphQL.AnalyticsIndicator
 {
     public class AnalyticsIndicator
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [GraphQLNonNullType]
         public string Title { get; set; }
 
-        [GraphQLNonNullType]
-        public string Code { get; set; }
-
         [GraphQLType(typeof(IdType))]
-        public string ParentId { get; set; }
+        public Guid? ParentId { get; set; }
+
+        private readonly IIS.Core.Analytics.EntityFramework.AnalyticsIndicator _indicator;
 
         public AnalyticsIndicator(IIS.Core.Analytics.EntityFramework.AnalyticsIndicator indicator)
         {
-            Id = indicator.Id.ToString();
+            Id = indicator.Id;
             Title = indicator.Title;
-            Code = indicator.Code;
 
             if (indicator.ParentId != null)
             {
-                ParentId = indicator.ParentId.ToString();
+                ParentId = indicator.ParentId;
             }
+
+            _indicator = indicator;
+        }
+
+        [GraphQLType(typeof(AnyType))]
+        public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> GetValues([Service] IAnalyticsRepository repository, DateTime? from, DateTime? to)
+        {
+            if (_indicator.Query == null)
+                return null;
+
+            return await repository.calcAsync(_indicator, from, to);
+        }
+    }
+
+    public class AnalyticsIndicatorValue
+    {
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public Guid EntityId { get; set; }
+
+        [GraphQLType(typeof(NonNullType<AnyType>))]
+        public string Value { get; set; }
+
+        public AnalyticsIndicatorValue(AnalyticsQueryIndicatorResult result)
+        {
+            EntityId = result.Id;
+            Value = result.Value.ToString();
         }
     }
 }

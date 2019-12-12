@@ -1,0 +1,8 @@
+{
+    "Match": [
+      "(person:Person)-[:workIn]->(:WorkIn)-[:organization]->(o:Organization)",
+      "(o)-[:organizationTag]->(:OrganizationTag)-[:code]->@(:Code { \"Value\": \"dotl\"})"
+    ],
+    "GroupBy": ["o.Id"],
+    "Count": "person.Id"
+}

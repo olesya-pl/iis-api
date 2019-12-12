@@ -17,7 +17,7 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
         protected override void Configure(IEnumTypeDescriptor descriptor)
         {
-            descriptor.Name("EntityAttributeType"); // Typo on dev: EnityAttributeType
+            descriptor.Name("EntityAttributeType");
             descriptor.Item(OScalarType.Integer.ToString()).Name("int");
             descriptor.Item(OScalarType.Decimal.ToString()).Name("float");
             descriptor.Item(OScalarType.String.ToString()).Name("string");
@@ -51,12 +51,10 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] bool Editable { get; }
 
-        string Hint { get; }
         bool Multiple { get; }
         string Format { get; }
-        [GraphQLType(typeof(JsonScalarType))] JObject FormField { get; }
-        [GraphQLType(typeof(JsonScalarType))] JObject Validation { get; }
-        [GraphQLType(typeof(JsonScalarType))] JObject Meta { get; }
+        [GraphQLType(typeof(AnyType))] FormField FormField { get; }
+        [GraphQLType(typeof(AnyType))] IValidation Validation { get; }
     }
 
     public abstract class EntityAttributeBase : IEntityAttribute
@@ -84,34 +82,24 @@ namespace IIS.Core.GraphQL.EntityTypes
         public bool IsInversed => Source.IsInversed;
         public bool IsComputed => Source.IsComputed();
 
-        public string Hint => null; // null on dev also
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
         public string Format => (MetaObject as AttributeRelationMeta)?.Format;
 
-        [GraphQLType(typeof(JsonScalarType))] public JObject Meta => Source.Meta.Serialize();
+        [GraphQLType(typeof(AnyType))]
+        public FormField FormField => MetaObject?.FormField;
 
-        [GraphQLType(typeof(JsonScalarType))]
-        public JObject FormField
-        {
-            get
-            {
-                var ff = MetaObject?.FormField;
-                if (ff == null) return null;
-                var jo = JObject.FromObject(ff);
-                jo.KeysToLowerCamelcase();
-                return jo;
-            }
-        }
-
-        [GraphQLType(typeof(JsonScalarType))] public JObject Validation
-        {
-            get
-            {
+        [GraphQLType(typeof(AnyType))]
+        public IValidation Validation {
+            get {
                 var validation = MetaObject?.Validation;
-                if (validation == null) return null;
-                var jo = JObject.FromObject(validation);
-                jo.KeysToLowerCamelcase();
-                return jo;
+
+                if (Source.EmbeddingOptions == EmbeddingOptions.Required)
+                {
+                    validation = validation ?? new Validation();
+                    validation.Required = true;
+                }
+
+                return validation;
             }
         }
     }

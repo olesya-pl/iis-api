@@ -5,6 +5,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
+    <UserSecretsId>7fbdec57-37c4-4ac5-bbe0-b67a05e1794d</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -14,17 +15,21 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="2.2.4" />
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="2.2.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="2.2.0" />
     <PackageReference Include="Flee" Version="1.2.2" />
     <PackageReference Include="GeoJSON.Net" Version="1.1.72" />
-    <PackageReference Include="HotChocolate" Version="11.0.0-preview.17" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.17" />
-    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.17" />
+    <PackageReference Include="HotChocolate" Version="11.0.0-preview.58" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.58" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.58" />
     <PackageReference Include="LinqKit.Core" Version="1.1.16" />
     <PackageReference Include="Microsoft.AspNetCore.App">
       <PrivateAssets Condition="'%(PackageReference.Version)' == ''">all</PrivateAssets>
       <Publish Condition="'%(PackageReference.Version)' == ''">true</Publish>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.4" />
     <PackageReference Include="protobuf-net" Version="2.4.0" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />

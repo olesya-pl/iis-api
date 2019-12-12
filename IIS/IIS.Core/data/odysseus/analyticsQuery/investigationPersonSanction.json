@@ -1,0 +1,11 @@
+{
+  "StartDateField": "date.Value",
+  "Match": [
+    "(o:Organization)-[:vettingProcedure]->(vp:VettingProcedure)",
+    "(vp)-[:conductedBy]->(sbu:Organization)",
+    "(vp)-[:sanction]->(s:InvestigationPersonSanction)",
+    "(s)-[:order]->(:SimpleDocument)-[:date]->@(date:Date)"
+  ],
+  "GroupBy": ["sbu.Id"],
+  "Count": "s.Id"
+}

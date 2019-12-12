@@ -421,6 +421,11 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                             m.FormField = new FormField {Type = "table", HasIndexColumn = true})
                     )
                     .HasMultiple("VettingProcedure")
+                    .HasOptional(r => r
+                        .Target("Organization")
+                        .WithName("dotl")
+                        .WithTitle("Орган / підрозділ СБУ")
+                    );
                 ;
 
 

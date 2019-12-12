@@ -1,4 +1,6 @@
+using System.Linq;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using IIS.Core.Users.EntityFramework;
 
@@ -15,7 +17,6 @@ namespace IIS.Core.Analytics.EntityFramework
         [MaxLength(1000)]
         public string Description { get; set; }
 
-
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
@@ -25,8 +26,20 @@ namespace IIS.Core.Analytics.EntityFramework
         [Required]
         public Guid LastUpdaterId { get; set; }
 
+        public List<DateRange> DateRanges { get; set; } = new List<DateRange>();
+
         public virtual User Creator { get; set; }
 
         public virtual User LastUpdater { get; set; }
+
+        public virtual ICollection<AnalyticsQueryIndicator> Indicators { get; set; } = new List<AnalyticsQueryIndicator>();
+
+        public class DateRange {
+            public int Id { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public string Color { get; set; }
+        }
     }
+
 }
