@@ -37,6 +37,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace IIS.Core
 {
@@ -193,6 +194,8 @@ namespace IIS.Core
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OntologyContext context)
         {
+            app.UseSerilogRequestLogging();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
