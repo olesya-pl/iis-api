@@ -34,17 +34,28 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("-u", "--uri", required=True)
     parser.add_argument("-s", "--source", default="")
+    parser.add_argument("-l", "--log", default="", required=True)
+    parser.add_argument("-p", "--passwd",default="", required=True)
+
     args = parser.parse_args()
     source = args.source if isabs(args.source) else join(getcwd(), args.source)
 
     for intercept_name in list_intercepts(source):
         try:
             media_id = upload_media(intercept_name, source, args.uri)
-            response = upload_meta(intercept_name, source, args.uri, media_id)
+            response = upload_meta(intercept_name, source, args.uri, media_id, args.log, args.passwd)
             print(response)
         except Exception:
             print("FAIL. ", intercept_name, " всрався. Moving next item...")
             continue
+
+
+def get_auth_token(uri, log, passwd):
+    curl = {"operationName": "login","variables":{"username": log,"password": passwd},"query":"mutation login($username: String!, $password: String!) \
+    { login(username: $username, password: $password) { token } }"}
+    res = requests.post(uri, json=curl)
+    auth_token = res.json()['data']['login']['token']
+    return auth_token
 
 
 def list_intercepts(source):
@@ -55,15 +66,16 @@ def list_intercepts(source):
 
 
 def upload_media(intercept_name, source, uri):
-    with open(join(source, "Voice_" + intercept_name + ".wav"), mode="rb") as f:
-        response = requests.post(uri + "/api/files", files={"file": f})
+    filename = intercept_name + ".wav"
+    with open(join(source, "Voice_" + filename), mode="rb") as f:
+        response = requests.post(uri + "/api/files", files={"file": (filename, f, 'audio/x-wav')})
         return json.loads(response.text)["id"]
 
 
-def upload_meta(intercept_name, source, uri, media_id):
+def upload_meta(intercept_name, source, uri, media_id, log, passwd):
     content = read_meta_file(intercept_name, source)
     data = parse_meta_content(content)
-    return send_meta(uri, media_id, data)
+    return send_meta(uri, media_id, data, log, passwd)
 
 
 def read_meta_file(intercept_name, source):
@@ -84,12 +96,13 @@ def parse_meta_content(content):
     return data
 
 
-def send_meta(uri, media_id, data):
+def send_meta(uri, media_id, data, log, passwd):
     query = build_query(media_id, data)
     headers = {
         'Content-type': 'application/json',
-        'Accept': 'text/plain',
-        'Content-Encoding': 'utf-8'
+        'Accept': 'application/json',
+        'Content-Encoding': 'utf-8',
+        'Authorization': get_auth_token(uri, log, passwd)
     }
     return requests.post(uri, data=json.dumps(query), headers=headers)
 
