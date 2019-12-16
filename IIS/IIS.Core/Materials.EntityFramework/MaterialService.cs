@@ -41,8 +41,8 @@ namespace IIS.Core.Materials.EntityFramework
                 if (!file.IsTemporary) throw new ArgumentException($"File with guid {material.File.Id} is already used");
                 await _fileService.MarkFilePermanentAsync(file.Id);
                 // todo: implement correct file type - material type compatibility checking
-                if (material.Type == "cell.voice" && file.ContentType.StartsWith("audio/"))
-                    throw new ArgumentException($"Unable to attach {file.ContentType} file to {material.Type} material");
+                if (material.Type == "cell.voice" && !file.ContentType.StartsWith("audio/"))
+                    throw new ArgumentException($"\"{material.Type}\" material expects audio file to be attached. Got \"{file.ContentType}\"");
             }
             if (parentId.HasValue && _materialProvider.GetMaterialAsync(parentId.Value) == null)
                 throw new ArgumentException($"Material with guid {parentId.Value} does not exist");

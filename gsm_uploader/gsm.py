@@ -32,30 +32,47 @@ KEYS_MAP = {
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument("-u", "--uri", required=True)
-    parser.add_argument("-s", "--source", default="")
-    parser.add_argument("-l", "--log", default="", required=True)
-    parser.add_argument("-p", "--passwd",default="", required=True)
+    parser.add_argument("uri", help="IIS GraphQL API endpoint")
+    parser.add_argument("-s", "--source-dir", required=True, help="Path to folder which contains GSM files")
+    parser.add_argument("-u", "--username", required=True, help="User's login to GraphQL API")
+    parser.add_argument("-p", "--password", required=True, help="User's password to GraphQL API")
 
     args = parser.parse_args()
-    source = args.source if isabs(args.source) else join(getcwd(), args.source)
+    source_dir = args.source_dir if isabs(args.source_dir) else join(getcwd(), args.source_dir)
 
-    for intercept_name in list_intercepts(source):
+    try:
+        token = authenticate(args.uri, args.username, args.password)
+    except Exception as error:
+        print("Unable to authenticate")
+        raise error
+
+    for file_name in list_intercepts(source_dir):
         try:
-            media_id = upload_media(intercept_name, source, args.uri)
-            response = upload_meta(intercept_name, source, args.uri, media_id, args.log, args.passwd)
-            print(response)
-        except Exception:
-            print("FAIL. ", intercept_name, " всрався. Moving next item...")
+            media_id = upload_media(token, file_name, source_dir, args.uri)
+            response = upload_meta(token, file_name, source_dir, args.uri, media_id, args.username, args.password)
+            if 'errors' in response:
+                print(json.dumps(response, indent=2))
+            else:
+                print("Successfully uploaded %s"%(file_name))
+        except Exception as err:
+            print("Unable to process and upload GSM file: %s. Skipping..."%(file_name))
             continue
 
 
-def get_auth_token(uri, log, passwd):
-    curl = {"operationName": "login","variables":{"username": log,"password": passwd},"query":"mutation login($username: String!, $password: String!) \
-    { login(username: $username, password: $password) { token } }"}
-    res = requests.post(uri, json=curl)
-    auth_token = res.json()['data']['login']['token']
-    return auth_token
+def authenticate(uri, username, password):
+    payload = {
+        "operationName": "login",
+        "variables": { "username": username, "password": password },
+        "query": """
+            mutation login($username: String!, $password: String!) {
+                login(username: $username, password: $password) {
+                    token
+                }
+            }
+        """
+    }
+    response = requests.post(uri, json=payload).json()
+    return response['data']['login']['token']
 
 
 def list_intercepts(source):
@@ -65,17 +82,18 @@ def list_intercepts(source):
         raise Exception("Data was not found in " + source)
 
 
-def upload_media(intercept_name, source, uri):
-    filename = intercept_name + ".wav"
-    with open(join(source, "Voice_" + filename), mode="rb") as f:
-        response = requests.post(uri + "/api/files", files={"file": (filename, f, 'audio/x-wav')})
-        return json.loads(response.text)["id"]
+def upload_media(token, file_name, source_dir, uri):
+    filename = file_name + ".wav"
+    headers = { 'Authorization': token }
+    with open(join(source_dir, "Voice_" + filename), mode="rb") as f:
+        response = requests.post(uri + "/api/files", headers=headers, files={"file": (filename, f, 'audio/wav')})
+        return response.json()["id"]
 
 
-def upload_meta(intercept_name, source, uri, media_id, log, passwd):
+def upload_meta(token, intercept_name, source, uri, media_id, username, password):
     content = read_meta_file(intercept_name, source)
     data = parse_meta_content(content)
-    return send_meta(uri, media_id, data, log, passwd)
+    return send_meta(token, uri, media_id, data, username, password)
 
 
 def read_meta_file(intercept_name, source):
@@ -96,23 +114,29 @@ def parse_meta_content(content):
     return data
 
 
-def send_meta(uri, media_id, data, log, passwd):
+def send_meta(token, uri, media_id, data, log, passwd):
     query = build_query(media_id, data)
     headers = {
-        'Content-type': 'application/json',
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Content-Encoding': 'utf-8',
-        'Authorization': get_auth_token(uri, log, passwd)
+        'Authorization': token
     }
-    return requests.post(uri, data=json.dumps(query), headers=headers)
+    print(json.dumps(query, indent=2))
+    return requests.post(uri, json=query, headers=headers).json()
 
 
 def build_query(media_id, data):
     date = datetime.strptime(data["time"], "%d.%m.%Y, %H:%M:%S")
-    phone_number = data.get("phone_number")
-    json_string = json.dumps(data)
     return {
-        "query": "mutation($input:MaterialInput!){createMaterial(input:$input){id}}",
+        "operationName": "uploadGsmMaterial",
+        "query": """
+            mutation uploadGsmMaterial($input: MaterialInput!) {
+                createMaterial(input: $input) {
+                    id
+                }
+            }
+        """,
         "variables": {
             "input": {
                 "fileId": media_id,
@@ -124,7 +148,7 @@ def build_query(media_id, data):
                         "nodes": [
                             {
                                 "relation": "Source",
-                                "value": phone_number,
+                                "value": data.get("phone_number"),
                                 "type": "CellphoneSign"
                             }
                         ]
@@ -133,7 +157,7 @@ def build_query(media_id, data):
                 "data": [
                     {
                         "type": "Text",
-                        "text": json_string
+                        "text": json.dumps(data)
                     }
                 ]
             }

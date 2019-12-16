@@ -72,7 +72,7 @@ If `--iis-actions` option is specified, application server doesn't start. To ove
 2. `db` setting should point to destination database (for .NET)
 3. inside `publish/core` (or `publish/web`) run
    ```sh
-   ASPNETCORE_ENVIRONMENT=Staging dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,migrate-legacy-types,seed-contour-data,migrate-legacy-entities,migrate-legacy-files
+   dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,migrate-legacy-types,seed-contour-data,migrate-legacy-entities,migrate-legacy-files
    ```
 
 ## Setup for project
@@ -84,7 +84,7 @@ Ontology is cached in server's memory, so don't forget to restart server when yo
 For this project the ontology structure is hand-coded in [IIS/IIS.Core/Ontology.Seeding/Odysseus](./IIS/IIS.Core/Ontology.Seeding/Odysseus) folder. So, you can seed and run the project:
 
 ```sh
-ASPNETCORE_ENVIRONMENT=Staging dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,fill-odysseus-types,seed-odysseus-data
+dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,fill-odysseus-types,seed-odysseus-data
 ```
 
 ### Contour
