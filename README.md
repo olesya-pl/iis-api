@@ -87,6 +87,10 @@ For this project the ontology structure is hand-coded in [IIS/IIS.Core/Ontology.
 dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,fill-odysseus-types,seed-odysseus-data
 ```
 
+Set `reportsAvailable` configuration variable to `false`.
+
 ### Contour
 
 For this project there is no hand-coded ontology version in .NET, only in [Node.js](https://git.warfare-tec.com/IIS/iis-api/tree/contour-master/src/ontology/contour). So, to run and seed the project you need to have either database dump for .NET or Node.js database with all required data (then follow [Migrate entities from Node.js db instructions](#migrate-entities-from-nodejs-db))
+
+Set `reportsAvailable` configuration variable to `true`.

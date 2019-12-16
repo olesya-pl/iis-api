@@ -45,7 +45,7 @@ namespace IIS.Core.Ontology.Meta
         public string Type { get; set; }
         public int? Lines { get; set; }
         public string Hint { get; set; }
-        public bool HasIndexColumn { get; set; }
+        public bool? HasIndexColumn { get; set; }
         public string RadioType { get; set; }
         public string Layout { get; set; }
         public string Icon { get; set; }

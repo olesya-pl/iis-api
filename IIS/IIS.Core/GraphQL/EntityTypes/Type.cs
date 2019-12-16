@@ -57,12 +57,10 @@ namespace IIS.Core.GraphQL.EntityTypes
 
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]
-        [GraphQLDescription("Get all type relations. Sort argument is deprecated.")]
-        public IEnumerable<IEntityAttribute> GetAttributes(bool? sort = false)
+        [GraphQLDescription("Get all type relations")]
+        public IEnumerable<IEntityAttribute> GetAttributes()
         {
-            var props = Source.AllProperties;
-            if (sort == true)
-                props = props.OrderBy(a => a.EmbeddingMeta.SortOrder);
+            var props = Source.AllProperties.OrderBy(a => a.CreatedAt);
             return props.Select(CreateEntityAttribute);
         }
 

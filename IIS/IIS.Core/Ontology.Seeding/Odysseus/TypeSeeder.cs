@@ -530,7 +530,7 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(attachment, "ScanOfAct",  "Акт перевірки")
                     .HasMultiple(r => r
                         .Target("Person")
-                        .WithName( "CommitteeMembers")
+                        .WithName("CommitteeMembers")
                         .WithTitle("Члени комісії"))
                     .HasOptional(r => r
                         .Target("Person")
@@ -575,8 +575,8 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .AcceptEmbeddedOperations()
                     .HasOptional(date)
                     .HasOptional(number)
-                    .HasOptional(attachment, "Original", null)
-                    .HasOptional(text, "Content", null)
+                    .HasOptional(attachment, "Original", "Оригінал")
+                    .HasOptional(text, "Content", "Зміст (або примітка)")
                 ;
 
             var sanction = ctx.CreateBuilder().IsEntity()
@@ -815,12 +815,10 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .WithTitle("Перевірка")
                     .AcceptEmbeddedOperations()
                     .HasRequired(r => r
-                        .Target(number)
-                        .WithTitle("Номер припису")
-                    )
-                    .HasRequired(r => r
-                        .Target(date)
-                        .WithTitle("Дата припису")
+                        .Target(legalDocument)
+                        .WithName("prescriptionToExamination")
+                        .WithTitle("Припис на перевірку")
+                        .WithFormFieldType("legalDocument")
                     )
                     .HasOptional(r => r
                         .Target(dateRange)
@@ -844,8 +842,10 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                         .WithTitle("Орган / підрозділ СБУ")
                     )
                     .HasOptional(r => r
-                        .Target(attachment)
+                        .Target(legalDocument)
+                        .WithName("actOfInspection")
                         .WithTitle("Акт перевірки")
+                        .WithFormFieldType("legalDocument")
                     )
                     .HasMultiple(r => r
                         .Target(sanction)
@@ -853,7 +853,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     )
                 ;
 
-            // Person Control
             var personControl = ctx.CreateBuilder().IsEntity()
                     .WithName("PersonControl")
                     .WithTitle(null)
@@ -871,15 +870,6 @@ namespace IIS.Core.Ontology.Seeding.Odysseus
                     .HasOptional(attachment, "ResultAttachment", "Розпорядження (результат)")
                     .HasOptional(date, "Date", "Дата розпорядження")
                 ;
-
-
-//            var personProfile = ctx.CreateBuilder().IsEntity()
-//                    .WithName("PersonProfile")
-//                    .WithTitle("Профайл людини")
-//                    .AcceptEmbeddedOperations()
-//                ;
-//            CreatePersonProfile(ctx, personProfile);
-//            person.HasOptional(personProfile);
 
             CreatePersonProfile(ctx, person);
         }

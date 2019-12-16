@@ -51,7 +51,6 @@ namespace IIS.Core
         public bool ProcessArguments()
         {
             var action = _configuration["iis-actions"];
-            var runServer = _configuration.GetValue<bool>("iis-run-server");
             if (action == null)
                 return true;
             var actions = action.Split(",");
@@ -60,8 +59,7 @@ namespace IIS.Core
             foreach (var actionName in actions)
                 DoAction(actionName);
 
-            Console.WriteLine($"--iis-run-server is {runServer}");
-            return runServer;
+            return _configuration.GetValue<bool>("iis-run-server");
         }
 
         public void ClearTypes()
