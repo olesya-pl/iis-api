@@ -1,0 +1,20 @@
+{
+  "id": "bbf634f1-2e16-4bce-b10f-8b319a0587c3",
+  "name": "EventImportance",
+  "title": "Важливість Події",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "35077216-a1ce-43d6-9b88-159146744f59",
+      "name": "code",
+      "title": "Код",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "code"
+    }
+  ]
+}

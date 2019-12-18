@@ -1,0 +1,8 @@
+{
+  "id": "e5182849-ebdf-4e81-adef-adf467ac47e3",
+  "name": "CalleeTerminalIdSign",
+  "title": "callee_terminal_id",
+  "extends": [
+    "ObjectSign"
+  ]
+}

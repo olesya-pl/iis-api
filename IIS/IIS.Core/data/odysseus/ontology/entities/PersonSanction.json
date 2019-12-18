@@ -1,0 +1,34 @@
+{
+  "id": "3730045d-d194-41c9-b1a4-3982ecae0a17",
+  "abstract": true,
+  "name": "PersonSanction",
+  "title": "Санкція по людині",
+  "extends": [
+    "Sanction"
+  ],
+  "attributes": [
+    {
+      "id": "b6240baa-c28a-4800-9d8b-256c0c5b79ab",
+      "name": "investigationPersonSanction",
+      "meta": {
+        "acceptsEntityOperations": [],
+        "multiple": false
+      },
+      "target": "InvestigationPersonSanction"
+    },
+    {
+      "id": "64ca3a59-7a1a-4522-8df2-5f29d7298209",
+      "name": "person",
+      "meta": {
+        "inversed": {
+          "code": "sanctions",
+          "editable": false,
+          "title": "Заходи впливу до секретоносія",
+          "multiple": true
+        },
+        "multiple": false
+      },
+      "target": "Person"
+    }
+  ]
+}

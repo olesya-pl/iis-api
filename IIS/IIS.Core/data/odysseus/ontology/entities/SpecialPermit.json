@@ -1,0 +1,57 @@
+{
+  "id": "8b83457d-7fc8-4f4b-8754-c911be18cc17",
+  "name": "SpecialPermit",
+  "title": "Спецдозвіл",
+  "attributes": [
+    {
+      "id": "c3bddcb1-9730-4e0a-b957-dbb3b8416ed5",
+      "name": "sBU",
+      "target": "Organization"
+    },
+    {
+      "id": "28d9a02c-7101-4833-9593-0aaec22a6b56",
+      "name": "scan",
+      "target": "Attachment"
+    },
+    {
+      "id": "e29e39b4-eb75-4eb6-a46a-55beeaefd97f",
+      "name": "scanOfAct",
+      "target": "Attachment"
+    },
+    {
+      "id": "12140b29-a8ee-4e95-9099-111ee258efa6",
+      "name": "accessLevel",
+      "target": "AccessLevel"
+    },
+    {
+      "id": "9700f6e7-c9f4-4136-be01-3782b2c2c362",
+      "name": "committeeMembers",
+      "target": "Person"
+    },
+    {
+      "id": "1e8ebcc6-a9da-4d72-b2ff-74eb9baf6c54",
+      "name": "specialPermitStatus",
+      "target": "SpecialPermitStatus"
+    },
+    {
+      "id": "c5652fd8-1ef4-47c9-85be-c0f8d6af527e",
+      "name": "endDate",
+      "target": "Date"
+    },
+    {
+      "id": "b8c00a5b-39d7-438b-a8f6-921cca36f9a1",
+      "name": "committeeHead",
+      "target": "Person"
+    },
+    {
+      "id": "37b1a330-5dcc-4969-ba73-08808162a27d",
+      "name": "issueDate",
+      "target": "Date"
+    },
+    {
+      "id": "d295ec77-246f-48c1-b57e-60dbe4e415c1",
+      "name": "issueNumber",
+      "target": "Code"
+    }
+  ]
+}

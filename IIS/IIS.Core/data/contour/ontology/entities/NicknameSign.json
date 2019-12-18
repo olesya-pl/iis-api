@@ -1,0 +1,8 @@
+{
+  "id": "274dbf09-d40d-444a-9580-b14e41658c67",
+  "name": "NicknameSign",
+  "title": "Позивний",
+  "extends": [
+    "ObjectSign"
+  ]
+}

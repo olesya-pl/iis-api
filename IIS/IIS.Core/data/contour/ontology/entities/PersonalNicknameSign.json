@@ -1,0 +1,8 @@
+{
+  "id": "873e938d-dd64-43c2-9bb4-204f4c2d4132",
+  "name": "PersonalNicknameSign",
+  "title": "Індивідуальний позивний (прізвисько)",
+  "extends": [
+    "ObjectSign"
+  ]
+}

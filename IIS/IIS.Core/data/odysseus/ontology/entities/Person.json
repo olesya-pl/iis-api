@@ -1,0 +1,369 @@
+{
+  "id": "dac295ac-6afd-4113-aa57-6427b43f37b7",
+  "name": "Person",
+  "title": "Особа",
+  "attributes": [
+    {
+      "id": "49738782-29ea-45f2-a18c-fa353c2e77a8",
+      "name": "failureToSubmitDocumentsForStateAccess",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "FailureToSubmitDocumentsForStateAccess"
+    },
+    {
+      "id": "2c300007-7cb2-41be-94ec-9befa766a5de",
+      "name": "fullName",
+      "meta": {
+        "formula": "Join(secondName, firstName, fatherName)",
+        "multiple": false
+      },
+      "target": "Name"
+    },
+    {
+      "id": "98e6024e-6d3f-42c6-8331-d8ffd0d38ca1",
+      "name": "writtenObligation",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "WrittenObligation"
+    },
+    {
+      "id": "af9c084b-235b-41c0-9326-795eb0637a73",
+      "name": "familyRelations",
+      "target": "FamilyRelationInfo"
+    },
+    {
+      "id": "c3b51370-3dd7-47af-a97d-f477e2067969",
+      "name": "photo",
+      "target": "Photo"
+    },
+    {
+      "id": "154f999f-ba3d-47ee-b87c-71c2a91ef545",
+      "name": "foreignersRelations",
+      "target": "Text"
+    },
+    {
+      "id": "48cab612-50af-4260-aa8b-acecbf698451",
+      "name": "occupiedTerritoriesVisits",
+      "target": "Text"
+    },
+    {
+      "id": "8cec3111-454d-47c4-9bd8-7446d008f603",
+      "name": "foreignCountriesRelations",
+      "target": "Text"
+    },
+    {
+      "id": "35e5d521-284c-4615-a0a4-7fc4ad84f1ce",
+      "name": "secretCarrierAssignment",
+      "target": "Text"
+    },
+    {
+      "id": "08f513d1-bc46-400b-87c8-0478f1ba56e6",
+      "name": "taxId",
+      "target": "TaxId"
+    },
+    {
+      "id": "04eba04c-d900-4cbf-9b65-670728132d5a",
+      "name": "emailSign",
+      "target": "EmailSign"
+    },
+    {
+      "id": "0b382c5d-ef8e-4acd-b22d-3e6b9619c205",
+      "name": "accessRejection",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "AccessRejection"
+    },
+    {
+      "id": "d6eaae2a-229a-4e05-bf54-91ee5539b2bb",
+      "name": "firstName",
+      "target": "FirstName"
+    },
+    {
+      "id": "74578acb-4c82-4026-af45-415f132a03a6",
+      "name": "accessToCryptoProtection",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "TextAttachmentForm"
+    },
+    {
+      "id": "0341a60b-29cc-4aa2-b4a6-5c9d11b5be57",
+      "name": "accessToBackupManagementPoints",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "TextAttachmentForm"
+    },
+    {
+      "id": "e806c94f-c3ad-4237-a0ad-99ebd23fb1fd",
+      "name": "accessToOfficeInformation",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "TextAttachmentForm"
+    },
+    {
+      "id": "60bbebb9-c6c1-4965-a6a3-e74c39047c53",
+      "name": "accessToSpecialReserachWork",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "TextAttachmentForm"
+    },
+    {
+      "id": "56cd0bf7-ac5e-4081-a19c-700a2b6733b8",
+      "name": "accessToResearchWork",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "TextAttachmentForm"
+    },
+    {
+      "id": "e13bd6d1-0338-4aa7-aa19-6a6451d16e75",
+      "name": "reasonToGetAccess",
+      "meta": {
+        "formField": {
+          "type": "ReasonToGetAccess"
+        },
+        "multiple": false
+      },
+      "target": "ReasonToGetAccess"
+    },
+    {
+      "id": "d579e09d-da56-49dd-a814-dcf279fa9559",
+      "name": "workIn",
+      "meta": {
+        "inversed": {
+          "editable": false,
+          "multiple": false
+        },
+        "multiple": false
+      },
+      "target": "WorkIn"
+    },
+    {
+      "id": "c0da8175-c7ae-4c8d-aaf8-e4679ca1fc73",
+      "name": "autobiography",
+      "target": "Attachment"
+    },
+    {
+      "id": "6676f05e-f5ae-4cbf-9451-5df00e6c4e1e",
+      "name": "answerRules",
+      "target": "Attachment"
+    },
+    {
+      "id": "c987f7cc-06fd-47cd-9dd0-53e4ebee2892",
+      "name": "scanForm5",
+      "target": "Attachment"
+    },
+    {
+      "id": "2387d8db-aa51-4d50-bfae-d0aab704741f",
+      "name": "form8",
+      "target": "Attachment"
+    },
+    {
+      "id": "4aecc3f6-8d9e-48b3-8d61-b0c1daf6239b",
+      "name": "birthPlace",
+      "target": "Address"
+    },
+    {
+      "id": "d72d3908-c52d-497b-b822-696d7b995f61",
+      "name": "registrationPlace",
+      "target": "Address"
+    },
+    {
+      "id": "2627ca23-24d6-4908-96e1-95c7fa8b76f2",
+      "name": "livingPlace",
+      "target": "Address"
+    },
+    {
+      "id": "5362a094-b494-40df-bcf3-1e388522db7a",
+      "name": "passport",
+      "target": "Passport"
+    },
+    {
+      "id": "03374f89-87f3-4792-b6df-df22e0962cc3",
+      "name": "fatherName",
+      "target": "FatherName"
+    },
+    {
+      "id": "52270fe2-0834-4417-97e9-fa2a05129a90",
+      "name": "nATOCertificate",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "NATOCertificate"
+    },
+    {
+      "id": "03fdc5d1-56aa-4888-ad9f-a3f353cc4f38",
+      "name": "psychophysiologicalResearch",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "PsychophysiologicalResearch"
+    },
+    {
+      "id": "91d29b13-d6a5-4380-adde-6d24e10b79ff",
+      "name": "phoneSign",
+      "target": "PhoneSign"
+    },
+    {
+      "id": "847fe4ce-4606-4be4-9bde-839fa462a97f",
+      "name": "birthDate",
+      "target": "BirthDate"
+    },
+    {
+      "id": "e639fa96-49c4-4ba2-a7a4-97e22bdb601c",
+      "name": "secondName",
+      "target": "SecondName"
+    },
+    {
+      "id": "67779523-29d5-4bf2-b72f-e9f497879b59",
+      "name": "domicileRequest",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "DomicileRequest"
+    },
+    {
+      "id": "afaed073-8555-4614-98a5-b9729544d70c",
+      "name": "operationalData",
+      "meta": {
+        "formField": {
+          "type": "table",
+          "hasIndexColumn": true
+        },
+        "multiple": true
+      },
+      "target": "OperationalData"
+    },
+    {
+      "id": "2a30f206-8c20-47eb-a973-5e72a9adbe44",
+      "name": "unprocessedDocsLetter",
+      "meta": {
+        "formField": {
+          "type": "table"
+        },
+        "multiple": true
+      },
+      "target": "UnprocessedDocsLetter"
+    },
+    {
+      "id": "6302ffc6-e730-44b9-8c11-0da1a2999767",
+      "name": "thirdPartyInterest",
+      "meta": {
+        "formField": {
+          "type": "table"
+        },
+        "multiple": true
+      },
+      "target": "ThirdPartyInterest"
+    },
+    {
+      "id": "ef5a7da2-5239-4374-ba6f-70456eac7516",
+      "name": "appealAgainstDecisionsOfSSU",
+      "meta": {
+        "formField": {
+          "type": "table"
+        },
+        "multiple": true
+      },
+      "target": "AppealAgainstDecisionsOfSSU"
+    },
+    {
+      "id": "9be6804b-6ea9-43a2-a805-46a1eb7c3248",
+      "name": "voluntaryRefusalToGetAccess",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "VoluntaryRefusalToGetAccess"
+    },
+    {
+      "id": "37a06342-968f-4da3-b023-d829dd10468b",
+      "name": "access",
+      "target": "Access"
+    },
+    {
+      "id": "44736ffb-49d0-4dde-80ab-070a72ba6e4e",
+      "name": "personControl",
+      "target": "PersonControl"
+    },
+    {
+      "id": "b7f58b06-cff9-4826-9b36-9dacb83b76d0",
+      "name": "domicileChangeRestrictions",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "DomicileChangeRestrictions"
+    },
+    {
+      "id": "414f7dc3-409b-4d39-8bc6-63caeb990820",
+      "name": "socialNetworkSign",
+      "target": "SocialNetworkSign"
+    },
+    {
+      "id": "55d756c6-bfc1-417c-98c9-620b016035b7",
+      "name": "highRiskPositionAudit",
+      "meta": {
+        "formField": {
+          "type": "form",
+          "layout": "inline"
+        },
+        "multiple": false
+      },
+      "target": "HighRiskPositionAudit"
+    }
+  ]
+}

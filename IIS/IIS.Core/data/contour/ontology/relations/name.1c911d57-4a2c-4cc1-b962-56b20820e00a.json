@@ -1,0 +1,12 @@
+{
+  "id": "1c911d57-4a2c-4cc1-b962-56b20820e00a",
+  "name": "name",
+  "title": "Назва",
+  "meta": {
+    "sortOrder": 0,
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

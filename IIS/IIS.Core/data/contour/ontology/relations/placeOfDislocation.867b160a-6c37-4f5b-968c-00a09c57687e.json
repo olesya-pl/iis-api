@@ -1,0 +1,10 @@
+{
+  "id": "867b160a-6c37-4f5b-968c-00a09c57687e",
+  "name": "placeOfDislocation",
+  "title": "Місце розташування",
+  "meta": {
+    "sortOrder": 220,
+    "title": "Місце поточної дислокації",
+    "multiple": false
+  }
+}

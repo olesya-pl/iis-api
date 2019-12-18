@@ -1,0 +1,17 @@
+{
+  "id": "d8e8e038-90c9-45ef-bf83-22b84b7c5f00",
+  "name": "sign",
+  "title": "Ознаки",
+  "meta": {
+    "acceptsEntityOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ],
+    "sortOrder": 80,
+    "formField": {
+      "type": "form"
+    },
+    "multiple": true
+  }
+}

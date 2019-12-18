@@ -1,0 +1,101 @@
+{
+  "id": "87b39fae-5b68-48cd-a5ed-f6ac96aae7f7",
+  "abstract": true,
+  "name": "ObjectOfStudy",
+  "title": "Об'єкт розвідки",
+  "attributes": [
+    {
+      "id": "760f86e2-f336-44a7-8533-d9cbccf719fa",
+      "name": "importance",
+      "title": "Важливість",
+      "meta": {
+        "sortOrder": 20,
+        "formField": {
+          "type": "dropdown",
+          "hasIndexColumn": false
+        },
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "ObjectImportance"
+    },
+    {
+      "id": "7b73b18e-53bd-450e-8e85-e8f61f9b1993",
+      "name": "attachment",
+      "title": "Прикріплений файл",
+      "meta": {
+        "sortOrder": 120,
+        "multiple": true
+      },
+      "target": "attachment"
+    },
+    {
+      "id": "d8e8e038-90c9-45ef-bf83-22b84b7c5f00",
+      "name": "sign",
+      "title": "Ознаки",
+      "meta": {
+        "acceptsEntityOperations": [
+          "Create",
+          "Update",
+          "Delete"
+        ],
+        "sortOrder": 80,
+        "formField": {
+          "type": "form"
+        },
+        "multiple": true
+      },
+      "target": "ObjectSign"
+    },
+    {
+      "id": "770fd47d-cf52-4aa8-a132-0daeb55b39e3",
+      "name": "title",
+      "title": "Повна назва",
+      "meta": {
+        "formula": "entity.name",
+        "sortOrder": 60,
+        "multiple": false
+      },
+      "target": "title"
+    },
+    {
+      "id": "84a7e236-3ca6-4574-aa76-3a6319a5e0c9",
+      "name": "affiliation",
+      "title": "Приналежність",
+      "meta": {
+        "sortOrder": 0,
+        "formField": {
+          "type": "dropdown",
+          "hasIndexColumn": false
+        },
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "ObjectAffiliation"
+    },
+    {
+      "id": "9b9eb6f6-197c-47de-b562-435a3f6bc0fa",
+      "name": "lastConfirmedAt",
+      "title": "Останнє підтвердження",
+      "meta": {
+        "sortOrder": 100,
+        "multiple": false
+      },
+      "target": "lastConfirmedAt"
+    },
+    {
+      "id": "3e0780dd-e0a6-42c4-acc6-30fdfc1da699",
+      "name": "photo",
+      "title": "Фото",
+      "meta": {
+        "sortOrder": 40,
+        "multiple": false
+      },
+      "target": "photo"
+    }
+  ]
+}

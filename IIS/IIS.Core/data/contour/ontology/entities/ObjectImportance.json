@@ -1,0 +1,20 @@
+{
+  "id": "06c079c0-2521-42d6-90ac-89c685457a35",
+  "name": "ObjectImportance",
+  "title": "Важливість Об'єкта Розвідки",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "d4d2c0ac-e3b0-4ad8-8b8e-10c3afed7b51",
+      "name": "code",
+      "title": "Код",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "code"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "274950a7-f780-482d-8c3c-7f9dd0242331",
+  "name": "CancellationPersonSanction",
+  "title": "Скасування допуска",
+  "extends": [
+    "FinalPersonSanction"
+  ]
+}

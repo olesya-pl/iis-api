@@ -1,0 +1,8 @@
+{
+  "id": "7698e188-99f1-4bb8-8fd2-3dfd0469a866",
+  "name": "SpecialPermitSuspensionSanction",
+  "title": "Зупинення спецдозволу",
+  "extends": [
+    "OrganizationPermitSanction"
+  ]
+}

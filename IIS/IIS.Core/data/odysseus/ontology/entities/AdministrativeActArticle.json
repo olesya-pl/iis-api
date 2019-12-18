@@ -1,0 +1,8 @@
+{
+  "id": "45a94392-268a-463f-8c7f-dd7e097c931b",
+  "name": "AdministrativeActArticle",
+  "title": "КУпАП",
+  "extends": [
+    "LegalActArticle"
+  ]
+}

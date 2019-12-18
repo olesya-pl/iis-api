@@ -1,0 +1,14 @@
+{
+  "id": "289b72c1-878d-4352-b108-6455b2b5fca2",
+  "name": "value",
+  "title": "Значення",
+  "meta": {
+    "format": "email",
+    "sortOrder": 0,
+    "multiple": false,
+    "validation": {
+      "email": true,
+      "required": true
+    }
+  }
+}

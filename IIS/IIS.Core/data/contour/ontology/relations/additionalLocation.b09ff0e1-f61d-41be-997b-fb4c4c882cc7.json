@@ -1,0 +1,9 @@
+{
+  "id": "b09ff0e1-f61d-41be-997b-fb4c4c882cc7",
+  "name": "additionalLocation",
+  "title": "Додаткові географічні координати",
+  "meta": {
+    "sortOrder": 200,
+    "multiple": true
+  }
+}

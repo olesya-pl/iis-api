@@ -1,0 +1,37 @@
+{
+  "id": "3657bed3-c756-4c83-9061-65ddcb0a3677",
+  "name": "FamilyRelationInfo",
+  "title": "Родинні зв’язки",
+  "attributes": [
+    {
+      "id": "7ae2315e-abce-4b2f-a3e5-4f974c34bbfa",
+      "name": "liveIn",
+      "target": "Text"
+    },
+    {
+      "id": "bdcb98da-9823-46a8-9073-58e5610f808a",
+      "name": "fullName",
+      "target": "Text"
+    },
+    {
+      "id": "6f0ccc47-9d28-4c72-88ec-df53b1b35d94",
+      "name": "workPlaceAndPosition",
+      "target": "Text"
+    },
+    {
+      "id": "4e527a0d-6428-4d87-965f-6a708bc83bc8",
+      "name": "dateAndPlaceOfBirth",
+      "target": "Text"
+    },
+    {
+      "id": "046394c6-708d-4727-8226-b7b9cd437237",
+      "name": "familyRelationKind",
+      "target": "FamilyRelationKind"
+    },
+    {
+      "id": "c9241601-08f7-464b-98cd-c8c23d8fea3c",
+      "name": "personLink",
+      "target": "Person"
+    }
+  ]
+}

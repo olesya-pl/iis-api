@@ -1,0 +1,14 @@
+{
+  "id": "f08b4dd7-7e2b-4801-996c-cabffd58decc",
+  "name": "description",
+  "title": "Додаткові дані",
+  "meta": {
+    "sortOrder": 20,
+    "title": "Опис",
+    "formField": {
+      "lines": 5,
+      "hasIndexColumn": false
+    },
+    "multiple": false
+  }
+}

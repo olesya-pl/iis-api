@@ -1,0 +1,13 @@
+{
+  "id": "9695c585-85a5-4368-9109-ac3052ad9248",
+  "abstract": true,
+  "name": "Sign",
+  "title": "Ознака",
+  "attributes": [
+    {
+      "id": "54a5a4f6-c59e-4b1a-9f1e-b4e9e93a4487",
+      "name": "value",
+      "target": "Value"
+    }
+  ]
+}

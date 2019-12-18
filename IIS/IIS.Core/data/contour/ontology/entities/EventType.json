@@ -1,0 +1,36 @@
+{
+  "id": "490dd5ac-11a1-4f21-b94c-e6f2de67fbab",
+  "name": "EventType",
+  "title": "Tип події",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "d6d3a236-7a62-416e-87cc-c0f9abd29fa0",
+      "name": "code",
+      "title": "Код",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "code"
+    },
+    {
+      "id": "fb8fcc06-01b9-458b-a86a-eeeaa5282e93",
+      "name": "child",
+      "title": "Ієрархічний вказівник на дочірні елементи",
+      "meta": {
+        "type": "hierarchical",
+        "inversed": {
+          "code": "parent",
+          "editable": false,
+          "multiple": false
+        },
+        "sortOrder": 20,
+        "multiple": true
+      },
+      "target": "EventType"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "bcea0365-4269-44a8-9758-2ffba6ea5cf1",
+  "name": "LegalActArticle",
+  "title": "НПА",
+  "attributes": [
+    {
+      "id": "5afa7928-aa1e-4f2b-8f9d-eb4109912eda",
+      "name": "content",
+      "target": "Text"
+    },
+    {
+      "id": "d3cb00cc-502e-4c49-a4b2-1c9af57b8701",
+      "name": "number",
+      "target": "Number"
+    }
+  ]
+}

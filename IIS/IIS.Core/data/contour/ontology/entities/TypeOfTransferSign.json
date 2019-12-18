@@ -1,0 +1,8 @@
+{
+  "id": "7d32bb23-c983-4929-a00d-61909417f7c5",
+  "name": "TypeOfTransferSign",
+  "title": "Тип передачі",
+  "extends": [
+    "ObjectSign"
+  ]
+}

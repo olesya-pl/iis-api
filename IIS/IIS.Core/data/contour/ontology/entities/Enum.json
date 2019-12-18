@@ -1,0 +1,31 @@
+{
+  "id": "dc44910c-c022-467c-baeb-48b2965ec178",
+  "abstract": true,
+  "name": "Enum",
+  "title": "Список",
+  "attributes": [
+    {
+      "id": "1c911d57-4a2c-4cc1-b962-56b20820e00a",
+      "name": "name",
+      "title": "Назва",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "name"
+    },
+    {
+      "id": "b64f5ea1-423f-47a6-929f-7e079d88a0e8",
+      "name": "sortOrder",
+      "title": "Порядок сортування",
+      "meta": {
+        "sortOrder": 20,
+        "multiple": false
+      },
+      "target": "sortOrder"
+    }
+  ]
+}

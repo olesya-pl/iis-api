@@ -1,0 +1,22 @@
+{
+  "id": "e2f8e572-6189-489a-bff1-588c9b42d322",
+  "name": "Citizenship",
+  "title": "Громадянство",
+  "attributes": [
+    {
+      "id": "58993bdb-545f-42e2-b90a-f2a8d8b97879",
+      "name": "taxId",
+      "target": "TaxId"
+    },
+    {
+      "id": "18d362df-2ee3-4576-819c-39a8bed08be0",
+      "name": "passport",
+      "target": "Passport"
+    },
+    {
+      "id": "1c4c8cf1-7759-4fa2-83c4-21a4f173167c",
+      "name": "country",
+      "target": "Country"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "38a82c32-90dd-4050-9102-cc7a5e1f3848",
+  "name": "LegalDocument",
+  "title": "",
+  "attributes": [
+    {
+      "id": "04b23bb6-926b-462f-aa2d-bb2d89caba54",
+      "name": "date",
+      "target": "Date"
+    },
+    {
+      "id": "f575d107-d389-4041-ba06-bd2ac9360b45",
+      "name": "content",
+      "target": "Text"
+    },
+    {
+      "id": "cdb5a54a-aa82-4a8c-a6b2-4dca3df0b742",
+      "name": "original",
+      "target": "Attachment"
+    },
+    {
+      "id": "0cbe6ed2-5c88-429f-ae40-e4ee1ae7f17b",
+      "name": "number",
+      "target": "Number"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "b3705045-fc64-4423-95c5-fafaac061c28",
+  "name": "militaryBase",
+  "title": "Військова частина",
+  "meta": {
+    "sortOrder": 120,
+    "multiple": false
+  }
+}

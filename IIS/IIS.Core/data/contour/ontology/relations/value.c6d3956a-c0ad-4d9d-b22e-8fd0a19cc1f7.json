@@ -1,0 +1,12 @@
+{
+  "id": "c6d3956a-c0ad-4d9d-b22e-8fd0a19cc1f7",
+  "name": "value",
+  "title": "Значення",
+  "meta": {
+    "sortOrder": 0,
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

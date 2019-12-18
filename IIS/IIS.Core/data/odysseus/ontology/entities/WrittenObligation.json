@@ -1,0 +1,31 @@
+{
+  "id": "14f0033f-04d0-4fc9-add1-e6399dd569c7",
+  "name": "WrittenObligation",
+  "title": "15. Взяття особою письмового зобов’язання у зв’язку з доступом до державної таємниці у межах ст. 27 Закону України «Про державну таємницю» - повідомлення СРСД та фотокартка з Інтернет-ресурсів.",
+  "extends": [
+    "ProfileQuestion"
+  ],
+  "attributes": [
+    {
+      "id": "7a25b331-3c5a-4978-a35a-c0d315308b4e",
+      "name": "text",
+      "meta": {
+        "formField": {
+          "type": "radioComment"
+        },
+        "multiple": false
+      },
+      "target": "Text"
+    },
+    {
+      "id": "9f87beae-fc9b-4fb7-9b34-bbffb521c602",
+      "name": "message",
+      "target": "Attachment"
+    },
+    {
+      "id": "d8354983-241a-4f81-924a-b7b19abf296a",
+      "name": "photo",
+      "target": "Attachment"
+    }
+  ]
+}

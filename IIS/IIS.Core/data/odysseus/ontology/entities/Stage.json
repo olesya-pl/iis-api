@@ -1,0 +1,23 @@
+{
+  "id": "8e6878f0-f27c-46b9-bfe1-b9071334c378",
+  "name": "Stage",
+  "title": "Етапи НДДКР",
+  "attributes": [
+    {
+      "id": "f0c86f38-df6c-40ae-97cd-ac5e02b96368",
+      "name": "name",
+      "target": "Name"
+    },
+    {
+      "id": "fa0a25c1-9c15-49f5-9df3-dedd4ed9efc3",
+      "name": "dateRange",
+      "meta": {
+        "formField": {
+          "type": "dateRange"
+        },
+        "multiple": false
+      },
+      "target": "DateRange"
+    }
+  ]
+}

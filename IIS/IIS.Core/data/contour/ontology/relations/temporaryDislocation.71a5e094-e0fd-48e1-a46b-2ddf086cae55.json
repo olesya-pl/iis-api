@@ -1,0 +1,9 @@
+{
+  "id": "71a5e094-e0fd-48e1-a46b-2ddf086cae55",
+  "name": "temporaryDislocation",
+  "title": "Пункт Тимчасової Дислокації (ПТД)",
+  "meta": {
+    "sortOrder": 120,
+    "multiple": false
+  }
+}

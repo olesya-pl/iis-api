@@ -1,0 +1,13 @@
+{
+  "id": "89692a14-34b2-4d10-bfde-82f8108b884e",
+  "name": "name",
+  "title": "Назва",
+  "meta": {
+    "sortOrder": 0,
+    "title": "Назва",
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

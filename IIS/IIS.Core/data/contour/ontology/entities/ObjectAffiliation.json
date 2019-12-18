@@ -1,0 +1,30 @@
+{
+  "id": "78e310c0-7505-40bc-be7f-c234a9690767",
+  "name": "ObjectAffiliation",
+  "title": "Приналежність Об'єкта Розвідки",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "883e9245-9c69-4efa-ab57-54000b732dd0",
+      "name": "code",
+      "title": "Код",
+      "meta": {
+        "sortOrder": 20,
+        "multiple": false
+      },
+      "target": "code"
+    },
+    {
+      "id": "138994af-13b1-44d6-9cd9-ce9a9f790827",
+      "name": "sidc",
+      "title": "Військова абрівіатура НАТО",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "sidc"
+    }
+  ]
+}

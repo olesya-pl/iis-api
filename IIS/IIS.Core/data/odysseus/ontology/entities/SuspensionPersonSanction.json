@@ -1,0 +1,8 @@
+{
+  "id": "f3b480cd-0e73-4ce9-bd6d-7c9a6621a10d",
+  "name": "SuspensionPersonSanction",
+  "title": "Зупинення спецдозволу",
+  "extends": [
+    "FinalPersonSanction"
+  ]
+}

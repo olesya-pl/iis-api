@@ -1,0 +1,8 @@
+{
+  "id": "0de6715d-7f52-437d-948d-e20f8c739ef8",
+  "name": "VettingProcedureType",
+  "title": "Тип перевірки",
+  "extends": [
+    "Enum"
+  ]
+}

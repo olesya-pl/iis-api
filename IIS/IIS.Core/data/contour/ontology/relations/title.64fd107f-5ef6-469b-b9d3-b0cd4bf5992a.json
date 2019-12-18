@@ -1,0 +1,10 @@
+{
+  "id": "64fd107f-5ef6-469b-b9d3-b0cd4bf5992a",
+  "name": "title",
+  "title": "Повна назва",
+  "meta": {
+    "formula": "h.fullTitle(entity.shortName, entity.name)",
+    "sortOrder": 0,
+    "multiple": false
+  }
+}

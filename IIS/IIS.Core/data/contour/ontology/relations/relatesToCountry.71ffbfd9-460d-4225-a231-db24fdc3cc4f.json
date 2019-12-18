@@ -1,0 +1,13 @@
+{
+  "id": "71ffbfd9-460d-4225-a231-db24fdc3cc4f",
+  "name": "relatesToCountry",
+  "title": "Державна приналежність",
+  "meta": {
+    "sortOrder": 140,
+    "formField": {
+      "type": "dropdown",
+      "icon": "flag"
+    },
+    "multiple": false
+  }
+}

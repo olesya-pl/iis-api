@@ -1,0 +1,9 @@
+{
+  "id": "19eae220-fbe8-431e-b697-f384ae6ee1a5",
+  "name": "placeOfDislocation",
+  "title": "Місце розташування",
+  "meta": {
+    "sortOrder": 100,
+    "multiple": false
+  }
+}

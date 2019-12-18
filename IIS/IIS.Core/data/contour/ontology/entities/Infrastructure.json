@@ -1,0 +1,129 @@
+{
+  "id": "43927602-182d-42c5-a193-95174baa9ea7",
+  "name": "Infrastructure",
+  "title": "Інфраструктура",
+  "extends": [
+    "ObjectOfStudy"
+  ],
+  "attributes": [
+    {
+      "id": "71a5e094-e0fd-48e1-a46b-2ddf086cae55",
+      "name": "temporaryDislocation",
+      "title": "Пункт Тимчасової Дислокації (ПТД)",
+      "meta": {
+        "sortOrder": 120,
+        "multiple": false
+      },
+      "target": "temporaryDislocation"
+    },
+    {
+      "id": "cd472875-82c4-48ba-98b5-fc0ce3f64c00",
+      "name": "dislocation",
+      "title": "Пункт Постійної Дислокації (ППД)",
+      "meta": {
+        "sortOrder": 140,
+        "multiple": false
+      },
+      "target": "dislocation"
+    },
+    {
+      "id": "ce1bf4c4-f3f7-42ef-b8a1-f039d302c905",
+      "name": "description",
+      "title": "Додаткові дані",
+      "meta": {
+        "sortOrder": 200,
+        "multiple": false
+      },
+      "target": "description"
+    },
+    {
+      "id": "48db73b0-e8cb-4662-bf90-04b6d7b026d3",
+      "name": "infrastructureType",
+      "title": "Тип інфраструктури",
+      "meta": {
+        "sortOrder": 80,
+        "multiple": false
+      },
+      "target": "InfrastructureType"
+    },
+    {
+      "id": "e4fa35af-acd1-4ebd-aba8-0d9d5fbe3228",
+      "name": "bePartOf",
+      "title": "Належність",
+      "meta": {
+        "sortOrder": 160,
+        "multiple": false
+      },
+      "target": "Infrastructure_bePartOf"
+    },
+    {
+      "id": "bf18e61f-03f4-4e59-9b7c-2a6dc35d7bb8",
+      "name": "name",
+      "title": "Назва",
+      "meta": {
+        "sortOrder": 40,
+        "title": "Повне найменування",
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "name"
+    },
+    {
+      "id": "dd2c93d2-e601-46e8-9a77-347a1934c8b8",
+      "name": "relatesToCountry",
+      "title": "Державна приналежність",
+      "meta": {
+        "sortOrder": 60,
+        "formField": {
+          "type": "dropdown",
+          "icon": "flag"
+        },
+        "multiple": false
+      },
+      "target": "Country"
+    },
+    {
+      "id": "19eae220-fbe8-431e-b697-f384ae6ee1a5",
+      "name": "placeOfDislocation",
+      "title": "Місце розташування",
+      "meta": {
+        "sortOrder": 100,
+        "multiple": false
+      },
+      "target": "placeOfDislocation"
+    },
+    {
+      "id": "64fd107f-5ef6-469b-b9d3-b0cd4bf5992a",
+      "name": "title",
+      "title": "Повна назва",
+      "meta": {
+        "formula": "h.fullTitle(entity.shortName, entity.name)",
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "title"
+    },
+    {
+      "id": "fff76c8f-356a-4dad-b90a-25df5cf5bd5f",
+      "name": "shortName",
+      "title": "Скорочене найменування",
+      "meta": {
+        "sortOrder": 20,
+        "multiple": false
+      },
+      "target": "shortName"
+    },
+    {
+      "id": "68e8570f-6dd5-4b46-918d-8727ff8014b7",
+      "name": "militaryBase",
+      "title": "Військова частина",
+      "meta": {
+        "sortOrder": 180,
+        "multiple": false
+      },
+      "target": "MilitaryBase"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "0a268618-96c5-4cf2-b179-f68ea2e3c400",
+  "name": "code",
+  "title": "Код",
+  "type": "String",
+  "meta": {
+    "kind": "Keyword"
+  }
+}

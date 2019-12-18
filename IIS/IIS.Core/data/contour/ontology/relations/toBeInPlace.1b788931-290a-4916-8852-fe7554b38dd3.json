@@ -1,0 +1,9 @@
+{
+  "id": "1b788931-290a-4916-8852-fe7554b38dd3",
+  "name": "toBeInPlace",
+  "title": "Місце перебування",
+  "meta": {
+    "sortOrder": 220,
+    "multiple": false
+  }
+}

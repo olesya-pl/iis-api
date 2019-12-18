@@ -1,0 +1,9 @@
+{
+  "id": "20fc1116-f8df-4aea-8964-be422d8baaf8",
+  "name": "serialNumber",
+  "title": "Серійний номер",
+  "type": "String",
+  "meta": {
+    "kind": "Keyword"
+  }
+}

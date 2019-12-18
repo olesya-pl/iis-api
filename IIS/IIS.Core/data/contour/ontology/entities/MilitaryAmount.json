@@ -1,0 +1,8 @@
+{
+  "id": "68031c57-86ea-49a5-92a6-7bcc350a5b04",
+  "name": "MilitaryAmount",
+  "title": "Чисельність",
+  "extends": [
+    "Enum"
+  ]
+}

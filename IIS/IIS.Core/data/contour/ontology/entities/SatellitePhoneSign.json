@@ -1,0 +1,8 @@
+{
+  "id": "b10b46cb-f4b2-4778-974a-807c6ce3bb2c",
+  "name": "SatellitePhoneSign",
+  "title": "Супутниковий телефон",
+  "extends": [
+    "ObjectSign"
+  ]
+}

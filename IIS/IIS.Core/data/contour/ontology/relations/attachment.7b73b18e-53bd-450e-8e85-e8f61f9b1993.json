@@ -1,0 +1,9 @@
+{
+  "id": "7b73b18e-53bd-450e-8e85-e8f61f9b1993",
+  "name": "attachment",
+  "title": "Прикріплений файл",
+  "meta": {
+    "sortOrder": 120,
+    "multiple": true
+  }
+}

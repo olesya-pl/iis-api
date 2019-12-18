@@ -1,0 +1,38 @@
+{
+  "id": "0ef99e5d-51f3-450a-ad78-a1745239a4fc",
+  "name": "License",
+  "title": "Ліцензія",
+  "attributes": [
+    {
+      "id": "283fea8d-3979-4b9c-abf2-d24f1529876f",
+      "name": "licenseNumber",
+      "target": "Number"
+    },
+    {
+      "id": "41f69497-1ccb-4ea4-9f08-941d268a770b",
+      "name": "validRange",
+      "meta": {
+        "formField": {
+          "type": "dateRange"
+        },
+        "multiple": false
+      },
+      "target": "DateRange"
+    },
+    {
+      "id": "5805e367-e330-4cf6-b6bd-86482486b23f",
+      "name": "activityType",
+      "target": "Text"
+    },
+    {
+      "id": "dd1a48ac-e73d-4694-a96d-2c57a1b84a45",
+      "name": "scan",
+      "target": "Attachment"
+    },
+    {
+      "id": "95e07080-bdfe-437b-8842-e29513e27587",
+      "name": "approvalNumber",
+      "target": "Number"
+    }
+  ]
+}

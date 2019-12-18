@@ -1,0 +1,8 @@
+{
+  "id": "61305fbe-bf01-4991-a1cb-e05d53852d26",
+  "name": "IpPhoneSign",
+  "title": "IP Телефон",
+  "extends": [
+    "ObjectSign"
+  ]
+}

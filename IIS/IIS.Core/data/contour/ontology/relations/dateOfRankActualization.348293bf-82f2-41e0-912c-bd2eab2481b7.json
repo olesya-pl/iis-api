@@ -1,0 +1,9 @@
+{
+  "id": "348293bf-82f2-41e0-912c-bd2eab2481b7",
+  "name": "dateOfRankActualization",
+  "title": "Дата актуалізації звання",
+  "meta": {
+    "sortOrder": 240,
+    "multiple": false
+  }
+}

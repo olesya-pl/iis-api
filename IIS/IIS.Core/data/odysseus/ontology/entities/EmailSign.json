@@ -1,0 +1,8 @@
+{
+  "id": "621534eb-ec34-4b26-aeec-55a21b03c4fd",
+  "name": "EmailSign",
+  "title": "Електронна скринька",
+  "extends": [
+    "Sign"
+  ]
+}

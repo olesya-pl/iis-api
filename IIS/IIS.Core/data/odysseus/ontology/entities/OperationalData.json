@@ -1,0 +1,32 @@
+{
+  "id": "d56806ae-89af-4b9c-acc0-ac0203c79c80",
+  "name": "OperationalData",
+  "title": "Оперативні дані",
+  "attributes": [
+    {
+      "id": "bc36d543-e854-4921-8225-6ccc7da5d05c",
+      "name": "source",
+      "target": "OperationalDataSource"
+    },
+    {
+      "id": "6c1f3601-d5f3-4c18-9e23-c10eede9ca68",
+      "name": "comment",
+      "target": "Text"
+    },
+    {
+      "id": "b7a9b171-1c24-4725-9d71-1ecabbeb72f9",
+      "name": "content",
+      "target": "Text"
+    },
+    {
+      "id": "2db4b560-17d6-44a6-95bc-8182934e1db8",
+      "name": "attachment",
+      "target": "Attachment"
+    },
+    {
+      "id": "2cc3b758-ddc7-423b-8195-864288e417e4",
+      "name": "date",
+      "target": "Date"
+    }
+  ]
+}

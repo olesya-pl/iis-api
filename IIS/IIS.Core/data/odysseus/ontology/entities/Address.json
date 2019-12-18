@@ -1,0 +1,52 @@
+{
+  "id": "88640bb8-43cf-4615-a39a-a27cbb500432",
+  "name": "Address",
+  "title": "Адреса",
+  "attributes": [
+    {
+      "id": "73bb4b57-65b0-4768-bc43-dc9c13813583",
+      "name": "subregion",
+      "target": "Subregion"
+    },
+    {
+      "id": "84ea5a87-c9b0-4a9e-b504-f59f69f77aa8",
+      "name": "coordinates",
+      "target": "Coordinates"
+    },
+    {
+      "id": "3bdc94fa-7778-4854-b53d-9ef622cec26e",
+      "name": "city",
+      "target": "City"
+    },
+    {
+      "id": "aaf3092a-774f-4c59-a6b1-6657fb26c0aa",
+      "name": "street",
+      "target": "Street"
+    },
+    {
+      "id": "4a6aa30d-bd69-4992-bbed-064df5360531",
+      "name": "building",
+      "target": "Building"
+    },
+    {
+      "id": "d66f914a-518f-490f-9644-0c0671128a86",
+      "name": "apartment",
+      "target": "Apartment"
+    },
+    {
+      "id": "0e60a437-311d-4191-bd1f-1d2b2ee5a204",
+      "name": "housing",
+      "target": "Housing"
+    },
+    {
+      "id": "8edf3ce4-e3f3-4dc9-bb9d-ce148329d4c8",
+      "name": "zipCode",
+      "target": "ZipCode"
+    },
+    {
+      "id": "ac9fc4b7-1ca9-4321-8bfb-547c4d68055e",
+      "name": "region",
+      "target": "Region"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "b95b4e3a-0f7e-4831-a3a8-68dbd534231a",
+  "name": "FamilyRelationKind",
+  "title": "Ступінь родинного зв’язку",
+  "extends": [
+    "Enum"
+  ]
+}

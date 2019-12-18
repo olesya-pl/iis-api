@@ -1,0 +1,17 @@
+{
+  "id": "dcc41d1d-3634-48f4-b85c-29fcddd894b7",
+  "name": "McciSpecialCommunications",
+  "title": "МНСІ органів спецзв’язку",
+  "attributes": [
+    {
+      "id": "9d1ea7fd-7e53-437b-b3e7-d419b4b20296",
+      "name": "count",
+      "target": "Count"
+    },
+    {
+      "id": "168892a2-8b7c-4b8b-b9fa-bf34a5404257",
+      "name": "category",
+      "target": "AccessLevel"
+    }
+  ]
+}

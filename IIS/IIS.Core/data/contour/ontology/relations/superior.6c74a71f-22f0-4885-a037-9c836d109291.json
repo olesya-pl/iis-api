@@ -1,0 +1,16 @@
+{
+  "id": "6c74a71f-22f0-4885-a037-9c836d109291",
+  "name": "superior",
+  "title": "Підлеглість",
+  "meta": {
+    "type": "hierarchical",
+    "inversed": {
+      "code": "subordinate",
+      "editable": false,
+      "title": "Підлеглий",
+      "multiple": true
+    },
+    "sortOrder": 140,
+    "multiple": false
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "bda14a46-98a3-42c4-b63b-ca003c68c647",
+  "name": "registrationPlace",
+  "title": "Місце реєстрації",
+  "meta": {
+    "sortOrder": 340,
+    "multiple": false
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "c00833c7-0b04-4f58-8d57-fa90433d7831",
+  "name": "NATOCertificate",
+  "title": "16. Сертифікат особового допуску НАТО (стадії: оформлення – лист СРСД; надання – дата фактичного підписання сертифікату).",
+  "extends": [
+    "ProfileQuestion"
+  ],
+  "attributes": [
+    {
+      "id": "80232675-d545-49de-b10e-9e129791ae63",
+      "name": "attachment",
+      "target": "Attachment"
+    },
+    {
+      "id": "9cea3416-85df-45f3-8be7-e482f85ca270",
+      "name": "date",
+      "target": "Date"
+    }
+  ]
+}

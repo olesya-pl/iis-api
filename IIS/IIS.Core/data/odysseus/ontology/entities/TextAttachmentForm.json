@@ -1,0 +1,23 @@
+{
+  "id": "6ea1293d-a786-4239-8d16-63cac1701715",
+  "name": "TextAttachmentForm",
+  "title": "TextAttachmentForm",
+  "attributes": [
+    {
+      "id": "9e12f819-580b-45a1-8ffd-69b50ef1dacf",
+      "name": "text",
+      "meta": {
+        "formField": {
+          "type": "radioComment"
+        },
+        "multiple": false
+      },
+      "target": "Text"
+    },
+    {
+      "id": "48c75bbb-2062-408e-8b8d-316d2df171b7",
+      "name": "attachment",
+      "target": "Attachment"
+    }
+  ]
+}

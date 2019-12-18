@@ -1,0 +1,8 @@
+{
+  "id": "a746000b-7bac-4d9e-bbec-95ae38a5d01c",
+  "name": "AccessStatus",
+  "title": "Статус допуску",
+  "extends": [
+    "Enum"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "f313a3be-0c91-4bf9-8392-8c14993ca14a",
+  "name": "SocialNetworkSign",
+  "title": "Соціальна мережа",
+  "extends": [
+    "Sign"
+  ]
+}

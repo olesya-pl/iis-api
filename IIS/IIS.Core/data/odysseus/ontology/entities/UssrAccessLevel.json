@@ -1,0 +1,9 @@
+{
+  "id": "62d907ea-05ec-42c5-9200-880a31f1dab6",
+  "name": "UssrAccessLevel",
+  "title": "Рівень доступу СРСР",
+  "extends": [
+    "AbstractAccessLevel",
+    "Enum"
+  ]
+}

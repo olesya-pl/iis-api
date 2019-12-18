@@ -1,0 +1,11 @@
+{
+  "id": "70b053d1-7702-4078-b086-d89540fcbddc",
+  "name": "name",
+  "title": "Назва",
+  "type": "String",
+  "meta": {
+    "validation": {
+      "required": true
+    }
+  }
+}

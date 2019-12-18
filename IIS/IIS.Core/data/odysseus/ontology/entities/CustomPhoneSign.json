@@ -1,0 +1,8 @@
+{
+  "id": "a843509a-af21-4f8f-a0b7-d7caef5c7e38",
+  "name": "CustomPhoneSign",
+  "title": "Інший телефон",
+  "extends": [
+    "PhoneSign"
+  ]
+}

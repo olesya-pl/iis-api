@@ -1,0 +1,26 @@
+{
+  "id": "7e50d540-e638-48a3-a44a-6bda227dc8d8",
+  "name": "EventComponent",
+  "title": "Компонент події",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "646acdeb-b04b-4d81-ae51-d273bca07d14",
+      "name": "child",
+      "title": "Ієрархічний вказівник на дочірні елементи",
+      "meta": {
+        "type": "hierarchical",
+        "inversed": {
+          "code": "parent",
+          "editable": false,
+          "multiple": false
+        },
+        "sortOrder": 0,
+        "multiple": true
+      },
+      "target": "EventComponent"
+    }
+  ]
+}

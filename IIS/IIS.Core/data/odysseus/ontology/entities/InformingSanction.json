@@ -1,0 +1,32 @@
+{
+  "id": "5bcc76b5-aa44-4260-945f-2e8d6574dfcb",
+  "name": "InformingSanction",
+  "title": "Інформування",
+  "extends": [
+    "OrganizationSanction"
+  ],
+  "attributes": [
+    {
+      "id": "a1bfc994-8d94-443c-82bd-34158ff2ed51",
+      "name": "answer",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "LegalDocument"
+    },
+    {
+      "id": "9ac86cbb-c2db-4e7d-903c-d6f9670580cf",
+      "name": "inform",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "LegalDocument"
+    }
+  ]
+}

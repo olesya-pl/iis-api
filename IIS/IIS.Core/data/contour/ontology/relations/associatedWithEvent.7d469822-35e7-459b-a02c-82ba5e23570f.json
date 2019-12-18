@@ -1,0 +1,9 @@
+{
+  "id": "7d469822-35e7-459b-a02c-82ba5e23570f",
+  "name": "associatedWithEvent",
+  "title": "Об'єкти розвідки, пов'язані з подією",
+  "meta": {
+    "sortOrder": 140,
+    "multiple": true
+  }
+}

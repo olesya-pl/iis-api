@@ -1,0 +1,27 @@
+{
+  "id": "c3950ef0-9d0b-4bc0-81b1-01b1cec5b097",
+  "name": "PsychophysiologicalResearch",
+  "title": "33. Проходження психофізіологічного дослідження із застосуванням поліграфа.",
+  "attributes": [
+    {
+      "id": "3650c777-579f-486c-b1e0-12a8411b8301",
+      "name": "passed",
+      "target": "Boolean"
+    },
+    {
+      "id": "fa47c3e3-67ba-48a1-82f2-2c2f84aa9cc5",
+      "name": "assigned",
+      "target": "Boolean"
+    },
+    {
+      "id": "9ffa25d1-09ad-4d72-b132-34e5cb10908f",
+      "name": "cancelApplication",
+      "target": "Attachment"
+    },
+    {
+      "id": "ee2b459a-8d89-4b37-8240-00293f015665",
+      "name": "passingAct",
+      "target": "Attachment"
+    }
+  ]
+}

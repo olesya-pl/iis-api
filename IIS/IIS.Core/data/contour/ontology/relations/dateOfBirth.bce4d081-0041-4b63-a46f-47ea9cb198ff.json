@@ -1,0 +1,9 @@
+{
+  "id": "bce4d081-0041-4b63-a46f-47ea9cb198ff",
+  "name": "dateOfBirth",
+  "title": "Дата народження",
+  "meta": {
+    "sortOrder": 140,
+    "multiple": false
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "c71f0e12-4f98-448e-b1c6-61c598106b2e",
+  "abstract": true,
+  "name": "PhoneSign",
+  "title": "Телефон",
+  "extends": [
+    "Sign"
+  ]
+}

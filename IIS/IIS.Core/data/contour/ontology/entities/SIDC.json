@@ -1,0 +1,20 @@
+{
+  "id": "dda028ca-7769-4c93-a7b8-fa54a2359649",
+  "name": "SIDC",
+  "title": "SIDC",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "07ac9dbe-0808-4c36-b337-930ab9415f29",
+      "name": "code",
+      "title": "Код",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "code"
+    }
+  ]
+}

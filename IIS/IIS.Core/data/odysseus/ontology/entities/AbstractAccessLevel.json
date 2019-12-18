@@ -1,0 +1,9 @@
+{
+  "id": "28ccec7e-e766-4756-8d45-5705ee7080fe",
+  "abstract": true,
+  "name": "AbstractAccessLevel",
+  "title": "Рівень доступу",
+  "extends": [
+    "Enum"
+  ]
+}

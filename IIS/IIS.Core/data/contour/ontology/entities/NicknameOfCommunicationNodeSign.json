@@ -1,0 +1,8 @@
+{
+  "id": "9778568c-d702-411c-92b9-bac07aad8e7e",
+  "name": "NicknameOfCommunicationNodeSign",
+  "title": "Позивний вузла зв'язку",
+  "extends": [
+    "ObjectSign"
+  ]
+}

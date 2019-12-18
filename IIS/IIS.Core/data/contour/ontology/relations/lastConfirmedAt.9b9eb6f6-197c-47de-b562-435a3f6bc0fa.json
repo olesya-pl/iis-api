@@ -1,0 +1,9 @@
+{
+  "id": "9b9eb6f6-197c-47de-b562-435a3f6bc0fa",
+  "name": "lastConfirmedAt",
+  "title": "Останнє підтвердження",
+  "meta": {
+    "sortOrder": 100,
+    "multiple": false
+  }
+}

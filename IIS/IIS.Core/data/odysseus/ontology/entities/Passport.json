@@ -1,0 +1,22 @@
+{
+  "id": "ae32e86f-df70-4954-a6ed-b11980068e05",
+  "name": "Passport",
+  "title": "Паспорт",
+  "attributes": [
+    {
+      "id": "686984c3-cd00-4c33-979c-71a7350f0e15",
+      "name": "issueInfo",
+      "target": "IssueInfo"
+    },
+    {
+      "id": "622759ed-beba-4e4c-9c9c-e73de15c22a6",
+      "name": "issueDate",
+      "target": "IssueDate"
+    },
+    {
+      "id": "e3662ed5-fcd9-4d2e-956b-0fb17e37bd98",
+      "name": "code",
+      "target": "Code"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "32897259-9685-4047-9d46-886400eb681e",
+  "name": "relatesToCountry",
+  "title": "Країна",
+  "meta": {
+    "sortOrder": 120,
+    "title": "Країна",
+    "formField": {
+      "type": "dropdown",
+      "icon": "flag"
+    },
+    "multiple": true,
+    "validation": {
+      "required": true
+    }
+  }
+}

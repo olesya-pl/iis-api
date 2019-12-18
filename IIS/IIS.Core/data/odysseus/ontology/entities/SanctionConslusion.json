@@ -1,0 +1,22 @@
+{
+  "id": "4bc2d210-de6b-4f05-a282-ae6d2b5e5021",
+  "name": "SanctionConslusion",
+  "title": "SanctionConslusion",
+  "attributes": [
+    {
+      "id": "53c57fe7-822c-4b81-af7a-aa70393ba990",
+      "name": "attachment",
+      "target": "Attachment"
+    },
+    {
+      "id": "dd49e6a5-f863-4c85-8b1c-9955a95ac906",
+      "name": "date",
+      "target": "Date"
+    },
+    {
+      "id": "411beb99-e696-440b-b192-cd98ea236c59",
+      "name": "number",
+      "target": "Number"
+    }
+  ]
+}

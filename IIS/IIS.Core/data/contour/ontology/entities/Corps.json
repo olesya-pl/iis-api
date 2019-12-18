@@ -1,0 +1,8 @@
+{
+  "id": "698f0493-1937-4155-a9e1-0f6bdffc332a",
+  "name": "Corps",
+  "title": "Рiд вiйськ",
+  "extends": [
+    "Enum"
+  ]
+}

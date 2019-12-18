@@ -1,0 +1,12 @@
+{
+  "id": "43006fc6-faf2-455d-b9c2-3d191c1f7a36",
+  "name": "baseCode",
+  "title": "Номер військової частини",
+  "meta": {
+    "sortOrder": 60,
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

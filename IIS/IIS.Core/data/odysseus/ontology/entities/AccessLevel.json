@@ -1,0 +1,16 @@
+{
+  "id": "ba93c96c-1fbb-4fb2-818f-4cf143b07016",
+  "name": "AccessLevel",
+  "title": "Рівень доступу",
+  "extends": [
+    "AbstractAccessLevel",
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "9b013726-dc92-467a-b857-af5c9c8336b7",
+      "name": "number",
+      "target": "Number"
+    }
+  ]
+}

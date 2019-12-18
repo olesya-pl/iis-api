@@ -1,0 +1,20 @@
+{
+  "id": "91322731-7305-436b-a087-96521cfe01c3",
+  "name": "AccessLevelForm",
+  "title": "Форма, на яку подається",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "47a7c0f9-2eb3-412f-a9b3-e443b5dcc7ff",
+      "name": "number",
+      "target": "Number"
+    },
+    {
+      "id": "f6229f7a-ebc2-4412-9e6a-d710648a690d",
+      "name": "years",
+      "target": "Years"
+    }
+  ]
+}

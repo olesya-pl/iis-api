@@ -1,0 +1,16 @@
+{
+  "id": "84a7e236-3ca6-4574-aa76-3a6319a5e0c9",
+  "name": "affiliation",
+  "title": "Приналежність",
+  "meta": {
+    "sortOrder": 0,
+    "formField": {
+      "type": "dropdown",
+      "hasIndexColumn": false
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "341756bb-6408-4d12-bc93-f62b8a087d24",
+  "name": "SimpleDocument",
+  "title": "SimpleDocument",
+  "attributes": [
+    {
+      "id": "b76885b1-84c6-4dca-9a0b-63458ffb959b",
+      "name": "number",
+      "target": "Number"
+    },
+    {
+      "id": "83de36d8-8613-49ca-9b63-359054423236",
+      "name": "date",
+      "target": "Date"
+    }
+  ]
+}

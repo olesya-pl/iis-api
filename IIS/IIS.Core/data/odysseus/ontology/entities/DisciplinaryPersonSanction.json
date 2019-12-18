@@ -1,0 +1,26 @@
+{
+  "id": "9eec5d3b-5004-4ad0-a0c9-b2304d54fa17",
+  "name": "DisciplinaryPersonSanction",
+  "title": "Дисциплінарна відповідальність",
+  "extends": [
+    "PersonSanction"
+  ],
+  "attributes": [
+    {
+      "id": "3b7967e8-58d8-4201-9f97-5813d9820741",
+      "name": "report",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "LegalDocument"
+    },
+    {
+      "id": "b5d6b60d-4de7-4faf-b03d-376e5f247b03",
+      "name": "disciplinarySanctionKind",
+      "target": "DisciplinarySanctionKind"
+    }
+  ]
+}

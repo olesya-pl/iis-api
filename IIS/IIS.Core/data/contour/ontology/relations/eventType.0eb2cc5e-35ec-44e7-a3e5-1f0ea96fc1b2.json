@@ -1,0 +1,16 @@
+{
+  "id": "0eb2cc5e-35ec-44e7-a3e5-1f0ea96fc1b2",
+  "name": "eventType",
+  "title": "Тип події",
+  "meta": {
+    "sortOrder": 220,
+    "formField": {
+      "type": "dropdownTree",
+      "hasIndexColumn": false
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

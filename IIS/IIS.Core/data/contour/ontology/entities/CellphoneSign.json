@@ -1,0 +1,24 @@
+{
+  "id": "42c958bb-6699-45bc-93f4-49e23abb4928",
+  "name": "CellphoneSign",
+  "title": "Мобільний телефон",
+  "extends": [
+    "ObjectSign"
+  ],
+  "attributes": [
+    {
+      "id": "ec4819d4-990b-4bd6-a68f-94d1492c45ee",
+      "name": "value",
+      "title": "Значення",
+      "meta": {
+        "format": "phone",
+        "sortOrder": 0,
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "value"
+    }
+  ]
+}

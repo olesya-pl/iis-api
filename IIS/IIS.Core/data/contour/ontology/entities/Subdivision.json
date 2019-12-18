@@ -1,0 +1,213 @@
+{
+  "id": "f0ab37f0-c40f-48d5-b9e3-ad1b39638bb8",
+  "name": "Subdivision",
+  "title": "Підрозділ",
+  "extends": [
+    "ObjectOfStudy",
+    "Infrastructure_bePartOf",
+    "MilitaryMachinery_bePartOf",
+    "Person_militaryService",
+    "Subdivision_superior"
+  ],
+  "attributes": [
+    {
+      "id": "642d9ceb-81bc-4fe9-8ecb-3a7bfae809d0",
+      "name": "temporaryDislocation",
+      "title": "Пункт Тимчасової Дислокації (ПТД)",
+      "meta": {
+        "sortOrder": 240,
+        "title": "Географічні координати місце поточної дислокації (ПТД)",
+        "multiple": false
+      },
+      "target": "temporaryDislocation"
+    },
+    {
+      "id": "0b4994df-4ad4-432f-ab42-80cd79d86f88",
+      "name": "dislocation",
+      "title": "Пункт Постійної Дислокації (ППД)",
+      "meta": {
+        "sortOrder": 260,
+        "title": "Географічні координати пункту дислокації штабу (ППД)",
+        "multiple": false
+      },
+      "target": "dislocation"
+    },
+    {
+      "id": "21bc760c-d927-4210-a023-fab57cefc98f",
+      "name": "subtype",
+      "title": "Підтип",
+      "meta": {
+        "sortOrder": 20,
+        "multiple": false
+      },
+      "target": "MachinerySubtype"
+    },
+    {
+      "id": "33984fb2-3461-48e7-ad69-18f6e4896c9c",
+      "name": "title",
+      "title": "Повна назва",
+      "meta": {
+        "formula": "h.fullTitle(entity.shortName, entity.name)",
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "title"
+    },
+    {
+      "id": "02db08a5-4bca-4a41-adb7-9e9c73fdac87",
+      "name": "militaryBase",
+      "title": "Військова частина",
+      "meta": {
+        "sortOrder": 160,
+        "multiple": false
+      },
+      "target": "MilitaryBase"
+    },
+    {
+      "id": "39cbc1ae-a227-44a0-b53a-024ae17f9c7f",
+      "name": "headquartersDislocation",
+      "title": "Географічні координати пункту дислокації штабу",
+      "meta": {
+        "sortOrder": 320,
+        "multiple": false
+      },
+      "target": "headquartersDislocation"
+    },
+    {
+      "id": "c7ec540f-5a9f-4d85-9894-9753c0e166e2",
+      "name": "relatesToCountry",
+      "title": "Державна приналежність",
+      "meta": {
+        "sortOrder": 200,
+        "formField": {
+          "type": "dropdown",
+          "icon": "flag"
+        },
+        "multiple": false
+      },
+      "target": "Country"
+    },
+    {
+      "id": "dd5f5f16-b3ba-40fd-9b6d-de4fecefb041",
+      "name": "amount",
+      "title": "Чисельність",
+      "meta": {
+        "sortOrder": 100,
+        "multiple": false
+      },
+      "target": "MilitaryAmount"
+    },
+    {
+      "id": "6bfca26b-99dd-4208-ab5e-1213c9d640db",
+      "name": "corpsType",
+      "title": "Рід військ",
+      "meta": {
+        "sortOrder": 40,
+        "multiple": false
+      },
+      "target": "Corps"
+    },
+    {
+      "id": "312c7b21-46e7-4f82-94a7-772d1e5c5925",
+      "name": "name",
+      "title": "Назва",
+      "meta": {
+        "sortOrder": 80,
+        "title": "Повне найменування",
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "name"
+    },
+    {
+      "id": "59dde20a-f3d8-4fc4-8d6f-7c1f3ca02d2a",
+      "name": "description",
+      "title": "Додаткові дані",
+      "meta": {
+        "sortOrder": 280,
+        "multiple": false
+      },
+      "target": "description"
+    },
+    {
+      "id": "14e059c1-ad31-41ac-a8dd-e3c09cf765e0",
+      "name": "shortName",
+      "title": "Скорочене найменування",
+      "meta": {
+        "sortOrder": 60,
+        "multiple": false
+      },
+      "target": "shortName"
+    },
+    {
+      "id": "867b160a-6c37-4f5b-968c-00a09c57687e",
+      "name": "placeOfDislocation",
+      "title": "Місце розташування",
+      "meta": {
+        "sortOrder": 220,
+        "title": "Місце поточної дислокації",
+        "multiple": false
+      },
+      "target": "placeOfDislocation"
+    },
+    {
+      "id": "6a6762e3-de3c-487a-ac08-7dc091deb367",
+      "name": "placeOfHeadquartersDislocation",
+      "title": "Пункт постійної дислокації штабу",
+      "meta": {
+        "sortOrder": 340,
+        "multiple": false
+      },
+      "target": "placeOfHeadquartersDislocation"
+    },
+    {
+      "id": "ff37a26d-a620-4f44-bd5f-494a2face951",
+      "name": "sidcTitle",
+      "title": "SIDC",
+      "meta": {
+        "sortOrder": 120,
+        "multiple": false
+      },
+      "target": "SIDC"
+    },
+    {
+      "id": "6c74a71f-22f0-4885-a037-9c836d109291",
+      "name": "superior",
+      "title": "Підлеглість",
+      "meta": {
+        "type": "hierarchical",
+        "inversed": {
+          "code": "subordinate",
+          "editable": false,
+          "title": "Підлеглий",
+          "multiple": true
+        },
+        "sortOrder": 140,
+        "multiple": false
+      },
+      "target": "Subdivision_superior"
+    },
+    {
+      "id": "9fab74d9-810c-494b-94dc-34d42f796ace",
+      "name": "bePartOf",
+      "title": "Належність",
+      "meta": {
+        "sortOrder": 180,
+        "multiple": false
+      },
+      "target": "Subdivision"
+    },
+    {
+      "id": "cfdfe48b-b511-4862-ab5e-8bc1eef59de5",
+      "name": "amountOfPersonnel",
+      "title": "Кiлькiсть особового складу",
+      "meta": {
+        "sortOrder": 300,
+        "multiple": false
+      },
+      "target": "amountOfPersonnel"
+    }
+  ]
+}

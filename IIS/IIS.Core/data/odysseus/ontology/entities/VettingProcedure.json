@@ -1,0 +1,90 @@
+{
+  "id": "8d5f14aa-93f7-4c58-af66-0315b8c36ac0",
+  "name": "VettingProcedure",
+  "title": "Перевірка",
+  "attributes": [
+    {
+      "id": "c93d88bc-55c3-4fe7-81a1-c20f3d9fc819",
+      "name": "vettingProcedureType",
+      "target": "VettingProcedureType"
+    },
+    {
+      "id": "ba30d555-05f4-42bd-ae35-c34c825e71b9",
+      "name": "prescriptionToExamination",
+      "meta": {
+        "formField": {
+          "type": "legalDocument"
+        },
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "LegalDocument"
+    },
+    {
+      "id": "bb76fdf2-09bf-4838-aa6c-0ba3bada3140",
+      "name": "actOfInspection",
+      "meta": {
+        "formField": {
+          "type": "legalDocument"
+        },
+        "multiple": false
+      },
+      "target": "LegalDocument"
+    },
+    {
+      "id": "413a2964-59ac-46fd-8725-d36328277b03",
+      "name": "duration",
+      "meta": {
+        "formField": {
+          "type": "dateRange"
+        },
+        "multiple": false
+      },
+      "target": "DateRange"
+    },
+    {
+      "id": "fd130afa-036b-4f32-a67c-8bb62f3ba40f",
+      "name": "checkPeriod",
+      "meta": {
+        "formField": {
+          "type": "dateRange"
+        },
+        "multiple": false
+      },
+      "target": "DateRange"
+    },
+    {
+      "id": "69bd5fd3-f338-45c4-984c-e9ea8b611a91",
+      "name": "conductedBy",
+      "target": "Organization"
+    },
+    {
+      "id": "1e595327-60b8-4af0-bd67-72c3aeda940f",
+      "name": "sanction",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": true
+      },
+      "target": "Sanction"
+    },
+    {
+      "id": "1fb6f006-64af-4223-8e1e-a8f0a5946519",
+      "name": "vettingProcedureKind",
+      "target": "VettingProcedureKind"
+    },
+    {
+      "id": "b16bc33c-522c-4d70-96d9-877971a28be6",
+      "name": "committeeHead",
+      "target": "Person"
+    },
+    {
+      "id": "54dde75c-0e73-4ff6-8bd8-a012c7fa84f1",
+      "name": "committeeMembers",
+      "target": "Person"
+    }
+  ]
+}

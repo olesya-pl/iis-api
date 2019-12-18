@@ -1,0 +1,8 @@
+{
+  "id": "c8dadf79-1a43-43a4-9086-0e865f4c8f5f",
+  "name": "NatoAccessLevel",
+  "title": "Рівень доступу НАТО",
+  "extends": [
+    "Enum"
+  ]
+}

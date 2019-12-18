@@ -1,0 +1,8 @@
+{
+  "id": "c8a71c38-c200-463f-9f1e-1816e7ec94b7",
+  "name": "NicknameVHFSign",
+  "title": "Позивний УКХ",
+  "extends": [
+    "ObjectSign"
+  ]
+}

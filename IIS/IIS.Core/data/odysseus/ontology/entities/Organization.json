@@ -1,0 +1,194 @@
+{
+  "id": "64cebc6d-bd13-4908-a7a9-23d1042db3b8",
+  "name": "Organization",
+  "title": "Суб'єкт",
+  "attributes": [
+    {
+      "id": "3efe5ccc-2e8d-4c43-aeb3-6c8ba870f309",
+      "name": "website",
+      "target": "Website"
+    },
+    {
+      "id": "e53571a4-65fb-4526-a96d-8e2d0f71592d",
+      "name": "license",
+      "target": "License"
+    },
+    {
+      "id": "0f922144-3bb2-4142-9d6c-c6598ba32695",
+      "name": "name",
+      "target": "Name"
+    },
+    {
+      "id": "b424cf77-6220-4744-ab97-e192066caabc",
+      "name": "legalForm",
+      "target": "LegalForm"
+    },
+    {
+      "id": "25e34b33-8828-4edc-9769-6bedc2e5f37f",
+      "name": "photo",
+      "target": "Photo"
+    },
+    {
+      "id": "8835859f-8eea-460a-8abc-392a0a980000",
+      "name": "taxId",
+      "target": "TaxId"
+    },
+    {
+      "id": "09276225-7246-4aa1-b18b-013510a96904",
+      "name": "headOrganization",
+      "meta": {
+        "inversed": {
+          "code": "childOrganizations",
+          "editable": false,
+          "title": "Філії",
+          "multiple": true
+        },
+        "multiple": false
+      },
+      "target": "Organization"
+    },
+    {
+      "id": "e785864a-0f66-44e4-b9b9-d2bccc628624",
+      "name": "operationalData",
+      "meta": {
+        "formField": {
+          "type": "table",
+          "hasIndexColumn": true
+        },
+        "multiple": true
+      },
+      "target": "OperationalData"
+    },
+    {
+      "id": "e4c8fa9f-828f-4bbb-a50d-a691d2539ea8",
+      "name": "dotl",
+      "target": "Organization"
+    },
+    {
+      "id": "542317fe-89fb-476c-9832-42f3f5a57285",
+      "name": "organizationTag",
+      "target": "OrganizationTag"
+    },
+    {
+      "id": "6873d804-32ab-4564-b7db-2f58ba0fb8f6",
+      "name": "propertyOwnership",
+      "target": "PropertyOwnership"
+    },
+    {
+      "id": "0fdd7b8d-f857-47ce-8855-81ea1697288b",
+      "name": "locatedAt",
+      "target": "Address"
+    },
+    {
+      "id": "2ce3a392-450b-4f10-b3dd-96cb118ecc72",
+      "name": "registeredAt",
+      "target": "Address"
+    },
+    {
+      "id": "59c25244-5be0-45de-8074-830ed33e3ec1",
+      "name": "branchAddress",
+      "target": "Address"
+    },
+    {
+      "id": "aedf055a-b672-42c1-9016-12506a8aad5f",
+      "name": "secretFacilityAddress",
+      "target": "Address"
+    },
+    {
+      "id": "d7f8fd70-8573-42ba-9046-e5574d49c44a",
+      "name": "secretFacilityArchiveAddress",
+      "target": "Address"
+    },
+    {
+      "id": "83f20f1e-d9f8-474a-8978-dd40953f96e6",
+      "name": "rSOCreationRequest",
+      "target": "Attachment"
+    },
+    {
+      "id": "f6e79482-2243-4987-8ef7-f3dccf7f0fcb",
+      "name": "statuteOnEPARSS",
+      "target": "Attachment"
+    },
+    {
+      "id": "f04ea571-83e9-4e4f-82f2-de13bcd87dc1",
+      "name": "listOfPositions",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "ListOfPositions"
+    },
+    {
+      "id": "e402bbe4-b311-4dc9-9fdd-c0cc424d04c1",
+      "name": "specialPermit",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "SpecialPermit"
+    },
+    {
+      "id": "d6af7c7b-af2e-408b-a0eb-b029235d93c6",
+      "name": "mcci",
+      "meta": {
+        "formField": {
+          "type": "table"
+        },
+        "multiple": true
+      },
+      "target": "Mcci"
+    },
+    {
+      "id": "ab8f8174-b851-4ea1-b391-af90161828c9",
+      "name": "mciNato",
+      "meta": {
+        "formField": {
+          "type": "table"
+        },
+        "multiple": true
+      },
+      "target": "MciNato"
+    },
+    {
+      "id": "0dfca7cd-2b11-4333-bf3f-4c6517f44b4f",
+      "name": "mcciSpecialCommunications",
+      "meta": {
+        "formField": {
+          "type": "table"
+        },
+        "multiple": true
+      },
+      "target": "McciSpecialCommunications"
+    },
+    {
+      "id": "699d2570-41b5-42db-b7ba-2ed1b67d1b2a",
+      "name": "srddw",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": true
+      },
+      "target": "Srddw"
+    },
+    {
+      "id": "f05268e7-34a2-443e-aa37-31846420e421",
+      "name": "vettingProcedure",
+      "target": "VettingProcedure"
+    },
+    {
+      "id": "831f9c5b-cb11-45c7-a9bf-ddf96b11b94e",
+      "name": "head",
+      "target": "Person"
+    },
+    {
+      "id": "e8ce10d6-376e-416d-8017-ea8f710a6b67",
+      "name": "beneficiary",
+      "target": "Person"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "f70cd011-4f9d-409b-b2de-eee01174dc32",
+  "name": "PropertyOwnership",
+  "title": "Форма власності",
+  "extends": [
+    "Enum"
+  ]
+}

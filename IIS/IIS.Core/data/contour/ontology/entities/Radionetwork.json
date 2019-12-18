@@ -1,0 +1,44 @@
+{
+  "id": "bb306a9b-833e-410a-a663-0485ce8c0c0d",
+  "name": "Radionetwork",
+  "title": "Радіомережа",
+  "extends": [
+    "ObjectOfStudy"
+  ],
+  "attributes": [
+    {
+      "id": "2d893f60-cdf7-4fa2-be35-9399e792a593",
+      "name": "name",
+      "title": "Назва",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false,
+        "validation": {
+          "required": true
+        }
+      },
+      "target": "name"
+    },
+    {
+      "id": "22a0358b-f1cc-4149-8579-2339369d6020",
+      "name": "description",
+      "title": "Додаткові дані",
+      "meta": {
+        "sortOrder": 40,
+        "title": "Особливості",
+        "multiple": false
+      },
+      "target": "description"
+    },
+    {
+      "id": "4b92bd57-a943-4ccd-ad5f-dd91e549f54f",
+      "name": "purpose",
+      "title": "Призначення",
+      "meta": {
+        "sortOrder": 20,
+        "multiple": false
+      },
+      "target": "purpose"
+    }
+  ]
+}

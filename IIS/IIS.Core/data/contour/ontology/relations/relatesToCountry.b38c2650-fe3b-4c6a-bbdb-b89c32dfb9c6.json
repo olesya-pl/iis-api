@@ -1,0 +1,14 @@
+{
+  "id": "b38c2650-fe3b-4c6a-bbdb-b89c32dfb9c6",
+  "name": "relatesToCountry",
+  "title": "Громадянство",
+  "meta": {
+    "sortOrder": 40,
+    "title": "Громадянство",
+    "formField": {
+      "type": "dropdown",
+      "icon": "flag"
+    },
+    "multiple": false
+  }
+}

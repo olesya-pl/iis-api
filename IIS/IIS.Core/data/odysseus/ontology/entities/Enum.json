@@ -1,0 +1,18 @@
+{
+  "id": "59bb4b72-4a6d-4252-b78f-b4e69857f82a",
+  "abstract": true,
+  "name": "Enum",
+  "title": "Перелік",
+  "attributes": [
+    {
+      "id": "05466d46-f6dc-4eec-8b68-75b058054f5b",
+      "name": "name",
+      "target": "Name"
+    },
+    {
+      "id": "dde942db-f176-46b8-a47c-a2ba895627ac",
+      "name": "code",
+      "target": "Code"
+    }
+  ]
+}

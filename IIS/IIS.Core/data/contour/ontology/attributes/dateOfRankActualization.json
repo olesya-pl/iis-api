@@ -1,0 +1,7 @@
+{
+  "id": "a31d8344-1c09-47c3-b61d-c4dce9a8910a",
+  "name": "dateOfRankActualization",
+  "title": "Дата актуалізації звання",
+  "type": "DateTime",
+  "meta": {}
+}

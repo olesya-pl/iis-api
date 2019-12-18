@@ -1,0 +1,9 @@
+{
+  "id": "b64f5ea1-423f-47a6-929f-7e079d88a0e8",
+  "name": "sortOrder",
+  "title": "Порядок сортування",
+  "meta": {
+    "sortOrder": 20,
+    "multiple": false
+  }
+}

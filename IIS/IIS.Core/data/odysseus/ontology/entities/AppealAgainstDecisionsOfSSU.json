@@ -1,0 +1,22 @@
+{
+  "id": "ef0e1bc5-e2cf-4ac2-b587-c614a9b6a50e",
+  "name": "AppealAgainstDecisionsOfSSU",
+  "title": "36. Оскарження громадянином рішень органу СБУ.",
+  "attributes": [
+    {
+      "id": "9de30e85-98e0-49c0-b7e7-595360929d6a",
+      "name": "comment",
+      "target": "Text"
+    },
+    {
+      "id": "cbedece4-e957-49be-8e24-f860d4dfc83e",
+      "name": "answer",
+      "target": "Attachment"
+    },
+    {
+      "id": "08d078c0-001d-4c3a-9bf5-61eef2c3de17",
+      "name": "appeal",
+      "target": "Attachment"
+    }
+  ]
+}

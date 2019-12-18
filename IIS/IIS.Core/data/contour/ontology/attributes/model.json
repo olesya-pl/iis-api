@@ -1,0 +1,9 @@
+{
+  "id": "ad55719c-94ba-4b14-b61a-036ae4a79b68",
+  "name": "model",
+  "title": "Модель",
+  "type": "String",
+  "meta": {
+    "kind": "Keyword"
+  }
+}

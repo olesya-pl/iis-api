@@ -1,0 +1,8 @@
+{
+  "id": "c9702dbb-0a67-414a-a11b-f16d2881c6fd",
+  "name": "SpecialPermitStatus",
+  "title": "Статус спецдозволу",
+  "extends": [
+    "Enum"
+  ]
+}

@@ -10,10 +10,7 @@ using IIS.Core.Analytics.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core
@@ -35,6 +32,8 @@ namespace IIS.Core
             _actions.Add("seed-odysseus-data", SeedOdysseusData);
             _actions.Add("apply-ef-migrations", ApplyEfMigrations);
             _actions.Add("help", Help);
+            _actions.Add("dump-contour-ontology", DumpContourOntology);
+            _actions.Add("dump-odysseus-ontology", DumpOdysseusOntology);
         }
 
         public ConsoleUtilities(IServiceProvider serviceProvider)
@@ -101,7 +100,7 @@ namespace IIS.Core
         {
             using(var scope = _serviceProvider.CreateScope())
             {
-                scope.ServiceProvider.GetService<Seeder>().Seed("contour").Wait();
+                scope.ServiceProvider.GetService<Seeder>().Seed(Path.Combine("contour", "entities")).Wait();
                 Console.WriteLine("Contour data seeded");
             }
         }
@@ -183,6 +182,26 @@ namespace IIS.Core
                 .Database
                 .Migrate();
             Console.WriteLine("Migration has been applied.");
+        }
+
+        public void DumpOdysseusOntology()
+        {
+            _dumpOntology("odysseus");
+        }
+
+        public void DumpContourOntology()
+        {
+            _dumpOntology("contour");
+        }
+
+        private void _dumpOntology(string name)
+        {
+            var ontology = _serviceProvider.GetService<IOntologyProvider>().GetOntologyAsync().Result;
+            var basePath = Path.Combine(Environment.CurrentDirectory, "data", name, "ontology");
+            var serializer = new Serializer();
+
+            serializer.serialize(basePath, ontology);
+            Console.WriteLine($"Dumped ontology for {name} into {basePath}");
         }
 
         public void Help()

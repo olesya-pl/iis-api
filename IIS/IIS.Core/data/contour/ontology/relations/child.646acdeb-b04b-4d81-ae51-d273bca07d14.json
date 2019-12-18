@@ -1,0 +1,15 @@
+{
+  "id": "646acdeb-b04b-4d81-ae51-d273bca07d14",
+  "name": "child",
+  "title": "Ієрархічний вказівник на дочірні елементи",
+  "meta": {
+    "type": "hierarchical",
+    "inversed": {
+      "code": "parent",
+      "editable": false,
+      "multiple": false
+    },
+    "sortOrder": 0,
+    "multiple": true
+  }
+}

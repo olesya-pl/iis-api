@@ -1,0 +1,8 @@
+{
+  "id": "7513fa9b-b1c3-4052-b48a-4a267e3f6ef8",
+  "name": "DisciplinarySanctionKind",
+  "title": "Вид дисциплінарної відповідальністі",
+  "extends": [
+    "Enum"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "a5fab2d3-4324-4a4b-bc38-0a1e26f40ecc",
+  "name": "firstName",
+  "title": "Ім'я",
+  "meta": {
+    "sortOrder": 40,
+    "multiple": false
+  }
+}

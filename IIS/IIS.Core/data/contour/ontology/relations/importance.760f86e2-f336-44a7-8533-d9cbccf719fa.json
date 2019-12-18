@@ -1,0 +1,16 @@
+{
+  "id": "760f86e2-f336-44a7-8533-d9cbccf719fa",
+  "name": "importance",
+  "title": "Важливість",
+  "meta": {
+    "sortOrder": 20,
+    "formField": {
+      "type": "dropdown",
+      "hasIndexColumn": false
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

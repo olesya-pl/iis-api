@@ -1,0 +1,9 @@
+{
+  "id": "cfdfe48b-b511-4862-ab5e-8bc1eef59de5",
+  "name": "amountOfPersonnel",
+  "title": "Кiлькiсть особового складу",
+  "meta": {
+    "sortOrder": 300,
+    "multiple": false
+  }
+}

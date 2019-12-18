@@ -1,0 +1,10 @@
+{
+  "id": "770fd47d-cf52-4aa8-a132-0daeb55b39e3",
+  "name": "title",
+  "title": "Повна назва",
+  "meta": {
+    "formula": "entity.name",
+    "sortOrder": 60,
+    "multiple": false
+  }
+}

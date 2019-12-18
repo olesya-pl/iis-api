@@ -1,0 +1,8 @@
+{
+  "id": "74ed021d-310d-4335-ba45-e85e73cd0173",
+  "name": "HomePhoneSign",
+  "title": "Домашній телефон",
+  "extends": [
+    "PhoneSign"
+  ]
+}

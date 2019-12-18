@@ -1,0 +1,38 @@
+{
+  "id": "0e080b5f-c7de-4780-a65a-3828ebbf95de",
+  "abstract": true,
+  "name": "FinalPersonSanction",
+  "title": "FinalPersonSanction",
+  "extends": [
+    "PersonSanction"
+  ],
+  "attributes": [
+    {
+      "id": "58437951-4af8-4521-9e32-71fe26ee6258",
+      "name": "breachInfo",
+      "target": "Text"
+    },
+    {
+      "id": "11accd3d-ba87-4711-b473-518f458983c6",
+      "name": "breachedArticles",
+      "meta": {
+        "formField": {
+          "type": "popup"
+        },
+        "multiple": true
+      },
+      "target": "LegalActArticle"
+    },
+    {
+      "id": "e01e2924-1279-4dea-bbbf-2ae98e0646ce",
+      "name": "decree",
+      "meta": {
+        "formField": {
+          "type": "form"
+        },
+        "multiple": false
+      },
+      "target": "LegalDocument"
+    }
+  ]
+}

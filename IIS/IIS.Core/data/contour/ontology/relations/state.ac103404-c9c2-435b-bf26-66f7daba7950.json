@@ -1,0 +1,16 @@
+{
+  "id": "ac103404-c9c2-435b-bf26-66f7daba7950",
+  "name": "state",
+  "title": "Стан",
+  "meta": {
+    "sortOrder": 60,
+    "formField": {
+      "type": "radioGroup",
+      "hasIndexColumn": false
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

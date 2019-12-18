@@ -1,0 +1,9 @@
+{
+  "id": "97357eb7-a126-4f72-b2cd-4c4df65112ed",
+  "name": "dateOfServingPlaceActualization",
+  "title": "Дата актуалізації місця служби",
+  "meta": {
+    "sortOrder": 260,
+    "multiple": false
+  }
+}

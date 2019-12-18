@@ -1,0 +1,8 @@
+{
+  "id": "49ff80af-3010-4c1f-b2d9-3edb83266cd0",
+  "name": "BandFrequencySign",
+  "title": "Смуга, кГц.",
+  "extends": [
+    "ObjectSign"
+  ]
+}

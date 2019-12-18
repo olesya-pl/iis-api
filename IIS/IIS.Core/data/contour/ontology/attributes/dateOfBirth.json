@@ -1,0 +1,7 @@
+{
+  "id": "2a07bdd5-40de-4c27-a38a-eb4b69b3dc4d",
+  "name": "dateOfBirth",
+  "title": "Дата народження",
+  "type": "DateTime",
+  "meta": {}
+}

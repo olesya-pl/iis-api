@@ -1,0 +1,13 @@
+{
+  "id": "74b42747-74ab-42ec-9ec9-c3005765dc9d",
+  "name": "value",
+  "title": "Значення",
+  "meta": {
+    "format": "phone",
+    "sortOrder": 0,
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

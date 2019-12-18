@@ -1,0 +1,13 @@
+{
+  "id": "fd16de04-808d-4a80-992a-4d7bad172a1b",
+  "name": "name",
+  "title": "Назва",
+  "meta": {
+    "sortOrder": 20,
+    "title": "Повне найменування",
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
+}

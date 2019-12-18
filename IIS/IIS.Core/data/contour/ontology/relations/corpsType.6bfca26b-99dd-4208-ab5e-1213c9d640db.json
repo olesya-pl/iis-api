@@ -1,0 +1,9 @@
+{
+  "id": "6bfca26b-99dd-4208-ab5e-1213c9d640db",
+  "name": "corpsType",
+  "title": "Рід військ",
+  "meta": {
+    "sortOrder": 40,
+    "multiple": false
+  }
+}

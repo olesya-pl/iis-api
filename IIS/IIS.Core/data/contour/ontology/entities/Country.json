@@ -1,0 +1,20 @@
+{
+  "id": "659d9e1f-b584-4ab4-b5f2-39a0ca16773a",
+  "name": "Country",
+  "title": "Країна",
+  "extends": [
+    "Enum"
+  ],
+  "attributes": [
+    {
+      "id": "bb0ff183-3282-443c-a52c-27bf941fc1a1",
+      "name": "code",
+      "title": "Код",
+      "meta": {
+        "sortOrder": 0,
+        "multiple": false
+      },
+      "target": "code"
+    }
+  ]
+}

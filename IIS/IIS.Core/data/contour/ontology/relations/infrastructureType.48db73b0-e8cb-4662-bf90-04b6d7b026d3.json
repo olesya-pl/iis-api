@@ -1,0 +1,9 @@
+{
+  "id": "48db73b0-e8cb-4662-bf90-04b6d7b026d3",
+  "name": "infrastructureType",
+  "title": "Тип інфраструктури",
+  "meta": {
+    "sortOrder": 80,
+    "multiple": false
+  }
+}

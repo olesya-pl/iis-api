@@ -1,0 +1,8 @@
+{
+  "id": "1f56c708-93e8-4594-9f5f-16525f8746f0",
+  "name": "ControlType",
+  "title": "Тип перевірки",
+  "extends": [
+    "Enum"
+  ]
+}

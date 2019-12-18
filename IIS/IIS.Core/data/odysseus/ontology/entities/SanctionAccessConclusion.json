@@ -1,0 +1,8 @@
+{
+  "id": "b7bfb4d9-618f-4a10-a098-079b7bbcaf0f",
+  "name": "SanctionAccessConclusion",
+  "title": "Заходи реагування",
+  "extends": [
+    "Enum"
+  ]
+}

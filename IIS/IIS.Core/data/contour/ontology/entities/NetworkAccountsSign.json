@@ -1,0 +1,8 @@
+{
+  "id": "c6ae8893-b9e3-4bd3-8a6a-084bba3cc2fe",
+  "name": "NetworkAccountsSign",
+  "title": "Акаунти у соц. мережах",
+  "extends": [
+    "ObjectSign"
+  ]
+}

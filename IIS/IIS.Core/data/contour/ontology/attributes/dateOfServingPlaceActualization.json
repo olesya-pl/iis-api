@@ -1,0 +1,7 @@
+{
+  "id": "7e9123c0-0af9-4c0c-86f5-7518941f75e6",
+  "name": "dateOfServingPlaceActualization",
+  "title": "Дата актуалізації місця служби",
+  "type": "DateTime",
+  "meta": {}
+}

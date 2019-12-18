@@ -1,0 +1,25 @@
+{
+  "id": "2146953d-dac0-4914-8ec7-19a5b809e6a6",
+  "name": "EmailSign",
+  "title": "Електронна скринька",
+  "extends": [
+    "ObjectSign"
+  ],
+  "attributes": [
+    {
+      "id": "289b72c1-878d-4352-b108-6455b2b5fca2",
+      "name": "value",
+      "title": "Значення",
+      "meta": {
+        "format": "email",
+        "sortOrder": 0,
+        "multiple": false,
+        "validation": {
+          "email": true,
+          "required": true
+        }
+      },
+      "target": "value"
+    }
+  ]
+}

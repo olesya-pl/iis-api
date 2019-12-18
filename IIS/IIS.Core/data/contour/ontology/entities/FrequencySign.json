@@ -1,0 +1,8 @@
+{
+  "id": "ecf424cb-9e1d-446a-be68-90bd232918d1",
+  "name": "FrequencySign",
+  "title": "Частота, МГц.",
+  "extends": [
+    "ObjectSign"
+  ]
+}

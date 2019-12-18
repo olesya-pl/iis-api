@@ -1,0 +1,8 @@
+{
+  "id": "f6c215a0-a02d-41e7-9f2a-40f119fa67c4",
+  "name": "Country",
+  "title": "Країна",
+  "extends": [
+    "Enum"
+  ]
+}
