@@ -1,5 +1,9 @@
 {
   "id": "af9c084b-235b-41c0-9326-795eb0637a73",
+  "conceptType": "relations",
   "name": "familyRelations",
-  "title": "Родинні зв'язки"
+  "title": "Родинні зв'язки",
+  "meta": {
+    "multiple": true
+  }
 }

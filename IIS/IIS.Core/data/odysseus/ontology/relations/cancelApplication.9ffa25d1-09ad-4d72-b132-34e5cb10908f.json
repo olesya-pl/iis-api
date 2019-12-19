@@ -1,5 +1,6 @@
 {
   "id": "9ffa25d1-09ad-4d72-b132-34e5cb10908f",
+  "conceptType": "relations",
   "name": "cancelApplication",
   "title": "Заява про відмову"
 }

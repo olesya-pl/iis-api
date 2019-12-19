@@ -1,6 +1,8 @@
 {
   "id": "12d8a87b-20a0-42f2-bbe2-908b0a668ab8",
+  "conceptType": "attributes",
   "name": "Subregion",
   "title": "Район",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

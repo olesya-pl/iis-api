@@ -1,5 +1,6 @@
 {
   "id": "bda14a46-98a3-42c4-b63b-ca003c68c647",
+  "conceptType": "relations",
   "name": "registrationPlace",
   "title": "Місце реєстрації",
   "meta": {

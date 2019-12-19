@@ -1,5 +1,6 @@
 {
   "id": "a315a7a9-d5f7-416f-bb9c-bb7cfee77127",
+  "conceptType": "attributes",
   "name": "location",
   "title": "Географічні координати",
   "type": "Geo",

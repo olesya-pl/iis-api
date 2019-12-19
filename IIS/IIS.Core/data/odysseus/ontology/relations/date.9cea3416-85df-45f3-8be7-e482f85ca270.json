@@ -1,5 +1,6 @@
 {
   "id": "9cea3416-85df-45f3-8be7-e482f85ca270",
+  "conceptType": "relations",
   "name": "date",
   "title": "Дата фактичного надання"
 }

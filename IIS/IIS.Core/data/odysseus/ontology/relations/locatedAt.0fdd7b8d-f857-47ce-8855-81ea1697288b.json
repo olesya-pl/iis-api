@@ -1,5 +1,6 @@
 {
   "id": "0fdd7b8d-f857-47ce-8855-81ea1697288b",
+  "conceptType": "relations",
   "name": "locatedAt",
   "title": "Фактична адреса"
 }

@@ -1,5 +1,12 @@
 {
   "id": "3b7967e8-58d8-4201-9f97-5813d9820741",
+  "conceptType": "relations",
   "name": "report",
-  "title": "Протокол"
+  "title": "Протокол",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

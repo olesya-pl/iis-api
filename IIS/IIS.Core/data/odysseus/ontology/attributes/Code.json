@@ -1,6 +1,8 @@
 {
   "id": "c4883d17-0f75-4148-a902-d2d32518e329",
+  "conceptType": "attributes",
   "name": "Code",
   "title": "Код",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

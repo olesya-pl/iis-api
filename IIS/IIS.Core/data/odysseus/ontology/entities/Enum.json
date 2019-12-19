@@ -1,6 +1,7 @@
 {
   "id": "59bb4b72-4a6d-4252-b78f-b4e69857f82a",
   "abstract": true,
+  "conceptType": "entities",
   "name": "Enum",
   "title": "Перелік",
   "attributes": [
@@ -14,5 +15,8 @@
       "name": "code",
       "target": "Code"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

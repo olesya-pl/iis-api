@@ -1,4 +1,11 @@
 {
   "id": "e01e2924-1279-4dea-bbbf-2ae98e0646ce",
-  "name": "decree"
+  "conceptType": "relations",
+  "name": "decree",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

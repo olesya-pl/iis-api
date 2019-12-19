@@ -1,8 +1,10 @@
 {
   "id": "3ffd509e-6b52-4793-917a-167ee23d4c72",
+  "conceptType": "entities",
   "name": "MachinerySubtype",
   "title": "Підтип",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {}
 }

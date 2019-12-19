@@ -1,6 +1,14 @@
 {
   "id": "a949f238-f932-4873-b789-75ef787f713d",
   "abstract": true,
+  "conceptType": "entities",
   "name": "Sanction",
-  "title": "Санкція"
+  "title": "Санкція",
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -61,7 +61,7 @@ namespace IIS.Core
                 _securityTokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
                 return TokenPayload.From(validatedToken as JwtSecurityToken);
             }
-            catch (SecurityTokenException e)
+            catch (SecurityTokenException)
             {
                 throw new AuthenticationException("Token is invalid or has been expired");
             }

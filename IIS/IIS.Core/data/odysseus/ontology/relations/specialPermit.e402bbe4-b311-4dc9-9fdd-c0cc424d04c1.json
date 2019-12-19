@@ -1,4 +1,11 @@
 {
   "id": "e402bbe4-b311-4dc9-9fdd-c0cc424d04c1",
-  "name": "specialPermit"
+  "conceptType": "relations",
+  "name": "specialPermit",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

@@ -1,5 +1,6 @@
 {
   "id": "f0ab37f0-c40f-48d5-b9e3-ad1b39638bb8",
+  "conceptType": "entities",
   "name": "Subdivision",
   "title": "Підрозділ",
   "extends": [
@@ -209,5 +210,6 @@
       },
       "target": "amountOfPersonnel"
     }
-  ]
+  ],
+  "meta": {}
 }

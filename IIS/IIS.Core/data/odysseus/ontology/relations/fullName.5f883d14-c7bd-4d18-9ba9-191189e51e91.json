@@ -1,5 +1,6 @@
 {
   "id": "5f883d14-c7bd-4d18-9ba9-191189e51e91",
+  "conceptType": "relations",
   "name": "fullName",
   "title": "Повна назва роботи"
 }

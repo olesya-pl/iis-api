@@ -1,17 +1,27 @@
 {
   "id": "f659f825-ab40-4243-8c57-617e0722dc30",
+  "conceptType": "entities",
   "name": "ThirdPartyInterest",
   "title": "37. Зацікавленість секретонсієм з боку третіх осіб – офіційна (заяви, скарги чи інші звернення) чи оперативна інформація (запит на отримання інформації про особу).",
   "attributes": [
     {
       "id": "f492046a-9554-48aa-a7df-873cec547185",
       "name": "comment",
+      "title": "Примітка (причина)",
       "target": "Text"
     },
     {
       "id": "efbab997-277f-4c02-81e6-d099a46c2000",
       "name": "document",
+      "title": "Документ",
       "target": "Attachment"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

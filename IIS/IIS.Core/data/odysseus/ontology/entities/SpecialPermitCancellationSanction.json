@@ -1,8 +1,16 @@
 {
   "id": "538b1615-65a9-4eb2-bd65-6c93d2cb1c11",
+  "conceptType": "entities",
   "name": "SpecialPermitCancellationSanction",
   "title": "Скасування спецдозволу",
   "extends": [
     "OrganizationPermitSanction"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

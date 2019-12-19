@@ -1,5 +1,6 @@
 {
   "id": "e728b97f-cbe0-405e-b4fa-af4b76999750",
+  "conceptType": "relations",
   "name": "comment",
   "title": "Коментар"
 }

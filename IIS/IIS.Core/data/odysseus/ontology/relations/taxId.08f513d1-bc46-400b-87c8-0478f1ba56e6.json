@@ -1,5 +1,6 @@
 {
   "id": "08f513d1-bc46-400b-87c8-0478f1ba56e6",
+  "conceptType": "relations",
   "name": "taxId",
   "title": "ІПН"
 }

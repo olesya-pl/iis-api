@@ -1,21 +1,25 @@
 {
   "id": "83f1d69a-3bb0-4476-8157-fb57f5e30f96",
+  "conceptType": "entities",
   "name": "WorkIn",
   "title": "Місце роботи",
   "attributes": [
     {
       "id": "b8ad805d-17f1-4f67-8c40-44da43fa4d00",
       "name": "subdivision",
+      "title": "Підрозділ",
       "target": "Text"
     },
     {
       "id": "c8ab6220-b499-4d9d-a259-15e0f4b62f37",
       "name": "jobPosition",
+      "title": "Посада",
       "target": "Text"
     },
     {
       "id": "9d0fdd9c-536c-41fc-a99f-b9ec086485c4",
       "name": "organization",
+      "title": "Поточне місце роботи",
       "meta": {
         "inversed": {
           "code": "employees",
@@ -27,5 +31,12 @@
       },
       "target": "Organization"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

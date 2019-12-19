@@ -1,5 +1,6 @@
 {
   "id": "378c51d6-01a6-4f75-8140-1621c1e1150c",
+  "conceptType": "relations",
   "name": "customer",
   "title": "Замовник роботи"
 }

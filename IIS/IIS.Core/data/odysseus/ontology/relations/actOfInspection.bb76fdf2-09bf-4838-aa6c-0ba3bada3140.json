@@ -1,5 +1,12 @@
 {
   "id": "bb76fdf2-09bf-4838-aa6c-0ba3bada3140",
+  "conceptType": "relations",
   "name": "actOfInspection",
-  "title": "Акт перевірки"
+  "title": "Акт перевірки",
+  "meta": {
+    "formField": {
+      "type": "legalDocument"
+    },
+    "multiple": false
+  }
 }

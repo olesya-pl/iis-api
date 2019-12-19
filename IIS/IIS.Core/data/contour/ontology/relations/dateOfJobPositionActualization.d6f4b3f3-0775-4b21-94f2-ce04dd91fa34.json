@@ -1,5 +1,6 @@
 {
   "id": "d6f4b3f3-0775-4b21-94f2-ce04dd91fa34",
+  "conceptType": "relations",
   "name": "dateOfJobPositionActualization",
   "title": "Дата актуальності посади",
   "meta": {

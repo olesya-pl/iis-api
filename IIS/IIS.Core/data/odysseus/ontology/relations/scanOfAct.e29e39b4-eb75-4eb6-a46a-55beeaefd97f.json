@@ -1,5 +1,6 @@
 {
   "id": "e29e39b4-eb75-4eb6-a46a-55beeaefd97f",
+  "conceptType": "relations",
   "name": "scanOfAct",
   "title": "Акт перевірки"
 }

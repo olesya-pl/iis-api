@@ -1,8 +1,12 @@
 {
   "id": "32a25697-d914-4371-b73d-6c590d599525",
+  "conceptType": "entities",
   "name": "LegalForm",
   "title": "Організаційно-правова форма",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

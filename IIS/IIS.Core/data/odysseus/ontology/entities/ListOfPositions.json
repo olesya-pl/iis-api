@@ -1,11 +1,13 @@
 {
   "id": "ed1ba26e-e82a-4a81-b85d-1ceb37c909a7",
+  "conceptType": "entities",
   "name": "ListOfPositions",
   "title": "Штат",
   "attributes": [
     {
       "id": "44b15c22-e7e9-4e4c-8297-c95869a8e75c",
       "name": "originalDocument",
+      "title": "Оригінал документа",
       "target": "Attachment"
     },
     {
@@ -19,5 +21,12 @@
       },
       "target": "ListOfPositionsItem"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

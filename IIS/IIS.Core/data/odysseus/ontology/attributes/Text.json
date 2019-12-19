@@ -1,6 +1,8 @@
 {
   "id": "540c2b56-2ec6-4941-973f-96b3d09e5c4c",
+  "conceptType": "attributes",
   "name": "Text",
   "title": "Текст",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

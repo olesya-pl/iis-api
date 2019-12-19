@@ -1,5 +1,6 @@
 {
   "id": "bbf634f1-2e16-4bce-b10f-8b319a0587c3",
+  "conceptType": "entities",
   "name": "EventImportance",
   "title": "Важливість Події",
   "extends": [
@@ -16,5 +17,8 @@
       },
       "target": "code"
     }
-  ]
+  ],
+  "meta": {
+    "hasFewEntities": true
+  }
 }

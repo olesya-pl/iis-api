@@ -1,5 +1,6 @@
 {
   "id": "a31d8344-1c09-47c3-b61d-c4dce9a8910a",
+  "conceptType": "attributes",
   "name": "dateOfRankActualization",
   "title": "Дата актуалізації звання",
   "type": "DateTime",

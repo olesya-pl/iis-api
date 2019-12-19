@@ -1,17 +1,27 @@
 {
   "id": "c93cf057-36ed-49cb-87c7-5ced604115c6",
+  "conceptType": "entities",
   "name": "ListOfPositionsItem",
   "title": "",
   "attributes": [
     {
       "id": "e18fdd4a-7339-49a3-9255-078f6318e9e9",
       "name": "position",
+      "title": "Посада",
       "target": "Text"
     },
     {
       "id": "810ad6f0-7383-433c-a9b0-651b010b3463",
       "name": "count",
+      "title": "Кількість",
       "target": "Count"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,8 +1,12 @@
 {
   "id": "1efd38b6-a9d2-4203-a39e-d342cc394c56",
+  "conceptType": "entities",
   "name": "IMSISign",
   "title": "IMSI",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

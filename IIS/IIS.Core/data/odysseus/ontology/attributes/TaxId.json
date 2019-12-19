@@ -1,6 +1,8 @@
 {
   "id": "5c1b6408-acf4-42f6-8839-e74ad651aa05",
+  "conceptType": "attributes",
   "name": "TaxId",
   "title": "Податковий ідентифікатор",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

@@ -1,5 +1,6 @@
 {
   "id": "bb306a9b-833e-410a-a663-0485ce8c0c0d",
+  "conceptType": "entities",
   "name": "Radionetwork",
   "title": "Радіомережа",
   "extends": [
@@ -40,5 +41,6 @@
       },
       "target": "purpose"
     }
-  ]
+  ],
+  "meta": {}
 }

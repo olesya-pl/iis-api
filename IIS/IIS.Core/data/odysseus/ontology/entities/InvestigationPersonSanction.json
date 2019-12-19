@@ -1,5 +1,6 @@
 {
   "id": "2e8e7807-3e83-4909-8a06-cc458a107e76",
+  "conceptType": "entities",
   "name": "InvestigationPersonSanction",
   "title": "Службове розслідування",
   "extends": [
@@ -9,6 +10,7 @@
     {
       "id": "326dfed5-3e68-4cb1-b6f0-7ac5974a59da",
       "name": "reason",
+      "title": "Підстава (№ акта)",
       "meta": {
         "formField": {
           "type": "form"
@@ -23,6 +25,7 @@
     {
       "id": "31f28d18-8771-48f7-be9b-be558b78aa8e",
       "name": "conclusion",
+      "title": "Висновок за результатами розслідування",
       "meta": {
         "formField": {
           "type": "form"
@@ -37,6 +40,7 @@
     {
       "id": "c045994a-20ed-448d-b9f2-e7042c21e4d5",
       "name": "order",
+      "title": "Наказ про проведення службового розслідування:",
       "meta": {
         "formField": {
           "type": "form"
@@ -48,5 +52,12 @@
       },
       "target": "SimpleDocument"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

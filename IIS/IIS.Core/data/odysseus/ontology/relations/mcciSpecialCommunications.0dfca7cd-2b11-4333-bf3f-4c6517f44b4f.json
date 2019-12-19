@@ -1,4 +1,11 @@
 {
   "id": "0dfca7cd-2b11-4333-bf3f-4c6517f44b4f",
-  "name": "mcciSpecialCommunications"
+  "conceptType": "relations",
+  "name": "mcciSpecialCommunications",
+  "meta": {
+    "formField": {
+      "type": "table"
+    },
+    "multiple": true
+  }
 }

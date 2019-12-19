@@ -1,12 +1,21 @@
 {
   "id": "0a7df18e-629c-4fe7-8323-c33fa6990c0c",
+  "conceptType": "entities",
   "name": "FailureToSubmitDocumentsForStateAccess",
   "title": "35. Неподання особою документів для оформлення допуску до державної таємниці – результати проведення офіційних заходів контролю на СРСД чи повідомлення СРСД.",
   "attributes": [
     {
       "id": "58e65756-ebbc-4e1e-978d-2199493035d9",
       "name": "protocol",
+      "title": "Повідомлення СРСД або протокол",
       "target": "Attachment"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

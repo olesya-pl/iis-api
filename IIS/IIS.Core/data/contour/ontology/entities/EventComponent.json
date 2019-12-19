@@ -1,5 +1,6 @@
 {
   "id": "7e50d540-e638-48a3-a44a-6bda227dc8d8",
+  "conceptType": "entities",
   "name": "EventComponent",
   "title": "Компонент події",
   "extends": [
@@ -22,5 +23,8 @@
       },
       "target": "EventComponent"
     }
-  ]
+  ],
+  "meta": {
+    "hasFewEntities": true
+  }
 }

@@ -1,11 +1,13 @@
 {
   "id": "a58d3454-6505-43fd-9d08-374fba70edc2",
+  "conceptType": "entities",
   "name": "Mcci",
   "title": "МНСІ",
   "attributes": [
     {
       "id": "b90732b5-f5b7-4591-a707-ab20c09743f9",
       "name": "category",
+      "title": "Категорія",
       "target": "AbstractAccessLevel"
     },
     {
@@ -13,5 +15,12 @@
       "name": "count",
       "target": "Count"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,4 +1,11 @@
 {
   "id": "ef5a7da2-5239-4374-ba6f-70456eac7516",
-  "name": "appealAgainstDecisionsOfSSU"
+  "conceptType": "relations",
+  "name": "appealAgainstDecisionsOfSSU",
+  "meta": {
+    "formField": {
+      "type": "table"
+    },
+    "multiple": true
+  }
 }

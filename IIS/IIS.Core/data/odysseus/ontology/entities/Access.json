@@ -1,5 +1,6 @@
 {
   "id": "f280ad72-2916-4a4e-8b17-c6f771de7be0",
+  "conceptType": "entities",
   "name": "Access",
   "title": "Допуск",
   "attributes": [
@@ -16,12 +17,21 @@
     {
       "id": "77615b0c-ecc8-464f-9cba-1870e225e68d",
       "name": "endDate",
+      "title": "Дата завершення дії",
       "target": "Date"
     },
     {
       "id": "02c4ed19-cf36-4044-9686-6bf39ea66ee8",
       "name": "issueDate",
+      "title": "Дата видачі",
       "target": "Date"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

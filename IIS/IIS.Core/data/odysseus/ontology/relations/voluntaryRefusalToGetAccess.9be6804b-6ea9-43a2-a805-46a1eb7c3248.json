@@ -1,4 +1,11 @@
 {
   "id": "9be6804b-6ea9-43a2-a805-46a1eb7c3248",
-  "name": "voluntaryRefusalToGetAccess"
+  "conceptType": "relations",
+  "name": "voluntaryRefusalToGetAccess",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

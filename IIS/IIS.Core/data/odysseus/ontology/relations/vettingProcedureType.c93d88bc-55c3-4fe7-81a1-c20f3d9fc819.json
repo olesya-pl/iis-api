@@ -1,4 +1,11 @@
 {
   "id": "c93d88bc-55c3-4fe7-81a1-c20f3d9fc819",
-  "name": "vettingProcedureType"
+  "conceptType": "relations",
+  "name": "vettingProcedureType",
+  "meta": {
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

@@ -1,5 +1,6 @@
 {
   "id": "5bcc76b5-aa44-4260-945f-2e8d6574dfcb",
+  "conceptType": "entities",
   "name": "InformingSanction",
   "title": "Інформування",
   "extends": [
@@ -9,6 +10,7 @@
     {
       "id": "a1bfc994-8d94-443c-82bd-34158ff2ed51",
       "name": "answer",
+      "title": "Відповідь",
       "meta": {
         "formField": {
           "type": "form"
@@ -20,6 +22,7 @@
     {
       "id": "9ac86cbb-c2db-4e7d-903c-d6f9670580cf",
       "name": "inform",
+      "title": "Інформування",
       "meta": {
         "formField": {
           "type": "form"
@@ -28,5 +31,12 @@
       },
       "target": "LegalDocument"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,8 +1,12 @@
 {
   "id": "ecf424cb-9e1d-446a-be68-90bd232918d1",
+  "conceptType": "entities",
   "name": "FrequencySign",
   "title": "Частота, МГц.",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

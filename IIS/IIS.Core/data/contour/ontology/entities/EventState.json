@@ -1,5 +1,6 @@
 {
   "id": "833fecd1-7cf4-49b4-a47f-dd3326a7a30c",
+  "conceptType": "entities",
   "name": "EventState",
   "title": "Стан Події",
   "extends": [
@@ -16,5 +17,8 @@
       },
       "target": "code"
     }
-  ]
+  ],
+  "meta": {
+    "hasFewEntities": true
+  }
 }

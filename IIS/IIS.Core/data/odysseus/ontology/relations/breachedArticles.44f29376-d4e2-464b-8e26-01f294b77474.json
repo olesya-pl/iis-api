@@ -1,5 +1,12 @@
 {
   "id": "44f29376-d4e2-464b-8e26-01f294b77474",
+  "conceptType": "relations",
   "name": "breachedArticles",
-  "title": "Статті КК України"
+  "title": "Статті КК України",
+  "meta": {
+    "formField": {
+      "type": "popup"
+    },
+    "multiple": true
+  }
 }

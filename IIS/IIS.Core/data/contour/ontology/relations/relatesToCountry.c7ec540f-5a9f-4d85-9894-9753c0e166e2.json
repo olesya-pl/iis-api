@@ -1,5 +1,6 @@
 {
   "id": "c7ec540f-5a9f-4d85-9894-9753c0e166e2",
+  "conceptType": "relations",
   "name": "relatesToCountry",
   "title": "Державна приналежність",
   "meta": {

@@ -1,5 +1,15 @@
 {
   "id": "c045994a-20ed-448d-b9f2-e7042c21e4d5",
+  "conceptType": "relations",
   "name": "order",
-  "title": "Наказ про проведення службового розслідування:"
+  "title": "Наказ про проведення службового розслідування:",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

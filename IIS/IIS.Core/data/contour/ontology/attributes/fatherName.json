@@ -1,5 +1,6 @@
 {
   "id": "d73be51b-fb56-43d6-a288-f032deccd91a",
+  "conceptType": "attributes",
   "name": "fatherName",
   "title": "По батькові",
   "type": "String",

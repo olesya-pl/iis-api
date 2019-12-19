@@ -1,6 +1,7 @@
 {
   "id": "0e080b5f-c7de-4780-a65a-3828ebbf95de",
   "abstract": true,
+  "conceptType": "entities",
   "name": "FinalPersonSanction",
   "title": "FinalPersonSanction",
   "extends": [
@@ -34,5 +35,12 @@
       },
       "target": "LegalDocument"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

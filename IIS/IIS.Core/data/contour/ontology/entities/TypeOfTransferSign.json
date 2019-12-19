@@ -1,8 +1,12 @@
 {
   "id": "7d32bb23-c983-4929-a00d-61909417f7c5",
+  "conceptType": "entities",
   "name": "TypeOfTransferSign",
   "title": "Тип передачі",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

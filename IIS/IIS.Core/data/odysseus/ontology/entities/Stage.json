@@ -1,5 +1,6 @@
 {
   "id": "8e6878f0-f27c-46b9-bfe1-b9071334c378",
+  "conceptType": "entities",
   "name": "Stage",
   "title": "Етапи НДДКР",
   "attributes": [
@@ -19,5 +20,12 @@
       },
       "target": "DateRange"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

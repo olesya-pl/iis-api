@@ -1,5 +1,9 @@
 {
   "id": "7cb8f42f-0b23-4af4-86e7-9e7718da56b9",
+  "conceptType": "relations",
   "name": "coContractor",
-  "title": "Співвиконавець (співвиконавці)"
+  "title": "Співвиконавець (співвиконавці)",
+  "meta": {
+    "multiple": true
+  }
 }

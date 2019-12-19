@@ -1,5 +1,6 @@
 {
   "id": "03aa000a-be1d-446d-b7fb-961b718ae0d4",
+  "conceptType": "attributes",
   "name": "temporaryDislocation",
   "title": "Пункт Тимчасової Дислокації (ПТД)",
   "type": "Geo",

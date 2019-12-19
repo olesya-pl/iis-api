@@ -1,5 +1,6 @@
 {
   "id": "97357eb7-a126-4f72-b2cd-4c4df65112ed",
+  "conceptType": "relations",
   "name": "dateOfServingPlaceActualization",
   "title": "Дата актуалізації місця служби",
   "meta": {

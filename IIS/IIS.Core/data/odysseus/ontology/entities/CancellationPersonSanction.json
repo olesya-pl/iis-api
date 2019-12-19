@@ -1,8 +1,16 @@
 {
   "id": "274950a7-f780-482d-8c3c-7f9dd0242331",
+  "conceptType": "entities",
   "name": "CancellationPersonSanction",
   "title": "Скасування допуска",
   "extends": [
     "FinalPersonSanction"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

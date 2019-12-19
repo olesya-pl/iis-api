@@ -1,5 +1,12 @@
 {
   "id": "7a25b331-3c5a-4978-a35a-c0d315308b4e",
+  "conceptType": "relations",
   "name": "text",
-  "title": "Коментар"
+  "title": "Коментар",
+  "meta": {
+    "formField": {
+      "type": "radioComment"
+    },
+    "multiple": false
+  }
 }

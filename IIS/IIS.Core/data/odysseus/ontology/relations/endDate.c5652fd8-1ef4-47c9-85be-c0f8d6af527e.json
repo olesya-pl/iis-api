@@ -1,5 +1,6 @@
 {
   "id": "c5652fd8-1ef4-47c9-85be-c0f8d6af527e",
+  "conceptType": "relations",
   "name": "endDate",
   "title": "Дата завершення дії"
 }

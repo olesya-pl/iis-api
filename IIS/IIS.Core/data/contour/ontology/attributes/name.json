@@ -1,5 +1,6 @@
 {
   "id": "70b053d1-7702-4078-b086-d89540fcbddc",
+  "conceptType": "attributes",
   "name": "name",
   "title": "Назва",
   "type": "String",

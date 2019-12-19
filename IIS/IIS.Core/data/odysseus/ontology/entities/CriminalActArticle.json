@@ -1,8 +1,10 @@
 {
   "id": "a9869361-d16b-429f-a3ee-ff8142f6714c",
+  "conceptType": "entities",
   "name": "CriminalActArticle",
   "title": "Кримінальний кодекс",
   "extends": [
     "LegalActArticle"
-  ]
+  ],
+  "meta": {}
 }

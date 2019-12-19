@@ -1,6 +1,14 @@
 {
   "id": "f374a240-8031-42ea-ad17-2baba6005dc7",
   "abstract": true,
+  "conceptType": "entities",
   "name": "ProfileQuestion",
-  "title": "ProfileQuestion"
+  "title": "ProfileQuestion",
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

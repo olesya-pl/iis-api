@@ -1,5 +1,6 @@
 {
   "id": "aaf7ac72-77a2-4438-887a-5a52d8068774",
+  "conceptType": "attributes",
   "name": "lastConfirmedAt",
   "title": "Останнє підтвердження",
   "type": "DateTime",

@@ -1,8 +1,10 @@
 {
   "id": "e5fd5ea4-1101-4d9c-a5bf-81c6e5f4a78e",
+  "conceptType": "entities",
   "name": "Tag",
   "title": "Теги",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {}
 }

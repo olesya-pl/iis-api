@@ -1,5 +1,6 @@
 {
   "id": "fed56ff4-0d3c-4b6e-88cc-79dce33ba88b",
+  "conceptType": "attributes",
   "name": "amountOfPersonnel",
   "title": "Кiлькiсть особового складу",
   "type": "Integer",

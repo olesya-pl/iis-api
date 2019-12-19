@@ -1,5 +1,6 @@
 {
   "id": "5167a538-d77c-47eb-acb3-94059025e352",
+  "conceptType": "entities",
   "name": "MilitaryMachinery",
   "title": "Озброєння та військова техніка",
   "extends": [
@@ -145,5 +146,6 @@
       },
       "target": "Country"
     }
-  ]
+  ],
+  "meta": {}
 }

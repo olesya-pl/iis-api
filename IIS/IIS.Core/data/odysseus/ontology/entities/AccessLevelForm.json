@@ -1,5 +1,6 @@
 {
   "id": "91322731-7305-436b-a087-96521cfe01c3",
+  "conceptType": "entities",
   "name": "AccessLevelForm",
   "title": "Форма, на яку подається",
   "extends": [
@@ -16,5 +17,8 @@
       "name": "years",
       "target": "Years"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

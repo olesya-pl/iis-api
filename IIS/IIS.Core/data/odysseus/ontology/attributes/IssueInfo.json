@@ -1,6 +1,8 @@
 {
   "id": "1a5d57e6-ac3e-4075-8f13-45e00e056062",
+  "conceptType": "attributes",
   "name": "IssueInfo",
   "title": "Ким виданий",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

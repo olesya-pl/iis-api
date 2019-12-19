@@ -1,5 +1,6 @@
 {
   "id": "bdcb98da-9823-46a8-9073-58e5610f808a",
+  "conceptType": "relations",
   "name": "fullName",
   "title": "Прізвище, ім’я та по батькові"
 }

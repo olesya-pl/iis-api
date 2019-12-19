@@ -1,5 +1,6 @@
 {
   "id": "659d9e1f-b584-4ab4-b5f2-39a0ca16773a",
+  "conceptType": "entities",
   "name": "Country",
   "title": "Країна",
   "extends": [
@@ -16,5 +17,6 @@
       },
       "target": "code"
     }
-  ]
+  ],
+  "meta": {}
 }

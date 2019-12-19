@@ -1,4 +1,11 @@
 {
   "id": "11accd3d-ba87-4711-b473-518f458983c6",
-  "name": "breachedArticles"
+  "conceptType": "relations",
+  "name": "breachedArticles",
+  "meta": {
+    "formField": {
+      "type": "popup"
+    },
+    "multiple": true
+  }
 }

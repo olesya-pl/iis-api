@@ -1,5 +1,6 @@
 {
   "id": "06c079c0-2521-42d6-90ac-89c685457a35",
+  "conceptType": "entities",
   "name": "ObjectImportance",
   "title": "Важливість Об'єкта Розвідки",
   "extends": [
@@ -16,5 +17,8 @@
       },
       "target": "code"
     }
-  ]
+  ],
+  "meta": {
+    "hasFewEntities": true
+  }
 }

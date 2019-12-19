@@ -1,4 +1,11 @@
 {
   "id": "6212a9be-8ce4-45e6-9445-600e4106fe70",
-  "name": "resolution"
+  "conceptType": "relations",
+  "name": "resolution",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

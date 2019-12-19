@@ -1,8 +1,12 @@
 {
   "id": "b49f4a22-ea6f-4124-bcc6-6c920ffb8bc1",
+  "conceptType": "entities",
   "name": "IMEISign",
   "title": "IMEI",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

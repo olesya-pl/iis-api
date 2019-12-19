@@ -1,5 +1,6 @@
 {
   "id": "e2f8e572-6189-489a-bff1-588c9b42d322",
+  "conceptType": "entities",
   "name": "Citizenship",
   "title": "Громадянство",
   "attributes": [
@@ -18,5 +19,12 @@
       "name": "country",
       "target": "Country"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

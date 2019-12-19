@@ -1,8 +1,12 @@
 {
   "id": "2d5d83e7-c1ea-4df9-83bd-7c34d8885325",
+  "conceptType": "entities",
   "name": "OperationalDataSource",
   "title": "Джерела оперативної інформації",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

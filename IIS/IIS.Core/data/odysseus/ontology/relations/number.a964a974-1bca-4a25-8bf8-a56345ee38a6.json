@@ -1,5 +1,12 @@
 {
   "id": "a964a974-1bca-4a25-8bf8-a56345ee38a6",
+  "conceptType": "relations",
   "name": "number",
-  "title": "Номер протоколу"
+  "title": "Номер протоколу",
+  "meta": {
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

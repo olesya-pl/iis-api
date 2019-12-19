@@ -1,16 +1,19 @@
 {
   "id": "0ef99e5d-51f3-450a-ad78-a1745239a4fc",
+  "conceptType": "entities",
   "name": "License",
   "title": "Ліцензія",
   "attributes": [
     {
       "id": "283fea8d-3979-4b9c-abf2-d24f1529876f",
       "name": "licenseNumber",
+      "title": "Номер ліцензіі",
       "target": "Number"
     },
     {
       "id": "41f69497-1ccb-4ea4-9f08-941d268a770b",
       "name": "validRange",
+      "title": "Термін дії",
       "meta": {
         "formField": {
           "type": "dateRange"
@@ -22,17 +25,27 @@
     {
       "id": "5805e367-e330-4cf6-b6bd-86482486b23f",
       "name": "activityType",
+      "title": "Вид діяльності",
       "target": "Text"
     },
     {
       "id": "dd1a48ac-e73d-4694-a96d-2c57a1b84a45",
       "name": "scan",
+      "title": "Скан ліцензії",
       "target": "Attachment"
     },
     {
       "id": "95e07080-bdfe-437b-8842-e29513e27587",
       "name": "approvalNumber",
+      "title": "Номер рішення",
       "target": "Number"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

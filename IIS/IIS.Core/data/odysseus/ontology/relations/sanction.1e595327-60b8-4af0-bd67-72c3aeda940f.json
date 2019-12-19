@@ -1,4 +1,11 @@
 {
   "id": "1e595327-60b8-4af0-bd67-72c3aeda940f",
-  "name": "sanction"
+  "conceptType": "relations",
+  "name": "sanction",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": true
+  }
 }

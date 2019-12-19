@@ -1,5 +1,12 @@
 {
   "id": "53c57fe7-822c-4b81-af7a-aa70393ba990",
+  "conceptType": "relations",
   "name": "attachment",
-  "title": "Оригінал"
+  "title": "Оригінал",
+  "meta": {
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

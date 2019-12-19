@@ -1,4 +1,11 @@
 {
   "id": "fa0a25c1-9c15-49f5-9df3-dedd4ed9efc3",
-  "name": "dateRange"
+  "conceptType": "relations",
+  "name": "dateRange",
+  "meta": {
+    "formField": {
+      "type": "dateRange"
+    },
+    "multiple": false
+  }
 }

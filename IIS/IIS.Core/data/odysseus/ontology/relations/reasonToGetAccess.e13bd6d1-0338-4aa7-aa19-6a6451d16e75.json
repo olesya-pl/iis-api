@@ -1,4 +1,11 @@
 {
   "id": "e13bd6d1-0338-4aa7-aa19-6a6451d16e75",
-  "name": "reasonToGetAccess"
+  "conceptType": "relations",
+  "name": "reasonToGetAccess",
+  "meta": {
+    "formField": {
+      "type": "ReasonToGetAccess"
+    },
+    "multiple": false
+  }
 }

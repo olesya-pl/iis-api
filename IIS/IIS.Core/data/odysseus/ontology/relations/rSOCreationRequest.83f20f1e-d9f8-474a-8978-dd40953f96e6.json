@@ -1,5 +1,6 @@
 {
   "id": "83f20f1e-d9f8-474a-8978-dd40953f96e6",
+  "conceptType": "relations",
   "name": "rSOCreationRequest",
   "title": "Вмотивований запит на створення РСО"
 }

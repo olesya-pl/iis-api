@@ -1,5 +1,6 @@
 {
   "id": "7c666b72-9037-4187-821d-10a70bfdab16",
+  "conceptType": "entities",
   "name": "Unknown",
   "title": "Невизначений",
   "extends": [
@@ -19,5 +20,6 @@
       },
       "target": "name"
     }
-  ]
+  ],
+  "meta": {}
 }

@@ -1,5 +1,12 @@
 {
   "id": "dfb2c11a-0654-4dfe-afa2-612cfbc839f9",
+  "conceptType": "relations",
   "name": "decree",
-  "title": "Розпорядження"
+  "title": "Розпорядження",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

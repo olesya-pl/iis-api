@@ -1,5 +1,15 @@
 {
   "id": "64ca3a59-7a1a-4522-8df2-5f29d7298209",
+  "conceptType": "relations",
   "name": "person",
-  "title": "Секретоносій"
+  "title": "Секретоносій",
+  "meta": {
+    "inversed": {
+      "code": "sanctions",
+      "editable": false,
+      "title": "Заходи впливу до секретоносія",
+      "multiple": true
+    },
+    "multiple": false
+  }
 }

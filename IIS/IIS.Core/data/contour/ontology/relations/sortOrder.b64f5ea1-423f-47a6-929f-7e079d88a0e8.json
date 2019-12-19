@@ -1,5 +1,6 @@
 {
   "id": "b64f5ea1-423f-47a6-929f-7e079d88a0e8",
+  "conceptType": "relations",
   "name": "sortOrder",
   "title": "Порядок сортування",
   "meta": {

@@ -1,4 +1,11 @@
 {
   "id": "6302ffc6-e730-44b9-8c11-0da1a2999767",
-  "name": "thirdPartyInterest"
+  "conceptType": "relations",
+  "name": "thirdPartyInterest",
+  "meta": {
+    "formField": {
+      "type": "table"
+    },
+    "multiple": true
+  }
 }

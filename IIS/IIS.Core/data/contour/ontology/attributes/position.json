@@ -1,5 +1,6 @@
 {
   "id": "93aae166-749b-484d-9613-59f7a577e918",
+  "conceptType": "attributes",
   "name": "position",
   "title": "Посада",
   "type": "String",

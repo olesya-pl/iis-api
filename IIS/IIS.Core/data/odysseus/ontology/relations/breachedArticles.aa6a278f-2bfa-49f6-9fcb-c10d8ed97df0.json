@@ -1,5 +1,12 @@
 {
   "id": "aa6a278f-2bfa-49f6-9fcb-c10d8ed97df0",
+  "conceptType": "relations",
   "name": "breachedArticles",
-  "title": "Порушено вимоги НПА"
+  "title": "Порушено вимоги НПА",
+  "meta": {
+    "formField": {
+      "type": "popup"
+    },
+    "multiple": true
+  }
 }

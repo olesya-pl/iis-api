@@ -1,5 +1,6 @@
 {
   "id": "a335127b-44e4-4b97-b10b-9643c4d82d7d",
+  "conceptType": "attributes",
   "name": "shortName",
   "title": "Скорочене найменування",
   "type": "String",

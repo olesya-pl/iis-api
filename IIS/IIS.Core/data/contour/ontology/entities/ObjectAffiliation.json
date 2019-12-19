@@ -1,5 +1,6 @@
 {
   "id": "78e310c0-7505-40bc-be7f-c234a9690767",
+  "conceptType": "entities",
   "name": "ObjectAffiliation",
   "title": "Приналежність Об'єкта Розвідки",
   "extends": [
@@ -26,5 +27,8 @@
       },
       "target": "sidc"
     }
-  ]
+  ],
+  "meta": {
+    "hasFewEntities": true
+  }
 }

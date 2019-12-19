@@ -1,5 +1,6 @@
 {
   "id": "dd5f5f16-b3ba-40fd-9b6d-de4fecefb041",
+  "conceptType": "relations",
   "name": "amount",
   "title": "Чисельність",
   "meta": {

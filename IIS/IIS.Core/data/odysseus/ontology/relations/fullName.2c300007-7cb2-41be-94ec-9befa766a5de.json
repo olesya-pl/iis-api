@@ -1,5 +1,10 @@
 {
   "id": "2c300007-7cb2-41be-94ec-9befa766a5de",
+  "conceptType": "relations",
   "name": "fullName",
-  "title": "Повне ім'я"
+  "title": "Повне ім'я",
+  "meta": {
+    "formula": "Join(secondName, firstName, fatherName)",
+    "multiple": false
+  }
 }

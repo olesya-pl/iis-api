@@ -1,5 +1,13 @@
 {
   "id": "41103999-cf24-459c-91e6-8c65a6d3884c",
+  "conceptType": "relations",
   "name": "checkResult",
-  "title": "Резолюція по кандидату"
+  "title": "Резолюція по кандидату",
+  "meta": {
+    "formField": {
+      "type": "radioGroup",
+      "radioType": "radioButton"
+    },
+    "multiple": false
+  }
 }

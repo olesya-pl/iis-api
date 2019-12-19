@@ -1,5 +1,10 @@
 {
   "id": "b6240baa-c28a-4800-9d8b-256c0c5b79ab",
+  "conceptType": "relations",
   "name": "investigationPersonSanction",
-  "title": "Службове розслідування"
+  "title": "Службове розслідування",
+  "meta": {
+    "acceptsEntityOperations": [],
+    "multiple": false
+  }
 }

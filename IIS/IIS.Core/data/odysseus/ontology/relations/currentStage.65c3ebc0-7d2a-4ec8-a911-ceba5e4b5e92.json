@@ -1,5 +1,10 @@
 {
   "id": "65c3ebc0-7d2a-4ec8-a911-ceba5e4b5e92",
+  "conceptType": "relations",
   "name": "currentStage",
-  "title": "Поточний етап"
+  "title": "Поточний етап",
+  "meta": {
+    "acceptsEntityOperations": [],
+    "multiple": false
+  }
 }

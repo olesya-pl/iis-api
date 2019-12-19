@@ -1,5 +1,6 @@
 {
   "id": "cfdfe48b-b511-4862-ab5e-8bc1eef59de5",
+  "conceptType": "relations",
   "name": "amountOfPersonnel",
   "title": "Кiлькiсть особового складу",
   "meta": {

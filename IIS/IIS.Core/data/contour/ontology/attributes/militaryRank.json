@@ -1,5 +1,6 @@
 {
   "id": "566f4198-44e6-476a-9367-e164056743fb",
+  "conceptType": "attributes",
   "name": "militaryRank",
   "title": "Військове звання",
   "type": "String",

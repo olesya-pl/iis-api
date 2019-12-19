@@ -1,5 +1,6 @@
 {
   "id": "95e07080-bdfe-437b-8842-e29513e27587",
+  "conceptType": "relations",
   "name": "approvalNumber",
   "title": "Номер рішення"
 }

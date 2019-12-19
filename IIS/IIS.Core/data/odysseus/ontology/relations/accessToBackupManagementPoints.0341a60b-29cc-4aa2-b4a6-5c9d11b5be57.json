@@ -1,5 +1,13 @@
 {
   "id": "0341a60b-29cc-4aa2-b4a6-5c9d11b5be57",
+  "conceptType": "relations",
   "name": "accessToBackupManagementPoints",
-  "title": "18. Доступ до запасних пунктів управління. "
+  "title": "18. Доступ до запасних пунктів управління. ",
+  "meta": {
+    "formField": {
+      "type": "form",
+      "layout": "inline"
+    },
+    "multiple": false
+  }
 }

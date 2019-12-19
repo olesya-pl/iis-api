@@ -1,5 +1,6 @@
 {
   "id": "05996a64-0339-4921-88c5-c7244e8d36f8",
+  "conceptType": "attributes",
   "name": "modelNumber",
   "title": "Бортовий номер",
   "type": "String",

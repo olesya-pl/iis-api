@@ -1,5 +1,6 @@
 {
   "id": "8835859f-8eea-460a-8abc-392a0a980000",
+  "conceptType": "relations",
   "name": "taxId",
   "title": "Код ЄДРПОУ"
 }

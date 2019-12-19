@@ -1,5 +1,6 @@
 {
   "id": "2146953d-dac0-4914-8ec7-19a5b809e6a6",
+  "conceptType": "entities",
   "name": "EmailSign",
   "title": "Електронна скринька",
   "extends": [
@@ -21,5 +22,8 @@
       },
       "target": "value"
     }
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

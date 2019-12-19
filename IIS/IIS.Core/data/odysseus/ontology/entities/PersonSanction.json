@@ -1,6 +1,7 @@
 {
   "id": "3730045d-d194-41c9-b1a4-3982ecae0a17",
   "abstract": true,
+  "conceptType": "entities",
   "name": "PersonSanction",
   "title": "Санкція по людині",
   "extends": [
@@ -10,6 +11,7 @@
     {
       "id": "b6240baa-c28a-4800-9d8b-256c0c5b79ab",
       "name": "investigationPersonSanction",
+      "title": "Службове розслідування",
       "meta": {
         "acceptsEntityOperations": [],
         "multiple": false
@@ -19,6 +21,7 @@
     {
       "id": "64ca3a59-7a1a-4522-8df2-5f29d7298209",
       "name": "person",
+      "title": "Секретоносій",
       "meta": {
         "inversed": {
           "code": "sanctions",
@@ -30,5 +33,12 @@
       },
       "target": "Person"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,6 +1,7 @@
 {
   "id": "87b39fae-5b68-48cd-a5ed-f6ac96aae7f7",
   "abstract": true,
+  "conceptType": "entities",
   "name": "ObjectOfStudy",
   "title": "Об'єкт розвідки",
   "attributes": [
@@ -97,5 +98,6 @@
       },
       "target": "photo"
     }
-  ]
+  ],
+  "meta": {}
 }

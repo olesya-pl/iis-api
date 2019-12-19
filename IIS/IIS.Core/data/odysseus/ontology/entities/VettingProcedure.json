@@ -1,5 +1,6 @@
 {
   "id": "8d5f14aa-93f7-4c58-af66-0315b8c36ac0",
+  "conceptType": "entities",
   "name": "VettingProcedure",
   "title": "Перевірка",
   "attributes": [
@@ -11,6 +12,7 @@
     {
       "id": "ba30d555-05f4-42bd-ae35-c34c825e71b9",
       "name": "prescriptionToExamination",
+      "title": "Припис на перевірку",
       "meta": {
         "formField": {
           "type": "legalDocument"
@@ -25,6 +27,7 @@
     {
       "id": "bb76fdf2-09bf-4838-aa6c-0ba3bada3140",
       "name": "actOfInspection",
+      "title": "Акт перевірки",
       "meta": {
         "formField": {
           "type": "legalDocument"
@@ -36,6 +39,7 @@
     {
       "id": "413a2964-59ac-46fd-8725-d36328277b03",
       "name": "duration",
+      "title": "Тривалість перевірки",
       "meta": {
         "formField": {
           "type": "dateRange"
@@ -47,6 +51,7 @@
     {
       "id": "fd130afa-036b-4f32-a67c-8bb62f3ba40f",
       "name": "checkPeriod",
+      "title": "Період діяльності, який перевіряється",
       "meta": {
         "formField": {
           "type": "dateRange"
@@ -58,6 +63,7 @@
     {
       "id": "69bd5fd3-f338-45c4-984c-e9ea8b611a91",
       "name": "conductedBy",
+      "title": "Орган / підрозділ СБУ",
       "target": "Organization"
     },
     {
@@ -79,12 +85,21 @@
     {
       "id": "b16bc33c-522c-4d70-96d9-877971a28be6",
       "name": "committeeHead",
+      "title": "Голова комісії",
       "target": "Person"
     },
     {
       "id": "54dde75c-0e73-4ff6-8bd8-a012c7fa84f1",
       "name": "committeeMembers",
+      "title": "Члени комісії",
       "target": "Person"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

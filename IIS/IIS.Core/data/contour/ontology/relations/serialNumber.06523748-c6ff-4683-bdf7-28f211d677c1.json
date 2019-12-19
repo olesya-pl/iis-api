@@ -1,5 +1,6 @@
 {
   "id": "06523748-c6ff-4683-bdf7-28f211d677c1",
+  "conceptType": "relations",
   "name": "serialNumber",
   "title": "Серійний номер",
   "meta": {

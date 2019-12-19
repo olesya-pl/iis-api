@@ -1,9 +1,13 @@
 {
   "id": "21896454-08ea-41da-bd2f-89fedc737e37",
   "abstract": true,
+  "conceptType": "entities",
   "name": "Tag",
   "title": "Тег",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

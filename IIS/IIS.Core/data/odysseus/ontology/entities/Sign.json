@@ -1,6 +1,7 @@
 {
   "id": "9695c585-85a5-4368-9109-ac3052ad9248",
   "abstract": true,
+  "conceptType": "entities",
   "name": "Sign",
   "title": "Ознака",
   "attributes": [
@@ -9,5 +10,12 @@
       "name": "value",
       "target": "Value"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

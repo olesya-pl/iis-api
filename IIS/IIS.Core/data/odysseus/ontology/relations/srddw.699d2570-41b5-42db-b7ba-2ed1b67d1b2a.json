@@ -1,4 +1,11 @@
 {
   "id": "699d2570-41b5-42db-b7ba-2ed1b67d1b2a",
-  "name": "srddw"
+  "conceptType": "relations",
+  "name": "srddw",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": true
+  }
 }

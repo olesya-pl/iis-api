@@ -1,5 +1,6 @@
 {
   "id": "9eec5d3b-5004-4ad0-a0c9-b2304d54fa17",
+  "conceptType": "entities",
   "name": "DisciplinaryPersonSanction",
   "title": "Дисциплінарна відповідальність",
   "extends": [
@@ -9,6 +10,7 @@
     {
       "id": "3b7967e8-58d8-4201-9f97-5813d9820741",
       "name": "report",
+      "title": "Протокол",
       "meta": {
         "formField": {
           "type": "form"
@@ -22,5 +24,12 @@
       "name": "disciplinarySanctionKind",
       "target": "DisciplinarySanctionKind"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,8 +1,12 @@
 {
   "id": "369b9231-6cd8-4fe2-9964-303db5cb1a98",
+  "conceptType": "entities",
   "name": "PersonCheckResult",
   "title": "PersonCheckResult",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

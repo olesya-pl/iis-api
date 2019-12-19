@@ -5,11 +5,12 @@ using System.IO;
 using Meta = IIS.Core.Ontology.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
 {
-
-    public class Serializer {
+    public class Serializer
+    {
         public void serialize(string basePath, Ontology ontology)
         {
             foreach (var type in ontology.Types)
@@ -18,23 +19,22 @@ namespace IIS.Core.Ontology
                     continue;
 
                 var dataType = _mapToDataType(type);
-                _writeToFile(basePath, _logicalType(type), dataType);
+                _writeToFile(basePath, dataType);
             }
         }
 
-        private DataType _mapToDataType(Type type)
+        private DataType<Meta.IMeta> _mapToDataType(Type type)
         {
-            var dataType = new DataType {
+            var dataType = new DataType<Meta.IMeta> {
                 Id = type.Id,
                 Title = type.Title,
                 Name = type.Name,
+                ConceptType = _logicalType(type),
+                Meta = type.Meta
             };
 
             if (type.DirectProperties.Count() > 0)
                 dataType.Attributes = _aggregateAttributes(type);
-
-            if (type.Meta != null)
-                dataType.Meta = _mapMeta(type.Meta);
 
             if (type.DirectParents.Count() > 0)
                 dataType.Extends = type.DirectParents.Select(t => t.Name).ToArray();
@@ -51,14 +51,14 @@ namespace IIS.Core.Ontology
             return dataType;
         }
 
-        private List<DataEntityRelation> _aggregateAttributes(Type type)
+        private List<DataEntityRelation<Meta.IMeta>> _aggregateAttributes(Type type)
         {
-            return type.DirectProperties.Aggregate(new List<DataEntityRelation>(), (props, prop) =>
+            return type.DirectProperties.Aggregate(new List<DataEntityRelation<Meta.IMeta>>(), (props, prop) =>
             {
                 if (prop.IsInversed)
                     return props;
 
-                var attribute = new DataEntityRelation {
+                var attribute = new DataEntityRelation<Meta.IMeta> {
                     Id = prop.Id,
                     Target = prop.TargetType.Name,
                     Name = prop.Name,
@@ -86,20 +86,7 @@ namespace IIS.Core.Ontology
             });
         }
 
-        private Meta.IMeta _mapMeta(Meta.IMeta meta)
-        {
-            if (meta is Meta.EntityMeta entityMeta)
-            {
-                if (entityMeta.AcceptsEmbeddedOperations?.Count() > 0)
-                    return entityMeta;
-
-                return null;
-            }
-
-            return meta;
-        }
-
-        private string _serializeDataType(DataType dataType)
+        private string _serializeDataType(DataType<Meta.IMeta> dataType)
         {
             var settings = new JsonSerializerSettings {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -120,31 +107,34 @@ namespace IIS.Core.Ontology
             throw new ArgumentException($"Cannot detect logical type of {type.Name}");
         }
 
-        private void _writeToFile(string basePath, string type, DataType dataType)
+        private void _writeToFile(string basePath, DataType<Meta.IMeta> dataType)
         {
             // relations currently may have the same name, so we need to append their id in file name
-            var name = type == "relations" ? $"{dataType.Name}.{dataType.Id}" : dataType.Name;
+            var name = dataType.ConceptType == "relations" ? $"{dataType.Name}.{dataType.Id}" : dataType.Name;
             var content = _serializeDataType(dataType);
 
-            File.WriteAllText(Path.Combine(basePath, type, $"{name}.json"), content);
+            File.WriteAllText(Path.Combine(basePath, dataType.ConceptType, $"{name}.json"), content);
         }
 
-        class DataType {
+        public class DataType<TMeta>
+        {
             public Guid Id; // we need Id because RelationType.Name is not unique but it MUST!
             public bool? Abstract;
+            public string ConceptType;
             public string Name;
             public string Title;
             public string Type;
             public string[] Extends;
-            public List<DataEntityRelation> Attributes;
-            public Meta.IMeta Meta;
+            public List<DataEntityRelation<TMeta>> Attributes;
+            public TMeta Meta;
         }
 
-        class DataEntityRelation {
+        public class DataEntityRelation<TMeta>
+        {
             public Guid Id;
             public string Name;
             public string Title;
-            public Meta.IMeta Meta;
+            public TMeta Meta;
             public string Target;
         }
     }

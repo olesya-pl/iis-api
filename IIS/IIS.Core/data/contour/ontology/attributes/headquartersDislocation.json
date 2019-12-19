@@ -1,5 +1,6 @@
 {
   "id": "60a2f1b6-6b54-4cf5-9a9c-95b6c6a6b5a6",
+  "conceptType": "attributes",
   "name": "headquartersDislocation",
   "title": "Географічні координати пункту дислокації штабу",
   "type": "Geo",

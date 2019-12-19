@@ -1,5 +1,6 @@
 {
   "id": "4e527a0d-6428-4d87-965f-6a708bc83bc8",
+  "conceptType": "relations",
   "name": "dateAndPlaceOfBirth",
   "title": "Дата та місце народження, громадянство"
 }

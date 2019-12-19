@@ -1,5 +1,6 @@
 {
   "id": "38a82c32-90dd-4050-9102-cc7a5e1f3848",
+  "conceptType": "entities",
   "name": "LegalDocument",
   "title": "",
   "attributes": [
@@ -11,11 +12,13 @@
     {
       "id": "f575d107-d389-4041-ba06-bd2ac9360b45",
       "name": "content",
+      "title": "Зміст (або примітка)",
       "target": "Text"
     },
     {
       "id": "cdb5a54a-aa82-4a8c-a6b2-4dca3df0b742",
       "name": "original",
+      "title": "Оригінал",
       "target": "Attachment"
     },
     {
@@ -23,5 +26,12 @@
       "name": "number",
       "target": "Number"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

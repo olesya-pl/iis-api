@@ -1,6 +1,8 @@
 {
   "id": "aca3ced2-36cd-404c-9890-134933fa4734",
+  "conceptType": "attributes",
   "name": "ZipCode",
   "title": "Індекс",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

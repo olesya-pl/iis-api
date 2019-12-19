@@ -1,5 +1,6 @@
 {
   "id": "7782e0eb-865c-47c7-b293-6cf84cddd299",
+  "conceptType": "entities",
   "name": "ReportPersonSanction",
   "title": "Протокол",
   "extends": [
@@ -9,21 +10,25 @@
     {
       "id": "128128ae-6540-477f-abac-2828b82d597b",
       "name": "description",
+      "title": "Сутність адмінправопорушення",
       "target": "Text"
     },
     {
       "id": "5bd25353-61b8-441f-aaa1-0cbe1413354b",
       "name": "court",
+      "title": "Суд, який розглядає матеріали КП",
       "target": "Organization"
     },
     {
       "id": "7b493785-b1d9-41bd-8276-c8b2f021ea90",
       "name": "judgment",
+      "title": "Рішення суду",
       "target": "Attachment"
     },
     {
       "id": "aa1efa7e-96c4-4889-9884-36742875abd8",
       "name": "resolutionArticles",
+      "title": "Статті КУпАП за якою притягнуто до відповідальності",
       "meta": {
         "formField": {
           "type": "popup"
@@ -35,6 +40,7 @@
     {
       "id": "aa6a278f-2bfa-49f6-9fcb-c10d8ed97df0",
       "name": "breachedArticles",
+      "title": "Порушено вимоги НПА",
       "meta": {
         "formField": {
           "type": "popup"
@@ -46,17 +52,27 @@
     {
       "id": "c092aa62-40ad-411f-a516-2a1b24088c4e",
       "name": "drawnUpBy",
+      "title": "Склав",
       "target": "Person"
     },
     {
       "id": "67e25dfc-5047-4fda-98fe-7e86cb2e5f65",
       "name": "registrationDate",
+      "title": "Дата реєстрації",
       "target": "Date"
     },
     {
       "id": "a964a974-1bca-4a25-8bf8-a56345ee38a6",
       "name": "number",
+      "title": "Номер протоколу",
       "target": "Number"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

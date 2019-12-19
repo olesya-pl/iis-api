@@ -1,4 +1,8 @@
 {
   "id": "414f7dc3-409b-4d39-8bc6-63caeb990820",
-  "name": "socialNetworkSign"
+  "conceptType": "relations",
+  "name": "socialNetworkSign",
+  "meta": {
+    "multiple": true
+  }
 }

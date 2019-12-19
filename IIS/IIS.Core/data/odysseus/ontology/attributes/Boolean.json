@@ -1,6 +1,8 @@
 {
   "id": "1708e1df-b5d9-4252-9827-6773ba05ba3d",
+  "conceptType": "attributes",
   "name": "Boolean",
   "title": "Булево",
-  "type": "Boolean"
+  "type": "Boolean",
+  "meta": {}
 }

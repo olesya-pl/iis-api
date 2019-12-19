@@ -1,5 +1,13 @@
 {
   "id": "e806c94f-c3ad-4237-a0ad-99ebd23fb1fd",
+  "conceptType": "relations",
   "name": "accessToOfficeInformation",
-  "title": "21.  Наявність доступу до службової інформації – повідомлення підприємства, установи чи організації. "
+  "title": "21.  Наявність доступу до службової інформації – повідомлення підприємства, установи чи організації. ",
+  "meta": {
+    "formField": {
+      "type": "form",
+      "layout": "inline"
+    },
+    "multiple": false
+  }
 }

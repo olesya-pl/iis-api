@@ -1,6 +1,8 @@
 {
   "id": "546c6556-be78-47e7-a186-fa46463c80a8",
+  "conceptType": "attributes",
   "name": "Count",
   "title": "Кількість",
-  "type": "Integer"
+  "type": "Integer",
+  "meta": {}
 }

@@ -1,6 +1,7 @@
 {
   "id": "2731ad18-44df-4cf6-bf33-4f44af2eba17",
   "abstract": true,
+  "conceptType": "entities",
   "name": "OrganizationPermitSanction",
   "title": "Санкції до Спецдозволу",
   "extends": [
@@ -10,6 +11,7 @@
     {
       "id": "dfb2c11a-0654-4dfe-afa2-612cfbc839f9",
       "name": "decree",
+      "title": "Розпорядження",
       "meta": {
         "formField": {
           "type": "form"
@@ -21,6 +23,7 @@
     {
       "id": "bfcae4c6-c4c3-4b0d-aa1d-2c2b332d8cb2",
       "name": "breachedArticles",
+      "title": "Порушено вимоги НПА",
       "meta": {
         "formField": {
           "type": "popup"
@@ -32,7 +35,15 @@
     {
       "id": "832988ed-4f88-4a73-81f9-4caf20806dc9",
       "name": "breachInfo",
+      "title": "Відомості про порушення",
       "target": "Text"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

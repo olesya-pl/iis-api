@@ -1,5 +1,12 @@
 {
   "id": "aa1efa7e-96c4-4889-9884-36742875abd8",
+  "conceptType": "relations",
   "name": "resolutionArticles",
-  "title": "Статті КУпАП за якою притягнуто до відповідальності"
+  "title": "Статті КУпАП за якою притягнуто до відповідальності",
+  "meta": {
+    "formField": {
+      "type": "popup"
+    },
+    "multiple": true
+  }
 }

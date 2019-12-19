@@ -1,5 +1,6 @@
 {
   "id": "88ee1556-073d-436e-b7b4-2ecc87fbbe7e",
+  "conceptType": "relations",
   "name": "date",
   "title": "Дата вмотивованого запиту"
 }

@@ -1,9 +1,11 @@
 {
   "id": "8bb87ca2-fa90-4540-9451-124d008b7e3b",
+  "conceptType": "entities",
   "name": "InfrastructureType",
   "title": "Тип Інфраструктури",
   "extends": [
     "MilitaryMachinery_toBeInPlace",
     "Enum"
-  ]
+  ],
+  "meta": {}
 }

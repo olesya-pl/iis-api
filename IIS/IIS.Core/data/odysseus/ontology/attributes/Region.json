@@ -1,6 +1,8 @@
 {
   "id": "fd8aef96-010e-4cbb-b282-340a7a7656db",
+  "conceptType": "attributes",
   "name": "Region",
   "title": "Область",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

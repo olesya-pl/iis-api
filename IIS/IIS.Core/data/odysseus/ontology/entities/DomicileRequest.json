@@ -1,11 +1,13 @@
 {
   "id": "d2ecf05b-b4c3-426f-a1b1-7a389a0d1c16",
+  "conceptType": "entities",
   "name": "DomicileRequest",
   "title": "25. Подання особою клопотання про виїзд на постійне місце проживання до іноземної держави або її залишення на постійне проживання за кордоном (передбачається введення відповідної іноземної країни)– анкета, що подана особою.",
   "attributes": [
     {
       "id": "0fdc03bc-8f39-4ba8-8de7-4834251c9d91",
       "name": "attachment",
+      "title": "Анкета",
       "target": "Attachment"
     },
     {
@@ -13,5 +15,12 @@
       "name": "country",
       "target": "Country"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

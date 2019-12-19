@@ -1,5 +1,6 @@
 {
   "id": "bee4ba15-30ac-489e-b158-39bb01488b0d",
+  "conceptType": "entities",
   "name": "Event",
   "title": "Подія",
   "attributes": [
@@ -191,5 +192,6 @@
       },
       "target": "additionalLocation"
     }
-  ]
+  ],
+  "meta": {}
 }

@@ -1,5 +1,6 @@
 {
   "id": "283fea8d-3979-4b9c-abf2-d24f1529876f",
+  "conceptType": "relations",
   "name": "licenseNumber",
   "title": "Номер ліцензіі"
 }

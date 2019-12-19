@@ -1,6 +1,8 @@
 {
   "id": "1073ab6f-c463-4691-b7af-f397152f2759",
+  "conceptType": "attributes",
   "name": "Name",
   "title": "Назва",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

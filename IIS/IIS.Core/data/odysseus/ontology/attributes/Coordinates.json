@@ -1,6 +1,8 @@
 {
   "id": "5e4748dd-e334-4df5-b2fe-5a63a8abd980",
+  "conceptType": "attributes",
   "name": "Coordinates",
   "title": "Координати",
-  "type": "Geo"
+  "type": "Geo",
+  "meta": {}
 }

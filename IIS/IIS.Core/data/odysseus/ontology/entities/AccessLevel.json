@@ -1,5 +1,6 @@
 {
   "id": "ba93c96c-1fbb-4fb2-818f-4cf143b07016",
+  "conceptType": "entities",
   "name": "AccessLevel",
   "title": "Рівень доступу",
   "extends": [
@@ -12,5 +13,8 @@
       "name": "number",
       "target": "Number"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

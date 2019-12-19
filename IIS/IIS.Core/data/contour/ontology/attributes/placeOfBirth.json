@@ -1,5 +1,6 @@
 {
   "id": "f4df5428-080d-4cb9-91f0-25b105f3bab1",
+  "conceptType": "attributes",
   "name": "placeOfBirth",
   "title": "Місце народження",
   "type": "String",

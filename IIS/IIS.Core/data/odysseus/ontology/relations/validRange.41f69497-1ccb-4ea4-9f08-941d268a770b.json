@@ -1,5 +1,12 @@
 {
   "id": "41f69497-1ccb-4ea4-9f08-941d268a770b",
+  "conceptType": "relations",
   "name": "validRange",
-  "title": "Термін дії"
+  "title": "Термін дії",
+  "meta": {
+    "formField": {
+      "type": "dateRange"
+    },
+    "multiple": false
+  }
 }

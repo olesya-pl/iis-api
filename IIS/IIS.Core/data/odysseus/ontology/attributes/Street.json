@@ -1,6 +1,8 @@
 {
   "id": "d1b30bf5-c111-43f7-94f9-106843acc3d8",
+  "conceptType": "attributes",
   "name": "Street",
   "title": "Вулиця",
-  "type": "String"
+  "type": "String",
+  "meta": {}
 }

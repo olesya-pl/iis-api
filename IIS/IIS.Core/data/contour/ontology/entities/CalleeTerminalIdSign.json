@@ -1,8 +1,12 @@
 {
   "id": "e5182849-ebdf-4e81-adef-adf467ac47e3",
+  "conceptType": "entities",
   "name": "CalleeTerminalIdSign",
   "title": "callee_terminal_id",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

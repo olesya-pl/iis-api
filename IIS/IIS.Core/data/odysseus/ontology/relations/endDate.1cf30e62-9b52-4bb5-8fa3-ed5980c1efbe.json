@@ -1,5 +1,6 @@
 {
   "id": "1cf30e62-9b52-4bb5-8fa3-ed5980c1efbe",
+  "conceptType": "relations",
   "name": "endDate",
   "title": "Дата завершення роботи"
 }

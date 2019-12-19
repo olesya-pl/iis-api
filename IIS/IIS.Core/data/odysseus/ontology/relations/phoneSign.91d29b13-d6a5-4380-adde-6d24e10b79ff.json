@@ -1,4 +1,8 @@
 {
   "id": "91d29b13-d6a5-4380-adde-6d24e10b79ff",
-  "name": "phoneSign"
+  "conceptType": "relations",
+  "name": "phoneSign",
+  "meta": {
+    "multiple": true
+  }
 }

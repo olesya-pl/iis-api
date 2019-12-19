@@ -1,6 +1,8 @@
 {
   "id": "cae3fbf4-27e9-4708-a441-88a9bfa244ff",
+  "conceptType": "attributes",
   "name": "Date",
   "title": "Дата",
-  "type": "DateTime"
+  "type": "DateTime",
+  "meta": {}
 }

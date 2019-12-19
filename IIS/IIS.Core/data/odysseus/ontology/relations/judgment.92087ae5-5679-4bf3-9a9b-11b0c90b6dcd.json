@@ -1,5 +1,12 @@
 {
   "id": "92087ae5-5679-4bf3-9a9b-11b0c90b6dcd",
+  "conceptType": "relations",
   "name": "judgment",
-  "title": "Вирок/ухвала/покарання"
+  "title": "Вирок/ухвала/покарання",
+  "meta": {
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

@@ -1,4 +1,12 @@
 {
   "id": "b7f58b06-cff9-4826-9b36-9dacb83b76d0",
-  "name": "domicileChangeRestrictions"
+  "conceptType": "relations",
+  "name": "domicileChangeRestrictions",
+  "meta": {
+    "formField": {
+      "type": "form",
+      "layout": "inline"
+    },
+    "multiple": false
+  }
 }

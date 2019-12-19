@@ -1,4 +1,8 @@
 {
   "id": "542317fe-89fb-476c-9832-42f3f5a57285",
-  "name": "organizationTag"
+  "conceptType": "relations",
+  "name": "organizationTag",
+  "meta": {
+    "multiple": true
+  }
 }

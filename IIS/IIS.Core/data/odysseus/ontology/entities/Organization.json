@@ -1,5 +1,6 @@
 {
   "id": "64cebc6d-bd13-4908-a7a9-23d1042db3b8",
+  "conceptType": "entities",
   "name": "Organization",
   "title": "Суб'єкт",
   "attributes": [
@@ -31,11 +32,13 @@
     {
       "id": "8835859f-8eea-460a-8abc-392a0a980000",
       "name": "taxId",
+      "title": "Код ЄДРПОУ",
       "target": "TaxId"
     },
     {
       "id": "09276225-7246-4aa1-b18b-013510a96904",
       "name": "headOrganization",
+      "title": "Відомча підпорядкованість",
       "meta": {
         "inversed": {
           "code": "childOrganizations",
@@ -62,6 +65,7 @@
     {
       "id": "e4c8fa9f-828f-4bbb-a50d-a691d2539ea8",
       "name": "dotl",
+      "title": "Орган / підрозділ СБУ",
       "target": "Organization"
     },
     {
@@ -77,36 +81,43 @@
     {
       "id": "0fdd7b8d-f857-47ce-8855-81ea1697288b",
       "name": "locatedAt",
+      "title": "Фактична адреса",
       "target": "Address"
     },
     {
       "id": "2ce3a392-450b-4f10-b3dd-96cb118ecc72",
       "name": "registeredAt",
+      "title": "Юридична адреса",
       "target": "Address"
     },
     {
       "id": "59c25244-5be0-45de-8074-830ed33e3ec1",
       "name": "branchAddress",
+      "title": "Філія",
       "target": "Address"
     },
     {
       "id": "aedf055a-b672-42c1-9016-12506a8aad5f",
       "name": "secretFacilityAddress",
+      "title": "РСО",
       "target": "Address"
     },
     {
       "id": "d7f8fd70-8573-42ba-9046-e5574d49c44a",
       "name": "secretFacilityArchiveAddress",
+      "title": "Архів РСО",
       "target": "Address"
     },
     {
       "id": "83f20f1e-d9f8-474a-8978-dd40953f96e6",
       "name": "rSOCreationRequest",
+      "title": "Вмотивований запит на створення РСО",
       "target": "Attachment"
     },
     {
       "id": "f6e79482-2243-4987-8ef7-f3dccf7f0fcb",
       "name": "statuteOnEPARSS",
+      "title": "Положення про СРСД",
       "target": "Attachment"
     },
     {
@@ -183,12 +194,17 @@
     {
       "id": "831f9c5b-cb11-45c7-a9bf-ddf96b11b94e",
       "name": "head",
+      "title": "Керівник",
       "target": "Person"
     },
     {
       "id": "e8ce10d6-376e-416d-8017-ea8f710a6b67",
       "name": "beneficiary",
+      "title": "Засновнки (бенефіциари)",
       "target": "Person"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

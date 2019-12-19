@@ -1,5 +1,6 @@
 {
   "id": "2ce3a392-450b-4f10-b3dd-96cb118ecc72",
+  "conceptType": "relations",
   "name": "registeredAt",
   "title": "Юридична адреса"
 }

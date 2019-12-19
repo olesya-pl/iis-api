@@ -1,8 +1,10 @@
 {
   "id": "698f0493-1937-4155-a9e1-0f6bdffc332a",
+  "conceptType": "entities",
   "name": "Corps",
   "title": "Рiд вiйськ",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {}
 }

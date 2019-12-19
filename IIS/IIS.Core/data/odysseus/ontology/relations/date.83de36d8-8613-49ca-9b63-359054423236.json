@@ -1,5 +1,12 @@
 {
   "id": "83de36d8-8613-49ca-9b63-359054423236",
+  "conceptType": "relations",
   "name": "date",
-  "title": "Дата реєстрації"
+  "title": "Дата реєстрації",
+  "meta": {
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

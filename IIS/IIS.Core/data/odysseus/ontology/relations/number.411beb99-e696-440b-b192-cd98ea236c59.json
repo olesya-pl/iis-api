@@ -1,5 +1,12 @@
 {
   "id": "411beb99-e696-440b-b192-cd98ea236c59",
+  "conceptType": "relations",
   "name": "number",
-  "title": "Номер"
+  "title": "Номер",
+  "meta": {
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

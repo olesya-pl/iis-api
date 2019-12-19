@@ -1,5 +1,9 @@
 {
   "id": "5d08cda2-1aef-436e-9a01-130598cdb922",
+  "conceptType": "relations",
   "name": "accessors",
-  "title": "Список осіб, допущених до роботи"
+  "title": "Список осіб, допущених до роботи",
+  "meta": {
+    "multiple": true
+  }
 }

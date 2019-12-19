@@ -1,5 +1,6 @@
 {
   "id": "882cae61-c616-41f1-9ddc-9be9e68f86d9",
+  "conceptType": "attributes",
   "name": "description",
   "title": "Додаткові дані",
   "type": "String",

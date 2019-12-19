@@ -1,36 +1,43 @@
 {
   "id": "fdcb801c-182a-4882-a2c7-4ac7002ba64b",
+  "conceptType": "entities",
   "name": "Srddw",
   "title": "НДДКР",
   "attributes": [
     {
       "id": "7508d723-5c69-43fa-af1a-c42ab2748053",
       "name": "cypherName",
+      "title": "Шифр роботи",
       "target": "Text"
     },
     {
       "id": "5f883d14-c7bd-4d18-9ba9-191189e51e91",
       "name": "fullName",
+      "title": "Повна назва роботи",
       "target": "Text"
     },
     {
       "id": "0886efbd-7e92-4d0b-b76e-04109a11fd25",
       "name": "workBasis",
+      "title": "Підстава для виконання роботи",
       "target": "Text"
     },
     {
       "id": "7cb8f42f-0b23-4af4-86e7-9e7718da56b9",
       "name": "coContractor",
+      "title": "Співвиконавець (співвиконавці)",
       "target": "Organization"
     },
     {
       "id": "e75c9b07-0bf0-4ed1-8cf7-3bec054fde01",
       "name": "contractor",
+      "title": "Виконавець роботи",
       "target": "Organization"
     },
     {
       "id": "378c51d6-01a6-4f75-8140-1621c1e1150c",
       "name": "customer",
+      "title": "Замовник роботи",
       "target": "Organization"
     },
     {
@@ -41,11 +48,13 @@
     {
       "id": "eddb496c-8e7b-455b-af9b-9495afc0cb1e",
       "name": "pssActivitiesPlan",
+      "title": "План заходів ОДТ по НДДКР",
       "target": "Attachment"
     },
     {
       "id": "65c3ebc0-7d2a-4ec8-a911-ceba5e4b5e92",
       "name": "currentStage",
+      "title": "Поточний етап",
       "meta": {
         "acceptsEntityOperations": [],
         "multiple": false
@@ -66,22 +75,33 @@
     {
       "id": "21bcc4ba-ee6e-4340-b793-bb26521a8c50",
       "name": "secretLevel",
+      "title": "Ступінь секретності роботи",
       "target": "AccessLevel"
     },
     {
       "id": "b356e925-49b4-4851-8e61-a637e3df6731",
       "name": "startDate",
+      "title": "Дата початку роботи",
       "target": "Date"
     },
     {
       "id": "1cf30e62-9b52-4bb5-8fa3-ed5980c1efbe",
       "name": "endDate",
+      "title": "Дата завершення роботи",
       "target": "Date"
     },
     {
       "id": "5d08cda2-1aef-436e-9a01-130598cdb922",
       "name": "accessors",
+      "title": "Список осіб, допущених до роботи",
       "target": "Person"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

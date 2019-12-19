@@ -1,5 +1,15 @@
 {
   "id": "09276225-7246-4aa1-b18b-013510a96904",
+  "conceptType": "relations",
   "name": "headOrganization",
-  "title": "Відомча підпорядкованість"
+  "title": "Відомча підпорядкованість",
+  "meta": {
+    "inversed": {
+      "code": "childOrganizations",
+      "editable": false,
+      "title": "Філії",
+      "multiple": true
+    },
+    "multiple": false
+  }
 }

@@ -1,5 +1,6 @@
 {
   "id": "35d5afe8-e38d-48ef-af4b-41568e9ff518",
+  "conceptType": "attributes",
   "name": "dateOfJobPositionActualization",
   "title": "Дата актуальності посади",
   "type": "DateTime",

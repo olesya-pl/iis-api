@@ -1,8 +1,12 @@
 {
   "id": "f70cd011-4f9d-409b-b2de-eee01174dc32",
+  "conceptType": "entities",
   "name": "PropertyOwnership",
   "title": "Форма власності",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

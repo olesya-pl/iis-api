@@ -1,5 +1,12 @@
 {
   "id": "7b493785-b1d9-41bd-8276-c8b2f021ea90",
+  "conceptType": "relations",
   "name": "judgment",
-  "title": "Рішення суду"
+  "title": "Рішення суду",
+  "meta": {
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

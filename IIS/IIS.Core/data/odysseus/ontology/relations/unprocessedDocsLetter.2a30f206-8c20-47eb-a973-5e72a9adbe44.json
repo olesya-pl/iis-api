@@ -1,4 +1,11 @@
 {
   "id": "2a30f206-8c20-47eb-a973-5e72a9adbe44",
-  "name": "unprocessedDocsLetter"
+  "conceptType": "relations",
+  "name": "unprocessedDocsLetter",
+  "meta": {
+    "formField": {
+      "type": "table"
+    },
+    "multiple": true
+  }
 }

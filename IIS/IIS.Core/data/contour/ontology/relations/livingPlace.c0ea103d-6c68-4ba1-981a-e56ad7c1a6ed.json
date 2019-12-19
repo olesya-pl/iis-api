@@ -1,5 +1,6 @@
 {
   "id": "c0ea103d-6c68-4ba1-981a-e56ad7c1a6ed",
+  "conceptType": "relations",
   "name": "livingPlace",
   "title": "Місце останнього проживання",
   "meta": {

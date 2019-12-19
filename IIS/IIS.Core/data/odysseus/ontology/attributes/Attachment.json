@@ -1,6 +1,8 @@
 {
   "id": "84d3eaa5-bbc3-4ce7-b179-6ea0c5a851d9",
+  "conceptType": "attributes",
   "name": "Attachment",
   "title": "Додані файли",
-  "type": "File"
+  "type": "File",
+  "meta": {}
 }

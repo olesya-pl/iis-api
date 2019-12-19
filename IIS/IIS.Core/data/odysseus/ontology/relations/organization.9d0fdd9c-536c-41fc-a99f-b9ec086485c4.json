@@ -1,5 +1,15 @@
 {
   "id": "9d0fdd9c-536c-41fc-a99f-b9ec086485c4",
+  "conceptType": "relations",
   "name": "organization",
-  "title": "Поточне місце роботи"
+  "title": "Поточне місце роботи",
+  "meta": {
+    "inversed": {
+      "code": "employees",
+      "editable": false,
+      "title": "Працівники",
+      "multiple": true
+    },
+    "multiple": false
+  }
 }

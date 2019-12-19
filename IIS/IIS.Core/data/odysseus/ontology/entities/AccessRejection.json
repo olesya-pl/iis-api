@@ -1,12 +1,21 @@
 {
   "id": "6c3679da-2f14-45f5-a419-3bbb8399a4bf",
+  "conceptType": "entities",
   "name": "AccessRejection",
   "title": "31. Відмова у наданні допуску до державної таємниці чи його примусове скасування – п. 11 Переліку питань…, або відповідні висновки чи розпорядження СБУ.",
   "attributes": [
     {
       "id": "6413f993-6b94-441e-ad37-d6679c639fa1",
       "name": "cancellation",
+      "title": "Розпорядження СБУ про скасуваня",
       "target": "Attachment"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,4 +1,12 @@
 {
   "id": "55d756c6-bfc1-417c-98c9-620b016035b7",
-  "name": "highRiskPositionAudit"
+  "conceptType": "relations",
+  "name": "highRiskPositionAudit",
+  "meta": {
+    "formField": {
+      "type": "form",
+      "layout": "inline"
+    },
+    "multiple": false
+  }
 }

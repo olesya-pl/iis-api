@@ -1,8 +1,12 @@
 {
   "id": "65347d41-ecf5-4536-9643-2e5c8c840252",
+  "conceptType": "entities",
   "name": "OrganizationTag",
   "title": "Теги",
   "extends": [
     "Tag"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

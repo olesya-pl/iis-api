@@ -1,8 +1,12 @@
 {
   "id": "c9702dbb-0a67-414a-a11b-f16d2881c6fd",
+  "conceptType": "entities",
   "name": "SpecialPermitStatus",
   "title": "Статус спецдозволу",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

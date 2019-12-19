@@ -1,8 +1,12 @@
 {
   "id": "53b83ca1-e0d2-4545-8797-0ae08ca36038",
+  "conceptType": "entities",
   "name": "RadarWeaponrySign",
   "title": "Радіолокаційне озброєння",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

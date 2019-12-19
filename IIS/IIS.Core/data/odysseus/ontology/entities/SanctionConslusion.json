@@ -1,22 +1,33 @@
 {
   "id": "4bc2d210-de6b-4f05-a282-ae6d2b5e5021",
+  "conceptType": "entities",
   "name": "SanctionConslusion",
   "title": "SanctionConslusion",
   "attributes": [
     {
       "id": "53c57fe7-822c-4b81-af7a-aa70393ba990",
       "name": "attachment",
+      "title": "Оригінал",
       "target": "Attachment"
     },
     {
       "id": "dd49e6a5-f863-4c85-8b1c-9955a95ac906",
       "name": "date",
+      "title": "Дата реєстрації",
       "target": "Date"
     },
     {
       "id": "411beb99-e696-440b-b192-cd98ea236c59",
       "name": "number",
+      "title": "Номер",
       "target": "Number"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

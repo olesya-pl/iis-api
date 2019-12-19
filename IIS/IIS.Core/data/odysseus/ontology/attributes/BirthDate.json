@@ -1,6 +1,8 @@
 {
   "id": "c839c6f0-b9bd-42ec-af36-5424c749fdd1",
+  "conceptType": "attributes",
   "name": "BirthDate",
   "title": "Дата народження",
-  "type": "DateTime"
+  "type": "DateTime",
+  "meta": {}
 }

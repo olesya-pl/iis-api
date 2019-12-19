@@ -1,8 +1,12 @@
 {
   "id": "f6e148e7-12ac-497a-b732-3cd613cc839b",
+  "conceptType": "entities",
   "name": "OsintSign",
   "title": "Ознака Osint",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

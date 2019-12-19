@@ -1,5 +1,6 @@
 {
   "id": "fdc2d199-e340-4dcf-a2ee-04b1db9b79bd",
+  "conceptType": "relations",
   "name": "subtype",
   "title": "Підтип",
   "meta": {

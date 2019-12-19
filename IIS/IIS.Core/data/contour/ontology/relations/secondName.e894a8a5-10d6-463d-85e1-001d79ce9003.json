@@ -1,5 +1,6 @@
 {
   "id": "e894a8a5-10d6-463d-85e1-001d79ce9003",
+  "conceptType": "relations",
   "name": "secondName",
   "title": "Прізвище",
   "meta": {

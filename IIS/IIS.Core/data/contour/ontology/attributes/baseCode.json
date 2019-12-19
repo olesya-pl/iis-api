@@ -1,5 +1,6 @@
 {
   "id": "19ea714b-3264-4f98-9d6c-eb9b0f0f2b01",
+  "conceptType": "attributes",
   "name": "baseCode",
   "title": "Номер військової частини",
   "type": "String",

@@ -1,4 +1,11 @@
 {
   "id": "f04ea571-83e9-4e4f-82f2-de13bcd87dc1",
-  "name": "listOfPositions"
+  "conceptType": "relations",
+  "name": "listOfPositions",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

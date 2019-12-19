@@ -1,5 +1,6 @@
 {
   "id": "43927602-182d-42c5-a193-95174baa9ea7",
+  "conceptType": "entities",
   "name": "Infrastructure",
   "title": "Інфраструктура",
   "extends": [
@@ -125,5 +126,6 @@
       },
       "target": "MilitaryBase"
     }
-  ]
+  ],
+  "meta": {}
 }

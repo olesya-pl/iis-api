@@ -1,5 +1,6 @@
 {
   "id": "59b45be0-65d2-4e5f-9f53-fcda4368aa18",
+  "conceptType": "attributes",
   "name": "maritalStatus",
   "title": "Сімейний стан",
   "type": "String",

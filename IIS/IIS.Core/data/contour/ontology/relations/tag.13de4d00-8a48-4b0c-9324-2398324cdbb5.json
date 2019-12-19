@@ -1,5 +1,6 @@
 {
   "id": "13de4d00-8a48-4b0c-9324-2398324cdbb5",
+  "conceptType": "relations",
   "name": "tag",
   "title": "Теги",
   "meta": {

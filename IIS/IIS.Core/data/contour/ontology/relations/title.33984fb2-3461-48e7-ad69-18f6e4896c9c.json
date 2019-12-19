@@ -1,5 +1,6 @@
 {
   "id": "33984fb2-3461-48e7-ad69-18f6e4896c9c",
+  "conceptType": "relations",
   "name": "title",
   "title": "Повна назва",
   "meta": {

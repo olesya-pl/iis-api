@@ -1,4 +1,12 @@
 {
   "id": "0b382c5d-ef8e-4acd-b22d-3e6b9619c205",
-  "name": "accessRejection"
+  "conceptType": "relations",
+  "name": "accessRejection",
+  "meta": {
+    "formField": {
+      "type": "form",
+      "layout": "inline"
+    },
+    "multiple": false
+  }
 }

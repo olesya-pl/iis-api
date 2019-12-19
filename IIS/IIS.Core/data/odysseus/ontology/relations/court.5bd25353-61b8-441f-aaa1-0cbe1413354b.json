@@ -1,5 +1,6 @@
 {
   "id": "5bd25353-61b8-441f-aaa1-0cbe1413354b",
+  "conceptType": "relations",
   "name": "court",
   "title": "Суд, який розглядає матеріали КП"
 }

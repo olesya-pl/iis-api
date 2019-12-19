@@ -1,5 +1,6 @@
 {
   "id": "56c3b98d-f7b5-4cf6-a610-76bf5f91613b",
+  "conceptType": "entities",
   "name": "MilitaryBase",
   "title": "Військова частина",
   "extends": [
@@ -60,5 +61,6 @@
       },
       "target": "shortName"
     }
-  ]
+  ],
+  "meta": {}
 }

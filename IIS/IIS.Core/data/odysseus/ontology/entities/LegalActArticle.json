@@ -1,5 +1,6 @@
 {
   "id": "bcea0365-4269-44a8-9758-2ffba6ea5cf1",
+  "conceptType": "entities",
   "name": "LegalActArticle",
   "title": "НПА",
   "attributes": [
@@ -13,5 +14,6 @@
       "name": "number",
       "target": "Number"
     }
-  ]
+  ],
+  "meta": {}
 }

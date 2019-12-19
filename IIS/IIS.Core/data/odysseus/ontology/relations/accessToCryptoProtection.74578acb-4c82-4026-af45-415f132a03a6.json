@@ -1,5 +1,13 @@
 {
   "id": "74578acb-4c82-4026-af45-415f132a03a6",
+  "conceptType": "relations",
   "name": "accessToCryptoProtection",
-  "title": "17. Доступ до засобів криптографічного захисту секретної інформації (шифри тощо)."
+  "title": "17. Доступ до засобів криптографічного захисту секретної інформації (шифри тощо).",
+  "meta": {
+    "formField": {
+      "type": "form",
+      "layout": "inline"
+    },
+    "multiple": false
+  }
 }

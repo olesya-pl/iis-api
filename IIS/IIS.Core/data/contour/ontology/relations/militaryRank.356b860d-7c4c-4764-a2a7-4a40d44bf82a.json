@@ -1,5 +1,6 @@
 {
   "id": "356b860d-7c4c-4764-a2a7-4a40d44bf82a",
+  "conceptType": "relations",
   "name": "militaryRank",
   "title": "Військове звання",
   "meta": {

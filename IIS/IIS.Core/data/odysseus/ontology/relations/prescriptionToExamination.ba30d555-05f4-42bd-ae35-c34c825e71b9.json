@@ -1,5 +1,15 @@
 {
   "id": "ba30d555-05f4-42bd-ae35-c34c825e71b9",
+  "conceptType": "relations",
   "name": "prescriptionToExamination",
-  "title": "Припис на перевірку"
+  "title": "Припис на перевірку",
+  "meta": {
+    "formField": {
+      "type": "legalDocument"
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

@@ -1,6 +1,7 @@
 {
   "id": "dc44910c-c022-467c-baeb-48b2965ec178",
   "abstract": true,
+  "conceptType": "entities",
   "name": "Enum",
   "title": "Список",
   "attributes": [
@@ -27,5 +28,6 @@
       },
       "target": "sortOrder"
     }
-  ]
+  ],
+  "meta": {}
 }

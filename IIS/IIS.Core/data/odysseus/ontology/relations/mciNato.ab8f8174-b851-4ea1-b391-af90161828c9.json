@@ -1,4 +1,11 @@
 {
   "id": "ab8f8174-b851-4ea1-b391-af90161828c9",
-  "name": "mciNato"
+  "conceptType": "relations",
+  "name": "mciNato",
+  "meta": {
+    "formField": {
+      "type": "table"
+    },
+    "multiple": true
+  }
 }

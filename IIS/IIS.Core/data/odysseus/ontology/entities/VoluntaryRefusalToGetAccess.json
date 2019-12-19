@@ -1,12 +1,21 @@
 {
   "id": "e123cce3-3f82-4d31-96e8-e6bc28a16970",
+  "conceptType": "entities",
   "name": "VoluntaryRefusalToGetAccess",
   "title": "34. Добровільна відмова громадянина від допуску до державної таємниці – заява особи чи лист керівника СРСД.",
   "attributes": [
     {
       "id": "a1d474a6-dea4-49dc-b03a-81685457b2df",
       "name": "application",
+      "title": "Заява про відмову",
       "target": "Attachment"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

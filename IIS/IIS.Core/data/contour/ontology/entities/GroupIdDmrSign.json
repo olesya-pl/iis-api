@@ -1,8 +1,12 @@
 {
   "id": "4e5b827b-d452-4f89-9f6f-d006d7e90c7a",
+  "conceptType": "entities",
   "name": "GroupIdDmrSign",
   "title": "group id(dmr)",
   "extends": [
     "ObjectSign"
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

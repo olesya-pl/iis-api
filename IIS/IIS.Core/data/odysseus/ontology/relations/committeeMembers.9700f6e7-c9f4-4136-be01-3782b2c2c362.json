@@ -1,5 +1,9 @@
 {
   "id": "9700f6e7-c9f4-4136-be01-3782b2c2c362",
+  "conceptType": "relations",
   "name": "committeeMembers",
-  "title": "Члени комісії"
+  "title": "Члени комісії",
+  "meta": {
+    "multiple": true
+  }
 }

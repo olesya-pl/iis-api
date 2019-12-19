@@ -1,5 +1,12 @@
 {
   "id": "fd130afa-036b-4f32-a67c-8bb62f3ba40f",
+  "conceptType": "relations",
   "name": "checkPeriod",
-  "title": "Період діяльності, який перевіряється"
+  "title": "Період діяльності, який перевіряється",
+  "meta": {
+    "formField": {
+      "type": "dateRange"
+    },
+    "multiple": false
+  }
 }

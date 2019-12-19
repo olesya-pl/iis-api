@@ -1,5 +1,6 @@
 {
   "id": "88640bb8-43cf-4615-a39a-a27cbb500432",
+  "conceptType": "entities",
   "name": "Address",
   "title": "Адреса",
   "attributes": [
@@ -48,5 +49,12 @@
       "name": "region",
       "target": "Region"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

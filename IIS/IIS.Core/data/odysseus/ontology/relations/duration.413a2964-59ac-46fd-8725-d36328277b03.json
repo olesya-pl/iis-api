@@ -1,5 +1,12 @@
 {
   "id": "413a2964-59ac-46fd-8725-d36328277b03",
+  "conceptType": "relations",
   "name": "duration",
-  "title": "Тривалість перевірки"
+  "title": "Тривалість перевірки",
+  "meta": {
+    "formField": {
+      "type": "dateRange"
+    },
+    "multiple": false
+  }
 }

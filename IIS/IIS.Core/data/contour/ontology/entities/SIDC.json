@@ -1,5 +1,6 @@
 {
   "id": "dda028ca-7769-4c93-a7b8-fa54a2359649",
+  "conceptType": "entities",
   "name": "SIDC",
   "title": "SIDC",
   "extends": [
@@ -16,5 +17,6 @@
       },
       "target": "code"
     }
-  ]
+  ],
+  "meta": {}
 }

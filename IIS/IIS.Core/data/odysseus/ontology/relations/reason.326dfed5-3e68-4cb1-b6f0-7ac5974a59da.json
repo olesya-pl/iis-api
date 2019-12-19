@@ -1,5 +1,15 @@
 {
   "id": "326dfed5-3e68-4cb1-b6f0-7ac5974a59da",
+  "conceptType": "relations",
   "name": "reason",
-  "title": "Підстава (№ акта)"
+  "title": "Підстава (№ акта)",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

@@ -1,5 +1,15 @@
 {
   "id": "31f28d18-8771-48f7-be9b-be558b78aa8e",
+  "conceptType": "relations",
   "name": "conclusion",
-  "title": "Висновок за результатами розслідування"
+  "title": "Висновок за результатами розслідування",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false,
+    "validation": {
+      "required": true
+    }
+  }
 }

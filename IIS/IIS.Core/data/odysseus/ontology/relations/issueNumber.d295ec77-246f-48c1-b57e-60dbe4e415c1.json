@@ -1,5 +1,6 @@
 {
   "id": "d295ec77-246f-48c1-b57e-60dbe4e415c1",
+  "conceptType": "relations",
   "name": "issueNumber",
   "title": "Номер спецдозволу"
 }

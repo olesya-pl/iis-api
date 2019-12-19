@@ -1,6 +1,7 @@
 {
   "id": "46cf0540-27b8-468b-b55a-e77a3d575767",
   "abstract": true,
+  "conceptType": "entities",
   "name": "ObjectSign",
   "title": "Ознака об'єкту розвідки",
   "attributes": [
@@ -17,5 +18,8 @@
       },
       "target": "value"
     }
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

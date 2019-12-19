@@ -1,5 +1,6 @@
 {
   "id": "5bc64f8f-2265-4e09-909f-2c111f7af7d3",
+  "conceptType": "relations",
   "name": "fatherName",
   "title": "По батькові",
   "meta": {

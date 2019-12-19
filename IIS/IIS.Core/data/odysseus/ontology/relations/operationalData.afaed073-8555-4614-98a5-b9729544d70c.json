@@ -1,4 +1,12 @@
 {
   "id": "afaed073-8555-4614-98a5-b9729544d70c",
-  "name": "operationalData"
+  "conceptType": "relations",
+  "name": "operationalData",
+  "meta": {
+    "formField": {
+      "type": "table",
+      "hasIndexColumn": true
+    },
+    "multiple": true
+  }
 }

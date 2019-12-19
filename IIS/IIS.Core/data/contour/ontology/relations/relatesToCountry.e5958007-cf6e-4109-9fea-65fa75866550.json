@@ -1,5 +1,6 @@
 {
   "id": "e5958007-cf6e-4109-9fea-65fa75866550",
+  "conceptType": "relations",
   "name": "relatesToCountry",
   "title": "Громадянство",
   "meta": {

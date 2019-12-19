@@ -1,5 +1,6 @@
 {
   "id": "37b1a330-5dcc-4969-ba73-08808162a27d",
+  "conceptType": "relations",
   "name": "issueDate",
   "title": "Дата видачі"
 }

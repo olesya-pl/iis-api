@@ -1,6 +1,8 @@
 {
   "id": "4c3f9a72-ac84-4e74-8558-55886381df08",
+  "conceptType": "attributes",
   "name": "Photo",
   "title": "Фото",
-  "type": "File"
+  "type": "File",
+  "meta": {}
 }

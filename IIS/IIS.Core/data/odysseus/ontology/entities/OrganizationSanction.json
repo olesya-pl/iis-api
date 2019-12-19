@@ -1,9 +1,17 @@
 {
   "id": "4dcb97ac-e708-453d-aa5b-153c21809d2c",
   "abstract": true,
+  "conceptType": "entities",
   "name": "OrganizationSanction",
   "title": "Санкція до організацій",
   "extends": [
     "Sanction"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,8 +1,12 @@
 {
   "id": "98a5105c-f842-4765-a10f-609dd099a5e2",
+  "conceptType": "entities",
   "name": "VettingProcedureKind",
   "title": "Вид перевірки",
   "extends": [
     "Enum"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": []
+  }
 }

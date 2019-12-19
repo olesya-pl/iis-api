@@ -1,5 +1,6 @@
 {
   "id": "fb8fcc06-01b9-458b-a86a-eeeaa5282e93",
+  "conceptType": "relations",
   "name": "child",
   "title": "Ієрархічний вказівник на дочірні елементи",
   "meta": {

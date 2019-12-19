@@ -1,5 +1,6 @@
 {
   "id": "ae32e86f-df70-4954-a6ed-b11980068e05",
+  "conceptType": "entities",
   "name": "Passport",
   "title": "Паспорт",
   "attributes": [
@@ -16,7 +17,15 @@
     {
       "id": "e3662ed5-fcd9-4d2e-956b-0fb17e37bd98",
       "name": "code",
+      "title": "Серія та номер",
       "target": "Code"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

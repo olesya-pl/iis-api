@@ -1,5 +1,6 @@
 {
   "id": "8fc4243d-6d24-4c52-8630-42b688c57306",
+  "conceptType": "entities",
   "name": "MciNato",
   "title": "МНІ НАТО",
   "attributes": [
@@ -11,7 +12,15 @@
     {
       "id": "6f57993b-cd57-48e1-8820-e7de6732580d",
       "name": "category",
+      "title": "Категорія",
       "target": "NatoAccessLevel"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

@@ -1,17 +1,27 @@
 {
   "id": "6116815d-4755-4c97-a571-f05dbf64f160",
+  "conceptType": "entities",
   "name": "DateRange",
   "title": "Проміжок часу",
   "attributes": [
     {
       "id": "f81f6764-ce59-4d95-889c-f485ee7f052f",
       "name": "startDate",
+      "title": "Початок",
       "target": "Date"
     },
     {
       "id": "b905a59b-24bd-4f74-a215-11fbbf61fbd2",
       "name": "endDate",
+      "title": "Кінець",
       "target": "Date"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

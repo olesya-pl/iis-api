@@ -1,5 +1,6 @@
 {
   "id": "42c958bb-6699-45bc-93f4-49e23abb4928",
+  "conceptType": "entities",
   "name": "CellphoneSign",
   "title": "Мобільний телефон",
   "extends": [
@@ -20,5 +21,8 @@
       },
       "target": "value"
     }
-  ]
+  ],
+  "meta": {
+    "exposeOnApi": false
+  }
 }

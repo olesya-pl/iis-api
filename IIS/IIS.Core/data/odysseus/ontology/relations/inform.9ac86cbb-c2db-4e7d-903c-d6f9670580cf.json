@@ -1,5 +1,12 @@
 {
   "id": "9ac86cbb-c2db-4e7d-903c-d6f9670580cf",
+  "conceptType": "relations",
   "name": "inform",
-  "title": "Інформування"
+  "title": "Інформування",
+  "meta": {
+    "formField": {
+      "type": "form"
+    },
+    "multiple": false
+  }
 }

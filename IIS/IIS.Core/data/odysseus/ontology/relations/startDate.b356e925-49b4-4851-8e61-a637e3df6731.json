@@ -1,5 +1,6 @@
 {
   "id": "b356e925-49b4-4851-8e61-a637e3df6731",
+  "conceptType": "relations",
   "name": "startDate",
   "title": "Дата початку роботи"
 }

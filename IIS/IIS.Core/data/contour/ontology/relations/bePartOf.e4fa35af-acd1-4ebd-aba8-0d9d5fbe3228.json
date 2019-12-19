@@ -1,5 +1,6 @@
 {
   "id": "e4fa35af-acd1-4ebd-aba8-0d9d5fbe3228",
+  "conceptType": "relations",
   "name": "bePartOf",
   "title": "Належність",
   "meta": {

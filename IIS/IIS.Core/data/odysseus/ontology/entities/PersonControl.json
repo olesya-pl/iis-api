@@ -1,11 +1,13 @@
 {
   "id": "eaedca2b-1594-4c0f-9a9b-1d9dbcb2dccf",
+  "conceptType": "entities",
   "name": "PersonControl",
   "title": "PersonControl",
   "attributes": [
     {
       "id": "41103999-cf24-459c-91e6-8c65a6d3884c",
       "name": "checkResult",
+      "title": "Резолюція по кандидату",
       "meta": {
         "formField": {
           "type": "radioGroup",
@@ -18,11 +20,13 @@
     {
       "id": "c9c10195-1a9b-450b-8a52-27f1e0d09523",
       "name": "requestAttachment",
+      "title": "Вмотивований запит",
       "target": "Attachment"
     },
     {
       "id": "ae4de502-dbf2-4016-90c6-f0d622175527",
       "name": "resultAttachment",
+      "title": "Розпорядження (результат)",
       "target": "Attachment"
     },
     {
@@ -33,7 +37,15 @@
     {
       "id": "0edc8d09-cf37-466e-8d85-37166888933a",
       "name": "date",
+      "title": "Дата розпорядження",
       "target": "Date"
     }
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }

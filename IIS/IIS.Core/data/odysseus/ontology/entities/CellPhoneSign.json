@@ -1,8 +1,16 @@
 {
   "id": "15f33463-96b0-4238-bb14-0c6cbdf3e792",
+  "conceptType": "entities",
   "name": "CellPhoneSign",
   "title": "Мобільний телефон",
   "extends": [
     "PhoneSign"
-  ]
+  ],
+  "meta": {
+    "acceptsEmbeddedOperations": [
+      "Create",
+      "Update",
+      "Delete"
+    ]
+  }
 }
