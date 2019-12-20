@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using IIS.Core.Ontology.Meta;
@@ -6,7 +6,6 @@ using IIS.Core.Ontology.Meta;
 namespace IIS.Core.Ontology
 {
     public enum EmbeddingOptions { Optional, Required, Multiple }
-
     public class EmbeddingRelationType : RelationType
     {
         public bool IsInversed { get; }

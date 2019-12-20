@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Linq;
 
 namespace IIS.Core.Ontology
 {
-    public sealed class EntityType : Type
+    public class EntityType : Type
     {
         public bool IsAbstract { get; }
         public bool IsMarker => !RelatedTypes.Any();

@@ -87,8 +87,8 @@ namespace IIS.Core.GraphQL.Entities
 
         public void AddQueryFields(IObjectTypeDescriptor descriptor, EntityType type)
         {
-            IOntologyType objectType = _repository.GetOntologyType(type);
-            CollectionType collectionType =
+            var objectType = _repository.GetOntologyType(type);
+            var collectionType =
                 new CollectionType(OntologyObjectType.GetName(type), objectType); // TODO: new NonNullType() won't work
             descriptor.Field($"entity{type.Name}")
                 .Type(objectType)

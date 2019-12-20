@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using HotChocolate;
 using HotChocolate.Types;
@@ -82,9 +81,7 @@ namespace IIS.Core.GraphQL
             {
                 var ontology = _ontologyProvider.GetOntologyAsync().Result; // todo: refactor GetSchema to async
                 _typeRepository.InitializeTypes();
-
-                List<INamedType> types = _typeRepository.AllTypes.ToList();
-                foreach (var type in types)
+                foreach (var type in _typeRepository.AllTypes)
                     schemaBuilder.AddType(type);
                 return ontology;
             }
