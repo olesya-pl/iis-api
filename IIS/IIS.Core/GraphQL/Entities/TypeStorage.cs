@@ -8,28 +8,36 @@ using HCScalarType = HotChocolate.Types.ScalarType;
 
 namespace IIS.Core.GraphQL.Entities
 {
-    public class TypeStorage
+    public abstract class TypeStorage
     {
-        public Dictionary<Type, Dictionary<string, INamedType>> InputTypes =
-            new Dictionary<Type, Dictionary<string, INamedType>>();
+        public Dictionary<Type, Dictionary<string, INamedType>> InputTypes;
 
-        public Dictionary<Type, INamedType> CommonTypes { get; } = new Dictionary<Type, INamedType>();
+        public Dictionary<Type, INamedType> CommonTypes { get; }
 
-        public Dictionary<OScalarType, HCScalarType> Scalars { get; } = new Dictionary<OScalarType, HCScalarType>
-        {
-            [OScalarType.String] = new StringType(),
-            [OScalarType.Integer] = new IntType(),
-            [OScalarType.Boolean] = new BooleanType(),
-            [OScalarType.Decimal] = new DecimalType(),
-            [OScalarType.DateTime] = new DateTimeType(), // HotChocolate uses ISO-8601 by default
-            [OScalarType.Geo] = new AnyType(),
-//            [OScalarType.File] = null, // Implemented as a dirty hack in Extensions.AttributeType(), because File attribute is not scalar
-        };
+        public Dictionary<OScalarType, HCScalarType> Scalars { get; }
 
         public IEnumerable<INamedType> AllTypes => InputTypes.Values.SelectMany(d => d.Values)
             .Union(Scalars.Values).Union(CommonTypes.Values);
 
-        public T GetOrCreate<T>(string name, Func<T> creator) where T : INamedType
+        public TypeStorage()
+        {
+            InputTypes = new Dictionary<Type, Dictionary<string, INamedType>>();
+            CommonTypes = new Dictionary<Type, INamedType>();
+            Scalars = new Dictionary<OScalarType, HCScalarType>
+            {
+                [OScalarType.String] = new StringType(),
+                [OScalarType.Integer] = new IntType(),
+                [OScalarType.Boolean] = new BooleanType(),
+                [OScalarType.Decimal] = new DecimalType(),
+                [OScalarType.DateTime] = new DateTimeType(), // HotChocolate uses ISO-8601 by default
+                [OScalarType.Geo] = new AnyType(),
+                //[OScalarType.Geo] = new GeoJsonScalarType(),
+                //            [OScalarType.File] = null, // Implemented as a dirty hack in Extensions.AttributeType(), because File attribute is not scalar
+            };
+        }
+
+        public T GetOrCreate<T>(string name, Func<T> creator)
+            where T : INamedType
         {
             var type = typeof(T);
             if (!InputTypes.TryGetValue(type, out var dict))
@@ -39,7 +47,7 @@ namespace IIS.Core.GraphQL.Entities
             }
             else if (dict.ContainsKey(name))
             {
-                return (T) dict[name];
+                return (T)dict[name];
             }
 
             dict.Add(name, null); // Place empty record to avoid recursive calls on object creation
@@ -48,16 +56,18 @@ namespace IIS.Core.GraphQL.Entities
             return result;
         }
 
-        public T GetType<T>(string name) where T : INamedType
+        public T GetType<T>(string name)
+            where T : INamedType
         {
-            return (T) InputTypes[typeof(T)][name];
+            return (T)InputTypes[typeof(T)][name];
         }
 
-        public T GetType<T>() where T : INamedType, new()
+        public T GetType<T>()
+            where T : INamedType, new()
         {
             if (!CommonTypes.ContainsKey(typeof(T)))
                 CommonTypes.Add(typeof(T), new T());
-            return (T) CommonTypes[typeof(T)];
+            return (T)CommonTypes[typeof(T)];
         }
     }
 }

@@ -17,7 +17,7 @@ namespace IIS.Core.GraphQL.Entities
         }
     }
 
-    public class TypeRepository : TypeStorage
+    public sealed class TypeRepository : TypeStorage
     {
         private readonly IOntologyProvider _ontologyProvider;
         private readonly OntologyQueryTypesCreator _creator;
