@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 namespace IIS.Core
 {
@@ -14,13 +7,17 @@ namespace IIS.Core
     {
         public static void Main(string[] args)
         {
-            var webHost = CreateWebHostBuilder(args).Build();
-            if (new ConsoleUtilities(webHost.Services).ProcessArguments()) // do not start webserver if utilities were started
-                webHost.Run();
+            IHost host = CreateWebHostBuilder(args).Build();
+            if (new ConsoleUtilities(host.Services).ProcessArguments()) // do not start webserver if utilities were started
+                host.Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+
     }
 }

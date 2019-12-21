@@ -7,6 +7,7 @@ using HotChocolate.Resolvers;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -24,7 +25,8 @@ namespace IIS.Core.GraphQL.Users
         public LoginResponse Login([Required] string username, [Required] string password)
         {
             var hash = _configuration.GetPasswordHashAsBase64String(password);
-            var user = _context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == username.ToUpperInvariant() && u.PasswordHash == hash);
+            //var user = _context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == username.ToUpperInvariant() && u.PasswordHash == hash);
+            var user = _context.Users.SingleOrDefault(x => EF.Functions.Like(x.Username, $"%{username}%") && x.PasswordHash == hash);
 
             if (user == null || user.IsBlocked)
                 throw new InvalidCredentialException($"Wrong username or password");

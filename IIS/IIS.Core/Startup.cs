@@ -34,6 +34,7 @@ using RabbitMQ.Client;
 using IIS.Core.Analytics.EntityFramework;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 
 namespace IIS.Core
@@ -151,7 +152,7 @@ namespace IIS.Core
             EsConfiguration es = Configuration.GetSection("es").Get<EsConfiguration>();
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
-                .AddRabbitMQ(mqString);
+                .AddRabbitMQ(mqString, HealthStatus.Unhealthy);
                 //.AddElasticsearch(es.Host);
 
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
@@ -159,7 +160,8 @@ namespace IIS.Core
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
             services.AddHostedService<MaterialEventConsumer>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            //services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers();
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
@@ -186,7 +188,7 @@ namespace IIS.Core
             }
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, OntologyContext context)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OntologyContext context)
         {
             if (env.IsDevelopment())
             {
@@ -197,7 +199,13 @@ namespace IIS.Core
             app.UseGraphQL();
             app.UsePlayground();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
-            app.UseMvc();
+
+            //app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             SeedData(context);
         }
@@ -235,7 +243,8 @@ namespace IIS.Core
 
             if (!string.IsNullOrWhiteSpace(defaultUserName) && !string.IsNullOrWhiteSpace(defaultPassword))
             {
-                var admin = context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == defaultUserName.ToUpperInvariant());
+                //var admin = context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == defaultUserName.ToUpperInvariant());
+                var admin = context.Users.SingleOrDefault(x => EF.Functions.Like(x.Name, $"%{defaultUserName}%"));
                 if (admin == null)
                 {
                     context.Users.Add(new Core.Users.EntityFramework.User
@@ -275,7 +284,7 @@ namespace IIS.Core
 
         private Task BeginInvoke(HttpContext context)
         {
-            context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { (string)context.Request.Headers["Origin"] });
+            context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { (string)context.Request.Headers["Origin"] ?? string.Empty });
             context.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "authorization,content-type" });
             context.Response.Headers.Add("Access-Control-Allow-Methods", new[] { "GET, POST, PUT, DELETE, OPTIONS" });
             context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
