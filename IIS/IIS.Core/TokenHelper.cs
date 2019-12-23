@@ -20,13 +20,13 @@ namespace IIS.Core
         static JwtSecurityTokenHandler _securityTokenHandler = new JwtSecurityTokenHandler();
         public static string NewToken(string issuer, string audiene, string securityKey, TimeSpan lifetime, IEnumerable<Claim> claims)
         {
-            var now = DateTime.Now;
+            DateTime expires = DateTime.Now.Add(lifetime);
             var token = new JwtSecurityToken(
                     issuer,
                     null,
                     claims,
                     null,
-                    now.Add(lifetime),
+                    expires,
                     new SigningCredentials(GetSymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256));
             return _securityTokenHandler.WriteToken(token);
         }

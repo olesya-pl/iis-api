@@ -12,7 +12,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLNonNullType] public Metadata Metadata { get; set; }
         [GraphQLType(typeof(IdType))] public Guid? ParentId { get; set; }
         [GraphQLType(typeof(IdType))] public Guid? FileId { get; set; }
-        [GraphQLNonNullType] public IEnumerable<Data> Data { get; set; }
+        public IEnumerable<Data> Data { get; set; }
     }
 
     public class Metadata
@@ -35,6 +35,23 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLNonNullType] public string Type { get; set; } // todo confluence
         [GraphQLNonNullType] public string Value { get; set; }
         [GraphQLType(typeof(JsonScalarType))] public JObject Original { get; set; }
+        public UpdateFieldData UpdateField { get; set; }
+    }
+
+    public class UpdateFieldData
+    {
+        public string Name { get; set; }
+
+        public List<FieldValue> Values { get; set; }
+    }
+
+    public class FieldValue
+    {
+        public double Lat { get; set; }
+
+        public double Lng { get; set; }
+
+        public DateTime RegisteredAt { get; set; }
     }
 
     public class Data

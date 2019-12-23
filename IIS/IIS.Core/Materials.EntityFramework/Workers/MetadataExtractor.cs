@@ -67,7 +67,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
                                ?? throw new ArgumentException($"EntityType {node.Type} does not exist");
                     // TODO: should work with any entity type. Currently works only with entities which has value
                     var relationType = type.GetProperty("value");
-                    var feat = ToDomain(node);
+                    Materials.MaterialFeature feat = ToDomain(node);
                     feat = await MapToNodeDirect(feat, type, relationType);
                     features.Add(feat);
                     _context.Add(ToDal(feat, info.Id));
