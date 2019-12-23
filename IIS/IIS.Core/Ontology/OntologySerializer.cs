@@ -15,12 +15,17 @@ namespace IIS.Core.Ontology
         {
             foreach (var type in ontology.Types)
             {
-                if (type is EmbeddingRelationType relationType && relationType.IsInversed)
+                if (_isVirtual(type))
                     continue;
 
                 var dataType = _mapToDataType(type);
                 _writeToFile(basePath, dataType);
             }
+        }
+
+        private bool _isVirtual(Type type)
+        {
+            return type is EmbeddingRelationType relationType && relationType.IsInversed || type is InheritanceRelationType;
         }
 
         private DataType<Meta.IMeta> _mapToDataType(Type type)

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
@@ -11,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
-    public class JsonOntologyProvider : IOntologyProvider
+    public class JsonOntologyProvider : BaseOntologyProvider, IOntologyProvider
     {
         private string _basePath;
 
@@ -35,7 +36,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
             foreach (var path in files)
             {
-                var conceptType = Path.GetFileName(Path.GetDirectoryName(path));
                 var dataType = _parseToDataType(path);
                 var rawType = _mapTypeToRawType(dataType);
 
@@ -102,15 +102,24 @@ namespace IIS.Core.Ontology.EntityFramework
             foreach (var pair in ctx.RawTypes)
             {
                 var rawType = pair.Value;
+                var type = rawType.OntologyType;
 
                 if (rawType.DataType.Attributes != null)
                     _linkAttributes(rawType, ctx);
 
                 if (rawType.DataType.Extends != null)
-                    _linkParents(rawType, ctx);
+                    types.AddRange(_linkParents(rawType, ctx));
 
-                rawType.OntologyType.Meta = rawType.OntologyType.CreateMeta();
-                types.Add(rawType.OntologyType);
+                type.Meta = type.Meta ?? type.CreateMeta();
+                types.Add(type);
+            }
+
+            foreach (var pair in ctx.Relations)
+            {
+                var inversedRelationType = _addInversedRelation(pair.Key, pair.Value);
+
+                if (inversedRelationType != null)
+                    types.Add(inversedRelationType);
             }
 
             return types;
@@ -128,20 +137,34 @@ namespace IIS.Core.Ontology.EntityFramework
 
                 attrType.AddType(targetType);
                 type.AddType(attrType);
+                ctx.Relations.Add((EmbeddingRelationType)attrType, type);
             }
         }
 
-        private void _linkParents(UnSerializedType rawType, LoadingContext ctx)
+        private IEnumerable<InheritanceRelationType> _linkParents(UnSerializedType rawType, LoadingContext ctx)
         {
+            var parentTypes = new List<InheritanceRelationType>();
             var now = DateTime.UtcNow;
+            var type = rawType.OntologyType;
 
             foreach (var parentName in rawType.DataType.Extends)
             {
+                if (_hasParent(type, parentName))
+                    continue;
+
                 var parent = ctx.TypesByName[parentName];
-                var inheritance = new InheritanceRelationType(parent.Id) { CreatedAt = now, UpdatedAt = now };
+                var inheritance = new InheritanceRelationType(Guid.NewGuid()) { CreatedAt = now, UpdatedAt = now };
                 inheritance.AddType(ctx.RawTypes[parent.Id].OntologyType);
                 rawType.OntologyType.AddType(inheritance);
+                parentTypes.Add(inheritance);
             }
+
+            return parentTypes;
+        }
+
+        private bool _hasParent(Type type, string parentName)
+        {
+            return type.DirectParents.Any(parentType => parentType.Name == parentName);
         }
 
         public void Invalidate()
@@ -153,6 +176,7 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             public Dictionary<Guid, UnSerializedType> RawTypes = new Dictionary<Guid, UnSerializedType>();
             public Dictionary<string, Type> TypesByName = new Dictionary<string, Type>();
+            public Dictionary<EmbeddingRelationType, Type> Relations= new Dictionary<EmbeddingRelationType, Type>();
         }
 
         class UnSerializedType

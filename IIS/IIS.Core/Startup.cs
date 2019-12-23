@@ -61,7 +61,6 @@ namespace IIS.Core
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
-            services.AddTransient<Ontology.Seeding.Odysseus.TypeSeeder>();
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<ILegacyMigrator, LegacyMigrator>();
             services.AddTransient<IOntologyService, OntologyService>();

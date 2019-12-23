@@ -79,9 +79,9 @@ If `--iis-actions` option is specified, application server doesn't start. To ove
 
 Ontology is cached in server's memory, so don't forget to restart server when you change it!
 
-### Odysseus
+Ontology is stored inside JSON files in [IIS/IIS.Core/data](./IIS/IIS.Core/data) for both contour and odysseus. To setup database for specific project please run one of the following commands:
 
-For this project the ontology structure is hand-coded in [IIS/IIS.Core/Ontology.Seeding/Odysseus](./IIS/IIS.Core/Ontology.Seeding/Odysseus) folder. So, you can seed and run the project:
+### Odysseus
 
 ```sh
 dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,fill-odysseus-types,seed-odysseus-data
@@ -91,6 +91,8 @@ Set `reportsAvailable` configuration variable to `false`.
 
 ### Contour
 
-For this project there is no hand-coded ontology version in .NET, only in [Node.js](https://git.warfare-tec.com/IIS/iis-api/tree/contour-master/src/ontology/contour). So, to run and seed the project you need to have either database dump for .NET or Node.js database with all required data (then follow [Migrate entities from Node.js db instructions](#migrate-entities-from-nodejs-db))
+```sh
+dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,fill-contour-types,seed-contour-data
+```
 
 Set `reportsAvailable` configuration variable to `true`.

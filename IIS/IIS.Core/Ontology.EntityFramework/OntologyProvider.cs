@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
-    public class OntologyProvider : IOntologyProvider
+    public class OntologyProvider : BaseOntologyProvider, IOntologyProvider
     {
         private readonly ContextFactory _contextFactory;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -134,7 +134,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     var target = mapType(relationType.TargetType);
                     relation.AddType(target);
                     relation.Meta = relation.CreateMeta(); // todo: refactor meta creation
-                    addInversedRelation(relation, _types[relationType.SourceTypeId]);
+                    _addInversedRelation(relation, _types[relationType.SourceTypeId]);
                 }
                 else if (relationType.Kind == RelationKind.Inheritance)
                 {
@@ -149,23 +149,16 @@ namespace IIS.Core.Ontology.EntityFramework
 
                 return relation;
             }
+        }
 
-            void addInversedRelation(RelationType relation, Type sourceType)
-            {
-                if (!(relation is EmbeddingRelationType ert) || !ert.HasInversed())
-                    return;
-                var meta = ert.GetInversed();
-//                var embeddingOptions = EmbeddingOptions.Multiple; // All inversed relations without validation are multiple
-                var embeddingOptions = meta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
-                var name = meta.Code ?? sourceType.Name.ToLowerCamelcase();
-                var title = meta.Title ?? sourceType.Title ?? name;
-                var result = new EmbeddingRelationType(Guid.NewGuid(), name, embeddingOptions, true);
-                result.Title = title;
-                result.AddType(sourceType); // link to source type
-                result.AddType(ert); // link to original direct relation type
-                _types.Add(result.Id, result);
-                ert.TargetType.AddType(result);
-            }
+        protected override RelationType _addInversedRelation(RelationType relation, Type sourceType)
+        {
+            var inversedRelation = base._addInversedRelation(relation, sourceType);
+
+            if (inversedRelation != null)
+                _types.Add(inversedRelation.Id, inversedRelation);
+
+            return inversedRelation;
         }
 
         private static void FillProperties(Context.Type type, Type ontologyType)

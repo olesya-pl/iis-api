@@ -28,6 +28,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public void SaveTypes(IEnumerable<Type> types)
         {
+            // for `types` you need to pass only EntityTypes and/or AttributeTypes
+            // RelationTypes are walked recursively based on that 2 types
             ClearTypes();
             foreach (var type in types)
                 SaveType(type);
@@ -36,12 +38,18 @@ namespace IIS.Core.Ontology.EntityFramework
             _ontologyContext.SaveChanges();
         }
 
-        private Context.Type SaveType(Type type, Type relationSource = null)
+        private Context.Type SaveType(Type type, Type relationSourceType = null)
         {
             if (type.Id == Guid.Empty)
                 throw new ArgumentException(nameof(type));
             if (_types.ContainsKey(type.Id))
                 return _types[type.Id];
+
+            if (type is EmbeddingRelationType rel && rel.IsInversed)
+            {
+                // inversed relations are virtual and shouldn't be saved
+                return null;
+            }
 
             var result = new Context.Type();
             result.Name = type.Name;
@@ -67,25 +75,35 @@ namespace IIS.Core.Ontology.EntityFramework
             }
             else if (type is RelationType rt)
             {
+                result.Kind = Context.Kind.Relation;
+
                 if (type is EmbeddingRelationType ert)
+                {
                     result.RelationType = new Context.RelationType
                     {
                         Kind = Context.RelationKind.Embedding,
                         EmbeddingOptions = Map(ert.EmbeddingOptions),
                         TargetType = SaveType(ert.TargetType),
                     };
+                }
                 else if (type is InheritanceRelationType irt)
+                {
                     result.RelationType = new Context.RelationType
                     {
                         Kind = Context.RelationKind.Inheritance,
                         EmbeddingOptions = Context.EmbeddingOptions.None,
                         TargetType = SaveType(irt.ParentType),
                     };
-                else throw new NotImplementedException();
-                if (relationSource == null) throw new ArgumentNullException(nameof(relationSource));
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
 
-                result.Kind = Context.Kind.Relation;
-                result.RelationType.SourceType = SaveType(relationSource);
+                if (relationSourceType == null)
+                    throw new ArgumentNullException($"Unable to create relation type \"{type.Name}\" without specified source type");
+
+                result.RelationType.SourceType = SaveType(relationSourceType);
             }
             else throw new NotImplementedException();
 

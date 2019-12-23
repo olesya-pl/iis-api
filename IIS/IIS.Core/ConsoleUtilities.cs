@@ -4,7 +4,6 @@ using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Core.Ontology.Seeding;
-using IIS.Core.Ontology.Seeding.Odysseus;
 using IIS.Legacy.EntityFramework;
 using IIS.Core.Analytics.EntityFramework;
 using Microsoft.EntityFrameworkCore;
@@ -28,12 +27,13 @@ namespace IIS.Core
             _actions.Add("migrate-legacy-entities", MigrateLegacyEntities);
             _actions.Add("migrate-legacy-files", MigrateLegacyFiles);
             _actions.Add("fill-odysseus-types", FillOdysseusTypes);
+            _actions.Add("fill-contour-types", FillContourTypes);
             _actions.Add("seed-contour-data", SeedContourData);
             _actions.Add("seed-odysseus-data", SeedOdysseusData);
             _actions.Add("apply-ef-migrations", ApplyEfMigrations);
-            _actions.Add("help", Help);
             _actions.Add("dump-contour-ontology", DumpContourOntology);
             _actions.Add("dump-odysseus-ontology", DumpOdysseusOntology);
+            _actions.Add("help", Help);
         }
 
         public ConsoleUtilities(IServiceProvider serviceProvider)
@@ -90,10 +90,20 @@ namespace IIS.Core
 
         public void FillOdysseusTypes()
         {
-            var ontology = _serviceProvider.GetService<TypeSeeder>().GetOntologyAsync().Result;
-            _serviceProvider.GetService<OntologyTypeSaver>().SaveTypes(ontology.Types);
-            _serviceProvider.GetService<IOntologyProvider>().Invalidate();
-            Console.WriteLine("Odysseys types filled");
+            _seedTypes("odysseus");
+        }
+
+        public void FillContourTypes()
+        {
+            _seedTypes("contour");
+        }
+
+        private void _seedTypes(string name)
+        {
+            var provider = new JsonOntologyProvider(System.IO.Path.Combine(Environment.CurrentDirectory, "data", name, "ontology"));
+            var ontology = provider.GetOntologyAsync().Result;
+            _serviceProvider.GetService<OntologyTypeSaver>().SaveTypes(ontology.EntityTypes);
+            Console.WriteLine($"{name} types filled");
         }
 
         public void SeedContourData()
