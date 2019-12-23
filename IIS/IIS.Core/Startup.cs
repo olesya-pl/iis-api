@@ -26,7 +26,6 @@ using IIS.Legacy.EntityFramework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -164,9 +163,9 @@ namespace IIS.Core
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
+
             services.AddHostedService<MaterialEventConsumer>();
 
-            //services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddControllers();
         }
 

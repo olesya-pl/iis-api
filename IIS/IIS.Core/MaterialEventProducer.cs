@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using IIS.Core.GraphQL.Materials;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
@@ -8,10 +10,11 @@ using RabbitMQ.Client.Exceptions;
 
 namespace IIS.Core.GSM.Producer
 {
-    public struct MaterialAddedEvent
+    public class MaterialAddedEvent
     {
         public Guid FileId;
         public Guid MaterialId;
+        public List<IIS.Core.GraphQL.Materials.Node> Nodes { get; set; }
     }
 
     public interface IMaterialEventProducer : IDisposable

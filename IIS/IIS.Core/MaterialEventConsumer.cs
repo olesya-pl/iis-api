@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Files.EntityFramework;
+using IIS.Core.GraphQL.Materials;
 using IIS.Core.Ontology.EntityFramework;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,20 +20,26 @@ namespace IIS.Core.GSM.Consumer
         {
             public Guid FileId;
             public Guid MaterialId;
+            public List<IIS.Core.GraphQL.Materials.Node> Nodes { get; set; }
         }
+
+        private readonly ILogger<MaterialEventConsumer> _logger;
         private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        private readonly ILogger _logger;
         private readonly FileServiceFactory _fileServiceFactory;
         private readonly ContextFactory _contextFactory;
         private readonly IGsmTranscriber _gsmTranscriber;
 
 
-        public MaterialEventConsumer(IConnectionFactory connectionFactory, ILoggerFactory loggerFactory,
-            FileServiceFactory fileServiceFactory, ContextFactory contextFactory, IGsmTranscriber gsmTranscriber)
+        public MaterialEventConsumer(
+            ILogger<MaterialEventConsumer> logger,
+            IConnectionFactory connectionFactory,
+            FileServiceFactory fileServiceFactory,
+            ContextFactory contextFactory,
+            IGsmTranscriber gsmTranscriber)
         {
-            _logger = loggerFactory.CreateLogger<MaterialEventConsumer>();
+            _logger = logger;
             _connectionFactory = connectionFactory;
             _fileServiceFactory = fileServiceFactory;
             _contextFactory = contextFactory;
@@ -83,7 +91,14 @@ namespace IIS.Core.GSM.Consumer
                 // received message
                 var message = System.Text.Encoding.UTF8.GetString(ea.Body);
                 var json = JObject.Parse(message);
-                var eventData = json.ToObject<MaterialAddedEvent>();
+                MaterialAddedEvent eventData = json.ToObject<MaterialAddedEvent>();
+                if (eventData.FileId == Guid.Empty && eventData.MaterialId == Guid.Empty)
+                {
+                    List<Node> data = eventData.Nodes;
+                    // TODO: Process data.
+                    return;
+                }
+
                 _logger.LogInformation("***************** MESSAGE RECEIVED ********************" + message);
                 var fileService = _fileServiceFactory.CreateService();
                 var file = await fileService.GetFileAsync(eventData.FileId);

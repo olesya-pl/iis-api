@@ -13,7 +13,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private Context.OntologyContext _ontologyContext;
         private Dictionary<Guid, Context.Type> _types = new Dictionary<Guid, Context.Type>();
 
-        public OntologyTypeSaver(Context.OntologyContext ontologyContext, IApplicationLifetime applicationLifetime)
+        public OntologyTypeSaver(Context.OntologyContext ontologyContext)
         {
             _ontologyContext = ontologyContext;
         }

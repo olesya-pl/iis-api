@@ -9,10 +9,18 @@ namespace IIS.Core.GraphQL.Materials
     {
         public static Core.Materials.Material ToDomain(this MaterialInput input)
         {
-            var result = new Core.Materials.Material(Guid.NewGuid(), JObject.FromObject(input.Metadata),
-                JArray.FromObject(input.Data), input.Metadata.Type, input.Metadata.Source);
-            if (input.FileId.HasValue)
-                result.File = new IIS.Core.Files.FileInfo(input.FileId.Value);
+            Core.Materials.Material result = new Core.Materials.Material(
+                Guid.NewGuid(),
+                JObject.FromObject(input.Metadata),
+                input.Data == null ? null : JArray.FromObject(input.Data),
+                input.Metadata.Type,
+                input.Metadata.Source);
+
+            if (input.FileId != null)
+            {
+                result.File = new Core.Files.FileInfo((Guid)input.FileId);
+            }
+
             return result;
         }
 
@@ -22,7 +30,7 @@ namespace IIS.Core.GraphQL.Materials
             {
                 Id = material.Id,
                 Metadata = material.Metadata.ToObject<Metadata>(),
-                Data = material.Data.ToObject<IEnumerable<Data>>(),
+                Data = material.Data?.ToObject<IEnumerable<Data>>(),
                 FileId = material.File?.Id,
                 Transcriptions = material.Infos.Select(e => e.Data)
             };

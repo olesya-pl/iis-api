@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.Ontology.EntityFramework.Context;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +13,7 @@ namespace IIS.Core.Tools
         private readonly IConfiguration _configuration;
         private readonly OntologyContext _context;
 
-        public UserSeeder(ILogger<UserSeeder> logger, IConfiguration configuration,  OntologyContext context)
+        public UserSeeder(ILogger<UserSeeder> logger, IConfiguration configuration, OntologyContext context)
         {
             _logger = logger;
             _configuration = configuration;
