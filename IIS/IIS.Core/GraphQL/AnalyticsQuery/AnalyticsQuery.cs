@@ -101,7 +101,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         [GraphQLNonNullType]
         public DateTime EndDate { get; set; }
 
-        [GraphQLNonNullType]
         public string Color { get; set; }
 
         public DateRange(IIS.Core.Analytics.EntityFramework.AnalyticsQuery.DateRange range)

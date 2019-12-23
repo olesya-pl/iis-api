@@ -20,7 +20,6 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         [GraphQLNonNullType]
         public DateTime EndDate { get; set; }
 
-        [GraphQLNonNullType]
         public string Color { get; set; }
     }
 
