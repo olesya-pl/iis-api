@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -25,7 +25,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
-            var existing = _context.Nodes.Local.FirstOrDefault(e => e.Id == source.Id);
+            Context.Node existing = _context.Nodes.Local.FirstOrDefault(e => e.Id == source.Id);
 
             if (existing is null)
             {

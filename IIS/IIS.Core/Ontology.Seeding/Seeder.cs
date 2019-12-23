@@ -19,7 +19,7 @@ namespace IIS.Core.Ontology.Seeding
             _ontologyService = ontologyService;
         }
 
-        public async Task Seed(string subdir, CancellationToken cancellationToken = default)
+        public async Task SeedAsync(string subdir, CancellationToken cancellationToken = default)
         {
             var first = new List<Node>();
             var nodes = new List<Node>();

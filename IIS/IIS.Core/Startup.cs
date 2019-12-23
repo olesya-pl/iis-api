@@ -32,6 +32,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using IIS.Core.Analytics.EntityFramework;
+using IIS.Core.Tools;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -52,6 +53,8 @@ namespace IIS.Core
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.RegisterRunUpTools();
+
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +66,7 @@ namespace IIS.Core.Controllers
         {
             //if (_context.Nodes.Any()) return Ok("Cannot seed database because it is not empty. Clear db explicitly via /api/clear");
 
-            await _seeder.Seed("contour", cancellationToken);
+            await _seeder.SeedAsync("contour", cancellationToken);
 
             return Ok("Seeded");
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using IIS.Core.Ontology.Meta;
 using Microsoft.AspNetCore.Hosting;
 
@@ -17,6 +18,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _ontologyContext = ontologyContext;
         }
 
+        [Obsolete]
         public void ClearTypes()
         {
             _types.Clear();
@@ -24,6 +26,15 @@ namespace IIS.Core.Ontology.EntityFramework
             _ontologyContext.AttributeTypes.RemoveRange(_ontologyContext.AttributeTypes.ToArray());
             _ontologyContext.RelationTypes.RemoveRange(_ontologyContext.RelationTypes.ToArray());
             _ontologyContext.SaveChanges();
+        }
+
+        public async Task ClearTypesAsync()
+        {
+            _types.Clear();
+            _ontologyContext.Types.RemoveRange(_ontologyContext.Types.ToArray());
+            _ontologyContext.AttributeTypes.RemoveRange(_ontologyContext.AttributeTypes.ToArray());
+            _ontologyContext.RelationTypes.RemoveRange(_ontologyContext.RelationTypes.ToArray());
+            await _ontologyContext.SaveChangesAsync();
         }
 
         public void SaveTypes(IEnumerable<Type> types)

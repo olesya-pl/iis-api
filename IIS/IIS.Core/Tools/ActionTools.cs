@@ -1,128 +1,106 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Core.Ontology.Seeding;
 using IIS.Legacy.EntityFramework;
-using IIS.Core.Analytics.EntityFramework;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace IIS.Core
+namespace IIS.Core.Tools
 {
-    public class ConsoleUtilities
+    internal sealed class ActionTools
     {
-        private readonly IConfiguration _configuration;
-        private readonly IServiceProvider _serviceProvider;
-        private Dictionary<string, Action> _actions = new Dictionary<string, Action>();
+        private readonly ILogger<ActionTools> _logger;
+        private readonly ILegacyOntologyProvider _legacyOntologyProvider;
+        private readonly ILegacyMigrator _legacyMigrator;
+        private readonly IOntologyProvider _ontologyProvider;
+        private readonly OntologyTypeSaver _ontologyTypeSaver;
+        private readonly Seeder _seeder;
+        private readonly OntologyContext _ontologyContext;
 
-        private void FillActions()
+        public ActionTools(
+            ILogger<ActionTools> logger,
+            ILegacyOntologyProvider legacyOntologyProvider,
+            ILegacyMigrator legacyMigrator,
+            IOntologyProvider ontologyProvider,
+            OntologyTypeSaver ontologyTypeSaver,
+            Seeder seeder,
+            OntologyContext ontologyContext)
         {
-            _actions.Add("clear-types", ClearTypes);
-            _actions.Add("migrate-legacy-types", MigrateLegacyTypes);
-            _actions.Add("migrate-legacy-entities", MigrateLegacyEntities);
-            _actions.Add("migrate-legacy-files", MigrateLegacyFiles);
-            _actions.Add("fill-odysseus-types", FillOdysseusTypes);
-            _actions.Add("fill-contour-types", FillContourTypes);
-            _actions.Add("seed-contour-data", SeedContourData);
-            _actions.Add("seed-odysseus-data", SeedOdysseusData);
-            _actions.Add("apply-ef-migrations", ApplyEfMigrations);
-            _actions.Add("dump-contour-ontology", DumpContourOntology);
-            _actions.Add("dump-odysseus-ontology", DumpOdysseusOntology);
-            _actions.Add("help", Help);
+            _logger = logger;
+            _legacyOntologyProvider = legacyOntologyProvider;
+            _legacyMigrator = legacyMigrator;
+            _ontologyProvider = ontologyProvider;
+            _ontologyTypeSaver = ontologyTypeSaver;
+            _seeder = seeder;
+            _ontologyContext = ontologyContext;
         }
 
-        public ConsoleUtilities(IServiceProvider serviceProvider)
+        public async Task ClearTypesAsync()
         {
-            _serviceProvider = serviceProvider.CreateScope().ServiceProvider;
-            _configuration = _serviceProvider.GetService<IConfiguration>();
-            FillActions();
+            await _ontologyTypeSaver.ClearTypesAsync();
+            _ontologyProvider.Invalidate();
+            _logger.LogInformation("Types cleared.");
         }
 
-        /// <summary>
-        /// Processes commandline args for applying migrations or seeding instead of starting Kestrel.
-        /// </summary>
-        /// <returns>true if webserver should start</returns>
-        public bool ProcessArguments()
+        public async Task MigrateLegacyTypesAsync()
         {
-            var action = _configuration["iis-actions"];
-            if (action == null)
-                return true;
-            var actions = action.Split(",");
-            Console.WriteLine($"Received {actions.Length} actions: {string.Join(", ", actions)}");
-
-            foreach (var actionName in actions)
-                DoAction(actionName);
-
-            return _configuration.GetValue<bool>("iis-run-server");
+            var ontology = await _legacyOntologyProvider.GetOntologyAsync();
+            _ontologyTypeSaver.SaveTypes(ontology.Types);
+            _ontologyProvider.Invalidate();
+            _logger.LogInformation("Legacy types migrated.");
         }
 
-        public void ClearTypes()
+        public async Task MigrateLegacyEntitiesAsync()
         {
-            _serviceProvider.GetService<OntologyTypeSaver>().ClearTypes();
-            _serviceProvider.GetService<IOntologyProvider>().Invalidate();
-            Console.WriteLine("Types cleared");
+            await _legacyMigrator.Migrate();
+            _logger.LogInformation("Legacy entities migrated.");
         }
 
-        public void MigrateLegacyTypes()
+        public async Task MigrateLegacyFilesAsync()
         {
-            var ontology = _serviceProvider.GetService<ILegacyOntologyProvider>().GetOntologyAsync().Result;
-            _serviceProvider.GetService<OntologyTypeSaver>().SaveTypes(ontology.Types);
-            _serviceProvider.GetService<IOntologyProvider>().Invalidate();
-            Console.WriteLine("Legacy types migrated");
+            await _legacyMigrator.MigrateFiles();
+            _logger.LogInformation("Legacy entities migrated.");
         }
 
-        public void MigrateLegacyEntities()
+        public async Task FillOdysseusTypesAsync()
         {
-            _serviceProvider.GetService<ILegacyMigrator>().Migrate().Wait();
-            Console.WriteLine("Legacy entities migrated");
+            await _seedTypesAsync("odysseus");
         }
 
-        public void MigrateLegacyFiles()
+        public async Task FillContourTypesAsync()
         {
-            _serviceProvider.GetService<ILegacyMigrator>().MigrateFiles().Wait();
-            Console.WriteLine("Legacy entities migrated");
+            await _seedTypesAsync("contour");
         }
 
-        public void FillOdysseusTypes()
+        private async Task _seedTypesAsync(string name)
         {
-            _seedTypes("odysseus");
+            JsonOntologyProvider provider = new JsonOntologyProvider(Path.Combine(Environment.CurrentDirectory, "data", name, "ontology"));
+            Ontology.Ontology ontology = await provider.GetOntologyAsync();
+            _ontologyTypeSaver.SaveTypes(ontology.EntityTypes);
+            _logger.LogInformation("{name} types filled.", name);
         }
 
-        public void FillContourTypes()
+        public async Task SeedContourDataAsync()
         {
-            _seedTypes("contour");
+            await _seeder.SeedAsync(Path.Combine("contour", "entities"));
+            _logger.LogInformation("Contour data seeded.");
         }
 
-        private void _seedTypes(string name)
+        public async Task SeedOdysseusDataAsync()
         {
-            var provider = new JsonOntologyProvider(System.IO.Path.Combine(Environment.CurrentDirectory, "data", name, "ontology"));
-            var ontology = provider.GetOntologyAsync().Result;
-            _serviceProvider.GetService<OntologyTypeSaver>().SaveTypes(ontology.EntityTypes);
-            Console.WriteLine($"{name} types filled");
+            await _seeder.SeedAsync(Path.Combine("odysseus", "entities"));
+            await SeedOdysseusAnalyticsIndicatorsAsync();
+            _logger.LogInformation("Odysseus data seeded.");
         }
 
-        public void SeedContourData()
-        {
-            using(var scope = _serviceProvider.CreateScope())
-            {
-                scope.ServiceProvider.GetService<Seeder>().Seed(Path.Combine("contour", "entities")).Wait();
-                Console.WriteLine("Contour data seeded");
-            }
-        }
-
-        public void SeedOdysseusData()
-        {
-            _serviceProvider.GetService<Seeder>().Seed(Path.Combine("odysseus", "entities")).Wait();
-            _seedOdysseusAnalyticsIndicators();
-            Console.WriteLine("Odysseus data seeded");
-        }
-
-        private void _seedOdysseusAnalyticsIndicators()
+        private async Task SeedOdysseusAnalyticsIndicatorsAsync()
         {
             var b = new AnalyticsIndicatorBuilder();
             var root = b.NewIndicator(title: "Підрозділи СБУ", query: "sbuOrgs")
@@ -179,57 +157,37 @@ namespace IIS.Core
                         .AddChild(b.NewIndicator(title: "Цивільні", query: "civilOrgs"))
                 )
             ;
-            var ctx = _serviceProvider.GetRequiredService<OntologyContext>();
-            ctx.AnalyticsIndicators.AddRange(b.Indicators);
-            ctx.SaveChanges();
-            Console.WriteLine("Done analytics indicators");
+
+            _ontologyContext.AnalyticsIndicators.AddRange(b.Indicators);
+            await _ontologyContext.SaveChangesAsync();
+
+            _logger.LogInformation("Done analytics indicators.");
         }
 
         public void ApplyEfMigrations()
         {
-            _serviceProvider
-                .GetRequiredService<OntologyContext>()
-                .Database
-                .Migrate();
-            Console.WriteLine("Migration has been applied.");
+            _ontologyContext.Database.Migrate();
+            _logger.LogInformation("Migration has been applied.");
         }
 
-        public void DumpOdysseusOntology()
+        public async Task DumpOdysseusOntologyAsync()
         {
-            _dumpOntology("odysseus");
+            await _dumpOntology("odysseus");
         }
 
-        public void DumpContourOntology()
+        public async Task DumpContourOntologyAsync()
         {
-            _dumpOntology("contour");
+            await _dumpOntology("contour");
         }
 
-        private void _dumpOntology(string name)
+        private async Task _dumpOntology(string name)
         {
-            var ontology = _serviceProvider.GetService<IOntologyProvider>().GetOntologyAsync().Result;
+            var ontology = await _ontologyProvider.GetOntologyAsync();
             var basePath = Path.Combine(Environment.CurrentDirectory, "data", name, "ontology");
             var serializer = new Serializer();
 
             serializer.serialize(basePath, ontology);
             Console.WriteLine($"Dumped ontology for {name} into {basePath}");
-        }
-
-        public void Help()
-        {
-            Console.WriteLine("Usage: dotnet IIS.Core.dll --iis-actions action1,action2 [--iis-run-server true]");
-            Console.WriteLine("Available actions:");
-            foreach (var actionName in _actions.Keys)
-                Console.WriteLine($"\t{actionName}");
-        }
-
-        public void DoAction(string actionName)
-        {
-            if (!_actions.TryGetValue(actionName, out var action))
-                Console.WriteLine($"Unrecognized action: {actionName}");
-            else
-            {
-                action();
-            }
         }
 
         class AnalyticsIndicatorBuilder

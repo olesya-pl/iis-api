@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using IIS.Core.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -5,11 +7,13 @@ namespace IIS.Core
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             IHost host = CreateWebHostBuilder(args).Build();
-            if (new ConsoleUtilities(host.Services).ProcessArguments()) // do not start webserver if utilities were started
+            if (await host.RunUpAsync())
+            {
                 host.Run();
+            }
         }
 
         public static IHostBuilder CreateWebHostBuilder(string[] args) =>
