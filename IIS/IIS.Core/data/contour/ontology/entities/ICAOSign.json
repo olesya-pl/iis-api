@@ -1,0 +1,9 @@
+{
+  "id": "5e0aadea-8aa1-4868-8148-9c2db025b644",
+  "conceptType": "entities",
+  "name": "ICAOSign",
+  "title": "ІКАО",
+  "extends": [
+    "ObjectSign"
+  ]
+}
