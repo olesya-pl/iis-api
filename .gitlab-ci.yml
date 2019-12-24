@@ -55,7 +55,7 @@ deploy_contour_qa:
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: qa_con.yml
-    EXTRA_VARS: "tag_name=$TAG_NAME"
+    EXTRA_VARS: "tag_name=$TAG_NAME ontology_name=$ONTOLOGY_NAME"
   environment:
     name: qa_contour
     url: http://qa-app.contour.net
@@ -65,7 +65,7 @@ deploy_contour_stage:
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: stage_con.yml
-    EXTRA_VARS: "tag_name=$TAG_NAME"
+    EXTRA_VARS: "tag_name=$TAG_NAME ontology_name=$ONTOLOGY_NAME"
   environment:
     name: stage_contour
     url: http://192.168.88.164
@@ -75,7 +75,7 @@ deploy_od_stage:
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: stage_od.yml
-    EXTRA_VARS: "tag_name=$TAG_NAME"
+    EXTRA_VARS: "tag_name=$TAG_NAME ontology_name=$ONTOLOGY_NAME"
   environment:
     name: stage_odysseus
     url: http://stage-app.odysseus.lcl
@@ -85,7 +85,7 @@ deploy_od_qa:
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: qa_od.yml
-    EXTRA_VARS: "tag_name=$TAG_NAME"
+    EXTRA_VARS: "tag_name=$TAG_NAME ontology_name=$ONTOLOGY_NAME"
   environment:
     name: qa_odysseus
     url: http://qa-app.odysseus.lcl
