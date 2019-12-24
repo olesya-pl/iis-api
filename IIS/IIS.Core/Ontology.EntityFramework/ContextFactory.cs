@@ -14,7 +14,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public OntologyContext CreateContext()
         {
-            var options = new DbContextOptionsBuilder()
+            var options = new DbContextOptionsBuilder<OntologyContext>()
                 .UseNpgsql(_connectionString)
                 .EnableSensitiveDataLogging()
                 .Options;

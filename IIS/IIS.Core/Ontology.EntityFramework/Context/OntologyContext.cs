@@ -16,7 +16,7 @@ namespace IIS.Core.Ontology.EntityFramework.Context
             ChangeTracker.LazyLoadingEnabled = false;
         }
 
-        public OntologyContext(DbContextOptions options) : base(options) { }
+        public OntologyContext(DbContextOptions<OntologyContext> options) : base(options) { }
 
         public SemaphoreSlim Semaphore = new SemaphoreSlim(1, int.MaxValue);
 

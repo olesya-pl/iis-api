@@ -15,7 +15,7 @@ namespace IIS.Core.Files.EntityFramework
 
         public IFileService CreateService()
         {
-            var options = new DbContextOptionsBuilder()
+            var options = new DbContextOptionsBuilder<OntologyContext>()
                 .UseNpgsql(_connectionString)
                 .EnableSensitiveDataLogging()
                 .Options;

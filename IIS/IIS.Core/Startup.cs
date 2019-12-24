@@ -54,7 +54,9 @@ namespace IIS.Core
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.RegisterRunUpTools();
+            services
+                .RegisterRunUpTools()
+                .RegisterSeederTools();
 
             services.AddMemoryCache();
 
@@ -156,7 +158,7 @@ namespace IIS.Core
             EsConfiguration es = Configuration.GetSection("es").Get<EsConfiguration>();
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
-                .AddRabbitMQ(mqString, HealthStatus.Unhealthy);
+                .AddRabbitMQ(mqString, (SslOption)null);
                 //.AddElasticsearch(es.Host);
 
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
@@ -192,28 +194,31 @@ namespace IIS.Core
             }
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OntologyContext context)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSerilogRequestLogging();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware<OptionsMiddleware>();
+            app.UseCors(builder =>
+                builder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+            );
+
+            app.UseSerilogRequestLogging();
+
             app.UseGraphQL();
             app.UsePlayground();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
-            //app.UseMvc();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
-            SeedData(context);
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)
@@ -241,30 +246,6 @@ namespace IIS.Core
 
             await c.Response.WriteAsync(result);
         }
-
-        private void SeedData(OntologyContext context)
-        {
-            var defaultUserName = Configuration.GetValue<string>("defaultUserName");
-            var defaultPassword = Configuration.GetValue<string>("defaultPassword");
-
-            if (!string.IsNullOrWhiteSpace(defaultUserName) && !string.IsNullOrWhiteSpace(defaultPassword))
-            {
-                //var admin = context.Users.SingleOrDefault(u => u.Username.ToUpperInvariant() == defaultUserName.ToUpperInvariant());
-                var admin = context.Users.SingleOrDefault(x => EF.Functions.Like(x.Name, $"%{defaultUserName}%"));
-                if (admin == null)
-                {
-                    context.Users.Add(new Core.Users.EntityFramework.User
-                    {
-                        Id = Guid.NewGuid(),
-                        IsBlocked = false,
-                        Name = defaultUserName,
-                        Username = defaultUserName,
-                        PasswordHash = Configuration.GetPasswordHashAsBase64String(defaultPassword)
-                    });
-                    context.SaveChanges();
-                }
-            }
-        }
     }
 
     public class MqConfiguration
@@ -272,38 +253,6 @@ namespace IIS.Core
         public string Host { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-    }
-
-    public class OptionsMiddleware
-    {
-        private readonly RequestDelegate _next;
-
-        public OptionsMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public Task Invoke(HttpContext context)
-        {
-            return BeginInvoke(context);
-        }
-
-        private Task BeginInvoke(HttpContext context)
-        {
-            context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { (string)context.Request.Headers["Origin"] ?? string.Empty });
-            context.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "authorization,content-type" });
-            context.Response.Headers.Add("Access-Control-Allow-Methods", new[] { "GET, POST, PUT, DELETE, OPTIONS" });
-            context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
-            context.Response.Headers.Add("Access-Control-Max-Age", new[] { "600" });
-
-            if (context.Request.Method == "OPTIONS")
-            {
-                context.Response.StatusCode = 204;
-                return Task.FromResult(context.Response);
-            }
-
-            return _next.Invoke(context);
-        }
     }
 
     class AppErrorFilter : IErrorFilter
