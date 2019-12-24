@@ -5,8 +5,7 @@ stages:
 build_job:
   stage: build
   script:
-    - cd IIS 
-    - dotnet publish IIS.Core/IIS.Core.csproj --configuration Release --output ../publish/core --version-suffix $(git rev-parse --short HEAD)
+    - dotnet publish IIS/IIS.Core/IIS.Core.csproj --configuration Release --output publish/core --version-suffix $(git rev-parse --short HEAD)
   artifacts:
     paths:
     - publish
