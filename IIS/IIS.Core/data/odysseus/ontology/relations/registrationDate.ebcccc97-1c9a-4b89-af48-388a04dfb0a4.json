@@ -2,5 +2,10 @@
   "id": "ebcccc97-1c9a-4b89-af48-388a04dfb0a4",
   "conceptType": "relations",
   "name": "registrationDate",
-  "title": "Дата реєстрації"
+  "title": "Дата реєстрації",
+  "meta": {
+    "validation": {
+      "required": true
+    }
+  }
 }
