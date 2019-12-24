@@ -86,7 +86,7 @@ namespace IIS.Core.Ontology.EntityFramework
             if (meta == null)
                 return EmbeddingOptions.Optional;
 
-            if ((bool)meta["multiple"])
+            if (meta["multiple"] != null && (bool)meta["multiple"] == true)
                 return EmbeddingOptions.Multiple;
 
             if (meta["validation"] != null && (bool)meta["validation"]["required"])
