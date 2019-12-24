@@ -5,7 +5,8 @@
   "title": "Статті КУпАП за якою притягнуто до відповідальності",
   "meta": {
     "formField": {
-      "type": "popup"
+      "type": "popup",
+      "includeParent": true
     },
     "multiple": true
   }

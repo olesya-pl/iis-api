@@ -31,7 +31,8 @@
       "title": "Статті КК України",
       "meta": {
         "formField": {
-          "type": "popup"
+          "type": "popup",
+          "includeParent": true
         },
         "multiple": true
       },

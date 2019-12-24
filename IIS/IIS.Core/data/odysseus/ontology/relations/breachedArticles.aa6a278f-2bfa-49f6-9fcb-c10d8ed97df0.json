@@ -5,7 +5,8 @@
   "title": "Порушено вимоги НПА",
   "meta": {
     "formField": {
-      "type": "popup"
+      "type": "popup",
+      "includeParent": true
     },
     "multiple": true
   }

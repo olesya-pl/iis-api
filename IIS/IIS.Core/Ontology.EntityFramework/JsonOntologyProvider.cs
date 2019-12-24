@@ -135,6 +135,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 var attrType = ctx.RawTypes[attr.Id].OntologyType;
                 var targetType = ctx.TypesByName[attr.Target];
 
+                // TODO: merge metadata from attr.meta with attrType.Meta
                 attrType.AddType(targetType);
                 type.AddType(attrType);
                 ctx.Relations.Add((EmbeddingRelationType)attrType, type);

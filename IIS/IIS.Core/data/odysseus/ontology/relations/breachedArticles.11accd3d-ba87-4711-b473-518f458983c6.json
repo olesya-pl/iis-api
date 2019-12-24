@@ -4,7 +4,8 @@
   "name": "breachedArticles",
   "meta": {
     "formField": {
-      "type": "popup"
+      "type": "popup",
+      "includeParent": true
     },
     "multiple": true
   }
