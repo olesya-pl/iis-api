@@ -2,6 +2,10 @@ stages:
   - build
   - deploy
 
+.release_tags: &release_tags
+  - /^v.+$/
+  - /^sprint\..+$/
+
 build_job:
   stage: build
   variables:
@@ -18,8 +22,7 @@ build_job:
     - ci
   only:
     - master
-    - /^v.+$/
-    - /^sprint\..+$/
+    - *release_tags
 
 .deploy:
   stage: deploy
@@ -31,13 +34,13 @@ build_job:
     - cd /home/gitlab-runner/ansible
     - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE' -e '$EXTRA_VARS'
     - rm -rf $CI_PROJECT_DIR/*
-
   tags:
     - ansible
   only:
     - master
+    - *release_tags
 
-deploy_contour_dev:
+deploy_contour_dev: &deploy_contour_dev
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: dev_con.yml
@@ -45,14 +48,21 @@ deploy_contour_dev:
     name: dev_contour
     url: http://contour-dev-01.contour.net
 
+deploy_contour_dev_manual:
+  <<: *deploy_contour_dev
+  when: manual
 
-deploy_od_dev:
+deploy_od_dev: &deploy_od_dev
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: dev_od.yml
   environment:
     name: dev_odysseus
     url: http://od-dev.contour.net
+
+deploy_od_dev_manual:
+  <<: *deploy_od_dev
+  when: manual
 
 deploy_contour_qa:
   extends: .deploy
@@ -62,7 +72,6 @@ deploy_contour_qa:
   environment:
     name: qa_contour
     url: http://qa-app.contour.net
-  when: manual
 
 deploy_contour_stage:
   extends: .deploy
