@@ -35,8 +35,6 @@ build_job:
     - ansible
   only:
     - master
-    - /^v.+$/
-    - /^sprint\..+$/
 
 deploy_contour_dev: &deploy_contour_dev
   extends: .deploy
