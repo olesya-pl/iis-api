@@ -5,9 +5,9 @@ stages:
 build_job:
   stage: build
   variables:
-    IIS_SOURCE_REVISION_ID: git describe --always --tags --dirty
     IIS_VERSION_SUFFIX: $CI_PIPELINE_ID
   script:
+    - export IIS_SOURCE_REVISION_ID=`git describe --always --tags --dirty`
     - dotnet publish IIS/IIS.Core/IIS.Core.csproj -c Release -o publish/core
   artifacts:
     paths:
