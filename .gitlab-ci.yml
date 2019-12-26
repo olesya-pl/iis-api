@@ -1,23 +1,26 @@
 stages:
   - build
   - deploy
-  
+
 build_job:
   stage: build
+  variables:
+    IIS_SOURCE_REVISION_ID: $(git describe --always --tags --dirty)
+    IIS_VERSION_SUFFIX: $CI_PIPELINE_ID
   script:
-    - dotnet publish IIS/IIS.Core/IIS.Core.csproj --configuration Release --output publish/core --version-suffix $(git rev-parse --short HEAD)
+    - dotnet publish IIS/IIS.Core/IIS.Core.csproj -c Release -o publish/core
   artifacts:
     paths:
     - publish
     expire_in: 1 month
-    
+
   tags:
     - ci
-  only: 
+  only:
     - master
     - /^v.+$/
     - /^sprint\..+$/
-    
+
 .deploy:
   stage: deploy
   variables:
@@ -31,9 +34,9 @@ build_job:
 
   tags:
     - ansible
-  only: 
-    - master  
-    
+  only:
+    - master
+
 deploy_contour_dev:
   extends: .deploy
   variables:
@@ -60,7 +63,7 @@ deploy_contour_qa:
     name: qa_contour
     url: http://qa-app.contour.net
   when: manual
-  
+
 deploy_contour_stage:
   extends: .deploy
   variables:
@@ -70,7 +73,7 @@ deploy_contour_stage:
     name: stage_contour
     url: http://192.168.88.164
   when: manual
-  
+
 deploy_od_stage:
   extends: .deploy
   variables:
@@ -80,7 +83,7 @@ deploy_od_stage:
     name: stage_odysseus
     url: http://stage-app.odysseus.lcl
   when: manual
-  
+
 deploy_od_qa:
   extends: .deploy
   variables:
