@@ -34,7 +34,8 @@ build_job:
   tags:
     - ansible
   only:
-    - master
+    - /^v.+$/
+    - /^sprint\..+$/
 
 deploy_contour_dev: &deploy_contour_dev
   extends: .deploy
@@ -43,13 +44,12 @@ deploy_contour_dev: &deploy_contour_dev
   environment:
     name: dev_contour
     url: http://contour-dev-01.contour.net
+  only:
+    - master
 
 deploy_contour_dev_manual:
   <<: *deploy_contour_dev
   when: manual
-  only:
-    - /^v.+$/
-    - /^sprint\..+$/
 
 deploy_od_dev: &deploy_od_dev
   extends: .deploy
@@ -58,13 +58,12 @@ deploy_od_dev: &deploy_od_dev
   environment:
     name: dev_odysseus
     url: http://od-dev.contour.net
+  only:
+    - master
 
 deploy_od_dev_manual:
   <<: *deploy_od_dev
   when: manual
-  only:
-    - /^v.+$/
-    - /^sprint\..+$/
 
 deploy_contour_qa:
   extends: .deploy
