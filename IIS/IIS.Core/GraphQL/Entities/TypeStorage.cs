@@ -22,8 +22,9 @@ namespace IIS.Core.GraphQL.Entities
             [OScalarType.Boolean] = new BooleanType(),
             [OScalarType.Decimal] = new DecimalType(),
             [OScalarType.DateTime] = new DateTimeType(), // HotChocolate uses ISO-8601 by default
-            [OScalarType.Geo] = new AnyType(),
-//            [OScalarType.File] = null, // Implemented as a dirty hack in Extensions.AttributeType(), because File attribute is not scalar
+            //[OScalarType.Geo] = new AnyType(),
+            [OScalarType.Geo] = new GeoJsonScalarType(),
+            //[OScalarType.File] = null, // Implemented as a dirty hack in Extensions.AttributeType(), because File attribute is not scalar
         };
 
         public IEnumerable<INamedType> AllTypes => InputTypes.Values.SelectMany(d => d.Values)

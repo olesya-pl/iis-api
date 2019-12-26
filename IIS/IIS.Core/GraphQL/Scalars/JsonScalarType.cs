@@ -44,19 +44,19 @@ namespace IIS.Core.GraphQL.Scalars
             return jo;
         }
 
-        public override bool TrySerialize(object value, out object serialized)
-        {
-            try
-            {
-                serialized = JsonConvert.SerializeObject(value);
-                return true;
-            }
-            catch
-            {
-                serialized = null;
-                return false;
-            }
-        }
+        //public override bool TrySerialize(object value, out object serialized)
+        //{
+        //    try
+        //    {
+        //        serialized = JsonConvert.SerializeObject(value);
+        //        return true;
+        //    }
+        //    catch
+        //    {
+        //        serialized = null;
+        //        return false;
+        //    }
+        //}
 
         public override bool TryDeserialize(object serialized, out object value)
         {
