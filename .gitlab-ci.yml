@@ -2,10 +2,6 @@ stages:
   - build
   - deploy
 
-.release_tags: &release_tags
-  - /^v.+$/
-  - /^sprint\..+$/
-
 build_job:
   stage: build
   variables:
@@ -22,7 +18,8 @@ build_job:
     - ci
   only:
     - master
-    - *release_tags
+    - /^v.+$/
+    - /^sprint\..+$/
 
 .deploy:
   stage: deploy
@@ -38,7 +35,8 @@ build_job:
     - ansible
   only:
     - master
-    - *release_tags
+    - /^v.+$/
+    - /^sprint\..+$/
 
 deploy_contour_dev: &deploy_contour_dev
   extends: .deploy
@@ -72,6 +70,7 @@ deploy_contour_qa:
   environment:
     name: qa_contour
     url: http://qa-app.contour.net
+  when: manual
 
 deploy_contour_stage:
   extends: .deploy
