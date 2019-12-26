@@ -49,6 +49,9 @@ deploy_contour_dev: &deploy_contour_dev
 deploy_contour_dev_manual:
   <<: *deploy_contour_dev
   when: manual
+  only:
+    - /^v.+$/
+    - /^sprint\..+$/
 
 deploy_od_dev: &deploy_od_dev
   extends: .deploy
@@ -61,6 +64,9 @@ deploy_od_dev: &deploy_od_dev
 deploy_od_dev_manual:
   <<: *deploy_od_dev
   when: manual
+  only:
+    - /^v.+$/
+    - /^sprint\..+$/
 
 deploy_contour_qa:
   extends: .deploy
