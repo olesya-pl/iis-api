@@ -37,32 +37,38 @@ build_job:
     - /^v.+$/
     - /^sprint\..+$/
 
-deploy_contour_dev: &deploy_contour_dev
+.deploy_contour_dev:
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: dev_con.yml
   environment:
     name: dev_contour
     url: http://contour-dev-01.contour.net
-  only:
-    - master
 
-deploy_contour_dev_manual:
-  <<: *deploy_contour_dev
-  when: manual
-
-deploy_od_dev: &deploy_od_dev
+.deploy_od_dev:
   extends: .deploy
   variables:
     DEPLOYMENT_FILE: dev_od.yml
   environment:
     name: dev_odysseus
     url: http://od-dev.contour.net
+
+deploy_contour_dev:
+  extends: .deploy_contour_dev
   only:
     - master
 
+deploy_od_dev:
+  extends: .deploy_od_dev
+  only:
+    - master
+
+deploy_contour_dev_manual:
+  extends: .deploy_contour_dev
+  when: manual
+
 deploy_od_dev_manual:
-  <<: *deploy_od_dev
+  extends: .deploy_od_dev
   when: manual
 
 deploy_contour_qa:
