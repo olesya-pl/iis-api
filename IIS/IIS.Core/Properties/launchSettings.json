@@ -18,6 +18,7 @@
     },
     "IIS.Core": {
       "commandName": "Project",
+      "commandLineArgs": "--iis-actions apply-ef-migrations,clear-types,fill-contour-types",
       "launchBrowser": true,
       "launchUrl": "playground",
       "environmentVariables": {

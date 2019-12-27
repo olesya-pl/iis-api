@@ -76,7 +76,7 @@ namespace IIS.Core.Tools
 
         public async Task FillContourTypesAsync()
         {
-            await _seedTypesAsync("contour");
+            await _seedTypesAsync("test");
         }
 
         private async Task _seedTypesAsync(string name)

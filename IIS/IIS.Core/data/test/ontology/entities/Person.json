@@ -1,0 +1,15 @@
+{
+  "id": "4b6c977b-1d86-44f1-8802-223b47b1cfa3",
+  "conceptType": "entities",
+  "name": "Person",
+  "title": "Людина",
+  "attributes": [
+    {
+        "id": "bce4d081-0041-4b63-a46f-47ea9cb198ff",
+        "name": "name",
+        "title": "Name",
+        "target": "Name"
+    }
+  ],
+  "meta": {}
+}
