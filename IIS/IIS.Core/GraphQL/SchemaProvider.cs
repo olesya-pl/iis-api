@@ -37,37 +37,37 @@ namespace IIS.Core.GraphQL
         public ISchema GetSchema()
         {
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
-            //RegisterTypes(builder);
-            //var ontology = TryRegisterOntologyTypes(builder);
+            RegisterTypes(builder);
+            var ontology = TryRegisterOntologyTypes(builder);
             builder.AddQueryType(d =>
             {
                 d.Name("QueryType");
                 d.Include<QueryQ>();
                 d.Include<EntityTypes.Query>();
-                //d.Include<Materials.Query>();
-                //d.Include<Users.Query>();
-                //d.Include<AnalyticsQuery.Query>();
-                //d.Include<AnalyticsIndicator.Query>();
+                d.Include<Materials.Query>();
+                d.Include<Users.Query>();
+                d.Include<AnalyticsQuery.Query>();
+                d.Include<AnalyticsIndicator.Query>();
 
-                //if (_configuration.GetValue("reportsAvailable", true))
-                //{
-                //    d.Include<Reports.Query>();
-                //}
+                if (_configuration.GetValue("reportsAvailable", true))
+                {
+                    d.Include<Reports.Query>();
+                }
                 //if (ontology != null)
                 //    ConfigureOntologyQuery(d, ontology);
             });
             builder.AddMutationType(d =>
             {
                 d.Name("MutationType");
-                //d.Include<Materials.Mutation>();
-                //d.Include<Users.Mutation>();
+                d.Include<Materials.Mutation>();
+                d.Include<Users.Mutation>();
                 d.Include<Users.LoginResolver>();
-                //d.Include<AnalyticsQuery.Mutation>();
+                d.Include<AnalyticsQuery.Mutation>();
 
-                //if (_configuration.GetValue("reportsAvailable", true))
-                //{
-                //    d.Include<Reports.Mutation>();
-                //}
+                if (_configuration.GetValue("reportsAvailable", true))
+                {
+                    d.Include<Reports.Mutation>();
+                }
                 //if (ontology != null)
                 //    ConfigureOntologyMutation(d, ontology);
             });
