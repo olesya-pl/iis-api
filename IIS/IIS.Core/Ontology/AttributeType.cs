@@ -57,7 +57,7 @@ namespace IIS.Core.Ontology
             switch (scalarType)
             {
                 case ScalarType.Boolean: return bool.Parse(value);
-                case ScalarType.DateTime: return DateTime.Parse(value);
+                case ScalarType.DateTime: return DateTime.Parse(value).ToUniversalTime();
                 case ScalarType.Decimal: return decimal.Parse(value);
                 case ScalarType.Integer: return int.Parse(value);
                 case ScalarType.String: return value;
