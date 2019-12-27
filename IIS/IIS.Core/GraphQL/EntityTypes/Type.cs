@@ -58,16 +58,16 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]
         [GraphQLDescription("Get all type relations")]
-        public IEnumerable<EntityAttributeBase> GetAttributes()
+        public IEnumerable<IEntityAttribute> GetAttributes()
         {
             var props = Source.AllProperties.OrderBy(a => a.CreatedAt);
             return props.Select(CreateEntityAttribute);
         }
 
-        protected EntityAttributeBase CreateEntityAttribute(EmbeddingRelationType relationType)
+        protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType)
         {
             return relationType.IsAttributeType
-                ? (EntityAttributeBase) new EntityAttributePrimitive(relationType)
+                ? (IEntityAttribute) new EntityAttributePrimitive(relationType)
                 : new EntityAttributeRelation(relationType, _ontology);
         }
     }
