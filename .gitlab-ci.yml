@@ -30,7 +30,7 @@ build_job:
     EXTRA_VARS: "artifacts_path=$CI_PROJECT_DIR"
   script:
     - cd /home/gitlab-runner/ansible
-    - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE' -e '$EXTRA_VARS'
+    - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE' -e $EXTRA_VARS
     - rm -rf $CI_PROJECT_DIR/*
   tags:
     - ansible
