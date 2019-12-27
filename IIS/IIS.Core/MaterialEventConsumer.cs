@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Files.EntityFramework;
@@ -11,11 +13,18 @@ using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
+using System.Net.Http;
+using System.Net;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace IIS.Core.GSM.Consumer
 {
     public class MaterialEventConsumer : BackgroundService
     {
+        private static readonly HttpClient _httpClient = new HttpClient();
+
         private struct MaterialAddedEvent
         {
             public Guid FileId;
@@ -30,6 +39,7 @@ namespace IIS.Core.GSM.Consumer
         private readonly FileServiceFactory _fileServiceFactory;
         private readonly ContextFactory _contextFactory;
         private readonly IGsmTranscriber _gsmTranscriber;
+        private readonly IConfiguration _config;
 
 
         public MaterialEventConsumer(
@@ -37,13 +47,15 @@ namespace IIS.Core.GSM.Consumer
             IConnectionFactory connectionFactory,
             FileServiceFactory fileServiceFactory,
             ContextFactory contextFactory,
-            IGsmTranscriber gsmTranscriber)
+            IGsmTranscriber gsmTranscriber,
+            IConfiguration config)
         {
             _logger = logger;
             _connectionFactory = connectionFactory;
             _fileServiceFactory = fileServiceFactory;
             _contextFactory = contextFactory;
             _gsmTranscriber = gsmTranscriber;
+            _config = config;
 
             while (true)
             {
@@ -94,8 +106,8 @@ namespace IIS.Core.GSM.Consumer
                 MaterialAddedEvent eventData = json.ToObject<MaterialAddedEvent>();
                 if (eventData.FileId == Guid.Empty && eventData.MaterialId == Guid.Empty)
                 {
-                    List<Node> data = eventData.Nodes;
-                    // TODO: Process data.
+                    await _createFeaturesInArcgis(eventData.Nodes);
+                    _channel.BasicAck(ea.DeliveryTag, false);
                     return;
                 }
 
@@ -136,11 +148,86 @@ namespace IIS.Core.GSM.Consumer
             }
         }
 
+        private async Task _createFeaturesInArcgis(List<Node> nodes)
+        {
+            // TODO: the next line should be replaced with the id of autolinked entity
+            var entityId = Guid.NewGuid();
+            var jsonSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            foreach (var node in nodes)
+            {
+                if (node.UpdateField == null)
+                    continue;
+
+                var features = node.UpdateField.Values.Select(value => new ArcgisFeature(entityId, value));
+                var url = _config.GetValue<string>("map:layers:trackObjectPosition");
+
+                var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("features", JsonConvert.SerializeObject(features, Formatting.Indented, jsonSettings)),
+                    new KeyValuePair<string, string>("rollbackOnFailure", "true"),
+                    new KeyValuePair<string, string>("f", "json")
+                });
+
+                var response = await _httpClient.PostAsync($"{url}/addFeatures", content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var responseData = JObject.Parse(responseBody);
+
+                if (response.StatusCode != HttpStatusCode.OK || responseData["error"] != null)
+                {
+                    _logger.LogCritical($"Unable to create features in arcgis for node with value {node.Value}");
+                    _logger.LogCritical($"Response {responseBody}");
+                }
+                else
+                {
+                    _logger.LogInformation($"Successfully created arcgis features for object location tracking with value {node.Value}");
+                }
+            }
+        }
+
         public override void Dispose()
         {
             _channel.Close();
             _connection.Close();
             base.Dispose();
+        }
+    }
+
+    class ArcgisFeature {
+        public PointGeometry Geometry { get; set; }
+        public GeoMaterialAttributes Attributes { get; set; }
+
+        public ArcgisFeature(Guid entityId, FieldValue value) {
+            Geometry = new PointGeometry(value.Lng, value.Lat);
+            Attributes = new GeoMaterialAttributes(entityId, value);
+        }
+
+        public class PointGeometry {
+            public readonly double X;
+            public readonly double Y;
+
+            public PointGeometry(double lng, double lat)
+            {
+                X = lng;
+                Y = lat;
+            }
+        }
+
+        public class GeoMaterialAttributes {
+            public readonly double Lat;
+            public readonly double Lng;
+            public readonly DateTime RegisteredAt;
+            public readonly Guid EntityId;
+
+            public GeoMaterialAttributes(Guid entityId, FieldValue value)
+            {
+                EntityId = entityId;
+                Lat = value.Lat;
+                Lng = value.Lng;
+                RegisteredAt = value.RegisteredAt;
+            }
         }
     }
 }
