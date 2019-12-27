@@ -27,7 +27,7 @@ build_job:
   variables:
     GIT_STRATEGY: none
     GIT_CHECKOUT: "false"
-    EXTRA_VARS: "artifacts_path=$CI_PROJECT_DIR tag_name=''"
+    EXTRA_VARS: "artifacts_path=$CI_PROJECT_DIR"
   script:
     - cd /home/gitlab-runner/ansible
     - ansible-playbook app_api_net.yml -e '@./vars/$DEPLOYMENT_FILE' -e '$EXTRA_VARS'
