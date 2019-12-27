@@ -10,7 +10,6 @@ namespace IIS.Core.GraphQL.EntityTypes
 {
     public class Query
     {
-
         [GraphQLNonNullType]
         public async Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyProvider ontologyProvider,
             EntityTypesFilter filter = null)

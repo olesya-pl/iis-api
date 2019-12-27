@@ -29,9 +29,9 @@ namespace IIS.Core.GraphQL.EntityTypes
         }
     }
 
-    public class EntityAttributeType : InterfaceType<IEntityAttribute>
+    public class EntityAttributeType : InterfaceType<EntityAttributeBase>
     {
-        protected override void Configure(IInterfaceTypeDescriptor<IEntityAttribute> descriptor)
+        protected override void Configure(IInterfaceTypeDescriptor<EntityAttributeBase> descriptor)
         {
             descriptor.Name("EntityAttribute");
         }
