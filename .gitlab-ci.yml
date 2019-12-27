@@ -9,6 +9,7 @@ build_job:
   script:
     - export IIS_SOURCE_REVISION_ID=`git describe --always --tags --dirty`
     - dotnet publish IIS/IIS.Core/IIS.Core.csproj -c Release -o publish/core
+    - env
   artifacts:
     paths:
     - publish
