@@ -63,14 +63,22 @@ namespace IIS.Core.GraphQL.Reports
             forRemove.ExceptWith(data.AddEvents);
 
             var loader =  ctx.DataLoader<NodeDataLoader>();
-            context.ReportEvents.AddRange(forAdd.Select(eventId => new Core.Report.EntityFramework.ReportEvents
+            var addRange = forAdd.Select(eventId => new Core.Report.EntityFramework.ReportEvents
             {
-                EventId  = eventId,
+                EventId = eventId,
                 ReportId = id
-            }));
+            }).ToList();
+            var removeRange = context.ReportEvents.Where(re => re.ReportId == id && forRemove.Contains(re.EventId))
+                .ToList();
 
-            context.ReportEvents.RemoveRange(context.ReportEvents.Where(re => re.ReportId == id && forRemove.Contains(re.EventId)));
-            await context.SaveChangesAsync();
+            if (addRange.Count > 0 || removeRange.Count > 0)
+            {
+                if (addRange.Count > 0)
+                    context.ReportEvents.AddRange(addRange);
+                if (removeRange.Count > 0)
+                    context.ReportEvents.RemoveRange(removeRange);
+                await context.SaveChangesAsync();
+            }
 
             var report = await context.Reports
                 .Include(r => r.ReportEvents)
