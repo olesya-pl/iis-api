@@ -106,7 +106,8 @@ namespace IIS.Core.GSM.Consumer
                 MaterialAddedEvent eventData = json.ToObject<MaterialAddedEvent>();
                 if (eventData.FileId == Guid.Empty && eventData.MaterialId == Guid.Empty)
                 {
-                    await _createFeaturesInArcgis(eventData.Nodes);
+                    // todo: uncomment
+                    // await _createFeaturesInArcgis(eventData.Nodes);
                     _channel.BasicAck(ea.DeliveryTag, false);
                     return;
                 }
