@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.Files;
-using IIS.Core.GSM.Producer;
 using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.Extensions.DependencyInjection;
 

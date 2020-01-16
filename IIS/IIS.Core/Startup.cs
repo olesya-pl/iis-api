@@ -14,8 +14,6 @@ using HotChocolate.Language;
 using HotChocolate.Types.Relay;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
-using IIS.Core.GSM.Consumer;
-using IIS.Core.GSM.Producer;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Ontology;

@@ -20,19 +20,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using IIS.Core.Ontology;
 
-namespace IIS.Core.GSM.Consumer
+namespace IIS.Core.Materials
 {
     public class MaterialEventConsumer : BackgroundService
     {
         private static readonly HttpClient _httpClient = new HttpClient();
-
-        private struct MaterialAddedEvent
-        {
-            public Guid FileId;
-            public Guid MaterialId;
-            public List<IIS.Core.GraphQL.Materials.Node> Nodes { get; set; }
-        }
-
         private readonly ILogger<MaterialEventConsumer> _logger;
         private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
