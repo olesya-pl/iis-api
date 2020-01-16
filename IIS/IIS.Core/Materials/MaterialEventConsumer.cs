@@ -18,6 +18,7 @@ using System.Net;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using IIS.Core.Ontology;
 
 namespace IIS.Core.GSM.Consumer
 {
@@ -48,7 +49,8 @@ namespace IIS.Core.GSM.Consumer
             FileServiceFactory fileServiceFactory,
             ContextFactory contextFactory,
             IGsmTranscriber gsmTranscriber,
-            IConfiguration config)
+            IConfiguration config
+        )
         {
             _logger = logger;
             _connectionFactory = connectionFactory;
@@ -106,8 +108,7 @@ namespace IIS.Core.GSM.Consumer
                 MaterialAddedEvent eventData = json.ToObject<MaterialAddedEvent>();
                 if (eventData.FileId == Guid.Empty && eventData.MaterialId == Guid.Empty)
                 {
-                    // todo: uncomment
-                    // await _createFeaturesInArcgis(eventData.Nodes);
+                    await _createFeaturesInArcgis(eventData.Nodes);
                     _channel.BasicAck(ea.DeliveryTag, false);
                     return;
                 }
@@ -149,7 +150,7 @@ namespace IIS.Core.GSM.Consumer
             }
         }
 
-        private async Task _createFeaturesInArcgis(List<Node> nodes)
+        private async Task _createFeaturesInArcgis(List<GraphQL.Materials.Node> nodes)
         {
             // TODO: the next line should be replaced with the id of autolinked entity
             var entityId = Guid.NewGuid();
