@@ -78,7 +78,34 @@ namespace IIS.Core.Materials.EntityFramework
                 _eventProducer.SendMaterialAddedEventAsync(
                     new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id});
 
-            _eventProducer.SendMaterialAddedEventAsync(new MaterialAddedEvent { Nodes = nodes?.ToList() });
+            SendIcaoEvent(nodes);
+        }
+
+        private Guid GetIcaoNode(string icaoValue)
+        {
+            var q = from n in _context.Nodes
+                    join t in _context.Types on n.TypeId equals t.Id
+                    join r in _context.Relations on n.Id equals r.SourceNodeId
+                    join a in _context.Attributes on r.TargetNodeId equals a.Id
+                    where t.Name == "ICAOSign" && a.Value == icaoValue
+                    select r.TargetNodeId;
+
+            return q.FirstOrDefault();
+        }
+
+        private void SendIcaoEvent(IEnumerable<GraphQL.Materials.Node> nodes)
+        {
+            var node = nodes.Where(n => n.UpdateField != null).SingleOrDefault();
+            if (node == null) return;
+
+            var entityId = GetIcaoNode(node.Value);
+            var materialAddedEvent = new MaterialAddedEvent
+            {
+                EntityId = entityId,
+                Nodes = new List<GraphQL.Materials.Node> { node }
+            };
+
+            _eventProducer.SendMaterialAddedEventAsync(materialAddedEvent);
         }
 
         public async Task SaveAsync(Guid materialId, Materials.MaterialInfo materialInfo)

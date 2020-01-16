@@ -100,7 +100,7 @@ namespace IIS.Core.Materials
                 MaterialAddedEvent eventData = json.ToObject<MaterialAddedEvent>();
                 if (eventData.FileId == Guid.Empty && eventData.MaterialId == Guid.Empty)
                 {
-                    await _createFeaturesInArcgis(eventData.Nodes);
+                    await _createFeaturesInArcgis(eventData);
                     _channel.BasicAck(ea.DeliveryTag, false);
                     return;
                 }
@@ -142,7 +142,7 @@ namespace IIS.Core.Materials
             }
         }
 
-        private async Task _createFeaturesInArcgis(List<GraphQL.Materials.Node> nodes)
+        private async Task _createFeaturesInArcgis(MaterialAddedEvent eventData)
         {
             // TODO: the next line should be replaced with the id of autolinked entity
             var entityId = Guid.NewGuid();
@@ -150,12 +150,9 @@ namespace IIS.Core.Materials
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            foreach (var node in nodes)
+            foreach (var node in eventData.Nodes.Where(n => n.UpdateField != null))
             {
-                if (node.UpdateField == null)
-                    continue;
-
-                var features = node.UpdateField.Values.Select(value => new ArcgisFeature(entityId, value));
+                var features = node.UpdateField.Values.Select(value => new ArcgisFeature(eventData.EntityId, value));
                 var url = _config.GetValue<string>("map:layers:trackObjectPosition");
 
                 var content = new FormUrlEncodedContent(new[]

@@ -9,6 +9,7 @@ namespace IIS.Core.Materials
     {
         public Guid FileId;
         public Guid MaterialId;
+        public Guid EntityId;
         public List<IIS.Core.GraphQL.Materials.Node> Nodes { get; set; }
     }
 }
