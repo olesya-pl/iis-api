@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D1426B6D-FE1B-4319-A778-28D41466F0B0",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 49
+    },
+    "name": "toBeInPlace",
+    "target": "MilitaryMachinery_toBeInPlace",
+    "title": "Місце перебування"
+}

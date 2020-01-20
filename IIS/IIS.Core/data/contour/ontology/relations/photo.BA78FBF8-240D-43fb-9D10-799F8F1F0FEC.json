@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "BA78FBF8-240D-43fb-9D10-799F8F1F0FEC",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 7
+    },
+    "name": "photo",
+    "target": "photo",
+    "title": "Фото"
+}

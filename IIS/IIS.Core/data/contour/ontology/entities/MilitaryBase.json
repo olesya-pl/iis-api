@@ -1,66 +1,65 @@
 {
-  "id": "56c3b98d-f7b5-4cf6-a610-76bf5f91613b",
-  "conceptType": "entities",
-  "name": "MilitaryBase",
-  "title": "Військова частина",
-  "extends": [
-    "Infrastructure_bePartOf",
-    "ObjectOfStudy",
-    "MilitaryMachinery_toBeInPlace",
-    "MilitaryMachinery_bePartOf",
-    "Person_militaryService",
-    "Subdivision_superior"
-  ],
-  "attributes": [
-    {
-      "id": "43006fc6-faf2-455d-b9c2-3d191c1f7a36",
-      "name": "baseCode",
-      "title": "Номер військової частини",
-      "meta": {
-        "sortOrder": 60,
-        "multiple": false,
-        "validation": {
-          "required": true
-        }
-      },
-      "target": "baseCode"
-    },
-    {
-      "id": "fd2b3130-fc2e-47c6-ba05-7973938f0620",
-      "name": "title",
-      "title": "Повна назва",
-      "meta": {
-        "formula": "h.fullTitle(entity.baseCode, entity.shortName)",
-        "sortOrder": 0,
-        "multiple": false
-      },
-      "target": "title"
-    },
-    {
-      "id": "b38c2650-fe3b-4c6a-bbdb-b89c32dfb9c6",
-      "name": "relatesToCountry",
-      "title": "Громадянство",
-      "meta": {
-        "sortOrder": 40,
-        "title": "Громадянство",
-        "formField": {
-          "type": "dropdown",
-          "icon": "flag"
+    "attributes": [
+        {
+            "id": "9C997C81-CC15-4b28-9E37-92FC5DCA7D28",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 74
+            },
+            "name": "baseCode",
+            "target": "baseCode",
+            "title": "Номер військової частини"
         },
-        "multiple": false
-      },
-      "target": "Country"
+        {
+            "id": "3BC44BBC-C1E9-4523-A93C-BF4B7BE073F5",
+            "meta": {
+                "formula": "h.fullTitle(entity.baseCode, entity.shortName)",
+                "multiple": false,
+                "sortOrder": 75
+            },
+            "name": "title",
+            "target": "title",
+            "title": "Повна назва"
+        },
+        {
+            "id": "6D5EB041-2649-4017-A1BD-7BA3100EDD41",
+            "meta": {
+                "formField": {
+                    "icon": "flag",
+                    "type": "dropdown"
+                },
+                "multiple": false,
+                "sortOrder": 76,
+                "title": "Громадянство"
+            },
+            "name": "relatesToCountry",
+            "target": "Country",
+            "title": "Громадянство"
+        },
+        {
+            "id": "06D9B7AA-5E4F-45d5-BC58-11DD6966C0ED",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 77
+            },
+            "name": "shortName",
+            "target": "shortName",
+            "title": "Скорочене найменування"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "Infrastructure_bePartOf",
+        "ObjectOfStudy",
+        "MilitaryMachinery_toBeInPlace",
+        "MilitaryMachinery_bePartOf",
+        "Person_militaryService",
+        "Subdivision_superior"
+    ],
+    "id": "6D2A5C7B-CF50-49d5-8EE8-51979ECC38BC",
+    "meta": {
+        "sortOrder": 78
     },
-    {
-      "id": "c035d51b-ff49-437b-9612-e939f8697161",
-      "name": "shortName",
-      "title": "Скорочене найменування",
-      "meta": {
-        "sortOrder": 20,
-        "multiple": false
-      },
-      "target": "shortName"
-    }
-  ],
-  "meta": {}
+    "name": "MilitaryBase",
+    "title": "Військова частина"
 }

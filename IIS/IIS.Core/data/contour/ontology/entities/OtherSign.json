@@ -1,0 +1,24 @@
+{
+    "attributes": [
+        {
+            "id": "CBD1B73E-BFB4-40b1-91EC-A56D6C5AA9F3",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 150
+            },
+            "name": "name",
+            "target": "name",
+            "title": "Назва"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "DD0214E1-D7E4-4503-A1AF-8195CE649297",
+    "meta": {
+        "sortOrder": 151
+    },
+    "name": "OtherSign",
+    "title": "Інша ознака"
+}

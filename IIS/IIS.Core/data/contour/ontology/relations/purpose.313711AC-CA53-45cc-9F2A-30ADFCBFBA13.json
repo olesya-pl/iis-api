@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "313711AC-CA53-45cc-9F2A-30ADFCBFBA13",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 13
+    },
+    "name": "purpose",
+    "target": "purpose",
+    "title": "Призначення"
+}

@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "1BEB8089-2F37-4ce8-A5C7-5E69A260DAAE",
+    "meta": {
+        "formField": {
+            "hasIndexColumn": false,
+            "type": "dropdownTree"
+        },
+        "multiple": false,
+        "sortOrder": 21
+    },
+    "name": "component",
+    "target": "EventComponent",
+    "title": "Компонент"
+}

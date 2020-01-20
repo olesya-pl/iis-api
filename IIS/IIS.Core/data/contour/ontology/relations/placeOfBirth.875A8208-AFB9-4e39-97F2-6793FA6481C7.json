@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "875A8208-AFB9-4e39-97F2-6793FA6481C7",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 131
+    },
+    "name": "placeOfBirth",
+    "target": "placeOfBirth",
+    "title": "Місце народження"
+}

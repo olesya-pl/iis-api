@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "2510D415-0E0C-4c5f-B649-AC5103977E86",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 148
+    },
+    "name": "militaryService",
+    "target": "Person_militaryService",
+    "title": "Нести військову службу"
+}

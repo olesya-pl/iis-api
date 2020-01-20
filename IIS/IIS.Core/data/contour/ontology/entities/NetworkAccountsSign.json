@@ -1,12 +1,12 @@
 {
-  "id": "c6ae8893-b9e3-4bd3-8a6a-084bba3cc2fe",
-  "conceptType": "entities",
-  "name": "NetworkAccountsSign",
-  "title": "Акаунти у соц. мережах",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "7A832F96-8412-4915-8D31-84FC5996782C",
+    "meta": {
+        "sortOrder": 80
+    },
+    "name": "NetworkAccountsSign",
+    "title": "Акаунти у соц. мережах"
 }

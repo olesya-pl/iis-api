@@ -1,8 +1,10 @@
 {
-  "id": "d73be51b-fb56-43d6-a288-f032deccd91a",
-  "conceptType": "attributes",
-  "name": "fatherName",
-  "title": "По батькові",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "88433B8A-AA84-454b-A77A-46705C8BAFBF",
+    "meta": {
+    },
+    "name": "fatherName",
+    "target": "fatherName",
+    "title": "По батькові",
+    "type": "String"
 }

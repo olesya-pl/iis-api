@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "40D63BA9-A9B5-4f59-BD05-14827A68ECBC",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 137
+    },
+    "name": "fatherName",
+    "target": "fatherName",
+    "title": "По батькові"
+}

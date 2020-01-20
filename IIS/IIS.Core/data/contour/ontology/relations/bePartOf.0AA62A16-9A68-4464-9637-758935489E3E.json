@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "0AA62A16-9A68-4464-9637-758935489E3E",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 92
+    },
+    "name": "bePartOf",
+    "target": "Infrastructure_bePartOf",
+    "title": "Належність"
+}

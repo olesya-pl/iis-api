@@ -1,33 +1,32 @@
 {
-  "id": "dc44910c-c022-467c-baeb-48b2965ec178",
-  "abstract": true,
-  "conceptType": "entities",
-  "name": "Enum",
-  "title": "Список",
-  "attributes": [
-    {
-      "id": "1c911d57-4a2c-4cc1-b962-56b20820e00a",
-      "name": "name",
-      "title": "Назва",
-      "meta": {
-        "sortOrder": 0,
-        "multiple": false,
-        "validation": {
-          "required": true
+    "abstract": true,
+    "attributes": [
+        {
+            "id": "80D1468A-C735-4ee6-93CA-283F66211DB5",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 121
+            },
+            "name": "name",
+            "target": "name",
+            "title": "Назва"
+        },
+        {
+            "id": "4BDF4441-84A1-4a1b-94D7-F7BA21274C38",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 122
+            },
+            "name": "sortOrder",
+            "target": "sortOrder",
+            "title": "Порядок сортування"
         }
-      },
-      "target": "name"
+    ],
+    "conceptType": "entities",
+    "id": "A6BFF9B2-3275-4e96-AA0B-60D444C74238",
+    "meta": {
+        "sortOrder": 123
     },
-    {
-      "id": "b64f5ea1-423f-47a6-929f-7e079d88a0e8",
-      "name": "sortOrder",
-      "title": "Порядок сортування",
-      "meta": {
-        "sortOrder": 20,
-        "multiple": false
-      },
-      "target": "sortOrder"
-    }
-  ],
-  "meta": {}
+    "name": "Enum",
+    "title": "Список"
 }

@@ -1,13 +1,14 @@
 {
-  "id": "19ea714b-3264-4f98-9d6c-eb9b0f0f2b01",
-  "conceptType": "attributes",
-  "name": "baseCode",
-  "title": "Номер військової частини",
-  "type": "String",
-  "meta": {
-    "validation": {
-      "required": true
+    "conceptType": "attributes",
+    "id": "1D6C32FB-C14B-4a95-854A-1E2F2BB8CF00",
+    "meta": {
+        "kind": "Keyword",
+        "validation": {
+            "required": true
+        }
     },
-    "kind": "Keyword"
-  }
+    "name": "baseCode",
+    "target": "baseCode",
+    "title": "Номер військової частини",
+    "type": "String"
 }

@@ -1,12 +1,12 @@
 {
-  "id": "b49f4a22-ea6f-4124-bcc6-6c920ffb8bc1",
-  "conceptType": "entities",
-  "name": "IMEISign",
-  "title": "IMEI",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "7F3DAB47-49E8-4e3f-9876-28867713600F",
+    "meta": {
+        "sortOrder": 82
+    },
+    "name": "IMEISign",
+    "title": "IMEI"
 }

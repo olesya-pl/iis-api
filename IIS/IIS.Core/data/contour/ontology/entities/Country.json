@@ -1,22 +1,24 @@
 {
-  "id": "659d9e1f-b584-4ab4-b5f2-39a0ca16773a",
-  "conceptType": "entities",
-  "name": "Country",
-  "title": "Країна",
-  "extends": [
-    "Enum"
-  ],
-  "attributes": [
-    {
-      "id": "bb0ff183-3282-443c-a52c-27bf941fc1a1",
-      "name": "code",
-      "title": "Код",
-      "meta": {
-        "sortOrder": 0,
-        "multiple": false
-      },
-      "target": "code"
-    }
-  ],
-  "meta": {}
+    "attributes": [
+        {
+            "id": "82FFCDC7-C406-4727-9030-5835B508A44B",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 83
+            },
+            "name": "code",
+            "target": "code",
+            "title": "Код"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "819B5095-0730-4d2f-AF44-1A1A66E3000E",
+    "meta": {
+        "sortOrder": 84
+    },
+    "name": "Country",
+    "title": "Країна"
 }

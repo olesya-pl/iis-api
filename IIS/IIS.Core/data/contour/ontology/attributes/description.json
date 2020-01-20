@@ -1,8 +1,10 @@
 {
-  "id": "882cae61-c616-41f1-9ddc-9be9e68f86d9",
-  "conceptType": "attributes",
-  "name": "description",
-  "title": "Додаткові дані",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "D77567C7-AF36-47aa-A0BF-D1D8B80FC132",
+    "meta": {
+    },
+    "name": "description",
+    "target": "description",
+    "title": "Додаткові дані",
+    "type": "String"
 }

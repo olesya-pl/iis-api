@@ -1,10 +1,12 @@
 {
-  "id": "698f0493-1937-4155-a9e1-0f6bdffc332a",
-  "conceptType": "entities",
-  "name": "Corps",
-  "title": "Рiд вiйськ",
-  "extends": [
-    "Enum"
-  ],
-  "meta": {}
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "F245AFE7-8AC5-490b-BE4E-7BF18A2DD895",
+    "meta": {
+        "sortOrder": 159
+    },
+    "name": "Corps",
+    "title": "Рiд вiйськ"
 }

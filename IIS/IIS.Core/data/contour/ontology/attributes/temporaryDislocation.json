@@ -1,8 +1,10 @@
 {
-  "id": "03aa000a-be1d-446d-b7fb-961b718ae0d4",
-  "conceptType": "attributes",
-  "name": "temporaryDislocation",
-  "title": "Пункт Тимчасової Дислокації (ПТД)",
-  "type": "Geo",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "4AB85489-4AF7-4356-910F-40B979837060",
+    "meta": {
+    },
+    "name": "temporaryDislocation",
+    "target": "temporaryDislocation",
+    "title": "Пункт Тимчасової Дислокації (ПТД)",
+    "type": "Geo"
 }

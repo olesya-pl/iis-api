@@ -1,10 +1,12 @@
 {
-  "id": "68031c57-86ea-49a5-92a6-7bcc350a5b04",
-  "conceptType": "entities",
-  "name": "MilitaryAmount",
-  "title": "Чисельність",
-  "extends": [
-    "Enum"
-  ],
-  "meta": {}
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "C0CBD1D5-231F-4ba5-A90E-3696BE5DF903",
+    "meta": {
+        "sortOrder": 127
+    },
+    "name": "MilitaryAmount",
+    "title": "Чисельність"
 }

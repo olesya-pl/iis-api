@@ -1,8 +1,10 @@
 {
-  "id": "566f4198-44e6-476a-9367-e164056743fb",
-  "conceptType": "attributes",
-  "name": "militaryRank",
-  "title": "Військове звання",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "20B6C5CF-4C71-47e7-8F5B-BFD5C2FA7032",
+    "meta": {
+    },
+    "name": "militaryRank",
+    "target": "militaryRank",
+    "title": "Військове звання",
+    "type": "String"
 }

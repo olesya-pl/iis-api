@@ -1,12 +1,12 @@
 {
-  "id": "e5182849-ebdf-4e81-adef-adf467ac47e3",
-  "conceptType": "entities",
-  "name": "CalleeTerminalIdSign",
-  "title": "callee_terminal_id",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "293197D2-DB60-4ab2-9A37-9A83BF655CB8",
+    "meta": {
+        "sortOrder": 31
+    },
+    "name": "CalleeTerminalIdSign",
+    "title": "callee_terminal_id"
 }

@@ -1,10 +1,11 @@
 {
-  "id": "20fc1116-f8df-4aea-8964-be422d8baaf8",
-  "conceptType": "attributes",
-  "name": "serialNumber",
-  "title": "Серійний номер",
-  "type": "String",
-  "meta": {
-    "kind": "Keyword"
-  }
+    "conceptType": "attributes",
+    "id": "24263438-A60D-437a-B879-DE273B22E082",
+    "meta": {
+        "kind": "Keyword"
+    },
+    "name": "serialNumber",
+    "target": "serialNumber",
+    "title": "Серійний номер",
+    "type": "String"
 }

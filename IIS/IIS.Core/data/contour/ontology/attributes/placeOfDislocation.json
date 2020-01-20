@@ -1,8 +1,10 @@
 {
-  "id": "d9a4c262-b64d-4899-be90-b3bb19faf235",
-  "conceptType": "attributes",
-  "name": "placeOfDislocation",
-  "title": "Місце розташування",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "EBEA8298-F756-440d-81B6-3A22EDB99C8F",
+    "meta": {
+    },
+    "name": "placeOfDislocation",
+    "target": "placeOfDislocation",
+    "title": "Місце розташування",
+    "type": "String"
 }

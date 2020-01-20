@@ -1,0 +1,18 @@
+{
+    "conceptType": "relations",
+    "id": "8AE168C4-32D4-4801-8881-693C14099A73",
+    "meta": {
+        "inversed": {
+            "code": "subordinate",
+            "editable": false,
+            "multiple": true,
+            "title": "Підлеглий"
+        },
+        "multiple": false,
+        "sortOrder": 117,
+        "type": "hierarchical"
+    },
+    "name": "superior",
+    "target": "Subdivision_superior",
+    "title": "Підлеглість"
+}

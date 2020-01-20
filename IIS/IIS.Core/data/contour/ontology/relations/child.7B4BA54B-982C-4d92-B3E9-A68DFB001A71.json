@@ -1,0 +1,17 @@
+{
+    "conceptType": "relations",
+    "id": "7B4BA54B-982C-4d92-B3E9-A68DFB001A71",
+    "meta": {
+        "inversed": {
+            "code": "parent",
+            "editable": false,
+            "multiple": false
+        },
+        "multiple": true,
+        "sortOrder": 62,
+        "type": "hierarchical"
+    },
+    "name": "child",
+    "target": "EventComponent",
+    "title": "Ієрархічний вказівник на дочірні елементи"
+}

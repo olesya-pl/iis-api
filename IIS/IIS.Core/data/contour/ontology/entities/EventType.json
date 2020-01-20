@@ -1,40 +1,41 @@
 {
-  "id": "490dd5ac-11a1-4f21-b94c-e6f2de67fbab",
-  "conceptType": "entities",
-  "name": "EventType",
-  "title": "Tип події",
-  "extends": [
-    "Enum"
-  ],
-  "attributes": [
-    {
-      "id": "d6d3a236-7a62-416e-87cc-c0f9abd29fa0",
-      "name": "code",
-      "title": "Код",
-      "meta": {
-        "sortOrder": 0,
-        "multiple": false
-      },
-      "target": "code"
-    },
-    {
-      "id": "fb8fcc06-01b9-458b-a86a-eeeaa5282e93",
-      "name": "child",
-      "title": "Ієрархічний вказівник на дочірні елементи",
-      "meta": {
-        "type": "hierarchical",
-        "inversed": {
-          "code": "parent",
-          "editable": false,
-          "multiple": false
+    "attributes": [
+        {
+            "id": "578AF351-BCE2-405e-8A04-6C196E4C4D74",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 57
+            },
+            "name": "code",
+            "target": "code",
+            "title": "Код"
         },
-        "sortOrder": 20,
-        "multiple": true
-      },
-      "target": "EventType"
-    }
-  ],
-  "meta": {
-    "hasFewEntities": true
-  }
+        {
+            "id": "777B3DF5-0D08-411c-8338-55C796F462F9",
+            "meta": {
+                "inversed": {
+                    "code": "parent",
+                    "editable": false,
+                    "multiple": false
+                },
+                "multiple": true,
+                "sortOrder": 58,
+                "type": "hierarchical"
+            },
+            "name": "child",
+            "target": "EventType",
+            "title": "Ієрархічний вказівник на дочірні елементи"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "4B0341F0-2869-4052-B071-D19C6A374E43",
+    "meta": {
+        "hasFewEntities": true,
+        "sortOrder": 59
+    },
+    "name": "EventType",
+    "title": "Tип події"
 }

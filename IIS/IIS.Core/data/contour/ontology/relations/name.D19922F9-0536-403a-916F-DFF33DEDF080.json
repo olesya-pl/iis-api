@@ -1,0 +1,12 @@
+{
+    "conceptType": "relations",
+    "id": "D19922F9-0536-403a-916F-DFF33DEDF080",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 93,
+        "title": "Повне найменування"
+    },
+    "name": "name",
+    "target": "name",
+    "title": "Назва"
+}

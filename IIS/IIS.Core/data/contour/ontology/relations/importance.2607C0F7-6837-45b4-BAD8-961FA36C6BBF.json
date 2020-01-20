@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "2607C0F7-6837-45b4-BAD8-961FA36C6BBF",
+    "meta": {
+        "formField": {
+            "hasIndexColumn": false,
+            "type": "radioGroup"
+        },
+        "multiple": false,
+        "sortOrder": 26
+    },
+    "name": "importance",
+    "target": "EventImportance",
+    "title": "Важливість"
+}

@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "ABFB0B5E-A942-4a5a-88D6-ADC09EA08FC3",
+    "meta": {
+        "format": "phone",
+        "multiple": false,
+        "sortOrder": 53,
+        "validation": {
+            "required": true
+        }
+    },
+    "name": "value",
+    "target": "value",
+    "title": "Значення"
+}

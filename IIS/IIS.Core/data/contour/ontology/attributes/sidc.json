@@ -1,10 +1,11 @@
 {
-  "id": "2b43b337-590d-412f-8a32-0b11164e4188",
-  "conceptType": "attributes",
-  "name": "sidc",
-  "title": "Військова абрівіатура НАТО",
-  "type": "String",
-  "meta": {
-    "kind": "Keyword"
-  }
+    "conceptType": "attributes",
+    "id": "B5A93166-DCCC-4d80-AC15-A5733274F848",
+    "meta": {
+        "kind": "Keyword"
+    },
+    "name": "sidc",
+    "target": "sidc",
+    "title": "Військова абрівіатура НАТО",
+    "type": "String"
 }

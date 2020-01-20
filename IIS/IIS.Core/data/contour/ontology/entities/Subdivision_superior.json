@@ -1,9 +1,10 @@
 {
-  "id": "e9996b14-aeb6-40fd-bf0c-10a49ddaffc9",
-  "abstract": true,
-  "conceptType": "entities",
-  "name": "Subdivision_superior",
-  "title": "Subdivision_superior",
-  "attributes": [],
-  "meta": {}
+    "abstract": true,
+    "conceptType": "entities",
+    "id": "3587E89A-87BA-407e-920A-102A4EA28719",
+    "meta": {
+        "sortOrder": 34
+    },
+    "name": "Subdivision_superior",
+    "title": "Subdivision_superior"
 }

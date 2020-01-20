@@ -1,25 +1,25 @@
 {
-  "id": "46cf0540-27b8-468b-b55a-e77a3d575767",
-  "abstract": true,
-  "conceptType": "entities",
-  "name": "ObjectSign",
-  "title": "Ознака об'єкту розвідки",
-  "attributes": [
-    {
-      "id": "c6d3956a-c0ad-4d9d-b22e-8fd0a19cc1f7",
-      "name": "value",
-      "title": "Значення",
-      "meta": {
-        "sortOrder": 0,
-        "multiple": false,
-        "validation": {
-          "required": true
+    "abstract": true,
+    "attributes": [
+        {
+            "id": "FB2915A9-2098-48f2-8FE8-AC2AF040B3E5",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 152,
+                "validation": {
+                    "required": true
+                }
+            },
+            "name": "value",
+            "target": "value",
+            "title": "Значення"
         }
-      },
-      "target": "value"
-    }
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    ],
+    "conceptType": "entities",
+    "id": "DEEA2382-A1FB-4478-B2C7-763C470FEDE8",
+    "meta": {
+        "sortOrder": 153
+    },
+    "name": "ObjectSign",
+    "title": "Ознака об'єкту розвідки"
 }

@@ -1,8 +1,10 @@
 {
-  "id": "475b2948-a2b4-471c-883d-9cfead06f75c",
-  "conceptType": "attributes",
-  "name": "title",
-  "title": "Повна назва",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "957D10A8-0BD0-44da-92B3-BF4ED056072C",
+    "meta": {
+    },
+    "name": "title",
+    "target": "title",
+    "title": "Повна назва",
+    "type": "String"
 }

@@ -1,30 +1,31 @@
 {
-  "id": "7e50d540-e638-48a3-a44a-6bda227dc8d8",
-  "conceptType": "entities",
-  "name": "EventComponent",
-  "title": "Компонент події",
-  "extends": [
-    "Enum"
-  ],
-  "attributes": [
-    {
-      "id": "646acdeb-b04b-4d81-ae51-d273bca07d14",
-      "name": "child",
-      "title": "Ієрархічний вказівник на дочірні елементи",
-      "meta": {
-        "type": "hierarchical",
-        "inversed": {
-          "code": "parent",
-          "editable": false,
-          "multiple": false
-        },
-        "sortOrder": 0,
-        "multiple": true
-      },
-      "target": "EventComponent"
-    }
-  ],
-  "meta": {
-    "hasFewEntities": true
-  }
+    "attributes": [
+        {
+            "id": "7B4BA54B-982C-4d92-B3E9-A68DFB001A71",
+            "meta": {
+                "inversed": {
+                    "code": "parent",
+                    "editable": false,
+                    "multiple": false
+                },
+                "multiple": true,
+                "sortOrder": 62,
+                "type": "hierarchical"
+            },
+            "name": "child",
+            "target": "EventComponent",
+            "title": "Ієрархічний вказівник на дочірні елементи"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "5E364AF7-2612-4276-A895-ACFD787A3BCB",
+    "meta": {
+        "hasFewEntities": true,
+        "sortOrder": 63
+    },
+    "name": "EventComponent",
+    "title": "Компонент події"
 }

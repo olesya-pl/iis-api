@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "30B0C9DE-43D1-4a00-ACF1-EB10D4781191",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 16
+    },
+    "name": "attachment",
+    "target": "attachment",
+    "title": "Прикріплений файл"
+}

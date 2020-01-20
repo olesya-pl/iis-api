@@ -1,8 +1,10 @@
 {
-  "id": "a335127b-44e4-4b97-b10b-9643c4d82d7d",
-  "conceptType": "attributes",
-  "name": "shortName",
-  "title": "Скорочене найменування",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "75539307-5161-4514-9705-A57F1B18FFD9",
+    "meta": {
+    },
+    "name": "shortName",
+    "target": "shortName",
+    "title": "Скорочене найменування",
+    "type": "String"
 }

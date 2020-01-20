@@ -1,29 +1,30 @@
 {
-  "id": "2146953d-dac0-4914-8ec7-19a5b809e6a6",
-  "conceptType": "entities",
-  "name": "EmailSign",
-  "title": "Електронна скринька",
-  "extends": [
-    "ObjectSign"
-  ],
-  "attributes": [
-    {
-      "id": "289b72c1-878d-4352-b108-6455b2b5fca2",
-      "name": "value",
-      "title": "Значення",
-      "meta": {
-        "format": "email",
-        "sortOrder": 0,
-        "multiple": false,
-        "validation": {
-          "email": true,
-          "required": true
+    "attributes": [
+        {
+            "id": "4BE15E69-3747-437c-AD11-14A497E3FD18",
+            "meta": {
+                "format": "email",
+                "multiple": false,
+                "sortOrder": 55,
+                "validation": {
+                    "email": true,
+                    "required": true
+                }
+            },
+            "name": "value",
+            "target": "value",
+            "title": "Значення"
         }
-      },
-      "target": "value"
-    }
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "4AC6E86C-671F-4a02-A28F-7D32E3483DA7",
+    "meta": {
+        "exposeOnApi": false,
+        "sortOrder": 56
+    },
+    "name": "EmailSign",
+    "title": "Електронна скринька"
 }

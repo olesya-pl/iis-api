@@ -1,8 +1,10 @@
 {
-  "id": "a31d8344-1c09-47c3-b61d-c4dce9a8910a",
-  "conceptType": "attributes",
-  "name": "dateOfRankActualization",
-  "title": "Дата актуалізації звання",
-  "type": "DateTime",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "D7D39E63-E0D1-45b5-9224-C2002A4C3C42",
+    "meta": {
+    },
+    "name": "dateOfRankActualization",
+    "target": "dateOfRankActualization",
+    "title": "Дата актуалізації звання",
+    "type": "DateTime"
 }

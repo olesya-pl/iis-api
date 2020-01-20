@@ -1,12 +1,12 @@
 {
-  "id": "c8a71c38-c200-463f-9f1e-1816e7ec94b7",
-  "conceptType": "entities",
-  "name": "NicknameVHFSign",
-  "title": "Позивний УКХ",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "1F217A3B-24A4-4308-91B7-238DA5AD27A7",
+    "meta": {
+        "sortOrder": 30
+    },
+    "name": "NicknameVHFSign",
+    "title": "Позивний УКХ"
 }

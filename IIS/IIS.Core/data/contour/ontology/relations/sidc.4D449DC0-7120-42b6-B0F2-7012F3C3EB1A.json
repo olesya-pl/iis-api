@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "4D449DC0-7120-42b6-B0F2-7012F3C3EB1A",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 69
+    },
+    "name": "sidc",
+    "target": "sidc",
+    "title": "Військова абрівіатура НАТО"
+}

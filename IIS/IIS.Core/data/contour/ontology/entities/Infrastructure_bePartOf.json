@@ -1,8 +1,10 @@
 {
-  "id": "a3b6ca31-ed9c-43d5-a461-da8a0c49c9b0",
-  "abstract": true,
-  "conceptType": "entities",
-  "name": "Infrastructure_bePartOf",
-  "title": "Infrastructure_bePartOf",
-  "meta": {}
+    "abstract": true,
+    "conceptType": "entities",
+    "id": "A14B1FD7-41A5-4df8-9F27-543B5B3C8245",
+    "meta": {
+        "sortOrder": 100
+    },
+    "name": "Infrastructure_bePartOf",
+    "title": "Infrastructure_bePartOf"
 }

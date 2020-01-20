@@ -1,8 +1,10 @@
 {
-  "id": "1294e5ca-217e-4648-9280-61fe4101be39",
-  "conceptType": "attributes",
-  "name": "startsAt",
-  "title": "Початок",
-  "type": "DateTime",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "5186350E-3875-4265-99CB-FC36D1A08847",
+    "meta": {
+    },
+    "name": "startsAt",
+    "target": "startsAt",
+    "title": "Початок",
+    "type": "DateTime"
 }

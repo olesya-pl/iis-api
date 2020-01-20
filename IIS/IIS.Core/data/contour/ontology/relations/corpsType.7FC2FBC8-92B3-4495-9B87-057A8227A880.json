@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "7FC2FBC8-92B3-4495-9B87-057A8227A880",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 110
+    },
+    "name": "corpsType",
+    "target": "Corps",
+    "title": "Рід військ"
+}

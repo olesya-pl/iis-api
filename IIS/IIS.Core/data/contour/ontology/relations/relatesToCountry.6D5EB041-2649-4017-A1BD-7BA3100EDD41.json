@@ -1,0 +1,16 @@
+{
+    "conceptType": "relations",
+    "id": "6D5EB041-2649-4017-A1BD-7BA3100EDD41",
+    "meta": {
+        "formField": {
+            "icon": "flag",
+            "type": "dropdown"
+        },
+        "multiple": false,
+        "sortOrder": 76,
+        "title": "Громадянство"
+    },
+    "name": "relatesToCountry",
+    "target": "Country",
+    "title": "Громадянство"
+}

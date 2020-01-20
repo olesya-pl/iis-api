@@ -1,24 +1,25 @@
 {
-  "id": "833fecd1-7cf4-49b4-a47f-dd3326a7a30c",
-  "conceptType": "entities",
-  "name": "EventState",
-  "title": "Стан Події",
-  "extends": [
-    "Enum"
-  ],
-  "attributes": [
-    {
-      "id": "e40e988c-c815-4081-a0d8-78f32de6773c",
-      "name": "code",
-      "title": "Код",
-      "meta": {
-        "sortOrder": 0,
-        "multiple": false
-      },
-      "target": "code"
-    }
-  ],
-  "meta": {
-    "hasFewEntities": true
-  }
+    "attributes": [
+        {
+            "id": "4F9A7555-FFE2-48d3-AAA8-8B5414C85CFC",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 9
+            },
+            "name": "code",
+            "target": "code",
+            "title": "Код"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "1294C60D-C6E3-4187-BECC-A51017946EF0",
+    "meta": {
+        "hasFewEntities": true,
+        "sortOrder": 10
+    },
+    "name": "EventState",
+    "title": "Стан Події"
 }

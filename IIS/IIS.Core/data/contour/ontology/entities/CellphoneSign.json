@@ -1,28 +1,29 @@
 {
-  "id": "42c958bb-6699-45bc-93f4-49e23abb4928",
-  "conceptType": "entities",
-  "name": "CellphoneSign",
-  "title": "Мобільний телефон",
-  "extends": [
-    "ObjectSign"
-  ],
-  "attributes": [
-    {
-      "id": "ec4819d4-990b-4bd6-a68f-94d1492c45ee",
-      "name": "value",
-      "title": "Значення",
-      "meta": {
-        "format": "phone",
-        "sortOrder": 0,
-        "multiple": false,
-        "validation": {
-          "required": true
+    "attributes": [
+        {
+            "id": "ABFB0B5E-A942-4a5a-88D6-ADC09EA08FC3",
+            "meta": {
+                "format": "phone",
+                "multiple": false,
+                "sortOrder": 53,
+                "validation": {
+                    "required": true
+                }
+            },
+            "name": "value",
+            "target": "value",
+            "title": "Значення"
         }
-      },
-      "target": "value"
-    }
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "4A5EFCB0-8B11-4142-91FC-AA20CCB8212B",
+    "meta": {
+        "exposeOnApi": false,
+        "sortOrder": 54
+    },
+    "name": "CellphoneSign",
+    "title": "Мобільний телефон"
 }

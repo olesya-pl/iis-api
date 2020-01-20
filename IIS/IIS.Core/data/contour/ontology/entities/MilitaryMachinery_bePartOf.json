@@ -1,8 +1,10 @@
 {
-  "id": "aeac1c03-cec9-403d-aebd-b8e9a045143e",
-  "abstract": true,
-  "conceptType": "entities",
-  "name": "MilitaryMachinery_bePartOf",
-  "title": "MilitaryMachinery_bePartOf",
-  "meta": {}
+    "abstract": true,
+    "conceptType": "entities",
+    "id": "63CD9193-8DE3-478e-9780-2BD704564C27",
+    "meta": {
+        "sortOrder": 67
+    },
+    "name": "MilitaryMachinery_bePartOf",
+    "title": "MilitaryMachinery_bePartOf"
 }

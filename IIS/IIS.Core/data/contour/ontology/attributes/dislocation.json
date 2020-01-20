@@ -1,8 +1,10 @@
 {
-  "id": "1b871e59-a3e3-4a8a-9c45-26ec07fb87d9",
-  "conceptType": "attributes",
-  "name": "dislocation",
-  "title": "Пункт Постійної Дислокації (ППД)",
-  "type": "Geo",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "0B172D83-15F2-48e6-BA49-8B7F815D8983",
+    "meta": {
+    },
+    "name": "dislocation",
+    "target": "dislocation",
+    "title": "Пункт Постійної Дислокації (ППД)",
+    "type": "Geo"
 }

@@ -1,8 +1,10 @@
 {
-  "id": "31f69db8-429b-4052-839f-086300722922",
-  "conceptType": "attributes",
-  "name": "firstName",
-  "title": "Ім'я",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "87BC4316-2E55-4681-98B3-AAFF50286130",
+    "meta": {
+    },
+    "name": "firstName",
+    "target": "firstName",
+    "title": "Ім'я",
+    "type": "String"
 }

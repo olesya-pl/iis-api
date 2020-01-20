@@ -1,8 +1,10 @@
 {
-  "id": "b51a3ff6-8a8d-48c5-876c-f134e6a218b6",
-  "abstract": true,
-  "conceptType": "entities",
-  "name": "MilitaryMachinery_toBeInPlace",
-  "title": "MilitaryMachinery_toBeInPlace",
-  "meta": {}
+    "abstract": true,
+    "conceptType": "entities",
+    "id": "B0C8AC68-D19E-4a38-ABBC-3453D07463CC",
+    "meta": {
+        "sortOrder": 125
+    },
+    "name": "MilitaryMachinery_toBeInPlace",
+    "title": "MilitaryMachinery_toBeInPlace"
 }

@@ -1,0 +1,18 @@
+{
+    "conceptType": "relations",
+    "id": "027155F8-2404-40f6-9F0F-E13856BD0659",
+    "meta": {
+        "formField": {
+            "hasIndexColumn": false,
+            "type": "dropdown"
+        },
+        "multiple": false,
+        "sortOrder": 5,
+        "validation": {
+            "required": true
+        }
+    },
+    "name": "affiliation",
+    "target": "ObjectAffiliation",
+    "title": "Приналежність"
+}

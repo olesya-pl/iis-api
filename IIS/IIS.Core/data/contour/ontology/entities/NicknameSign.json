@@ -1,12 +1,12 @@
 {
-  "id": "274dbf09-d40d-444a-9580-b14e41658c67",
-  "conceptType": "entities",
-  "name": "NicknameSign",
-  "title": "Позивний",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "A49B1178-4154-4f8b-848C-EE6817200C2E",
+    "meta": {
+        "sortOrder": 101
+    },
+    "name": "NicknameSign",
+    "title": "Позивний"
 }

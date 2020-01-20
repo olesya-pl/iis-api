@@ -1,151 +1,149 @@
 {
-  "id": "5167a538-d77c-47eb-acb3-94059025e352",
-  "conceptType": "entities",
-  "name": "MilitaryMachinery",
-  "title": "Озброєння та військова техніка",
-  "extends": [
-    "ObjectOfStudy"
-  ],
-  "attributes": [
-    {
-      "id": "971e2cab-0df6-4232-8ad1-518e254c8b27",
-      "name": "modelNumber",
-      "title": "Бортовий номер",
-      "meta": {
-        "sortOrder": 100,
-        "multiple": false
-      },
-      "target": "modelNumber"
-    },
-    {
-      "id": "06523748-c6ff-4683-bdf7-28f211d677c1",
-      "name": "serialNumber",
-      "title": "Серійний номер",
-      "meta": {
-        "sortOrder": 240,
-        "multiple": false
-      },
-      "target": "serialNumber"
-    },
-    {
-      "id": "fdc2d199-e340-4dcf-a2ee-04b1db9b79bd",
-      "name": "subtype",
-      "title": "Підтип",
-      "meta": {
-        "sortOrder": 60,
-        "multiple": false
-      },
-      "target": "MachinerySubtype"
-    },
-    {
-      "id": "06d7a7ee-a6f7-474c-9f73-143edac4e328",
-      "name": "title",
-      "title": "Повна назва",
-      "meta": {
-        "formula": "h.fullTitle(entity.shortName, entity.name)",
-        "sortOrder": 0,
-        "multiple": false
-      },
-      "target": "title"
-    },
-    {
-      "id": "fd16de04-808d-4a80-992a-4d7bad172a1b",
-      "name": "name",
-      "title": "Назва",
-      "meta": {
-        "sortOrder": 20,
-        "title": "Повне найменування",
-        "multiple": false,
-        "validation": {
-          "required": true
-        }
-      },
-      "target": "name"
-    },
-    {
-      "id": "fb4e2338-6007-490f-92a5-16b250b3684b",
-      "name": "shortName",
-      "title": "Скорочене найменування",
-      "meta": {
-        "sortOrder": 40,
-        "multiple": false
-      },
-      "target": "shortName"
-    },
-    {
-      "id": "4f4340a3-0054-4bce-b5f7-5389cbc52782",
-      "name": "model",
-      "title": "Модель",
-      "meta": {
-        "sortOrder": 80,
-        "multiple": false
-      },
-      "target": "model"
-    },
-    {
-      "id": "81e2ceb0-8be9-489a-a0fe-dc476b5a1cc9",
-      "name": "description",
-      "title": "Додаткові дані",
-      "meta": {
-        "sortOrder": 260,
-        "multiple": false
-      },
-      "target": "description"
-    },
-    {
-      "id": "0dedeb97-c182-4a83-b3ef-299bef63ff66",
-      "name": "permanentDislocation",
-      "title": "Місце постійної дислокації",
-      "meta": {
-        "sortOrder": 160,
-        "multiple": false
-      },
-      "target": "InfrastructureType"
-    },
-    {
-      "id": "b3705045-fc64-4423-95c5-fafaac061c28",
-      "name": "militaryBase",
-      "title": "Військова частина",
-      "meta": {
-        "sortOrder": 120,
-        "multiple": false
-      },
-      "target": "MilitaryBase"
-    },
-    {
-      "id": "1b788931-290a-4916-8852-fe7554b38dd3",
-      "name": "toBeInPlace",
-      "title": "Місце перебування",
-      "meta": {
-        "sortOrder": 220,
-        "multiple": false
-      },
-      "target": "MilitaryMachinery_toBeInPlace"
-    },
-    {
-      "id": "0770ae49-cfd4-40d0-a097-9ea013c61a81",
-      "name": "bePartOf",
-      "title": "Належність",
-      "meta": {
-        "sortOrder": 180,
-        "multiple": false
-      },
-      "target": "MilitaryMachinery_bePartOf"
-    },
-    {
-      "id": "71ffbfd9-460d-4225-a231-db24fdc3cc4f",
-      "name": "relatesToCountry",
-      "title": "Державна приналежність",
-      "meta": {
-        "sortOrder": 140,
-        "formField": {
-          "type": "dropdown",
-          "icon": "flag"
+    "attributes": [
+        {
+            "id": "7162B2E4-3947-4d63-A2E1-8F1358DB1A22",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 39
+            },
+            "name": "modelNumber",
+            "target": "modelNumber",
+            "title": "Бортовий номер"
         },
-        "multiple": false
-      },
-      "target": "Country"
-    }
-  ],
-  "meta": {}
+        {
+            "id": "0DBCCC4A-9517-4980-A11C-4B491A33DC07",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 40
+            },
+            "name": "serialNumber",
+            "target": "serialNumber",
+            "title": "Серійний номер"
+        },
+        {
+            "id": "E7FFD1E2-CC97-4b0d-B13D-F5CBA777C1B0",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 41
+            },
+            "name": "subtype",
+            "target": "MachinerySubtype",
+            "title": "Підтип"
+        },
+        {
+            "id": "892195A3-5CCF-4ebe-BA2A-43DF0D27A2BC",
+            "meta": {
+                "formula": "h.fullTitle(entity.shortName, entity.name)",
+                "multiple": false,
+                "sortOrder": 42
+            },
+            "name": "title",
+            "target": "title",
+            "title": "Повна назва"
+        },
+        {
+            "id": "9513855E-3E15-483a-8F3E-68E54A5024AD",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 43
+            },
+            "name": "name",
+            "target": "name",
+            "title": "Назва"
+        },
+        {
+            "id": "3A9AA472-6DF9-42bb-855E-6EFD32178A69",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 44
+            },
+            "name": "shortName",
+            "target": "shortName",
+            "title": "Скорочене найменування"
+        },
+        {
+            "id": "27FE0C36-4B89-4d39-A2AE-180FABB58043",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 45
+            },
+            "name": "model",
+            "target": "model",
+            "title": "Модель"
+        },
+        {
+            "id": "6BC6FD99-1DE0-4d1c-AE21-930A70A29273",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 46
+            },
+            "name": "description",
+            "target": "description",
+            "title": "Додаткові дані"
+        },
+        {
+            "id": "44AE8787-8539-4e2d-97E8-35DF16B281B7",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 47
+            },
+            "name": "permanentDislocation",
+            "target": "InfrastructureType",
+            "title": "Місце постійної дислокації"
+        },
+        {
+            "id": "AA93E18F-FA72-425f-B32A-DA117EC7DA9F",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 48
+            },
+            "name": "militaryBase",
+            "target": "MilitaryBase",
+            "title": "Військова частина"
+        },
+        {
+            "id": "D1426B6D-FE1B-4319-A778-28D41466F0B0",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 49
+            },
+            "name": "toBeInPlace",
+            "target": "MilitaryMachinery_toBeInPlace",
+            "title": "Місце перебування"
+        },
+        {
+            "id": "B0535C18-B5CE-4889-90EA-F827B0B6B986",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 50
+            },
+            "name": "bePartOf",
+            "target": "MilitaryMachinery_bePartOf",
+            "title": "Належність"
+        },
+        {
+            "id": "6E7BAC60-4805-455d-8B13-05E178C53F34",
+            "meta": {
+                "formField": {
+                    "icon": "flag",
+                    "type": "dropdown"
+                },
+                "multiple": false,
+                "sortOrder": 51
+            },
+            "name": "relatesToCountry",
+            "target": "Country",
+            "title": "Державна приналежність"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "ObjectOfStudy"
+    ],
+    "id": "49B0F55D-1284-4358-867A-0C3011F765B8",
+    "meta": {
+        "sortOrder": 52
+    },
+    "name": "MilitaryMachinery",
+    "title": "Озброєння та військова техніка"
 }

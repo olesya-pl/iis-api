@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "A430B215-1E6B-45f2-A731-F2BC60F61EE2",
+    "meta": {
+        "formField": {
+            "hasIndexColumn": false,
+            "type": "dropdownTree"
+        },
+        "multiple": false,
+        "sortOrder": 18
+    },
+    "name": "eventType",
+    "target": "EventType",
+    "title": "Тип події"
+}

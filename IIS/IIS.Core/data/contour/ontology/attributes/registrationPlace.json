@@ -1,8 +1,10 @@
 {
-  "id": "989c3853-f6dc-4cfd-876c-d66e881583e6",
-  "conceptType": "attributes",
-  "name": "registrationPlace",
-  "title": "Місце реєстрації",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "77008604-B402-428b-9E56-A6FCB00E9CC4",
+    "meta": {
+    },
+    "name": "registrationPlace",
+    "target": "registrationPlace",
+    "title": "Місце реєстрації",
+    "type": "String"
 }

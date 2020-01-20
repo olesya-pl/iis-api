@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "6B505B0D-15B0-460e-A2D6-8767D86F4EE3",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 113
+    },
+    "name": "shortName",
+    "target": "shortName",
+    "title": "Скорочене найменування"
+}

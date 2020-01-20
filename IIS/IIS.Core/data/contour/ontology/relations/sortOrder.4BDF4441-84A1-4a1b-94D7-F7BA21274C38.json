@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "4BDF4441-84A1-4a1b-94D7-F7BA21274C38",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 122
+    },
+    "name": "sortOrder",
+    "target": "sortOrder",
+    "title": "Порядок сортування"
+}

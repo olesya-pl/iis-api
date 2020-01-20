@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "E3434A40-0AE8-4be3-A68D-8F3DF26F030D",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 143
+    },
+    "name": "dateOfRankActualization",
+    "target": "dateOfRankActualization",
+    "title": "Дата актуалізації звання"
+}

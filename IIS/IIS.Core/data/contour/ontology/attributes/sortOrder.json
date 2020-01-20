@@ -1,8 +1,10 @@
 {
-  "id": "9a0e92de-9306-41e8-a682-fe21ae47d664",
-  "conceptType": "attributes",
-  "name": "sortOrder",
-  "title": "Порядок сортування",
-  "type": "Integer",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "9A844420-13A2-4673-B984-ABD827AE2F81",
+    "meta": {
+    },
+    "name": "sortOrder",
+    "target": "sortOrder",
+    "title": "Порядок сортування",
+    "type": "Integer"
 }

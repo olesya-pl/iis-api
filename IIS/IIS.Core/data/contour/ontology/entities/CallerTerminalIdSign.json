@@ -1,12 +1,12 @@
 {
-  "id": "32cdd777-9e6d-46ca-9610-0b52125bd820",
-  "conceptType": "entities",
-  "name": "CallerTerminalIdSign",
-  "title": "caller_terminal_id",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "36CEBC44-3EA5-486b-9BC5-ECDF6549BF00",
+    "meta": {
+        "sortOrder": 36
+    },
+    "name": "CallerTerminalIdSign",
+    "title": "caller_terminal_id"
 }

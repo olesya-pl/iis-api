@@ -1,0 +1,18 @@
+{
+    "conceptType": "relations",
+    "id": "9AF66A0B-7B36-4d37-8C05-7781B257EA31",
+    "meta": {
+        "formField": {
+            "hasIndexColumn": false,
+            "type": "dropdown"
+        },
+        "multiple": false,
+        "sortOrder": 1,
+        "validation": {
+            "required": true
+        }
+    },
+    "name": "importance",
+    "target": "ObjectImportance",
+    "title": "Важливість"
+}

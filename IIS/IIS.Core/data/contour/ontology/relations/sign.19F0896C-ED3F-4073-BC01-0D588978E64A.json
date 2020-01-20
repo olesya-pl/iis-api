@@ -1,0 +1,19 @@
+{
+    "conceptType": "relations",
+    "id": "19F0896C-ED3F-4073-BC01-0D588978E64A",
+    "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
+        "formField": {
+            "type": "form"
+        },
+        "multiple": true,
+        "sortOrder": 3
+    },
+    "name": "sign",
+    "target": "ObjectSign",
+    "title": "Ознаки"
+}

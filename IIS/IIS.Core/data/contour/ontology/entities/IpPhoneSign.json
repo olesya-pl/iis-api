@@ -1,12 +1,12 @@
 {
-  "id": "61305fbe-bf01-4991-a1cb-e05d53852d26",
-  "conceptType": "entities",
-  "name": "IpPhoneSign",
-  "title": "IP Телефон",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "B2E790E6-3407-44ec-9FE4-5BD6EA20F260",
+    "meta": {
+        "sortOrder": 126
+    },
+    "name": "IpPhoneSign",
+    "title": "IP Телефон"
 }

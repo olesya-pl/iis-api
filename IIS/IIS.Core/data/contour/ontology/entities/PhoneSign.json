@@ -1,28 +1,28 @@
 {
-  "id": "e0b32c97-5290-4a80-86f1-ecf43dc21059",
-  "conceptType": "entities",
-  "name": "PhoneSign",
-  "title": "Tелефон",
-  "extends": [
-    "ObjectSign"
-  ],
-  "attributes": [
-    {
-      "id": "74b42747-74ab-42ec-9ec9-c3005765dc9d",
-      "name": "value",
-      "title": "Значення",
-      "meta": {
-        "format": "phone",
-        "sortOrder": 0,
-        "multiple": false,
-        "validation": {
-          "required": true
+    "attributes": [
+        {
+            "id": "E7C1DDC7-64D5-4bcb-8DE2-DBC8054EC057",
+            "meta": {
+                "format": "phone",
+                "multiple": false,
+                "sortOrder": 85,
+                "validation": {
+                    "required": true
+                }
+            },
+            "name": "value",
+            "target": "value",
+            "title": "Значення"
         }
-      },
-      "target": "value"
-    }
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "89677A4C-DAB9-4858-AE99-2F6B68815B1D",
+    "meta": {
+        "sortOrder": 86
+    },
+    "name": "PhoneSign",
+    "title": "Tелефон"
 }

@@ -1,8 +1,10 @@
 {
-  "id": "a2e17f8e-c974-446e-b414-4600a1bc7ae8",
-  "conceptType": "attributes",
-  "name": "fullNameRu",
-  "title": "П.І.П. російською",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "72C48F44-7000-422d-BF9E-D084E77641F2",
+    "meta": {
+    },
+    "name": "fullNameRu",
+    "target": "fullNameRu",
+    "title": "П.І.П. російською",
+    "type": "String"
 }

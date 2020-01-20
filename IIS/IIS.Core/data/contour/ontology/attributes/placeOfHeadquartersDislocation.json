@@ -1,8 +1,10 @@
 {
-  "id": "dd2847ac-1401-422a-951f-ed7893932aa4",
-  "conceptType": "attributes",
-  "name": "placeOfHeadquartersDislocation",
-  "title": "Пункт постійної дислокації штабу",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "BFB2F411-3E0B-4781-A46E-10A5E269C603",
+    "meta": {
+    },
+    "name": "placeOfHeadquartersDislocation",
+    "target": "placeOfHeadquartersDislocation",
+    "title": "Пункт постійної дислокації штабу",
+    "type": "String"
 }

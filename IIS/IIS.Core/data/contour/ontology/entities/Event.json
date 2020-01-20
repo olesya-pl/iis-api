@@ -1,197 +1,180 @@
 {
-  "id": "bee4ba15-30ac-489e-b158-39bb01488b0d",
-  "conceptType": "entities",
-  "name": "Event",
-  "title": "Подія",
-  "attributes": [
-    {
-      "id": "87a1b244-7e6b-4a91-8d7a-6c265fbfb2b8",
-      "name": "startsAt",
-      "title": "Початок",
-      "meta": {
-        "sortOrder": 80,
-        "multiple": false
-      },
-      "target": "startsAt"
-    },
-    {
-      "id": "83afcdb8-0ecf-4c54-b482-d42f23d7b1df",
-      "name": "attachment",
-      "title": "Прикріплений файл",
-      "meta": {
-        "sortOrder": 260,
-        "multiple": true
-      },
-      "target": "attachment"
-    },
-    {
-      "id": "c93642b2-d478-407c-b36d-3364e8aa7f3a",
-      "name": "endsAt",
-      "title": "Кінець",
-      "meta": {
-        "sortOrder": 100,
-        "multiple": false
-      },
-      "target": "endsAt"
-    },
-    {
-      "id": "0eb2cc5e-35ec-44e7-a3e5-1f0ea96fc1b2",
-      "name": "eventType",
-      "title": "Тип події",
-      "meta": {
-        "sortOrder": 220,
-        "formField": {
-          "type": "dropdownTree",
-          "hasIndexColumn": false
+    "attributes": [
+        {
+            "id": "F0B84A9A-06F0-424c-9E3B-846763950FD0",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 15
+            },
+            "name": "startsAt",
+            "target": "startsAt",
+            "title": "Початок"
         },
-        "multiple": false,
-        "validation": {
-          "required": true
-        }
-      },
-      "target": "EventType"
-    },
-    {
-      "id": "32897259-9685-4047-9d46-886400eb681e",
-      "name": "relatesToCountry",
-      "title": "Країна",
-      "meta": {
-        "sortOrder": 120,
-        "title": "Країна",
-        "formField": {
-          "type": "dropdown",
-          "icon": "flag"
+        {
+            "id": "30B0C9DE-43D1-4a00-ACF1-EB10D4781191",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 16
+            },
+            "name": "attachment",
+            "target": "attachment",
+            "title": "Прикріплений файл"
         },
-        "multiple": true,
-        "validation": {
-          "required": true
-        }
-      },
-      "target": "Country"
-    },
-    {
-      "id": "89692a14-34b2-4d10-bfde-82f8108b884e",
-      "name": "name",
-      "title": "Назва",
-      "meta": {
-        "sortOrder": 0,
-        "title": "Назва",
-        "multiple": false,
-        "validation": {
-          "required": true
-        }
-      },
-      "target": "name"
-    },
-    {
-      "id": "0dc72c15-9dfb-4036-9434-66ecec29233d",
-      "name": "component",
-      "title": "Компонент",
-      "meta": {
-        "sortOrder": 240,
-        "formField": {
-          "type": "dropdownTree",
-          "hasIndexColumn": false
+        {
+            "id": "2C1A4EA6-4A7E-4479-95F0-5C4E151D8818",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 17
+            },
+            "name": "endsAt",
+            "target": "endsAt",
+            "title": "Кінець"
         },
-        "multiple": false,
-        "validation": {
-          "required": true
-        }
-      },
-      "target": "EventComponent"
-    },
-    {
-      "id": "ac103404-c9c2-435b-bf26-66f7daba7950",
-      "name": "state",
-      "title": "Стан",
-      "meta": {
-        "sortOrder": 60,
-        "formField": {
-          "type": "radioGroup",
-          "hasIndexColumn": false
+        {
+            "id": "A430B215-1E6B-45f2-A731-F2BC60F61EE2",
+            "meta": {
+                "formField": {
+                    "hasIndexColumn": false,
+                    "type": "dropdownTree"
+                },
+                "multiple": false,
+                "sortOrder": 18
+            },
+            "name": "eventType",
+            "target": "EventType",
+            "title": "Тип події"
         },
-        "multiple": false,
-        "validation": {
-          "required": true
-        }
-      },
-      "target": "EventState"
-    },
-    {
-      "id": "7d469822-35e7-459b-a02c-82ba5e23570f",
-      "name": "associatedWithEvent",
-      "title": "Об'єкти розвідки, пов'язані з подією",
-      "meta": {
-        "sortOrder": 140,
-        "multiple": true
-      },
-      "target": "ObjectOfStudy"
-    },
-    {
-      "id": "f08b4dd7-7e2b-4801-996c-cabffd58decc",
-      "name": "description",
-      "title": "Додаткові дані",
-      "meta": {
-        "sortOrder": 20,
-        "title": "Опис",
-        "formField": {
-          "lines": 5,
-          "hasIndexColumn": false
+        {
+            "id": "ABDC3385-941E-4fb7-8A19-0A6C7B75A7C3",
+            "meta": {
+                "formField": {
+                    "icon": "flag",
+                    "type": "dropdown"
+                },
+                "multiple": true,
+                "sortOrder": 19
+            },
+            "name": "relatesToCountry",
+            "target": "Country",
+            "title": "Країна"
         },
-        "multiple": false
-      },
-      "target": "description"
-    },
-    {
-      "id": "20d22bc2-664a-427a-bf88-2441b49ed44c",
-      "name": "location",
-      "title": "Географічні координати",
-      "meta": {
-        "sortOrder": 180,
-        "multiple": false
-      },
-      "target": "location"
-    },
-    {
-      "id": "f43ba292-368c-49f1-a965-ebf7a99e8400",
-      "name": "importance",
-      "title": "Важливість",
-      "meta": {
-        "sortOrder": 40,
-        "formField": {
-          "type": "radioGroup",
-          "hasIndexColumn": false
+        {
+            "id": "A3A63FFB-21B7-4eab-BFA6-CEE8CC45EFA4",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 20,
+                "title": "Назва"
+            },
+            "name": "name",
+            "target": "name",
+            "title": "Назва"
         },
-        "multiple": false,
-        "validation": {
-          "required": true
+        {
+            "id": "1BEB8089-2F37-4ce8-A5C7-5E69A260DAAE",
+            "meta": {
+                "formField": {
+                    "hasIndexColumn": false,
+                    "type": "dropdownTree"
+                },
+                "multiple": false,
+                "sortOrder": 21
+            },
+            "name": "component",
+            "target": "EventComponent",
+            "title": "Компонент"
+        },
+        {
+            "id": "8B70ABA3-4D0E-4310-8D03-2E1F726F1999",
+            "meta": {
+                "formField": {
+                    "hasIndexColumn": false,
+                    "type": "radioGroup"
+                },
+                "multiple": false,
+                "sortOrder": 22
+            },
+            "name": "state",
+            "target": "EventState",
+            "title": "Стан"
+        },
+        {
+            "id": "2C4E7E01-8404-4e91-AA35-C5447FE590DC",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 23
+            },
+            "name": "associatedWithEvent",
+            "target": "ObjectOfStudy",
+            "title": "Об'єкти розвідки, пов'язані з подією"
+        },
+        {
+            "id": "44C2EDC4-8C94-4923-BB69-C9179F7C97EE",
+            "meta": {
+                "formField": {
+                    "hasIndexColumn": false,
+                    "lines": "5"
+                },
+                "multiple": false,
+                "sortOrder": 24,
+                "title": "Опис"
+            },
+            "name": "description",
+            "target": "description",
+            "title": "Додаткові дані"
+        },
+        {
+            "id": "B47E89D2-3C6D-499a-B7D2-551D72229F82",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 25
+            },
+            "name": "location",
+            "target": "location",
+            "title": "Географічні координати"
+        },
+        {
+            "id": "2607C0F7-6837-45b4-BAD8-961FA36C6BBF",
+            "meta": {
+                "formField": {
+                    "hasIndexColumn": false,
+                    "type": "radioGroup"
+                },
+                "multiple": false,
+                "sortOrder": 26
+            },
+            "name": "importance",
+            "target": "EventImportance",
+            "title": "Важливість"
+        },
+        {
+            "id": "B761EF62-C750-4938-942D-19D4200BDB8E",
+            "meta": {
+                "acceptsEntityOperations": [
+                    "Create"
+                ],
+                "multiple": true,
+                "sortOrder": 27
+            },
+            "name": "tag",
+            "target": "Tag",
+            "title": "Теги"
+        },
+        {
+            "id": "6342B205-EBE9-4c64-AB93-11307C208207",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 28
+            },
+            "name": "additionalLocation",
+            "target": "additionalLocation",
+            "title": "Додаткові географічні координати"
         }
-      },
-      "target": "EventImportance"
+    ],
+    "conceptType": "entities",
+    "id": "1CA66464-4B0C-4d46-8B7A-36A8FED863CA",
+    "meta": {
+        "sortOrder": 29
     },
-    {
-      "id": "13de4d00-8a48-4b0c-9324-2398324cdbb5",
-      "name": "tag",
-      "title": "Теги",
-      "meta": {
-        "acceptsEntityOperations": [
-          "Create"
-        ],
-        "sortOrder": 160,
-        "multiple": true
-      },
-      "target": "Tag"
-    },
-    {
-      "id": "b09ff0e1-f61d-41be-997b-fb4c4c882cc7",
-      "name": "additionalLocation",
-      "title": "Додаткові географічні координати",
-      "meta": {
-        "sortOrder": 200,
-        "multiple": true
-      },
-      "target": "additionalLocation"
-    }
-  ],
-  "meta": {}
+    "name": "Event",
+    "title": "Подія"
 }

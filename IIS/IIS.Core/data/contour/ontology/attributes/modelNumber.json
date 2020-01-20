@@ -1,10 +1,11 @@
 {
-  "id": "05996a64-0339-4921-88c5-c7244e8d36f8",
-  "conceptType": "attributes",
-  "name": "modelNumber",
-  "title": "Бортовий номер",
-  "type": "String",
-  "meta": {
-    "kind": "Keyword"
-  }
+    "conceptType": "attributes",
+    "id": "515D2ABF-61AF-4864-9577-BB425815D3B7",
+    "meta": {
+        "kind": "Keyword"
+    },
+    "name": "modelNumber",
+    "target": "modelNumber",
+    "title": "Бортовий номер",
+    "type": "String"
 }

@@ -1,8 +1,10 @@
 {
-  "id": "b0420e39-37c3-4e6b-b234-8aba077a64a5",
-  "conceptType": "attributes",
-  "name": "purpose",
-  "title": "Призначення",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "5C8743F3-1B06-439a-B537-E79588022B5A",
+    "meta": {
+    },
+    "name": "purpose",
+    "target": "purpose",
+    "title": "Призначення",
+    "type": "String"
 }

@@ -1,8 +1,10 @@
 {
-  "id": "35d5afe8-e38d-48ef-af4b-41568e9ff518",
-  "conceptType": "attributes",
-  "name": "dateOfJobPositionActualization",
-  "title": "Дата актуальності посади",
-  "type": "DateTime",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "DC390D5F-44E2-473b-BF19-ED3DD55BAC4A",
+    "meta": {
+    },
+    "name": "dateOfJobPositionActualization",
+    "target": "dateOfJobPositionActualization",
+    "title": "Дата актуальності посади",
+    "type": "DateTime"
 }

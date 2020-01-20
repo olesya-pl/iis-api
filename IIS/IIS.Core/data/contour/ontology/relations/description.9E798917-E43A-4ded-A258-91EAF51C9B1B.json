@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "9E798917-E43A-4ded-A258-91EAF51C9B1B",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 90
+    },
+    "name": "description",
+    "target": "description",
+    "title": "Додаткові дані"
+}

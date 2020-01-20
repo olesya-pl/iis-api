@@ -1,8 +1,13 @@
 {
-  "id": "305d1896-41c0-4843-86ab-f6b5c1007e86",
-  "conceptType": "attributes",
-  "name": "value",
-  "title": "Значення",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "9784383B-A69F-4e54-A8A2-4FC89459A23F",
+    "meta": {
+        "validation": {
+            "required": true
+        }
+    },
+    "name": "value",
+    "target": "value",
+    "title": "Значення",
+    "type": "String"
 }

@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "E4C2D499-9AC9-46dc-B65C-2C2CC517F7B4",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 138
+    },
+    "name": "position",
+    "target": "position",
+    "title": "Посада"
+}

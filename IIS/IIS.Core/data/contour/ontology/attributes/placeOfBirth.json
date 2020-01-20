@@ -1,8 +1,10 @@
 {
-  "id": "f4df5428-080d-4cb9-91f0-25b105f3bab1",
-  "conceptType": "attributes",
-  "name": "placeOfBirth",
-  "title": "Місце народження",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "49B2C0A1-6AE4-43af-A3DC-C22A8735B94A",
+    "meta": {
+    },
+    "name": "placeOfBirth",
+    "target": "placeOfBirth",
+    "title": "Місце народження",
+    "type": "String"
 }

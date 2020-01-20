@@ -1,8 +1,10 @@
 {
-  "id": "cdc031e1-52d0-41ce-9c8a-3c982f7d574f",
-  "abstract": true,
-  "conceptType": "entities",
-  "name": "Person_militaryService",
-  "title": "Person_militaryService",
-  "meta": {}
+    "abstract": true,
+    "conceptType": "entities",
+    "id": "36CB0BB5-C1B0-405b-869E-5191ECB77411",
+    "meta": {
+        "sortOrder": 35
+    },
+    "name": "Person_militaryService",
+    "title": "Person_militaryService"
 }

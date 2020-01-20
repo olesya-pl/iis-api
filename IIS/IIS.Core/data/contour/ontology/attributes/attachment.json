@@ -1,8 +1,10 @@
 {
-  "id": "29962730-19c0-4ecf-91c1-dc057ca9f617",
-  "conceptType": "attributes",
-  "name": "attachment",
-  "title": "Прикріплений файл",
-  "type": "File",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "8A17E77F-F174-4e7d-8FBD-7476CC73AD8C",
+    "meta": {
+    },
+    "name": "attachment",
+    "target": "attachment",
+    "title": "Прикріплений файл",
+    "type": "File"
 }

@@ -1,208 +1,210 @@
 {
-  "id": "4b6c977b-1d86-44f1-8802-223b47b1cfa3",
-  "conceptType": "entities",
-  "name": "Person",
-  "title": "Людина",
-  "extends": [
-    "ObjectOfStudy"
-  ],
-  "attributes": [
-    {
-      "id": "bce4d081-0041-4b63-a46f-47ea9cb198ff",
-      "name": "dateOfBirth",
-      "title": "Дата народження",
-      "meta": {
-        "sortOrder": 140,
-        "multiple": false
-      },
-      "target": "dateOfBirth"
-    },
-    {
-      "id": "e894a8a5-10d6-463d-85e1-001d79ce9003",
-      "name": "secondName",
-      "title": "Прізвище",
-      "meta": {
-        "sortOrder": 20,
-        "multiple": false
-      },
-      "target": "secondName"
-    },
-    {
-      "id": "a5fab2d3-4324-4a4b-bc38-0a1e26f40ecc",
-      "name": "firstName",
-      "title": "Ім'я",
-      "meta": {
-        "sortOrder": 40,
-        "multiple": false
-      },
-      "target": "firstName"
-    },
-    {
-      "id": "d6f4b3f3-0775-4b21-94f2-ce04dd91fa34",
-      "name": "dateOfJobPositionActualization",
-      "title": "Дата актуальності посади",
-      "meta": {
-        "sortOrder": 280,
-        "multiple": false
-      },
-      "target": "dateOfJobPositionActualization"
-    },
-    {
-      "id": "cfe6c8b9-584f-4544-a8a1-11fcfb571ea2",
-      "name": "title",
-      "title": "Повна назва",
-      "meta": {
-        "formula": "h.join(entity.secondName, entity.firstName, entity.fatherName)",
-        "sortOrder": 0,
-        "multiple": false
-      },
-      "target": "title"
-    },
-    {
-      "id": "356b860d-7c4c-4764-a2a7-4a40d44bf82a",
-      "name": "militaryRank",
-      "title": "Військове звання",
-      "meta": {
-        "sortOrder": 100,
-        "multiple": false
-      },
-      "target": "militaryRank"
-    },
-    {
-      "id": "5bc64f8f-2265-4e09-909f-2c111f7af7d3",
-      "name": "fatherName",
-      "title": "По батькові",
-      "meta": {
-        "sortOrder": 60,
-        "multiple": false
-      },
-      "target": "fatherName"
-    },
-    {
-      "id": "a575a130-10ed-423d-90ec-0a57df1637f5",
-      "name": "position",
-      "title": "Посада",
-      "meta": {
-        "sortOrder": 80,
-        "multiple": false
-      },
-      "target": "position"
-    },
-    {
-      "id": "e5958007-cf6e-4109-9fea-65fa75866550",
-      "name": "relatesToCountry",
-      "title": "Громадянство",
-      "meta": {
-        "sortOrder": 120,
-        "title": "Громадянство",
-        "formField": {
-          "type": "dropdown",
-          "icon": "flag"
+    "attributes": [
+        {
+            "id": "B262D42A-4AAA-46db-B6B8-1C5D548A0AEC",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 130
+            },
+            "name": "dateOfBirth",
+            "target": "dateOfBirth",
+            "title": "Дата народження"
         },
-        "multiple": false
-      },
-      "target": "Country"
+        {
+            "id": "875A8208-AFB9-4e39-97F2-6793FA6481C7",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 131
+            },
+            "name": "placeOfBirth",
+            "target": "placeOfBirth",
+            "title": "Місце народження"
+        },
+        {
+            "id": "831F0E78-5EFC-41e6-A2DC-B2D060C2D69C",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 132
+            },
+            "name": "secondName",
+            "target": "secondName",
+            "title": "Прізвище"
+        },
+        {
+            "id": "A192E17B-4158-4e9e-93FA-7DA6755DE628",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 133
+            },
+            "name": "firstName",
+            "target": "firstName",
+            "title": "Ім'я"
+        },
+        {
+            "id": "64482259-6832-49ca-9E07-ECFF0890AAB9",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 134
+            },
+            "name": "dateOfJobPositionActualization",
+            "target": "dateOfJobPositionActualization",
+            "title": "Дата актуальності посади"
+        },
+        {
+            "id": "C2F8CD51-EBCF-4f63-A9AE-20CB90F36D32",
+            "meta": {
+                "formula": "h.join(entity.secondName, entity.firstName, entity.fatherName)",
+                "multiple": false,
+                "sortOrder": 135
+            },
+            "name": "title",
+            "target": "title",
+            "title": "Повна назва"
+        },
+        {
+            "id": "5B9CC7FC-5A7D-48a4-A6B1-B92B4152CB51",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 136
+            },
+            "name": "militaryRank",
+            "target": "militaryRank",
+            "title": "Військове звання"
+        },
+        {
+            "id": "40D63BA9-A9B5-4f59-BD05-14827A68ECBC",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 137
+            },
+            "name": "fatherName",
+            "target": "fatherName",
+            "title": "По батькові"
+        },
+        {
+            "id": "E4C2D499-9AC9-46dc-B65C-2C2CC517F7B4",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 138
+            },
+            "name": "position",
+            "target": "position",
+            "title": "Посада"
+        },
+        {
+            "id": "2C0E2A59-90F1-4920-82F7-C0E1D229D513",
+            "meta": {
+                "formField": {
+                    "icon": "flag",
+                    "type": "dropdown"
+                },
+                "multiple": false,
+                "sortOrder": 139,
+                "title": "Громадянство"
+            },
+            "name": "relatesToCountry",
+            "target": "Country",
+            "title": "Громадянство"
+        },
+        {
+            "id": "1BF149CF-003F-45f2-8CE5-D3193A8B905C",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 140
+            },
+            "name": "description",
+            "target": "description",
+            "title": "Додаткові дані"
+        },
+        {
+            "id": "982D6D4C-AF02-411b-A350-6CA16A977864",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 141
+            },
+            "name": "maritalStatus",
+            "target": "maritalStatus",
+            "title": "Сімейний стан"
+        },
+        {
+            "id": "1746B63F-5B67-408a-8ABF-93858257048E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 142
+            },
+            "name": "education",
+            "target": "education",
+            "title": "Освіта"
+        },
+        {
+            "id": "E3434A40-0AE8-4be3-A68D-8F3DF26F030D",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 143
+            },
+            "name": "dateOfRankActualization",
+            "target": "dateOfRankActualization",
+            "title": "Дата актуалізації звання"
+        },
+        {
+            "id": "72E5CBA4-2021-46e7-9ABA-BF385F1B1DB9",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 144
+            },
+            "name": "dateOfServingPlaceActualization",
+            "target": "dateOfServingPlaceActualization",
+            "title": "Дата актуалізації місця служби"
+        },
+        {
+            "id": "3260AEB5-37E3-4ed4-BB3E-596D968FFD56",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 145
+            },
+            "name": "livingPlace",
+            "target": "livingPlace",
+            "title": "Місце останнього проживання"
+        },
+        {
+            "id": "22048990-2E1B-4964-9C51-E5C7B86C4967",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 146
+            },
+            "name": "registrationPlace",
+            "target": "registrationPlace",
+            "title": "Місце реєстрації"
+        },
+        {
+            "id": "FBBF0182-8A94-493f-A1C0-1E5CBB4E68BF",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 147
+            },
+            "name": "fullNameRu",
+            "target": "fullNameRu",
+            "title": "П.І.П. російською"
+        },
+        {
+            "id": "2510D415-0E0C-4c5f-B649-AC5103977E86",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 148
+            },
+            "name": "militaryService",
+            "target": "Person_militaryService",
+            "title": "Нести військову службу"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "ObjectOfStudy"
+    ],
+    "id": "DCCA16F0-7AA6-46e3-9984-6BD819D9A67A",
+    "meta": {
+        "sortOrder": 149
     },
-    {
-      "id": "ca0ca106-02ef-4ee3-848b-bbbb8ec24663",
-      "name": "description",
-      "title": "Додаткові дані",
-      "meta": {
-        "sortOrder": 160,
-        "multiple": false
-      },
-      "target": "description"
-    },
-    {
-      "id": "06225b8e-a844-478e-b3b1-bfb516154bc5",
-      "name": "maritalStatus",
-      "title": "Сімейний стан",
-      "meta": {
-        "sortOrder": 180,
-        "multiple": false
-      },
-      "target": "maritalStatus"
-    },
-    {
-      "id": "d27ab52f-0bde-4461-8c89-f2c02a1a5dcb",
-      "name": "education",
-      "title": "Освіта",
-      "meta": {
-        "sortOrder": 200,
-        "multiple": false
-      },
-      "target": "education"
-    },
-    {
-      "id": "348293bf-82f2-41e0-912c-bd2eab2481b7",
-      "name": "dateOfRankActualization",
-      "title": "Дата актуалізації звання",
-      "meta": {
-        "sortOrder": 240,
-        "multiple": false
-      },
-      "target": "dateOfRankActualization"
-    },
-    {
-      "id": "97357eb7-a126-4f72-b2cd-4c4df65112ed",
-      "name": "dateOfServingPlaceActualization",
-      "title": "Дата актуалізації місця служби",
-      "meta": {
-        "sortOrder": 260,
-        "multiple": false
-      },
-      "target": "dateOfServingPlaceActualization"
-    },
-    {
-      "id": "1cc60dfd-4109-4b3d-9774-ec9c7db8a0b1",
-      "name": "placeOfBirth",
-      "title": "Місце народження",
-      "meta": {
-        "sortOrder": 300,
-        "multiple": false
-      },
-      "target": "placeOfBirth"
-    },
-    {
-      "id": "c0ea103d-6c68-4ba1-981a-e56ad7c1a6ed",
-      "name": "livingPlace",
-      "title": "Місце останнього проживання",
-      "meta": {
-        "sortOrder": 320,
-        "multiple": false
-      },
-      "target": "livingPlace"
-    },
-    {
-      "id": "bda14a46-98a3-42c4-b63b-ca003c68c647",
-      "name": "registrationPlace",
-      "title": "Місце реєстрації",
-      "meta": {
-        "sortOrder": 340,
-        "multiple": false
-      },
-      "target": "registrationPlace"
-    },
-    {
-      "id": "cc6472d7-2df1-4070-9207-8569a8f31c2b",
-      "name": "fullNameRu",
-      "title": "П.І.П. російською",
-      "meta": {
-        "sortOrder": 360,
-        "multiple": false
-      },
-      "target": "fullNameRu"
-    },
-    {
-      "id": "0434e86e-45cb-41a0-bf81-49a6454a98c4",
-      "name": "militaryService",
-      "title": "Нести військову службу",
-      "meta": {
-        "sortOrder": 220,
-        "multiple": false
-      },
-      "target": "Person_militaryService"
-    }
-  ],
-  "meta": {}
+    "name": "Person",
+    "title": "Людина"
 }

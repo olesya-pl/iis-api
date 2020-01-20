@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "A5865C53-E147-477e-9493-ABDC0D2995EB",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 6
+    },
+    "name": "lastConfirmedAt",
+    "target": "lastConfirmedAt",
+    "title": "Останнє підтвердження"
+}

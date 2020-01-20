@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D5A8C0F1-D76D-452a-AF0D-59911C01DF12",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 115
+    },
+    "name": "placeOfHeadquartersDislocation",
+    "target": "placeOfHeadquartersDislocation",
+    "title": "Пункт постійної дислокації штабу"
+}

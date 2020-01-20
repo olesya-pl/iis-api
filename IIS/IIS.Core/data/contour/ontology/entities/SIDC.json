@@ -1,22 +1,24 @@
 {
-  "id": "dda028ca-7769-4c93-a7b8-fa54a2359649",
-  "conceptType": "entities",
-  "name": "SIDC",
-  "title": "SIDC",
-  "extends": [
-    "Enum"
-  ],
-  "attributes": [
-    {
-      "id": "07ac9dbe-0808-4c36-b337-930ab9415f29",
-      "name": "code",
-      "title": "Код",
-      "meta": {
-        "sortOrder": 0,
-        "multiple": false
-      },
-      "target": "code"
-    }
-  ],
-  "meta": {}
+    "attributes": [
+        {
+            "id": "E2ED5733-6D4C-4553-8F9D-321F0874EDF6",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 64
+            },
+            "name": "code",
+            "target": "code",
+            "title": "Код"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "6024A83C-64D5-4c6e-BA7E-7A22CAB639F7",
+    "meta": {
+        "sortOrder": 65
+    },
+    "name": "SIDC",
+    "title": "SIDC"
 }

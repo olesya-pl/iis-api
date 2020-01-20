@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "8B70ABA3-4D0E-4310-8D03-2E1F726F1999",
+    "meta": {
+        "formField": {
+            "hasIndexColumn": false,
+            "type": "radioGroup"
+        },
+        "multiple": false,
+        "sortOrder": 22
+    },
+    "name": "state",
+    "target": "EventState",
+    "title": "Стан"
+}

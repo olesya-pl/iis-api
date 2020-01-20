@@ -1,0 +1,14 @@
+{
+    "conceptType": "relations",
+    "id": "B761EF62-C750-4938-942D-19D4200BDB8E",
+    "meta": {
+        "acceptsEntityOperations": [
+            "Create"
+        ],
+        "multiple": true,
+        "sortOrder": 27
+    },
+    "name": "tag",
+    "target": "Tag",
+    "title": "Теги"
+}

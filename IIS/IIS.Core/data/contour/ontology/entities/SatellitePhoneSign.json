@@ -1,12 +1,12 @@
 {
-  "id": "b10b46cb-f4b2-4778-974a-807c6ce3bb2c",
-  "conceptType": "entities",
-  "name": "SatellitePhoneSign",
-  "title": "Супутниковий телефон",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "46AC8CD9-0DB4-41d6-8069-D335FB3F7AB8",
+    "meta": {
+        "sortOrder": 38
+    },
+    "name": "SatellitePhoneSign",
+    "title": "Супутниковий телефон"
 }

@@ -1,0 +1,12 @@
+{
+    "conceptType": "relations",
+    "id": "892195A3-5CCF-4ebe-BA2A-43DF0D27A2BC",
+    "meta": {
+        "formula": "h.fullTitle(entity.shortName, entity.name)",
+        "multiple": false,
+        "sortOrder": 42
+    },
+    "name": "title",
+    "target": "title",
+    "title": "Повна назва"
+}

@@ -1,9 +1,13 @@
 {
-  "id": "5e0aadea-8aa1-4868-8148-9c2db025b644",
-  "conceptType": "entities",
-  "name": "ICAOSign",
-  "title": "ІКАО",
-  "extends": [
-    "ObjectSign"
-  ]
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "30A373F5-470B-4df0-B8BA-FEF817169499",
+    "meta": {
+        "exposeOnApi": true,
+        "sortOrder": 33
+    },
+    "name": "ICAOSign",
+    "title": "ІКАО"
 }

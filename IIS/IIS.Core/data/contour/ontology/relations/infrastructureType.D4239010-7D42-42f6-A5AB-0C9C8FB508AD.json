@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D4239010-7D42-42f6-A5AB-0C9C8FB508AD",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 91
+    },
+    "name": "infrastructureType",
+    "target": "InfrastructureType",
+    "title": "Тип інфраструктури"
+}

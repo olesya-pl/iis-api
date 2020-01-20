@@ -1,12 +1,13 @@
 {
-  "id": "49ff80af-3010-4c1f-b2d9-3edb83266cd0",
-  "conceptType": "entities",
-  "name": "BandFrequencySign",
-  "title": "Смуга, кГц.",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "7B742DA0-3241-45e8-89DC-7E2B26DAB613",
+    "meta": {
+        "exposeOnApi": false,
+        "sortOrder": 81
+    },
+    "name": "BandFrequencySign",
+    "title": "Смуга, кГц."
 }

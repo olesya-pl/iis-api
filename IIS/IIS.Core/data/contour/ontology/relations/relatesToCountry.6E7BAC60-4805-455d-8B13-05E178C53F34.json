@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "6E7BAC60-4805-455d-8B13-05E178C53F34",
+    "meta": {
+        "formField": {
+            "icon": "flag",
+            "type": "dropdown"
+        },
+        "multiple": false,
+        "sortOrder": 51
+    },
+    "name": "relatesToCountry",
+    "target": "Country",
+    "title": "Державна приналежність"
+}

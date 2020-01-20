@@ -1,8 +1,10 @@
 {
-  "id": "2a07bdd5-40de-4c27-a38a-eb4b69b3dc4d",
-  "conceptType": "attributes",
-  "name": "dateOfBirth",
-  "title": "Дата народження",
-  "type": "DateTime",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "B3697F7A-1B6A-4383-B507-9317828E419D",
+    "meta": {
+    },
+    "name": "dateOfBirth",
+    "target": "dateOfBirth",
+    "title": "Дата народження",
+    "type": "DateTime"
 }

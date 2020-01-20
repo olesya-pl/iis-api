@@ -1,12 +1,13 @@
 {
-  "id": "70b053d1-7702-4078-b086-d89540fcbddc",
-  "conceptType": "attributes",
-  "name": "name",
-  "title": "Назва",
-  "type": "String",
-  "meta": {
-    "validation": {
-      "required": true
-    }
-  }
+    "conceptType": "attributes",
+    "id": "0A082DF1-2F72-4600-8663-C3DAAB99ADF3",
+    "meta": {
+        "validation": {
+            "required": true
+        }
+    },
+    "name": "name",
+    "target": "name",
+    "title": "Назва",
+    "type": "String"
 }

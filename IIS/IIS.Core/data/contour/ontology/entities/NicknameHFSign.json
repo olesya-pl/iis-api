@@ -1,12 +1,12 @@
 {
-  "id": "9085ade6-96f9-4b2e-bebe-2fd092820de5",
-  "conceptType": "entities",
-  "name": "NicknameHFSign",
-  "title": "Позивний КХ",
-  "extends": [
-    "ObjectSign"
-  ],
-  "meta": {
-    "exposeOnApi": false
-  }
+    "conceptType": "entities",
+    "extends": [
+        "ObjectSign"
+    ],
+    "id": "60420742-378F-451d-AF3A-493EDC82E086",
+    "meta": {
+        "sortOrder": 66
+    },
+    "name": "NicknameHFSign",
+    "title": "Позивний КХ"
 }

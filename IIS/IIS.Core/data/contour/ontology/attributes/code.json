@@ -1,10 +1,11 @@
 {
-  "id": "0a268618-96c5-4cf2-b179-f68ea2e3c400",
-  "conceptType": "attributes",
-  "name": "code",
-  "title": "Код",
-  "type": "String",
-  "meta": {
-    "kind": "Keyword"
-  }
+    "conceptType": "attributes",
+    "id": "9CE0964E-8C4E-41e9-BAA1-F034D4DE0CCF",
+    "meta": {
+        "kind": "Keyword"
+    },
+    "name": "code",
+    "target": "code",
+    "title": "Код",
+    "type": "String"
 }

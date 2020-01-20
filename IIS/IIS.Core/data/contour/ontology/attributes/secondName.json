@@ -1,8 +1,10 @@
 {
-  "id": "2d2c20ac-8d23-4ee8-8b86-6fea71a160a8",
-  "conceptType": "attributes",
-  "name": "secondName",
-  "title": "Прізвище",
-  "type": "String",
-  "meta": {}
+    "conceptType": "attributes",
+    "id": "11C99A19-AA2C-401a-823D-5CEAFF133175",
+    "meta": {
+    },
+    "name": "secondName",
+    "target": "secondName",
+    "title": "Прізвище",
+    "type": "String"
 }

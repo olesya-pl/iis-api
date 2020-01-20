@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "FBBF0182-8A94-493f-A1C0-1E5CBB4E68BF",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 147
+    },
+    "name": "fullNameRu",
+    "target": "fullNameRu",
+    "title": "П.І.П. російською"
+}

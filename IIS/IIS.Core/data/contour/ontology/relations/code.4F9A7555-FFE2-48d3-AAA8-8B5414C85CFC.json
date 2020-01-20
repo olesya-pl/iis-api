@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "4F9A7555-FFE2-48d3-AAA8-8B5414C85CFC",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 9
+    },
+    "name": "code",
+    "target": "code",
+    "title": "Код"
+}
