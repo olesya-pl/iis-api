@@ -2,12 +2,13 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.DataLoaders;
-using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Iis.DataModel;
+using Iis.DataModel.Reports;
 
 namespace IIS.Core.GraphQL.Reports
 {
@@ -15,7 +16,7 @@ namespace IIS.Core.GraphQL.Reports
     {
         public async Task<Report> CreateReport([Service] OntologyContext context, [GraphQLNonNullType] ReportInput data)
         {
-            var report = new Core.Report.EntityFramework.Report
+            var report = new Iis.DataModel.Reports.ReportEntity
             {
                 Id        = Guid.NewGuid(),
                 CreatedAt = DateTime.Now,
@@ -63,7 +64,7 @@ namespace IIS.Core.GraphQL.Reports
             forRemove.ExceptWith(data.AddEvents);
 
             var loader =  ctx.DataLoader<NodeDataLoader>();
-            var addRange = forAdd.Select(eventId => new Core.Report.EntityFramework.ReportEvents
+            var addRange = forAdd.Select(eventId => new ReportEventEntity
             {
                 EventId = eventId,
                 ReportId = id
@@ -96,7 +97,7 @@ namespace IIS.Core.GraphQL.Reports
             if (existingReport == null)
                 throw new InvalidOperationException($"Cannot find report with id  = {id}");
 
-            var newReport = new Core.Report.EntityFramework.Report(existingReport, Guid.NewGuid(), DateTime.Now);
+            var newReport = new Iis.DataModel.Reports.ReportEntity(existingReport, Guid.NewGuid(), DateTime.Now);
 
             newReport.Title = data.Title ?? newReport.Title;
             newReport.Recipient = data.Recipient ?? newReport.Recipient;

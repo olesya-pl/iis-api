@@ -1,5 +1,5 @@
 using System;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Files.EntityFramework

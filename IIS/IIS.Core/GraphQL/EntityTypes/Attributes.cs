@@ -7,9 +7,11 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
+using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OScalarType = IIS.Core.Ontology.ScalarType;
+using OScalarType = Iis.Domain.ScalarType;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -116,12 +118,12 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(EmbeddingRelationType source, Ontology.Ontology ontology) : base(source)
+        public EntityAttributeRelation(EmbeddingRelationType source, OntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
 
-        private Ontology.Ontology _ontology;
+        private OntologyModel _ontology;
 
         protected new EntityRelationMeta MetaObject => (EntityRelationMeta) base.MetaObject;
 
@@ -142,7 +144,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             bool? concreteTypes = false)
         {
             var ontology = await ontologyProvider.GetOntologyAsync();
-            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<Core.Ontology.EntityType>();
+            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<Iis.Domain.EntityType>();
             if (types == null)
                 types = new[] {Source.EntityType};
             else

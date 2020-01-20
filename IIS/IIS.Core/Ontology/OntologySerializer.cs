@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Iis.Domain;
+using Iis.Domain.Meta;
 using Meta = IIS.Core.Ontology.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -11,7 +13,7 @@ namespace IIS.Core.Ontology
 {
     public class Serializer
     {
-        public void serialize(string basePath, Ontology ontology)
+        public void serialize(string basePath, OntologyModel ontology)
         {
             foreach (var type in ontology.Types)
             {
@@ -23,14 +25,14 @@ namespace IIS.Core.Ontology
             }
         }
 
-        private bool _isVirtual(Type type)
+        private bool _isVirtual(NodeType type)
         {
             return type is EmbeddingRelationType relationType && relationType.IsInversed || type is InheritanceRelationType;
         }
 
-        private DataType<Meta.IMeta> _mapToDataType(Type type)
+        private DataType<IMeta> _mapToDataType(NodeType type)
         {
-            var dataType = new DataType<Meta.IMeta> {
+            var dataType = new DataType<IMeta> {
                 Id = type.Id,
                 Title = type.Title,
                 Name = type.Name,
@@ -56,14 +58,14 @@ namespace IIS.Core.Ontology
             return dataType;
         }
 
-        private List<DataEntityRelation<Meta.IMeta>> _aggregateAttributes(Type type)
+        private List<DataEntityRelation<IMeta>> _aggregateAttributes(NodeType type)
         {
-            return type.DirectProperties.Aggregate(new List<DataEntityRelation<Meta.IMeta>>(), (props, prop) =>
+            return type.DirectProperties.Aggregate(new List<DataEntityRelation<IMeta>>(), (props, prop) =>
             {
                 if (prop.IsInversed)
                     return props;
 
-                var attribute = new DataEntityRelation<Meta.IMeta> {
+                var attribute = new DataEntityRelation<IMeta> {
                     Id = prop.Id,
                     Target = prop.TargetType.Name,
                     Name = prop.Name,
@@ -71,16 +73,16 @@ namespace IIS.Core.Ontology
                     Meta = prop.Meta
                 };
 
-                if (prop.EmbeddingOptions == Core.Ontology.EmbeddingOptions.Required)
+                if (prop.EmbeddingOptions == EmbeddingOptions.Required)
                 {
-                    var meta = (Meta.RelationMetaBase)(prop.Meta ?? new Meta.RelationMetaBase());
+                    var meta = (RelationMetaBase)(prop.Meta ?? new RelationMetaBase());
                     meta.Validation = meta?.Validation ?? new Meta.Validation();
                     meta.Validation.Required = true;
                     prop.Meta = meta;
                 }
-                else if (prop.EmbeddingOptions == Core.Ontology.EmbeddingOptions.Multiple)
+                else if (prop.EmbeddingOptions == EmbeddingOptions.Multiple)
                 {
-                    var meta = (Meta.RelationMetaBase)(prop.Meta ?? new Meta.RelationMetaBase());
+                    var meta = (RelationMetaBase)(prop.Meta ?? new RelationMetaBase());
                     meta.Multiple = true;
                     prop.Meta = meta;
                 }
@@ -91,7 +93,7 @@ namespace IIS.Core.Ontology
             });
         }
 
-        private string _serializeDataType(DataType<Meta.IMeta> dataType)
+        private string _serializeDataType(DataType<IMeta> dataType)
         {
             var settings = new JsonSerializerSettings {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -100,7 +102,7 @@ namespace IIS.Core.Ontology
             return JsonConvert.SerializeObject(dataType, Formatting.Indented, settings);
         }
 
-        private string _logicalType(Type type)
+        private string _logicalType(NodeType type)
         {
             if (type is EntityType)
                 return "entities";
@@ -112,7 +114,7 @@ namespace IIS.Core.Ontology
             throw new ArgumentException($"Cannot detect logical type of {type.Name}");
         }
 
-        private void _writeToFile(string basePath, DataType<Meta.IMeta> dataType)
+        private void _writeToFile(string basePath, DataType<IMeta> dataType)
         {
             // relations currently may have the same name, so we need to append their id in file name
             var name = dataType.ConceptType == "relations" ? $"{dataType.Name}.{dataType.Id}" : dataType.Name;

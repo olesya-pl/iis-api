@@ -1,12 +1,12 @@
 using System;
 using HotChocolate;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.Users;
-using IIS.Core.Ontology.EntityFramework.Context;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Iis.DataModel;
+using User = IIS.Core.GraphQL.Users.User;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
 {
@@ -27,10 +27,10 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         [GraphQLNonNullType]
         public DateTime UpdatedAt { get; set; }
-        private IIS.Core.Analytics.EntityFramework.AnalyticsQuery _query { get; set; }
-        private IEnumerable<IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator> _indicators { get; set; }
+        private Iis.DataModel.Analytics.AnalyticQueryEntity _query { get; set; }
+        private IEnumerable<Iis.DataModel.Analytics.AnalyticQueryIndicatorEntity> _indicators { get; set; }
 
-        public AnalyticsQuery(IIS.Core.Analytics.EntityFramework.AnalyticsQuery query)
+        public AnalyticsQuery(Iis.DataModel.Analytics.AnalyticQueryEntity query)
         {
             Id = query.Id;
             Title = query.Title;
@@ -75,11 +75,11 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             return new AnalyticsIndicator.AnalyticsIndicator(rootIndicator);
         }
 
-        private async Task<IEnumerable<IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator>> _getQueryIndicators(OntologyContext context)
+        private async Task<IEnumerable<Iis.DataModel.Analytics.AnalyticQueryIndicatorEntity>> _getQueryIndicators(OntologyContext context)
         {
             if (_indicators == null)
             {
-                _indicators = await context.AnalyticsQueryIndicators
+                _indicators = await context.AnalyticQueryIndicators
                     .Include(i => i.Indicator)
                     .Where(i => i.QueryId == Id)
                     .OrderBy(i => i.SortOrder)
@@ -103,7 +103,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public string Color { get; set; }
 
-        public DateRange(IIS.Core.Analytics.EntityFramework.AnalyticsQuery.DateRange range)
+        public DateRange(Iis.DataModel.Analytics.AnalyticQueryEntity.DateRange range)
         {
             Id = range.Id;
             StartDate = range.StartDate;

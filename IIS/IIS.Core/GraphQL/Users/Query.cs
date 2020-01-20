@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.GraphQL.Users

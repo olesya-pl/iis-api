@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using IIS.Core;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
+using Iis.Domain.Meta;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Legacy.EntityFramework
 {
@@ -32,7 +33,7 @@ namespace IIS.Legacy.EntityFramework
             _connectionString = configuration.GetConnectionString("db-legacy", "DB_LEGACY_");
         }
 
-        public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
+        public async Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
             if (_connectionString == null)
                 throw new ArgumentException("There is no db-legacy connection string configured.");
@@ -50,7 +51,7 @@ namespace IIS.Legacy.EntityFramework
 
             var ontology = buildContext.BuildOntology();
             BuildUnions(ontology);
-            return new Ontology(ontology);
+            return new OntologyModel(ontology);
         }
 
         private void DescribeAttribute(OAttribute attribute, OntologyBuildContext buildContext)
@@ -133,7 +134,7 @@ namespace IIS.Legacy.EntityFramework
             else builder.IsEntity();
         }
 
-        private void BuildUnions(IEnumerable<Type> ontology)
+        private void BuildUnions(IEnumerable<NodeType> ontology)
         {
             var entities = ontology.OfType<EntityType>().ToDictionary(t => t.Name);
             foreach (var info in _unionInfos)
@@ -141,7 +142,7 @@ namespace IIS.Legacy.EntityFramework
                 var source = entities[info.Source.Code];
                 var relationName = info.Name.ToLowerCamelcase();
                 var relation = source.DirectProperties.Single(p => p.Name == relationName);
-                var nodes = (List<Type>) relation.RelatedTypes;
+                var nodes = (List<NodeType>) relation.RelatedTypes;
 
                 var unionName = $"{source.Name}_{relation.Name}";
                 var unionType = new EntityType(Guid.NewGuid(), unionName, true);

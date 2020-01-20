@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.Ontology;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {

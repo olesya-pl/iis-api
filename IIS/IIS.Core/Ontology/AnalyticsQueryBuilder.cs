@@ -3,6 +3,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
+using Iis.Domain;
 
 namespace IIS.Core.Ontology {
     public class AnalyticsQueryBuilder
@@ -18,12 +19,12 @@ namespace IIS.Core.Ontology {
 
         private static string[] _possibleOperators = new string[] { ">", ">=", "<", "<=", "=" };
 
-        public AnalyticsQueryBuilder(Ontology ontology)
+        public AnalyticsQueryBuilder(OntologyModel ontology)
         {
             _queryParser = new AnalyticsQueryParser(ontology);
         }
 
-        public static AnalyticsQueryBuilder From(Ontology ontology)
+        public static AnalyticsQueryBuilder From(OntologyModel ontology)
         {
             return new AnalyticsQueryBuilder(ontology);
         }
@@ -174,11 +175,11 @@ namespace IIS.Core.Ontology {
             private Dictionary<string, object> _sqlParams = new Dictionary<string, object>();
             private ConditionExpr[] _conditions;
 
-            private Dictionary<ScalarType, string> _dataTypesToSqlTypes = new Dictionary<ScalarType, string>() {
-                { ScalarType.Integer, "integer" },
-                { ScalarType.Decimal, "double" },
-                { ScalarType.Boolean, "boolean" },
-                { ScalarType.DateTime, "timestamp" }
+            private Dictionary<Iis.Domain.ScalarType, string> _dataTypesToSqlTypes = new Dictionary<Iis.Domain.ScalarType, string>() {
+                { Iis.Domain.ScalarType.Integer, "integer" },
+                { Iis.Domain.ScalarType.Decimal, "double" },
+                { Iis.Domain.ScalarType.Boolean, "boolean" },
+                { Iis.Domain.ScalarType.DateTime, "timestamp" }
             };
 
             public SQLGenerator(AnalyticsQueryParser.Ast ast, List<Expr> groups, Expr agg, Expr[] select, ConditionExpr[] conditions)

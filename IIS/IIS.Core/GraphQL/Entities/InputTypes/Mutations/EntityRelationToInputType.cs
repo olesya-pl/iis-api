@@ -1,7 +1,8 @@
 using System;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
-using Type = IIS.Core.Ontology.Type;
+using IIS.Core.Ontology;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {
@@ -9,16 +10,16 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
     {
         private readonly Operation _operation;
         private readonly EntityUnionInputType _target;
-        private readonly Type _type;
+        private readonly NodeType _type;
 
-        public EntityRelationToInputType(Operation operation, Type type, EntityUnionInputType target)
+        public EntityRelationToInputType(Operation operation, NodeType type, EntityUnionInputType target)
         {
             _operation = operation;
             _target = target;
             _type = type;
         }
 
-        public static string GetName(Operation operation, Type type)
+        public static string GetName(Operation operation, NodeType type)
         {
             return $"RelationTo_{operation.Short()}_{OntologyObjectType.GetName(type)}";
         }

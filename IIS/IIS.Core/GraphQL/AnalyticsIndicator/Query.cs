@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
-using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using IIS.Core.Analytics.EntityFramework;
+using Iis.DataModel;
 
 namespace IIS.Core.GraphQL.AnalyticsIndicator
 {
@@ -14,7 +14,7 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
     {
         public async Task<GraphQLCollection<AnalyticsIndicator>> GetAnalyticsRootIndicatorList([Service] OntologyContext context, [GraphQLNonNullType] PaginationInput pagination)
         {
-            var list = context.AnalyticsIndicators
+            var list = context.AnalyticIndicators
                 .Where(i => i.ParentId == null)
                 .GetPage(pagination)
                 .Select(i => new AnalyticsIndicator(i));
@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
 
         public async Task<AnalyticsIndicator> GetAnalyticsIndicator([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var indicator = await context.AnalyticsIndicators.FindAsync(id);
+            var indicator = await context.AnalyticIndicators.FindAsync(id);
 
             if (indicator == null)
                 throw new InvalidOperationException($"Cannot find analytics indicator with id \"{id}\"");

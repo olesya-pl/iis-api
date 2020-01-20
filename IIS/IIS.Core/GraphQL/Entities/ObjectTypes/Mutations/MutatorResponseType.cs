@@ -1,6 +1,7 @@
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes.Mutations
 {

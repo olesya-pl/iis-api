@@ -11,13 +11,13 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.ComputedProperties;
-using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
 using Microsoft.EntityFrameworkCore;
-using Attribute = IIS.Core.Ontology.Attribute;
-using EmbeddingOptions = IIS.Core.Ontology.EmbeddingOptions;
-using Node = IIS.Core.Ontology.Node;
-using Relation = IIS.Core.Ontology.Relation;
+using Attribute = Iis.Domain.Attribute;
+using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
+using Node = Iis.Domain.Node;
+using Relation = Iis.Domain.Relation;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

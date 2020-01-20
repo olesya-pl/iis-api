@@ -8,6 +8,7 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
+using Iis.Domain;
 using Microsoft.Extensions.Configuration;
 
 namespace IIS.Core.GraphQL
@@ -75,7 +76,7 @@ namespace IIS.Core.GraphQL
                 .AddType<EntityTypes.EntityAttributeRelation>();
         }
 
-        public Core.Ontology.Ontology TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder)
+        public OntologyModel TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder)
         {
             try
             {
@@ -93,7 +94,7 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, Core.Ontology.Ontology ontology)
+        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, OntologyModel ontology)
         {
             var typesToPopulate = ontology.EntityTypes
 //                .Where(t => t.CreateMeta().ExposeOnApi != false)
@@ -112,7 +113,7 @@ namespace IIS.Core.GraphQL
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().GetAllEntities(ctx));
         }
 
-        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, Core.Ontology.Ontology ontology)
+        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, OntologyModel ontology)
         {
             var typesToPopulate = ontology.EntityTypes;
 //                .Where(t => t.CreateMeta().ExposeOnApi != false);

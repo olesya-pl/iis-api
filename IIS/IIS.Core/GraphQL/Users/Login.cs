@@ -1,4 +1,3 @@
-using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -7,6 +6,7 @@ using HotChocolate.Resolvers;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
+using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.GraphQL.Users

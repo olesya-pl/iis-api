@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Core.Ontology.Meta;
+using Iis.DataModel;
+using Iis.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -14,14 +16,14 @@ namespace IIS.Core.Ontology.EntityFramework
     {
         private readonly ContextFactory _contextFactory;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private Ontology _ontology;
+        private OntologyModel _ontology;
 
         public OntologyProvider(ContextFactory contextFactory)
         {
             _contextFactory = contextFactory;
         }
 
-        public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
+        public async Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
             // ReaderWriterLockSlim is used to allow multiple concurrent reads and only one exclusive write.
             // Class member can be replaced with some distributed cache
@@ -47,9 +49,9 @@ namespace IIS.Core.Ontology.EntityFramework
                     // Query primary source and update the cache
                     using (var context = _contextFactory.CreateContext())
                     {
-                        var types = context.Types.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                            .Include(e => e.IncomingRelations).ThenInclude(e => e.Type)
-                            .Include(e => e.OutgoingRelations).ThenInclude(e => e.Type)
+                        var types = context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
+                            .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
+                            .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
                             .Include(e => e.AttributeType)
                             .ToArray();
                         var result = types.Select(e => MapType(e)).ToList();
@@ -57,7 +59,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         // todo: refactor
                         result.AddRange(relationTypes);
 
-                        _ontology = new Ontology(result);
+                        _ontology = new OntologyModel(result);
                         _types.Clear();
                     }
 
@@ -83,13 +85,13 @@ namespace IIS.Core.Ontology.EntityFramework
             }
         }
 
-        private Dictionary<Guid, Type> _types = new Dictionary<Guid, Type>();
-        private Type MapType(Context.Type ctxType)
+        private Dictionary<Guid, NodeType> _types = new Dictionary<Guid, NodeType>();
+        private NodeType MapType(Iis.DataModel.NodeTypeEntity ctxType)
         {
             var types = mapType(ctxType);
             return types;
 
-            Type mapType(Context.Type type)
+            NodeType mapType(Iis.DataModel.NodeTypeEntity type)
             {
                 if (_types.ContainsKey(type.Id))
                     return _types[type.Id];
@@ -119,12 +121,12 @@ namespace IIS.Core.Ontology.EntityFramework
                 throw new Exception("Unsupported type.");
             }
 
-            Type mapRelation(Context.RelationType relationType)
+            NodeType mapRelation(Iis.DataModel.RelationTypeEntity relationType)
             {
                 if (_types.ContainsKey(relationType.Id))
                     return _types[relationType.Id];
 
-                var type = relationType.Type;
+                var type = relationType.NodeType;
                 var relation = default(RelationType);
                 if (relationType.Kind == RelationKind.Embedding)
                 {
@@ -151,7 +153,7 @@ namespace IIS.Core.Ontology.EntityFramework
             }
         }
 
-        protected override RelationType _addInversedRelation(RelationType relation, Type sourceType)
+        protected override RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
         {
             var inversedRelation = base._addInversedRelation(relation, sourceType);
 
@@ -161,7 +163,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return inversedRelation;
         }
 
-        private static void FillProperties(Context.Type type, Type ontologyType)
+        private static void FillProperties(Iis.DataModel.NodeTypeEntity type, NodeType ontologyType)
         {
             ontologyType.Title = type.Title;
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
@@ -169,28 +171,28 @@ namespace IIS.Core.Ontology.EntityFramework
             ontologyType.UpdatedAt = type.UpdatedAt;
         }
 
-        private static ScalarType MapScalarType(Context.ScalarType scalarType)
+        private static Iis.Domain.ScalarType MapScalarType(Iis.DataModel.ScalarType scalarType)
         {
             switch (scalarType)
             {
-                case Context.ScalarType.Boolean: return ScalarType.Boolean;
-                case Context.ScalarType.Date: return ScalarType.DateTime;
-                case Context.ScalarType.Decimal: return ScalarType.Decimal;
-                case Context.ScalarType.File: return ScalarType.File;
-                case Context.ScalarType.Geo: return ScalarType.Geo;
-                case Context.ScalarType.Int: return ScalarType.Integer;
-                case Context.ScalarType.String: return ScalarType.String;
+                case Iis.DataModel.ScalarType.Boolean: return Iis.Domain.ScalarType.Boolean;
+                case Iis.DataModel.ScalarType.Date: return Iis.Domain.ScalarType.DateTime;
+                case Iis.DataModel.ScalarType.Decimal: return Iis.Domain.ScalarType.Decimal;
+                case Iis.DataModel.ScalarType.File: return Iis.Domain.ScalarType.File;
+                case Iis.DataModel.ScalarType.Geo: return Iis.Domain.ScalarType.Geo;
+                case Iis.DataModel.ScalarType.Int: return Iis.Domain.ScalarType.Integer;
+                case Iis.DataModel.ScalarType.String: return Iis.Domain.ScalarType.String;
                 default: throw new NotImplementedException();
             }
         }
 
-        private static EmbeddingOptions Map(Context.EmbeddingOptions embeddingOptions)
+        private static EmbeddingOptions Map(Iis.DataModel.EmbeddingOptions embeddingOptions)
         {
             switch (embeddingOptions)
             {
-                case Context.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
-                case Context.EmbeddingOptions.Required: return EmbeddingOptions.Required;
-                case Context.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
+                case Iis.DataModel.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
+                case Iis.DataModel.EmbeddingOptions.Required: return EmbeddingOptions.Required;
+                case Iis.DataModel.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
                 default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
             }
         }

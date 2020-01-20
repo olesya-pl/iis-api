@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using IIS.Core.Ontology;
-using Attribute = IIS.Core.Ontology.Attribute;
+using Iis.Domain;
+using Attribute = Iis.Domain.Attribute;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

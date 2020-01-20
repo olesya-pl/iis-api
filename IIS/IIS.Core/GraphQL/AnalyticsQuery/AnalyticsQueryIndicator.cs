@@ -20,9 +20,9 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         [GraphQLNonNullType]
         public AnalyticsIndicator.AnalyticsIndicator Indicator { get; set; }
-        private readonly IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator _queryIndicator;
+        private readonly Iis.DataModel.Analytics.AnalyticQueryIndicatorEntity _queryIndicator;
 
-        public AnalyticsQueryIndicator(IIS.Core.Analytics.EntityFramework.AnalyticsQueryIndicator queryIndicator)
+        public AnalyticsQueryIndicator(Iis.DataModel.Analytics.AnalyticQueryIndicatorEntity queryIndicator)
         {
             Id = queryIndicator.Id.ToString();
             Title = queryIndicator.Title ?? queryIndicator.Indicator.Title;

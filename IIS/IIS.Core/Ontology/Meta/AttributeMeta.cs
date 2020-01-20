@@ -1,3 +1,5 @@
+using Iis.Domain.Meta;
+
 namespace IIS.Core.Ontology.Meta
 {
     public class AttributeMeta : IMeta

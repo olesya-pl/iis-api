@@ -18,7 +18,7 @@ namespace IIS.Core.GraphQL.Users
         public string Username  { get; set; }
         public bool IsBlocked { get; set; }
 
-        public User(IIS.Core.Users.EntityFramework.User dbUser)
+        public User(Iis.DataModel.UserEntity dbUser)
         {
             Id        = dbUser.Id.ToString();
             Name      = dbUser.Name;

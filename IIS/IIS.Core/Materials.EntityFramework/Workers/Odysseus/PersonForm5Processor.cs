@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
+using Iis.Domain;
+using Iis.Domain.Materials;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -27,7 +29,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             _ontologyContext = ontologyContext;
         }
 
-        public async Task ExtractInfoAsync(Materials.Material material)
+        public async Task ExtractInfoAsync(Material material)
         {
             if (material.Type != MATERIAL_TYPE) return;
             var data = material.Data;
@@ -66,7 +68,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 throw new ArgumentException($"Entity with id {personId} is {entity.Type.Name}, not {ENTITY_TYPE}");
 
             // save mapping
-            var info = new MaterialInfo
+            var info = new Iis.DataModel.Materials.MaterialInfoEntity
             {
                 Id = Guid.NewGuid(),
                 Data = ExtractObjectOfDataType(data, ENTITY_TYPE).ToString(),
@@ -76,7 +78,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 SourceVersion = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     .InformationalVersion,
             };
-            var feature = new MaterialFeature
+            var feature = new Iis.DataModel.Materials.MaterialFeatureEntity
             {
                 Id = Guid.NewGuid(),
                 MaterialInfoId = info.Id,

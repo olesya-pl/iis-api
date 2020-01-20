@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -21,13 +22,13 @@ namespace IIS.Core.Ontology.EntityFramework
             _basePath = basePath;
         }
 
-        public async Task<Ontology> GetOntologyAsync(CancellationToken cancellationToken = default)
+        public async Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
             var ctx = new LoadingContext();
             _loadRawTypes(ctx);
             var types = _linkTypes(ctx);
 
-            return new Ontology(types);
+            return new OntologyModel(types);
         }
 
         private void _loadRawTypes(LoadingContext ctx)
@@ -54,7 +55,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private UnSerializedType _mapTypeToRawType(Serializer.DataType<JObject> dataType)
         {
-            Type type;
+            NodeType type;
 
             switch (dataType.ConceptType)
             {
@@ -65,7 +66,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     type = RelationType.Build(dataType.Id, dataType.Name, _metaToEmbeddingOptions(dataType.Meta));
                     break;
                 case "attributes":
-                    ScalarType attrDataType;
+                    Iis.Domain.ScalarType attrDataType;
                     Enum.TryParse(dataType.Type, out attrDataType);
                     type = new AttributeType(dataType.Id, dataType.Name, attrDataType);
                     break;
@@ -95,9 +96,9 @@ namespace IIS.Core.Ontology.EntityFramework
             return EmbeddingOptions.Optional;
         }
 
-        private IEnumerable<Type> _linkTypes(LoadingContext ctx)
+        private IEnumerable<NodeType> _linkTypes(LoadingContext ctx)
         {
-            var types = new List<Type>();
+            var types = new List<NodeType>();
 
             foreach (var pair in ctx.RawTypes)
             {
@@ -163,7 +164,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return parentTypes;
         }
 
-        private bool _hasParent(Type type, string parentName)
+        private bool _hasParent(NodeType type, string parentName)
         {
             return type.DirectParents.Any(parentType => parentType.Name == parentName);
         }
@@ -176,13 +177,13 @@ namespace IIS.Core.Ontology.EntityFramework
         class LoadingContext
         {
             public Dictionary<Guid, UnSerializedType> RawTypes = new Dictionary<Guid, UnSerializedType>();
-            public Dictionary<string, Type> TypesByName = new Dictionary<string, Type>();
-            public Dictionary<EmbeddingRelationType, Type> Relations= new Dictionary<EmbeddingRelationType, Type>();
+            public Dictionary<string, NodeType> TypesByName = new Dictionary<string, NodeType>();
+            public Dictionary<EmbeddingRelationType, NodeType> Relations= new Dictionary<EmbeddingRelationType, NodeType>();
         }
 
         class UnSerializedType
         {
-            public Type OntologyType;
+            public NodeType OntologyType;
             public Serializer.DataType<JObject> DataType;
         }
     }

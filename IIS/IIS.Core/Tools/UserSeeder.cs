@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +30,7 @@ namespace IIS.Core.Tools
                 var admin = _context.Users.SingleOrDefault(x => x.Username == defaultUserName);
                 if (admin == null)
                 {
-                    _context.Users.Add(new Core.Users.EntityFramework.User
+                    _context.Users.Add(new UserEntity
                     {
                         Id = Guid.NewGuid(),
                         IsBlocked = false,

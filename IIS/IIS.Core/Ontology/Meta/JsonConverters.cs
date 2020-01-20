@@ -1,3 +1,4 @@
+using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -7,7 +8,7 @@ namespace IIS.Core.Ontology.Meta
     {
         protected readonly JsonSerializer js;
 
-        protected TypeMetaConverterBase(ScalarType? scalarType)
+        protected TypeMetaConverterBase(Iis.Domain.ScalarType? scalarType)
         {
             js = new JsonSerializer {MissingMemberHandling = MissingMemberHandling.Error};
             js.Converters.Add(new ValidationConverter(scalarType, js));
@@ -21,7 +22,7 @@ namespace IIS.Core.Ontology.Meta
 
     public class MetaConverter<TMeta> : TypeMetaConverterBase where TMeta : IMeta
     {
-        public MetaConverter(ScalarType? scalarType) : base(scalarType)
+        public MetaConverter(Iis.Domain.ScalarType? scalarType) : base(scalarType)
         {
         }
 
@@ -35,10 +36,10 @@ namespace IIS.Core.Ontology.Meta
 
     public class ValidationConverter : JsonConverter<IValidation>
     {
-        private readonly ScalarType? _scalarType;
+        private readonly Iis.Domain.ScalarType? _scalarType;
         private JsonSerializer js;
 
-        public ValidationConverter(ScalarType? scalarType, JsonSerializer js)
+        public ValidationConverter(Iis.Domain.ScalarType? scalarType, JsonSerializer js)
         {
             _scalarType = scalarType;
             this.js = js;
@@ -55,11 +56,11 @@ namespace IIS.Core.Ontology.Meta
             var jo = JObject.Load(reader);
             switch (_scalarType)
             {
-                case ScalarType.String:
+                case Iis.Domain.ScalarType.String:
                     return jo.ToObject<StringValidation>();
-                case ScalarType.Integer:
+                case Iis.Domain.ScalarType.Integer:
                     return jo.ToObject<IntValidation>();
-                case ScalarType.DateTime:
+                case Iis.Domain.ScalarType.DateTime:
                     return jo.ToObject<DateValidation>();
                 default:
                     return jo.ToObject<Validation>();

@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Iis.Domain.Materials;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public static class Extensions
     {
-        public static Core.Materials.Material ToDomain(this MaterialInput input)
+        public static Iis.Domain.Materials.Material ToDomain(this MaterialInput input)
         {
-            Core.Materials.Material result = new Core.Materials.Material(
+            Iis.Domain.Materials.Material result = new Iis.Domain.Materials.Material(
                 Guid.NewGuid(),
                 JObject.FromObject(input.Metadata),
                 input.Data == null ? null : JArray.FromObject(input.Data),
@@ -18,13 +19,13 @@ namespace IIS.Core.GraphQL.Materials
 
             if (input.FileId != null)
             {
-                result.File = new Core.Files.FileInfo((Guid)input.FileId);
+                result.File = new FileInfo((Guid)input.FileId);
             }
 
             return result;
         }
 
-        public static Material ToView(this IIS.Core.Materials.Material material)
+        public static Material ToView(this Iis.Domain.Materials.Material material)
         {
             return new Material
             {
@@ -36,7 +37,7 @@ namespace IIS.Core.GraphQL.Materials
             };
         }
 
-        public static Files.FileInfo ToView(this IIS.Core.Files.FileInfo fileInfo)
+        public static Files.FileInfo ToView(this FileInfo fileInfo)
         {
             return new Files.FileInfo
             {

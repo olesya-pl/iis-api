@@ -13,7 +13,7 @@ namespace IIS.Core.GraphQL.Reports
         [GraphQLNonNullType]                       public DateTime          CreatedAt { get; set; }
         [GraphQLIgnore]                            public Guid[]            EventIds  { get; set; }
 
-        public Report(Core.Report.EntityFramework.Report report) : this(report.Id, report.Title, report.Recipient, report.CreatedAt, report.ReportEvents.Select(re => re.EventId).ToArray()) { }
+        public Report(Iis.DataModel.Reports.ReportEntity report) : this(report.Id, report.Title, report.Recipient, report.CreatedAt, report.ReportEvents.Select(re => re.EventId).ToArray()) { }
 
         public Report(Guid id, string title, string recepient, DateTime createdAt, Guid[] events)
         {

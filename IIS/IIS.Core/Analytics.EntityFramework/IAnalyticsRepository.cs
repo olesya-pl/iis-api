@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
+using Iis.DataModel.Analytics;
 
 namespace IIS.Core.Analytics.EntityFramework
 {
     public interface IAnalyticsRepository
     {
-        Task<AnalyticsIndicator> getRootAsync(Guid childId);
-        Task<IEnumerable<AnalyticsIndicator>> GetAllChildrenAsync(Guid parentId);
+        Task<AnalyticIndicatorEntity> getRootAsync(Guid childId);
+        Task<IEnumerable<AnalyticIndicatorEntity>> GetAllChildrenAsync(Guid parentId);
         Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsQueryBuilder query);
-        Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsIndicator indicator, DateTime? fromDate, DateTime? toDate);
-        Task<AnalyticsQueryBuilder> BuildQuery(AnalyticsIndicator indicator, DateTime? from, DateTime? to);
+        Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticIndicatorEntity indicator, DateTime? fromDate, DateTime? toDate);
+        Task<AnalyticsQueryBuilder> BuildQuery(AnalyticIndicatorEntity indicator, DateTime? from, DateTime? to);
     }
 }

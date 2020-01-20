@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Iis.Domain;
 
 namespace IIS.Core.Ontology
 {
@@ -17,7 +18,7 @@ namespace IIS.Core.Ontology
             return builder;
         }
 
-        public IEnumerable<Type> BuildOntology()
+        public IEnumerable<NodeType> BuildOntology()
         {
             if (_isBuilt) throw new Exception("Current ontology context has already been built.");
             _isBuilt = true;

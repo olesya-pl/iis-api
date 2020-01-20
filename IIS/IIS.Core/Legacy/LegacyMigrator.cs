@@ -3,12 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core;
 using IIS.Core.Files.EntityFramework;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
+using Iis.DataModel.Materials;
+using Iis.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using N = IIS.Core.Ontology;
-using Attribute = IIS.Core.Ontology.EntityFramework.Context.Attribute;
 
 namespace IIS.Legacy.EntityFramework
 {
@@ -27,7 +28,7 @@ namespace IIS.Legacy.EntityFramework
 
         }
 
-        private N.Ontology _ontology;
+        private OntologyModel _ontology;
         private DateTime _now;
 
         private void Init()
@@ -94,14 +95,14 @@ namespace IIS.Legacy.EntityFramework
             {
                 var attr = Map(oAttribute);
                 var relationId = Guid.NewGuid();
-                var relation = new Node
+                var relation = new NodeEntity
                 {
                     Id = relationId,
                     CreatedAt = _now,
                     UpdatedAt = _now,
                     IsArchived = false,
-                    TypeId = GetRelationType(oAttribute).Id,
-                    Relation = new Relation
+                    NodeTypeId = GetRelationType(oAttribute).Id,
+                    Relation = new RelationEntity
                     {
                         Id = relationId,
                         SourceNodeId = oAttribute.EntityId,
@@ -113,12 +114,12 @@ namespace IIS.Legacy.EntityFramework
             }
         }
 
-        private N.EntityType GetEntityType(OEntity oEntity)
+        private EntityType GetEntityType(OEntity oEntity)
         {
             return _ontology.GetEntityType(oEntity.Type.Code);
         }
 
-        private N.EmbeddingRelationType GetRelationType(ORelation oRelation)
+        private EmbeddingRelationType GetRelationType(ORelation oRelation)
         {
             var sourceType = GetEntityType(oRelation.Source);
             var relationName = oRelation.Type.Code.ToLowerCamelcase();
@@ -129,7 +130,7 @@ namespace IIS.Legacy.EntityFramework
             return relationType;
         }
 
-        private N.EmbeddingRelationType GetRelationType(OAttributeValue oAttributeValue)
+        private EmbeddingRelationType GetRelationType(OAttributeValue oAttributeValue)
         {
             var sourceType = GetEntityType(oAttributeValue.Entity);
             var relationName = oAttributeValue.Attribute.Code.ToLowerCamelcase();
@@ -140,35 +141,35 @@ namespace IIS.Legacy.EntityFramework
             return relationType;
         }
 
-        private N.AttributeType GetAttributeType(OAttributeValue oAttributeValue)
+        private AttributeType GetAttributeType(OAttributeValue oAttributeValue)
         {
             var relationType = GetRelationType(oAttributeValue);
             return relationType.AttributeType;
         }
 
-        private Node Map(OEntity oEntity)
+        private NodeEntity Map(OEntity oEntity)
         {
-            var result = new Node
+            var result = new NodeEntity
             {
                 Id = oEntity.Id,
                 CreatedAt = oEntity.CreatedAt,
                 UpdatedAt = oEntity.UpdatedAt,
                 IsArchived = oEntity.DeletedAt != null,
-                TypeId = GetEntityType(oEntity).Id,
+                NodeTypeId = GetEntityType(oEntity).Id,
             };
             return result;
         }
 
-        private Node Map(ORelation oRelation)
+        private NodeEntity Map(ORelation oRelation)
         {
-            var result = new Node
+            var result = new NodeEntity
             {
                 Id = oRelation.Id,
                 CreatedAt = oRelation.CreatedAt,
                 UpdatedAt = oRelation.CreatedAt,
                 IsArchived = oRelation.DeletedAt != null,
-                TypeId = GetRelationType(oRelation).Id,
-                Relation = new Relation
+                NodeTypeId = GetRelationType(oRelation).Id,
+                Relation = new RelationEntity
                 {
                     Id = oRelation.Id,
                     SourceNodeId = oRelation.SourceId,
@@ -178,20 +179,20 @@ namespace IIS.Legacy.EntityFramework
             return result;
         }
 
-        private Node Map(OAttributeValue oAttributeValue)
+        private NodeEntity Map(OAttributeValue oAttributeValue)
         {
             var attributeType = GetAttributeType(oAttributeValue);
-            var value = attributeType.ScalarTypeEnum == N.ScalarType.File
+            var value = attributeType.ScalarTypeEnum == Iis.Domain.ScalarType.File
                 ? MapFileValue(oAttributeValue.Value)
                 : oAttributeValue.Value;
-            var result = new Node
+            var result = new NodeEntity
             {
                 Id = oAttributeValue.Id,
                 CreatedAt = oAttributeValue.CreatedAt,
                 UpdatedAt = oAttributeValue.CreatedAt,
                 IsArchived = oAttributeValue.DeletedAt != null,
-                TypeId = attributeType.Id,
-                Attribute = new Attribute
+                NodeTypeId = attributeType.Id,
+                Attribute = new AttributeEntity
                 {
                     Id = oAttributeValue.Id,
                     Value = value
@@ -210,7 +211,7 @@ namespace IIS.Legacy.EntityFramework
             Init();
             foreach (var oFile in _contourContext.TemporaryFiles)
             {
-                _ontologyContext.Add(new File
+                _ontologyContext.Add(new FileEntity
                 {
                     Id = oFile.Id,
                     Contents = oFile.File,

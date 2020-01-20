@@ -1,6 +1,5 @@
 using HotChocolate;
 using HotChocolate.Types;
-using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -8,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Iis.DataModel;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.Users
             if (context.Users.Any(u => u.Username == data.Username))
                 throw new InvalidOperationException($"User {data.Username} already exists");
 
-            var user = new Core.Users.EntityFramework.User
+            var user = new Iis.DataModel.UserEntity
             {
                 Id           = Guid.NewGuid(),
                 IsBlocked    = data.IsBlocked,

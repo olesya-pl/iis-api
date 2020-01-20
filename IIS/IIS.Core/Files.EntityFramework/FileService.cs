@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
+using Iis.DataModel.Materials;
 using Microsoft.EntityFrameworkCore;
+using FileInfo = Iis.Domain.Materials.FileInfo;
 
 namespace IIS.Core.Files.EntityFramework
 {
@@ -25,7 +27,7 @@ namespace IIS.Core.Files.EntityFramework
                 contents = ms.ToArray();
             }
 
-            var file = new File
+            var file = new FileEntity
             {
                 Name = fileName,
                 ContentType = contentType,
@@ -41,7 +43,7 @@ namespace IIS.Core.Files.EntityFramework
         public async Task<FileInfo> GetFileAsync(Guid id)
         {
             await _context.Semaphore.WaitAsync();
-            File file;
+            FileEntity file;
             try
             {
                 file = _context.Files.SingleOrDefault(f => f.Id == id);

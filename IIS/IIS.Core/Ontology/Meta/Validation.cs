@@ -1,12 +1,8 @@
 using System;
+using Iis.Domain.Meta;
 
 namespace IIS.Core.Ontology.Meta
 {
-    public interface IValidation
-    {
-        bool? Required { get; set; } 
-    }
-
     public class Validation : IValidation
     {
         public bool? Required { get; set; } // Remove from meta to schema

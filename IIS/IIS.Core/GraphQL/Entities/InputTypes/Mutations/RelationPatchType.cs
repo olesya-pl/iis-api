@@ -4,6 +4,8 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
+using Iis.Domain.Meta;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {

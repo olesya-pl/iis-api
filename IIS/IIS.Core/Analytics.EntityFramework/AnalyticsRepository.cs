@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using IIS.Core.Ontology.EntityFramework;
+using Iis.DataModel;
+using Iis.DataModel.Analytics;
 using Newtonsoft.Json;
 
 namespace IIS.Core.Analytics.EntityFramework
@@ -22,11 +23,11 @@ namespace IIS.Core.Analytics.EntityFramework
             _ontologyProvider = ontologyProvider;
         }
 
-        public async Task<IEnumerable<AnalyticsIndicator>> GetAllChildrenAsync(Guid parentId)
+        public async Task<IEnumerable<AnalyticIndicatorEntity>> GetAllChildrenAsync(Guid parentId)
         {
             // TODO: better to use QueryBuilder because escaping is Postgres specific
-            return await _dbCtx.AnalyticsIndicators
-                .FromSql(@"
+            return await _dbCtx.AnalyticIndicators
+                .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *
                         FROM ""AnalyticsIndicators""
@@ -42,11 +43,11 @@ namespace IIS.Core.Analytics.EntityFramework
                 .ToListAsync();
         }
 
-        public async Task<AnalyticsIndicator> getRootAsync(Guid childId)
+        public async Task<AnalyticIndicatorEntity> getRootAsync(Guid childId)
         {
             // TODO: better to use QueryBuilder because escaping is Postgres specific
-            return await _dbCtx.AnalyticsIndicators
-                .FromSql(@"
+            return await _dbCtx.AnalyticIndicators
+                .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *, 0 as level
                         FROM ""AnalyticsIndicators""
@@ -96,13 +97,13 @@ namespace IIS.Core.Analytics.EntityFramework
             }
         }
 
-        public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsIndicator indicator, DateTime? fromDate, DateTime? toDate)
+        public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticIndicatorEntity indicator, DateTime? fromDate, DateTime? toDate)
         {
             var query = await BuildQuery(indicator, fromDate, toDate);
             return await calcAsync(query);
         }
 
-        public async Task<AnalyticsQueryBuilder> BuildQuery(AnalyticsIndicator indicator, DateTime? fromDate, DateTime? toDate)
+        public async Task<AnalyticsQueryBuilder> BuildQuery(AnalyticIndicatorEntity indicator, DateTime? fromDate, DateTime? toDate)
         {
             AnalyticsQueryBuilderConfig config;
             try {

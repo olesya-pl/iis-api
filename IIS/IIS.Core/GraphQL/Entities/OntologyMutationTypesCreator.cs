@@ -4,7 +4,8 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.InputTypes.Mutations;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
-using Type = IIS.Core.Ontology.Type;
+using Iis.Domain;
+using Iis.Domain.Meta;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -21,7 +22,7 @@ namespace IIS.Core.GraphQL.Entities
         public Operation Operation { get; }
 
         // this return value should not be wrapped in NonNullType()
-        public MutatorInputType NewMutatorInputType(Type type)
+        public MutatorInputType NewMutatorInputType(NodeType type)
         {
             var configure = new Action<IInputObjectTypeDescriptor>(d =>
             {

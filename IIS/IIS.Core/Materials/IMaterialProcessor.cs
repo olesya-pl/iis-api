@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Iis.Domain.Materials;
 
 namespace IIS.Core.Materials
 {

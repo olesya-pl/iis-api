@@ -10,9 +10,9 @@ using IIS.Core.Files;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.Ontology;
+using Iis.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Type = IIS.Core.Ontology.Type;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -35,12 +35,12 @@ namespace IIS.Core.GraphQL.Entities
             return Guid.Parse((string) obj);
         }
 
-        public static bool IsAssignableFrom(this Type target, Type source)
+        public static bool IsAssignableFrom(this NodeType target, NodeType source)
         {
             return source.Name == target.Name || source.AllParents.Any(t => t.Name == target.Name);
         }
 
-        public static async Task<Node> LoadNodeOfType(this IOntologyService service, Guid targetId, Type targetType)
+        public static async Task<Node> LoadNodeOfType(this IOntologyService service, Guid targetId, NodeType targetType)
         {
             var existingNode = await service.LoadNodesAsync(targetId, null); // no fields needed, only type
             if (existingNode == null)

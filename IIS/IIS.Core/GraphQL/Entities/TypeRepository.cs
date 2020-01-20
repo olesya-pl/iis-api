@@ -6,7 +6,7 @@ using IIS.Core.GraphQL.Entities.InputTypes.Mutations;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes.Mutations;
 using IIS.Core.Ontology;
-using Type = IIS.Core.Ontology.Type;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -22,7 +22,7 @@ namespace IIS.Core.GraphQL.Entities
         private readonly IOntologyProvider _ontologyProvider;
         private readonly OntologyQueryTypesCreator _creator;
         private readonly OntologyMutationTypesCreator[] _mutators;
-        private Core.Ontology.Ontology _ontology;
+        private OntologyModel _ontology;
 
         public TypeRepository(IOntologyProvider ontologyProvider)
         {
@@ -57,7 +57,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        public IEnumerable<Type> GetChildTypes(Type parent)
+        public IEnumerable<NodeType> GetChildTypes(NodeType parent)
         {
             return _ontology.GetChildTypes(parent);
         }
@@ -74,17 +74,17 @@ namespace IIS.Core.GraphQL.Entities
             return GetOrCreate(type.Name, () => _creator.NewOntologyType(type));
         }
 
-        public IOutputType GetScalarOutputType(Core.Ontology.ScalarType scalarType)
+        public IOutputType GetScalarOutputType(Iis.Domain.ScalarType scalarType)
         {
             IOutputType type;
-            if (scalarType == Core.Ontology.ScalarType.File)
+            if (scalarType == Iis.Domain.ScalarType.File)
                 type = GetType<AttachmentType>();
             else
                 type = Scalars[scalarType];
             return type;
         }
 
-        public IOutputType GetMultipleOutputType(Core.Ontology.ScalarType scalarType)
+        public IOutputType GetMultipleOutputType(Iis.Domain.ScalarType scalarType)
         {
             var name = scalarType.ToString();
             return GetOrCreate(name, () =>
@@ -105,7 +105,7 @@ namespace IIS.Core.GraphQL.Entities
         public IInputType GetInputAttributeType(AttributeType attributeType)
         {
             IInputType type;
-            if (attributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
+            if (attributeType.ScalarTypeEnum == Iis.Domain.ScalarType.File)
                 type = GetType<FileValueInputType>();
             else
                 type = Scalars[attributeType.ScalarTypeEnum];
@@ -114,7 +114,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC MUTATOR TYPES ----- //
 
-        public MutatorInputType GetMutatorInputType(Operation operation, Type type)
+        public MutatorInputType GetMutatorInputType(Operation operation, NodeType type)
         {
             var name = MutatorInputType.GetName(operation, type.Name);
             return GetOrCreate(name, () => GetMutator(operation).NewMutatorInputType(type));

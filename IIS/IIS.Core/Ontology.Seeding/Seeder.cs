@@ -1,51 +1,56 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.Domain;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using Attribute = Iis.Domain.Attribute;
 
 namespace IIS.Core.Ontology.Seeding
 {
     public class Seeder
     {
+        private readonly ILogger<Seeder> _logger;
         private IOntologyProvider _ontologyProvider;
         private IOntologyService _ontologyService;
 
-        public Seeder(IOntologyProvider ontologyProvider, IOntologyService ontologyService)
+        public Seeder(
+            ILogger<Seeder> logger,
+            IOntologyProvider ontologyProvider,
+            IOntologyService ontologyService)
         {
+            _logger = logger;
             _ontologyProvider = ontologyProvider;
             _ontologyService = ontologyService;
         }
 
         public async Task SeedAsync(string subdir, CancellationToken cancellationToken = default)
         {
-            var first = new List<Node>();
+            var firstNodes = new List<Node>();
             var nodes = new List<Node>();
 
-            var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-            var path = Path.Combine(Environment.CurrentDirectory, "data", subdir);
-            var fileNames = Directory.EnumerateFiles(path);
-            foreach (var fileName in fileNames)
+            OntologyModel ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+            string path = Path.Combine(Environment.CurrentDirectory, "data", subdir);
+            IEnumerable<string> fileNames = Directory.EnumerateFiles(path);
+            foreach (string fileName in fileNames)
             {
-                var typeName = new FileInfo(fileName).Name.Replace(".json", "");
+                string typeName = Path.GetFileNameWithoutExtension(fileName);
                 // tmp hardcode
                 //if (typeName == "EventType") continue;
 
-                using (var reader = new StreamReader(File.OpenRead(fileName)))
+                string content = File.ReadAllText(fileName);
+                JArray jArray = JArray.Parse(content);
+                foreach (JToken jToken in jArray.AsJEnumerable())
                 {
-                    var content = reader.ReadToEnd();
-                    var jArray = JArray.Parse(content);
-                    foreach (var jToken in jArray.AsJEnumerable())
-                    {
-                        var jObject = (JObject)jToken;
-                        var entity = Map(jObject, ontology, typeName, first);
-                        nodes.Add(entity);
-                    }
+                    var jObject = (JObject)jToken;
+                    Entity entity = Map(jObject, ontology, typeName, firstNodes);
+                    nodes.Add(entity);
                 }
             }
-            foreach (var node in first)
+
+            foreach (var node in firstNodes)
             {
                 await _ontologyService.SaveNodeAsync(node, cancellationToken);
             }
@@ -55,11 +60,11 @@ namespace IIS.Core.Ontology.Seeding
             }
         }
 
-        private Entity Map(JObject jObject, Core.Ontology.Ontology ontology, string typeName, List<Node> first)
+        private Entity Map(JObject jObject, OntologyModel ontology, string typeName, List<Node> first)
         {
-            var type = ontology.GetEntityType(typeName);
-            var entity = new Entity(Guid.NewGuid(), type);
-            foreach (var relationType in type.AllProperties)
+            EntityType type = ontology.GetEntityType(typeName);
+            Entity entity = new Entity(Guid.NewGuid(), type);
+            foreach (EmbeddingRelationType relationType in type.AllProperties)
             {
                 var jProperty = default(JProperty);
                 if (typeName == "Country" && relationType.Name == "code")
@@ -81,7 +86,7 @@ namespace IIS.Core.Ontology.Seeding
 
                 if (jProperty is null)
                 {
-                    Debug.WriteLine($"WARNING! The key '{relationType.Name}' of type '{typeName}' was not present in a seed file.");
+                    //_logger.LogTrace("WARNING! The key {relationTypeName} of type {typeName} was not present in a seed file.", relationType.Name, typeName);
                     continue;
                 }
 
@@ -102,7 +107,7 @@ namespace IIS.Core.Ontology.Seeding
                 {
                     var relation = new Relation(Guid.NewGuid(), relationType);
                     var jValue = (JValue)jProperty.Value;
-                    var attribute = new Core.Ontology.Attribute(Guid.NewGuid(), (AttributeType)relationType.TargetType, jValue.Value);
+                    var attribute = new Attribute(Guid.NewGuid(), (AttributeType)relationType.TargetType, jValue.Value);
                     relation.AddNode(attribute);
                     entity.AddNode(relation);
                 }

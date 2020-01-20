@@ -15,6 +15,7 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System.Net.Http;
 using System.Net;
+using Iis.DataModel.Materials;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -119,7 +120,7 @@ namespace IIS.Core.Materials
                     var data = JObject.Parse("{ 'transcription': '" + mlResponse["transcription"][0][0].Value<string>() + "' }");
                     using (var context = _contextFactory.CreateContext())
                     {
-                        var mi = new Materials.EntityFramework.MaterialInfo
+                        var mi = new MaterialInfoEntity
                         {
                             Id = Guid.NewGuid(),
                             Data = data?.ToString(),

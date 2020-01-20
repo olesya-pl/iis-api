@@ -20,7 +20,7 @@ namespace IIS.Core
 
         public static string GetPasswordHashAsBase64String(this IConfiguration configuration, string password)
         {
-            var salt = configuration.GetValue<string>("salt");
+            var salt = configuration.GetValue<string>("salt", string.Empty);
             return ComputeHash(password + salt);
         }
     }

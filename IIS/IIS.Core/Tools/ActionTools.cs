@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.EntityFramework;
-using IIS.Core.Ontology.EntityFramework.Context;
 using IIS.Core.Ontology.Seeding;
+using Iis.DataModel;
+using Iis.DataModel.Analytics;
+using Iis.Domain;
 using IIS.Legacy.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -71,18 +73,18 @@ namespace IIS.Core.Tools
 
         public async Task FillOdysseusTypesAsync()
         {
-            await _seedTypesAsync("odysseus");
+            await SeedTypesAsync("odysseus");
         }
 
         public async Task FillContourTypesAsync()
         {
-            await _seedTypesAsync("contour");
+            await SeedTypesAsync("contour");
         }
 
-        private async Task _seedTypesAsync(string name)
+        private async Task SeedTypesAsync(string name)
         {
             JsonOntologyProvider provider = new JsonOntologyProvider(Path.Combine(Environment.CurrentDirectory, "data", name, "ontology"));
-            Ontology.Ontology ontology = await provider.GetOntologyAsync();
+            OntologyModel ontology = await provider.GetOntologyAsync();
             _ontologyTypeSaver.SaveTypes(ontology.EntityTypes);
             _logger.LogInformation("{name} types filled.", name);
         }
@@ -158,7 +160,7 @@ namespace IIS.Core.Tools
                 )
             ;
 
-            _ontologyContext.AnalyticsIndicators.AddRange(b.Indicators);
+            _ontologyContext.AnalyticIndicators.AddRange(b.Indicators);
             await _ontologyContext.SaveChangesAsync();
 
             _logger.LogInformation("Done analytics indicators.");
@@ -192,11 +194,11 @@ namespace IIS.Core.Tools
 
         class AnalyticsIndicatorBuilder
         {
-            public List<AnalyticsIndicator> Indicators = new List<AnalyticsIndicator>();
+            public List<AnalyticIndicatorEntity> Indicators = new List<AnalyticIndicatorEntity>();
 
-            public AnalyticsIndicator NewIndicator(string title, string query = null)
+            public AnalyticIndicatorEntity NewIndicator(string title, string query = null)
             {
-                var indicator = new AnalyticsIndicator(Guid.NewGuid(), title);
+                var indicator = new AnalyticIndicatorEntity(Guid.NewGuid(), title);
 
                 if (query != null)
                     indicator.Query = _readQueryFile(query);

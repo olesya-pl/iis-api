@@ -1,5 +1,7 @@
 ﻿using System;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
+using Iis.Domain.Meta;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -20,12 +22,12 @@ namespace IIS.Core.Ontology
         ITypeBuilder IsAbstraction();
         ITypeBuilder IsEntity();
         IAttributeBuilder IsAttribute();
-        Type Build();
+        NodeType Build();
     }
 
     public interface IAttributeBuilder : ITypeBuilder
     {
-        IAttributeBuilder HasValueOf(ScalarType name);
+        IAttributeBuilder HasValueOf(Iis.Domain.ScalarType name);
     }
 
     public interface IRelationBuilder

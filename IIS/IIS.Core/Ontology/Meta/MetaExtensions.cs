@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using Iis.Domain;
+using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -18,14 +20,14 @@ namespace IIS.Core.Ontology.Meta
             return jo.ToObject<TMeta>(js);
         }
 
-        public static TMeta CreateMeta<TMeta>(Type type, JsonConverter typeConverter) where TMeta : IMeta
+        public static TMeta CreateMeta<TMeta>(NodeType type, JsonConverter typeConverter) where TMeta : IMeta
         {
             var js = CreateSerializer();
             js.Converters.Add(typeConverter);
             return type.GetFullMeta().ToObject<TMeta>(js);
         }
 
-        public static IMeta CreateMeta(this Type type)
+        public static IMeta CreateMeta(this NodeType type)
         {
             if (type?.MetaSource == null)
                 return null;
@@ -73,7 +75,7 @@ namespace IIS.Core.Ontology.Meta
 
         public static JObject Serialize(this IMeta meta) => JObject.FromObject(meta, CreateSerializer());
 
-        public static JObject GetFullMeta(this Type type)
+        public static JObject GetFullMeta(this NodeType type)
         {
             var settings = new JsonMergeSettings
             {

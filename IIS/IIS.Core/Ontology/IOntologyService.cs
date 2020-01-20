@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.Domain;
 
 namespace IIS.Core.Ontology
 {
     public interface IOntologyService
     {
-        Task<int> GetNodesCountAsync(IEnumerable<Type> types, NodeFilter filter, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<Type> types, NodeFilter filter, CancellationToken cancellationToken = default);
+        Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default);
 
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
 

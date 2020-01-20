@@ -5,6 +5,7 @@ using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using System;
 using System.Linq;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.Reports
 {

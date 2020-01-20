@@ -7,7 +7,8 @@ using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
-using Type = IIS.Core.Ontology.Type;
+using Iis.Domain;
+using Iis.Domain.Meta;
 
 namespace IIS.Core.GraphQL
 {
@@ -85,7 +86,7 @@ namespace IIS.Core.GraphQL
             return d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
         }
 
-        public static IEnumerable<Type> GetInheritors(this Type type, IEnumerable<Type> ontology)
+        public static IEnumerable<NodeType> GetInheritors(this NodeType type, IEnumerable<NodeType> ontology)
         {
             return ontology.Where(t =>
                 t.RelatedTypes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));

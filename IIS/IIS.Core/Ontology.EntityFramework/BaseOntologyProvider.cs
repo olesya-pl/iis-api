@@ -1,12 +1,13 @@
 using System;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
     public abstract class BaseOntologyProvider
     {
-        protected virtual RelationType _addInversedRelation(RelationType relation, Type sourceType)
+        protected virtual RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
         {
             if (!(relation is EmbeddingRelationType relationType) || !relationType.HasInversed())
                 return null;

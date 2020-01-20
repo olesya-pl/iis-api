@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IIS.Core", "IIS.Core\IIS.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmlJsonUploader", "EmlJsonUploader\EmlJsonUploader.csproj", "{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.DataModel", "Iis.DataModel\Iis.DataModel.csproj", "{6127346E-B6C7-4D42-8FBD-60FC76ABA367}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Domain", "Iis.Domain\Iis.Domain.csproj", "{C7A54D0A-E2D0-4931-B2C3-6C97A063B192}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F53CDF6-FCED-45FA-A635-DF4D853DBAE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6127346E-B6C7-4D42-8FBD-60FC76ABA367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6127346E-B6C7-4D42-8FBD-60FC76ABA367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6127346E-B6C7-4D42-8FBD-60FC76ABA367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6127346E-B6C7-4D42-8FBD-60FC76ABA367}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7A54D0A-E2D0-4931-B2C3-6C97A063B192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7A54D0A-E2D0-4931-B2C3-6C97A063B192}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7A54D0A-E2D0-4931-B2C3-6C97A063B192}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7A54D0A-E2D0-4931-B2C3-6C97A063B192}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using IIS.Core.Ontology;
-using Type = IIS.Core.Ontology.Type;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -16,16 +16,16 @@ namespace IIS.Core.GraphQL.EntityTypes
             EntityTypesFilter filter = null)
         {
             var ontology = await ontologyProvider.GetOntologyAsync();
-            IEnumerable<Type> types;
+            IEnumerable<NodeType> types;
             if (filter != null)
             {
                 var et = ontology.GetEntityType(filter.Parent);
                 if (et == null)
-                    types = new List<Type>();
+                    types = new List<NodeType>();
                 else
                     types = ontology.GetChildTypes(et);
                 if (filter.ConcreteTypes)
-                    types = types.OfType<Core.Ontology.EntityType>().Where(t => !t.IsAbstract);
+                    types = types.OfType<Iis.Domain.EntityType>().Where(t => !t.IsAbstract);
             }
             else
             {

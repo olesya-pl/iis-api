@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using FileInfo = Iis.Domain.Materials.FileInfo;
 
 namespace IIS.Core.Files
 {

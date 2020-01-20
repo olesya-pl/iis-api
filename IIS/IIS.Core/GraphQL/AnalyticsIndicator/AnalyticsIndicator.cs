@@ -18,9 +18,9 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
         [GraphQLType(typeof(IdType))]
         public Guid? ParentId { get; set; }
 
-        private readonly IIS.Core.Analytics.EntityFramework.AnalyticsIndicator _indicator;
+        private readonly Iis.DataModel.Analytics.AnalyticIndicatorEntity _indicator;
 
-        public AnalyticsIndicator(IIS.Core.Analytics.EntityFramework.AnalyticsIndicator indicator)
+        public AnalyticsIndicator(Iis.DataModel.Analytics.AnalyticIndicatorEntity indicator)
         {
             Id = indicator.Id;
             Title = indicator.Title;

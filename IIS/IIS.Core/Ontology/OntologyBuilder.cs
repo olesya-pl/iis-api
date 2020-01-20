@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
+using Iis.Domain.Meta;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -22,7 +24,7 @@ namespace IIS.Core.Ontology
             public IMeta Meta;
             public string Title;
         }
-        private Type _builtType;
+        private NodeType _builtType;
         private event EventHandler<EventArgs> TypeBuilt;
         private bool _isBuilding;
 
@@ -34,7 +36,7 @@ namespace IIS.Core.Ontology
         private List<Action<ITypeBuilder>> _parentBuilders = new List<Action<ITypeBuilder>>();
         private List<Relation> _childNodes = new List<Relation>();
         private Kind _kind;
-        private ScalarType _scalarType;
+        private Iis.Domain.ScalarType _scalarType;
 
         private readonly Dictionary<string, OntologyBuilder> Builders;
 
@@ -138,13 +140,13 @@ namespace IIS.Core.Ontology
         }
 
         // Attr
-        public IAttributeBuilder HasValueOf(ScalarType scalarType)
+        public IAttributeBuilder HasValueOf(Iis.Domain.ScalarType scalarType)
         {
             _scalarType = scalarType;
             return this;
         }
 
-        public Type Build()
+        public NodeType Build()
         {
             if (_builtType != null) return _builtType;
 
@@ -154,7 +156,7 @@ namespace IIS.Core.Ontology
             if (!NameRegex.IsMatch(_name))
                 throw new BuildException($"Type name '{_name}' is not valid");
 
-            var type = default(Type);
+            var type = default(NodeType);
             if (_kind == Kind.Attribute)
             {
                 type = new AttributeType(Guid.NewGuid(), _name, _scalarType);

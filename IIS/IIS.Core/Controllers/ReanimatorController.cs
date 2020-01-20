@@ -3,18 +3,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using IIS.Legacy.EntityFramework;
-using IIS.Core.Ontology.EntityFramework.Context;
-using OAttributeType = IIS.Core.Ontology.AttributeType;
-using OType = IIS.Core.Ontology.Type;
-using OEntityType = IIS.Core.Ontology.EntityType;
-using EmbeddingRelationType = IIS.Core.Ontology.EmbeddingRelationType;
-using InheritanceRelationType = IIS.Core.Ontology.InheritanceRelationType;
-using ORelationType = IIS.Core.Ontology.RelationType;
+using OAttributeType = Iis.Domain.AttributeType;
+using OEntityType = Iis.Domain.EntityType;
+using EmbeddingRelationType = Iis.Domain.EmbeddingRelationType;
+using InheritanceRelationType = Iis.Domain.InheritanceRelationType;
+using ORelationType = Iis.Domain.RelationType;
 using System.Linq;
 using System.Collections.Generic;
+using IIS.Core.Ontology;
 using IIS.Core.Ontology.Seeding;
+using Iis.DataModel;
+using Iis.Domain;
 using Microsoft.EntityFrameworkCore;
-using Type = IIS.Core.Ontology.EntityFramework.Context.Type;
 
 namespace IIS.Core.Controllers
 {
@@ -84,7 +84,7 @@ namespace IIS.Core.Controllers
         [Route("/api/cleartypes")]
         public async Task<IActionResult> ClearTypes(CancellationToken cancellationToken)
         {
-            _context.Types.RemoveRange(await _context.Types.ToArrayAsync(cancellationToken));
+            _context.NodeTypes.RemoveRange(await _context.NodeTypes.ToArrayAsync(cancellationToken));
             _context.AttributeTypes.RemoveRange(await _context.AttributeTypes.ToArrayAsync(cancellationToken));
             _context.RelationTypes.RemoveRange(await _context.RelationTypes.ToArrayAsync(cancellationToken));
             return Ok("Migration has been applied.");
@@ -94,7 +94,7 @@ namespace IIS.Core.Controllers
         {
             throw new NotImplementedException("Broken Reanimators type conversion because of relation model change. Use Graphql mutation 'migrateTypes'.");
 
-            _context.Types.RemoveRange(_context.Types.ToArray());
+            _context.NodeTypes.RemoveRange(_context.NodeTypes.ToArray());
             _context.AttributeTypes.RemoveRange(_context.AttributeTypes.ToArray());
             _context.RelationTypes.RemoveRange(_context.RelationTypes.ToArray());
             await _context.SaveChangesAsync();
@@ -107,9 +107,9 @@ namespace IIS.Core.Controllers
             return Ok();
         }
 
-        private Dictionary<System.Guid, Type> _typesCache = new Dictionary<System.Guid, Type>();
+        private Dictionary<System.Guid, NodeTypeEntity> _typesCache = new Dictionary<System.Guid, NodeTypeEntity>();
 
-        private Type MapType(OType type)
+        private NodeTypeEntity MapType(NodeType type)
         {
             if (_typesCache.ContainsKey(type.Id)) return _typesCache[type.Id];
 
@@ -119,7 +119,7 @@ namespace IIS.Core.Controllers
             throw new System.Exception("Unknown type.");
         }
 
-        private Type ToEntity(OEntityType entityType)
+        private NodeTypeEntity ToEntity(OEntityType entityType)
         {
             var type = _typesCache[entityType.Id] = ToType(entityType);
             type.Kind = Kind.Entity;
@@ -127,7 +127,7 @@ namespace IIS.Core.Controllers
 
             foreach (var relation in entityType.RelatedTypes.OfType<ORelationType>())
             {
-                var relationType = default(RelationType);
+                var relationType = default(RelationTypeEntity);
                 if (relation is EmbeddingRelationType)
                 {
                     relationType = ToEmbeddingRelation((EmbeddingRelationType)relation, type.Id);
@@ -142,68 +142,68 @@ namespace IIS.Core.Controllers
             return type;
         }
 
-        private RelationType ToEmbeddingRelation(EmbeddingRelationType relationType, System.Guid sourceId)
+        private RelationTypeEntity ToEmbeddingRelation(EmbeddingRelationType relationType, System.Guid sourceId)
         {
-            var relation = new RelationType
+            var relation = new RelationTypeEntity
             {
                 Id = relationType.Id,
 //                IsArray = relationType.EmbeddingOptions == Ontology.EmbeddingOptions.Multiple,
                 Kind = RelationKind.Embedding,
                 TargetType = MapType(relationType.TargetType),
                 SourceTypeId = sourceId,
-                Type = ToType(relationType)
+                NodeType = ToType(relationType)
             };
-            relation.Type.Kind = Kind.Relation;
+            relation.NodeType.Kind = Kind.Relation;
             return relation;
         }
 
-        private RelationType ToInheritanceRelation(InheritanceRelationType relationType, System.Guid sourceId)
+        private RelationTypeEntity ToInheritanceRelation(InheritanceRelationType relationType, System.Guid sourceId)
         {
-            var relation = new RelationType
+            var relation = new RelationTypeEntity
             {
                 Id = relationType.Id,
                 Kind = RelationKind.Inheritance,
                 TargetType = MapType(relationType.ParentType),
                 SourceTypeId = sourceId,
-                Type = ToType(relationType)
+                NodeType = ToType(relationType)
             };
-            relation.Type.Kind = Kind.Relation;
+            relation.NodeType.Kind = Kind.Relation;
             return relation;
         }
 
-        private Type ToAttribute(OAttributeType attributeType)
+        private NodeTypeEntity ToAttribute(OAttributeType attributeType)
         {
-            Ontology.EntityFramework.Context.ScalarType MapScalarType(Ontology.ScalarType scalarType)
+            Iis.DataModel.ScalarType MapScalarType(Iis.Domain.ScalarType scalarType)
             {
                 switch (scalarType)
                 {
-                    case Ontology.ScalarType.Boolean: return Ontology.EntityFramework.Context.ScalarType.Boolean;
-                    case Ontology.ScalarType.DateTime: return Ontology.EntityFramework.Context.ScalarType.Date;
-                    case Ontology.ScalarType.Decimal: return Ontology.EntityFramework.Context.ScalarType.Decimal;
-                    case Ontology.ScalarType.File: return Ontology.EntityFramework.Context.ScalarType.File;
-                    case Ontology.ScalarType.Geo: return Ontology.EntityFramework.Context.ScalarType.Geo;
-                    case Ontology.ScalarType.Integer: return Ontology.EntityFramework.Context.ScalarType.Int;
-                    case Ontology.ScalarType.String: return Ontology.EntityFramework.Context.ScalarType.String;
+                    case Iis.Domain.ScalarType.Boolean: return Iis.DataModel.ScalarType.Boolean;
+                    case Iis.Domain.ScalarType.DateTime: return Iis.DataModel.ScalarType.Date;
+                    case Iis.Domain.ScalarType.Decimal: return Iis.DataModel.ScalarType.Decimal;
+                    case Iis.Domain.ScalarType.File: return Iis.DataModel.ScalarType.File;
+                    case Iis.Domain.ScalarType.Geo: return Iis.DataModel.ScalarType.Geo;
+                    case Iis.Domain.ScalarType.Integer: return Iis.DataModel.ScalarType.Int;
+                    case Iis.Domain.ScalarType.String: return Iis.DataModel.ScalarType.String;
                     default: throw new System.NotImplementedException();
                 }
             }
 
             var type = ToType(attributeType);
             type.Kind = Kind.Attribute;
-            var attr = new AttributeType
+            var attr = new AttributeTypeEntity
             {
                 Id = attributeType.Id,
                 ScalarType = MapScalarType(attributeType.ScalarTypeEnum)
             };
             type.AttributeType = attr;
-            attr.Type = type;
+            attr.NodeType = type;
 
             return type;
         }
 
-        private static Type ToType(OType type)
+        private static NodeTypeEntity ToType(NodeType type)
         {
-            return new Type
+            return new NodeTypeEntity
             {
                 Id = type.Id,
                 Name = type.Name,

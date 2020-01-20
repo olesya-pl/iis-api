@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using IIS.Core.Files;
 using IIS.Core.Ontology;
+using Iis.Domain;
 using Newtonsoft.Json.Linq;
-using Attribute = IIS.Core.Ontology.Attribute;
+using Attribute = Iis.Domain.Attribute;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -104,9 +105,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (embed.IsAttributeType)
             {
-                if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.File)
+                if (embed.AttributeType.ScalarTypeEnum == Iis.Domain.ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.AttributeType.ScalarTypeEnum == Core.Ontology.ScalarType.Geo)
+                else if (embed.AttributeType.ScalarTypeEnum == Iis.Domain.ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.

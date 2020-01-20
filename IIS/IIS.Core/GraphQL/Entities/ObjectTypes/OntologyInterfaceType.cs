@@ -1,6 +1,7 @@
 using System;
 using HotChocolate.Types;
-using Type = IIS.Core.Ontology.Type;
+using IIS.Core.Ontology;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
@@ -10,7 +11,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         {
         }
 
-        public static string GetName(Type type)
+        public static string GetName(NodeType type)
         {
             return OntologyObjectType.GetName(type);
         }

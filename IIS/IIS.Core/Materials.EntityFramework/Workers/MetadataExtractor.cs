@@ -4,11 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
+using Iis.Domain;
+using Iis.Domain.Materials;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using EmbeddingOptions = IIS.Core.Ontology.EmbeddingOptions;
-using Node = IIS.Core.Ontology.Node;
+using Attribute = Iis.Domain.Attribute;
+using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
+using Material = Iis.Domain.Materials.Material;
+using Node = Iis.Domain.Node;
 
 namespace IIS.Core.Materials.EntityFramework.Workers
 {
@@ -27,7 +31,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             _ontologyProvider = ontologyProvider;
         }
 
-        public async Task ExtractInfoAsync(Materials.Material material)
+        public async Task ExtractInfoAsync(Material material)
         {
             await _context.Semaphore.WaitAsync();
             try
@@ -53,11 +57,11 @@ namespace IIS.Core.Materials.EntityFramework.Workers
                 await ExtractFeatures(info);
         }
 
-        private async Task ExtractFeatures(Materials.MaterialInfo info)
+        private async Task ExtractFeatures(MaterialInfo info)
         {
             var view = info.Data.ToObject<Metadata>();
             var ontology = await _ontologyProvider.GetOntologyAsync();
-            var features = new List<Materials.MaterialFeature>();
+            var features = new List<MaterialFeature>();
             await _context.Semaphore.WaitAsync();
             try
             {
@@ -67,7 +71,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
                                ?? throw new ArgumentException($"EntityType {node.Type} does not exist");
                     // TODO: should work with any entity type. Currently works only with entities which has value
                     var relationType = type.GetProperty("value");
-                    Materials.MaterialFeature feat = ToDomain(node);
+                    MaterialFeature feat = ToDomain(node);
                     feat = await MapToNodeDirect(feat, type, relationType);
                     features.Add(feat);
                     _context.Add(ToDal(feat, info.Id));
@@ -83,13 +87,13 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         }
 
         // uses hardcoded EntityType and RelationType
-        private async Task<Materials.MaterialFeature> MapToNodeDirect(Materials.MaterialFeature feature, EntityType type, EmbeddingRelationType relationType)
+        private async Task<MaterialFeature> MapToNodeDirect(MaterialFeature feature, EntityType type, EmbeddingRelationType relationType)
         {
             var relationTypeId = relationType.Id;
             var existingRelation = await _context.Relations
                 .Include(e => e.Node)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                .Where(e => e.Node.TypeId == relationTypeId)
+                .Where(e => e.Node.NodeTypeId == relationTypeId)
                 .FirstOrDefaultAsync(e => e.TargetNode.Attribute.Value == feature.Value); // SingleOrDefault()?
             if (existingRelation == null)
                 feature.Node = await CreateEntity(feature.Value, type, relationType);
@@ -98,11 +102,11 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             return feature;
         }
 
-        private async Task<Ontology.Node> CreateEntity(string value, EntityType type, EmbeddingRelationType relationType)
+        private async Task<Node> CreateEntity(string value, EntityType type, EmbeddingRelationType relationType)
         {
             var entity = new Entity(Guid.NewGuid(), type);
-            var relation = new Ontology.Relation(Guid.NewGuid(), relationType);
-            var attribute = new Ontology.Attribute(Guid.NewGuid(), relationType.AttributeType, value);
+            var relation = new Relation(Guid.NewGuid(), relationType);
+            var attribute = new Attribute(Guid.NewGuid(), relationType.AttributeType, value);
             relation.AddNode(attribute);
             entity.AddNode(relation);
             await _ontologyService.SaveNodeAsync(entity);
@@ -111,14 +115,14 @@ namespace IIS.Core.Materials.EntityFramework.Workers
 
         // ----- Relation creation ----- //
 
-        private string GetName(Materials.MaterialFeature feat1, Materials.MaterialFeature feat2)
+        private string GetName(MaterialFeature feat1, MaterialFeature feat2)
         {
             if (feat1.Node.Type.Id == feat2.Node.Type.Id)
                 return $"{feat1.Node.Type.Name}_{feat1.Relation}_{feat2.Relation}";
             return $"{feat1.Node.Type.Name}_{feat1.Relation}_{feat2.Node.Type.Name}_{feat2.Relation}";
         }
 
-        private async Task CreateRelations(List<Materials.MaterialFeature> features)
+        private async Task CreateRelations(List<MaterialFeature> features)
         {
             foreach (var feat1 in features)
             {
@@ -135,17 +139,17 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         private async Task<EmbeddingRelationType> GetRelationType(string name, Guid sourceTypeId, Guid targetTypeId)
         {
             // todo: change direct db access
-            var ct = _context.Types.SingleOrDefault(e => e.Name == name);
+            var ct = _context.NodeTypes.SingleOrDefault(e => e.Name == name);
             if (ct != null) return new EmbeddingRelationType(ct.Id, ct.Name, EmbeddingOptions.Multiple);
             var rt = new EmbeddingRelationType(Guid.NewGuid(), name, EmbeddingOptions.Multiple);
-            var ctxType = new IIS.Core.Ontology.EntityFramework.Context.Type
+            var ctxType = new NodeTypeEntity
             {
                 Id = rt.Id, Kind = Kind.Relation, Name = name, Meta = "{}", Title = name,
             };
-            ctxType.RelationType = new Ontology.EntityFramework.Context.RelationType
+            ctxType.RelationType = new RelationTypeEntity
             {
                 Id = rt.Id, Kind = RelationKind.Embedding,
-                EmbeddingOptions = Ontology.EntityFramework.Context.EmbeddingOptions.Multiple,
+                EmbeddingOptions = Iis.DataModel.EmbeddingOptions.Multiple,
                 SourceTypeId = sourceTypeId, TargetTypeId = targetTypeId,
             };
             _context.Add(ctxType);
@@ -155,11 +159,11 @@ namespace IIS.Core.Materials.EntityFramework.Workers
 
         private async Task SaveRelation(Node node1, Node node2, EmbeddingRelationType rtype)
         {
-            var node = new IIS.Core.Ontology.EntityFramework.Context.Node
+            var node = new Iis.DataModel.NodeEntity
             {
-                Id = Guid.NewGuid(), TypeId = rtype.Id, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow,
+                Id = Guid.NewGuid(), NodeTypeId = rtype.Id, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow,
             };
-            node.Relation = new IIS.Core.Ontology.EntityFramework.Context.Relation
+            node.Relation = new RelationEntity
             {
                 Id = node.Id, SourceNodeId = node1.Id, TargetNodeId = node2.Id
             };
@@ -167,27 +171,27 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             await _context.SaveChangesAsync();
         }
 
-        public MaterialInfo ToDal(JObject metadata, Guid materialId)
+        public Iis.DataModel.Materials.MaterialInfoEntity ToDal(JObject metadata, Guid materialId)
         {
-            return new MaterialInfo
+            return new Iis.DataModel.Materials.MaterialInfoEntity
             {
                 Id = Guid.NewGuid(), Data = metadata.ToString(), MaterialId = materialId,
                 Source = nameof(MetadataExtractor), SourceType = "InnerWorker", SourceVersion = "0.0"
             };
         }
 
-        public MaterialFeature ToDal(Materials.MaterialFeature feature, Guid materialInfoId)
+        public Iis.DataModel.Materials.MaterialFeatureEntity ToDal(MaterialFeature feature, Guid materialInfoId)
         {
-            return new MaterialFeature
+            return new Iis.DataModel.Materials.MaterialFeatureEntity
             {
                 MaterialInfoId = materialInfoId, Id = feature.Id,
                 Relation = feature.Relation, Value = feature.Value, NodeId = feature.Node.Id
             };
         }
 
-        private Materials.MaterialFeature ToDomain(GraphQL.Materials.Node node)
+        private MaterialFeature ToDomain(GraphQL.Materials.Node node)
         {
-            return new Materials.MaterialFeature(Guid.NewGuid(), node.Relation, node.Value);
+            return new MaterialFeature(Guid.NewGuid(), node.Relation, node.Value);
         }
     }
 }

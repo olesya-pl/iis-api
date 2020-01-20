@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
-using OScalarType = IIS.Core.Ontology.ScalarType;
+using OScalarType = Iis.Domain.ScalarType;
 using HCScalarType = HotChocolate.Types.ScalarType;
 
 namespace IIS.Core.GraphQL.Entities

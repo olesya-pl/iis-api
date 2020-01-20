@@ -2,13 +2,14 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
+using Iis.Domain;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology {
     public class AnalyticsQueryParser {
-        private readonly Ontology _ontology;
+        private readonly OntologyModel _ontology;
 
-        public AnalyticsQueryParser(Ontology ontology) {
+        public AnalyticsQueryParser(OntologyModel ontology) {
             _ontology = ontology;
         }
 
@@ -87,7 +88,7 @@ namespace IIS.Core.Ontology {
             });
         }
 
-        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: Type
+        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: NodeType
         {
             var value = rawValue;
             var conditionsIndex = value.IndexOf('{');
@@ -158,7 +159,7 @@ namespace IIS.Core.Ontology {
 
         public class AstNode {
             public string Name;
-            public virtual Type Type { get; private set; }
+            public virtual NodeType Type { get; private set; }
             public AstNode Next;
             public AstNode Prev;
             public virtual bool IsVirtual
@@ -171,7 +172,7 @@ namespace IIS.Core.Ontology {
                 get { return GetType().Name; }
             }
 
-            public AstNode(Type type)
+            public AstNode(NodeType type)
             {
                 Type = type;
             }
@@ -205,7 +206,7 @@ namespace IIS.Core.Ontology {
                 get { return this._ast.nodeByRef(Name).NodeType; }
             }
 
-            public override Type Type
+            public override NodeType Type
             {
                 get { return this._ast.nodeByRef(Name).Type; }
             }

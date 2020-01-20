@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IIS.Core.Files;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
+using Iis.Domain.Materials;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IIS.Core.Materials.EntityFramework
@@ -27,17 +28,17 @@ namespace IIS.Core.Materials.EntityFramework
         }
 
 
-        public async Task SaveAsync(Materials.Material material)
+        public async Task SaveAsync(Material material)
         {
             await SaveAsync(material, null);
         }
 
-        public async Task SaveAsync(Materials.Material material, Guid? parentId)
+        public async Task SaveAsync(Material material, Guid? parentId)
         {
             await SaveAsync(material, parentId, null);
         }
 
-        public async Task SaveAsync(Materials.Material material, Guid? parentId, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes)
+        public async Task SaveAsync(Material material, Guid? parentId, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes)
         {
             if (material.File != null) // if material has attached file
             {
@@ -84,7 +85,7 @@ namespace IIS.Core.Materials.EntityFramework
         private Guid GetIcaoNode(string icaoValue)
         {
             var q = from n in _context.Nodes
-                    join t in _context.Types on n.TypeId equals t.Id
+                    join t in _context.NodeTypes on n.NodeTypeId equals t.Id
                     join r in _context.Relations on n.Id equals r.SourceNodeId
                     join a in _context.Attributes on r.TargetNodeId equals a.Id
                     where t.Name == "ICAOSign" && a.Value == icaoValue
@@ -108,12 +109,12 @@ namespace IIS.Core.Materials.EntityFramework
             _eventProducer.SendMaterialAddedEventAsync(materialAddedEvent);
         }
 
-        public async Task SaveAsync(Guid materialId, Materials.MaterialInfo materialInfo)
+        public async Task SaveAsync(Guid materialId, MaterialInfo materialInfo)
         {
             await _context.Semaphore.WaitAsync();
             try
             {
-                var mi = new MaterialInfo
+                var mi = new Iis.DataModel.Materials.MaterialInfoEntity
                 {
                     Id = materialInfo.Id, Data = materialInfo.Data?.ToString(), MaterialId = materialId,
                     Source = materialInfo.Source, SourceType = materialInfo.SourceType,
@@ -128,9 +129,9 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        private Material Map(Materials.Material material, Guid? parentId = null)
+        private Iis.DataModel.Materials.MaterialEntity Map(Material material, Guid? parentId = null)
         {
-            return new Material
+            return new Iis.DataModel.Materials.MaterialEntity
             {
                 Id = material.Id,
                 FileId = material.File?.Id,
@@ -142,9 +143,9 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        private MaterialInfo Map(Materials.MaterialInfo info, Guid materialId)
+        private Iis.DataModel.Materials.MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
         {
-            return new MaterialInfo
+            return new Iis.DataModel.Materials.MaterialInfoEntity
             {
                 Id = info.Id,
                 MaterialId = materialId,

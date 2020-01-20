@@ -2,6 +2,7 @@ using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.Meta;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes
 {

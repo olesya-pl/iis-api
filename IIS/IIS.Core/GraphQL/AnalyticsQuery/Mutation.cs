@@ -1,7 +1,6 @@
 using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             Validator.ValidateObject(data, new ValidationContext(data), true);
 
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
-            var query = new Core.Analytics.EntityFramework.AnalyticsQuery {
+            var query = new Iis.DataModel.Analytics.AnalyticQueryEntity {
                 Id = Guid.NewGuid(),
                 CreatorId = tokenPayload.UserId,
                 LastUpdaterId = tokenPayload.UserId,
@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             _mapInputToModel(data, query);
             _tryToAddIndicators(context, query, data.Indicators);
 
-            context.AnalyticsQuery.Add(query);
+            context.AnalyticQueries.Add(query);
             await context.SaveChangesAsync();
             return new AnalyticsQuery(query);
         }
@@ -46,7 +46,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         public async Task<AnalyticsQuery> UpdateAnalyticsQuery(IResolverContext ctx, [Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] UpdateAnalyticsQueryInput data)
         {
             Validator.ValidateObject(data, new ValidationContext(data), true);
-            var query = await context.AnalyticsQuery.FindAsync(id);
+            var query = await context.AnalyticQueries.FindAsync(id);
             if (query == null)
                 throw new InvalidOperationException($"Cannot find analytics query with id = {id}");
 
@@ -59,7 +59,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             return new AnalyticsQuery(query);
         }
 
-        private void _mapInputToModel(AnalyticsQueryInput data, Core.Analytics.EntityFramework.AnalyticsQuery query)
+        private void _mapInputToModel(AnalyticsQueryInput data, Iis.DataModel.Analytics.AnalyticQueryEntity query)
         {
             query.UpdatedAt = DateTime.UtcNow;
 
@@ -100,13 +100,13 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             }
         }
 
-        private void _addAnalyticsDateRange(IEnumerable<CreateAnalyticsQueryDateRangeInput> dateRanges, Core.Analytics.EntityFramework.AnalyticsQuery query)
+        private void _addAnalyticsDateRange(IEnumerable<CreateAnalyticsQueryDateRangeInput> dateRanges, Iis.DataModel.Analytics.AnalyticQueryEntity query)
         {
             if (dateRanges == null)
                 return;
 
             var lastId = query.DateRanges.Any() ? query.DateRanges.Last().Id : 0;
-            var analyticsDateRanges = dateRanges.Select(range => new Core.Analytics.EntityFramework.AnalyticsQuery.DateRange
+            var analyticsDateRanges = dateRanges.Select(range => new Iis.DataModel.Analytics.AnalyticQueryEntity.DateRange
             {
                 Id = ++lastId,
                 StartDate = range.StartDate,
@@ -116,7 +116,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             query.DateRanges.AddRange(analyticsDateRanges);
         }
 
-        private void _tryToAddIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query,  IEnumerable<CreateAnalyticsQueryIndicatorInput> indicators)
+        private void _tryToAddIndicators(OntologyContext ctx, Iis.DataModel.Analytics.AnalyticQueryEntity query,  IEnumerable<CreateAnalyticsQueryIndicatorInput> indicators)
         {
             if (indicators == null)
             {
@@ -130,7 +130,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         {
             foreach (var input in indicators)
             {
-                ctx.AnalyticsQueryIndicators.Add(new Core.Analytics.EntityFramework.AnalyticsQueryIndicator
+                ctx.AnalyticQueryIndicators.Add(new Iis.DataModel.Analytics.AnalyticQueryIndicatorEntity
                 {
                     IndicatorId = input.IndicatorId,
                     QueryId = queryId,
@@ -140,7 +140,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             }
         }
 
-        private async Task _tryToToggleIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query, AnalyticsQueryIndicatorsInput patch)
+        private async Task _tryToToggleIndicators(OntologyContext ctx, Iis.DataModel.Analytics.AnalyticQueryEntity query, AnalyticsQueryIndicatorsInput patch)
         {
             if (patch == null)
                 return;
@@ -150,17 +150,17 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
             if (patch.Delete != null && patch.Delete.Any())
             {
-                ctx.AnalyticsQueryIndicators.RemoveRange(ctx.AnalyticsQueryIndicators.Where(i => patch.Delete.Contains(i.Id)));
+                ctx.AnalyticQueryIndicators.RemoveRange(ctx.AnalyticQueryIndicators.Where(i => patch.Delete.Contains(i.Id)));
             }
         }
 
-        private async Task _tryToUpdateIndicators(OntologyContext ctx, Core.Analytics.EntityFramework.AnalyticsQuery query, IEnumerable<UpdateAnalyticsQueryIndicatorInput> indicatorsInput)
+        private async Task _tryToUpdateIndicators(OntologyContext ctx, Iis.DataModel.Analytics.AnalyticQueryEntity query, IEnumerable<UpdateAnalyticsQueryIndicatorInput> indicatorsInput)
         {
             if (indicatorsInput == null)
                 return;
 
             var ids = indicatorsInput.Select(i => i.Id);
-            var analyticsQueries = await ctx.AnalyticsQueryIndicators
+            var analyticsQueries = await ctx.AnalyticQueryIndicators
                 .Where(q => ids.Contains(q.Id))
                 .ToDictionaryAsync(q => q.Id);
 
@@ -178,10 +178,10 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public async Task<AnalyticsQuery> DeleteAnalyticsQuery([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var query = await context.AnalyticsQuery.FindAsync(id);
+            var query = await context.AnalyticQueries.FindAsync(id);
             if (query == null)
                 throw new InvalidOperationException($"Analytics query with id = {id} not found");
-            context.AnalyticsQuery.Remove(query);
+            context.AnalyticQueries.Remove(query);
             await context.SaveChangesAsync();
 
             return new AnalyticsQuery(query);

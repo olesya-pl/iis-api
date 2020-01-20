@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
-using IIS.Core.Ontology.EntityFramework.Context;
+using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
@@ -13,7 +13,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
     {
         public async Task<AnalyticsQuery> GetAnalyticsQuery([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var query = await context.AnalyticsQuery
+            var query = await context.AnalyticQueries
                 .SingleOrDefaultAsync(q => q.Id == id);
 
             if (query == null)
@@ -24,11 +24,11 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
 
         public async Task<GraphQLCollection<AnalyticsQuery>> GetAnalyticsQueryList([Service] OntologyContext context, [GraphQLNonNullType] PaginationInput pagination)
         {
-            var queries = context.AnalyticsQuery
+            var queries = context.AnalyticQueries
                 .GetPage(pagination)
                 .Select(q => new AnalyticsQuery(q));
 
-            return new GraphQLCollection<AnalyticsQuery>(await queries.ToListAsync(), await context.AnalyticsQuery.CountAsync());
+            return new GraphQLCollection<AnalyticsQuery>(await queries.ToListAsync(), await context.AnalyticQueries.CountAsync());
         }
     }
 }

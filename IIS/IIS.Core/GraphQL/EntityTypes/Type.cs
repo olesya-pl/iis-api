@@ -5,20 +5,20 @@ using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.Ontology;
-using Type = IIS.Core.Ontology.Type;
+using Iis.Domain;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
-    public class EntityTypeCollection : Collection<Type, EntityType>
+    public class EntityTypeCollection : Collection<NodeType, EntityType>
     {
-        private Ontology.Ontology _ontology { get; }
+        private OntologyModel _ontology { get; }
 
-        public EntityTypeCollection(IEnumerable<Type> source, Ontology.Ontology ontology) : base(source)
+        public EntityTypeCollection(IEnumerable<NodeType> source, OntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
 
-        protected override EntityType Select(Type arg)
+        protected override EntityType Select(NodeType arg)
         {
             return new EntityType(arg, _ontology);
         }
@@ -26,15 +26,15 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityType
     {
-        public EntityType(Type source, Ontology.Ontology ontology)
+        public EntityType(NodeType source, OntologyModel ontology)
         {
             Source = source;
             _ontology = ontology;
         }
 
-        protected Type Source { get; }
+        protected NodeType Source { get; }
 
-        private Ontology.Ontology _ontology { get; }
+        private OntologyModel _ontology { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -43,7 +43,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] public string Code => Source.Name;
 
-        public bool IsAbstract => Source is Core.Ontology.EntityType et && et.IsAbstract; // todo
+        public bool IsAbstract => Source is Iis.Domain.EntityType et && et.IsAbstract; // todo
 
         [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
         public EntityType Parent =>

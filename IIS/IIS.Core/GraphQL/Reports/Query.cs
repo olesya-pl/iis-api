@@ -1,11 +1,11 @@
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
-using IIS.Core.Ontology.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Iis.DataModel;
 
 namespace IIS.Core.GraphQL.Reports
 {
