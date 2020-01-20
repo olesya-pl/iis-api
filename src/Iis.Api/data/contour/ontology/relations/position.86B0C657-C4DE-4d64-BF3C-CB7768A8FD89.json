@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "86B0C657-C4DE-4d64-BF3C-CB7768A8FD89",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 320
+    },
+    "name": "position",
+    "target": "Position",
+    "title": "Посада, яку обіймав"
+}

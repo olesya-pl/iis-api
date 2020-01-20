@@ -8,6 +8,6 @@
     },
     "name": "value",
     "target": "value",
-    "title": "Значення",
+    "title": "Номер",
     "type": "String"
 }

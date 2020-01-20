@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "0C2B882B-B827-4f9f-B6BB-B477FE5AEC10",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 156
+    },
+    "name": "authorityOrganizationCode",
+    "target": "authorityOrganizationCode",
+    "title": "Код підрозділу"
+}

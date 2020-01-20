@@ -3,7 +3,7 @@
     "id": "DD4CCB44-98D0-442f-BF65-53879CB051D2",
     "meta": {
         "multiple": false,
-        "sortOrder": 104
+        "sortOrder": 246
     },
     "name": "subtype",
     "target": "MachinerySubtype",

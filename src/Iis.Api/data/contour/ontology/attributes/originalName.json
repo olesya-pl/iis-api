@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "b8624d1f-aba8-43a4-88b8-47e83fdc5b64",
+    "meta": {
+    },
+    "name": "originalName",
+    "target": "originalName",
+    "title": "мовою оригіналу",
+    "type": "String"
+}

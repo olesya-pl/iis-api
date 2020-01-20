@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "F338EDFC-E5DC-4507-B0F4-5438DDBD1882",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 26
+    },
+    "name": "otherDocuments",
+    "target": "OtherDocument",
+    "title": "Інші документи"
+}

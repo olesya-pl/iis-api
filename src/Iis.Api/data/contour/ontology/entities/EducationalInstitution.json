@@ -1,0 +1,34 @@
+{
+    "attributes": [
+        {
+            "id": "3171DC39-19E3-4e08-BF34-A047E7391A1C",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 312
+            },
+            "name": "educationType",
+            "target": "EducationLevel",
+            "title": "тип освіти"
+        },
+        {
+            "id": "AC60EADB-02E2-4311-BC68-A65D2F173610",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 313
+            },
+            "name": "grade",
+            "target": "Grade",
+            "title": "кваліфікація"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "Organization"
+    ],
+    "id": "E3A67539-642F-41aa-9CE0-3DA1BA069B15",
+    "meta": {
+        "sortOrder": 314
+    },
+    "name": "EducationalInstitution",
+    "title": "Навчальний заклад"
+}

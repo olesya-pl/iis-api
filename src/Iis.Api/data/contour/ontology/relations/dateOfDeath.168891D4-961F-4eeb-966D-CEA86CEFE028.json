@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "168891D4-961F-4eeb-966D-CEA86CEFE028",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 13
+    },
+    "name": "dateOfDeath",
+    "target": "FuzzyDate",
+    "title": "Дата смерті"
+}

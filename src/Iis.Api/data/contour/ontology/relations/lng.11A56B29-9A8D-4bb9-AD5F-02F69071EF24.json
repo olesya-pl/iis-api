@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "11A56B29-9A8D-4bb9-AD5F-02F69071EF24",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 197
+    },
+    "name": "lng",
+    "target": "lng",
+    "title": ""
+}

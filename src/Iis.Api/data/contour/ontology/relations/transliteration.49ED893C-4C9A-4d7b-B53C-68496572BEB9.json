@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "49ED893C-4C9A-4d7b-B53C-68496572BEB9",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 118
+    },
+    "name": "transliteration",
+    "target": "transliteration",
+    "title": "транслітерація"
+}

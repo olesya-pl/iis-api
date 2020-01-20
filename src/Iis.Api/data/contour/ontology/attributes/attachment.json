@@ -5,6 +5,6 @@
     },
     "name": "attachment",
     "target": "attachment",
-    "title": "Прикріплений файл",
+    "title": "Додані файли",
     "type": "File"
 }

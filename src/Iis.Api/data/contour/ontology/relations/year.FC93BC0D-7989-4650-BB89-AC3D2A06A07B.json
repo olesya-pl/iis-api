@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "FC93BC0D-7989-4650-BB89-AC3D2A06A07B",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 72
+    },
+    "name": "year",
+    "target": "year",
+    "title": "рік"
+}

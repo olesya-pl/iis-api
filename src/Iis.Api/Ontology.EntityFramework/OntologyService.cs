@@ -39,7 +39,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     CreatedAt = source.CreatedAt,
                     UpdatedAt = source.UpdatedAt
                 };
-                _context.Add(existing);
+                _context.Nodes.Add(existing);
             }
 
             foreach (EmbeddingRelationType relationType in source.Type.AllProperties)

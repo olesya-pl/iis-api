@@ -1,0 +1,13 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Rank",
+        "Enum"
+    ],
+    "id": "30B87255-41E1-40c3-A369-AD64FB0F1508",
+    "meta": {
+        "sortOrder": 103
+    },
+    "name": "PositionRank",
+    "title": "Військове звання"
+}

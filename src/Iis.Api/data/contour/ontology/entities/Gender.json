@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "EC073019-470F-46bb-8DD8-771E88E4F1D0",
+    "meta": {
+        "sortOrder": 316
+    },
+    "name": "Gender",
+    "title": "Стать"
+}

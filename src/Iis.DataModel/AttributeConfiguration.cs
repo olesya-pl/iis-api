@@ -10,10 +10,6 @@ namespace Iis.DataModel
             builder
                 .Property(p => p.Id)
                 .ValueGeneratedNever();
-            //builder.HasOne(p => p.Node)
-            //    .WithOne(p => p.Attribute)
-            //    .HasForeignKey<AttributeEntity>(p => p.Id)
-            //    ;
         }
     }
 }

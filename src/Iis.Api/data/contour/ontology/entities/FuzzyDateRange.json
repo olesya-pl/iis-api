@@ -1,0 +1,31 @@
+{
+    "attributes": [
+        {
+            "id": "9A3F61B7-F221-43a9-BCF3-40239BDD5E39",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 215
+            },
+            "name": "start",
+            "target": "FuzzyDate",
+            "title": "початок"
+        },
+        {
+            "id": "48F75A31-3B1E-46c6-A757-1DEB92DE08D1",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 216
+            },
+            "name": "end",
+            "target": "FuzzyDate",
+            "title": "завершення"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "93794C80-56EE-4de7-AA2A-B4BDDF18B891",
+    "meta": {
+        "sortOrder": 217
+    },
+    "name": "FuzzyDateRange",
+    "title": "Неповний діапазон дат"
+}

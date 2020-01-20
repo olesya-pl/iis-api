@@ -1,0 +1,73 @@
+{
+    "attributes": [
+        {
+            "id": "12E6E834-692B-4ec2-9537-B353B70FB339",
+            "meta": {
+                "formField": {
+                    "type": "form"
+                },
+                "multiple": false,
+                "sortOrder": 282
+            },
+            "name": "date",
+            "target": "FuzzyDate",
+            "title": "Дата нагородження"
+        },
+        {
+            "id": "BFFE2201-4DC5-4f2b-A6B8-10F613D20251",
+            "meta": {
+                "formField": {
+                    "type": "form"
+                },
+                "multiple": false,
+                "sortOrder": 283
+            },
+            "name": "type",
+            "target": "TypeOfAward",
+            "title": "Вид нагороди"
+        },
+        {
+            "id": "9A093127-C5BE-4e82-A6CB-C34D7B540AFD",
+            "meta": {
+                "formField": {
+                    "type": "form"
+                },
+                "multiple": false,
+                "sortOrder": 284
+            },
+            "name": "reason",
+            "target": "TaggableString",
+            "title": "За що надано"
+        },
+        {
+            "id": "8F3D4CBE-52F5-47a6-A787-3C4478D247E2",
+            "meta": {
+                "formField": {
+                    "type": "form"
+                },
+                "multiple": false,
+                "sortOrder": 285
+            },
+            "name": "who",
+            "target": "TaggableString",
+            "title": "Ким надано"
+        },
+        {
+            "id": "E56538B0-25F3-4f1e-9ED7-94FA3FE391C0",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 286
+            },
+            "name": "file",
+            "target": "file",
+            "title": "Додані файли"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "C69245E1-BC26-49be-A17C-C8B2D8FCFD5B",
+    "meta": {
+        "sortOrder": 287
+    },
+    "name": "Award",
+    "title": "Нагородження"
+}

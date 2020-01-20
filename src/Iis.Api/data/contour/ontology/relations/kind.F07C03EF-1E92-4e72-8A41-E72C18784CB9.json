@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "F07C03EF-1E92-4e72-8A41-E72C18784CB9",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 218
+    },
+    "name": "kind",
+    "target": "ForeignPassportType",
+    "title": "Тип"
+}

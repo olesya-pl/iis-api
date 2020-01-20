@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "97243AA3-5A4B-4094-AAF7-8512E6F7F2FA",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 23
+    },
+    "name": "passportData",
+    "target": "Passport",
+    "title": "Внутрішній паспорт"
+}

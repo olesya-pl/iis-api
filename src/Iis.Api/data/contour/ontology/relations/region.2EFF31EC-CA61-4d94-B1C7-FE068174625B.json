@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "2EFF31EC-CA61-4d94-B1C7-FE068174625B",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 198
+    },
+    "name": "region",
+    "target": "region",
+    "title": ""
+}

@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "474997D1-84A3-4252-9C2F-BFB0955DDFC9",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 43
+    },
+    "name": "warOperationParticipation",
+    "target": "WarOperationParticipation",
+    "title": "Участь у бойових діях/миротворчих операціях"
+}

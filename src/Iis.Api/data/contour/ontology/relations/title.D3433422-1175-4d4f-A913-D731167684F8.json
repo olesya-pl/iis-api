@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D3433422-1175-4d4f-A913-D731167684F8",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 5
+    },
+    "name": "title",
+    "target": "title",
+    "title": "Повна назва"
+}

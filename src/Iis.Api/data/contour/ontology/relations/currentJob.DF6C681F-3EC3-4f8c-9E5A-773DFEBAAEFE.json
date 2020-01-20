@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "DF6C681F-3EC3-4f8c-9E5A-773DFEBAAEFE",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 30
+    },
+    "name": "currentJob",
+    "target": "WorkPlace",
+    "title": "Поточне місце військової служби/роботи"
+}

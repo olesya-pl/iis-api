@@ -5,6 +5,6 @@
     },
     "name": "location",
     "target": "location",
-    "title": "Географічні координати",
+    "title": "Координати",
     "type": "Geo"
 }

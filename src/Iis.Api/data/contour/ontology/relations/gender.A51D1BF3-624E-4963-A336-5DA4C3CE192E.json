@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "A51D1BF3-624E-4963-A336-5DA4C3CE192E",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 15
+    },
+    "name": "gender",
+    "target": "Gender",
+    "title": "стать"
+}

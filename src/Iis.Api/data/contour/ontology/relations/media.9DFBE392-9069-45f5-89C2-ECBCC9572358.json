@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "9DFBE392-9069-45f5-89C2-ECBCC9572358",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 127
+    },
+    "name": "media",
+    "target": "media",
+    "title": "Додані файли"
+}

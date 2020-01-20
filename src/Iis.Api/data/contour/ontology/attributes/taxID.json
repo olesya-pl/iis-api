@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "544d002f-9468-4f1c-ac75-78d47174462c",
+    "meta": {
+    },
+    "name": "taxID",
+    "target": "taxID",
+    "title": "Ідентифікаційний код",
+    "type": "String"
+}

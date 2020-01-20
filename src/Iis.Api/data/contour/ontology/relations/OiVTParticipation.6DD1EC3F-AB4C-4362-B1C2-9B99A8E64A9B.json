@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "6DD1EC3F-AB4C-4362-B1C2-9B99A8E64A9B",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 34
+    },
+    "name": "OiVTParticipation",
+    "target": "TaggableString",
+    "title": "Участь у розробці ОіВТ"
+}

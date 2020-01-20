@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "42764503-85FD-4602-9F34-6655A258F947",
+    "meta": {
+        "formField": {
+            "icon": "flag",
+            "type": "dropdown"
+        },
+        "multiple": false,
+        "sortOrder": 202
+    },
+    "name": "country",
+    "target": "Country",
+    "title": "Країна"
+}

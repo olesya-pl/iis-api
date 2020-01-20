@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "91c3730a-3b12-482a-b41b-c2a063edee7a",
+    "meta": {
+    },
+    "name": "lng",
+    "target": "lng",
+    "title": "",
+    "type": "String"
+}

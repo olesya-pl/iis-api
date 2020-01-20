@@ -7,7 +7,7 @@
             "type": "dropdownTree"
         },
         "multiple": false,
-        "sortOrder": 21
+        "sortOrder": 87
     },
     "name": "component",
     "target": "EventComponent",

@@ -4,7 +4,7 @@
             "id": "D026F987-4180-4891-A9E7-C618F21FC25B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 71
+                "sortOrder": 173
             },
             "name": "code",
             "target": "code",
@@ -18,7 +18,7 @@
     "id": "66010851-436A-4bc6-8194-3E3A38B4524C",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 72
+        "sortOrder": 174
     },
     "name": "ObjectImportance",
     "title": "Важливість Об'єкта Розвідки"

@@ -5,7 +5,7 @@
             "meta": {
                 "format": "phone",
                 "multiple": false,
-                "sortOrder": 85,
+                "sortOrder": 212,
                 "validation": {
                     "required": true
                 }
@@ -21,7 +21,8 @@
     ],
     "id": "89677A4C-DAB9-4858-AE99-2F6B68815B1D",
     "meta": {
-        "sortOrder": 86
+        "exposeOnApi": false,
+        "sortOrder": 213
     },
     "name": "PhoneSign",
     "title": "Tелефон"

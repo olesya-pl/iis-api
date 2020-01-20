@@ -5,7 +5,7 @@
             "id": "80D1468A-C735-4ee6-93CA-283F66211DB5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 121
+                "sortOrder": 263
             },
             "name": "name",
             "target": "name",
@@ -15,7 +15,7 @@
             "id": "4BDF4441-84A1-4a1b-94D7-F7BA21274C38",
             "meta": {
                 "multiple": false,
-                "sortOrder": 122
+                "sortOrder": 264
             },
             "name": "sortOrder",
             "target": "sortOrder",
@@ -25,7 +25,7 @@
     "conceptType": "entities",
     "id": "A6BFF9B2-3275-4e96-AA0B-60D444C74238",
     "meta": {
-        "sortOrder": 123
+        "sortOrder": 265
     },
     "name": "Enum",
     "title": "Список"

@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "4B726B9C-B7CD-46dd-96DE-564C5D92232B",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 52
+    },
+    "name": "contacts",
+    "target": "ObjectSign",
+    "title": "Контакти особи"
+}

@@ -1,0 +1,51 @@
+{
+    "attributes": [
+        {
+            "id": "A596B06D-4DEE-45f6-AC21-6870432A98C3",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 294
+            },
+            "name": "organization",
+            "target": "Organization",
+            "title": "організація"
+        },
+        {
+            "id": "5AAB4BFE-A41D-4938-9634-0AFD162712CB",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 295
+            },
+            "name": "period",
+            "target": "period",
+            "title": "часовий прогміжок"
+        },
+        {
+            "id": "9C26B203-EA5A-4744-88E7-1C890F30646C",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 296
+            },
+            "name": "description",
+            "target": "description",
+            "title": "примітка"
+        },
+        {
+            "id": "15FE316A-F6E4-4b01-9D11-54EBE0322B4F",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 297
+            },
+            "name": "position",
+            "target": "Position",
+            "title": "посада"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "CCC418D8-40D7-4c3d-9D34-7B8BC6201DA7",
+    "meta": {
+        "sortOrder": 298
+    },
+    "name": "OrgParticipation",
+    "title": "Відношення до організації"
+}

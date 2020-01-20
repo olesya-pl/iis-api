@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "2E6B5A50-283E-4ab0-A7E5-66AB8A22C664",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 205
+    },
+    "name": "subregion",
+    "target": "subregion",
+    "title": "Район"
+}

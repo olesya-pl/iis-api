@@ -1,0 +1,51 @@
+{
+    "attributes": [
+        {
+            "id": "F586ACE2-B5A7-4012-86B6-3F69750BCB16",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 323
+            },
+            "name": "number",
+            "target": "number",
+            "title": "Номер"
+        },
+        {
+            "id": "DB0510C9-E28C-4168-957B-95FAB0E8DA09",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 324
+            },
+            "name": "date",
+            "target": "date",
+            "title": "Дата"
+        },
+        {
+            "id": "82843C30-BBF5-48d3-A619-4BFB4C5DF524",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 325
+            },
+            "name": "orderPublisher",
+            "target": "Position",
+            "title": "Чий наказ"
+        },
+        {
+            "id": "24BFCF85-60A0-4060-B1A6-5CED90CCF69B",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 326
+            },
+            "name": "scan",
+            "target": "scan",
+            "title": "Скан документа"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "F2C66C04-6EFA-4992-8ED2-BD0AC3964EFF",
+    "meta": {
+        "sortOrder": 327
+    },
+    "name": "Order",
+    "title": "Наказ"
+}

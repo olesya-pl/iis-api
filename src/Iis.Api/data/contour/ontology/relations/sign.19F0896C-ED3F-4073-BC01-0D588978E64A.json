@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 3
+        "sortOrder": 59
     },
     "name": "sign",
     "target": "ObjectSign",

@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "09D2587C-534E-4b74-9BF2-8EC540D40A7F",
+    "meta": {
+        "sortOrder": 7
+    },
+    "name": "PersonType",
+    "title": ""
+}

@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "b558096e-341b-449c-96de-6b4a70bda60b",
+    "meta": {
+    },
+    "name": "number",
+    "target": "number",
+    "title": "Номер",
+    "type": "String"
+}

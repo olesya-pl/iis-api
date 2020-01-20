@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "365D00B7-DD31-4344-93C9-712723AB8CD4",
+    "meta": {
+        "sortOrder": 108
+    },
+    "name": "MartialStatus",
+    "title": "Сімейний стан"
+}

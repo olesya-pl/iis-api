@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "71edea5f-c3a4-4f09-b20d-6784e3004785",
+    "meta": {
+    },
+    "name": "ukraineName",
+    "target": "ukraineName",
+    "title": "українською",
+    "type": "String"
+}

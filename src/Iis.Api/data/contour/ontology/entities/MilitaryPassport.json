@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "CredPersonDocument"
+    ],
+    "id": "5FFD6CCD-0F5C-4b3c-9219-FB37F9C1D479",
+    "meta": {
+        "sortOrder": 164
+    },
+    "name": "MilitaryPassport",
+    "title": "Военный билет"
+}

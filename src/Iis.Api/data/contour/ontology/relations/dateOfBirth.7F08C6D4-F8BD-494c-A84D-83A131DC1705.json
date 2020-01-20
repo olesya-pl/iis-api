@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "7F08C6D4-F8BD-494c-A84D-83A131DC1705",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 12
+    },
+    "name": "dateOfBirth",
+    "target": "FuzzyDate",
+    "title": "дата народження"
+}

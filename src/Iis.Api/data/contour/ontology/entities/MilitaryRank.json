@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "44440195-F0DD-47e3-A57B-F862BA0E04CF",
+    "meta": {
+        "sortOrder": 129
+    },
+    "name": "MilitaryRank",
+    "title": "Військове звання (войсковое)"
+}

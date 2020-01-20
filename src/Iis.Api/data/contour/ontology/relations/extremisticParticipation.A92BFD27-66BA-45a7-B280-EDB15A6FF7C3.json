@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "A92BFD27-66BA-45a7-B280-EDB15A6FF7C3",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 35
+    },
+    "name": "extremisticParticipation",
+    "target": "OrgParticipation",
+    "title": "Причетність до терористичних, екстремістських або злочинних організацій"
+}

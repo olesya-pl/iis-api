@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "6DC1C4B4-3042-45f1-8CFD-078422529683",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 22
+    },
+    "name": "actualAccommodation",
+    "target": "UniversalLocation",
+    "title": "Місце фактичного проживання"
+}

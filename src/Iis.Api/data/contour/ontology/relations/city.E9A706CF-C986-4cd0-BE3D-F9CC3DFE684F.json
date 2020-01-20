@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "E9A706CF-C986-4cd0-BE3D-F9CC3DFE684F",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 206
+    },
+    "name": "city",
+    "target": "city",
+    "title": "Населений пункт"
+}

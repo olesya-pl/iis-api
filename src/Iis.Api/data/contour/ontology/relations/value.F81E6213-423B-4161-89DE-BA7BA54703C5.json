@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "F81E6213-423B-4161-89DE-BA7BA54703C5",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 116
+    },
+    "name": "value",
+    "target": "value",
+    "title": ""
+}

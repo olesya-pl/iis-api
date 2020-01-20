@@ -1,0 +1,41 @@
+{
+    "attributes": [
+        {
+            "id": "B8A72F1D-FE77-434c-9723-4114F3952EB5",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 318
+            },
+            "name": "period",
+            "target": "FuzzyDateRange",
+            "title": "Період"
+        },
+        {
+            "id": "4590578D-91F8-46e9-BBCC-DC38DA9E0A16",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 319
+            },
+            "name": "nameOfMission",
+            "target": "TaggableString",
+            "title": "Назва місії/контингенту"
+        },
+        {
+            "id": "86B0C657-C4DE-4d64-BF3C-CB7768A8FD89",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 320
+            },
+            "name": "position",
+            "target": "Position",
+            "title": "Посада, яку обіймав"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "F0CD7885-19BD-46a5-8EAE-96E4200D8B22",
+    "meta": {
+        "sortOrder": 321
+    },
+    "name": "WarOperationParticipation",
+    "title": "Участь у бойових діях"
+}

@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "48F75A31-3B1E-46c6-A757-1DEB92DE08D1",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 216
+    },
+    "name": "end",
+    "target": "FuzzyDate",
+    "title": "завершення"
+}

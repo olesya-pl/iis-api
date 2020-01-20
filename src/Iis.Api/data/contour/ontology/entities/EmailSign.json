@@ -5,7 +5,7 @@
             "meta": {
                 "format": "email",
                 "multiple": false,
-                "sortOrder": 55,
+                "sortOrder": 147,
                 "validation": {
                     "email": true,
                     "required": true
@@ -23,7 +23,7 @@
     "id": "4AC6E86C-671F-4a02-A28F-7D32E3483DA7",
     "meta": {
         "exposeOnApi": false,
-        "sortOrder": 56
+        "sortOrder": 148
     },
     "name": "EmailSign",
     "title": "Електронна скринька"

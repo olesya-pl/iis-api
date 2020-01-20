@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "523C7159-127D-497e-8CE5-0F6F34B0D2AA",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 121
+    },
+    "name": "educationalInstitution",
+    "target": "EducationalInstitution",
+    "title": "навчальний заклад"
+}

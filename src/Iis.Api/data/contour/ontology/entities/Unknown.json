@@ -4,7 +4,7 @@
             "id": "3CDF0248-1662-4d4d-AF89-4DD110E6755D",
             "meta": {
                 "multiple": false,
-                "sortOrder": 60
+                "sortOrder": 153
             },
             "name": "name",
             "target": "name",
@@ -17,7 +17,7 @@
     ],
     "id": "4E58E0DC-2C99-489d-B9EA-D88133C7E893",
     "meta": {
-        "sortOrder": 61
+        "sortOrder": 154
     },
     "name": "Unknown",
     "title": "Невизначений"

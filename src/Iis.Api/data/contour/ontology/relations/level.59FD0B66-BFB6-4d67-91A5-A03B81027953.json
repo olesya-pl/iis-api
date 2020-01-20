@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "59FD0B66-BFB6-4d67-91A5-A03B81027953",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 112
+    },
+    "name": "level",
+    "target": "level",
+    "title": "рівень володіння"
+}

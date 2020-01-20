@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "36CBF986-3AB5-4d64-985D-45A6F2C37156",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 220
+    },
+    "name": "date",
+    "target": "FuzzyDate",
+    "title": "Дата накладення"
+}

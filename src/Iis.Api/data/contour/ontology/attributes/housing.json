@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "30947df0-8c93-469f-9f5c-02e8edda48f0",
+    "meta": {
+    },
+    "name": "housing",
+    "target": "housing",
+    "title": "Корпус",
+    "type": "String"
+}

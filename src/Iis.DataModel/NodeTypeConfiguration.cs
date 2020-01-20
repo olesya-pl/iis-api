@@ -8,6 +8,10 @@ namespace Iis.DataModel
         public void Configure(EntityTypeBuilder<NodeTypeEntity> builder)
         {
             builder
+                .Property(p => p.Id)
+                .ValueGeneratedNever();
+
+            builder
                 .HasOne(p => p.AttributeType)
                 .WithOne(p => p.NodeType)
                 .HasForeignKey<AttributeTypeEntity>(p => p.Id);
@@ -24,11 +28,6 @@ namespace Iis.DataModel
                 .HasMany(e => e.OutgoingRelations)
                 .WithOne(e => e.SourceType)
                 .HasForeignKey(e => e.SourceTypeId);
-
-            //builder
-            //    .HasMany(e => e.Nodes)
-            //    .WithOne(e => e.NodeType)
-            //    .HasForeignKey(e => e.NodeTypeId);
         }
     }
 }

@@ -1,0 +1,16 @@
+{
+    "conceptType": "relations",
+    "id": "E120FC35-AD5F-407c-BF88-A46A14082A65",
+    "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
+        "multiple": true,
+        "sortOrder": 18
+    },
+    "name": "nicknameSign",
+    "target": "NicknameSign",
+    "title": "позивний"
+}

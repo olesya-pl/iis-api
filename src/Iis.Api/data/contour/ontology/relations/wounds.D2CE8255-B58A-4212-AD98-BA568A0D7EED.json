@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D2CE8255-B58A-4212-AD98-BA568A0D7EED",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 45
+    },
+    "name": "wounds",
+    "target": "BattleWound",
+    "title": "Поранення і контузії"
+}

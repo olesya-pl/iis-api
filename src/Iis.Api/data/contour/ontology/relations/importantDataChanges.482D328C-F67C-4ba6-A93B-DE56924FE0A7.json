@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "482D328C-F67C-4ba6-A93B-DE56924FE0A7",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 11
+    },
+    "name": "importantDataChanges",
+    "target": "importantDataChanges",
+    "title": "Зміни установчих даних"
+}

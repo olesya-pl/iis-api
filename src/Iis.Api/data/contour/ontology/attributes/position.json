@@ -6,6 +6,6 @@
     },
     "name": "position",
     "target": "position",
-    "title": "Посада",
+    "title": "Назва посади",
     "type": "String"
 }

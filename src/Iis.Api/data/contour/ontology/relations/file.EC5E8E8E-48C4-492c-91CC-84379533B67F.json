@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "EC5E8E8E-48C4-492c-91CC-84379533B67F",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 97
+    },
+    "name": "file",
+    "target": "file",
+    "title": "Скан документа"
+}

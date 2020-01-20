@@ -5,7 +5,7 @@
             "id": "FB2915A9-2098-48f2-8FE8-AC2AF040B3E5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 152,
+                "sortOrder": 307,
                 "validation": {
                     "required": true
                 }
@@ -18,7 +18,7 @@
     "conceptType": "entities",
     "id": "DEEA2382-A1FB-4478-B2C7-763C470FEDE8",
     "meta": {
-        "sortOrder": 153
+        "sortOrder": 308
     },
     "name": "ObjectSign",
     "title": "Ознака об'єкту розвідки"

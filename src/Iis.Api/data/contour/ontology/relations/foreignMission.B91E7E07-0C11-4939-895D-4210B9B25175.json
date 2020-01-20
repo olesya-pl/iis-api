@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "B91E7E07-0C11-4939-895D-4210B9B25175",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 46
+    },
+    "name": "foreignMission",
+    "target": "ForeignMission",
+    "title": "Закордонні відрядження"
+}

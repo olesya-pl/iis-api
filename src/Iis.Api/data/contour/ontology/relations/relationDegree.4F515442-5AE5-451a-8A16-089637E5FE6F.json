@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "4F515442-5AE5-451a-8A16-089637E5FE6F",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 1
+    },
+    "name": "relationDegree",
+    "target": "RelationDegree",
+    "title": "Ступінь споріднення"
+}

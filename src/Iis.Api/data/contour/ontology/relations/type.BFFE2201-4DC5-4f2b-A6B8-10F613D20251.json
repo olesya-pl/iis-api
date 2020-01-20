@@ -1,0 +1,14 @@
+{
+    "conceptType": "relations",
+    "id": "BFFE2201-4DC5-4f2b-A6B8-10F613D20251",
+    "meta": {
+        "formField": {
+            "type": "form"
+        },
+        "multiple": false,
+        "sortOrder": 283
+    },
+    "name": "type",
+    "target": "TypeOfAward",
+    "title": "Вид нагороди"
+}
