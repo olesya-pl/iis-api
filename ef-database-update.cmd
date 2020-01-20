@@ -1,7 +1,7 @@
 @echo OFF
-CD .\IIS
+CD .\src
 SET DbPassword=
 
 echo ON
-dotnet ef database update --startup-project IIS.Core --project Iis.DataModel --context Iis.DataModel.OntologyContext
+dotnet ef database update --startup-project Iis.Api --project Iis.DataModel --context Iis.DataModel.OntologyContext
 PAUSE
