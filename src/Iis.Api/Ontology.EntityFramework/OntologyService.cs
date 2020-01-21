@@ -65,6 +65,56 @@ namespace IIS.Core.Ontology.EntityFramework
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task SaveNodesAsync(IEnumerable<Node> nodes, CancellationToken cancellationToken = default)
+        {
+            IQueryable<NodeEntity> query =
+                from node in _context.Nodes
+                    .Include(x => x.Relation)
+                    .Include(x => x.Attribute)
+                    .Include(x => x.OutgoingRelations)
+                        .ThenInclude(x => x.Node)
+                select node;
+            Dictionary<Guid, NodeEntity> existingNodes = await query.ToDictionaryAsync(x => x.Id, cancellationToken);
+
+            foreach (Node source in nodes)
+            {
+                if (!existingNodes.TryGetValue(source.Id, out NodeEntity existing))
+                {
+                    existing = new NodeEntity
+                    {
+                        Id = source.Id,
+                        NodeTypeId = source.Type.Id,
+                        CreatedAt = source.CreatedAt,
+                        UpdatedAt = source.UpdatedAt
+                    };
+                    _context.Nodes.Add(existing);
+                    existingNodes.Add(existing.Id, existing);
+                }
+
+                foreach (EmbeddingRelationType relationType in source.Type.AllProperties)
+                {
+                    if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                    {
+                        Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
+                        RelationEntity existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id);
+                        ApplyChanges(existing, sourceRelation, existingRelation);
+                    }
+                    else
+                    {
+                        IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
+                        IEnumerable<RelationEntity> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
+                        var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
+                        foreach (var pair in pairs)
+                        {
+                            ApplyChanges(existing, pair.Left, pair.Right);
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
         void ApplyChanges(NodeEntity existing, Relation sourceRelation, RelationEntity existingRelation)
         {
             if (sourceRelation == null && existingRelation == null)

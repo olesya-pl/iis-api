@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Domain;
@@ -50,14 +51,15 @@ namespace IIS.Core.Ontology.Seeding
                 }
             }
 
-            foreach (var node in firstNodes)
-            {
-                await _ontologyService.SaveNodeAsync(node, cancellationToken);
-            }
-            foreach (var node in nodes)
-            {
-                await _ontologyService.SaveNodeAsync(node, cancellationToken);
-            }
+            //foreach (var node in firstNodes)
+            //{
+            //    await _ontologyService.SaveNodeAsync(node, cancellationToken);
+            //}
+            //foreach (var node in nodes)
+            //{
+            //    await _ontologyService.SaveNodeAsync(node, cancellationToken);
+            //}
+            await _ontologyService.SaveNodesAsync(firstNodes.Union(nodes).ToList(), cancellationToken);
         }
 
         private Entity Map(JObject jObject, OntologyModel ontology, string typeName, List<Node> first)
