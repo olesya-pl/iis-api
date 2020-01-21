@@ -168,7 +168,7 @@ namespace IIS.Core.Ontology.EntityFramework
             try
             {
                 var q = await GetNodesQueryAsync(ontology, types, filter, cancellationToken);
-                return q.Count();
+                return q.Distinct().Count();
             }
             finally
             {
@@ -183,8 +183,16 @@ namespace IIS.Core.Ontology.EntityFramework
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
             {
-                var q = await GetNodesQueryAsync(ontology, types, filter, cancellationToken);
-                ctxNodes = await q.Skip(filter.Offset).Take(filter.Limit).ToArrayAsync(cancellationToken);
+                var relationsQ = await GetNodesQueryAsync(ontology, types, filter, cancellationToken);
+                // workaround because of wrong generated query with distinct and order by
+                var workaroundQ = (from a in relationsQ.Distinct()
+                          select new { Node = a, dummy = string.Empty });
+
+                ctxNodes = await workaroundQ
+                    .Skip(filter.Offset)
+                    .Take(filter.Limit)
+                    .Select(r => r.Node)
+                    .ToArrayAsync(cancellationToken);
             }
             finally
             {
@@ -225,7 +233,7 @@ namespace IIS.Core.Ontology.EntityFramework
             if (suggestion != null)
                 relationsQ = relationsQ.Where(e =>
                     EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
-            return relationsQ.Select(e => e.SourceNode).Distinct();
+            return relationsQ.Select(e => e.SourceNode);
         }
 
         private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesInternalWithCriteriaAsync(Guid[] derived,
