@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "5844c830-1c60-40e0-ac0f-918e34446baf",
+    "meta": {
+    },
+    "name": "multipleRequiredBoolean",
+    "target": "multipleRequiredBoolean",
+    "title": "Атрибут 1..n",
+    "type": "Boolean"
+}

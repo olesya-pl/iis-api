@@ -80,6 +80,11 @@ namespace IIS.Core.Tools
         {
             await SeedTypesAsync("contour");
         }
+        
+        public async Task FillDeveloperTypesAsync()
+        {
+            await SeedTypesAsync("develop");
+        }
 
         private async Task SeedTypesAsync(string name)
         {
@@ -95,6 +100,12 @@ namespace IIS.Core.Tools
             _logger.LogInformation("Contour data seeded.");
         }
 
+        public async Task SeedDeveloperDataAsync()
+        {
+            await _seeder.SeedAsync(Path.Combine("develop", "entities"));
+            _logger.LogInformation("Develop data seeded.");
+        }
+        
         public async Task SeedOdysseusDataAsync()
         {
             await _seeder.SeedAsync(Path.Combine("odysseus", "entities"));

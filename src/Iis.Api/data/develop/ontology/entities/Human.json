@@ -1,0 +1,51 @@
+{
+    "attributes": [
+        {
+            "id": "3DDD302A-9D13-40c2-A0A9-8DC23BC15A02",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 1
+            },
+            "name": "oneRequiredString",
+            "target": "oneRequiredString",
+            "title": "Атрибут 1..1"
+        },
+        {
+            "id": "9B4F438C-2F06-4632-B22A-23F069B8B930",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 2
+            },
+            "name": "oneNotRequired",
+            "target": "oneNotRequired",
+            "title": "Атрибут 0..1"
+        },
+        {
+            "id": "9E2A8AF9-1C65-4ac1-B84B-9BE24510D906",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 3
+            },
+            "name": "multipleRequiredBoolean",
+            "target": "multipleRequiredBoolean",
+            "title": "Атрибут 1..n"
+        },
+        {
+            "id": "96FD26D8-CDB7-429a-9702-BA528CB8C357",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 4
+            },
+            "name": "multipleNotRequiredDecimal",
+            "target": "multipleNotRequiredDecimal",
+            "title": "Атрибут 0..n"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "F5588052-C8C2-46f3-8C4E-170F0C31B796",
+    "meta": {
+        "sortOrder": 5
+    },
+    "name": "Human",
+    "title": "Людина"
+}

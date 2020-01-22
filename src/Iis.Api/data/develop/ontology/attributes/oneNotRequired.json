@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "cac742f1-75ad-4604-980d-d0ba5486a0b1",
+    "meta": {
+    },
+    "name": "oneNotRequired",
+    "target": "oneNotRequired",
+    "title": "Атрибут 0..1",
+    "type": "Integer"
+}
