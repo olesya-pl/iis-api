@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "AC31E52F-DC25-4447-9FF3-939A0B15BC7B",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 51
+    },
+    "name": "closePersin",
+    "target": "ClosePerson",
+    "title": "дані про оточення"
+}

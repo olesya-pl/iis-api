@@ -1,0 +1,14 @@
+{
+    "conceptType": "relations",
+    "id": "9A093127-C5BE-4e82-A6CB-C34D7B540AFD",
+    "meta": {
+        "formField": {
+            "type": "form"
+        },
+        "multiple": false,
+        "sortOrder": 284
+    },
+    "name": "reason",
+    "target": "TaggableString",
+    "title": "За що надано"
+}

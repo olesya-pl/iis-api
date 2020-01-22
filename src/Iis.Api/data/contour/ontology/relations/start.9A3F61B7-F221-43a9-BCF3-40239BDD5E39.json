@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "9A3F61B7-F221-43a9-BCF3-40239BDD5E39",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 215
+    },
+    "name": "start",
+    "target": "FuzzyDate",
+    "title": "початок"
+}

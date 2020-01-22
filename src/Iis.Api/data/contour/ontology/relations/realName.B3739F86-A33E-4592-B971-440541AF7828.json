@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "B3739F86-A33E-4592-B971-440541AF7828",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 9
+    },
+    "name": "realName",
+    "target": "FullNameI18n",
+    "title": "Реальне ім'я"
+}

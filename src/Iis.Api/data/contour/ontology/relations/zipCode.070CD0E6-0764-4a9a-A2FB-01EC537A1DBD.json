@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "070CD0E6-0764-4a9a-A2FB-01EC537A1DBD",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 203
+    },
+    "name": "zipCode",
+    "target": "zipCode",
+    "title": "Індекс"
+}

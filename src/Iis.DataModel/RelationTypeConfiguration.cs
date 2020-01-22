@@ -7,10 +7,9 @@ namespace Iis.DataModel
     {
         public void Configure(EntityTypeBuilder<RelationTypeEntity> builder)
         {
-            //builder
-            //    .HasOne(p => p.NodeType)
-            //    .WithOne(p => p.RelationType)
-            //    .HasForeignKey<RelationTypeEntity>(p => p.Id);
+            builder
+                .Property(p => p.Id)
+                .ValueGeneratedNever();
         }
     }
 }

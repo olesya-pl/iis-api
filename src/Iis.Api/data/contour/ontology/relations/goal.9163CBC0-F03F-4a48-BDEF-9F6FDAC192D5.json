@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "9163CBC0-F03F-4a48-BDEF-9F6FDAC192D5",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 275
+    },
+    "name": "goal",
+    "target": "goal",
+    "title": "Мета"
+}

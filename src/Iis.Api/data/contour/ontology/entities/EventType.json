@@ -4,7 +4,7 @@
             "id": "578AF351-BCE2-405e-8A04-6C196E4C4D74",
             "meta": {
                 "multiple": false,
-                "sortOrder": 57
+                "sortOrder": 149
             },
             "name": "code",
             "target": "code",
@@ -19,7 +19,7 @@
                     "multiple": false
                 },
                 "multiple": true,
-                "sortOrder": 58,
+                "sortOrder": 150,
                 "type": "hierarchical"
             },
             "name": "child",
@@ -34,7 +34,7 @@
     "id": "4B0341F0-2869-4052-B071-D19C6A374E43",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 59
+        "sortOrder": 151
     },
     "name": "EventType",
     "title": "Tип події"

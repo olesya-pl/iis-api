@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "0f1db011-621e-40ec-811a-7c0284eb778a",
+    "meta": {
+    },
+    "name": "building",
+    "target": "building",
+    "title": "Будинок",
+    "type": "String"
+}

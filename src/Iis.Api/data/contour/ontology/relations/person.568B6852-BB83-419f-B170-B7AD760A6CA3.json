@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "568B6852-BB83-419f-B170-B7AD760A6CA3",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 2
+    },
+    "name": "person",
+    "target": "TaggableString",
+    "title": "Особа"
+}

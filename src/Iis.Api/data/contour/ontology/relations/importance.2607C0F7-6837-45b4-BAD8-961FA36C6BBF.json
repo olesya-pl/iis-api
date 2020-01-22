@@ -7,7 +7,7 @@
             "type": "radioGroup"
         },
         "multiple": false,
-        "sortOrder": 26
+        "sortOrder": 92
     },
     "name": "importance",
     "target": "EventImportance",

@@ -4,7 +4,7 @@
     "meta": {
         "formula": "entity.name",
         "multiple": false,
-        "sortOrder": 4
+        "sortOrder": 60
     },
     "name": "title",
     "target": "title",

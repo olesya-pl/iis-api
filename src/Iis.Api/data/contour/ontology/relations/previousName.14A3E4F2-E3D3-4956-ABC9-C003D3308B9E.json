@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "14A3E4F2-E3D3-4956-ABC9-C003D3308B9E",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 291
+    },
+    "name": "previousName",
+    "target": "StringI18n",
+    "title": "Дівоче/попереднє прізвище"
+}

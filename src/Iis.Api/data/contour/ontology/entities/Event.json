@@ -4,7 +4,7 @@
             "id": "F0B84A9A-06F0-424c-9E3B-846763950FD0",
             "meta": {
                 "multiple": false,
-                "sortOrder": 15
+                "sortOrder": 81
             },
             "name": "startsAt",
             "target": "startsAt",
@@ -14,7 +14,7 @@
             "id": "30B0C9DE-43D1-4a00-ACF1-EB10D4781191",
             "meta": {
                 "multiple": true,
-                "sortOrder": 16
+                "sortOrder": 82
             },
             "name": "attachment",
             "target": "attachment",
@@ -24,7 +24,7 @@
             "id": "2C1A4EA6-4A7E-4479-95F0-5C4E151D8818",
             "meta": {
                 "multiple": false,
-                "sortOrder": 17
+                "sortOrder": 83
             },
             "name": "endsAt",
             "target": "endsAt",
@@ -38,7 +38,7 @@
                     "type": "dropdownTree"
                 },
                 "multiple": false,
-                "sortOrder": 18
+                "sortOrder": 84
             },
             "name": "eventType",
             "target": "EventType",
@@ -52,7 +52,7 @@
                     "type": "dropdown"
                 },
                 "multiple": true,
-                "sortOrder": 19
+                "sortOrder": 85
             },
             "name": "relatesToCountry",
             "target": "Country",
@@ -62,7 +62,7 @@
             "id": "A3A63FFB-21B7-4eab-BFA6-CEE8CC45EFA4",
             "meta": {
                 "multiple": false,
-                "sortOrder": 20,
+                "sortOrder": 86,
                 "title": "Назва"
             },
             "name": "name",
@@ -77,7 +77,7 @@
                     "type": "dropdownTree"
                 },
                 "multiple": false,
-                "sortOrder": 21
+                "sortOrder": 87
             },
             "name": "component",
             "target": "EventComponent",
@@ -91,7 +91,7 @@
                     "type": "radioGroup"
                 },
                 "multiple": false,
-                "sortOrder": 22
+                "sortOrder": 88
             },
             "name": "state",
             "target": "EventState",
@@ -101,7 +101,7 @@
             "id": "2C4E7E01-8404-4e91-AA35-C5447FE590DC",
             "meta": {
                 "multiple": true,
-                "sortOrder": 23
+                "sortOrder": 89
             },
             "name": "associatedWithEvent",
             "target": "ObjectOfStudy",
@@ -115,7 +115,7 @@
                     "lines": "5"
                 },
                 "multiple": false,
-                "sortOrder": 24,
+                "sortOrder": 90,
                 "title": "Опис"
             },
             "name": "description",
@@ -126,7 +126,7 @@
             "id": "B47E89D2-3C6D-499a-B7D2-551D72229F82",
             "meta": {
                 "multiple": false,
-                "sortOrder": 25
+                "sortOrder": 91
             },
             "name": "location",
             "target": "location",
@@ -140,7 +140,7 @@
                     "type": "radioGroup"
                 },
                 "multiple": false,
-                "sortOrder": 26
+                "sortOrder": 92
             },
             "name": "importance",
             "target": "EventImportance",
@@ -153,7 +153,7 @@
                     "Create"
                 ],
                 "multiple": true,
-                "sortOrder": 27
+                "sortOrder": 93
             },
             "name": "tag",
             "target": "Tag",
@@ -163,7 +163,7 @@
             "id": "6342B205-EBE9-4c64-AB93-11307C208207",
             "meta": {
                 "multiple": true,
-                "sortOrder": 28
+                "sortOrder": 94
             },
             "name": "additionalLocation",
             "target": "additionalLocation",
@@ -173,7 +173,7 @@
     "conceptType": "entities",
     "id": "1CA66464-4B0C-4d46-8B7A-36A8FED863CA",
     "meta": {
-        "sortOrder": 29
+        "sortOrder": 95
     },
     "name": "Event",
     "title": "Подія"

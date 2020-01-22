@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "6E73D865-5B4F-4c0f-B44C-4B93B69997C7",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 50
+    },
+    "name": "martialStatus",
+    "target": "MartialStatus",
+    "title": "Сімейний стан"
+}

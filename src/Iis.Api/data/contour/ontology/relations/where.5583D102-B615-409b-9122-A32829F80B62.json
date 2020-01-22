@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "5583D102-B615-409b-9122-A32829F80B62",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 226
+    },
+    "name": "where",
+    "target": "TaggableString",
+    "title": "місце роботи"
+}

@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "582AA0A4-37C3-4df6-B0E7-AFA245C9884B",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 40
+    },
+    "name": "politicalActivity",
+    "target": "PoliticalActivity",
+    "title": "політична діяльність"
+}

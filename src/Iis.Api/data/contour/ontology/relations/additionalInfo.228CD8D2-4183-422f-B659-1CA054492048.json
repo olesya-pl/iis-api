@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "228CD8D2-4183-422f-B659-1CA054492048",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 126
+    },
+    "name": "additionalInfo",
+    "target": "additionalInfo",
+    "title": "Додаткова інформація"
+}

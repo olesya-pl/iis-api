@@ -5,6 +5,6 @@
     },
     "name": "description",
     "target": "description",
-    "title": "Додаткові дані",
+    "title": "примітка",
     "type": "String"
 }

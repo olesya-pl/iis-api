@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "50F94F14-23CD-4a4f-B2DA-5D88CBFAEC48",
+    "meta": {
+        "sortOrder": 155
+    },
+    "name": "EducationLevel",
+    "title": "Рівень освіти"
+}

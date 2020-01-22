@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "86b31833-3b1e-449b-b293-dda37e66fd43",
+    "meta": {
+    },
+    "name": "specialty",
+    "target": "specialty",
+    "title": "спеціальність",
+    "type": "String"
+}

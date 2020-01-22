@@ -4,7 +4,7 @@
     "meta": {
         "format": "email",
         "multiple": false,
-        "sortOrder": 55,
+        "sortOrder": 147,
         "validation": {
             "email": true,
             "required": true

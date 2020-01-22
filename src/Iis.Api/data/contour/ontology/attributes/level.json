@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "533295e0-22d6-482e-b1ce-71f215daff10",
+    "meta": {
+    },
+    "name": "level",
+    "target": "level",
+    "title": "рівень володіння",
+    "type": "String"
+}

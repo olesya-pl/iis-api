@@ -4,7 +4,7 @@
     "meta": {
         "formula": "h.fullTitle(entity.shortName, entity.name)",
         "multiple": false,
-        "sortOrder": 96
+        "sortOrder": 238
     },
     "name": "title",
     "target": "title",

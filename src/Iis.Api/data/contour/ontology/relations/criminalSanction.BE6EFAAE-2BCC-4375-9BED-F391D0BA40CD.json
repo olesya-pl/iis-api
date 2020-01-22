@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "BE6EFAAE-2BCC-4375-9BED-F391D0BA40CD",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 49
+    },
+    "name": "criminalSanction",
+    "target": "criminalSanction",
+    "title": "Кримінальна відповідальність"
+}

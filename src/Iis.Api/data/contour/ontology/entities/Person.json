@@ -1,210 +1,506 @@
 {
     "attributes": [
         {
-            "id": "B262D42A-4AAA-46db-B6B8-1C5D548A0AEC",
+            "id": "D98AA60D-91AA-4d14-AFD0-67EA2284B713",
             "meta": {
                 "multiple": false,
-                "sortOrder": 130
+                "sortOrder": 8
+            },
+            "name": "kind",
+            "target": "PersonType",
+            "title": ""
+        },
+        {
+            "id": "B3739F86-A33E-4592-B971-440541AF7828",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 9
+            },
+            "name": "realName",
+            "target": "FullNameI18n",
+            "title": "Реальне ім'я"
+        },
+        {
+            "id": "37F54A7E-310C-4f33-B0B4-8AF91B533B1C",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 10
+            },
+            "name": "fakeName",
+            "target": "FullNameI18n",
+            "title": "Ім'я прикриття"
+        },
+        {
+            "id": "482D328C-F67C-4ba6-A93B-DE56924FE0A7",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 11
+            },
+            "name": "importantDataChanges",
+            "target": "importantDataChanges",
+            "title": "Зміни установчих даних"
+        },
+        {
+            "id": "7F08C6D4-F8BD-494c-A84D-83A131DC1705",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 12
             },
             "name": "dateOfBirth",
-            "target": "dateOfBirth",
-            "title": "Дата народження"
+            "target": "FuzzyDate",
+            "title": "дата народження"
         },
         {
-            "id": "875A8208-AFB9-4e39-97F2-6793FA6481C7",
+            "id": "168891D4-961F-4eeb-966D-CEA86CEFE028",
             "meta": {
                 "multiple": false,
-                "sortOrder": 131
+                "sortOrder": 13
             },
-            "name": "placeOfBirth",
-            "target": "placeOfBirth",
-            "title": "Місце народження"
+            "name": "dateOfDeath",
+            "target": "FuzzyDate",
+            "title": "Дата смерті"
         },
         {
-            "id": "831F0E78-5EFC-41e6-A2DC-B2D060C2D69C",
+            "id": "D18AFC59-628F-49a2-A0E3-F89E7DCACBC9",
             "meta": {
                 "multiple": false,
-                "sortOrder": 132
+                "sortOrder": 14
             },
-            "name": "secondName",
-            "target": "secondName",
-            "title": "Прізвище"
+            "name": "deathCircumstances",
+            "target": "deathCircumstances",
+            "title": "Обставини смерті"
         },
         {
-            "id": "A192E17B-4158-4e9e-93FA-7DA6755DE628",
+            "id": "A51D1BF3-624E-4963-A336-5DA4C3CE192E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 133
+                "sortOrder": 15
             },
-            "name": "firstName",
-            "target": "firstName",
-            "title": "Ім'я"
+            "name": "gender",
+            "target": "Gender",
+            "title": "стать"
         },
         {
-            "id": "64482259-6832-49ca-9E07-ECFF0890AAB9",
+            "id": "0FDD5857-31BD-4941-A23A-62C2D400C4B6",
             "meta": {
                 "multiple": false,
-                "sortOrder": 134
+                "sortOrder": 16
             },
-            "name": "dateOfJobPositionActualization",
-            "target": "dateOfJobPositionActualization",
-            "title": "Дата актуальності посади"
+            "name": "nationality",
+            "target": "Nationality",
+            "title": "национальность"
         },
         {
-            "id": "C2F8CD51-EBCF-4f63-A9AE-20CB90F36D32",
-            "meta": {
-                "formula": "h.join(entity.secondName, entity.firstName, entity.fatherName)",
-                "multiple": false,
-                "sortOrder": 135
-            },
-            "name": "title",
-            "target": "title",
-            "title": "Повна назва"
-        },
-        {
-            "id": "5B9CC7FC-5A7D-48a4-A6B1-B92B4152CB51",
-            "meta": {
-                "multiple": false,
-                "sortOrder": 136
-            },
-            "name": "militaryRank",
-            "target": "militaryRank",
-            "title": "Військове звання"
-        },
-        {
-            "id": "40D63BA9-A9B5-4f59-BD05-14827A68ECBC",
-            "meta": {
-                "multiple": false,
-                "sortOrder": 137
-            },
-            "name": "fatherName",
-            "target": "fatherName",
-            "title": "По батькові"
-        },
-        {
-            "id": "E4C2D499-9AC9-46dc-B65C-2C2CC517F7B4",
-            "meta": {
-                "multiple": false,
-                "sortOrder": 138
-            },
-            "name": "position",
-            "target": "position",
-            "title": "Посада"
-        },
-        {
-            "id": "2C0E2A59-90F1-4920-82F7-C0E1D229D513",
+            "id": "88022D6C-B8DE-46b0-B621-8343554FDDFF",
             "meta": {
                 "formField": {
                     "icon": "flag",
                     "type": "dropdown"
                 },
-                "multiple": false,
-                "sortOrder": 139,
-                "title": "Громадянство"
+                "multiple": true,
+                "sortOrder": 17
             },
-            "name": "relatesToCountry",
+            "name": "citizenship",
             "target": "Country",
-            "title": "Громадянство"
+            "title": "громадянство"
         },
         {
-            "id": "1BF149CF-003F-45f2-8CE5-D3193A8B905C",
+            "id": "E120FC35-AD5F-407c-BF88-A46A14082A65",
             "meta": {
-                "multiple": false,
-                "sortOrder": 140
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "multiple": true,
+                "sortOrder": 18
             },
-            "name": "description",
-            "target": "description",
-            "title": "Додаткові дані"
+            "name": "nicknameSign",
+            "target": "NicknameSign",
+            "title": "позивний"
         },
         {
-            "id": "982D6D4C-AF02-411b-A350-6CA16A977864",
+            "id": "7A23BEC8-8A75-499a-84DF-54803AED9823",
             "meta": {
-                "multiple": false,
-                "sortOrder": 141
+                "multiple": true,
+                "sortOrder": 19
             },
-            "name": "maritalStatus",
-            "target": "maritalStatus",
-            "title": "Сімейний стан"
+            "name": "persNickNameSign",
+            "target": "PersonalNicknameSign",
+            "title": "Прізвисько"
         },
         {
-            "id": "1746B63F-5B67-408a-8ABF-93858257048E",
+            "id": "72E8BF1D-89E8-452c-B833-B028B0B8569B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 142
+                "sortOrder": 20
+            },
+            "name": "placeOfBirth",
+            "target": "UniversalLocation",
+            "title": "місце народження"
+        },
+        {
+            "id": "494A3783-D520-4f33-8A77-C7EC2F516903",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 21
+            },
+            "name": "registrationAddress",
+            "target": "UniversalLocation",
+            "title": "адреса реєстрації"
+        },
+        {
+            "id": "6DC1C4B4-3042-45f1-8CFD-078422529683",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 22
+            },
+            "name": "actualAccommodation",
+            "target": "UniversalLocation",
+            "title": "Місце фактичного проживання"
+        },
+        {
+            "id": "97243AA3-5A4B-4094-AAF7-8512E6F7F2FA",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 23
+            },
+            "name": "passportData",
+            "target": "Passport",
+            "title": "Внутрішній паспорт"
+        },
+        {
+            "id": "E4605767-01C1-4941-9F04-A769B1F051C5",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 24
+            },
+            "name": "foreignPassport",
+            "target": "ForeignPassport",
+            "title": "закордонний паспорт"
+        },
+        {
+            "id": "3E3B2036-336A-4e8d-A9A9-E7A81B00FA45",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 25
+            },
+            "name": "credPersonDocument",
+            "target": "CredPersonDocument",
+            "title": "Посвідчення особи"
+        },
+        {
+            "id": "F338EDFC-E5DC-4507-B0F4-5438DDBD1882",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 26
+            },
+            "name": "otherDocuments",
+            "target": "OtherDocument",
+            "title": "Інші документи"
+        },
+        {
+            "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 27
+            },
+            "name": "taxID",
+            "target": "taxID",
+            "title": "Ідентифікаційний код"
+        },
+        {
+            "id": "95275DE6-CD5F-4a78-81D2-6FF3FEDEEEC8",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 28
+            },
+            "name": "personArmyID",
+            "target": "personArmyID",
+            "title": "Особистий номер військовослужбовця"
+        },
+        {
+            "id": "66B04537-02EA-47ac-AA22-3EB89976D09F",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 29
+            },
+            "name": "otherPersonId",
+            "target": "otherPersonId",
+            "title": "Інші номери"
+        },
+        {
+            "id": "DF6C681F-3EC3-4f8c-9E5A-773DFEBAAEFE",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 30
+            },
+            "name": "currentJob",
+            "target": "WorkPlace",
+            "title": "Поточне місце військової служби/роботи"
+        },
+        {
+            "id": "E939CD89-7014-4423-B188-EE14CE3BB0C0",
+            "meta": {
+                "formField": {
+                    "type": "dropdown"
+                },
+                "multiple": true,
+                "sortOrder": 31
+            },
+            "name": "currentRank",
+            "target": "Rank",
+            "title": "Поточне військове/спеціальне звання/ранг"
+        },
+        {
+            "id": "BDD8F26B-DE33-4b5e-B28B-2C6C7903CDDA",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 32
+            },
+            "name": "jobHistory",
+            "target": "WorkPlace",
+            "title": "Місця проходження служби/роботи/безробіття"
+        },
+        {
+            "id": "533FA3B8-CE40-4da5-9366-18120FDC2B07",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 33
+            },
+            "name": "politicalParticipation",
+            "target": "OrgParticipation",
+            "title": "Приналежність до політичних партій, громадських організацій, рухів"
+        },
+        {
+            "id": "6DD1EC3F-AB4C-4362-B1C2-9B99A8E64A9B",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 34
+            },
+            "name": "OiVTParticipation",
+            "target": "TaggableString",
+            "title": "Участь у розробці ОіВТ"
+        },
+        {
+            "id": "A92BFD27-66BA-45a7-B280-EDB15A6FF7C3",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 35
+            },
+            "name": "extremisticParticipation",
+            "target": "OrgParticipation",
+            "title": "Причетність до терористичних, екстремістських або злочинних організацій"
+        },
+        {
+            "id": "08980950-D4EF-41e9-A0D8-21B5E244E350",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 36
+            },
+            "name": "privateMilitaryCompanyParticipation",
+            "target": "OrgParticipation",
+            "title": "Причетність до приватних військових компаній"
+        },
+        {
+            "id": "56DD286F-B3EF-436e-AA03-53FF40DE4501",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 37
             },
             "name": "education",
-            "target": "education",
+            "target": "Education",
             "title": "Освіта"
         },
         {
-            "id": "E3434A40-0AE8-4be3-A68D-8F3DF26F030D",
+            "id": "18542667-2008-47e0-89DD-B7484B05887E",
             "meta": {
-                "multiple": false,
-                "sortOrder": 143
+                "multiple": true,
+                "sortOrder": 38
             },
-            "name": "dateOfRankActualization",
-            "target": "dateOfRankActualization",
-            "title": "Дата актуалізації звання"
+            "name": "foreignLang",
+            "target": "ForeignLang",
+            "title": "Володіння іноземними мовами"
         },
         {
-            "id": "72E5CBA4-2021-46e7-9ABA-BF385F1B1DB9",
+            "id": "2EAFB927-A364-461f-B380-A55137332BC4",
             "meta": {
                 "multiple": false,
-                "sortOrder": 144
+                "sortOrder": 39
             },
-            "name": "dateOfServingPlaceActualization",
-            "target": "dateOfServingPlaceActualization",
-            "title": "Дата актуалізації місця служби"
+            "name": "mas",
+            "target": "MASItem",
+            "title": "Військово-облікова спеціальність"
         },
         {
-            "id": "3260AEB5-37E3-4ed4-BB3E-596D968FFD56",
+            "id": "582AA0A4-37C3-4df6-B0E7-AFA245C9884B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 145
+                "sortOrder": 40
             },
-            "name": "livingPlace",
-            "target": "livingPlace",
-            "title": "Місце останнього проживання"
+            "name": "politicalActivity",
+            "target": "PoliticalActivity",
+            "title": "політична діяльність"
         },
         {
-            "id": "22048990-2E1B-4964-9C51-E5C7B86C4967",
+            "id": "7AD1638F-413A-4aa0-9022-20DCF8EC3429",
             "meta": {
                 "multiple": false,
-                "sortOrder": 146
+                "sortOrder": 41
             },
-            "name": "registrationPlace",
-            "target": "registrationPlace",
-            "title": "Місце реєстрації"
+            "name": "created",
+            "target": "created",
+            "title": "дата першої фіксації"
         },
         {
-            "id": "FBBF0182-8A94-493f-A1C0-1E5CBB4E68BF",
+            "id": "C6B9535C-B6AB-48ef-9C39-F695CAA62348",
             "meta": {
                 "multiple": false,
-                "sortOrder": 147
+                "sortOrder": 42
             },
-            "name": "fullNameRu",
-            "target": "fullNameRu",
-            "title": "П.І.П. російською"
+            "name": "updated",
+            "target": "updated",
+            "title": "дата оновлення інформації"
         },
         {
-            "id": "2510D415-0E0C-4c5f-B649-AC5103977E86",
+            "id": "474997D1-84A3-4252-9C2F-BFB0955DDFC9",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 43
+            },
+            "name": "warOperationParticipation",
+            "target": "WarOperationParticipation",
+            "title": "Участь у бойових діях/миротворчих операціях"
+        },
+        {
+            "id": "35304AF6-2545-483e-B681-2C65944C3E6D",
             "meta": {
                 "multiple": false,
-                "sortOrder": 148
+                "sortOrder": 44
             },
-            "name": "militaryService",
-            "target": "Person_militaryService",
-            "title": "Нести військову службу"
+            "name": "currentLocation",
+            "target": "UniversalLocation",
+            "title": "Поточне місце перебування"
+        },
+        {
+            "id": "D2CE8255-B58A-4212-AD98-BA568A0D7EED",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 45
+            },
+            "name": "wounds",
+            "target": "BattleWound",
+            "title": "Поранення і контузії"
+        },
+        {
+            "id": "B91E7E07-0C11-4939-895D-4210B9B25175",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 46
+            },
+            "name": "foreignMission",
+            "target": "ForeignMission",
+            "title": "Закордонні відрядження"
+        },
+        {
+            "id": "70FF083C-D075-479d-84A6-0DD3D4D8F8C0",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 47
+            },
+            "name": "award",
+            "target": "Award",
+            "title": "Заохочення"
+        },
+        {
+            "id": "89501CC7-C719-4624-966D-B14724ADF14B",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 48
+            },
+            "name": "sanction",
+            "target": "Sanction",
+            "title": "Стягнення"
+        },
+        {
+            "id": "BE6EFAAE-2BCC-4375-9BED-F391D0BA40CD",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 49
+            },
+            "name": "criminalSanction",
+            "target": "criminalSanction",
+            "title": "Кримінальна відповідальність"
+        },
+        {
+            "id": "6E73D865-5B4F-4c0f-B44C-4B93B69997C7",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 50
+            },
+            "name": "martialStatus",
+            "target": "MartialStatus",
+            "title": "Сімейний стан"
+        },
+        {
+            "id": "AC31E52F-DC25-4447-9FF3-939A0B15BC7B",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 51
+            },
+            "name": "closePersin",
+            "target": "ClosePerson",
+            "title": "дані про оточення"
+        },
+        {
+            "id": "4B726B9C-B7CD-46dd-96DE-564C5D92232B",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 52
+            },
+            "name": "contacts",
+            "target": "ObjectSign",
+            "title": "Контакти особи"
+        },
+        {
+            "id": "AA757315-667A-4141-BC15-87330FED1F6E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 53
+            },
+            "name": "otherInterestingData",
+            "target": "otherInterestingData",
+            "title": "Інші дані, які представляють інтерес"
+        },
+        {
+            "id": "93C2BC5A-CC5D-4f2f-8182-BB3902A2FE02",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 54
+            },
+            "name": "attachment",
+            "target": "attachment",
+            "title": "Додані файли"
+        },
+        {
+            "id": "E1C2EECC-F0E8-437a-9352-7758BD0E2407",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 55
+            },
+            "name": "actsOfTerrorParticipation",
+            "target": "TaggableString",
+            "title": "Причетність до резонансних подій/терактів/злочинів"
         }
     ],
     "conceptType": "entities",
     "extends": [
         "ObjectOfStudy"
     ],
-    "id": "DCCA16F0-7AA6-46e3-9984-6BD819D9A67A",
+    "id": "0E18C118-94CD-4c82-87AF-8F68AB885451",
     "meta": {
-        "sortOrder": 149
+        "sortOrder": 56
     },
     "name": "Person",
-    "title": "Людина"
+    "title": "Персона"
 }

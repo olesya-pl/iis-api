@@ -1,0 +1,41 @@
+{
+    "attributes": [
+        {
+            "id": "2BB023DE-F757-4c52-A3B0-6827C3FA5CA5",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 267
+            },
+            "name": "date",
+            "target": "FuzzyDate",
+            "title": "Дата"
+        },
+        {
+            "id": "001A00F6-0738-4015-8AB8-3BA36432236B",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 268
+            },
+            "name": "damageLevel",
+            "target": "damageLevel",
+            "title": "Ступінь важкості"
+        },
+        {
+            "id": "B25118FD-5C44-4e2a-BB7B-D78C4EF9AB87",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 269
+            },
+            "name": "circumstances",
+            "target": "circumstances",
+            "title": "Обставини"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "AB874590-E222-433e-82C8-82ABCE29750C",
+    "meta": {
+        "sortOrder": 270
+    },
+    "name": "BattleWound",
+    "title": "Поранення і контузії"
+}

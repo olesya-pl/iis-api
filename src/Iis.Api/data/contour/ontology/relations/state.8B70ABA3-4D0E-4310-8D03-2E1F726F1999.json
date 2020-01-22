@@ -7,7 +7,7 @@
             "type": "radioGroup"
         },
         "multiple": false,
-        "sortOrder": 22
+        "sortOrder": 88
     },
     "name": "state",
     "target": "EventState",

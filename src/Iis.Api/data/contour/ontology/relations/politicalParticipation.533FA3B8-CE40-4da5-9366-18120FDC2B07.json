@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "533FA3B8-CE40-4da5-9366-18120FDC2B07",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 33
+    },
+    "name": "politicalParticipation",
+    "target": "OrgParticipation",
+    "title": "Приналежність до політичних партій, громадських організацій, рухів"
+}

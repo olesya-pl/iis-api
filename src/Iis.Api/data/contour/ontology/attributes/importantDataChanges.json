@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "c31250f0-f7da-4b22-bb0c-685f9a6a8a5d",
+    "meta": {
+    },
+    "name": "importantDataChanges",
+    "target": "importantDataChanges",
+    "title": "Зміни установчих даних",
+    "type": "String"
+}

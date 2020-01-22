@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "BA7F6AC7-EA77-4b74-8021-23C1FC378D9D",
+    "meta": {
+        "sortOrder": 273
+    },
+    "name": "Rank",
+    "title": ""
+}

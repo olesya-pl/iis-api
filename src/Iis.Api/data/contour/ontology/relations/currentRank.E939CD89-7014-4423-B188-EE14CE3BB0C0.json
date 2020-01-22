@@ -1,0 +1,14 @@
+{
+    "conceptType": "relations",
+    "id": "E939CD89-7014-4423-B188-EE14CE3BB0C0",
+    "meta": {
+        "formField": {
+            "type": "dropdown"
+        },
+        "multiple": true,
+        "sortOrder": 31
+    },
+    "name": "currentRank",
+    "target": "Rank",
+    "title": "Поточне військове/спеціальне звання/ранг"
+}

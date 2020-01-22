@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "E1C2EECC-F0E8-437a-9352-7758BD0E2407",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 55
+    },
+    "name": "actsOfTerrorParticipation",
+    "target": "TaggableString",
+    "title": "Причетність до резонансних подій/терактів/злочинів"
+}

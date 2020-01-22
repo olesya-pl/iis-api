@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "C570F9EE-AFB9-4e4d-9B28-7F1117C6795D",
+    "meta": {
+        "sortOrder": 281
+    },
+    "name": "Grade",
+    "title": "Кваліфікація"
+}

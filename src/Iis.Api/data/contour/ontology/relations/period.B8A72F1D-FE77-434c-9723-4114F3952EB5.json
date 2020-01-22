@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "B8A72F1D-FE77-434c-9723-4114F3952EB5",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 318
+    },
+    "name": "period",
+    "target": "FuzzyDateRange",
+    "title": "Період"
+}

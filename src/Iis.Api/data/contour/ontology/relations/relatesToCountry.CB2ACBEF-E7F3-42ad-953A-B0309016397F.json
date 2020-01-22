@@ -7,7 +7,7 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 108
+        "sortOrder": 250
     },
     "name": "relatesToCountry",
     "target": "Country",

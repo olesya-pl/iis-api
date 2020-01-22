@@ -1,0 +1,31 @@
+{
+    "attributes": [
+        {
+            "id": "2DD07743-F11E-4036-B081-60D62991127E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 67
+            },
+            "name": "name",
+            "target": "name",
+            "title": "Назва"
+        },
+        {
+            "id": "4F1385FD-5657-4699-815A-5D035A8459A6",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 68
+            },
+            "name": "previousOwner",
+            "target": "Person",
+            "title": "занимавшие ранее"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "15648CDF-78DA-4963-976D-8E3757020664",
+    "meta": {
+        "sortOrder": 69
+    },
+    "name": "Position",
+    "title": "Посада"
+}

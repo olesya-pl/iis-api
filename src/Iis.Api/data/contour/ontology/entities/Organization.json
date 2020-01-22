@@ -1,0 +1,31 @@
+{
+    "attributes": [
+        {
+            "id": "EFE6B452-E3AD-4098-AA77-F2F6C102A2F1",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 4
+            },
+            "name": "name",
+            "target": "name",
+            "title": "Назва"
+        },
+        {
+            "id": "D3433422-1175-4d4f-A913-D731167684F8",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 5
+            },
+            "name": "title",
+            "target": "title",
+            "title": "Повна назва"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "077946F8-C103-4238-AB29-B3D6B96BA349",
+    "meta": {
+        "sortOrder": 6
+    },
+    "name": "Organization",
+    "title": "Организація"
+}

@@ -1,0 +1,91 @@
+{
+    "attributes": [
+        {
+            "id": "1A2B6345-4AFB-41f9-919C-2E533A52852D",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 120
+            },
+            "name": "duration",
+            "target": "FuzzyDateRange",
+            "title": "термін навчання"
+        },
+        {
+            "id": "523C7159-127D-497e-8CE5-0F6F34B0D2AA",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 121
+            },
+            "name": "educationalInstitution",
+            "target": "EducationalInstitution",
+            "title": "навчальний заклад"
+        },
+        {
+            "id": "0FE0EAAB-4924-48e2-8FE5-8825A0A99A7E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 122
+            },
+            "name": "educationType",
+            "target": "EducationLevel",
+            "title": "рівень освіти"
+        },
+        {
+            "id": "0588C89A-C22D-4a87-A4A1-DA7AF032F169",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 123
+            },
+            "name": "grade",
+            "target": "Grade",
+            "title": "здобута кваліфікація"
+        },
+        {
+            "id": "1533BE32-FAE7-4c94-9D67-FCB669E16F4D",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 124
+            },
+            "name": "specialty",
+            "target": "specialty",
+            "title": "спеціальність"
+        },
+        {
+            "id": "AD7CEC88-E927-4369-9A80-19546B2989E4",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 125
+            },
+            "name": "specialization",
+            "target": "specialization",
+            "title": "спеціалізація"
+        },
+        {
+            "id": "228CD8D2-4183-422f-B659-1CA054492048",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 126
+            },
+            "name": "additionalInfo",
+            "target": "additionalInfo",
+            "title": "Додаткова інформація"
+        },
+        {
+            "id": "9DFBE392-9069-45f5-89C2-ECBCC9572358",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 127
+            },
+            "name": "media",
+            "target": "media",
+            "title": "Додані файли"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "43629937-AAA2-4be6-8531-97C439507ECB",
+    "meta": {
+        "sortOrder": 128
+    },
+    "name": "Education",
+    "title": "Освіта"
+}

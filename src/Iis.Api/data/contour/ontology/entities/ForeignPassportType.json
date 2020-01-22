@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "FE108C0E-5BB0-4191-AC64-CBA105386160",
+    "meta": {
+        "sortOrder": 331
+    },
+    "name": "ForeignPassportType",
+    "title": "Тип загранпаспорта"
+}

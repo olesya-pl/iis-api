@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "DB0510C9-E28C-4168-957B-95FAB0E8DA09",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 324
+    },
+    "name": "date",
+    "target": "date",
+    "title": "Дата"
+}

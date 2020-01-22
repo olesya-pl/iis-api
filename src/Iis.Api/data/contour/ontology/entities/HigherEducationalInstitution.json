@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "EducationalInstitution"
+    ],
+    "id": "D7FF635E-5734-47dc-A173-131E0593638B",
+    "meta": {
+        "sortOrder": 300
+    },
+    "name": "HigherEducationalInstitution",
+    "title": "Вищий навчальний заклад"
+}

@@ -4,7 +4,7 @@
             "id": "9C997C81-CC15-4b28-9E37-92FC5DCA7D28",
             "meta": {
                 "multiple": false,
-                "sortOrder": 74
+                "sortOrder": 181
             },
             "name": "baseCode",
             "target": "baseCode",
@@ -15,7 +15,7 @@
             "meta": {
                 "formula": "h.fullTitle(entity.baseCode, entity.shortName)",
                 "multiple": false,
-                "sortOrder": 75
+                "sortOrder": 182
             },
             "name": "title",
             "target": "title",
@@ -29,7 +29,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 76,
+                "sortOrder": 183,
                 "title": "Громадянство"
             },
             "name": "relatesToCountry",
@@ -40,7 +40,7 @@
             "id": "06D9B7AA-5E4F-45d5-BC58-11DD6966C0ED",
             "meta": {
                 "multiple": false,
-                "sortOrder": 77
+                "sortOrder": 184
             },
             "name": "shortName",
             "target": "shortName",
@@ -58,7 +58,7 @@
     ],
     "id": "6D2A5C7B-CF50-49d5-8EE8-51979ECC38BC",
     "meta": {
-        "sortOrder": 78
+        "sortOrder": 185
     },
     "name": "MilitaryBase",
     "title": "Військова частина"

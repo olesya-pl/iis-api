@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "014FED8B-043D-4684-A9E4-6FFDE0677078",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 208
+    },
+    "name": "building",
+    "target": "building",
+    "title": "Будинок"
+}

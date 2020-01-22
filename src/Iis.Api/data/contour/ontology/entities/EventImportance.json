@@ -4,7 +4,7 @@
             "id": "2DC35A5A-CAED-43f7-859D-9CCB1487F6D3",
             "meta": {
                 "multiple": false,
-                "sortOrder": 154
+                "sortOrder": 309
             },
             "name": "code",
             "target": "code",
@@ -18,7 +18,7 @@
     "id": "E1614CED-12AD-4e1e-9ADF-73D22CF1E9EA",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 155
+        "sortOrder": 310
     },
     "name": "EventImportance",
     "title": "Важливість Події"

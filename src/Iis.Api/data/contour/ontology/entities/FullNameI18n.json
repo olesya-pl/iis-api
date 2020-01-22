@@ -1,0 +1,51 @@
+{
+    "attributes": [
+        {
+            "id": "3EBE0B45-5574-4170-839D-AE6F36EEAC14",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 288
+            },
+            "name": "firstName",
+            "target": "StringI18n",
+            "title": "ім'я"
+        },
+        {
+            "id": "5A574E72-BDBC-4760-9021-24C8D530D7D5",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 289
+            },
+            "name": "lastName",
+            "target": "StringI18n",
+            "title": "прізвище"
+        },
+        {
+            "id": "96F19368-4E99-40f7-BA78-E914A32DD250",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 290
+            },
+            "name": "fatherName",
+            "target": "StringI18n",
+            "title": "по батькові"
+        },
+        {
+            "id": "14A3E4F2-E3D3-4956-ABC9-C003D3308B9E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 291
+            },
+            "name": "previousName",
+            "target": "StringI18n",
+            "title": "Дівоче/попереднє прізвище"
+        }
+    ],
+    "conceptType": "entities",
+    "id": "CA90CE22-6334-4a49-8287-0FA566592445",
+    "meta": {
+        "sortOrder": 292
+    },
+    "name": "FullNameI18n",
+    "title": "Повне ім'я"
+}

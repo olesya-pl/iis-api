@@ -12,6 +12,7 @@ namespace IIS.Core.Ontology
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default);
 
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
+        Task SaveNodesAsync(IEnumerable<Node> node, CancellationToken cancellationToken = default);
 
         Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default);
         Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default);

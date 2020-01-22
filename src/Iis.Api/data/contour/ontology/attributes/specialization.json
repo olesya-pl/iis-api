@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "0a689af4-df4a-4dc2-a6bf-7ccca7c57826",
+    "meta": {
+    },
+    "name": "specialization",
+    "target": "specialization",
+    "title": "спеціалізація",
+    "type": "String"
+}

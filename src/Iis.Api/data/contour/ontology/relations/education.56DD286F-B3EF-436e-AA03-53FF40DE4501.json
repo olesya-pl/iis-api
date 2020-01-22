@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "56DD286F-B3EF-436e-AA03-53FF40DE4501",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 37
+    },
+    "name": "education",
+    "target": "Education",
+    "title": "Освіта"
+}

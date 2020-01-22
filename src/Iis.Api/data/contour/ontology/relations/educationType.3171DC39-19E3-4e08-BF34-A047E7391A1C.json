@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "3171DC39-19E3-4e08-BF34-A047E7391A1C",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 312
+    },
+    "name": "educationType",
+    "target": "EducationLevel",
+    "title": "тип освіти"
+}

@@ -1,0 +1,15 @@
+{
+    "conceptType": "relations",
+    "id": "88022D6C-B8DE-46b0-B621-8343554FDDFF",
+    "meta": {
+        "formField": {
+            "icon": "flag",
+            "type": "dropdown"
+        },
+        "multiple": true,
+        "sortOrder": 17
+    },
+    "name": "citizenship",
+    "target": "Country",
+    "title": "громадянство"
+}

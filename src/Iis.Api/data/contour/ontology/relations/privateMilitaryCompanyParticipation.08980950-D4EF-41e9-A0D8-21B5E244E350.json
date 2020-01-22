@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "08980950-D4EF-41e9-A0D8-21B5E244E350",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 36
+    },
+    "name": "privateMilitaryCompanyParticipation",
+    "target": "OrgParticipation",
+    "title": "Причетність до приватних військових компаній"
+}

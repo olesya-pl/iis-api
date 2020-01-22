@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "7A23BEC8-8A75-499a-84DF-54803AED9823",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 19
+    },
+    "name": "persNickNameSign",
+    "target": "PersonalNicknameSign",
+    "title": "Прізвисько"
+}

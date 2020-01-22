@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "24BFCF85-60A0-4060-B1A6-5CED90CCF69B",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 326
+    },
+    "name": "scan",
+    "target": "scan",
+    "title": "Скан документа"
+}

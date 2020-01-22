@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "89501CC7-C719-4624-966D-B14724ADF14B",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 48
+    },
+    "name": "sanction",
+    "target": "Sanction",
+    "title": "Стягнення"
+}

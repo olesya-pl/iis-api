@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "80514B48-3511-4ec0-AF79-0EEABB47E6F5",
+    "meta": {
+        "sortOrder": 191
+    },
+    "name": "NavyRank",
+    "title": "Військове звання (флотське)"
+}

@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "BDD8F26B-DE33-4b5e-B28B-2C6C7903CDDA",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 32
+    },
+    "name": "jobHistory",
+    "target": "WorkPlace",
+    "title": "Місця проходження служби/роботи/безробіття"
+}

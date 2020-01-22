@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "E8895B71-8F98-407e-96DC-0260D1BD1538",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 115
+    },
+    "name": "taggedEntities",
+    "target": "ObjectOfStudy",
+    "title": "Посилання на ОР"
+}

@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "60341764-713D-453a-9FA9-396218940735",
+    "meta": {
+        "sortOrder": 167
+    },
+    "name": "Language",
+    "title": "Мова"
+}

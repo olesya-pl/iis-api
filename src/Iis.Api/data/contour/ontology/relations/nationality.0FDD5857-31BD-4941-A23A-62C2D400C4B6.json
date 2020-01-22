@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "0FDD5857-31BD-4941-A23A-62C2D400C4B6",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 16
+    },
+    "name": "nationality",
+    "target": "Nationality",
+    "title": "национальность"
+}

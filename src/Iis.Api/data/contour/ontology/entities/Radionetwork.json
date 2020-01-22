@@ -4,7 +4,7 @@
             "id": "78C173C3-61B3-449d-B5F9-2DD1ACF09A68",
             "meta": {
                 "multiple": false,
-                "sortOrder": 11
+                "sortOrder": 77
             },
             "name": "name",
             "target": "name",
@@ -14,7 +14,7 @@
             "id": "92D3DE68-6E44-4dfd-BA69-D96FA819B495",
             "meta": {
                 "multiple": false,
-                "sortOrder": 12,
+                "sortOrder": 78,
                 "title": "Особливості"
             },
             "name": "description",
@@ -25,7 +25,7 @@
             "id": "313711AC-CA53-45cc-9F2A-30ADFCBFBA13",
             "meta": {
                 "multiple": false,
-                "sortOrder": 13
+                "sortOrder": 79
             },
             "name": "purpose",
             "target": "purpose",
@@ -38,7 +38,7 @@
     ],
     "id": "19C73810-19C0-480e-8F64-63D54BD1A70B",
     "meta": {
-        "sortOrder": 14
+        "sortOrder": 80
     },
     "name": "Radionetwork",
     "title": "Радіомережа"

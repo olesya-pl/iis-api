@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "15b84f5c-8715-4ef2-8466-c4beb748252c",
+    "meta": {
+    },
+    "name": "goal",
+    "target": "goal",
+    "title": "Мета",
+    "type": "String"
+}

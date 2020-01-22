@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Enum"
+    ],
+    "id": "28B6DFE7-789D-4d1b-83B1-64E7ADB8B3BF",
+    "meta": {
+        "sortOrder": 99
+    },
+    "name": "AcademicRank",
+    "title": "Вчене звання"
+}

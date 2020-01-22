@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "30DE68A4-8C35-4f29-8A13-49408F94C8C9",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 228
+    },
+    "name": "order",
+    "target": "Order",
+    "title": "Наказ про призначення"
+}

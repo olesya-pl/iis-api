@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "72696BA8-B900-4a88-8C10-5FD1ED1B10D6",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 178
+    },
+    "name": "issuingAuthority",
+    "target": "Organization",
+    "title": "Орган,що видав"
+}

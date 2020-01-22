@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "95275DE6-CD5F-4a78-81D2-6FF3FEDEEEC8",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 28
+    },
+    "name": "personArmyID",
+    "target": "personArmyID",
+    "title": "Особистий номер військовослужбовця"
+}

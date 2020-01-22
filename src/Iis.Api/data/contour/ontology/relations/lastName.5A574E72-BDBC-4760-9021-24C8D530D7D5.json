@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "5A574E72-BDBC-4760-9021-24C8D530D7D5",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 289
+    },
+    "name": "lastName",
+    "target": "StringI18n",
+    "title": "прізвище"
+}

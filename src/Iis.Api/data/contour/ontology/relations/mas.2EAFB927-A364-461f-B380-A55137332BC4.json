@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "2EAFB927-A364-461f-B380-A55137332BC4",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 39
+    },
+    "name": "mas",
+    "target": "MASItem",
+    "title": "Військово-облікова спеціальність"
+}

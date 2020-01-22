@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D98AA60D-91AA-4d14-AFD0-67EA2284B713",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 8
+    },
+    "name": "kind",
+    "target": "PersonType",
+    "title": ""
+}
