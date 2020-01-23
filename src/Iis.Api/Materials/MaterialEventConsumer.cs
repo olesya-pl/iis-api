@@ -145,8 +145,6 @@ namespace IIS.Core.Materials
 
         private async Task _createFeaturesInArcgis(MaterialAddedEvent eventData)
         {
-            // TODO: the next line should be replaced with the id of autolinked entity
-            var entityId = Guid.NewGuid();
             var jsonSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
