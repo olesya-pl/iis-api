@@ -209,11 +209,11 @@ namespace IIS.Core.Materials
             public readonly double Lat;
             public readonly double Lng;
             public readonly DateTime RegisteredAt;
-            public readonly Guid EntityId;
+            public readonly string EntityId;
 
             public GeoMaterialAttributes(Guid entityId, FieldValue value)
             {
-                EntityId = entityId;
+                EntityId = entityId.ToString("N");
                 Lat = value.Lat;
                 Lng = value.Lng;
                 RegisteredAt = value.RegisteredAt;
