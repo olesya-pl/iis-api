@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Iis.Api.Ontology.EntityFramework
+namespace IIS.Core.Ontology.EntityFramework
 {
-    public class ExtNodeService
+    public class ExtNodeService: IExtNodeService
     {
         private readonly OntologyContext _context;
 
@@ -43,11 +43,27 @@ namespace Iis.Api.Ontology.EntityFramework
         public async Task<List<ExtNode>> GetExtNodesByIds(IEnumerable<Guid> ids)
         {
             var nodes = await GetNodeQuery()
-                .Where(n => ids.Contains(n.Id))
+                .Where(node => ids.Contains(node.Id))
                 .ToListAsync();
 
-            var result = nodes.Select(async n => await MapExtNode(n)).Select(t => t.Result).ToList();
+            var result = await GetExtNodesAsync(nodes);
             return result;
+        }
+
+        public async Task<List<ExtNode>> GetExtNodesByTypeIds(IEnumerable<Guid> nodeTypeIds)
+        {
+            var nodes = await GetNodeQuery()
+                .Where(node => nodeTypeIds.Contains(node.NodeTypeId))
+                .ToListAsync();
+
+            var result = await GetExtNodesAsync(nodes);
+            return result;
+        }
+
+        public async Task<List<Guid>> GetNodeTypesForElastic()
+        {
+            var typeNames = new List<string> { "Person", "Subdivision", "MilitaryMachinery", "Infrastructure", "Radionetwork" };
+            return await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).Select(nt => nt.Id).ToListAsync();
         }
 
         private IQueryable<NodeEntity> GetNodeQuery()
@@ -57,6 +73,17 @@ namespace Iis.Api.Ontology.EntityFramework
                 .Include(n => n.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode);
+        }
+
+        private async Task<List<ExtNode>> GetExtNodesAsync(IEnumerable<NodeEntity> nodeEntities)
+        {
+            var result = new List<ExtNode>();
+            foreach (var node in nodeEntities)
+            {
+                var extNode = await MapExtNode(node);
+                result.Add(extNode);
+            }
+            return result;
         }
     }
 }

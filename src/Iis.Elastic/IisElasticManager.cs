@@ -1,58 +1,57 @@
 ﻿using Elasticsearch.Net;
-using Nest;
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Iis.Elastic
 {
-    public class Person
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Title { get; set; }
-    }
-
     public class IisElasticManager
     {
-        ElasticClient _client;
         ElasticLowLevelClient _lowLevelClient;
+        IisElasticConfiguration _configuration;
         
-        const string INDEX_NAME = "test";
-        public IisElasticManager(string uriString = @"http://localhost:9200")
+        public IisElasticManager(IisElasticConfiguration configuration)
         {
-            var uri = new Uri(uriString);
-            var settings = new ConnectionSettings(uri);
-            _client = new ElasticClient(settings);
+            _configuration = configuration;
 
-            var connectionPool = new SniffingConnectionPool(new[] { uri });
+            var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
             var config = new ConnectionConfiguration(connectionPool);
             _lowLevelClient = new ElasticLowLevelClient(config);
         }
 
-        public void InsertPerson()
+        public async Task<bool> InsertJsonAsync(string baseIndexName, string id, string json, CancellationToken cancellationToken)
         {
-            var settings = new IndexSettings { NumberOfReplicas = 1, NumberOfShards = 2 };
-            var indexConfig = new IndexState
-            {
-                Settings = settings
-            };
-            
-            if (!_client.Indices.Exists(INDEX_NAME).Exists)
-            {
-                _client.Indices.Create(INDEX_NAME, index => index
-                    .InitializeUsing(indexConfig)
-                    .Map<Person>(mp => mp.AutoMap()));
-            }
-
-            var person = new Person { Id = "abcdabcd12341234", Name = "John", Title = "Mister" };
-            
-            var result = _client.Index(person, i => i.Index(INDEX_NAME).Id(person.Id));
-            
+            var path = $"{GetRealIndexName(baseIndexName)}/{id}";
+            PostData postData = json;
+            var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, $"test/person/{id}", cancellationToken, postData);
+            return response.Success;
         }
 
-        public void DoLowLevel()
+        private string GetRealIndexName(string baseIndexName)
         {
-            //var response = _lowLevelClient.DoRequest()
+            return $"{_configuration.IndexPreffix}{baseIndexName}";
+        }
+
+        private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
+        {
+            PostData postData = data;
+            return await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, path, cancellationToken, postData);
+        }
+
+        private async Task<StringResponse> PutAsync(string path, string data, CancellationToken cancellationToken)
+        {
+            return await DoRequestAsync(HttpMethod.PUT, path, data, cancellationToken);
+        }
+
+        private async Task<StringResponse> GetAsync(string path, string data, CancellationToken cancellationToken)
+        {
+            return await DoRequestAsync(HttpMethod.GET, path, data, cancellationToken);
+        }
+
+        private async Task<StringResponse> PostAsync(string path, string data, CancellationToken cancellationToken)
+        {
+            return await DoRequestAsync(HttpMethod.POST, path, data, cancellationToken);
         }
     }
 }

@@ -68,6 +68,7 @@ namespace IIS.Core
             services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
             services.AddTransient<ILegacyMigrator, LegacyMigrator>();
             services.AddTransient<IOntologyService, OntologyService>();
+            services.AddTransient<IExtNodeService, ExtNodeService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IMaterialProvider, MaterialProvider>();

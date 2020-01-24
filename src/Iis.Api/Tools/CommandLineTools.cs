@@ -9,7 +9,8 @@ namespace IIS.Core.Tools
         public static IServiceCollection RegisterRunUpTools(this IServiceCollection services) =>
             services
                 .AddTransient<RunUpTools>()
-                .AddTransient<ActionTools>();
+                .AddTransient<ActionTools>()
+                .AddTransient<ElasticTools>();
 
         public static async Task<bool> RunUpAsync(this IHost host)
         {
