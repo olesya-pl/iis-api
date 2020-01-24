@@ -6,7 +6,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 181
+        "sortOrder": 4
     },
     "name": "issuingAuthority",
     "target": null,

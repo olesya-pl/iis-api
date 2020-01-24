@@ -3,7 +3,7 @@
     "id": "7448142C-A980-455f-8321-539FC83CB64B",
     "meta": {
         "multiple": false,
-        "sortOrder": 73
+        "sortOrder": 2
     },
     "name": "month",
     "target": "MonthInteger",

@@ -4,7 +4,7 @@
             "id": "3171DC39-19E3-4e08-BF34-A047E7391A1C",
             "meta": {
                 "multiple": true,
-                "sortOrder": 359
+                "sortOrder": 1
             },
             "name": "educationType",
             "target": "EducationLevel",
@@ -14,7 +14,7 @@
             "id": "AC60EADB-02E2-4311-BC68-A65D2F173610",
             "meta": {
                 "multiple": true,
-                "sortOrder": 360
+                "sortOrder": 2
             },
             "name": "grade",
             "target": "Grade",

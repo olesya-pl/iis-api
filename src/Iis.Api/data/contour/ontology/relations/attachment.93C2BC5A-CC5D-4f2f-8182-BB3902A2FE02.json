@@ -8,7 +8,7 @@
             "containertype": "Accordion"
         },
         "multiple": true,
-        "sortOrder": 55
+        "sortOrder": 48
     },
     "name": "attachment",
     "target": "AttachmentFile",

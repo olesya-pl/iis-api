@@ -11,7 +11,7 @@
             "type": "dropdown"
         },
         "multiple": true,
-        "sortOrder": 32
+        "sortOrder": 25
     },
     "name": "currentRank",
     "target": null,

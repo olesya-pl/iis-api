@@ -4,7 +4,7 @@
             "id": "A596B06D-4DEE-45f6-AC21-6870432A98C3",
             "meta": {
                 "multiple": false,
-                "sortOrder": 341
+                "sortOrder": 1
             },
             "name": "organization",
             "target": "Organization",
@@ -15,7 +15,7 @@
             "id": "5AAB4BFE-A41D-4938-9634-0AFD162712CB",
             "meta": {
                 "multiple": false,
-                "sortOrder": 342
+                "sortOrder": 2
             },
             "name": "period",
             "target": "period",
@@ -26,7 +26,7 @@
             "id": "9C26B203-EA5A-4744-88E7-1C890F30646C",
             "meta": {
                 "multiple": false,
-                "sortOrder": 343
+                "sortOrder": 3
             },
             "name": "description",
             "target": "description",
@@ -36,7 +36,7 @@
             "id": "15FE316A-F6E4-4b01-9D11-54EBE0322B4F",
             "meta": {
                 "multiple": false,
-                "sortOrder": 344
+                "sortOrder": 4
             },
             "name": "position",
             "target": "Position",

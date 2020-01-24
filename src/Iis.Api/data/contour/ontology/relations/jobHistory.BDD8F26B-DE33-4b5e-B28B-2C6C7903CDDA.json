@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 33
+        "sortOrder": 26
     },
     "name": "jobHistory",
     "target": null,

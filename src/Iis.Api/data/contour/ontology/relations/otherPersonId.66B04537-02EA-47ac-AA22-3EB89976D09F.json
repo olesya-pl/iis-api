@@ -8,7 +8,7 @@
             "containertype": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 30
+        "sortOrder": 23
     },
     "name": "otherPersonId",
     "target": "OtherPersonIdString",

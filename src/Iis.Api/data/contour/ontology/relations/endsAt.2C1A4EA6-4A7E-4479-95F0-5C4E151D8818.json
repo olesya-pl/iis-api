@@ -3,7 +3,7 @@
     "id": "2C1A4EA6-4A7E-4479-95F0-5C4E151D8818",
     "meta": {
         "multiple": false,
-        "sortOrder": 85
+        "sortOrder": 3
     },
     "name": "endsAt",
     "target": "EndsAtDateTime",

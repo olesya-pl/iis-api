@@ -4,7 +4,7 @@
             "id": "F5D17F31-3641-4c3b-86FC-487FDEC29268",
             "meta": {
                 "multiple": false,
-                "sortOrder": 198
+                "sortOrder": 1
             },
             "name": "realName",
             "target": "Accordion",
@@ -14,7 +14,7 @@
             "id": "F2C9BE02-3E0C-4f42-936E-6B1DE960C4E6",
             "meta": {
                 "multiple": false,
-                "sortOrder": 199
+                "sortOrder": 2
             },
             "name": "fakeName",
             "target": "Accordion",
@@ -24,7 +24,7 @@
             "id": "31820E7A-C1D0-42a5-9E55-BB2724A7A95E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 200
+                "sortOrder": 3
             },
             "name": "importantDataChanges",
             "target": "Accordion",
@@ -34,7 +34,7 @@
             "id": "D2D7C903-1636-4b94-91A5-9E140C399B49",
             "meta": {
                 "multiple": false,
-                "sortOrder": 201
+                "sortOrder": 4
             },
             "name": "birthAndDeath",
             "target": "Accordion",
@@ -44,7 +44,7 @@
             "id": "81783AB2-77C8-43b1-B544-354F346964E2",
             "meta": {
                 "multiple": false,
-                "sortOrder": 202
+                "sortOrder": 5
             },
             "name": "identificationData",
             "target": "Accordion",
@@ -54,7 +54,7 @@
             "id": "8AC004FE-E197-4697-9095-D897FB0E74FA",
             "meta": {
                 "multiple": false,
-                "sortOrder": 203
+                "sortOrder": 6
             },
             "name": "passportData",
             "target": "Accordion",
@@ -64,7 +64,7 @@
             "id": "5CDA3A25-B8C2-4377-B72B-97696A04219E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 204
+                "sortOrder": 7
             },
             "name": "foreignPassport",
             "target": "Accordion",
@@ -74,7 +74,7 @@
             "id": "917F7737-FA64-4ee0-AE04-C250354B71D0",
             "meta": {
                 "multiple": false,
-                "sortOrder": 205
+                "sortOrder": 8
             },
             "name": "credPersonDocument",
             "target": "Accordion",
@@ -84,7 +84,7 @@
             "id": "6E72D533-9207-4149-B6C7-A4E802DE6D36",
             "meta": {
                 "multiple": false,
-                "sortOrder": 206
+                "sortOrder": 9
             },
             "name": "otherDocuments",
             "target": "Accordion",
@@ -94,7 +94,7 @@
             "id": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
             "meta": {
                 "multiple": false,
-                "sortOrder": 207
+                "sortOrder": 10
             },
             "name": "importantId",
             "target": "Accordion",
@@ -104,7 +104,7 @@
             "id": "945CC957-C1DF-4a2a-BB24-7E549D037D88",
             "meta": {
                 "multiple": false,
-                "sortOrder": 208
+                "sortOrder": 11
             },
             "name": "otherID",
             "target": "Accordion",
@@ -114,7 +114,7 @@
             "id": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
             "meta": {
                 "multiple": false,
-                "sortOrder": 209
+                "sortOrder": 12
             },
             "name": "currentWorkplace",
             "target": "Accordion",
@@ -124,7 +124,7 @@
             "id": "48410D55-4D75-4d83-A1B3-61428EEB01C0",
             "meta": {
                 "multiple": false,
-                "sortOrder": 210
+                "sortOrder": 13
             },
             "name": "jobHistory",
             "target": "Accordion",
@@ -134,7 +134,7 @@
             "id": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
             "meta": {
                 "multiple": false,
-                "sortOrder": 211
+                "sortOrder": 14
             },
             "name": "politicalParticipation",
             "target": "Accordion",
@@ -144,7 +144,7 @@
             "id": "3BD55143-A266-4e35-9E00-574FF61A456D",
             "meta": {
                 "multiple": false,
-                "sortOrder": 212
+                "sortOrder": 15
             },
             "name": "OiVTParticipation",
             "target": "Accordion",
@@ -154,7 +154,7 @@
             "id": "D39BCDB7-9374-47c6-B29A-6A96A112B8BE",
             "meta": {
                 "multiple": false,
-                "sortOrder": 213
+                "sortOrder": 16
             },
             "name": "extremisticOrgParticipation",
             "target": "Accordion",
@@ -164,7 +164,7 @@
             "id": "582DF971-DABD-4168-973B-7CAFEAFD8A23",
             "meta": {
                 "multiple": false,
-                "sortOrder": 214
+                "sortOrder": 17
             },
             "name": "privateMilitaryCompanyParticipation",
             "target": "Accordion",
@@ -174,7 +174,7 @@
             "id": "3CA195B6-033D-4717-A8AB-9BFC5DFBCCC3",
             "meta": {
                 "multiple": false,
-                "sortOrder": 215
+                "sortOrder": 18
             },
             "name": "teractsParticipation",
             "target": "Accordion",
@@ -184,7 +184,7 @@
             "id": "61A466B0-5178-468c-AB3A-B64B77F5C2B6",
             "meta": {
                 "multiple": false,
-                "sortOrder": 216
+                "sortOrder": 19
             },
             "name": "education",
             "target": "Accordion",
@@ -194,7 +194,7 @@
             "id": "B9B7EC0F-1BFE-4fe4-8D55-C8993EE58AEC",
             "meta": {
                 "multiple": false,
-                "sortOrder": 217
+                "sortOrder": 20
             },
             "name": "foreignLang",
             "target": "Accordion",
@@ -204,7 +204,7 @@
             "id": "FBF3A236-9335-4f0d-A935-54F947EDD7CA",
             "meta": {
                 "multiple": false,
-                "sortOrder": 218
+                "sortOrder": 21
             },
             "name": "MASItem",
             "target": "Accordion",
@@ -214,7 +214,7 @@
             "id": "38B0D1FF-D8D7-4719-9FA3-4602E96CE7B4",
             "meta": {
                 "multiple": false,
-                "sortOrder": 219
+                "sortOrder": 22
             },
             "name": "warOperationParticipation",
             "target": "Accordion",
@@ -224,7 +224,7 @@
             "id": "83985A1B-B32F-433c-8FB3-48E052FD22DE",
             "meta": {
                 "multiple": false,
-                "sortOrder": 220
+                "sortOrder": 23
             },
             "name": "currentLocation",
             "target": "Accordion",
@@ -234,7 +234,7 @@
             "id": "1FA1ED3F-4118-42a5-9CF5-FE027D678D8D",
             "meta": {
                 "multiple": false,
-                "sortOrder": 221
+                "sortOrder": 24
             },
             "name": "wounds",
             "target": "Accordion",
@@ -244,7 +244,7 @@
             "id": "C429BF16-9AC2-4485-B40C-3CD9B519E0DD",
             "meta": {
                 "multiple": false,
-                "sortOrder": 222
+                "sortOrder": 25
             },
             "name": "foreignMission",
             "target": "Accordion",
@@ -254,7 +254,7 @@
             "id": "8944ED63-DD7E-465c-A381-7DD227B78B8E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 223
+                "sortOrder": 26
             },
             "name": "award",
             "target": "Accordion",
@@ -264,7 +264,7 @@
             "id": "85F3F0E4-02F6-46b8-A09A-B203DEFC2A39",
             "meta": {
                 "multiple": false,
-                "sortOrder": 224
+                "sortOrder": 27
             },
             "name": "sanction",
             "target": "Accordion",
@@ -274,7 +274,7 @@
             "id": "BDE2491B-B051-4541-A58C-5FB7DFB196AE",
             "meta": {
                 "multiple": false,
-                "sortOrder": 225
+                "sortOrder": 28
             },
             "name": "criminalSanction",
             "target": "Accordion",
@@ -284,7 +284,7 @@
             "id": "046D4D55-6B93-49ad-BB83-DD14EAF023F5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 226
+                "sortOrder": 29
             },
             "name": "martialStatus",
             "target": "Accordion",
@@ -294,7 +294,7 @@
             "id": "69D6C36A-595D-4858-A168-4D48DC976ADE",
             "meta": {
                 "multiple": false,
-                "sortOrder": 227
+                "sortOrder": 30
             },
             "name": "closePerson",
             "target": "Accordion",
@@ -304,7 +304,7 @@
             "id": "470950D8-5550-4d48-A946-41AAEEDFDCA8",
             "meta": {
                 "multiple": false,
-                "sortOrder": 228
+                "sortOrder": 31
             },
             "name": "contacts",
             "target": "Accordion",
@@ -314,7 +314,7 @@
             "id": "37EE6BFB-6A20-469f-9677-BCE87A410AF3",
             "meta": {
                 "multiple": false,
-                "sortOrder": 229
+                "sortOrder": 32
             },
             "name": "otherInterestingData",
             "target": "Accordion",
@@ -324,7 +324,7 @@
             "id": "D1D6CF4F-52AC-4dc1-8AC6-C627C325B3CB",
             "meta": {
                 "multiple": false,
-                "sortOrder": 230
+                "sortOrder": 33
             },
             "name": "attachment",
             "target": "Accordion",
@@ -334,7 +334,7 @@
             "id": "7E473587-1D03-443f-8822-A4F06AA01860",
             "meta": {
                 "multiple": false,
-                "sortOrder": 231
+                "sortOrder": 34
             },
             "name": "other",
             "target": "Accordion",
@@ -344,7 +344,7 @@
             "id": "CBFB512A-5698-40d0-A95D-951C42E03079",
             "meta": {
                 "multiple": false,
-                "sortOrder": 232
+                "sortOrder": 35
             },
             "name": "toSort",
             "target": "Accordion",

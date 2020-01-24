@@ -7,7 +7,7 @@
             "type": "radioGroup"
         },
         "multiple": false,
-        "sortOrder": 94
+        "sortOrder": 12
     },
     "name": "importance",
     "target": null,

@@ -3,7 +3,7 @@
     "id": "F586ACE2-B5A7-4012-86B6-3F69750BCB16",
     "meta": {
         "multiple": false,
-        "sortOrder": 370
+        "sortOrder": 1
     },
     "name": "number",
     "target": "NumberString",

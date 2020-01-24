@@ -8,7 +8,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 247
+                "sortOrder": 1
             },
             "name": "country",
             "target": "Country",
@@ -19,7 +19,7 @@
             "id": "070CD0E6-0764-4a9a-A2FB-01EC537A1DBD",
             "meta": {
                 "multiple": false,
-                "sortOrder": 248
+                "sortOrder": 2
             },
             "name": "zipCode",
             "target": "zipCode",
@@ -30,7 +30,7 @@
             "id": "FE4FEE0B-1766-4a0c-8AC4-F4EA8CA4C668",
             "meta": {
                 "multiple": false,
-                "sortOrder": 249
+                "sortOrder": 3
             },
             "name": "region",
             "target": "region",
@@ -41,7 +41,7 @@
             "id": "2E6B5A50-283E-4ab0-A7E5-66AB8A22C664",
             "meta": {
                 "multiple": false,
-                "sortOrder": 250
+                "sortOrder": 4
             },
             "name": "subregion",
             "target": "subregion",
@@ -52,7 +52,7 @@
             "id": "E9A706CF-C986-4cd0-BE3D-F9CC3DFE684F",
             "meta": {
                 "multiple": false,
-                "sortOrder": 251
+                "sortOrder": 5
             },
             "name": "city",
             "target": "city",
@@ -63,7 +63,7 @@
             "id": "40D12A66-DE48-4879-8C32-F8F84BBCAC93",
             "meta": {
                 "multiple": false,
-                "sortOrder": 252
+                "sortOrder": 6
             },
             "name": "street",
             "target": "street",
@@ -74,7 +74,7 @@
             "id": "014FED8B-043D-4684-A9E4-6FFDE0677078",
             "meta": {
                 "multiple": false,
-                "sortOrder": 253
+                "sortOrder": 7
             },
             "name": "building",
             "target": "building",
@@ -85,7 +85,7 @@
             "id": "7C4923C0-24A4-408c-802A-8BEDA323908E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 254
+                "sortOrder": 8
             },
             "name": "housing",
             "target": "housing",
@@ -96,7 +96,7 @@
             "id": "B2DA67F6-D642-47fa-AE36-0C12F374C795",
             "meta": {
                 "multiple": false,
-                "sortOrder": 255
+                "sortOrder": 9
             },
             "name": "apartment",
             "target": "apartment",

@@ -3,7 +3,7 @@
     "id": "F0B84A9A-06F0-424c-9E3B-846763950FD0",
     "meta": {
         "multiple": false,
-        "sortOrder": 83
+        "sortOrder": 1
     },
     "name": "startsAt",
     "target": "StartsAtDateTime",

@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 35
+        "sortOrder": 28
     },
     "name": "OiVTParticipation",
     "target": null,

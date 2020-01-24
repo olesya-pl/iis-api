@@ -3,7 +3,7 @@
     "id": "7162B2E4-3947-4d63-A2E1-8F1358DB1A22",
     "meta": {
         "multiple": false,
-        "sortOrder": 134
+        "sortOrder": 1
     },
     "name": "modelNumber",
     "target": "ModelNumberString",

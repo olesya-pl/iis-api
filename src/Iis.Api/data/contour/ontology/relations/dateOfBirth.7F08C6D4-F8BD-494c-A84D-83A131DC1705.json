@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 12
+        "sortOrder": 5
     },
     "name": "dateOfBirth",
     "target": null,

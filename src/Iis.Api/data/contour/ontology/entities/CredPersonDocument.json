@@ -5,7 +5,7 @@
             "id": "3A7FA84F-A328-4d33-89E6-3E882786E20E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 178
+                "sortOrder": 1
             },
             "name": "series",
             "target": "series",
@@ -16,7 +16,7 @@
             "id": "1EBF40DC-3E9C-4391-9BAE-D08ABCD9C282",
             "meta": {
                 "multiple": false,
-                "sortOrder": 179
+                "sortOrder": 2
             },
             "name": "number",
             "target": "number",
@@ -27,7 +27,7 @@
             "id": "1E90026A-A2A6-4e15-8C55-22D8B88DE07E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 180
+                "sortOrder": 3
             },
             "name": "dateOfIssue",
             "target": "dateOfIssue",
@@ -40,7 +40,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 181
+                "sortOrder": 4
             },
             "name": "issuingAuthority",
             "target": "Organization",

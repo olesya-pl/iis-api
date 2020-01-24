@@ -4,7 +4,7 @@
             "id": "36CBF986-3AB5-4d64-985D-45A6F2C37156",
             "meta": {
                 "multiple": false,
-                "sortOrder": 266
+                "sortOrder": 1
             },
             "name": "date",
             "target": "FuzzyDate",
@@ -15,7 +15,7 @@
             "id": "476A97C1-0493-486d-96F1-C6013EA6E85D",
             "meta": {
                 "multiple": false,
-                "sortOrder": 267
+                "sortOrder": 2
             },
             "name": "reason",
             "target": "reason",
@@ -25,7 +25,7 @@
             "id": "C235BE3A-9C22-4b90-B111-81ADE0CA7403",
             "meta": {
                 "multiple": false,
-                "sortOrder": 268
+                "sortOrder": 3
             },
             "name": "who",
             "target": "TaggableString",
@@ -36,7 +36,7 @@
             "id": "F37ED3B1-3937-4aed-BDE8-CB9A827251DA",
             "meta": {
                 "multiple": true,
-                "sortOrder": 269
+                "sortOrder": 4
             },
             "name": "attachment",
             "target": "attachment",

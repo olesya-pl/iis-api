@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 20
+        "sortOrder": 13
     },
     "name": "persNickNameSign",
     "target": null,

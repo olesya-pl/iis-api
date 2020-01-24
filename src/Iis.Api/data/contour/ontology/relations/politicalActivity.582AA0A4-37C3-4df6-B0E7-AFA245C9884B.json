@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 41
+        "sortOrder": 34
     },
     "name": "politicalActivity",
     "target": null,

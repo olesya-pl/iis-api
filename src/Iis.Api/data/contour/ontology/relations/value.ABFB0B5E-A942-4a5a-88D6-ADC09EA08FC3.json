@@ -4,7 +4,7 @@
     "meta": {
         "format": "phone",
         "multiple": false,
-        "sortOrder": 148,
+        "sortOrder": 1,
         "validation": {
             "required": true
         }

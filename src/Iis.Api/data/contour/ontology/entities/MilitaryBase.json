@@ -5,7 +5,7 @@
             "id": "9C997C81-CC15-4b28-9E37-92FC5DCA7D28",
             "meta": {
                 "multiple": false,
-                "sortOrder": 186
+                "sortOrder": 1
             },
             "name": "baseCode",
             "target": "baseCode",
@@ -17,7 +17,7 @@
             "meta": {
                 "formula": "h.fullTitle(entity.baseCode, entity.shortName)",
                 "multiple": false,
-                "sortOrder": 187
+                "sortOrder": 2
             },
             "name": "title",
             "target": "title",
@@ -31,7 +31,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 188,
+                "sortOrder": 3,
                 "title": "Громадянство"
             },
             "name": "relatesToCountry",
@@ -43,7 +43,7 @@
             "id": "06D9B7AA-5E4F-45d5-BC58-11DD6966C0ED",
             "meta": {
                 "multiple": false,
-                "sortOrder": 189
+                "sortOrder": 4
             },
             "name": "shortName",
             "target": "shortName",

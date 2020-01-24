@@ -7,7 +7,7 @@
             "type": "dropdownTree"
         },
         "multiple": false,
-        "sortOrder": 89
+        "sortOrder": 7
     },
     "name": "component",
     "target": null,

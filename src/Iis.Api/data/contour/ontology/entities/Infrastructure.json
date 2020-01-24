@@ -5,7 +5,7 @@
             "id": "5E07CDBA-2B7C-48c3-A9C4-1045F481B233",
             "meta": {
                 "multiple": false,
-                "sortOrder": 276
+                "sortOrder": 1
             },
             "name": "temporaryDislocation",
             "target": "temporaryDislocation",
@@ -16,7 +16,7 @@
             "id": "CBAC5FCB-D7D0-4b7d-AD6A-31951AD71365",
             "meta": {
                 "multiple": false,
-                "sortOrder": 277
+                "sortOrder": 2
             },
             "name": "dislocation",
             "target": "dislocation",
@@ -27,7 +27,7 @@
             "id": "9E798917-E43A-4ded-A258-91EAF51C9B1B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 278
+                "sortOrder": 3
             },
             "name": "description",
             "target": "description",
@@ -37,7 +37,7 @@
             "id": "D4239010-7D42-42f6-A5AB-0C9C8FB508AD",
             "meta": {
                 "multiple": false,
-                "sortOrder": 279
+                "sortOrder": 4
             },
             "name": "infrastructureType",
             "target": "InfrastructureType",
@@ -47,7 +47,7 @@
             "id": "0AA62A16-9A68-4464-9637-758935489E3E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 280
+                "sortOrder": 5
             },
             "name": "bePartOf",
             "target": "Infrastructure_bePartOf",
@@ -58,7 +58,7 @@
             "id": "D19922F9-0536-403a-916F-DFF33DEDF080",
             "meta": {
                 "multiple": false,
-                "sortOrder": 281,
+                "sortOrder": 6,
                 "title": "Повне найменування"
             },
             "name": "name",
@@ -73,7 +73,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 282
+                "sortOrder": 7
             },
             "name": "relatesToCountry",
             "target": "Country",
@@ -84,7 +84,7 @@
             "id": "AA1C1117-B261-46fe-8BEC-E4869263F962",
             "meta": {
                 "multiple": false,
-                "sortOrder": 283
+                "sortOrder": 8
             },
             "name": "placeOfDislocation",
             "target": "placeOfDislocation",
@@ -96,7 +96,7 @@
             "meta": {
                 "formula": "h.fullTitle(entity.shortName, entity.name)",
                 "multiple": false,
-                "sortOrder": 284
+                "sortOrder": 9
             },
             "name": "title",
             "target": "title",
@@ -107,7 +107,7 @@
             "id": "98D7EF5A-223F-46aa-B92B-5FF337226E24",
             "meta": {
                 "multiple": false,
-                "sortOrder": 285
+                "sortOrder": 10
             },
             "name": "shortName",
             "target": "shortName",
@@ -117,7 +117,7 @@
             "id": "C21A684E-4491-44c9-8328-EA5F14344181",
             "meta": {
                 "multiple": false,
-                "sortOrder": 286
+                "sortOrder": 11
             },
             "name": "militaryBase",
             "target": "MilitaryBase",

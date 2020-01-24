@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 37
+        "sortOrder": 30
     },
     "name": "privateMilitaryCompanyParticipation",
     "target": null,

@@ -7,11 +7,8 @@
             "containerTitle": "Установчі дані",
             "containertype": "Accordion"
         },
-        "formField": {
-            "type": "form"
-        },
         "multiple": false,
-        "sortOrder": 16
+        "sortOrder": 9
     },
     "name": "gender",
     "target": null,

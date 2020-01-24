@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 60
+        "sortOrder": 3
     },
     "name": "sign",
     "target": null,

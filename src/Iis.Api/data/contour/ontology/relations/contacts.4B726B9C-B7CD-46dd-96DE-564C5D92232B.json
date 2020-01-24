@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 53
+        "sortOrder": 46
     },
     "name": "contacts",
     "target": null,

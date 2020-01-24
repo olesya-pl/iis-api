@@ -5,7 +5,7 @@
             "id": "2DD07743-F11E-4036-B081-60D62991127E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 68
+                "sortOrder": 1
             },
             "name": "name",
             "target": "name",
@@ -15,7 +15,7 @@
             "id": "1BCACFB4-2818-4c96-8EEC-B3C6595D9BE9",
             "meta": {
                 "multiple": false,
-                "sortOrder": 69
+                "sortOrder": 2
             },
             "name": "currentOwner",
             "target": "Person",
@@ -25,7 +25,7 @@
             "id": "4F1385FD-5657-4699-815A-5D035A8459A6",
             "meta": {
                 "multiple": false,
-                "sortOrder": 70
+                "sortOrder": 3
             },
             "name": "previousOwner",
             "target": "Person",

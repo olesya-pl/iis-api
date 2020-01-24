@@ -3,7 +3,7 @@
     "id": "13B650A0-5BB4-4e44-9890-610D1F8A88E0",
     "meta": {
         "multiple": false,
-        "sortOrder": 290,
+        "sortOrder": 1,
         "title": "Географічні координати місце поточної дислокації (ПТД)"
     },
     "name": "temporaryDislocation",

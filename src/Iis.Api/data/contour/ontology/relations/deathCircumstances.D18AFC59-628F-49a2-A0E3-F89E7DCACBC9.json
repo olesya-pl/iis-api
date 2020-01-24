@@ -8,7 +8,7 @@
             "containertype": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 15
+        "sortOrder": 8
     },
     "name": "deathCircumstances",
     "target": "DeathCircumstancesString",

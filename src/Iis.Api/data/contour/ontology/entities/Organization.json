@@ -5,7 +5,7 @@
             "id": "EFE6B452-E3AD-4098-AA77-F2F6C102A2F1",
             "meta": {
                 "multiple": false,
-                "sortOrder": 4
+                "sortOrder": 1
             },
             "name": "name",
             "target": "name",
@@ -16,7 +16,7 @@
             "id": "D3433422-1175-4d4f-A913-D731167684F8",
             "meta": {
                 "multiple": false,
-                "sortOrder": 5
+                "sortOrder": 2
             },
             "name": "title",
             "target": "title",

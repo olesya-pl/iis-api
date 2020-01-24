@@ -3,7 +3,7 @@
     "id": "0B1940AE-5E7F-421b-9107-B154E7911194",
     "meta": {
         "multiple": false,
-        "sortOrder": 348
+        "sortOrder": 1
     },
     "name": "location",
     "target": "LocationGeo",

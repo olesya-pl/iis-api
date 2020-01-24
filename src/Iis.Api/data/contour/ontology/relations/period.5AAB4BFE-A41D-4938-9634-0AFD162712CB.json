@@ -3,7 +3,7 @@
     "id": "5AAB4BFE-A41D-4938-9634-0AFD162712CB",
     "meta": {
         "multiple": false,
-        "sortOrder": 342
+        "sortOrder": 2
     },
     "name": "period",
     "target": "PeriodDateRange",

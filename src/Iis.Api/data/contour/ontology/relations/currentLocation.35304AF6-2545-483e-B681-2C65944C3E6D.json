@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 45
+        "sortOrder": 38
     },
     "name": "currentLocation",
     "target": null,

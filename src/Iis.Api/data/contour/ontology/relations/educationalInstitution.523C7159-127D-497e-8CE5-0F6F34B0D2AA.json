@@ -6,7 +6,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 124
+        "sortOrder": 2
     },
     "name": "educationalInstitution",
     "target": null,

@@ -3,7 +3,7 @@
     "id": "0DBCCC4A-9517-4980-A11C-4B491A33DC07",
     "meta": {
         "multiple": false,
-        "sortOrder": 135
+        "sortOrder": 2
     },
     "name": "serialNumber",
     "target": "SerialNumberString",

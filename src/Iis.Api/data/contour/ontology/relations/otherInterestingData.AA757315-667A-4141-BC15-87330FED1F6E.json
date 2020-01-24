@@ -8,7 +8,7 @@
             "containertype": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 54
+        "sortOrder": 47
     },
     "name": "otherInterestingData",
     "target": "OtherInterestingDataString",

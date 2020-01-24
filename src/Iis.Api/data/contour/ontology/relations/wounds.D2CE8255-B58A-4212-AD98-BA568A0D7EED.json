@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 46
+        "sortOrder": 39
     },
     "name": "wounds",
     "target": null,

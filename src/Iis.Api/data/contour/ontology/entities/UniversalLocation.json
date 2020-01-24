@@ -5,7 +5,7 @@
             "id": "0B1940AE-5E7F-421b-9107-B154E7911194",
             "meta": {
                 "multiple": false,
-                "sortOrder": 348
+                "sortOrder": 1
             },
             "name": "location",
             "target": "location",
@@ -15,7 +15,7 @@
             "id": "B9B0E246-906B-4bf1-BA0A-FE7AECFE3F44",
             "meta": {
                 "multiple": false,
-                "sortOrder": 349
+                "sortOrder": 2
             },
             "name": "postalAddress",
             "target": "PostalAddress",
@@ -26,7 +26,7 @@
             "id": "38FB5A6C-51A7-4d4d-ADC5-6FDDB6563DF6",
             "meta": {
                 "multiple": false,
-                "sortOrder": 350
+                "sortOrder": 3
             },
             "name": "geoID",
             "target": "geoID",

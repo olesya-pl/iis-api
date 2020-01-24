@@ -4,7 +4,7 @@
     "meta": {
         "formula": "h.join(entity.realName.ukraineName, entity.realName.ukraineName, entity.realName.ukraineName)",
         "multiple": false,
-        "sortOrder": 14
+        "sortOrder": 7
     },
     "name": "title",
     "target": "TitleString",

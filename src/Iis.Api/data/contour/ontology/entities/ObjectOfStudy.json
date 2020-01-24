@@ -9,7 +9,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 58,
+                "sortOrder": 1,
                 "validation": {
                     "required": true
                 }
@@ -23,7 +23,7 @@
             "id": "A73E7CD0-A93C-4763-B754-97FEC8897C02",
             "meta": {
                 "multiple": true,
-                "sortOrder": 59
+                "sortOrder": 2
             },
             "name": "attachment",
             "target": "attachment",
@@ -41,7 +41,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 60
+                "sortOrder": 3
             },
             "name": "sign",
             "target": "ObjectSign",
@@ -53,7 +53,7 @@
             "meta": {
                 "formula": "entity.name",
                 "multiple": false,
-                "sortOrder": 61,
+                "sortOrder": 4,
                 "validation": {
                     "required": true
                 }
@@ -70,7 +70,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 62,
+                "sortOrder": 5,
                 "validation": {
                     "required": true
                 }
@@ -84,7 +84,7 @@
             "id": "A5865C53-E147-477e-9493-ABDC0D2995EB",
             "meta": {
                 "multiple": false,
-                "sortOrder": 63
+                "sortOrder": 6
             },
             "name": "lastConfirmedAt",
             "target": "lastConfirmedAt",
@@ -95,7 +95,7 @@
             "id": "BA78FBF8-240D-43fb-9D10-799F8F1F0FEC",
             "meta": {
                 "multiple": false,
-                "sortOrder": 64
+                "sortOrder": 7
             },
             "name": "photo",
             "target": "photo",

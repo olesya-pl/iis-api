@@ -5,7 +5,7 @@
             "id": "78C173C3-61B3-449d-B5F9-2DD1ACF09A68",
             "meta": {
                 "multiple": false,
-                "sortOrder": 79
+                "sortOrder": 1
             },
             "name": "name",
             "target": "name",
@@ -16,7 +16,7 @@
             "id": "92D3DE68-6E44-4dfd-BA69-D96FA819B495",
             "meta": {
                 "multiple": false,
-                "sortOrder": 80,
+                "sortOrder": 2,
                 "title": "Особливості"
             },
             "name": "description",
@@ -28,7 +28,7 @@
             "id": "313711AC-CA53-45cc-9F2A-30ADFCBFBA13",
             "meta": {
                 "multiple": false,
-                "sortOrder": 81
+                "sortOrder": 3
             },
             "name": "purpose",
             "target": "purpose",

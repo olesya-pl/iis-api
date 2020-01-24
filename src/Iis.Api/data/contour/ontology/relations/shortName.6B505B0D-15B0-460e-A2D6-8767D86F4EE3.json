@@ -3,7 +3,7 @@
     "id": "6B505B0D-15B0-460e-A2D6-8767D86F4EE3",
     "meta": {
         "multiple": false,
-        "sortOrder": 301
+        "sortOrder": 12
     },
     "name": "shortName",
     "target": "ShortNameString",

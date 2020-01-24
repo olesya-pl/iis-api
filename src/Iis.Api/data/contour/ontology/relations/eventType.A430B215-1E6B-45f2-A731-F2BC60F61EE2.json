@@ -7,7 +7,7 @@
             "type": "dropdownTree"
         },
         "multiple": false,
-        "sortOrder": 86
+        "sortOrder": 4
     },
     "name": "eventType",
     "target": null,

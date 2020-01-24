@@ -5,7 +5,7 @@
             "id": "0DDB81F7-EA48-4a90-AD24-6BDD072B5370",
             "meta": {
                 "multiple": false,
-                "sortOrder": 72
+                "sortOrder": 1
             },
             "name": "day",
             "target": "day",
@@ -16,7 +16,7 @@
             "id": "7448142C-A980-455f-8321-539FC83CB64B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 73
+                "sortOrder": 2
             },
             "name": "month",
             "target": "month",
@@ -27,7 +27,7 @@
             "id": "FC93BC0D-7989-4650-BB89-AC3D2A06A07B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 74
+                "sortOrder": 3
             },
             "name": "year",
             "target": "year",

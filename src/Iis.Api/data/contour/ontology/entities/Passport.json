@@ -5,7 +5,7 @@
             "id": "0C2B882B-B827-4f9f-B6BB-B477FE5AEC10",
             "meta": {
                 "multiple": false,
-                "sortOrder": 159
+                "sortOrder": 1
             },
             "name": "authorityOrganizationCode",
             "target": "authorityOrganizationCode",

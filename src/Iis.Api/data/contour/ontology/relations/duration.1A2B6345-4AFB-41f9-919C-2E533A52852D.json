@@ -6,7 +6,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 123
+        "sortOrder": 1
     },
     "name": "duration",
     "target": null,

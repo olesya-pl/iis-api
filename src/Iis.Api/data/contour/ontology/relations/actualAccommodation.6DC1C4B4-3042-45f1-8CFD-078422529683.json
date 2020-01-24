@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 23
+        "sortOrder": 16
     },
     "name": "actualAccommodation",
     "target": null,

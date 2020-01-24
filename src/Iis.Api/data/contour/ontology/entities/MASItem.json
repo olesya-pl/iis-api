@@ -5,7 +5,7 @@
             "id": "B6C73845-27C5-4fa4-B396-72793EDD7566",
             "meta": {
                 "multiple": false,
-                "sortOrder": 161
+                "sortOrder": 1
             },
             "name": "code",
             "target": "code",
@@ -16,7 +16,7 @@
             "id": "B4313AC3-77FD-4654-A337-E4C7A9007808",
             "meta": {
                 "multiple": false,
-                "sortOrder": 162
+                "sortOrder": 2
             },
             "name": "name",
             "target": "name",

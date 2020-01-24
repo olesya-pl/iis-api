@@ -3,7 +3,7 @@
     "id": "FC93BC0D-7989-4650-BB89-AC3D2A06A07B",
     "meta": {
         "multiple": false,
-        "sortOrder": 74
+        "sortOrder": 3
     },
     "name": "year",
     "target": "YearInteger",

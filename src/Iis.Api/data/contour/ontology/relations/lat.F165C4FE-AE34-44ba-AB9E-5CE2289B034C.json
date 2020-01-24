@@ -3,7 +3,7 @@
     "id": "F165C4FE-AE34-44ba-AB9E-5CE2289B034C",
     "meta": {
         "multiple": false,
-        "sortOrder": 241
+        "sortOrder": 5
     },
     "name": "lat",
     "target": "LatString",

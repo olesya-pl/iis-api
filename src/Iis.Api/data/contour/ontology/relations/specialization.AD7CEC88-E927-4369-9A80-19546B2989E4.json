@@ -3,7 +3,7 @@
     "id": "AD7CEC88-E927-4369-9A80-19546B2989E4",
     "meta": {
         "multiple": false,
-        "sortOrder": 128
+        "sortOrder": 6
     },
     "name": "specialization",
     "target": "SpecializationString",

@@ -8,7 +8,7 @@
             "containertype": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 29
+        "sortOrder": 22
     },
     "name": "personArmyID",
     "target": "PersonArmyIDString",

@@ -3,7 +3,7 @@
     "id": "5E07CDBA-2B7C-48c3-A9C4-1045F481B233",
     "meta": {
         "multiple": false,
-        "sortOrder": 276
+        "sortOrder": 1
     },
     "name": "temporaryDislocation",
     "target": "TemporaryDislocationGeo",

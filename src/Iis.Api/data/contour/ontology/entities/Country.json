@@ -5,7 +5,7 @@
             "id": "82FFCDC7-C406-4727-9030-5835B508A44B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 237
+                "sortOrder": 1
             },
             "name": "code",
             "target": "code",
@@ -16,7 +16,7 @@
             "id": "BD75FC00-6C69-454e-9569-597D0499E9E8",
             "meta": {
                 "multiple": false,
-                "sortOrder": 238
+                "sortOrder": 2
             },
             "name": "alpha2",
             "target": "alpha2",
@@ -27,7 +27,7 @@
             "id": "08EB5E21-47F4-4c09-AA64-C4AA2C9CDE7F",
             "meta": {
                 "multiple": false,
-                "sortOrder": 239
+                "sortOrder": 3
             },
             "name": "alpha3",
             "target": "alpha3",
@@ -38,7 +38,7 @@
             "id": "77A58922-2228-47a6-B5DF-7AFADFC66D33",
             "meta": {
                 "multiple": false,
-                "sortOrder": 240
+                "sortOrder": 4
             },
             "name": "text",
             "target": "text",
@@ -49,7 +49,7 @@
             "id": "F165C4FE-AE34-44ba-AB9E-5CE2289B034C",
             "meta": {
                 "multiple": false,
-                "sortOrder": 241
+                "sortOrder": 5
             },
             "name": "lat",
             "target": "lat",
@@ -60,7 +60,7 @@
             "id": "11A56B29-9A8D-4bb9-AD5F-02F69071EF24",
             "meta": {
                 "multiple": false,
-                "sortOrder": 242
+                "sortOrder": 6
             },
             "name": "lng",
             "target": "lng",
@@ -71,7 +71,7 @@
             "id": "2EFF31EC-CA61-4d94-B1C7-FE068174625B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 243
+                "sortOrder": 7
             },
             "name": "region",
             "target": "region",
@@ -82,7 +82,7 @@
             "id": "E2AD62AC-65F9-47c1-9DC5-2A2697F7B630",
             "meta": {
                 "multiple": false,
-                "sortOrder": 244
+                "sortOrder": 8
             },
             "name": "sub_region",
             "target": "sub_region",

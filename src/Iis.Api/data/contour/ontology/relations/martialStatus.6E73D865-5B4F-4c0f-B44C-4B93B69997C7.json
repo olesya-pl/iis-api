@@ -11,7 +11,7 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 51
+        "sortOrder": 44
     },
     "name": "martialStatus",
     "target": null,

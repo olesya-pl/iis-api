@@ -6,7 +6,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 336
+        "sortOrder": 2
     },
     "name": "lastName",
     "target": null,

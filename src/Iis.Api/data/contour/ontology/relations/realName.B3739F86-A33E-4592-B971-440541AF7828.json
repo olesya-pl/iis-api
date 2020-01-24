@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 9
+        "sortOrder": 2
     },
     "name": "realName",
     "target": null,

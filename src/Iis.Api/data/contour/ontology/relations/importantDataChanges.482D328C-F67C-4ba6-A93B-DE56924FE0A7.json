@@ -7,11 +7,8 @@
             "containerTitle": "Зміни установчих даних",
             "containertype": "Accordion"
         },
-        "formField": {
-            "type": "form"
-        },
         "multiple": true,
-        "sortOrder": 11
+        "sortOrder": 4
     },
     "name": "importantDataChanges",
     "target": "ImportantDataChangesString",

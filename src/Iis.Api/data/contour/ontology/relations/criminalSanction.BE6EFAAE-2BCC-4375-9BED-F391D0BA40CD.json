@@ -8,7 +8,7 @@
             "containertype": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 50
+        "sortOrder": 43
     },
     "name": "criminalSanction",
     "target": "CriminalSanctionString",

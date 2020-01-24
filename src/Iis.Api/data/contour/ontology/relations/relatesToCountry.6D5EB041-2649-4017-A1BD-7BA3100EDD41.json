@@ -7,7 +7,7 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 188,
+        "sortOrder": 3,
         "title": "Громадянство"
     },
     "name": "relatesToCountry",

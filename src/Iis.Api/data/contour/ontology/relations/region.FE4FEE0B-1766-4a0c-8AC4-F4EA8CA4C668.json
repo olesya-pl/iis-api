@@ -3,7 +3,7 @@
     "id": "FE4FEE0B-1766-4a0c-8AC4-F4EA8CA4C668",
     "meta": {
         "multiple": false,
-        "sortOrder": 249
+        "sortOrder": 3
     },
     "name": "region",
     "target": "RegionString",

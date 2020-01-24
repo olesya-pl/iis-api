@@ -5,7 +5,7 @@
             "id": "F586ACE2-B5A7-4012-86B6-3F69750BCB16",
             "meta": {
                 "multiple": false,
-                "sortOrder": 370
+                "sortOrder": 1
             },
             "name": "number",
             "target": "number",
@@ -16,7 +16,7 @@
             "id": "DB0510C9-E28C-4168-957B-95FAB0E8DA09",
             "meta": {
                 "multiple": false,
-                "sortOrder": 371
+                "sortOrder": 2
             },
             "name": "date",
             "target": "date",
@@ -26,7 +26,7 @@
             "id": "82843C30-BBF5-48d3-A619-4BFB4C5DF524",
             "meta": {
                 "multiple": false,
-                "sortOrder": 372
+                "sortOrder": 3
             },
             "name": "orderPublisher",
             "target": "Position",
@@ -37,7 +37,7 @@
             "id": "24BFCF85-60A0-4060-B1A6-5CED90CCF69B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 373
+                "sortOrder": 4
             },
             "name": "scan",
             "target": "scan",

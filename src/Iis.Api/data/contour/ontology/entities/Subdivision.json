@@ -5,7 +5,7 @@
             "id": "13B650A0-5BB4-4e44-9890-610D1F8A88E0",
             "meta": {
                 "multiple": false,
-                "sortOrder": 290,
+                "sortOrder": 1,
                 "title": "Географічні координати місце поточної дислокації (ПТД)"
             },
             "name": "temporaryDislocation",
@@ -17,7 +17,7 @@
             "id": "45E8AA5E-F4B8-477c-B25B-27E81AED00F1",
             "meta": {
                 "multiple": false,
-                "sortOrder": 291,
+                "sortOrder": 2,
                 "title": "Географічні координати пункту дислокації штабу (ППД)"
             },
             "name": "dislocation",
@@ -28,7 +28,7 @@
             "id": "DD4CCB44-98D0-442f-BF65-53879CB051D2",
             "meta": {
                 "multiple": false,
-                "sortOrder": 292
+                "sortOrder": 3
             },
             "name": "subtype",
             "target": "MachinerySubtype",
@@ -40,7 +40,7 @@
             "meta": {
                 "formula": "h.fullTitle(entity.shortName, entity.name)",
                 "multiple": false,
-                "sortOrder": 293
+                "sortOrder": 4
             },
             "name": "title",
             "target": "title",
@@ -50,7 +50,7 @@
             "id": "59D79DA2-9C71-4d86-AD0B-2E5E9475F0E9",
             "meta": {
                 "multiple": false,
-                "sortOrder": 294
+                "sortOrder": 5
             },
             "name": "militaryBase",
             "target": "MilitaryBase",
@@ -61,7 +61,7 @@
             "id": "D6AB4AD9-81B1-4215-AE2E-4C93A951119E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 295
+                "sortOrder": 6
             },
             "name": "headquartersDislocation",
             "target": "headquartersDislocation",
@@ -75,7 +75,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 296
+                "sortOrder": 7
             },
             "name": "relatesToCountry",
             "target": "Country",
@@ -85,7 +85,7 @@
             "id": "C732D9AF-F716-49dc-95ED-43B871652AA1",
             "meta": {
                 "multiple": false,
-                "sortOrder": 297
+                "sortOrder": 8
             },
             "name": "amount",
             "target": "MilitaryAmount",
@@ -95,7 +95,7 @@
             "id": "7FC2FBC8-92B3-4495-9B87-057A8227A880",
             "meta": {
                 "multiple": false,
-                "sortOrder": 298
+                "sortOrder": 9
             },
             "name": "corpsType",
             "target": "Corps",
@@ -106,7 +106,7 @@
             "id": "6778A896-E457-4188-8152-6C39D373D562",
             "meta": {
                 "multiple": false,
-                "sortOrder": 299,
+                "sortOrder": 10,
                 "title": "Повне найменування"
             },
             "name": "name",
@@ -118,7 +118,7 @@
             "id": "792C4AA0-62B5-428f-9B0D-446EF4B571E2",
             "meta": {
                 "multiple": false,
-                "sortOrder": 300
+                "sortOrder": 11
             },
             "name": "description",
             "target": "description",
@@ -129,7 +129,7 @@
             "id": "6B505B0D-15B0-460e-A2D6-8767D86F4EE3",
             "meta": {
                 "multiple": false,
-                "sortOrder": 301
+                "sortOrder": 12
             },
             "name": "shortName",
             "target": "shortName",
@@ -140,7 +140,7 @@
             "id": "C5BD9336-783D-4529-88AE-8B54A00DE96C",
             "meta": {
                 "multiple": false,
-                "sortOrder": 302,
+                "sortOrder": 13,
                 "title": "Місце поточної дислокації"
             },
             "name": "placeOfDislocation",
@@ -152,7 +152,7 @@
             "id": "D5A8C0F1-D76D-452a-AF0D-59911C01DF12",
             "meta": {
                 "multiple": false,
-                "sortOrder": 303
+                "sortOrder": 14
             },
             "name": "placeOfHeadquartersDislocation",
             "target": "placeOfHeadquartersDislocation",
@@ -162,7 +162,7 @@
             "id": "AF187C17-916B-4c04-9A20-F4FC2BD91E2B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 304
+                "sortOrder": 15
             },
             "name": "sidcTitle",
             "target": "SIDC",
@@ -178,7 +178,7 @@
                     "title": "Підлеглий"
                 },
                 "multiple": false,
-                "sortOrder": 305,
+                "sortOrder": 16,
                 "type": "hierarchical"
             },
             "name": "superior",
@@ -189,7 +189,7 @@
             "id": "F089BAE1-EC5E-49fc-AC19-74E855652ADF",
             "meta": {
                 "multiple": false,
-                "sortOrder": 306
+                "sortOrder": 17
             },
             "name": "bePartOf",
             "target": "Subdivision",
@@ -200,7 +200,7 @@
             "id": "7DCE59F4-374B-4458-8940-E9E56C52806A",
             "meta": {
                 "multiple": false,
-                "sortOrder": 307
+                "sortOrder": 18
             },
             "name": "amountOfPersonnel",
             "target": "amountOfPersonnel",

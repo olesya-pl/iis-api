@@ -9,7 +9,7 @@
                     "containertype": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 8
+                "sortOrder": 1
             },
             "name": "kind",
             "target": "PersonType",
@@ -27,7 +27,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 9
+                "sortOrder": 2
             },
             "name": "realName",
             "target": "FullNameI18n",
@@ -45,7 +45,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 10
+                "sortOrder": 3
             },
             "name": "fakeName",
             "target": "FullNameI18n",
@@ -60,11 +60,8 @@
                     "containerTitle": "Зміни установчих даних",
                     "containertype": "Accordion"
                 },
-                "formField": {
-                    "type": "form"
-                },
                 "multiple": true,
-                "sortOrder": 11
+                "sortOrder": 4
             },
             "name": "importantDataChanges",
             "target": "importantDataChanges",
@@ -82,7 +79,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 12
+                "sortOrder": 5
             },
             "name": "dateOfBirth",
             "target": "FuzzyDate",
@@ -100,7 +97,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 13
+                "sortOrder": 6
             },
             "name": "dateOfDeath",
             "target": "FuzzyDate",
@@ -112,7 +109,7 @@
             "meta": {
                 "formula": "h.join(entity.realName.ukraineName, entity.realName.ukraineName, entity.realName.ukraineName)",
                 "multiple": false,
-                "sortOrder": 14
+                "sortOrder": 7
             },
             "name": "title",
             "target": "title",
@@ -128,7 +125,7 @@
                     "containertype": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 15
+                "sortOrder": 8
             },
             "name": "deathCircumstances",
             "target": "deathCircumstances",
@@ -142,11 +139,8 @@
                     "containerTitle": "Установчі дані",
                     "containertype": "Accordion"
                 },
-                "formField": {
-                    "type": "form"
-                },
                 "multiple": false,
-                "sortOrder": 16
+                "sortOrder": 9
             },
             "name": "gender",
             "target": "Gender",
@@ -164,7 +158,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 17
+                "sortOrder": 10
             },
             "name": "nationality",
             "target": "Nationality",
@@ -183,7 +177,7 @@
                     "type": "dropdown"
                 },
                 "multiple": true,
-                "sortOrder": 18
+                "sortOrder": 11
             },
             "name": "citizenship",
             "target": "Country",
@@ -206,7 +200,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 19
+                "sortOrder": 12
             },
             "name": "nicknameSign",
             "target": "NicknameSign",
@@ -224,7 +218,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 20
+                "sortOrder": 13
             },
             "name": "persNickNameSign",
             "target": "PersonalNicknameSign",
@@ -242,7 +236,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 21
+                "sortOrder": 14
             },
             "name": "placeOfBirth",
             "target": "UniversalLocation",
@@ -260,7 +254,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 22
+                "sortOrder": 15
             },
             "name": "registrationAddress",
             "target": "UniversalLocation",
@@ -278,7 +272,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 23
+                "sortOrder": 16
             },
             "name": "actualAccommodation",
             "target": "UniversalLocation",
@@ -296,7 +290,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 24
+                "sortOrder": 17
             },
             "name": "passportData",
             "target": "Passport",
@@ -314,7 +308,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 25
+                "sortOrder": 18
             },
             "name": "foreignPassport",
             "target": "ForeignPassport",
@@ -332,7 +326,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 26
+                "sortOrder": 19
             },
             "name": "credPersonDocument",
             "target": "CredPersonDocument",
@@ -350,7 +344,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 27
+                "sortOrder": 20
             },
             "name": "otherDocuments",
             "target": "OtherDocument",
@@ -361,7 +355,7 @@
             "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
             "meta": {
                 "multiple": false,
-                "sortOrder": 28
+                "sortOrder": 21
             },
             "name": "taxID",
             "target": "taxID",
@@ -377,7 +371,7 @@
                     "containertype": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 29
+                "sortOrder": 22
             },
             "name": "personArmyID",
             "target": "personArmyID",
@@ -393,7 +387,7 @@
                     "containertype": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 30
+                "sortOrder": 23
             },
             "name": "otherPersonId",
             "target": "otherPersonId",
@@ -411,7 +405,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 31
+                "sortOrder": 24
             },
             "name": "currentJob",
             "target": "WorkPlace",
@@ -429,7 +423,7 @@
                     "type": "dropdown"
                 },
                 "multiple": true,
-                "sortOrder": 32
+                "sortOrder": 25
             },
             "name": "currentRank",
             "target": "Rank",
@@ -447,7 +441,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 33
+                "sortOrder": 26
             },
             "name": "jobHistory",
             "target": "WorkPlace",
@@ -465,7 +459,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 34
+                "sortOrder": 27
             },
             "name": "politicalParticipation",
             "target": "OrgParticipation",
@@ -483,7 +477,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 35
+                "sortOrder": 28
             },
             "name": "OiVTParticipation",
             "target": "TaggableString",
@@ -501,7 +495,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 36
+                "sortOrder": 29
             },
             "name": "extremisticParticipation",
             "target": "OrgParticipation",
@@ -519,7 +513,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 37
+                "sortOrder": 30
             },
             "name": "privateMilitaryCompanyParticipation",
             "target": "OrgParticipation",
@@ -537,7 +531,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 38
+                "sortOrder": 31
             },
             "name": "education",
             "target": "Education",
@@ -555,7 +549,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 39
+                "sortOrder": 32
             },
             "name": "foreignLang",
             "target": "ForeignLang",
@@ -573,7 +567,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 40
+                "sortOrder": 33
             },
             "name": "mas",
             "target": "MASItem",
@@ -591,7 +585,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 41
+                "sortOrder": 34
             },
             "name": "politicalActivity",
             "target": "PoliticalActivity",
@@ -602,7 +596,7 @@
             "id": "7AD1638F-413A-4aa0-9022-20DCF8EC3429",
             "meta": {
                 "multiple": false,
-                "sortOrder": 42
+                "sortOrder": 35
             },
             "name": "created",
             "target": "created",
@@ -613,7 +607,7 @@
             "id": "C6B9535C-B6AB-48ef-9C39-F695CAA62348",
             "meta": {
                 "multiple": false,
-                "sortOrder": 43
+                "sortOrder": 36
             },
             "name": "updated",
             "target": "updated",
@@ -631,7 +625,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 44
+                "sortOrder": 37
             },
             "name": "warOperationParticipation",
             "target": "WarOperationParticipation",
@@ -649,7 +643,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 45
+                "sortOrder": 38
             },
             "name": "currentLocation",
             "target": "UniversalLocation",
@@ -667,7 +661,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 46
+                "sortOrder": 39
             },
             "name": "wounds",
             "target": "BattleWound",
@@ -685,7 +679,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 47
+                "sortOrder": 40
             },
             "name": "foreignMission",
             "target": "ForeignMission",
@@ -703,7 +697,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 48
+                "sortOrder": 41
             },
             "name": "award",
             "target": "Award",
@@ -721,7 +715,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 49
+                "sortOrder": 42
             },
             "name": "sanction",
             "target": "Sanction",
@@ -737,7 +731,7 @@
                     "containertype": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 50
+                "sortOrder": 43
             },
             "name": "criminalSanction",
             "target": "criminalSanction",
@@ -755,7 +749,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 51
+                "sortOrder": 44
             },
             "name": "martialStatus",
             "target": "MartialStatus",
@@ -773,7 +767,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 52
+                "sortOrder": 45
             },
             "name": "closePersin",
             "target": "ClosePerson",
@@ -791,7 +785,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 53
+                "sortOrder": 46
             },
             "name": "contacts",
             "target": "ObjectSign",
@@ -807,7 +801,7 @@
                     "containertype": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 54
+                "sortOrder": 47
             },
             "name": "otherInterestingData",
             "target": "otherInterestingData",
@@ -823,7 +817,7 @@
                     "containertype": "Accordion"
                 },
                 "multiple": true,
-                "sortOrder": 55
+                "sortOrder": 48
             },
             "name": "attachment",
             "target": "attachment",
@@ -836,7 +830,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 56
+                "sortOrder": 49
             },
             "name": "actsOfTerrorParticipation",
             "target": "TaggableString",

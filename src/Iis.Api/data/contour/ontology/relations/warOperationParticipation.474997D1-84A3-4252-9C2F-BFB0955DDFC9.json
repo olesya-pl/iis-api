@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 44
+        "sortOrder": 37
     },
     "name": "warOperationParticipation",
     "target": null,

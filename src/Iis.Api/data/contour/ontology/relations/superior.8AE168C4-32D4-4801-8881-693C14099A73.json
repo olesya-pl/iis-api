@@ -9,7 +9,7 @@
             "title": "Підлеглий"
         },
         "multiple": false,
-        "sortOrder": 305,
+        "sortOrder": 16,
         "type": "hierarchical"
     },
     "name": "superior",

@@ -4,7 +4,7 @@
             "id": "C8AD7EB5-F7C9-4a7d-912D-0CE5C3EDD81E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 113
+                "sortOrder": 1
             },
             "name": "lang",
             "target": "Language",
@@ -15,7 +15,7 @@
             "id": "59FD0B66-BFB6-4d67-91A5-A03B81027953",
             "meta": {
                 "multiple": false,
-                "sortOrder": 114
+                "sortOrder": 2
             },
             "name": "level",
             "target": "level",

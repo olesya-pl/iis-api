@@ -3,7 +3,7 @@
     "id": "EC5E8E8E-48C4-492c-91CC-84379533B67F",
     "meta": {
         "multiple": true,
-        "sortOrder": 99
+        "sortOrder": 1
     },
     "name": "file",
     "target": "FileFile",
