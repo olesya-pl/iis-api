@@ -4,13 +4,13 @@
     "meta": {
         "format": "email",
         "multiple": false,
-        "sortOrder": 147,
+        "sortOrder": 150,
         "validation": {
             "email": true,
             "required": true
         }
     },
     "name": "value",
-    "target": "value",
+    "target": "ValueString",
     "title": "Значення"
 }

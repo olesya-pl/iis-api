@@ -7,12 +7,12 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 57,
+        "sortOrder": 58,
         "validation": {
             "required": true
         }
     },
     "name": "importance",
-    "target": "ObjectImportance",
+    "target": null,
     "title": "Важливість"
 }

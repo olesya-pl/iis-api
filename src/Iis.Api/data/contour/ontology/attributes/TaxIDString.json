@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "TaxIDString",
+    "conceptType": "attributes",
+    "id": "06b2dd20-6225-4d50-8b33-46f10821007e",
+    "meta": {
+    },
+    "name": "taxID",
+    "title": "Ідентифікаційний код",
+    "type": "String"
+}

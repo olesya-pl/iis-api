@@ -3,10 +3,10 @@
     "id": "45E8AA5E-F4B8-477c-B25B-27E81AED00F1",
     "meta": {
         "multiple": false,
-        "sortOrder": 245,
+        "sortOrder": 291,
         "title": "Географічні координати пункту дислокації штабу (ППД)"
     },
     "name": "dislocation",
-    "target": "dislocation",
+    "target": "DislocationGeo",
     "title": "Пункт Постійної Дислокації (ППД)"
 }

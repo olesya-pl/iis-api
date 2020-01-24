@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "D2CE8255-B58A-4212-AD98-BA568A0D7EED",
     "meta": {
+        "container": {
+            "containerId": "1FA1ED3F-4118-42a5-9CF5-FE027D678D8D",
+            "containerTitle": "Поранення і контузії",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 45
+        "sortOrder": 46
     },
     "name": "wounds",
-    "target": "BattleWound",
+    "target": null,
     "title": "Поранення і контузії"
 }

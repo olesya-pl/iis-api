@@ -7,9 +7,9 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 143
+        "sortOrder": 146
     },
     "name": "relatesToCountry",
-    "target": "Country",
+    "target": null,
     "title": "Державна приналежність"
 }

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "PhotoFile",
+    "conceptType": "attributes",
+    "id": "2A573EA2-E18C-4d5e-82BC-3E2D2691A98D",
+    "meta": {
+    },
+    "name": "photo",
+    "title": "Фото",
+    "type": "File"
+}

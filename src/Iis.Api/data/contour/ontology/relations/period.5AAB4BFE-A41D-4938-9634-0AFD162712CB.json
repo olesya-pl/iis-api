@@ -3,9 +3,9 @@
     "id": "5AAB4BFE-A41D-4938-9634-0AFD162712CB",
     "meta": {
         "multiple": false,
-        "sortOrder": 295
+        "sortOrder": 342
     },
     "name": "period",
-    "target": "period",
+    "target": "PeriodDateRange",
     "title": "часовий прогміжок"
 }

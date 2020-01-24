@@ -3,9 +3,9 @@
     "id": "49ED893C-4C9A-4d7b-B53C-68496572BEB9",
     "meta": {
         "multiple": false,
-        "sortOrder": 118
+        "sortOrder": 121
     },
     "name": "transliteration",
-    "target": "transliteration",
+    "target": "TransliterationString",
     "title": "транслітерація"
 }

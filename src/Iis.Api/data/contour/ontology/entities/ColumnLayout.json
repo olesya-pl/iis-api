@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Layout"
+    ],
+    "id": "BE7D760C-55AE-4723-8FC1-3EAABF639567",
+    "meta": {
+        "sortOrder": 320
+    },
+    "name": "ColumnLayout",
+    "title": ""
+}

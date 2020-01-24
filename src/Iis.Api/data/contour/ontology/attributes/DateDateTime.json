@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "DateDateTime",
+    "conceptType": "attributes",
+    "id": "2a2bcf95-4f67-49ad-bc65-aed1965c8ebb",
+    "meta": {
+    },
+    "name": "date",
+    "title": "Дата",
+    "type": "DateTime"
+}

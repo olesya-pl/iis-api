@@ -1,11 +1,12 @@
 {
     "attributes": [
         {
+            "attrTypeName": "ValueString",
             "id": "4BE15E69-3747-437c-AD11-14A497E3FD18",
             "meta": {
                 "format": "email",
                 "multiple": false,
-                "sortOrder": 147,
+                "sortOrder": 150,
                 "validation": {
                     "email": true,
                     "required": true
@@ -23,7 +24,7 @@
     "id": "4AC6E86C-671F-4a02-A28F-7D32E3483DA7",
     "meta": {
         "exposeOnApi": false,
-        "sortOrder": 148
+        "sortOrder": 151
     },
     "name": "EmailSign",
     "title": "Електронна скринька"

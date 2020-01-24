@@ -6,9 +6,9 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 282
+        "sortOrder": 329
     },
     "name": "date",
-    "target": "FuzzyDate",
+    "target": null,
     "title": "Дата нагородження"
 }

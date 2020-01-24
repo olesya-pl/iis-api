@@ -4,27 +4,39 @@
             "id": "E8895B71-8F98-407e-96DC-0260D1BD1538",
             "meta": {
                 "multiple": true,
-                "sortOrder": 115
+                "sortOrder": 117
             },
             "name": "taggedEntities",
             "target": "ObjectOfStudy",
             "title": "Посилання на ОР"
         },
         {
+            "attrTypeName": "ValueString",
             "id": "F81E6213-423B-4161-89DE-BA7BA54703C5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 116
+                "sortOrder": 118
             },
             "name": "value",
             "target": "value",
-            "title": ""
+            "title": "Текст"
+        },
+        {
+            "attrTypeName": "ScopeString",
+            "id": "335FEA0E-9B19-4b52-AF27-99FE336E735F",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 119
+            },
+            "name": "scope",
+            "target": "scope",
+            "title": "Область пошуку"
         }
     ],
     "conceptType": "entities",
     "id": "4217AB5A-94D9-4e6d-86C8-49B4071EFC0C",
     "meta": {
-        "sortOrder": 117
+        "sortOrder": 120
     },
     "name": "TaggableString",
     "title": "Строка з посиланнями"

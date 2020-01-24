@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "A51D1BF3-624E-4963-A336-5DA4C3CE192E",
     "meta": {
+        "container": {
+            "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+            "containerTitle": "Установчі дані",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 15
+        "sortOrder": 16
     },
     "name": "gender",
-    "target": "Gender",
+    "target": null,
     "title": "стать"
 }

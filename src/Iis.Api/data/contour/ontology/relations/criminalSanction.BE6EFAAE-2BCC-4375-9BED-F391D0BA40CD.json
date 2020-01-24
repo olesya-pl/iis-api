@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "BE6EFAAE-2BCC-4375-9BED-F391D0BA40CD",
     "meta": {
+        "container": {
+            "containerId": "BDE2491B-B051-4541-A58C-5FB7DFB196AE",
+            "containerTitle": "Притягнення до кримінальної та адміністративної відповідальності",
+            "containertype": "Accordion"
+        },
         "multiple": false,
-        "sortOrder": 49
+        "sortOrder": 50
     },
     "name": "criminalSanction",
-    "target": "criminalSanction",
+    "target": "CriminalSanctionString",
     "title": "Кримінальна відповідальність"
 }

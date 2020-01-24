@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "C429BF16-9AC2-4485-B40C-3CD9B519E0DD",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 222
+    },
+    "name": "foreignMission",
+    "target": null,
+    "title": "Дані про перебування у закордонному відрядженні (не у складі військ)"
+}

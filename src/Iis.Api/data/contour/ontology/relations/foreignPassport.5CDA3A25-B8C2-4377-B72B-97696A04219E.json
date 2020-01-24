@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "5CDA3A25-B8C2-4377-B72B-97696A04219E",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 204
+    },
+    "name": "foreignPassport",
+    "target": null,
+    "title": "Закордонні паспорти"
+}

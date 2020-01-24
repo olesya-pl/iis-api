@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "CodeString",
             "id": "578AF351-BCE2-405e-8A04-6C196E4C4D74",
             "meta": {
                 "multiple": false,
-                "sortOrder": 149
+                "sortOrder": 152
             },
             "name": "code",
             "target": "code",
@@ -19,7 +20,7 @@
                     "multiple": false
                 },
                 "multiple": true,
-                "sortOrder": 150,
+                "sortOrder": 153,
                 "type": "hierarchical"
             },
             "name": "child",
@@ -34,7 +35,7 @@
     "id": "4B0341F0-2869-4052-B071-D19C6A374E43",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 151
+        "sortOrder": 154
     },
     "name": "EventType",
     "title": "Tип події"

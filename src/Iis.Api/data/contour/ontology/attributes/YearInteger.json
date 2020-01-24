@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "YearInteger",
+    "conceptType": "attributes",
+    "id": "E31FE61A-1074-4650-99A1-884DC82FE8AE",
+    "meta": {
+    },
+    "name": "year",
+    "title": "рік",
+    "type": "Integer"
+}

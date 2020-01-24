@@ -3,9 +3,9 @@
     "id": "3CDF0248-1662-4d4d-AF89-4DD110E6755D",
     "meta": {
         "multiple": false,
-        "sortOrder": 153
+        "sortOrder": 156
     },
     "name": "name",
-    "target": "name",
+    "target": "NameString",
     "title": "Назва"
 }

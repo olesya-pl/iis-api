@@ -3,9 +3,9 @@
     "id": "FE4FEE0B-1766-4a0c-8AC4-F4EA8CA4C668",
     "meta": {
         "multiple": false,
-        "sortOrder": 204
+        "sortOrder": 249
     },
     "name": "region",
-    "target": "region",
+    "target": "RegionString",
     "title": "Область"
 }

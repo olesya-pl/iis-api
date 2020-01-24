@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "AdditionalInfoString",
+    "conceptType": "attributes",
+    "id": "841addd5-9d61-438f-972c-85221591311b",
+    "meta": {
+    },
+    "name": "additionalInfo",
+    "title": "Додаткова інформація",
+    "type": "String"
+}

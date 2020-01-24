@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "56DD286F-B3EF-436e-AA03-53FF40DE4501",
     "meta": {
+        "container": {
+            "containerId": "61A466B0-5178-468c-AB3A-B64B77F5C2B6",
+            "containerTitle": "Освіта",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 37
+        "sortOrder": 38
     },
     "name": "education",
-    "target": "Education",
+    "target": null,
     "title": "Освіта"
 }

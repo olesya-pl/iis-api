@@ -3,9 +3,9 @@
     "id": "BF6411BA-B74F-49d8-A811-B9566A21E475",
     "meta": {
         "multiple": true,
-        "sortOrder": 277
+        "sortOrder": 324
     },
     "name": "attachment",
-    "target": "attachment",
+    "target": "AttachmentFile",
     "title": "Додані файли"
 }

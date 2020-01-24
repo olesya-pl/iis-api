@@ -3,16 +3,29 @@
         {
             "id": "D98AA60D-91AA-4d14-AFD0-67EA2284B713",
             "meta": {
+                "container": {
+                    "containerId": "CBFB512A-5698-40d0-A95D-951C42E03079",
+                    "containerTitle": "Нерозібране (тимчасово)",
+                    "containertype": "Accordion"
+                },
                 "multiple": false,
                 "sortOrder": 8
             },
             "name": "kind",
             "target": "PersonType",
-            "title": ""
+            "title": "Поточний тип (військовий-цивільний)"
         },
         {
             "id": "B3739F86-A33E-4592-B971-440541AF7828",
             "meta": {
+                "container": {
+                    "containerId": "F5D17F31-3641-4c3b-86FC-487FDEC29268",
+                    "containerTitle": "Реальне ПІБ",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 9
             },
@@ -23,6 +36,14 @@
         {
             "id": "37F54A7E-310C-4f33-B0B4-8AF91B533B1C",
             "meta": {
+                "container": {
+                    "containerId": "F2C9BE02-3E0C-4f42-936E-6B1DE960C4E6",
+                    "containerTitle": "ПІБ прикриття",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
                 "sortOrder": 10
             },
@@ -31,8 +52,17 @@
             "title": "Ім'я прикриття"
         },
         {
+            "attrTypeName": "ImportantDataChangesString",
             "id": "482D328C-F67C-4ba6-A93B-DE56924FE0A7",
             "meta": {
+                "container": {
+                    "containerId": "31820E7A-C1D0-42a5-9E55-BB2724A7A95E",
+                    "containerTitle": "Зміни установчих даних",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
                 "sortOrder": 11
             },
@@ -43,6 +73,14 @@
         {
             "id": "7F08C6D4-F8BD-494c-A84D-83A131DC1705",
             "meta": {
+                "container": {
+                    "containerId": "D2D7C903-1636-4b94-91A5-9E140C399B49",
+                    "containerTitle": "Народження та смерть",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 12
             },
@@ -53,6 +91,14 @@
         {
             "id": "168891D4-961F-4eeb-966D-CEA86CEFE028",
             "meta": {
+                "container": {
+                    "containerId": "D2D7C903-1636-4b94-91A5-9E140C399B49",
+                    "containerTitle": "Народження та смерть",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 13
             },
@@ -61,10 +107,28 @@
             "title": "Дата смерті"
         },
         {
-            "id": "D18AFC59-628F-49a2-A0E3-F89E7DCACBC9",
+            "attrTypeName": "TitleString",
+            "id": "9B66E24E-BC6E-4560-8F21-EEE40EEFE60A",
             "meta": {
+                "formula": "h.join(entity.realName.ukraineName, entity.realName.ukraineName, entity.realName.ukraineName)",
                 "multiple": false,
                 "sortOrder": 14
+            },
+            "name": "title",
+            "target": "title",
+            "title": "Повна назва"
+        },
+        {
+            "attrTypeName": "DeathCircumstancesString",
+            "id": "D18AFC59-628F-49a2-A0E3-F89E7DCACBC9",
+            "meta": {
+                "container": {
+                    "containerId": "D2D7C903-1636-4b94-91A5-9E140C399B49",
+                    "containerTitle": "Народження та смерть",
+                    "containertype": "Accordion"
+                },
+                "multiple": false,
+                "sortOrder": 15
             },
             "name": "deathCircumstances",
             "target": "deathCircumstances",
@@ -73,8 +137,16 @@
         {
             "id": "A51D1BF3-624E-4963-A336-5DA4C3CE192E",
             "meta": {
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 15
+                "sortOrder": 16
             },
             "name": "gender",
             "target": "Gender",
@@ -83,8 +155,16 @@
         {
             "id": "0FDD5857-31BD-4941-A23A-62C2D400C4B6",
             "meta": {
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 16
+                "sortOrder": 17
             },
             "name": "nationality",
             "target": "Nationality",
@@ -93,12 +173,17 @@
         {
             "id": "88022D6C-B8DE-46b0-B621-8343554FDDFF",
             "meta": {
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
                 "formField": {
                     "icon": "flag",
                     "type": "dropdown"
                 },
                 "multiple": true,
-                "sortOrder": 17
+                "sortOrder": 18
             },
             "name": "citizenship",
             "target": "Country",
@@ -112,8 +197,16 @@
                     "Update",
                     "Delete"
                 ],
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 18
+                "sortOrder": 19
             },
             "name": "nicknameSign",
             "target": "NicknameSign",
@@ -122,8 +215,16 @@
         {
             "id": "7A23BEC8-8A75-499a-84DF-54803AED9823",
             "meta": {
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 19
+                "sortOrder": 20
             },
             "name": "persNickNameSign",
             "target": "PersonalNicknameSign",
@@ -132,8 +233,16 @@
         {
             "id": "72E8BF1D-89E8-452c-B833-B028B0B8569B",
             "meta": {
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 20
+                "sortOrder": 21
             },
             "name": "placeOfBirth",
             "target": "UniversalLocation",
@@ -142,8 +251,16 @@
         {
             "id": "494A3783-D520-4f33-8A77-C7EC2F516903",
             "meta": {
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 21
+                "sortOrder": 22
             },
             "name": "registrationAddress",
             "target": "UniversalLocation",
@@ -152,8 +269,16 @@
         {
             "id": "6DC1C4B4-3042-45f1-8CFD-078422529683",
             "meta": {
+                "container": {
+                    "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+                    "containerTitle": "Установчі дані",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 22
+                "sortOrder": 23
             },
             "name": "actualAccommodation",
             "target": "UniversalLocation",
@@ -162,8 +287,16 @@
         {
             "id": "97243AA3-5A4B-4094-AAF7-8512E6F7F2FA",
             "meta": {
+                "container": {
+                    "containerId": "8AC004FE-E197-4697-9095-D897FB0E74FA",
+                    "containerTitle": "Внутрішні паспорти",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 23
+                "sortOrder": 24
             },
             "name": "passportData",
             "target": "Passport",
@@ -172,8 +305,16 @@
         {
             "id": "E4605767-01C1-4941-9F04-A769B1F051C5",
             "meta": {
+                "container": {
+                    "containerId": "5CDA3A25-B8C2-4377-B72B-97696A04219E",
+                    "containerTitle": "Закордонні паспорти",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 24
+                "sortOrder": 25
             },
             "name": "foreignPassport",
             "target": "ForeignPassport",
@@ -182,8 +323,16 @@
         {
             "id": "3E3B2036-336A-4e8d-A9A9-E7A81B00FA45",
             "meta": {
+                "container": {
+                    "containerId": "917F7737-FA64-4ee0-AE04-C250354B71D0",
+                    "containerTitle": "Посвідчення особи",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 25
+                "sortOrder": 26
             },
             "name": "credPersonDocument",
             "target": "CredPersonDocument",
@@ -192,38 +341,59 @@
         {
             "id": "F338EDFC-E5DC-4507-B0F4-5438DDBD1882",
             "meta": {
+                "container": {
+                    "containerId": "6E72D533-9207-4149-B6C7-A4E802DE6D36",
+                    "containerTitle": "Ідентифікаційні номери",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 26
+                "sortOrder": 27
             },
             "name": "otherDocuments",
             "target": "OtherDocument",
             "title": "Інші документи"
         },
         {
+            "attrTypeName": "TaxIDString",
             "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
             "meta": {
                 "multiple": false,
-                "sortOrder": 27
+                "sortOrder": 28
             },
             "name": "taxID",
             "target": "taxID",
             "title": "Ідентифікаційний код"
         },
         {
+            "attrTypeName": "PersonArmyIDString",
             "id": "95275DE6-CD5F-4a78-81D2-6FF3FEDEEEC8",
             "meta": {
+                "container": {
+                    "containerId": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
+                    "containerTitle": "Ідентифікаційні номери",
+                    "containertype": "Accordion"
+                },
                 "multiple": false,
-                "sortOrder": 28
+                "sortOrder": 29
             },
             "name": "personArmyID",
             "target": "personArmyID",
             "title": "Особистий номер військовослужбовця"
         },
         {
+            "attrTypeName": "OtherPersonIdString",
             "id": "66B04537-02EA-47ac-AA22-3EB89976D09F",
             "meta": {
+                "container": {
+                    "containerId": "945CC957-C1DF-4a2a-BB24-7E549D037D88",
+                    "containerTitle": "Інші ідентифікаційні номери",
+                    "containertype": "Accordion"
+                },
                 "multiple": false,
-                "sortOrder": 29
+                "sortOrder": 30
             },
             "name": "otherPersonId",
             "target": "otherPersonId",
@@ -232,8 +402,16 @@
         {
             "id": "DF6C681F-3EC3-4f8c-9E5A-773DFEBAAEFE",
             "meta": {
+                "container": {
+                    "containerId": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
+                    "containerTitle": "Поточне місце військової служби/роботи",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 30
+                "sortOrder": 31
             },
             "name": "currentJob",
             "target": "WorkPlace",
@@ -242,11 +420,16 @@
         {
             "id": "E939CD89-7014-4423-B188-EE14CE3BB0C0",
             "meta": {
+                "container": {
+                    "containerId": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
+                    "containerTitle": "Поточне місце військової служби/роботи",
+                    "containertype": "Accordion"
+                },
                 "formField": {
                     "type": "dropdown"
                 },
                 "multiple": true,
-                "sortOrder": 31
+                "sortOrder": 32
             },
             "name": "currentRank",
             "target": "Rank",
@@ -255,8 +438,16 @@
         {
             "id": "BDD8F26B-DE33-4b5e-B28B-2C6C7903CDDA",
             "meta": {
+                "container": {
+                    "containerId": "48410D55-4D75-4d83-A1B3-61428EEB01C0",
+                    "containerTitle": "Місця проходження служби/роботи/безробіття",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 32
+                "sortOrder": 33
             },
             "name": "jobHistory",
             "target": "WorkPlace",
@@ -265,8 +456,16 @@
         {
             "id": "533FA3B8-CE40-4da5-9366-18120FDC2B07",
             "meta": {
+                "container": {
+                    "containerId": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
+                    "containerTitle": "Приналежність до політичних партій, громадських організацій, рухів",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 33
+                "sortOrder": 34
             },
             "name": "politicalParticipation",
             "target": "OrgParticipation",
@@ -275,8 +474,16 @@
         {
             "id": "6DD1EC3F-AB4C-4362-B1C2-9B99A8E64A9B",
             "meta": {
+                "container": {
+                    "containerId": "3BD55143-A266-4e35-9E00-574FF61A456D",
+                    "containerTitle": "Участь у розробці ОіВТ",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 34
+                "sortOrder": 35
             },
             "name": "OiVTParticipation",
             "target": "TaggableString",
@@ -285,8 +492,16 @@
         {
             "id": "A92BFD27-66BA-45a7-B280-EDB15A6FF7C3",
             "meta": {
+                "container": {
+                    "containerId": "D39BCDB7-9374-47c6-B29A-6A96A112B8BE",
+                    "containerTitle": "Причетність до терористичних, екстремістських або злочинних організацій (у т.ч., незареєстрованих приватних військових компаній)",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 35
+                "sortOrder": 36
             },
             "name": "extremisticParticipation",
             "target": "OrgParticipation",
@@ -295,8 +510,16 @@
         {
             "id": "08980950-D4EF-41e9-A0D8-21B5E244E350",
             "meta": {
+                "container": {
+                    "containerId": "582DF971-DABD-4168-973B-7CAFEAFD8A23",
+                    "containerTitle": "Причетність до приватних військових, приватних охоронних або приватних безпекових компаній",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 36
+                "sortOrder": 37
             },
             "name": "privateMilitaryCompanyParticipation",
             "target": "OrgParticipation",
@@ -305,8 +528,16 @@
         {
             "id": "56DD286F-B3EF-436e-AA03-53FF40DE4501",
             "meta": {
+                "container": {
+                    "containerId": "61A466B0-5178-468c-AB3A-B64B77F5C2B6",
+                    "containerTitle": "Освіта",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 37
+                "sortOrder": 38
             },
             "name": "education",
             "target": "Education",
@@ -315,8 +546,16 @@
         {
             "id": "18542667-2008-47e0-89DD-B7484B05887E",
             "meta": {
+                "container": {
+                    "containerId": "B9B7EC0F-1BFE-4fe4-8D55-C8993EE58AEC",
+                    "containerTitle": "Володіння іноземними мовами",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 38
+                "sortOrder": 39
             },
             "name": "foreignLang",
             "target": "ForeignLang",
@@ -325,8 +564,16 @@
         {
             "id": "2EAFB927-A364-461f-B380-A55137332BC4",
             "meta": {
+                "container": {
+                    "containerId": "FBF3A236-9335-4f0d-A935-54F947EDD7CA",
+                    "containerTitle": "Військово-облікова спеціальність",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 39
+                "sortOrder": 40
             },
             "name": "mas",
             "target": "MASItem",
@@ -335,28 +582,38 @@
         {
             "id": "582AA0A4-37C3-4df6-B0E7-AFA245C9884B",
             "meta": {
+                "container": {
+                    "containerId": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
+                    "containerTitle": "Приналежність до політичних партій, громадських організацій, рухів",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 40
+                "sortOrder": 41
             },
             "name": "politicalActivity",
             "target": "PoliticalActivity",
             "title": "політична діяльність"
         },
         {
+            "attrTypeName": "CreatedDateTime",
             "id": "7AD1638F-413A-4aa0-9022-20DCF8EC3429",
             "meta": {
                 "multiple": false,
-                "sortOrder": 41
+                "sortOrder": 42
             },
             "name": "created",
             "target": "created",
             "title": "дата першої фіксації"
         },
         {
+            "attrTypeName": "UpdatedDateTime",
             "id": "C6B9535C-B6AB-48ef-9C39-F695CAA62348",
             "meta": {
                 "multiple": false,
-                "sortOrder": 42
+                "sortOrder": 43
             },
             "name": "updated",
             "target": "updated",
@@ -365,8 +622,16 @@
         {
             "id": "474997D1-84A3-4252-9C2F-BFB0955DDFC9",
             "meta": {
+                "container": {
+                    "containerId": "38B0D1FF-D8D7-4719-9FA3-4602E96CE7B4",
+                    "containerTitle": "Участь у бойових діях/миротворчих операціях",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 43
+                "sortOrder": 44
             },
             "name": "warOperationParticipation",
             "target": "WarOperationParticipation",
@@ -375,8 +640,16 @@
         {
             "id": "35304AF6-2545-483e-B681-2C65944C3E6D",
             "meta": {
+                "container": {
+                    "containerId": "83985A1B-B32F-433c-8FB3-48E052FD22DE",
+                    "containerTitle": "Поточне місце перебування",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 44
+                "sortOrder": 45
             },
             "name": "currentLocation",
             "target": "UniversalLocation",
@@ -385,8 +658,16 @@
         {
             "id": "D2CE8255-B58A-4212-AD98-BA568A0D7EED",
             "meta": {
+                "container": {
+                    "containerId": "1FA1ED3F-4118-42a5-9CF5-FE027D678D8D",
+                    "containerTitle": "Поранення і контузії",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 45
+                "sortOrder": 46
             },
             "name": "wounds",
             "target": "BattleWound",
@@ -395,8 +676,16 @@
         {
             "id": "B91E7E07-0C11-4939-895D-4210B9B25175",
             "meta": {
+                "container": {
+                    "containerId": "C429BF16-9AC2-4485-B40C-3CD9B519E0DD",
+                    "containerTitle": "Дані про перебування у закордонному відрядженні (не у складі військ)",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 46
+                "sortOrder": 47
             },
             "name": "foreignMission",
             "target": "ForeignMission",
@@ -405,8 +694,16 @@
         {
             "id": "70FF083C-D075-479d-84A6-0DD3D4D8F8C0",
             "meta": {
+                "container": {
+                    "containerId": "8944ED63-DD7E-465c-A381-7DD227B78B8E",
+                    "containerTitle": "Заохочення (вид нагороди, медалі, цінні подарунки тощо)",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 47
+                "sortOrder": 48
             },
             "name": "award",
             "target": "Award",
@@ -415,18 +712,32 @@
         {
             "id": "89501CC7-C719-4624-966D-B14724ADF14B",
             "meta": {
+                "container": {
+                    "containerId": "85F3F0E4-02F6-46b8-A09A-B203DEFC2A39",
+                    "containerTitle": "Стягнення",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 48
+                "sortOrder": 49
             },
             "name": "sanction",
             "target": "Sanction",
             "title": "Стягнення"
         },
         {
+            "attrTypeName": "CriminalSanctionString",
             "id": "BE6EFAAE-2BCC-4375-9BED-F391D0BA40CD",
             "meta": {
+                "container": {
+                    "containerId": "BDE2491B-B051-4541-A58C-5FB7DFB196AE",
+                    "containerTitle": "Притягнення до кримінальної та адміністративної відповідальності",
+                    "containertype": "Accordion"
+                },
                 "multiple": false,
-                "sortOrder": 49
+                "sortOrder": 50
             },
             "name": "criminalSanction",
             "target": "criminalSanction",
@@ -435,8 +746,16 @@
         {
             "id": "6E73D865-5B4F-4c0f-B44C-4B93B69997C7",
             "meta": {
+                "container": {
+                    "containerId": "046D4D55-6B93-49ad-BB83-DD14EAF023F5",
+                    "containerTitle": "Сімейний стан",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "dropdown"
+                },
                 "multiple": false,
-                "sortOrder": 50
+                "sortOrder": 51
             },
             "name": "martialStatus",
             "target": "MartialStatus",
@@ -445,8 +764,16 @@
         {
             "id": "AC31E52F-DC25-4447-9FF3-939A0B15BC7B",
             "meta": {
+                "container": {
+                    "containerId": "69D6C36A-595D-4858-A168-4D48DC976ADE",
+                    "containerTitle": "Оточення",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 51
+                "sortOrder": 52
             },
             "name": "closePersin",
             "target": "ClosePerson",
@@ -455,28 +782,48 @@
         {
             "id": "4B726B9C-B7CD-46dd-96DE-564C5D92232B",
             "meta": {
+                "container": {
+                    "containerId": "470950D8-5550-4d48-A946-41AAEEDFDCA8",
+                    "containerTitle": "Контакти особи",
+                    "containertype": "Accordion"
+                },
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
-                "sortOrder": 52
+                "sortOrder": 53
             },
             "name": "contacts",
             "target": "ObjectSign",
             "title": "Контакти особи"
         },
         {
+            "attrTypeName": "OtherInterestingDataString",
             "id": "AA757315-667A-4141-BC15-87330FED1F6E",
             "meta": {
+                "container": {
+                    "containerId": "37EE6BFB-6A20-469f-9677-BCE87A410AF3",
+                    "containerTitle": "Інші дані, які представляють інтерес",
+                    "containertype": "Accordion"
+                },
                 "multiple": false,
-                "sortOrder": 53
+                "sortOrder": 54
             },
             "name": "otherInterestingData",
             "target": "otherInterestingData",
             "title": "Інші дані, які представляють інтерес"
         },
         {
+            "attrTypeName": "AttachmentFile",
             "id": "93C2BC5A-CC5D-4f2f-8182-BB3902A2FE02",
             "meta": {
+                "container": {
+                    "containerId": "D1D6CF4F-52AC-4dc1-8AC6-C627C325B3CB",
+                    "containerTitle": "Додані файли",
+                    "containertype": "Accordion"
+                },
                 "multiple": true,
-                "sortOrder": 54
+                "sortOrder": 55
             },
             "name": "attachment",
             "target": "attachment",
@@ -485,8 +832,11 @@
         {
             "id": "E1C2EECC-F0E8-437a-9352-7758BD0E2407",
             "meta": {
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 55
+                "sortOrder": 56
             },
             "name": "actsOfTerrorParticipation",
             "target": "TaggableString",
@@ -499,7 +849,12 @@
     ],
     "id": "0E18C118-94CD-4c82-87AF-8F68AB885451",
     "meta": {
-        "sortOrder": 56
+        "container": {
+            "containerId": "CBFB512A-5698-40d0-A95D-951C42E03079",
+            "containerTitle": "Нерозібране (тимчасово)",
+            "containertype": "Accordion"
+        },
+        "sortOrder": 57
     },
     "name": "Person",
     "title": "Персона"

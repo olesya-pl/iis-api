@@ -8,10 +8,10 @@
             "multiple": false
         },
         "multiple": true,
-        "sortOrder": 150,
+        "sortOrder": 153,
         "type": "hierarchical"
     },
     "name": "child",
-    "target": "EventType",
+    "target": null,
     "title": "Ієрархічний вказівник на дочірні елементи"
 }

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "DescriptionString",
+    "conceptType": "attributes",
+    "id": "D77567C7-AF36-47aa-A0BF-D1D8B80FC132",
+    "meta": {
+    },
+    "name": "description",
+    "title": "примітка",
+    "type": "String"
+}

@@ -2,10 +2,13 @@
     "conceptType": "relations",
     "id": "72696BA8-B900-4a88-8C10-5FD1ED1B10D6",
     "meta": {
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 178
+        "sortOrder": 181
     },
     "name": "issuingAuthority",
-    "target": "Organization",
+    "target": null,
     "title": "Орган,що видав"
 }

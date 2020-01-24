@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "AttachmentFile",
+    "conceptType": "attributes",
+    "id": "8A17E77F-F174-4e7d-8FBD-7476CC73AD8C",
+    "meta": {
+    },
+    "name": "attachment",
+    "title": "Додані файли",
+    "type": "File"
+}

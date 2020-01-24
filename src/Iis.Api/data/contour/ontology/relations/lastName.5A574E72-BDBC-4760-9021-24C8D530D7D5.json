@@ -2,10 +2,13 @@
     "conceptType": "relations",
     "id": "5A574E72-BDBC-4760-9021-24C8D530D7D5",
     "meta": {
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 289
+        "sortOrder": 336
     },
     "name": "lastName",
-    "target": "StringI18n",
+    "target": null,
     "title": "прізвище"
 }

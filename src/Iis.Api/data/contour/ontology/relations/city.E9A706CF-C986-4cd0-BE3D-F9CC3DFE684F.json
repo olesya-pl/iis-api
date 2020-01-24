@@ -3,9 +3,9 @@
     "id": "E9A706CF-C986-4cd0-BE3D-F9CC3DFE684F",
     "meta": {
         "multiple": false,
-        "sortOrder": 206
+        "sortOrder": 251
     },
     "name": "city",
-    "target": "city",
+    "target": "CityString",
     "title": "Населений пункт"
 }

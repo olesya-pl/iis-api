@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "SortOrderInteger",
+    "conceptType": "attributes",
+    "id": "9A844420-13A2-4673-B984-ABD827AE2F81",
+    "meta": {
+    },
+    "name": "sortOrder",
+    "title": "Порядок сортування",
+    "type": "Integer"
+}

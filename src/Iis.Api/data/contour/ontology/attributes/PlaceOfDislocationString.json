@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "PlaceOfDislocationString",
+    "conceptType": "attributes",
+    "id": "EBEA8298-F756-440d-81B6-3A22EDB99C8F",
+    "meta": {
+    },
+    "name": "placeOfDislocation",
+    "title": "Місце розташування",
+    "type": "String"
+}

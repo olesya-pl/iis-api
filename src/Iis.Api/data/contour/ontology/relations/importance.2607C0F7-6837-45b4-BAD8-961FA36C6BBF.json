@@ -7,9 +7,9 @@
             "type": "radioGroup"
         },
         "multiple": false,
-        "sortOrder": 92
+        "sortOrder": 94
     },
     "name": "importance",
-    "target": "EventImportance",
+    "target": null,
     "title": "Важливість"
 }

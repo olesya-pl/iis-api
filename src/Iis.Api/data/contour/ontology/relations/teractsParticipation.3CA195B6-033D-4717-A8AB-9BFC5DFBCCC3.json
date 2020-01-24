@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "3CA195B6-033D-4717-A8AB-9BFC5DFBCCC3",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 215
+    },
+    "name": "teractsParticipation",
+    "target": null,
+    "title": "Причетність до резонансних подій/терактів/злочинів"
+}

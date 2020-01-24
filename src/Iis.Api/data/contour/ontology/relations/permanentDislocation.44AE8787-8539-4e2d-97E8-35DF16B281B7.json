@@ -3,9 +3,9 @@
     "id": "44AE8787-8539-4e2d-97E8-35DF16B281B7",
     "meta": {
         "multiple": false,
-        "sortOrder": 139
+        "sortOrder": 142
     },
     "name": "permanentDislocation",
-    "target": "InfrastructureType",
+    "target": null,
     "title": "Місце постійної дислокації"
 }

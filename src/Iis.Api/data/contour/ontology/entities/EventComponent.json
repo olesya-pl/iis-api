@@ -9,7 +9,7 @@
                     "multiple": false
                 },
                 "multiple": true,
-                "sortOrder": 162,
+                "sortOrder": 165,
                 "type": "hierarchical"
             },
             "name": "child",
@@ -24,7 +24,7 @@
     "id": "5E364AF7-2612-4276-A895-ACFD787A3BCB",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 163
+        "sortOrder": 166
     },
     "name": "EventComponent",
     "title": "Компонент події"

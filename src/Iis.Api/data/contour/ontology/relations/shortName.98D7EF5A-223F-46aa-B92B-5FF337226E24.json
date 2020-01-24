@@ -3,9 +3,9 @@
     "id": "98D7EF5A-223F-46aa-B92B-5FF337226E24",
     "meta": {
         "multiple": false,
-        "sortOrder": 239
+        "sortOrder": 285
     },
     "name": "shortName",
-    "target": "shortName",
+    "target": "ShortNameString",
     "title": "Скорочене найменування"
 }

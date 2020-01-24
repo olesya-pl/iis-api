@@ -3,9 +3,9 @@
     "id": "2C1A4EA6-4A7E-4479-95F0-5C4E151D8818",
     "meta": {
         "multiple": false,
-        "sortOrder": 83
+        "sortOrder": 85
     },
     "name": "endsAt",
-    "target": "endsAt",
+    "target": "EndsAtDateTime",
     "title": "Кінець"
 }

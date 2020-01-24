@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "E4605767-01C1-4941-9F04-A769B1F051C5",
     "meta": {
+        "container": {
+            "containerId": "5CDA3A25-B8C2-4377-B72B-97696A04219E",
+            "containerTitle": "Закордонні паспорти",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 24
+        "sortOrder": 25
     },
     "name": "foreignPassport",
-    "target": "ForeignPassport",
+    "target": null,
     "title": "закордонний паспорт"
 }

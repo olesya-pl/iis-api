@@ -1,20 +1,22 @@
 {
     "attributes": [
         {
+            "attrTypeName": "OriginalNameString",
             "id": "9343CCFF-6659-4fb4-AD2B-8806787CA695",
             "meta": {
                 "multiple": false,
-                "sortOrder": 104
+                "sortOrder": 106
             },
             "name": "originalName",
             "target": "originalName",
             "title": "мовою оригіналу"
         },
         {
+            "attrTypeName": "UkraineNameString",
             "id": "0CE20960-4481-4a85-AE67-B0BBF1022258",
             "meta": {
                 "multiple": false,
-                "sortOrder": 105
+                "sortOrder": 107
             },
             "name": "ukraineName",
             "target": "ukraineName",
@@ -24,7 +26,7 @@
     "conceptType": "entities",
     "id": "31040072-F8F9-404c-B074-7F2004B39304",
     "meta": {
-        "sortOrder": 106
+        "sortOrder": 108
     },
     "name": "TwoLangString",
     "title": "Двомовна строка"

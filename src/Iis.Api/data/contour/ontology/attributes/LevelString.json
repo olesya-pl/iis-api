@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "LevelString",
+    "conceptType": "attributes",
+    "id": "2e90b7b5-c734-4143-bafd-6c14b0d0f4d7",
+    "meta": {
+    },
+    "name": "level",
+    "title": "рівень володіння",
+    "type": "String"
+}

@@ -7,9 +7,9 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 202
+        "sortOrder": 247
     },
     "name": "country",
-    "target": "Country",
+    "target": null,
     "title": "Країна"
 }

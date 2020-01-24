@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "B9B7EC0F-1BFE-4fe4-8D55-C8993EE58AEC",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 217
+    },
+    "name": "foreignLang",
+    "target": null,
+    "title": "Володіння іноземними мовами"
+}

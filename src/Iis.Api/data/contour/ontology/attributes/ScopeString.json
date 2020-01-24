@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "ScopeString",
+    "conceptType": "attributes",
+    "id": "3950ee07-cd8e-4c3f-a40b-620bb86b943f",
+    "meta": {
+    },
+    "name": "scope",
+    "title": "Область пошуку",
+    "type": "String"
+}

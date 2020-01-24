@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "08980950-D4EF-41e9-A0D8-21B5E244E350",
     "meta": {
+        "container": {
+            "containerId": "582DF971-DABD-4168-973B-7CAFEAFD8A23",
+            "containerTitle": "Причетність до приватних військових, приватних охоронних або приватних безпекових компаній",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 36
+        "sortOrder": 37
     },
     "name": "privateMilitaryCompanyParticipation",
-    "target": "OrgParticipation",
+    "target": null,
     "title": "Причетність до приватних військових компаній"
 }

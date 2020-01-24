@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "MediaFile",
+    "conceptType": "attributes",
+    "id": "936d2955-71ac-4c16-8f28-d2e5874ed56a",
+    "meta": {
+    },
+    "name": "media",
+    "title": "Додані файли",
+    "type": "File"
+}

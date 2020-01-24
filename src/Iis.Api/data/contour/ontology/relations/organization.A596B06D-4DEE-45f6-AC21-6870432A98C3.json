@@ -3,9 +3,9 @@
     "id": "A596B06D-4DEE-45f6-AC21-6870432A98C3",
     "meta": {
         "multiple": false,
-        "sortOrder": 294
+        "sortOrder": 341
     },
     "name": "organization",
-    "target": "Organization",
+    "target": null,
     "title": "організація"
 }

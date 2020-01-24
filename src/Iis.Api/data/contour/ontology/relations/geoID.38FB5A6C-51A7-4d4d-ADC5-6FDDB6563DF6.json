@@ -3,9 +3,9 @@
     "id": "38FB5A6C-51A7-4d4d-ADC5-6FDDB6563DF6",
     "meta": {
         "multiple": false,
-        "sortOrder": 303
+        "sortOrder": 350
     },
     "name": "geoID",
-    "target": "geoID",
-    "title": ""
+    "target": "GeoIDString",
+    "title": "ID ArcGIS"
 }

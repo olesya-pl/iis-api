@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "NumberString",
+    "conceptType": "attributes",
+    "id": "1885cb94-4106-478a-98b4-b4e841721f8a",
+    "meta": {
+    },
+    "name": "number",
+    "title": "Номер",
+    "type": "String"
+}

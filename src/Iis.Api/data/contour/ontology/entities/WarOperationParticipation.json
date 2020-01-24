@@ -4,7 +4,7 @@
             "id": "B8A72F1D-FE77-434c-9723-4114F3952EB5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 318
+                "sortOrder": 365
             },
             "name": "period",
             "target": "FuzzyDateRange",
@@ -14,7 +14,7 @@
             "id": "4590578D-91F8-46e9-BBCC-DC38DA9E0A16",
             "meta": {
                 "multiple": false,
-                "sortOrder": 319
+                "sortOrder": 366
             },
             "name": "nameOfMission",
             "target": "TaggableString",
@@ -24,7 +24,7 @@
             "id": "86B0C657-C4DE-4d64-BF3C-CB7768A8FD89",
             "meta": {
                 "multiple": false,
-                "sortOrder": 320
+                "sortOrder": 367
             },
             "name": "position",
             "target": "Position",
@@ -34,7 +34,7 @@
     "conceptType": "entities",
     "id": "F0CD7885-19BD-46a5-8EAE-96E4200D8B22",
     "meta": {
-        "sortOrder": 321
+        "sortOrder": 368
     },
     "name": "WarOperationParticipation",
     "title": "Участь у бойових діях"

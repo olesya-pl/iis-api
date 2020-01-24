@@ -3,9 +3,9 @@
     "id": "E2ED5733-6D4C-4553-8F9D-321F0874EDF6",
     "meta": {
         "multiple": false,
-        "sortOrder": 165
+        "sortOrder": 168
     },
     "name": "code",
-    "target": "code",
+    "target": "CodeString",
     "title": "Код"
 }

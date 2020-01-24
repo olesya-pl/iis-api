@@ -3,9 +3,9 @@
     "id": "A5865C53-E147-477e-9493-ABDC0D2995EB",
     "meta": {
         "multiple": false,
-        "sortOrder": 62
+        "sortOrder": 63
     },
     "name": "lastConfirmedAt",
-    "target": "lastConfirmedAt",
+    "target": "LastConfirmedAtDateTime",
     "title": "Останнє підтвердження"
 }

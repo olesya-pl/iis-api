@@ -6,9 +6,9 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 285
+        "sortOrder": 332
     },
     "name": "who",
-    "target": "TaggableString",
+    "target": null,
     "title": "Ким надано"
 }

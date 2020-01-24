@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "F5D17F31-3641-4c3b-86FC-487FDEC29268",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 198
+    },
+    "name": "realName",
+    "target": null,
+    "title": "Реальне ПІБ"
+}

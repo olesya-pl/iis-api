@@ -3,9 +3,9 @@
     "id": "7DCE59F4-374B-4458-8940-E9E56C52806A",
     "meta": {
         "multiple": false,
-        "sortOrder": 261
+        "sortOrder": 307
     },
     "name": "amountOfPersonnel",
-    "target": "amountOfPersonnel",
+    "target": "AmountOfPersonnelInteger",
     "title": "Кiлькiсть особового складу"
 }

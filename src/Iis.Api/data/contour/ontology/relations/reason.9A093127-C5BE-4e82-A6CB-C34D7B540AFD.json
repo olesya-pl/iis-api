@@ -6,9 +6,9 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 284
+        "sortOrder": 331
     },
     "name": "reason",
-    "target": "TaggableString",
+    "target": null,
     "title": "За що надано"
 }

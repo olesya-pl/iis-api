@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "LocationGeo",
             "id": "0B1940AE-5E7F-421b-9107-B154E7911194",
             "meta": {
                 "multiple": false,
-                "sortOrder": 301
+                "sortOrder": 348
             },
             "name": "location",
             "target": "location",
@@ -14,27 +15,28 @@
             "id": "B9B0E246-906B-4bf1-BA0A-FE7AECFE3F44",
             "meta": {
                 "multiple": false,
-                "sortOrder": 302
+                "sortOrder": 349
             },
             "name": "postalAddress",
             "target": "PostalAddress",
             "title": "Поштова адреса"
         },
         {
+            "attrTypeName": "GeoIDString",
             "id": "38FB5A6C-51A7-4d4d-ADC5-6FDDB6563DF6",
             "meta": {
                 "multiple": false,
-                "sortOrder": 303
+                "sortOrder": 350
             },
             "name": "geoID",
             "target": "geoID",
-            "title": ""
+            "title": "ID ArcGIS"
         }
     ],
     "conceptType": "entities",
     "id": "DCBD9F20-4E87-4052-AD13-802CF81978A4",
     "meta": {
-        "sortOrder": 304
+        "sortOrder": 351
     },
     "name": "UniversalLocation",
     "title": "Універсальна адреса"

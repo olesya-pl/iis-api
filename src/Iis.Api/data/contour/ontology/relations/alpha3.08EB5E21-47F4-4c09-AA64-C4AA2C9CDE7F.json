@@ -3,9 +3,9 @@
     "id": "08EB5E21-47F4-4c09-AA64-C4AA2C9CDE7F",
     "meta": {
         "multiple": false,
-        "sortOrder": 194
+        "sortOrder": 239
     },
     "name": "alpha3",
-    "target": "alpha3",
+    "target": "Alpha3String",
     "title": ""
 }

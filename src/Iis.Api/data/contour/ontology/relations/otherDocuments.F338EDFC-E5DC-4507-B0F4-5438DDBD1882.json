@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "F338EDFC-E5DC-4507-B0F4-5438DDBD1882",
     "meta": {
+        "container": {
+            "containerId": "6E72D533-9207-4149-B6C7-A4E802DE6D36",
+            "containerTitle": "Ідентифікаційні номери",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 26
+        "sortOrder": 27
     },
     "name": "otherDocuments",
-    "target": "OtherDocument",
+    "target": null,
     "title": "Інші документи"
 }

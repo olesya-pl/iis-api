@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "PlaceOfHeadquartersDislocationString",
+    "conceptType": "attributes",
+    "id": "BFB2F411-3E0B-4781-A46E-10A5E269C603",
+    "meta": {
+    },
+    "name": "placeOfHeadquartersDislocation",
+    "title": "Пункт постійної дислокації штабу",
+    "type": "String"
+}

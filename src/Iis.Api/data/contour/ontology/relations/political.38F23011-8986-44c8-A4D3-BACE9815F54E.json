@@ -3,9 +3,9 @@
     "id": "38F23011-8986-44c8-A4D3-BACE9815F54E",
     "meta": {
         "multiple": true,
-        "sortOrder": 74
+        "sortOrder": 76
     },
     "name": "political",
-    "target": "OrgParticipation",
+    "target": null,
     "title": "політичні"
 }

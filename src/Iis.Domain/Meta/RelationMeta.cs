@@ -6,6 +6,7 @@ namespace Iis.Domain.Meta
         public int? SortOrder { get; set; }
         public string Title { get; set; }
         public FormField FormField { get; set; }
+        public ContainerMeta Container { get; set; }
         public bool Multiple { get; set; }
         public IValidation Validation { get; set; }
     }

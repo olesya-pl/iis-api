@@ -3,9 +3,9 @@
     "id": "7448142C-A980-455f-8321-539FC83CB64B",
     "meta": {
         "multiple": false,
-        "sortOrder": 71
+        "sortOrder": 73
     },
     "name": "month",
-    "target": "month",
+    "target": "MonthInteger",
     "title": "місяць"
 }

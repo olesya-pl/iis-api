@@ -1,0 +1,13 @@
+{
+    "attrTypeName": "ValueString",
+    "conceptType": "attributes",
+    "id": "9784383B-A69F-4e54-A8A2-4FC89459A23F",
+    "meta": {
+        "validation": {
+            "required": true
+        }
+    },
+    "name": "value",
+    "title": "Номер",
+    "type": "String"
+}

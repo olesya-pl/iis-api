@@ -1,0 +1,9 @@
+[
+	{
+		"oneRequiredString": "Петя",
+		"oneNotRequired":50,
+	},
+	{
+		"oneRequiredString": "Вася",
+	}
+]

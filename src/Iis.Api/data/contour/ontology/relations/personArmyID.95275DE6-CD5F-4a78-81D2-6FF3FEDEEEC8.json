@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "95275DE6-CD5F-4a78-81D2-6FF3FEDEEEC8",
     "meta": {
+        "container": {
+            "containerId": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
+            "containerTitle": "Ідентифікаційні номери",
+            "containertype": "Accordion"
+        },
         "multiple": false,
-        "sortOrder": 28
+        "sortOrder": 29
     },
     "name": "personArmyID",
-    "target": "personArmyID",
+    "target": "PersonArmyIDString",
     "title": "Особистий номер військовослужбовця"
 }

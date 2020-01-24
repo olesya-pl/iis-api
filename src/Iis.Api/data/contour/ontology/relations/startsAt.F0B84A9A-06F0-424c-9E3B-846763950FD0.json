@@ -3,9 +3,9 @@
     "id": "F0B84A9A-06F0-424c-9E3B-846763950FD0",
     "meta": {
         "multiple": false,
-        "sortOrder": 81
+        "sortOrder": 83
     },
     "name": "startsAt",
-    "target": "startsAt",
+    "target": "StartsAtDateTime",
     "title": "Початок"
 }

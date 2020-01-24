@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using Iis.Domain;
 using Iis.Domain.Meta;
-using Meta = IIS.Core.Ontology.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
@@ -76,7 +75,7 @@ namespace IIS.Core.Ontology
                 if (prop.EmbeddingOptions == EmbeddingOptions.Required)
                 {
                     var meta = (RelationMetaBase)(prop.Meta ?? new RelationMetaBase());
-                    meta.Validation = meta?.Validation ?? new Meta.Validation();
+                    meta.Validation = meta?.Validation ?? new Validation();
                     meta.Validation.Required = true;
                     prop.Meta = meta;
                 }

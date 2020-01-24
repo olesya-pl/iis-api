@@ -4,17 +4,18 @@
             "id": "CF6A6132-AABF-4fb7-9D1F-716C1B89281A",
             "meta": {
                 "multiple": false,
-                "sortOrder": 274
+                "sortOrder": 321
             },
             "name": "period",
             "target": "FuzzyDateRange",
             "title": "Період"
         },
         {
+            "attrTypeName": "GoalString",
             "id": "9163CBC0-F03F-4a48-BDEF-9F6FDAC192D5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 275
+                "sortOrder": 322
             },
             "name": "goal",
             "target": "goal",
@@ -24,17 +25,18 @@
             "id": "3D33E1C5-1AB5-4d7d-B8D5-EDA9C54F73F0",
             "meta": {
                 "multiple": false,
-                "sortOrder": 276
+                "sortOrder": 323
             },
             "name": "country",
             "target": "Country",
             "title": "Крaїна"
         },
         {
+            "attrTypeName": "AttachmentFile",
             "id": "BF6411BA-B74F-49d8-A811-B9566A21E475",
             "meta": {
                 "multiple": true,
-                "sortOrder": 277
+                "sortOrder": 324
             },
             "name": "attachment",
             "target": "attachment",
@@ -44,7 +46,7 @@
     "conceptType": "entities",
     "id": "BFB47D32-D98D-421f-803D-62DBCB0D7F5D",
     "meta": {
-        "sortOrder": 278
+        "sortOrder": 325
     },
     "name": "ForeignMission",
     "title": "Закордонне відрядження"

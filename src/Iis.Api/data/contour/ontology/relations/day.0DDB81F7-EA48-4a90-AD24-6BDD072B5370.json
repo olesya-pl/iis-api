@@ -3,9 +3,9 @@
     "id": "0DDB81F7-EA48-4a90-AD24-6BDD072B5370",
     "meta": {
         "multiple": false,
-        "sortOrder": 70
+        "sortOrder": 72
     },
     "name": "day",
-    "target": "day",
+    "target": "DayInteger",
     "title": "день"
 }

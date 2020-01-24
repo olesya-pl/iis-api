@@ -4,12 +4,12 @@
     "meta": {
         "format": "phone",
         "multiple": false,
-        "sortOrder": 145,
+        "sortOrder": 148,
         "validation": {
             "required": true
         }
     },
     "name": "value",
-    "target": "value",
+    "target": "ValueString",
     "title": "Значення"
 }

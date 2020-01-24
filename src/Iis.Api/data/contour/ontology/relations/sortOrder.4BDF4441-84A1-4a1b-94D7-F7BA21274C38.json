@@ -3,9 +3,9 @@
     "id": "4BDF4441-84A1-4a1b-94D7-F7BA21274C38",
     "meta": {
         "multiple": false,
-        "sortOrder": 264
+        "sortOrder": 310
     },
     "name": "sortOrder",
-    "target": "sortOrder",
+    "target": "SortOrderInteger",
     "title": "Порядок сортування"
 }

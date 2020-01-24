@@ -1,0 +1,15 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Layout"
+    ],
+    "id": "99D956EA-F102-482b-BEFA-D120A789F60A",
+    "meta": {
+        "formField": {
+            "type": "form"
+        },
+        "sortOrder": 265
+    },
+    "name": "VerticalLayout",
+    "title": ""
+}

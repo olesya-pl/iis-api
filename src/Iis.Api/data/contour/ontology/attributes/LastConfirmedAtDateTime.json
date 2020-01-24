@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "LastConfirmedAtDateTime",
+    "conceptType": "attributes",
+    "id": "0751C10B-C33B-4a3b-B5AF-00F516DB61D4",
+    "meta": {
+    },
+    "name": "lastConfirmedAt",
+    "title": "Останнє підтвердження",
+    "type": "DateTime"
+}

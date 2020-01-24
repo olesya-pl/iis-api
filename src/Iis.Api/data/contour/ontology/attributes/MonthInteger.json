@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "MonthInteger",
+    "conceptType": "attributes",
+    "id": "19ABFA7E-E33E-4695-A0CD-6B8FE1307BF0",
+    "meta": {
+    },
+    "name": "month",
+    "title": "місяць",
+    "type": "Integer"
+}

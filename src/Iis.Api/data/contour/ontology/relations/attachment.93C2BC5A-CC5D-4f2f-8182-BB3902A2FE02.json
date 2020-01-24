@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "93C2BC5A-CC5D-4f2f-8182-BB3902A2FE02",
     "meta": {
+        "container": {
+            "containerId": "D1D6CF4F-52AC-4dc1-8AC6-C627C325B3CB",
+            "containerTitle": "Додані файли",
+            "containertype": "Accordion"
+        },
         "multiple": true,
-        "sortOrder": 54
+        "sortOrder": 55
     },
     "name": "attachment",
-    "target": "attachment",
+    "target": "AttachmentFile",
     "title": "Додані файли"
 }

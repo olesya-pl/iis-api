@@ -1,0 +1,11 @@
+{
+    "attrTypeName": "PositionString",
+    "conceptType": "attributes",
+    "id": "9CFD5183-3574-48dd-8E99-DF3E80B548E0",
+    "meta": {
+        "kind": "Keyword"
+    },
+    "name": "position",
+    "title": "Назва посади",
+    "type": "String"
+}

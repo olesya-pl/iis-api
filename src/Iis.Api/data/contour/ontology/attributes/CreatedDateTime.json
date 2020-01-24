@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "CreatedDateTime",
+    "conceptType": "attributes",
+    "id": "53f91d17-ed40-4b37-8a6d-bd527f60384f",
+    "meta": {
+    },
+    "name": "created",
+    "title": "дата першої фіксації",
+    "type": "DateTime"
+}

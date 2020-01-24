@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "DamageLevelString",
+    "conceptType": "attributes",
+    "id": "d493e507-7419-40c7-a196-48d3ac05af58",
+    "meta": {
+    },
+    "name": "damageLevel",
+    "title": "Ступінь важкості",
+    "type": "String"
+}

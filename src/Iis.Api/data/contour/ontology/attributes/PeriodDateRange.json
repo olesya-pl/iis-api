@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "PeriodDateRange",
+    "conceptType": "attributes",
+    "id": "b627d58c-2111-44f5-91fa-cb02b3f946bc",
+    "meta": {
+    },
+    "name": "period",
+    "title": "часовий прогміжок",
+    "type": "DateRange"
+}

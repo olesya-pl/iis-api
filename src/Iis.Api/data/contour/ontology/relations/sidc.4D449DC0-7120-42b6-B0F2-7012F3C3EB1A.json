@@ -3,9 +3,9 @@
     "id": "4D449DC0-7120-42b6-B0F2-7012F3C3EB1A",
     "meta": {
         "multiple": false,
-        "sortOrder": 171
+        "sortOrder": 174
     },
     "name": "sidc",
-    "target": "sidc",
+    "target": "SidcString",
     "title": "Військова абрівіатура НАТО"
 }

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "LocationGeo",
+    "conceptType": "attributes",
+    "id": "A154BF09-94C8-430c-AE54-F87B40F934AF",
+    "meta": {
+    },
+    "name": "location",
+    "title": "Координати",
+    "type": "Geo"
+}

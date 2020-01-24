@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "CodeString",
             "id": "E2ED5733-6D4C-4553-8F9D-321F0874EDF6",
             "meta": {
                 "multiple": false,
-                "sortOrder": 165
+                "sortOrder": 168
             },
             "name": "code",
             "target": "code",
@@ -17,7 +18,7 @@
     ],
     "id": "6024A83C-64D5-4c6e-BA7E-7A22CAB639F7",
     "meta": {
-        "sortOrder": 166
+        "sortOrder": 169
     },
     "name": "SIDC",
     "title": "SIDC"

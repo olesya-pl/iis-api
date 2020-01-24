@@ -6,6 +6,6 @@
         "sortOrder": 1
     },
     "name": "relationDegree",
-    "target": "RelationDegree",
+    "target": null,
     "title": "Ступінь споріднення"
 }

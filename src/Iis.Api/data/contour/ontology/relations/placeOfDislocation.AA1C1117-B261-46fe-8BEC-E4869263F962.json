@@ -3,9 +3,9 @@
     "id": "AA1C1117-B261-46fe-8BEC-E4869263F962",
     "meta": {
         "multiple": false,
-        "sortOrder": 237
+        "sortOrder": 283
     },
     "name": "placeOfDislocation",
-    "target": "placeOfDislocation",
+    "target": "PlaceOfDislocationString",
     "title": "Місце розташування"
 }

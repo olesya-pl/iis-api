@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "UpdatedDateTime",
+    "conceptType": "attributes",
+    "id": "fdbd1a05-77d6-4b80-83db-67e35433be94",
+    "meta": {
+    },
+    "name": "updated",
+    "title": "дата оновлення інформації",
+    "type": "DateTime"
+}

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "AuthorityOrganizationCodeString",
+    "conceptType": "attributes",
+    "id": "6088ca48-c351-427a-a987-e1a9d78a8ca5",
+    "meta": {
+    },
+    "name": "authorityOrganizationCode",
+    "title": "Код підрозділу",
+    "type": "String"
+}

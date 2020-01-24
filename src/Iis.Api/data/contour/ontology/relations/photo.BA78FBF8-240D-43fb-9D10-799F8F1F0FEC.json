@@ -3,9 +3,9 @@
     "id": "BA78FBF8-240D-43fb-9D10-799F8F1F0FEC",
     "meta": {
         "multiple": false,
-        "sortOrder": 63
+        "sortOrder": 64
     },
     "name": "photo",
-    "target": "photo",
+    "target": "PhotoFile",
     "title": "Фото"
 }

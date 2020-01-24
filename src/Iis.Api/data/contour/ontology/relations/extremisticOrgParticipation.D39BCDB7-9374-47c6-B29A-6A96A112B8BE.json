@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D39BCDB7-9374-47c6-B29A-6A96A112B8BE",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 213
+    },
+    "name": "extremisticOrgParticipation",
+    "target": null,
+    "title": "Причетність до терористичних, екстремістських або злочинних організацій (у т.ч., незареєстрованих приватних військових компаній)"
+}

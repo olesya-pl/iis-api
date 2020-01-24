@@ -1,20 +1,22 @@
 {
     "attributes": [
         {
+            "attrTypeName": "NameString",
             "id": "78C173C3-61B3-449d-B5F9-2DD1ACF09A68",
             "meta": {
                 "multiple": false,
-                "sortOrder": 77
+                "sortOrder": 79
             },
             "name": "name",
             "target": "name",
             "title": "Назва"
         },
         {
+            "attrTypeName": "DescriptionString",
             "id": "92D3DE68-6E44-4dfd-BA69-D96FA819B495",
             "meta": {
                 "multiple": false,
-                "sortOrder": 78,
+                "sortOrder": 80,
                 "title": "Особливості"
             },
             "name": "description",
@@ -22,10 +24,11 @@
             "title": "Додаткові дані"
         },
         {
+            "attrTypeName": "PurposeString",
             "id": "313711AC-CA53-45cc-9F2A-30ADFCBFBA13",
             "meta": {
                 "multiple": false,
-                "sortOrder": 79
+                "sortOrder": 81
             },
             "name": "purpose",
             "target": "purpose",
@@ -38,7 +41,7 @@
     ],
     "id": "19C73810-19C0-480e-8F64-63D54BD1A70B",
     "meta": {
-        "sortOrder": 80
+        "sortOrder": 82
     },
     "name": "Radionetwork",
     "title": "Радіомережа"

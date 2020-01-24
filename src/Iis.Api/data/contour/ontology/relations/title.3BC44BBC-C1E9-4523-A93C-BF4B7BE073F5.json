@@ -4,9 +4,9 @@
     "meta": {
         "formula": "h.fullTitle(entity.baseCode, entity.shortName)",
         "multiple": false,
-        "sortOrder": 182
+        "sortOrder": 187
     },
     "name": "title",
-    "target": "title",
+    "target": "TitleString",
     "title": "Повна назва"
 }

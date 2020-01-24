@@ -9,10 +9,10 @@
             "title": "Підлеглий"
         },
         "multiple": false,
-        "sortOrder": 259,
+        "sortOrder": 305,
         "type": "hierarchical"
     },
     "name": "superior",
-    "target": "Subdivision_superior",
+    "target": null,
     "title": "Підлеглість"
 }

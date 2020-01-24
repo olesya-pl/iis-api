@@ -3,9 +3,9 @@
     "id": "8DDDA9BC-7B7C-4c50-87CA-701C9D279EE0",
     "meta": {
         "multiple": false,
-        "sortOrder": 329
+        "sortOrder": 376
     },
     "name": "value",
-    "target": "value",
+    "target": "ValueString",
     "title": "Номер"
 }

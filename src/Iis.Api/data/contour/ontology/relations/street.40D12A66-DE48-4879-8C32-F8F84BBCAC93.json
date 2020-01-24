@@ -3,9 +3,9 @@
     "id": "40D12A66-DE48-4879-8C32-F8F84BBCAC93",
     "meta": {
         "multiple": false,
-        "sortOrder": 207
+        "sortOrder": 252
     },
     "name": "street",
-    "target": "street",
+    "target": "StreetString",
     "title": "Вулиця"
 }

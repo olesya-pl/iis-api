@@ -3,9 +3,9 @@
     "id": "476A97C1-0493-486d-96F1-C6013EA6E85D",
     "meta": {
         "multiple": false,
-        "sortOrder": 221
+        "sortOrder": 267
     },
     "name": "reason",
-    "target": "reason",
+    "target": "ReasonString",
     "title": "За що накладено"
 }

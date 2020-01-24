@@ -6,9 +6,9 @@
             "Create"
         ],
         "multiple": true,
-        "sortOrder": 93
+        "sortOrder": 95
     },
     "name": "tag",
-    "target": "Tag",
+    "target": null,
     "title": "Теги"
 }

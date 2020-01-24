@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "NameString",
             "id": "50AD48DD-50BB-4645-A267-E201A31AA435",
             "meta": {
                 "multiple": false,
-                "sortOrder": 332
+                "sortOrder": 379
             },
             "name": "name",
             "target": "name",
@@ -17,7 +18,7 @@
     ],
     "id": "FF39BF88-E29D-4bbf-AB7E-3AB5BB3EF3B0",
     "meta": {
-        "sortOrder": 333
+        "sortOrder": 380
     },
     "name": "OtherDocument",
     "title": "Інший документ"

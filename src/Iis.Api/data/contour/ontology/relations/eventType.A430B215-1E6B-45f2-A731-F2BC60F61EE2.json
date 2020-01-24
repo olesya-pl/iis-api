@@ -7,9 +7,9 @@
             "type": "dropdownTree"
         },
         "multiple": false,
-        "sortOrder": 84
+        "sortOrder": 86
     },
     "name": "eventType",
-    "target": "EventType",
+    "target": null,
     "title": "Тип події"
 }

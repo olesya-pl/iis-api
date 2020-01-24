@@ -7,7 +7,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 282
+                "sortOrder": 329
             },
             "name": "date",
             "target": "FuzzyDate",
@@ -20,7 +20,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 283
+                "sortOrder": 330
             },
             "name": "type",
             "target": "TypeOfAward",
@@ -33,7 +33,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 284
+                "sortOrder": 331
             },
             "name": "reason",
             "target": "TaggableString",
@@ -46,17 +46,18 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 285
+                "sortOrder": 332
             },
             "name": "who",
             "target": "TaggableString",
             "title": "Ким надано"
         },
         {
+            "attrTypeName": "FileFile",
             "id": "E56538B0-25F3-4f1e-9ED7-94FA3FE391C0",
             "meta": {
                 "multiple": true,
-                "sortOrder": 286
+                "sortOrder": 333
             },
             "name": "file",
             "target": "file",
@@ -66,7 +67,7 @@
     "conceptType": "entities",
     "id": "C69245E1-BC26-49be-A17C-C8B2D8FCFD5B",
     "meta": {
-        "sortOrder": 287
+        "sortOrder": 334
     },
     "name": "Award",
     "title": "Нагородження"

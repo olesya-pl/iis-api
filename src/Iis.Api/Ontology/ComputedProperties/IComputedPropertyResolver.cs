@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Flee.PublicTypes;
-using IIS.Core.Ontology.Meta;
 using Iis.Domain;
 using Iis.Domain.Meta;
 

@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "97243AA3-5A4B-4094-AAF7-8512E6F7F2FA",
     "meta": {
+        "container": {
+            "containerId": "8AC004FE-E197-4697-9095-D897FB0E74FA",
+            "containerTitle": "Внутрішні паспорти",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 23
+        "sortOrder": 24
     },
     "name": "passportData",
-    "target": "Passport",
+    "target": null,
     "title": "Внутрішній паспорт"
 }

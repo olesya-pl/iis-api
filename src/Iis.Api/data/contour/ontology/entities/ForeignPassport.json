@@ -3,8 +3,11 @@
         {
             "id": "F07C03EF-1E92-4e72-8A41-E72C18784CB9",
             "meta": {
+                "formField": {
+                    "type": "dropdown"
+                },
                 "multiple": false,
-                "sortOrder": 218
+                "sortOrder": 263
             },
             "name": "kind",
             "target": "ForeignPassportType",
@@ -17,7 +20,7 @@
     ],
     "id": "999E2799-211B-4d89-A249-6AB51CF715AE",
     "meta": {
-        "sortOrder": 219
+        "sortOrder": 264
     },
     "name": "ForeignPassport",
     "title": "Закордонний паспорт"

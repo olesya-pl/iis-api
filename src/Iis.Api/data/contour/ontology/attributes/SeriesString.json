@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "SeriesString",
+    "conceptType": "attributes",
+    "id": "91f3451b-187b-479a-8f5f-bff481137bfa",
+    "meta": {
+    },
+    "name": "series",
+    "title": "Серія",
+    "type": "String"
+}

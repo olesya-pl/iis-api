@@ -3,9 +3,9 @@
     "id": "C21A684E-4491-44c9-8328-EA5F14344181",
     "meta": {
         "multiple": false,
-        "sortOrder": 240
+        "sortOrder": 286
     },
     "name": "militaryBase",
-    "target": "MilitaryBase",
+    "target": null,
     "title": "Військова частина"
 }

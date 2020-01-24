@@ -3,9 +3,9 @@
     "id": "77A58922-2228-47a6-B5DF-7AFADFC66D33",
     "meta": {
         "multiple": false,
-        "sortOrder": 195
+        "sortOrder": 240
     },
     "name": "text",
-    "target": "text",
+    "target": "TextString",
     "title": ""
 }

@@ -3,9 +3,9 @@
     "id": "E7FFD1E2-CC97-4b0d-B13D-F5CBA777C1B0",
     "meta": {
         "multiple": false,
-        "sortOrder": 133
+        "sortOrder": 136
     },
     "name": "subtype",
-    "target": "MachinerySubtype",
+    "target": null,
     "title": "Підтип"
 }

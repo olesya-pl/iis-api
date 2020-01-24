@@ -3,12 +3,12 @@
     "id": "FB2915A9-2098-48f2-8FE8-AC2AF040B3E5",
     "meta": {
         "multiple": false,
-        "sortOrder": 307,
+        "sortOrder": 354,
         "validation": {
             "required": true
         }
     },
     "name": "value",
-    "target": "value",
+    "target": "ValueString",
     "title": "Значення"
 }

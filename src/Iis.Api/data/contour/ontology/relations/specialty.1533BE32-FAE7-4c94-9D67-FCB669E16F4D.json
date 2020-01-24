@@ -3,9 +3,9 @@
     "id": "1533BE32-FAE7-4c94-9D67-FCB669E16F4D",
     "meta": {
         "multiple": false,
-        "sortOrder": 124
+        "sortOrder": 127
     },
     "name": "specialty",
-    "target": "specialty",
+    "target": "SpecialtyString",
     "title": "спеціальність"
 }

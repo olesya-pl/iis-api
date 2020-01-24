@@ -1,0 +1,364 @@
+{
+    "attributes": [
+        {
+            "id": "F5D17F31-3641-4c3b-86FC-487FDEC29268",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 198
+            },
+            "name": "realName",
+            "target": "Accordion",
+            "title": "Реальне ПІБ"
+        },
+        {
+            "id": "F2C9BE02-3E0C-4f42-936E-6B1DE960C4E6",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 199
+            },
+            "name": "fakeName",
+            "target": "Accordion",
+            "title": "ПІБ прикриття"
+        },
+        {
+            "id": "31820E7A-C1D0-42a5-9E55-BB2724A7A95E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 200
+            },
+            "name": "importantDataChanges",
+            "target": "Accordion",
+            "title": "Зміни установчих даних"
+        },
+        {
+            "id": "D2D7C903-1636-4b94-91A5-9E140C399B49",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 201
+            },
+            "name": "birthAndDeath",
+            "target": "Accordion",
+            "title": "Народження та смерть"
+        },
+        {
+            "id": "81783AB2-77C8-43b1-B544-354F346964E2",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 202
+            },
+            "name": "identificationData",
+            "target": "Accordion",
+            "title": "Установчі дані"
+        },
+        {
+            "id": "8AC004FE-E197-4697-9095-D897FB0E74FA",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 203
+            },
+            "name": "passportData",
+            "target": "Accordion",
+            "title": "Внутрішні паспорти"
+        },
+        {
+            "id": "5CDA3A25-B8C2-4377-B72B-97696A04219E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 204
+            },
+            "name": "foreignPassport",
+            "target": "Accordion",
+            "title": "Закордонні паспорти"
+        },
+        {
+            "id": "917F7737-FA64-4ee0-AE04-C250354B71D0",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 205
+            },
+            "name": "credPersonDocument",
+            "target": "Accordion",
+            "title": "Посвідчення особи"
+        },
+        {
+            "id": "6E72D533-9207-4149-B6C7-A4E802DE6D36",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 206
+            },
+            "name": "otherDocuments",
+            "target": "Accordion",
+            "title": "Ідентифікаційні номери"
+        },
+        {
+            "id": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 207
+            },
+            "name": "importantId",
+            "target": "Accordion",
+            "title": "Ідентифікаційні номери"
+        },
+        {
+            "id": "945CC957-C1DF-4a2a-BB24-7E549D037D88",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 208
+            },
+            "name": "otherID",
+            "target": "Accordion",
+            "title": "Інші ідентифікаційні номери"
+        },
+        {
+            "id": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 209
+            },
+            "name": "currentWorkplace",
+            "target": "Accordion",
+            "title": "Поточне місце військової служби/роботи"
+        },
+        {
+            "id": "48410D55-4D75-4d83-A1B3-61428EEB01C0",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 210
+            },
+            "name": "jobHistory",
+            "target": "Accordion",
+            "title": "Місця проходження служби/роботи/безробіття"
+        },
+        {
+            "id": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 211
+            },
+            "name": "politicalParticipation",
+            "target": "Accordion",
+            "title": "Приналежність до політичних партій, громадських організацій, рухів"
+        },
+        {
+            "id": "3BD55143-A266-4e35-9E00-574FF61A456D",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 212
+            },
+            "name": "OiVTParticipation",
+            "target": "Accordion",
+            "title": "Участь у розробці ОіВТ"
+        },
+        {
+            "id": "D39BCDB7-9374-47c6-B29A-6A96A112B8BE",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 213
+            },
+            "name": "extremisticOrgParticipation",
+            "target": "Accordion",
+            "title": "Причетність до терористичних, екстремістських або злочинних організацій (у т.ч., незареєстрованих приватних військових компаній)"
+        },
+        {
+            "id": "582DF971-DABD-4168-973B-7CAFEAFD8A23",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 214
+            },
+            "name": "privateMilitaryCompanyParticipation",
+            "target": "Accordion",
+            "title": "Причетність до приватних військових, приватних охоронних або приватних безпекових компаній"
+        },
+        {
+            "id": "3CA195B6-033D-4717-A8AB-9BFC5DFBCCC3",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 215
+            },
+            "name": "teractsParticipation",
+            "target": "Accordion",
+            "title": "Причетність до резонансних подій/терактів/злочинів"
+        },
+        {
+            "id": "61A466B0-5178-468c-AB3A-B64B77F5C2B6",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 216
+            },
+            "name": "education",
+            "target": "Accordion",
+            "title": "Освіта"
+        },
+        {
+            "id": "B9B7EC0F-1BFE-4fe4-8D55-C8993EE58AEC",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 217
+            },
+            "name": "foreignLang",
+            "target": "Accordion",
+            "title": "Володіння іноземними мовами"
+        },
+        {
+            "id": "FBF3A236-9335-4f0d-A935-54F947EDD7CA",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 218
+            },
+            "name": "MASItem",
+            "target": "Accordion",
+            "title": "Військово-облікова спеціальність"
+        },
+        {
+            "id": "38B0D1FF-D8D7-4719-9FA3-4602E96CE7B4",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 219
+            },
+            "name": "warOperationParticipation",
+            "target": "Accordion",
+            "title": "Участь у бойових діях/миротворчих операціях"
+        },
+        {
+            "id": "83985A1B-B32F-433c-8FB3-48E052FD22DE",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 220
+            },
+            "name": "currentLocation",
+            "target": "Accordion",
+            "title": "Поточне місце перебування"
+        },
+        {
+            "id": "1FA1ED3F-4118-42a5-9CF5-FE027D678D8D",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 221
+            },
+            "name": "wounds",
+            "target": "Accordion",
+            "title": "Поранення і контузії"
+        },
+        {
+            "id": "C429BF16-9AC2-4485-B40C-3CD9B519E0DD",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 222
+            },
+            "name": "foreignMission",
+            "target": "Accordion",
+            "title": "Дані про перебування у закордонному відрядженні (не у складі військ)"
+        },
+        {
+            "id": "8944ED63-DD7E-465c-A381-7DD227B78B8E",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 223
+            },
+            "name": "award",
+            "target": "Accordion",
+            "title": "Заохочення (вид нагороди, медалі, цінні подарунки тощо)"
+        },
+        {
+            "id": "85F3F0E4-02F6-46b8-A09A-B203DEFC2A39",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 224
+            },
+            "name": "sanction",
+            "target": "Accordion",
+            "title": "Стягнення"
+        },
+        {
+            "id": "BDE2491B-B051-4541-A58C-5FB7DFB196AE",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 225
+            },
+            "name": "criminalSanction",
+            "target": "Accordion",
+            "title": "Притягнення до кримінальної та адміністративної відповідальності"
+        },
+        {
+            "id": "046D4D55-6B93-49ad-BB83-DD14EAF023F5",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 226
+            },
+            "name": "martialStatus",
+            "target": "Accordion",
+            "title": "Сімейний стан"
+        },
+        {
+            "id": "69D6C36A-595D-4858-A168-4D48DC976ADE",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 227
+            },
+            "name": "closePerson",
+            "target": "Accordion",
+            "title": "Оточення"
+        },
+        {
+            "id": "470950D8-5550-4d48-A946-41AAEEDFDCA8",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 228
+            },
+            "name": "contacts",
+            "target": "Accordion",
+            "title": "Контакти особи"
+        },
+        {
+            "id": "37EE6BFB-6A20-469f-9677-BCE87A410AF3",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 229
+            },
+            "name": "otherInterestingData",
+            "target": "Accordion",
+            "title": "Інші дані, які представляють інтерес"
+        },
+        {
+            "id": "D1D6CF4F-52AC-4dc1-8AC6-C627C325B3CB",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 230
+            },
+            "name": "attachment",
+            "target": "Accordion",
+            "title": "Додані файли"
+        },
+        {
+            "id": "7E473587-1D03-443f-8822-A4F06AA01860",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 231
+            },
+            "name": "other",
+            "target": "Accordion",
+            "title": "Інше"
+        },
+        {
+            "id": "CBFB512A-5698-40d0-A95D-951C42E03079",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 232
+            },
+            "name": "toSort",
+            "target": "Accordion",
+            "title": "Нерозібране (тимчасово)"
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "UI"
+    ],
+    "id": "7C99A1E6-57D3-4875-9572-714343B49018",
+    "meta": {
+        "sortOrder": 233
+    },
+    "name": "PersonEdit",
+    "title": ""
+}

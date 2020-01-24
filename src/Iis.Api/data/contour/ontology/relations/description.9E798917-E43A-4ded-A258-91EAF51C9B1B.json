@@ -3,9 +3,9 @@
     "id": "9E798917-E43A-4ded-A258-91EAF51C9B1B",
     "meta": {
         "multiple": false,
-        "sortOrder": 232
+        "sortOrder": 278
     },
     "name": "description",
-    "target": "description",
+    "target": "DescriptionString",
     "title": "Додаткові дані"
 }

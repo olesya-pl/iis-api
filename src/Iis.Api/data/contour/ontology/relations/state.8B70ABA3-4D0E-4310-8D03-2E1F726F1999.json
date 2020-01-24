@@ -7,9 +7,9 @@
             "type": "radioGroup"
         },
         "multiple": false,
-        "sortOrder": 88
+        "sortOrder": 90
     },
     "name": "state",
-    "target": "EventState",
+    "target": null,
     "title": "Стан"
 }

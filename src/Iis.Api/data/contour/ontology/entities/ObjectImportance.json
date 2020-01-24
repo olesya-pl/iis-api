@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "CodeString",
             "id": "D026F987-4180-4891-A9E7-C618F21FC25B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 173
+                "sortOrder": 176
             },
             "name": "code",
             "target": "code",
@@ -18,7 +19,7 @@
     "id": "66010851-436A-4bc6-8194-3E3A38B4524C",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 174
+        "sortOrder": 177
     },
     "name": "ObjectImportance",
     "title": "Важливість Об'єкта Розвідки"

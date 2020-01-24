@@ -9,7 +9,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 57,
+                "sortOrder": 58,
                 "validation": {
                     "required": true
                 }
@@ -19,10 +19,11 @@
             "title": "Важливість"
         },
         {
+            "attrTypeName": "AttachmentFile",
             "id": "A73E7CD0-A93C-4763-B754-97FEC8897C02",
             "meta": {
                 "multiple": true,
-                "sortOrder": 58
+                "sortOrder": 59
             },
             "name": "attachment",
             "target": "attachment",
@@ -40,18 +41,22 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 59
+                "sortOrder": 60
             },
             "name": "sign",
             "target": "ObjectSign",
             "title": "Ознаки"
         },
         {
+            "attrTypeName": "TitleString",
             "id": "F0B073F5-FAF3-4c50-A8A6-1ADEA5072AE4",
             "meta": {
                 "formula": "entity.name",
                 "multiple": false,
-                "sortOrder": 60
+                "sortOrder": 61,
+                "validation": {
+                    "required": true
+                }
             },
             "name": "title",
             "target": "title",
@@ -65,7 +70,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 61,
+                "sortOrder": 62,
                 "validation": {
                     "required": true
                 }
@@ -75,20 +80,22 @@
             "title": "Приналежність"
         },
         {
+            "attrTypeName": "LastConfirmedAtDateTime",
             "id": "A5865C53-E147-477e-9493-ABDC0D2995EB",
             "meta": {
                 "multiple": false,
-                "sortOrder": 62
+                "sortOrder": 63
             },
             "name": "lastConfirmedAt",
             "target": "lastConfirmedAt",
             "title": "Останнє підтвердження"
         },
         {
+            "attrTypeName": "PhotoFile",
             "id": "BA78FBF8-240D-43fb-9D10-799F8F1F0FEC",
             "meta": {
                 "multiple": false,
-                "sortOrder": 63
+                "sortOrder": 64
             },
             "name": "photo",
             "target": "photo",
@@ -98,7 +105,7 @@
     "conceptType": "entities",
     "id": "12714279-135C-4e93-AF46-43235F9F94B9",
     "meta": {
-        "sortOrder": 64
+        "sortOrder": 65
     },
     "name": "ObjectOfStudy",
     "title": "Об'єкт розвідки"

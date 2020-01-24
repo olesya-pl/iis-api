@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "HousingString",
+    "conceptType": "attributes",
+    "id": "4c029a3f-cff7-4e0e-83f8-bb2d487fb631",
+    "meta": {
+    },
+    "name": "housing",
+    "title": "Корпус",
+    "type": "String"
+}

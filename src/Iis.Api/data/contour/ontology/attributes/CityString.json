@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "CityString",
+    "conceptType": "attributes",
+    "id": "ce01c68b-b716-4c0e-b30b-02e205d2b6fc",
+    "meta": {
+    },
+    "name": "city",
+    "title": "Населений пункт",
+    "type": "String"
+}

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "GeoIDString",
+    "conceptType": "attributes",
+    "id": "842d9955-1fe1-43e7-a4a4-99928714df95",
+    "meta": {
+    },
+    "name": "geoID",
+    "title": "ID ArcGIS",
+    "type": "String"
+}

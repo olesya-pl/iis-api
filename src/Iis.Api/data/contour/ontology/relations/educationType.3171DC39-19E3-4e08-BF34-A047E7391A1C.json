@@ -3,9 +3,9 @@
     "id": "3171DC39-19E3-4e08-BF34-A047E7391A1C",
     "meta": {
         "multiple": true,
-        "sortOrder": 312
+        "sortOrder": 359
     },
     "name": "educationType",
-    "target": "EducationLevel",
+    "target": null,
     "title": "тип освіти"
 }

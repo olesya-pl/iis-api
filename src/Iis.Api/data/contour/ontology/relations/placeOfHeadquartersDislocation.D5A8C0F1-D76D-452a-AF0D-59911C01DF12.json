@@ -3,9 +3,9 @@
     "id": "D5A8C0F1-D76D-452a-AF0D-59911C01DF12",
     "meta": {
         "multiple": false,
-        "sortOrder": 257
+        "sortOrder": 303
     },
     "name": "placeOfHeadquartersDislocation",
-    "target": "placeOfHeadquartersDislocation",
+    "target": "PlaceOfHeadquartersDislocationString",
     "title": "Пункт постійної дислокації штабу"
 }

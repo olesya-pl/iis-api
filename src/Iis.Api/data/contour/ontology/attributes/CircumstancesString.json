@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "CircumstancesString",
+    "conceptType": "attributes",
+    "id": "aa228609-fa42-451a-aa43-4a0a8fc297ad",
+    "meta": {
+    },
+    "name": "circumstances",
+    "title": "Обставини",
+    "type": "String"
+}

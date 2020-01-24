@@ -3,9 +3,9 @@
     "id": "D1426B6D-FE1B-4319-A778-28D41466F0B0",
     "meta": {
         "multiple": false,
-        "sortOrder": 141
+        "sortOrder": 144
     },
     "name": "toBeInPlace",
-    "target": "MilitaryMachinery_toBeInPlace",
+    "target": null,
     "title": "Місце перебування"
 }

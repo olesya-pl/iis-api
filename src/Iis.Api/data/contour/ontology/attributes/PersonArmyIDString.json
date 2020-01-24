@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "PersonArmyIDString",
+    "conceptType": "attributes",
+    "id": "e4520e43-2d41-4d2c-a11b-cb987130a6ad",
+    "meta": {
+    },
+    "name": "personArmyID",
+    "title": "Особистий номер військовослужбовця",
+    "type": "String"
+}

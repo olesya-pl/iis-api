@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "DateOfIssueDateTime",
+    "conceptType": "attributes",
+    "id": "58625e88-6d35-4d61-9828-e94d969c725f",
+    "meta": {
+    },
+    "name": "dateOfIssue",
+    "title": "Дата видачі",
+    "type": "DateTime"
+}

@@ -3,9 +3,9 @@
     "id": "AD7CEC88-E927-4369-9A80-19546B2989E4",
     "meta": {
         "multiple": false,
-        "sortOrder": 125
+        "sortOrder": 128
     },
     "name": "specialization",
-    "target": "specialization",
+    "target": "SpecializationString",
     "title": "спеціалізація"
 }

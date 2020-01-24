@@ -3,9 +3,9 @@
     "id": "27FE0C36-4B89-4d39-A2AE-180FABB58043",
     "meta": {
         "multiple": false,
-        "sortOrder": 137
+        "sortOrder": 140
     },
     "name": "model",
-    "target": "model",
+    "target": "ModelString",
     "title": "Модель"
 }

@@ -3,9 +3,9 @@
     "id": "0DBCCC4A-9517-4980-A11C-4B491A33DC07",
     "meta": {
         "multiple": false,
-        "sortOrder": 132
+        "sortOrder": 135
     },
     "name": "serialNumber",
-    "target": "serialNumber",
+    "target": "SerialNumberString",
     "title": "Серійний номер"
 }

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "DislocationGeo",
+    "conceptType": "attributes",
+    "id": "0B172D83-15F2-48e6-BA49-8B7F815D8983",
+    "meta": {
+    },
+    "name": "dislocation",
+    "title": "Пункт Постійної Дислокації (ППД)",
+    "type": "Geo"
+}

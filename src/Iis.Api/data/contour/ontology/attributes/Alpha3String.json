@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "Alpha3String",
+    "conceptType": "attributes",
+    "id": "d8e35dd8-3af6-456e-aa87-4d50f22e4387",
+    "meta": {
+    },
+    "name": "alpha3",
+    "title": "",
+    "type": "String"
+}

@@ -2,20 +2,22 @@
     "abstract": true,
     "attributes": [
         {
+            "attrTypeName": "NameString",
             "id": "80D1468A-C735-4ee6-93CA-283F66211DB5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 263
+                "sortOrder": 309
             },
             "name": "name",
             "target": "name",
             "title": "Назва"
         },
         {
+            "attrTypeName": "SortOrderInteger",
             "id": "4BDF4441-84A1-4a1b-94D7-F7BA21274C38",
             "meta": {
                 "multiple": false,
-                "sortOrder": 264
+                "sortOrder": 310
             },
             "name": "sortOrder",
             "target": "sortOrder",
@@ -25,7 +27,7 @@
     "conceptType": "entities",
     "id": "A6BFF9B2-3275-4e96-AA0B-60D444C74238",
     "meta": {
-        "sortOrder": 265
+        "sortOrder": 311
     },
     "name": "Enum",
     "title": "Список"

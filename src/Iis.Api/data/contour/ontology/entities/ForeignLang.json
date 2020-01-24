@@ -4,17 +4,18 @@
             "id": "C8AD7EB5-F7C9-4a7d-912D-0CE5C3EDD81E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 111
+                "sortOrder": 113
             },
             "name": "lang",
             "target": "Language",
             "title": "мова"
         },
         {
+            "attrTypeName": "LevelString",
             "id": "59FD0B66-BFB6-4d67-91A5-A03B81027953",
             "meta": {
                 "multiple": false,
-                "sortOrder": 112
+                "sortOrder": 114
             },
             "name": "level",
             "target": "level",
@@ -24,7 +25,7 @@
     "conceptType": "entities",
     "id": "3A6CA356-7C22-4aa9-9E62-A15956BB753A",
     "meta": {
-        "sortOrder": 113
+        "sortOrder": 115
     },
     "name": "ForeignLang",
     "title": "Володіння іноземними мовами"

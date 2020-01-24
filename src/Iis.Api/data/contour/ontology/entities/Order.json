@@ -1,20 +1,22 @@
 {
     "attributes": [
         {
+            "attrTypeName": "NumberString",
             "id": "F586ACE2-B5A7-4012-86B6-3F69750BCB16",
             "meta": {
                 "multiple": false,
-                "sortOrder": 323
+                "sortOrder": 370
             },
             "name": "number",
             "target": "number",
             "title": "Номер"
         },
         {
+            "attrTypeName": "DateDateTime",
             "id": "DB0510C9-E28C-4168-957B-95FAB0E8DA09",
             "meta": {
                 "multiple": false,
-                "sortOrder": 324
+                "sortOrder": 371
             },
             "name": "date",
             "target": "date",
@@ -24,17 +26,18 @@
             "id": "82843C30-BBF5-48d3-A619-4BFB4C5DF524",
             "meta": {
                 "multiple": false,
-                "sortOrder": 325
+                "sortOrder": 372
             },
             "name": "orderPublisher",
             "target": "Position",
             "title": "Чий наказ"
         },
         {
+            "attrTypeName": "ScanFile",
             "id": "24BFCF85-60A0-4060-B1A6-5CED90CCF69B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 326
+                "sortOrder": 373
             },
             "name": "scan",
             "target": "scan",
@@ -44,7 +47,7 @@
     "conceptType": "entities",
     "id": "F2C66C04-6EFA-4992-8ED2-BD0AC3964EFF",
     "meta": {
-        "sortOrder": 327
+        "sortOrder": 374
     },
     "name": "Order",
     "title": "Наказ"

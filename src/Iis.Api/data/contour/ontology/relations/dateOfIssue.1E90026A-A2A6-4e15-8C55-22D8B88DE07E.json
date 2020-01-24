@@ -3,9 +3,9 @@
     "id": "1E90026A-A2A6-4e15-8C55-22D8B88DE07E",
     "meta": {
         "multiple": false,
-        "sortOrder": 177
+        "sortOrder": 180
     },
     "name": "dateOfIssue",
-    "target": "dateOfIssue",
+    "target": "DateOfIssueDateTime",
     "title": "Дата видачі"
 }

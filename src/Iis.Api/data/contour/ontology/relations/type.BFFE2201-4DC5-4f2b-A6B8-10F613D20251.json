@@ -6,9 +6,9 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 283
+        "sortOrder": 330
     },
     "name": "type",
-    "target": "TypeOfAward",
+    "target": null,
     "title": "Вид нагороди"
 }

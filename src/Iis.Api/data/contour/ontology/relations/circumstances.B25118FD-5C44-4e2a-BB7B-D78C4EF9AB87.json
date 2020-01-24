@@ -3,9 +3,9 @@
     "id": "B25118FD-5C44-4e2a-BB7B-D78C4EF9AB87",
     "meta": {
         "multiple": false,
-        "sortOrder": 269
+        "sortOrder": 315
     },
     "name": "circumstances",
-    "target": "circumstances",
+    "target": "CircumstancesString",
     "title": "Обставини"
 }

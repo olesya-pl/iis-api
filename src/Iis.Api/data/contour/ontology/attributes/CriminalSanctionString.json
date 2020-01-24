@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "CriminalSanctionString",
+    "conceptType": "attributes",
+    "id": "4c7e7deb-16c4-4148-aaef-fed4e66de41a",
+    "meta": {
+    },
+    "name": "criminalSanction",
+    "title": "Кримінальна відповідальність",
+    "type": "String"
+}

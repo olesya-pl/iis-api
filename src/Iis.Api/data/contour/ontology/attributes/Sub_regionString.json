@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "Sub_regionString",
+    "conceptType": "attributes",
+    "id": "1e8b61bd-4f35-41f3-8cbe-9de76204d8db",
+    "meta": {
+    },
+    "name": "sub_region",
+    "title": "",
+    "type": "String"
+}

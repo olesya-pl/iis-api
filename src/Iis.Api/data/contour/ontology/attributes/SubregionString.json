@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "SubregionString",
+    "conceptType": "attributes",
+    "id": "58a6802b-0cd9-4c30-b6fb-fae2ef9f9db3",
+    "meta": {
+    },
+    "name": "subregion",
+    "title": "Район",
+    "type": "String"
+}

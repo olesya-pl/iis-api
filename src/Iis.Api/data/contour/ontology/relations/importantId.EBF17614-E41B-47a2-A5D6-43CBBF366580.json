@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 207
+    },
+    "name": "importantId",
+    "target": null,
+    "title": "Ідентифікаційні номери"
+}

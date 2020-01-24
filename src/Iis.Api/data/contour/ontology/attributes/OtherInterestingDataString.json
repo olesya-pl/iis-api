@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "OtherInterestingDataString",
+    "conceptType": "attributes",
+    "id": "6f864f9b-f09e-4c2a-9961-6aa6e17aa291",
+    "meta": {
+    },
+    "name": "otherInterestingData",
+    "title": "Інші дані, які представляють інтерес",
+    "type": "String"
+}

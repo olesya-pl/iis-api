@@ -3,9 +3,9 @@
     "id": "F089BAE1-EC5E-49fc-AC19-74E855652ADF",
     "meta": {
         "multiple": false,
-        "sortOrder": 260
+        "sortOrder": 306
     },
     "name": "bePartOf",
-    "target": "Subdivision",
+    "target": null,
     "title": "Належність"
 }

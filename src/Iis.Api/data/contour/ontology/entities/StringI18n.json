@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "TransliterationString",
             "id": "49ED893C-4C9A-4d7b-B53C-68496572BEB9",
             "meta": {
                 "multiple": false,
-                "sortOrder": 118
+                "sortOrder": 121
             },
             "name": "transliteration",
             "target": "transliteration",
@@ -17,7 +18,7 @@
     ],
     "id": "428A7162-F518-4fa1-9238-0410E9E62EE5",
     "meta": {
-        "sortOrder": 119
+        "sortOrder": 122
     },
     "name": "StringI18n",
     "title": "Глобалізована строка i18n"

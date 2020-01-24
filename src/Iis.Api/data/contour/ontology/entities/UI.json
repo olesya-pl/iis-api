@@ -1,0 +1,23 @@
+{
+    "abstract": true,
+    "attributes": [
+        {
+            "attrTypeName": "SortOrderInteger",
+            "id": "6B6DA2BF-FCA7-4368-8BC1-0C537E101972",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 196
+            },
+            "name": "sortOrder",
+            "target": "sortOrder",
+            "title": ""
+        }
+    ],
+    "conceptType": "entities",
+    "id": "7B833B5A-177A-4b68-9BCB-47042A966884",
+    "meta": {
+        "sortOrder": 197
+    },
+    "name": "UI",
+    "title": ""
+}

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using IIS.Core.Ontology.Meta;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Newtonsoft.Json.Linq;

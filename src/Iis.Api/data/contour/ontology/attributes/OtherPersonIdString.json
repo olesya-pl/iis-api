@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "OtherPersonIdString",
+    "conceptType": "attributes",
+    "id": "f7ddbbed-8d3a-430d-ba98-66bed1a3868b",
+    "meta": {
+    },
+    "name": "otherPersonId",
+    "title": "Інші номери",
+    "type": "String"
+}

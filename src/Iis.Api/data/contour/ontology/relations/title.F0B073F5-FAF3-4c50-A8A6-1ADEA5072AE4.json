@@ -4,9 +4,12 @@
     "meta": {
         "formula": "entity.name",
         "multiple": false,
-        "sortOrder": 60
+        "sortOrder": 61,
+        "validation": {
+            "required": true
+        }
     },
     "name": "title",
-    "target": "title",
+    "target": "TitleString",
     "title": "Повна назва"
 }

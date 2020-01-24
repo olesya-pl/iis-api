@@ -7,12 +7,12 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 61,
+        "sortOrder": 62,
         "validation": {
             "required": true
         }
     },
     "name": "affiliation",
-    "target": "ObjectAffiliation",
+    "target": null,
     "title": "Приналежність"
 }

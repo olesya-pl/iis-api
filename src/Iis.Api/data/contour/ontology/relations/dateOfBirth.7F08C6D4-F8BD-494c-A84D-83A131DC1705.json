@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "7F08C6D4-F8BD-494c-A84D-83A131DC1705",
     "meta": {
+        "container": {
+            "containerId": "D2D7C903-1636-4b94-91A5-9E140C399B49",
+            "containerTitle": "Народження та смерть",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
         "sortOrder": 12
     },
     "name": "dateOfBirth",
-    "target": "FuzzyDate",
+    "target": null,
     "title": "дата народження"
 }

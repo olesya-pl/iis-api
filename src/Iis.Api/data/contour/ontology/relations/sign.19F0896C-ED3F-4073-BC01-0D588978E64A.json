@@ -11,9 +11,9 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 59
+        "sortOrder": 60
     },
     "name": "sign",
-    "target": "ObjectSign",
+    "target": null,
     "title": "Ознаки"
 }

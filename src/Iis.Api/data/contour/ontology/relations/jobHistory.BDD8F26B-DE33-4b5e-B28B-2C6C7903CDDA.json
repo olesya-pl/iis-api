@@ -2,10 +2,18 @@
     "conceptType": "relations",
     "id": "BDD8F26B-DE33-4b5e-B28B-2C6C7903CDDA",
     "meta": {
+        "container": {
+            "containerId": "48410D55-4D75-4d83-A1B3-61428EEB01C0",
+            "containerTitle": "Місця проходження служби/роботи/безробіття",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 32
+        "sortOrder": 33
     },
     "name": "jobHistory",
-    "target": "WorkPlace",
+    "target": null,
     "title": "Місця проходження служби/роботи/безробіття"
 }

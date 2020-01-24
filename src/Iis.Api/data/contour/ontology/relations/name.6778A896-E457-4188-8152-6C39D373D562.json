@@ -3,10 +3,10 @@
     "id": "6778A896-E457-4188-8152-6C39D373D562",
     "meta": {
         "multiple": false,
-        "sortOrder": 253,
+        "sortOrder": 299,
         "title": "Повне найменування"
     },
     "name": "name",
-    "target": "name",
+    "target": "NameString",
     "title": "Назва"
 }

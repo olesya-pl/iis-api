@@ -3,9 +3,9 @@
     "id": "001A00F6-0738-4015-8AB8-3BA36432236B",
     "meta": {
         "multiple": false,
-        "sortOrder": 268
+        "sortOrder": 314
     },
     "name": "damageLevel",
-    "target": "damageLevel",
+    "target": "DamageLevelString",
     "title": "Ступінь важкості"
 }

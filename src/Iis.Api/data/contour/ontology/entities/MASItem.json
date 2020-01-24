@@ -1,20 +1,22 @@
 {
     "attributes": [
         {
+            "attrTypeName": "CodeString",
             "id": "B6C73845-27C5-4fa4-B396-72793EDD7566",
             "meta": {
                 "multiple": false,
-                "sortOrder": 158
+                "sortOrder": 161
             },
             "name": "code",
             "target": "code",
             "title": "код"
         },
         {
+            "attrTypeName": "NameString",
             "id": "B4313AC3-77FD-4654-A337-E4C7A9007808",
             "meta": {
                 "multiple": false,
-                "sortOrder": 159
+                "sortOrder": 162
             },
             "name": "name",
             "target": "name",
@@ -24,7 +26,7 @@
     "conceptType": "entities",
     "id": "55B1F036-9F02-4dd8-865F-8E0A43564FF8",
     "meta": {
-        "sortOrder": 160
+        "sortOrder": 163
     },
     "name": "MASItem",
     "title": "ВУС"

@@ -3,9 +3,9 @@
     "id": "C235BE3A-9C22-4b90-B111-81ADE0CA7403",
     "meta": {
         "multiple": false,
-        "sortOrder": 222
+        "sortOrder": 268
     },
     "name": "who",
-    "target": "TaggableString",
+    "target": null,
     "title": "Ким накладено"
 }

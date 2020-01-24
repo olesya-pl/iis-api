@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.Meta;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Microsoft.EntityFrameworkCore;

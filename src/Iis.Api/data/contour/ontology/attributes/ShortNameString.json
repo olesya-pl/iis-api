@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "ShortNameString",
+    "conceptType": "attributes",
+    "id": "75539307-5161-4514-9705-A57F1B18FFD9",
+    "meta": {
+    },
+    "name": "shortName",
+    "title": "Скорочене найменування",
+    "type": "String"
+}
