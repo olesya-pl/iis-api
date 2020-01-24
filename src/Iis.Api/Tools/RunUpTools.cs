@@ -88,11 +88,17 @@ namespace IIS.Core.Tools
                 case "fill-contour-types":
                     await tools.FillContourTypesAsync();
                     break;
+                case "fill-developer-types":
+                    await tools.FillDeveloperTypesAsync();
+                    break;
                 case "seed-contour-data":
                     await tools.SeedContourDataAsync();
                     break;
                 case "seed-odysseus-data":
                     await tools.SeedOdysseusDataAsync();
+                    break;
+                case "seed-developer-data":
+                    await tools.SeedDeveloperDataAsync();
                     break;
                 case "apply-ef-migrations":
                     tools.ApplyEfMigrations();

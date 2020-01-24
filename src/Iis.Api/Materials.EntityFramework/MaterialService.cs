@@ -87,9 +87,10 @@ namespace IIS.Core.Materials.EntityFramework
             var q = from n in _context.Nodes
                     join t in _context.NodeTypes on n.NodeTypeId equals t.Id
                     join r in _context.Relations on n.Id equals r.SourceNodeId
+                    join rp in _context.Relations on n.Id equals rp.TargetNodeId
                     join a in _context.Attributes on r.TargetNodeId equals a.Id
                     where t.Name == "ICAOSign" && a.Value == icaoValue
-                    select r.TargetNodeId;
+                    select rp.SourceNodeId;
 
             return q.FirstOrDefault();
         }

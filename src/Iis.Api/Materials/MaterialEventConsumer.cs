@@ -145,8 +145,6 @@ namespace IIS.Core.Materials
 
         private async Task _createFeaturesInArcgis(MaterialAddedEvent eventData)
         {
-            // TODO: the next line should be replaced with the id of autolinked entity
-            var entityId = Guid.NewGuid();
             var jsonSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -211,11 +209,11 @@ namespace IIS.Core.Materials
             public readonly double Lat;
             public readonly double Lng;
             public readonly DateTime RegisteredAt;
-            public readonly Guid EntityId;
+            public readonly string EntityId;
 
             public GeoMaterialAttributes(Guid entityId, FieldValue value)
             {
-                EntityId = entityId;
+                EntityId = entityId.ToString("N");
                 Lat = value.Lat;
                 Lng = value.Lng;
                 RegisteredAt = value.RegisteredAt;

@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "5703fded-05f2-4358-aafb-9736fbeff063",
+    "meta": {
+    },
+    "name": "multipleNotRequiredDecimal",
+    "target": "multipleNotRequiredDecimal",
+    "title": "Атрибут 0..n",
+    "type": "Decimal"
+}

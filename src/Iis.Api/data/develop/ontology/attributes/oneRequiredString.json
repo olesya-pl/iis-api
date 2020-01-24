@@ -1,0 +1,10 @@
+{
+    "conceptType": "attributes",
+    "id": "6babf4e2-68ee-4509-98df-db13f27c658a",
+    "meta": {
+    },
+    "name": "oneRequiredString",
+    "target": "oneRequiredString",
+    "title": "Атрибут 1..1",
+    "type": "String"
+}

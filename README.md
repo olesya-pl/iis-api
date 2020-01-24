@@ -84,7 +84,7 @@ Ontology is stored inside JSON files in [IIS/IIS.Core/data](./IIS/IIS.Core/data)
 ### Odysseus
 
 ```sh
-dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,fill-odysseus-types,seed-odysseus-data
+dotnet Iis.Api.dll --iis-actions apply-ef-migrations,clear-types,fill-odysseus-types,seed-odysseus-data
 ```
 
 Set `reportsAvailable` configuration variable to `false`.
@@ -92,7 +92,13 @@ Set `reportsAvailable` configuration variable to `false`.
 ### Contour
 
 ```sh
-dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,fill-contour-types,seed-contour-data
+dotnet Iis.Api.dll --iis-actions apply-ef-migrations,clear-types,fill-contour-types,seed-contour-data
+```
+
+### Development
+
+```sh
+dotnet Iis.Api.dll --iis-actions apply-ef-migrations,clear-types,fill-developer-types,seed-developer-data
 ```
 
 Set `reportsAvailable` configuration variable to `true`.

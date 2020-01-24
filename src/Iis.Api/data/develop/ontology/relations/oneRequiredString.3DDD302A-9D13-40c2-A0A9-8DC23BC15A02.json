@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "3DDD302A-9D13-40c2-A0A9-8DC23BC15A02",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 1
+    },
+    "name": "oneRequiredString",
+    "target": "oneRequiredString",
+    "title": "Атрибут 1..1"
+}
