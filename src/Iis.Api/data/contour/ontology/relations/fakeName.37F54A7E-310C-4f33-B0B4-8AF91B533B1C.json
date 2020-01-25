@@ -14,6 +14,6 @@
         "sortOrder": 3
     },
     "name": "fakeName",
-    "target": null,
+    "target": "FullNameI18n",
     "title": "Ім'я прикриття"
 }

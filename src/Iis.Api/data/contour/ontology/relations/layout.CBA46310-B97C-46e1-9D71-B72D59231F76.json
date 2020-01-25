@@ -6,6 +6,6 @@
         "sortOrder": 1
     },
     "name": "layout",
-    "target": null,
+    "target": "Layout",
     "title": ""
 }

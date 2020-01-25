@@ -14,6 +14,6 @@
         "sortOrder": 10
     },
     "name": "nationality",
-    "target": null,
+    "target": "Nationality",
     "title": "национальность"
 }

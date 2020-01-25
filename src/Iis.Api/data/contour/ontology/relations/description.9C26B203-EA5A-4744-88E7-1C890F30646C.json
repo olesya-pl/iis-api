@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DescriptionString",
     "conceptType": "relations",
     "id": "9C26B203-EA5A-4744-88E7-1C890F30646C",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "description",
-    "target": "DescriptionString",
+    "target": "description",
     "title": "примітка"
 }

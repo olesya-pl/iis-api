@@ -13,6 +13,6 @@
         "type": "hierarchical"
     },
     "name": "superior",
-    "target": null,
+    "target": "Subdivision_superior",
     "title": "Підлеглість"
 }

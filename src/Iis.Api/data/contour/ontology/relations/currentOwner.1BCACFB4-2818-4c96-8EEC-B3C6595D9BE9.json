@@ -6,6 +6,6 @@
         "sortOrder": 2
     },
     "name": "currentOwner",
-    "target": null,
+    "target": "Person",
     "title": "Сейчас занимает"
 }

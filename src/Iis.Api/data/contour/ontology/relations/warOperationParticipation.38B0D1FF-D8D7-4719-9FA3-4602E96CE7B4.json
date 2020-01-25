@@ -6,6 +6,6 @@
         "sortOrder": 22
     },
     "name": "warOperationParticipation",
-    "target": null,
+    "target": "Accordion",
     "title": "Участь у бойових діях/миротворчих операціях"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "previousOwner",
-    "target": null,
+    "target": "Person",
     "title": "занимавшие ранее"
 }

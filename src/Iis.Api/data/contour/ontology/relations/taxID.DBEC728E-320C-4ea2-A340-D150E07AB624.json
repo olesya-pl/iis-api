@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "TaxIDString",
     "conceptType": "relations",
     "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 21
     },
     "name": "taxID",
-    "target": "TaxIDString",
+    "target": "taxID",
     "title": "Ідентифікаційний код"
 }

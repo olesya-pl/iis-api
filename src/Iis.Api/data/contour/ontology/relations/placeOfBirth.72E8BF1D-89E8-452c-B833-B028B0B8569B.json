@@ -14,6 +14,6 @@
         "sortOrder": 14
     },
     "name": "placeOfBirth",
-    "target": null,
+    "target": "UniversalLocation",
     "title": "місце народження"
 }

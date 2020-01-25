@@ -6,6 +6,6 @@
         "sortOrder": 24
     },
     "name": "wounds",
-    "target": null,
+    "target": "Accordion",
     "title": "Поранення і контузії"
 }

@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "StreetString",
     "conceptType": "relations",
     "id": "40D12A66-DE48-4879-8C32-F8F84BBCAC93",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 6
     },
     "name": "street",
-    "target": "StreetString",
+    "target": "street",
     "title": "Вулиця"
 }

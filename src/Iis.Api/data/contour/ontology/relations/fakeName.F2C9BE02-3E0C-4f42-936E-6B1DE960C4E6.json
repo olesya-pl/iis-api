@@ -6,6 +6,6 @@
         "sortOrder": 2
     },
     "name": "fakeName",
-    "target": null,
+    "target": "Accordion",
     "title": "ПІБ прикриття"
 }

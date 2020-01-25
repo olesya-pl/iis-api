@@ -6,6 +6,6 @@
         "sortOrder": 2
     },
     "name": "nameOfMission",
-    "target": null,
+    "target": "TaggableString",
     "title": "Назва місії/контингенту"
 }

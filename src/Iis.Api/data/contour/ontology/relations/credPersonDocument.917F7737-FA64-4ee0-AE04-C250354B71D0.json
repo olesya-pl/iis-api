@@ -6,6 +6,6 @@
         "sortOrder": 8
     },
     "name": "credPersonDocument",
-    "target": null,
+    "target": "Accordion",
     "title": "Посвідчення особи"
 }

@@ -14,6 +14,6 @@
         "sortOrder": 37
     },
     "name": "warOperationParticipation",
-    "target": null,
+    "target": "WarOperationParticipation",
     "title": "Участь у бойових діях/миротворчих операціях"
 }

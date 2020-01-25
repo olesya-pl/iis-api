@@ -6,6 +6,6 @@
         "sortOrder": 1
     },
     "name": "taggedEntities",
-    "target": null,
+    "target": "ObjectOfStudy",
     "title": "Посилання на ОР"
 }

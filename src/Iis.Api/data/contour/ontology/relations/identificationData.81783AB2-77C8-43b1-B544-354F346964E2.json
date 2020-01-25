@@ -6,6 +6,6 @@
         "sortOrder": 5
     },
     "name": "identificationData",
-    "target": null,
+    "target": "Accordion",
     "title": "Установчі дані"
 }

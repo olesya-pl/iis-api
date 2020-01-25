@@ -14,6 +14,6 @@
         "sortOrder": 46
     },
     "name": "contacts",
-    "target": null,
+    "target": "ObjectSign",
     "title": "Контакти особи"
 }

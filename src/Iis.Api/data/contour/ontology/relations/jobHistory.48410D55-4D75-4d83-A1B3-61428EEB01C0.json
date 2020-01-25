@@ -6,6 +6,6 @@
         "sortOrder": 13
     },
     "name": "jobHistory",
-    "target": null,
+    "target": "Accordion",
     "title": "Місця проходження служби/роботи/безробіття"
 }

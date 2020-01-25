@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "orderPublisher",
-    "target": null,
+    "target": "Position",
     "title": "Чий наказ"
 }

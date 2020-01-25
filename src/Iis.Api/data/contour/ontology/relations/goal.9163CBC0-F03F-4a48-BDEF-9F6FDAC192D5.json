@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "GoalString",
     "conceptType": "relations",
     "id": "9163CBC0-F03F-4a48-BDEF-9F6FDAC192D5",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "goal",
-    "target": "GoalString",
+    "target": "goal",
     "title": "Мета"
 }

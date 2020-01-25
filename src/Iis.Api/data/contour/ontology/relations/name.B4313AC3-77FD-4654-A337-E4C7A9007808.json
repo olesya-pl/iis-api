@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "NameString",
     "conceptType": "relations",
     "id": "B4313AC3-77FD-4654-A337-E4C7A9007808",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "name",
-    "target": "NameString",
+    "target": "name",
     "title": "назва"
 }

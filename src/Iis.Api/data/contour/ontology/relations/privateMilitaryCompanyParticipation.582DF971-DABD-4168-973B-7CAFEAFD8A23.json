@@ -6,6 +6,6 @@
         "sortOrder": 17
     },
     "name": "privateMilitaryCompanyParticipation",
-    "target": null,
+    "target": "Accordion",
     "title": "Причетність до приватних військових, приватних охоронних або приватних безпекових компаній"
 }

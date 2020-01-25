@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "StartsAtDateTime",
     "conceptType": "relations",
     "id": "F0B84A9A-06F0-424c-9E3B-846763950FD0",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "startsAt",
-    "target": "StartsAtDateTime",
+    "target": "startsAt",
     "title": "Початок"
 }

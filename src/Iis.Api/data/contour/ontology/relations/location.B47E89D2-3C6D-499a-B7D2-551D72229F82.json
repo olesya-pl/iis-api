@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "LocationGeo",
     "conceptType": "relations",
     "id": "B47E89D2-3C6D-499a-B7D2-551D72229F82",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 11
     },
     "name": "location",
-    "target": "LocationGeo",
+    "target": "location",
     "title": "Географічні координати"
 }

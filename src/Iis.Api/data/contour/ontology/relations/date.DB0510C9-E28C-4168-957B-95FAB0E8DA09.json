@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DateDateTime",
     "conceptType": "relations",
     "id": "DB0510C9-E28C-4168-957B-95FAB0E8DA09",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "date",
-    "target": "DateDateTime",
+    "target": "date",
     "title": "Дата"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "position",
-    "target": null,
+    "target": "Position",
     "title": "Посада, яку обіймав"
 }

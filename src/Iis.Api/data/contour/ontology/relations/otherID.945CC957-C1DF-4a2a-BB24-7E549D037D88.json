@@ -6,6 +6,6 @@
         "sortOrder": 11
     },
     "name": "otherID",
-    "target": null,
+    "target": "Accordion",
     "title": "Інші ідентифікаційні номери"
 }

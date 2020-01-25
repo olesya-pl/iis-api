@@ -6,6 +6,6 @@
         "sortOrder": 2
     },
     "name": "postalAddress",
-    "target": null,
+    "target": "PostalAddress",
     "title": "Поштова адреса"
 }

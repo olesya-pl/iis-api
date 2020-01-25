@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "PersonArmyIDString",
     "conceptType": "relations",
     "id": "95275DE6-CD5F-4a78-81D2-6FF3FEDEEEC8",
     "meta": {
@@ -11,6 +12,6 @@
         "sortOrder": 22
     },
     "name": "personArmyID",
-    "target": "PersonArmyIDString",
+    "target": "personArmyID",
     "title": "Особистий номер військовослужбовця"
 }

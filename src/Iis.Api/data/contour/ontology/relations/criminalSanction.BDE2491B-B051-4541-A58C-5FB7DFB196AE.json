@@ -6,6 +6,6 @@
         "sortOrder": 28
     },
     "name": "criminalSanction",
-    "target": null,
+    "target": "Accordion",
     "title": "Притягнення до кримінальної та адміністративної відповідальності"
 }

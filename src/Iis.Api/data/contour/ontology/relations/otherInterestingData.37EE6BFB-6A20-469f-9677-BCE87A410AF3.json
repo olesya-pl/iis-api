@@ -6,6 +6,6 @@
         "sortOrder": 32
     },
     "name": "otherInterestingData",
-    "target": null,
+    "target": "Accordion",
     "title": "Інші дані, які представляють інтерес"
 }

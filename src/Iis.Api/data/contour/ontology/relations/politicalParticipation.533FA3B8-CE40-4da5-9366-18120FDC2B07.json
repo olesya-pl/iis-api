@@ -14,6 +14,6 @@
         "sortOrder": 27
     },
     "name": "politicalParticipation",
-    "target": null,
+    "target": "OrgParticipation",
     "title": "Приналежність до політичних партій, громадських організацій, рухів"
 }

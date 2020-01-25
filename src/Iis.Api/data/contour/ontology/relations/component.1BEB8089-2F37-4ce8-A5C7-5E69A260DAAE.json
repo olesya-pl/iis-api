@@ -10,6 +10,6 @@
         "sortOrder": 7
     },
     "name": "component",
-    "target": null,
+    "target": "EventComponent",
     "title": "Компонент"
 }

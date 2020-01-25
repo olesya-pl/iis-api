@@ -6,6 +6,6 @@
         "sortOrder": 35
     },
     "name": "toSort",
-    "target": null,
+    "target": "Accordion",
     "title": "Нерозібране (тимчасово)"
 }

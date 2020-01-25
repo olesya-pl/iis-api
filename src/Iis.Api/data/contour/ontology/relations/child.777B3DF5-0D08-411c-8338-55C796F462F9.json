@@ -12,6 +12,6 @@
         "type": "hierarchical"
     },
     "name": "child",
-    "target": null,
+    "target": "EventType",
     "title": "Ієрархічний вказівник на дочірні елементи"
 }

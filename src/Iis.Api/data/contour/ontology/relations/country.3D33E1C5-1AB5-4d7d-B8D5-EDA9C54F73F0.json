@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "country",
-    "target": null,
+    "target": "Country",
     "title": "Крaїна"
 }

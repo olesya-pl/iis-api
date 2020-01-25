@@ -9,6 +9,6 @@
         "sortOrder": 2
     },
     "name": "educationalInstitution",
-    "target": null,
+    "target": "EducationalInstitution",
     "title": "навчальний заклад"
 }

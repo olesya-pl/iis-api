@@ -6,6 +6,6 @@
         "sortOrder": 9
     },
     "name": "corpsType",
-    "target": null,
+    "target": "Corps",
     "title": "Рід військ"
 }

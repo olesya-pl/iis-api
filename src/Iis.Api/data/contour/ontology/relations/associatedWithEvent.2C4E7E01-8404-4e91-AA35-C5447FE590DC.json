@@ -6,6 +6,6 @@
         "sortOrder": 9
     },
     "name": "associatedWithEvent",
-    "target": null,
+    "target": "ObjectOfStudy",
     "title": "Об'єкти розвідки, пов'язані з подією"
 }

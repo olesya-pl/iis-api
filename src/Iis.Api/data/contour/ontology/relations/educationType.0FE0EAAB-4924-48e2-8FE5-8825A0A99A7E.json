@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "educationType",
-    "target": null,
+    "target": "EducationLevel",
     "title": "рівень освіти"
 }

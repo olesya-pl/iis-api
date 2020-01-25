@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DayInteger",
     "conceptType": "relations",
     "id": "0DDB81F7-EA48-4a90-AD24-6BDD072B5370",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "day",
-    "target": "DayInteger",
+    "target": "day",
     "title": "день"
 }

@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DamageLevelString",
     "conceptType": "relations",
     "id": "001A00F6-0738-4015-8AB8-3BA36432236B",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "damageLevel",
-    "target": "DamageLevelString",
+    "target": "damageLevel",
     "title": "Ступінь важкості"
 }

@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "CreatedDateTime",
     "conceptType": "relations",
     "id": "7AD1638F-413A-4aa0-9022-20DCF8EC3429",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 35
     },
     "name": "created",
-    "target": "CreatedDateTime",
+    "target": "created",
     "title": "дата першої фіксації"
 }

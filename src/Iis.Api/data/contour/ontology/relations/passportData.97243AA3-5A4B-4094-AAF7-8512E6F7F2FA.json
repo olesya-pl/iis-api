@@ -14,6 +14,6 @@
         "sortOrder": 17
     },
     "name": "passportData",
-    "target": null,
+    "target": "Passport",
     "title": "Внутрішній паспорт"
 }

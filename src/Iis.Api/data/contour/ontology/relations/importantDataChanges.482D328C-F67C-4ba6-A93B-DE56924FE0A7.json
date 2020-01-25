@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "ImportantDataChangesString",
     "conceptType": "relations",
     "id": "482D328C-F67C-4ba6-A93B-DE56924FE0A7",
     "meta": {
@@ -11,6 +12,6 @@
         "sortOrder": 4
     },
     "name": "importantDataChanges",
-    "target": "ImportantDataChangesString",
+    "target": "importantDataChanges",
     "title": "Зміни установчих даних"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 2
     },
     "name": "grade",
-    "target": null,
+    "target": "Grade",
     "title": "кваліфікація"
 }

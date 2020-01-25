@@ -6,6 +6,6 @@
         "sortOrder": 4
     },
     "name": "position",
-    "target": null,
+    "target": "Position",
     "title": "посада"
 }

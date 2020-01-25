@@ -6,6 +6,6 @@
         "sortOrder": 12
     },
     "name": "currentWorkplace",
-    "target": null,
+    "target": "Accordion",
     "title": "Поточне місце військової служби/роботи"
 }

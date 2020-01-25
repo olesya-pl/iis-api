@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "subtype",
-    "target": null,
+    "target": "MachinerySubtype",
     "title": "Підтип"
 }

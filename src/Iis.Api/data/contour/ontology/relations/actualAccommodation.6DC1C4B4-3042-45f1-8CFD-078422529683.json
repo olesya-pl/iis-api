@@ -14,6 +14,6 @@
         "sortOrder": 16
     },
     "name": "actualAccommodation",
-    "target": null,
+    "target": "UniversalLocation",
     "title": "Місце фактичного проживання"
 }

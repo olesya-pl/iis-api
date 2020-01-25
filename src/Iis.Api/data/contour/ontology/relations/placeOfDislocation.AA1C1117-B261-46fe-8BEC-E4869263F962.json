@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "PlaceOfDislocationString",
     "conceptType": "relations",
     "id": "AA1C1117-B261-46fe-8BEC-E4869263F962",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 8
     },
     "name": "placeOfDislocation",
-    "target": "PlaceOfDislocationString",
+    "target": "placeOfDislocation",
     "title": "Місце розташування"
 }

@@ -14,6 +14,6 @@
         "sortOrder": 41
     },
     "name": "award",
-    "target": null,
+    "target": "Award",
     "title": "Заохочення"
 }

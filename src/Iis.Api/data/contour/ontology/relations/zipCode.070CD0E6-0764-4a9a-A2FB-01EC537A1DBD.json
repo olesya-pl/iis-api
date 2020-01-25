@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "ZipCodeString",
     "conceptType": "relations",
     "id": "070CD0E6-0764-4a9a-A2FB-01EC537A1DBD",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "zipCode",
-    "target": "ZipCodeString",
+    "target": "zipCode",
     "title": "Індекс"
 }

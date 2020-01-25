@@ -6,6 +6,6 @@
         "sortOrder": 23
     },
     "name": "currentLocation",
-    "target": null,
+    "target": "Accordion",
     "title": "Поточне місце перебування"
 }

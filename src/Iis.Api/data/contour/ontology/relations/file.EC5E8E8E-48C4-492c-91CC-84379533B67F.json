@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "FileFile",
     "conceptType": "relations",
     "id": "EC5E8E8E-48C4-492c-91CC-84379533B67F",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "file",
-    "target": "FileFile",
+    "target": "file",
     "title": "Скан документа"
 }

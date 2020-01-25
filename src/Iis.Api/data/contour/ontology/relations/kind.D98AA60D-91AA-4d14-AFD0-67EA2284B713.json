@@ -11,6 +11,6 @@
         "sortOrder": 1
     },
     "name": "kind",
-    "target": null,
+    "target": "PersonType",
     "title": "Поточний тип (військовий-цивільний)"
 }

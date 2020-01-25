@@ -9,6 +9,6 @@
         "sortOrder": 2
     },
     "name": "end",
-    "target": null,
+    "target": "FuzzyDate",
     "title": "завершення"
 }

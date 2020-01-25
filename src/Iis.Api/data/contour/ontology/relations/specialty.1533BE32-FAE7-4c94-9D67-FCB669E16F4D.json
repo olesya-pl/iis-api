@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "SpecialtyString",
     "conceptType": "relations",
     "id": "1533BE32-FAE7-4c94-9D67-FCB669E16F4D",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 5
     },
     "name": "specialty",
-    "target": "SpecialtyString",
+    "target": "specialty",
     "title": "спеціальність"
 }

@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "NameString",
     "conceptType": "relations",
     "id": "6778A896-E457-4188-8152-6C39D373D562",
     "meta": {
@@ -7,6 +8,6 @@
         "title": "Повне найменування"
     },
     "name": "name",
-    "target": "NameString",
+    "target": "name",
     "title": "Назва"
 }

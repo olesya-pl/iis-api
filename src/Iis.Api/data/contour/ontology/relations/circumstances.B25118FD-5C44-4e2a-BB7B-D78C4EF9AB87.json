@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "CircumstancesString",
     "conceptType": "relations",
     "id": "B25118FD-5C44-4e2a-BB7B-D78C4EF9AB87",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "circumstances",
-    "target": "CircumstancesString",
+    "target": "circumstances",
     "title": "Обставини"
 }

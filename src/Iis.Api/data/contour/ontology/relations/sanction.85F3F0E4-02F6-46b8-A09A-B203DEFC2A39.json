@@ -6,6 +6,6 @@
         "sortOrder": 27
     },
     "name": "sanction",
-    "target": null,
+    "target": "Accordion",
     "title": "Стягнення"
 }

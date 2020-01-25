@@ -13,6 +13,6 @@
         }
     },
     "name": "importance",
-    "target": null,
+    "target": "ObjectImportance",
     "title": "Важливість"
 }

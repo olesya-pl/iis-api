@@ -9,6 +9,6 @@
         "sortOrder": 1
     },
     "name": "duration",
-    "target": null,
+    "target": "FuzzyDateRange",
     "title": "термін навчання"
 }

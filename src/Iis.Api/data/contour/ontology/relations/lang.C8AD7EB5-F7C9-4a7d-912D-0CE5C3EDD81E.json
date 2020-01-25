@@ -6,6 +6,6 @@
         "sortOrder": 1
     },
     "name": "lang",
-    "target": null,
+    "target": "Language",
     "title": "мова"
 }

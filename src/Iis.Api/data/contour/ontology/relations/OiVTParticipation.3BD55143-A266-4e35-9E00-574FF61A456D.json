@@ -6,6 +6,6 @@
         "sortOrder": 15
     },
     "name": "OiVTParticipation",
-    "target": null,
+    "target": "Accordion",
     "title": "Участь у розробці ОіВТ"
 }

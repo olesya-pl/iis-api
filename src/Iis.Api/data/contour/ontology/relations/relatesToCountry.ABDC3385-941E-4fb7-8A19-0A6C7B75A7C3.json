@@ -10,6 +10,6 @@
         "sortOrder": 5
     },
     "name": "relatesToCountry",
-    "target": null,
+    "target": "Country",
     "title": "Країна"
 }

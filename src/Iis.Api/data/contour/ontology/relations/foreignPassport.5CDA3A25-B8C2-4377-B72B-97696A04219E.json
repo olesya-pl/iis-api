@@ -6,6 +6,6 @@
         "sortOrder": 7
     },
     "name": "foreignPassport",
-    "target": null,
+    "target": "Accordion",
     "title": "Закордонні паспорти"
 }

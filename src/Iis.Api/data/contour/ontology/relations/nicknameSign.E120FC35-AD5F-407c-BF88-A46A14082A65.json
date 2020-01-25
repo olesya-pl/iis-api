@@ -19,6 +19,6 @@
         "sortOrder": 12
     },
     "name": "nicknameSign",
-    "target": null,
+    "target": "NicknameSign",
     "title": "позивний"
 }

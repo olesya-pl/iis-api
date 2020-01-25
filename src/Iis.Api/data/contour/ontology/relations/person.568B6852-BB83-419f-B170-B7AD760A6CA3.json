@@ -6,6 +6,6 @@
         "sortOrder": 2
     },
     "name": "person",
-    "target": null,
+    "target": "TaggableString",
     "title": "Особа"
 }

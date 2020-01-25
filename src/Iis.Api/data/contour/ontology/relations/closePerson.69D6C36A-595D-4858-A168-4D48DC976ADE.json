@@ -6,6 +6,6 @@
         "sortOrder": 30
     },
     "name": "closePerson",
-    "target": null,
+    "target": "Accordion",
     "title": "Оточення"
 }

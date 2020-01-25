@@ -6,6 +6,6 @@
         "sortOrder": 33
     },
     "name": "attachment",
-    "target": null,
+    "target": "Accordion",
     "title": "Додані файли"
 }

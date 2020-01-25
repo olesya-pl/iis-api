@@ -9,6 +9,6 @@
         "sortOrder": 1
     },
     "name": "firstName",
-    "target": null,
+    "target": "StringI18n",
     "title": "ім'я"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 26
     },
     "name": "award",
-    "target": null,
+    "target": "Accordion",
     "title": "Заохочення (вид нагороди, медалі, цінні подарунки тощо)"
 }

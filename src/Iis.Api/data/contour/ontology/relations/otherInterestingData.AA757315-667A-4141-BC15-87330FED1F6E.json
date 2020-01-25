@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "OtherInterestingDataString",
     "conceptType": "relations",
     "id": "AA757315-667A-4141-BC15-87330FED1F6E",
     "meta": {
@@ -11,6 +12,6 @@
         "sortOrder": 47
     },
     "name": "otherInterestingData",
-    "target": "OtherInterestingDataString",
+    "target": "otherInterestingData",
     "title": "Інші дані, які представляють інтерес"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 6
     },
     "name": "passportData",
-    "target": null,
+    "target": "Accordion",
     "title": "Внутрішні паспорти"
 }

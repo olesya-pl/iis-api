@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "RegionString",
     "conceptType": "relations",
     "id": "FE4FEE0B-1766-4a0c-8AC4-F4EA8CA4C668",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "region",
-    "target": "RegionString",
+    "target": "region",
     "title": "Область"
 }

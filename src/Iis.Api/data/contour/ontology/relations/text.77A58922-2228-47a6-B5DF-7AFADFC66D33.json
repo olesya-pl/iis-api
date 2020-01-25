@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "TextString",
     "conceptType": "relations",
     "id": "77A58922-2228-47a6-B5DF-7AFADFC66D33",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 4
     },
     "name": "text",
-    "target": "TextString",
+    "target": "text",
     "title": ""
 }

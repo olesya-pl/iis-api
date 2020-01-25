@@ -14,6 +14,6 @@
         "sortOrder": 29
     },
     "name": "extremisticParticipation",
-    "target": null,
+    "target": "OrgParticipation",
     "title": "Причетність до терористичних, екстремістських або злочинних організацій"
 }

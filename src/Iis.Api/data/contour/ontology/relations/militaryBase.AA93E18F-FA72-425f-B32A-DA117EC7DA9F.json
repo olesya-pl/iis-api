@@ -6,6 +6,6 @@
         "sortOrder": 10
     },
     "name": "militaryBase",
-    "target": null,
+    "target": "MilitaryBase",
     "title": "Військова частина"
 }

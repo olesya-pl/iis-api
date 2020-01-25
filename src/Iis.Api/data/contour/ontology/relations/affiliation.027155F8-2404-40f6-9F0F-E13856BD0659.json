@@ -13,6 +13,6 @@
         }
     },
     "name": "affiliation",
-    "target": null,
+    "target": "ObjectAffiliation",
     "title": "Приналежність"
 }

@@ -9,6 +9,6 @@
         "sortOrder": 13
     },
     "name": "tag",
-    "target": null,
+    "target": "Tag",
     "title": "Теги"
 }

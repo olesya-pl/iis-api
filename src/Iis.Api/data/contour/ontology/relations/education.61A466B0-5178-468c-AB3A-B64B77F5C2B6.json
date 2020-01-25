@@ -6,6 +6,6 @@
         "sortOrder": 19
     },
     "name": "education",
-    "target": null,
+    "target": "Accordion",
     "title": "Освіта"
 }

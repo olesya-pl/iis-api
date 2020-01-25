@@ -11,6 +11,6 @@
         "sortOrder": 9
     },
     "name": "gender",
-    "target": null,
+    "target": "Gender",
     "title": "стать"
 }

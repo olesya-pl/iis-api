@@ -10,6 +10,6 @@
         "sortOrder": 4
     },
     "name": "eventType",
-    "target": null,
+    "target": "EventType",
     "title": "Тип події"
 }

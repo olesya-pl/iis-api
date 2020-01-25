@@ -9,6 +9,6 @@
         "sortOrder": 2
     },
     "name": "type",
-    "target": null,
+    "target": "TypeOfAward",
     "title": "Вид нагороди"
 }

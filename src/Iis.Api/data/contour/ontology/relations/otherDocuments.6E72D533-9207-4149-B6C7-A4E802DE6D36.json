@@ -6,6 +6,6 @@
         "sortOrder": 9
     },
     "name": "otherDocuments",
-    "target": null,
+    "target": "Accordion",
     "title": "Ідентифікаційні номери"
 }

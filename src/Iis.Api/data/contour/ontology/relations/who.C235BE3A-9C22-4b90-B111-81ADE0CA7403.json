@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "who",
-    "target": null,
+    "target": "TaggableString",
     "title": "Ким накладено"
 }

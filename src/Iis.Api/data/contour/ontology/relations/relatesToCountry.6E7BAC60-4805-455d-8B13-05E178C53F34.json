@@ -10,6 +10,6 @@
         "sortOrder": 13
     },
     "name": "relatesToCountry",
-    "target": null,
+    "target": "Country",
     "title": "Державна приналежність"
 }

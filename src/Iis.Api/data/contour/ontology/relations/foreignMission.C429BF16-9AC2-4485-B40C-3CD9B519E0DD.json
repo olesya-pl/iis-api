@@ -6,6 +6,6 @@
         "sortOrder": 25
     },
     "name": "foreignMission",
-    "target": null,
+    "target": "Accordion",
     "title": "Дані про перебування у закордонному відрядженні (не у складі військ)"
 }

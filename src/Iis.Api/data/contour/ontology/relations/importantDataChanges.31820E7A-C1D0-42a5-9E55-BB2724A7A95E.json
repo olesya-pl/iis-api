@@ -6,6 +6,6 @@
         "sortOrder": 3
     },
     "name": "importantDataChanges",
-    "target": null,
+    "target": "Accordion",
     "title": "Зміни установчих даних"
 }

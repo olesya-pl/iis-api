@@ -6,6 +6,6 @@
         "sortOrder": 2
     },
     "name": "terroristic",
-    "target": null,
+    "target": "OrgParticipation",
     "title": "террористичні"
 }

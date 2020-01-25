@@ -6,6 +6,6 @@
         "sortOrder": 1
     },
     "name": "period",
-    "target": null,
+    "target": "FuzzyDateRange",
     "title": "Період"
 }

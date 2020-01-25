@@ -15,6 +15,6 @@
         "sortOrder": 11
     },
     "name": "citizenship",
-    "target": null,
+    "target": "Country",
     "title": "громадянство"
 }

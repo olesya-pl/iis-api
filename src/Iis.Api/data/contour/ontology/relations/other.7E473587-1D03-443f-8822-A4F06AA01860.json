@@ -6,6 +6,6 @@
         "sortOrder": 34
     },
     "name": "other",
-    "target": null,
+    "target": "Accordion",
     "title": "Інше"
 }

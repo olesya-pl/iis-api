@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DislocationGeo",
     "conceptType": "relations",
     "id": "45E8AA5E-F4B8-477c-B25B-27E81AED00F1",
     "meta": {
@@ -7,6 +8,6 @@
         "title": "Географічні координати пункту дислокації штабу (ППД)"
     },
     "name": "dislocation",
-    "target": "DislocationGeo",
+    "target": "dislocation",
     "title": "Пункт Постійної Дислокації (ППД)"
 }

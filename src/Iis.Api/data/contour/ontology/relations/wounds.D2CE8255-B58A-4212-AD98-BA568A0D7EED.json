@@ -14,6 +14,6 @@
         "sortOrder": 39
     },
     "name": "wounds",
-    "target": null,
+    "target": "BattleWound",
     "title": "Поранення і контузії"
 }

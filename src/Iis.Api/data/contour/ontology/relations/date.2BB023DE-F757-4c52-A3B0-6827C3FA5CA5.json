@@ -6,6 +6,6 @@
         "sortOrder": 1
     },
     "name": "date",
-    "target": null,
+    "target": "FuzzyDate",
     "title": "Дата"
 }

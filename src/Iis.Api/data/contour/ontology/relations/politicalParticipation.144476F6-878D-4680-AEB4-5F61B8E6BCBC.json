@@ -6,6 +6,6 @@
         "sortOrder": 14
     },
     "name": "politicalParticipation",
-    "target": null,
+    "target": "Accordion",
     "title": "Приналежність до політичних партій, громадських організацій, рухів"
 }

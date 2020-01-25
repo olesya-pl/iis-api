@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "CodeString",
     "conceptType": "relations",
     "id": "2DC35A5A-CAED-43f7-859D-9CCB1487F6D3",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "code",
-    "target": "CodeString",
+    "target": "code",
     "title": "Код"
 }

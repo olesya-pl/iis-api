@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "AuthorityOrganizationCodeString",
     "conceptType": "relations",
     "id": "0C2B882B-B827-4f9f-B6BB-B477FE5AEC10",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "authorityOrganizationCode",
-    "target": "AuthorityOrganizationCodeString",
+    "target": "authorityOrganizationCode",
     "title": "Код підрозділу"
 }

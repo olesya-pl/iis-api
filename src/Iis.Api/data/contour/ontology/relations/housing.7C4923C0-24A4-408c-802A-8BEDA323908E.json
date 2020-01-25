@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "HousingString",
     "conceptType": "relations",
     "id": "7C4923C0-24A4-408c-802A-8BEDA323908E",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 8
     },
     "name": "housing",
-    "target": "HousingString",
+    "target": "housing",
     "title": "Корпус"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 29
     },
     "name": "martialStatus",
-    "target": null,
+    "target": "Accordion",
     "title": "Сімейний стан"
 }

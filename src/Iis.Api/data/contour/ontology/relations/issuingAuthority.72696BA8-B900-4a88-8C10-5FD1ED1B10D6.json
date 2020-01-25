@@ -9,6 +9,6 @@
         "sortOrder": 4
     },
     "name": "issuingAuthority",
-    "target": null,
+    "target": "Organization",
     "title": "Орган,що видав"
 }

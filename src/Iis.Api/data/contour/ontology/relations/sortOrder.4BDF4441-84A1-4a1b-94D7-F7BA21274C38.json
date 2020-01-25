@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "SortOrderInteger",
     "conceptType": "relations",
     "id": "4BDF4441-84A1-4a1b-94D7-F7BA21274C38",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "sortOrder",
-    "target": "SortOrderInteger",
+    "target": "sortOrder",
     "title": "Порядок сортування"
 }

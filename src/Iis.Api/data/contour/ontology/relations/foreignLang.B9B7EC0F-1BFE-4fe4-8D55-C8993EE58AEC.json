@@ -6,6 +6,6 @@
         "sortOrder": 20
     },
     "name": "foreignLang",
-    "target": null,
+    "target": "Accordion",
     "title": "Володіння іноземними мовами"
 }

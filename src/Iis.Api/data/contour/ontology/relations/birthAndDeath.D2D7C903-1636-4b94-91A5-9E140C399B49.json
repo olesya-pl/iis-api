@@ -6,6 +6,6 @@
         "sortOrder": 4
     },
     "name": "birthAndDeath",
-    "target": null,
+    "target": "Accordion",
     "title": "Народження та смерть"
 }

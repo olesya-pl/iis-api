@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "Alpha3String",
     "conceptType": "relations",
     "id": "08EB5E21-47F4-4c09-AA64-C4AA2C9CDE7F",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "alpha3",
-    "target": "Alpha3String",
+    "target": "alpha3",
     "title": ""
 }

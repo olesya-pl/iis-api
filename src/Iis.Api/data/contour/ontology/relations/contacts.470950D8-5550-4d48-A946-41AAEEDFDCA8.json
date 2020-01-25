@@ -6,6 +6,6 @@
         "sortOrder": 31
     },
     "name": "contacts",
-    "target": null,
+    "target": "Accordion",
     "title": "Контакти особи"
 }

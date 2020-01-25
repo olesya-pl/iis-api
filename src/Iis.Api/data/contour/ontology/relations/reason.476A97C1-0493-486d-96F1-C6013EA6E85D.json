@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "ReasonString",
     "conceptType": "relations",
     "id": "476A97C1-0493-486d-96F1-C6013EA6E85D",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "reason",
-    "target": "ReasonString",
+    "target": "reason",
     "title": "За що накладено"
 }

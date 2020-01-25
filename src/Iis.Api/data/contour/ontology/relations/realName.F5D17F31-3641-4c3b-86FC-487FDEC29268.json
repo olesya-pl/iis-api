@@ -6,6 +6,6 @@
         "sortOrder": 1
     },
     "name": "realName",
-    "target": null,
+    "target": "Accordion",
     "title": "Реальне ПІБ"
 }

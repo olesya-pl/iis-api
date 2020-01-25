@@ -14,6 +14,6 @@
         "sortOrder": 13
     },
     "name": "persNickNameSign",
-    "target": null,
+    "target": "PersonalNicknameSign",
     "title": "Прізвисько"
 }

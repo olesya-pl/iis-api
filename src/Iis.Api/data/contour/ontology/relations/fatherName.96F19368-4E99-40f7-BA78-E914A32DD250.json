@@ -9,6 +9,6 @@
         "sortOrder": 3
     },
     "name": "fatherName",
-    "target": null,
+    "target": "StringI18n",
     "title": "по батькові"
 }

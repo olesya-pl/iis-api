@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "ValueString",
     "conceptType": "relations",
     "id": "4BE15E69-3747-437c-AD11-14A497E3FD18",
     "meta": {
@@ -11,6 +12,6 @@
         }
     },
     "name": "value",
-    "target": "ValueString",
+    "target": "value",
     "title": "Значення"
 }

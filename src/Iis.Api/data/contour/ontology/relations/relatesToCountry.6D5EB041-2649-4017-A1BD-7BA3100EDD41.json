@@ -11,6 +11,6 @@
         "title": "Громадянство"
     },
     "name": "relatesToCountry",
-    "target": null,
+    "target": "Country",
     "title": "Громадянство"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 10
     },
     "name": "importantId",
-    "target": null,
+    "target": "Accordion",
     "title": "Ідентифікаційні номери"
 }

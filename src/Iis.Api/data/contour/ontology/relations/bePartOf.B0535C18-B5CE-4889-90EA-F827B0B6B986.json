@@ -6,6 +6,6 @@
         "sortOrder": 12
     },
     "name": "bePartOf",
-    "target": null,
+    "target": "MilitaryMachinery_bePartOf",
     "title": "Належність"
 }

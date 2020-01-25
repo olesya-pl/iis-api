@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "OtherPersonIdString",
     "conceptType": "relations",
     "id": "66B04537-02EA-47ac-AA22-3EB89976D09F",
     "meta": {
@@ -11,6 +12,6 @@
         "sortOrder": 23
     },
     "name": "otherPersonId",
-    "target": "OtherPersonIdString",
+    "target": "otherPersonId",
     "title": "Інші номери"
 }

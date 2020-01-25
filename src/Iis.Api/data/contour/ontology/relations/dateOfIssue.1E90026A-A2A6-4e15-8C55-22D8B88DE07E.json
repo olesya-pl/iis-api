@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DateOfIssueDateTime",
     "conceptType": "relations",
     "id": "1E90026A-A2A6-4e15-8C55-22D8B88DE07E",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "dateOfIssue",
-    "target": "DateOfIssueDateTime",
+    "target": "dateOfIssue",
     "title": "Дата видачі"
 }

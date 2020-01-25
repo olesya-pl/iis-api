@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "ValueString",
     "conceptType": "relations",
     "id": "F81E6213-423B-4161-89DE-BA7BA54703C5",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "value",
-    "target": "ValueString",
+    "target": "value",
     "title": "Текст"
 }

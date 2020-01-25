@@ -6,6 +6,6 @@
         "sortOrder": 8
     },
     "name": "amount",
-    "target": null,
+    "target": "MilitaryAmount",
     "title": "Чисельність"
 }

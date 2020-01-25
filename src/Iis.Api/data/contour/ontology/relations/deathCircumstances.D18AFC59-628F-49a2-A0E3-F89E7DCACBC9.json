@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DeathCircumstancesString",
     "conceptType": "relations",
     "id": "D18AFC59-628F-49a2-A0E3-F89E7DCACBC9",
     "meta": {
@@ -11,6 +12,6 @@
         "sortOrder": 8
     },
     "name": "deathCircumstances",
-    "target": "DeathCircumstancesString",
+    "target": "deathCircumstances",
     "title": "Обставини смерті"
 }

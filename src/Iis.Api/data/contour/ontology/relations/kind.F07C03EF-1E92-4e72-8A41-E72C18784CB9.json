@@ -9,6 +9,6 @@
         "sortOrder": 1
     },
     "name": "kind",
-    "target": null,
+    "target": "ForeignPassportType",
     "title": "Тип"
 }

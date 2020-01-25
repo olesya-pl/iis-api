@@ -9,6 +9,6 @@
         "sortOrder": 1
     },
     "name": "start",
-    "target": null,
+    "target": "FuzzyDate",
     "title": "початок"
 }

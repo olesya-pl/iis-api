@@ -6,6 +6,6 @@
         "sortOrder": 4
     },
     "name": "order",
-    "target": null,
+    "target": "Order",
     "title": "Наказ про призначення"
 }

@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "BuildingString",
     "conceptType": "relations",
     "id": "014FED8B-043D-4684-A9E4-6FFDE0677078",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 7
     },
     "name": "building",
-    "target": "BuildingString",
+    "target": "building",
     "title": "Будинок"
 }

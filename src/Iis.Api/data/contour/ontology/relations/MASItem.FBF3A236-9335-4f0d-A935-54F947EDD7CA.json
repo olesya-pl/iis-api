@@ -6,6 +6,6 @@
         "sortOrder": 21
     },
     "name": "MASItem",
-    "target": null,
+    "target": "Accordion",
     "title": "Військово-облікова спеціальність"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 5
     },
     "name": "bePartOf",
-    "target": null,
+    "target": "Infrastructure_bePartOf",
     "title": "Належність"
 }

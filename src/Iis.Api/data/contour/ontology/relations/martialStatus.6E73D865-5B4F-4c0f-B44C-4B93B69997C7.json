@@ -14,6 +14,6 @@
         "sortOrder": 44
     },
     "name": "martialStatus",
-    "target": null,
+    "target": "MartialStatus",
     "title": "Сімейний стан"
 }

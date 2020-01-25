@@ -10,6 +10,6 @@
         "sortOrder": 8
     },
     "name": "state",
-    "target": null,
+    "target": "EventState",
     "title": "Стан"
 }

@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "FileFile",
     "conceptType": "relations",
     "id": "E56538B0-25F3-4f1e-9ED7-94FA3FE391C0",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 5
     },
     "name": "file",
-    "target": "FileFile",
+    "target": "file",
     "title": "Додані файли"
 }

@@ -14,6 +14,6 @@
         "sortOrder": 33
     },
     "name": "mas",
-    "target": null,
+    "target": "MASItem",
     "title": "Військово-облікова спеціальність"
 }

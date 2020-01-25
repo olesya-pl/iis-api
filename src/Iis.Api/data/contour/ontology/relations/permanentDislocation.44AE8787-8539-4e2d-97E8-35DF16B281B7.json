@@ -6,6 +6,6 @@
         "sortOrder": 9
     },
     "name": "permanentDislocation",
-    "target": null,
+    "target": "InfrastructureType",
     "title": "Місце постійної дислокації"
 }

@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "UkraineNameString",
     "conceptType": "relations",
     "id": "0CE20960-4481-4a85-AE67-B0BBF1022258",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "ukraineName",
-    "target": "UkraineNameString",
+    "target": "ukraineName",
     "title": "українською"
 }

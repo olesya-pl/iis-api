@@ -6,6 +6,6 @@
         "sortOrder": 17
     },
     "name": "bePartOf",
-    "target": null,
+    "target": "Subdivision",
     "title": "Належність"
 }

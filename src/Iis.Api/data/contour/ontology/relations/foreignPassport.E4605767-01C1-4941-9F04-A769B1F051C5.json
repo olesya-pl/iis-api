@@ -14,6 +14,6 @@
         "sortOrder": 18
     },
     "name": "foreignPassport",
-    "target": null,
+    "target": "ForeignPassport",
     "title": "закордонний паспорт"
 }

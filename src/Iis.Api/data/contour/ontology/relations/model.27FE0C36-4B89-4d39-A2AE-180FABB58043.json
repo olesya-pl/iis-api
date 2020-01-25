@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "ModelString",
     "conceptType": "relations",
     "id": "27FE0C36-4B89-4d39-A2AE-180FABB58043",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 7
     },
     "name": "model",
-    "target": "ModelString",
+    "target": "model",
     "title": "Модель"
 }

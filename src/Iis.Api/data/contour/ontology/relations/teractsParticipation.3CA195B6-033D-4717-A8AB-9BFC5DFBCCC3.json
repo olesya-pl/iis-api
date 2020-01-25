@@ -6,6 +6,6 @@
         "sortOrder": 18
     },
     "name": "teractsParticipation",
-    "target": null,
+    "target": "Accordion",
     "title": "Причетність до резонансних подій/терактів/злочинів"
 }

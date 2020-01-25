@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "SidcString",
     "conceptType": "relations",
     "id": "4D449DC0-7120-42b6-B0F2-7012F3C3EB1A",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "sidc",
-    "target": "SidcString",
+    "target": "sidc",
     "title": "Військова абрівіатура НАТО"
 }

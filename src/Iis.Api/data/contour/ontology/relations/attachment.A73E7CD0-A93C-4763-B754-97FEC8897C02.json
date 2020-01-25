@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "AttachmentFile",
     "conceptType": "relations",
     "id": "A73E7CD0-A93C-4763-B754-97FEC8897C02",
     "meta": {
@@ -6,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "attachment",
-    "target": "AttachmentFile",
+    "target": "attachment",
     "title": "Прикріплений файл"
 }

@@ -6,6 +6,6 @@
         "sortOrder": 4
     },
     "name": "infrastructureType",
-    "target": null,
+    "target": "InfrastructureType",
     "title": "Тип інфраструктури"
 }
