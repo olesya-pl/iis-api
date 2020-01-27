@@ -11,7 +11,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void Test01()
         {
-            var manager = new IisElasticManager(new IisElasticConfiguration());
+            var manager = new IisElasticManager(new IisElasticConfiguration(), new IisElasticSerializer());
             //manager.DoLowLevel();
         }
     }

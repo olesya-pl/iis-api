@@ -43,6 +43,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
+    <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis\Iis.csproj" />
   </ItemGroup>
   <ItemGroup>

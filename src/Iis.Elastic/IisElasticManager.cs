@@ -1,4 +1,6 @@
 ﻿using Elasticsearch.Net;
+using Iis.Domain.Elastic;
+using Iis.Domain.ExtendedData;
 using System;
 using System.IO;
 using System.Threading;
@@ -6,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace Iis.Elastic
 {
-    public class IisElasticManager
+    public class IisElasticManager: IElasticManager
     {
         ElasticLowLevelClient _lowLevelClient;
         IisElasticConfiguration _configuration;
+        IisElasticSerializer _serializer;
         
-        public IisElasticManager(IisElasticConfiguration configuration)
+        public IisElasticManager(IisElasticConfiguration configuration, IisElasticSerializer serializer)
         {
             _configuration = configuration;
 
@@ -20,12 +23,18 @@ namespace Iis.Elastic
             _lowLevelClient = new ElasticLowLevelClient(config);
         }
 
-        public async Task<bool> InsertJsonAsync(string baseIndexName, string id, string json, CancellationToken cancellationToken)
+        public async Task<bool> InsertJsonAsync(string baseIndexName, string id, string json, CancellationToken cancellationToken = default)
         {
             var path = $"{GetRealIndexName(baseIndexName)}/{id}";
             PostData postData = json;
             var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, $"test/person/{id}", cancellationToken, postData);
             return response.Success;
+        }
+
+        public async Task<bool> InsertExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default)
+        {
+            var json = _serializer.ToJson(extNode);
+            return await InsertJsonAsync(extNode.NodeTypeName, extNode.Id.ToString("N"), json, cancellationToken);
         }
 
         private string GetRealIndexName(string baseIndexName)

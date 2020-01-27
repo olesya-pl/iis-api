@@ -35,6 +35,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
+using Iis.Domain.Elastic;
+using Iis.Elastic;
 
 namespace IIS.Core
 {
@@ -162,8 +164,11 @@ namespace IIS.Core
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
-
+            services.AddSingleton<IElasticManager, IisElasticManager>();
+            services.AddSingleton<IisElasticSerializer>();
+            
             services.AddHostedService<MaterialEventConsumer>();
+
 
             services.AddControllers();
         }
