@@ -155,7 +155,7 @@ namespace IIS.Core
             services.AddTransient<IConnectionFactory>(s => factory);
 
             string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}";
-            EsConfiguration es = Configuration.GetSection("es").Get<EsConfiguration>();
+            
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
                 .AddRabbitMQ(mqString, (SslOption)null);
@@ -164,11 +164,12 @@ namespace IIS.Core
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
+
             services.AddSingleton<IElasticManager, IisElasticManager>();
             services.AddSingleton<IisElasticSerializer>();
-            
-            services.AddHostedService<MaterialEventConsumer>();
+            services.AddSingleton(Configuration.GetSection("elasticSearch").Get<IisElasticConfiguration>());
 
+            services.AddHostedService<MaterialEventConsumer>();
 
             services.AddControllers();
         }
@@ -276,10 +277,5 @@ namespace IIS.Core
 
             return error;
         }
-    }
-
-    public class EsConfiguration
-    {
-        public string Host { get; set; }
     }
 }

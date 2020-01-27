@@ -21,13 +21,13 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             var extNode = new ExtNode
             {
-                Id = nodeEntity.Id,
-                NodeTypeId = nodeEntity.NodeTypeId,
+                Id = nodeEntity.Id.ToString("N"),
+                NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
                 NodeTypeName = nodeEntity.NodeType?.Name,
                 AttributeValue = nodeEntity.Attribute?.Value,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
-                Children = await GetExtNodesByIds(nodeEntity.OutgoingRelations.Select(r => r.Id))
+                Children = await GetExtNodesByIds(nodeEntity.OutgoingRelations.Select(r => r.TargetNodeId))
             };
             return await Task.FromResult(extNode);
         }

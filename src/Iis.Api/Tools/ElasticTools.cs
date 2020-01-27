@@ -21,7 +21,10 @@ namespace IIS.Core.Tools
         {
             var nodeTypeIds = await _extNodeService.GetNodeTypesForElastic();
             var extNodes = await _extNodeService.GetExtNodesByTypeIds(nodeTypeIds);
-            
+            foreach (var extNode in extNodes)
+            {
+                await _elasticManager.InsertExtNodeAsync(extNode);
+            }
         }
     }
 }

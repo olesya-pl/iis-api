@@ -17,6 +17,7 @@ namespace Iis.Elastic
         public IisElasticManager(IisElasticConfiguration configuration, IisElasticSerializer serializer)
         {
             _configuration = configuration;
+            _serializer = serializer;
 
             var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
             var config = new ConnectionConfiguration(connectionPool);
@@ -25,21 +26,21 @@ namespace Iis.Elastic
 
         public async Task<bool> InsertJsonAsync(string baseIndexName, string id, string json, CancellationToken cancellationToken = default)
         {
-            var path = $"{GetRealIndexName(baseIndexName)}/{id}";
+            var path = $"{GetRealIndexName(baseIndexName)}/_doc/{id}";
             PostData postData = json;
-            var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, $"test/person/{id}", cancellationToken, postData);
+            var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, path, cancellationToken, postData);
             return response.Success;
         }
 
         public async Task<bool> InsertExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default)
         {
-            var json = _serializer.ToJson(extNode);
-            return await InsertJsonAsync(extNode.NodeTypeName, extNode.Id.ToString("N"), json, cancellationToken);
+            var json = _serializer.GetJsonByExtNode(extNode);
+            return await InsertJsonAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
         private string GetRealIndexName(string baseIndexName)
         {
-            return $"{_configuration.IndexPreffix}{baseIndexName}";
+            return $"{_configuration.IndexPreffix}{baseIndexName}".ToLower();
         }
 
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
