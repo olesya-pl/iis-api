@@ -18,6 +18,11 @@
         {
             "id": "B3739F86-A33E-4592-B971-440541AF7828",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "F5D17F31-3641-4c3b-86FC-487FDEC29268",
                     "title": "Реальне ПІБ",
@@ -36,6 +41,11 @@
         {
             "id": "37F54A7E-310C-4f33-B0B4-8AF91B533B1C",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "F2C9BE02-3E0C-4f42-936E-6B1DE960C4E6",
                     "title": "ПІБ прикриття",
@@ -70,6 +80,11 @@
         {
             "id": "7F08C6D4-F8BD-494c-A84D-83A131DC1705",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "D2D7C903-1636-4b94-91A5-9E140C399B49",
                     "title": "Народження та смерть",
@@ -88,6 +103,11 @@
         {
             "id": "168891D4-961F-4eeb-966D-CEA86CEFE028",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "D2D7C903-1636-4b94-91A5-9E140C399B49",
                     "title": "Народження та смерть",
@@ -149,6 +169,11 @@
         {
             "id": "0FDD5857-31BD-4941-A23A-62C2D400C4B6",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "81783AB2-77C8-43b1-B544-354F346964E2",
                     "title": "Установчі дані",
@@ -232,6 +257,11 @@
         {
             "id": "72E8BF1D-89E8-452c-B833-B028B0B8569B",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "81783AB2-77C8-43b1-B544-354F346964E2",
                     "title": "Установчі дані",
@@ -250,6 +280,11 @@
         {
             "id": "494A3783-D520-4f33-8A77-C7EC2F516903",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "81783AB2-77C8-43b1-B544-354F346964E2",
                     "title": "Установчі дані",
@@ -268,6 +303,11 @@
         {
             "id": "6DC1C4B4-3042-45f1-8CFD-078422529683",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "81783AB2-77C8-43b1-B544-354F346964E2",
                     "title": "Установчі дані",
@@ -286,6 +326,11 @@
         {
             "id": "97243AA3-5A4B-4094-AAF7-8512E6F7F2FA",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "8AC004FE-E197-4697-9095-D897FB0E74FA",
                     "title": "Внутрішні паспорти",
@@ -304,6 +349,11 @@
         {
             "id": "E4605767-01C1-4941-9F04-A769B1F051C5",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "5CDA3A25-B8C2-4377-B72B-97696A04219E",
                     "title": "Закордонні паспорти",
@@ -322,6 +372,11 @@
         {
             "id": "3E3B2036-336A-4e8d-A9A9-E7A81B00FA45",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "917F7737-FA64-4ee0-AE04-C250354B71D0",
                     "title": "Посвідчення особи",
@@ -340,6 +395,11 @@
         {
             "id": "F338EDFC-E5DC-4507-B0F4-5438DDBD1882",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "6E72D533-9207-4149-B6C7-A4E802DE6D36",
                     "title": "Ідентифікаційні номери",
@@ -359,6 +419,11 @@
             "attrTypeName": "TaxIDString",
             "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
             "meta": {
+                "container": {
+                    "id": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
+                    "title": "Ідентифікаційні номери",
+                    "type": "Accordion"
+                },
                 "multiple": false,
                 "sortOrder": 21
             },
@@ -401,6 +466,11 @@
         {
             "id": "DF6C681F-3EC3-4f8c-9E5A-773DFEBAAEFE",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
                     "title": "Поточне місце військової служби/роботи",
@@ -437,6 +507,11 @@
         {
             "id": "BDD8F26B-DE33-4b5e-B28B-2C6C7903CDDA",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "48410D55-4D75-4d83-A1B3-61428EEB01C0",
                     "title": "Місця проходження служби/роботи/безробіття",
@@ -455,6 +530,11 @@
         {
             "id": "533FA3B8-CE40-4da5-9366-18120FDC2B07",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
                     "title": "Приналежність до політичних партій, громадських організацій, рухів",
@@ -473,6 +553,11 @@
         {
             "id": "6DD1EC3F-AB4C-4362-B1C2-9B99A8E64A9B",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "3BD55143-A266-4e35-9E00-574FF61A456D",
                     "title": "Участь у розробці ОіВТ",
@@ -491,6 +576,11 @@
         {
             "id": "A92BFD27-66BA-45a7-B280-EDB15A6FF7C3",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "D39BCDB7-9374-47c6-B29A-6A96A112B8BE",
                     "title": "Причетність до терористичних, екстремістських або злочинних організацій (у т.ч., незареєстрованих приватних військових компаній)",
@@ -509,6 +599,11 @@
         {
             "id": "08980950-D4EF-41e9-A0D8-21B5E244E350",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "582DF971-DABD-4168-973B-7CAFEAFD8A23",
                     "title": "Причетність до приватних військових, приватних охоронних або приватних безпекових компаній",
@@ -527,6 +622,11 @@
         {
             "id": "56DD286F-B3EF-436e-AA03-53FF40DE4501",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "61A466B0-5178-468c-AB3A-B64B77F5C2B6",
                     "title": "Освіта",
@@ -545,6 +645,11 @@
         {
             "id": "18542667-2008-47e0-89DD-B7484B05887E",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "B9B7EC0F-1BFE-4fe4-8D55-C8993EE58AEC",
                     "title": "Володіння іноземними мовами",
@@ -563,6 +668,11 @@
         {
             "id": "2EAFB927-A364-461f-B380-A55137332BC4",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "FBF3A236-9335-4f0d-A935-54F947EDD7CA",
                     "title": "Військово-облікова спеціальність",
@@ -581,6 +691,11 @@
         {
             "id": "582AA0A4-37C3-4df6-B0E7-AFA245C9884B",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
                     "title": "Приналежність до політичних партій, громадських організацій, рухів",
@@ -621,6 +736,11 @@
         {
             "id": "474997D1-84A3-4252-9C2F-BFB0955DDFC9",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "38B0D1FF-D8D7-4719-9FA3-4602E96CE7B4",
                     "title": "Участь у бойових діях/миротворчих операціях",
@@ -639,6 +759,11 @@
         {
             "id": "35304AF6-2545-483e-B681-2C65944C3E6D",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "83985A1B-B32F-433c-8FB3-48E052FD22DE",
                     "title": "Поточне місце перебування",
@@ -657,6 +782,11 @@
         {
             "id": "D2CE8255-B58A-4212-AD98-BA568A0D7EED",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "1FA1ED3F-4118-42a5-9CF5-FE027D678D8D",
                     "title": "Поранення і контузії",
@@ -675,6 +805,11 @@
         {
             "id": "B91E7E07-0C11-4939-895D-4210B9B25175",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "C429BF16-9AC2-4485-B40C-3CD9B519E0DD",
                     "title": "Дані про перебування у закордонному відрядженні (не у складі військ)",
@@ -693,6 +828,11 @@
         {
             "id": "70FF083C-D075-479d-84A6-0DD3D4D8F8C0",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "8944ED63-DD7E-465c-A381-7DD227B78B8E",
                     "title": "Заохочення (вид нагороди, медалі, цінні подарунки тощо)",
@@ -711,6 +851,11 @@
         {
             "id": "89501CC7-C719-4624-966D-B14724ADF14B",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "85F3F0E4-02F6-46b8-A09A-B203DEFC2A39",
                     "title": "Стягнення",
@@ -763,6 +908,11 @@
         {
             "id": "AC31E52F-DC25-4447-9FF3-939A0B15BC7B",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "69D6C36A-595D-4858-A168-4D48DC976ADE",
                     "title": "Оточення",
@@ -781,6 +931,11 @@
         {
             "id": "4B726B9C-B7CD-46dd-96DE-564C5D92232B",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "container": {
                     "id": "470950D8-5550-4d48-A946-41AAEEDFDCA8",
                     "title": "Контакти особи",
@@ -831,6 +986,16 @@
         {
             "id": "E1C2EECC-F0E8-437a-9352-7758BD0E2407",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "container": {
+                    "id": "3CA195B6-033D-4717-A8AB-9BFC5DFBCCC3",
+                    "title": "Причетність до резонансних подій/терактів/злочинів",
+                    "type": "Accordion"
+                },
                 "formField": {
                     "type": "form"
                 },
