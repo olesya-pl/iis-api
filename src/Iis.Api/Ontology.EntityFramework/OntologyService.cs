@@ -18,12 +18,14 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly OntologyContext _context;
         private readonly IOntologyProvider _ontologyProvider;
         private readonly IMemoryCache _cache;
+        private readonly ElasticService _elasticService;
 
-        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache)
+        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache, ElasticService elasticService)
         {
             _context = context;
             _ontologyProvider = ontologyProvider;
             _cache = cache;
+            _elasticService = elasticService;
         }
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
@@ -253,29 +255,29 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesQueryAsync(OntologyModel ontology, IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
         {
-            var derived = types.SelectMany(e => ontology.GetChildTypes(e)).Select(e => e.Id)
-                .Concat(types.Select(e => e.Id)).Distinct().ToArray();
+            var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                .Concat(types).Distinct().ToArray();
 
             if (filter.SearchCriteria.Count > 0)
             {
-                var result = await GetNodesInternalWithCriteriaAsync(derived, filter.SearchCriteria, filter.AnyOfCriteria,
+                var result = await GetNodesInternalWithCriteriaAsync(derivedTypes.Select(t => t.Id), filter.SearchCriteria, filter.AnyOfCriteria,
                     filter.ExactMatch, cancellationToken);
                 if (filter.Suggestion == null)
                     return result;
-                var suggestedIds = await GetNodesInternalWithSuggestion(derived, filter.Suggestion).Select(n => n.Id).ToArrayAsync(cancellationToken);
+                var suggestedIds = (await GetNodesByElasticAllFields(derivedTypes, filter.Suggestion)).Select(n => n.Id).ToArray();
                 return result.Where(n => suggestedIds.Contains(n.Id));
             }
             if (filter.Suggestion != null)
-                return GetNodesInternalWithSuggestion(derived, filter.Suggestion);
-            return GetNodesInternal(derived);
+                return await GetNodesByElasticAllFields(derivedTypes, filter.Suggestion);
+            return GetNodesInternal(derivedTypes.Select(t => t.Id));
         }
 
-        private IQueryable<Iis.DataModel.NodeEntity> GetNodesInternal(Guid[] derived)
+        private IQueryable<Iis.DataModel.NodeEntity> GetNodesInternal(IEnumerable<Guid> derived)
         {
             return _context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived);
         }
 
-        private IQueryable<Iis.DataModel.NodeEntity> GetNodesInternalWithSuggestion(Guid[] derived, string suggestion)
+        private IQueryable<Iis.DataModel.NodeEntity> GetNodesInternalWithSuggestion(IEnumerable<Guid> derived, string suggestion)
         {
             var relationsQ = _context.Relations
                 .Include(e => e.SourceNode)
@@ -286,7 +288,13 @@ namespace IIS.Core.Ontology.EntityFramework
             return relationsQ.Select(e => e.SourceNode);
         }
 
-        private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesInternalWithCriteriaAsync(Guid[] derived,
+        private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion)
+        {
+            var ids = await _elasticService.SearchByAllFields(types, suggestion);
+            return _context.Nodes.Where(node => ids.Contains(node.Id));
+        }
+
+        private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesInternalWithCriteriaAsync(IEnumerable<Guid> derived,
             List<Tuple<EmbeddingRelationType, string>> criteria, bool anyOfCriteria, bool exactMatch,
             CancellationToken cancellationToken = default)
         {

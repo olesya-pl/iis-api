@@ -76,6 +76,7 @@ namespace IIS.Core
             services.AddTransient<IMaterialProvider, MaterialProvider>();
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
+            services.AddSingleton<ElasticService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
