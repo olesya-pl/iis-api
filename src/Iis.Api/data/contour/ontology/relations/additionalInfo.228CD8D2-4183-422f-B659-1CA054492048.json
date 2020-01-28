@@ -7,6 +7,6 @@
         "sortOrder": 7
     },
     "name": "additionalInfo",
-    "target": "additionalInfo",
+    "target": "AdditionalInfoString",
     "title": "Додаткова інформація"
 }

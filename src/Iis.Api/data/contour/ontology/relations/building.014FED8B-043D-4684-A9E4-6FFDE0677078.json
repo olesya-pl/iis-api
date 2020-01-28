@@ -7,6 +7,6 @@
         "sortOrder": 7
     },
     "name": "building",
-    "target": "building",
+    "target": "BuildingString",
     "title": "Будинок"
 }

@@ -7,6 +7,6 @@
         "sortOrder": 8
     },
     "name": "sub_region",
-    "target": "sub_region",
+    "target": "Sub_regionString",
     "title": ""
 }

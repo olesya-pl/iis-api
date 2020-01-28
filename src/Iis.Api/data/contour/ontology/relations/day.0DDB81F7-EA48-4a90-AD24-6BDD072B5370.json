@@ -7,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "day",
-    "target": "day",
+    "target": "DayInteger",
     "title": "день"
 }

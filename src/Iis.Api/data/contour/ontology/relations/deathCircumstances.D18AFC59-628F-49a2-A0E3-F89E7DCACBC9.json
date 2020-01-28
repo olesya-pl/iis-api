@@ -4,14 +4,14 @@
     "id": "D18AFC59-628F-49a2-A0E3-F89E7DCACBC9",
     "meta": {
         "container": {
-            "containerId": "D2D7C903-1636-4b94-91A5-9E140C399B49",
-            "containerTitle": "Народження та смерть",
-            "containertype": "Accordion"
+            "id": "D2D7C903-1636-4b94-91A5-9E140C399B49",
+            "title": "Народження та смерть",
+            "type": "Accordion"
         },
         "multiple": false,
         "sortOrder": 8
     },
     "name": "deathCircumstances",
-    "target": "deathCircumstances",
+    "target": "DeathCircumstancesString",
     "title": "Обставини смерті"
 }

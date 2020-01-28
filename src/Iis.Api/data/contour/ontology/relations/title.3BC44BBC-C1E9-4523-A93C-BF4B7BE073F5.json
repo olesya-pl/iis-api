@@ -8,6 +8,6 @@
         "sortOrder": 2
     },
     "name": "title",
-    "target": "title",
+    "target": "TitleString",
     "title": "Повна назва"
 }

@@ -7,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "damageLevel",
-    "target": "damageLevel",
+    "target": "DamageLevelString",
     "title": "Ступінь важкості"
 }

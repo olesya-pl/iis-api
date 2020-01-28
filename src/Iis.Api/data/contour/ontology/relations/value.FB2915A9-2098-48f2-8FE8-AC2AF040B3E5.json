@@ -10,6 +10,6 @@
         }
     },
     "name": "value",
-    "target": "value",
+    "target": "ValueString",
     "title": "Значення"
 }

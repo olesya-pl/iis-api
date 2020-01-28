@@ -4,14 +4,14 @@
     "id": "66B04537-02EA-47ac-AA22-3EB89976D09F",
     "meta": {
         "container": {
-            "containerId": "945CC957-C1DF-4a2a-BB24-7E549D037D88",
-            "containerTitle": "Інші ідентифікаційні номери",
-            "containertype": "Accordion"
+            "id": "945CC957-C1DF-4a2a-BB24-7E549D037D88",
+            "title": "Інші ідентифікаційні номери",
+            "type": "Accordion"
         },
         "multiple": false,
         "sortOrder": 23
     },
     "name": "otherPersonId",
-    "target": "otherPersonId",
+    "target": "OtherPersonIdString",
     "title": "Інші номери"
 }

@@ -8,6 +8,6 @@
         "title": "Географічні координати пункту дислокації штабу (ППД)"
     },
     "name": "dislocation",
-    "target": "dislocation",
+    "target": "DislocationGeo",
     "title": "Пункт Постійної Дислокації (ППД)"
 }

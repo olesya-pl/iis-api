@@ -3,9 +3,9 @@
     "id": "494A3783-D520-4f33-8A77-C7EC2F516903",
     "meta": {
         "container": {
-            "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
-            "containerTitle": "Установчі дані",
-            "containertype": "Accordion"
+            "id": "81783AB2-77C8-43b1-B544-354F346964E2",
+            "title": "Установчі дані",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"

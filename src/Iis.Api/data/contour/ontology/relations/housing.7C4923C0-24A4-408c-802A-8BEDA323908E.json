@@ -7,6 +7,6 @@
         "sortOrder": 8
     },
     "name": "housing",
-    "target": "housing",
+    "target": "HousingString",
     "title": "Корпус"
 }

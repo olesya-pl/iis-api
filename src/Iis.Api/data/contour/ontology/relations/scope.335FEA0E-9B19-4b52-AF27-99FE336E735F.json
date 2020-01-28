@@ -7,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "scope",
-    "target": "scope",
+    "target": "ScopeString",
     "title": "Область пошуку"
 }

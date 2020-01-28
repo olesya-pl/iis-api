@@ -7,6 +7,6 @@
         "sortOrder": 7
     },
     "name": "photo",
-    "target": "photo",
+    "target": "PhotoFile",
     "title": "Фото"
 }

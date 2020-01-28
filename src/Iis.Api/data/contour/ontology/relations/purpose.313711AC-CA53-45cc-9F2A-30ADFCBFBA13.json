@@ -7,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "purpose",
-    "target": "purpose",
+    "target": "PurposeString",
     "title": "Призначення"
 }

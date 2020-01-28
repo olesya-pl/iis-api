@@ -7,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "dateOfIssue",
-    "target": "dateOfIssue",
+    "target": "DateOfIssueDateTime",
     "title": "Дата видачі"
 }

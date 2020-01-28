@@ -7,6 +7,6 @@
         "sortOrder": 9
     },
     "name": "apartment",
-    "target": "apartment",
+    "target": "ApartmentString",
     "title": "Квартира"
 }

@@ -4,14 +4,14 @@
     "id": "93C2BC5A-CC5D-4f2f-8182-BB3902A2FE02",
     "meta": {
         "container": {
-            "containerId": "D1D6CF4F-52AC-4dc1-8AC6-C627C325B3CB",
-            "containerTitle": "Додані файли",
-            "containertype": "Accordion"
+            "id": "D1D6CF4F-52AC-4dc1-8AC6-C627C325B3CB",
+            "title": "Додані файли",
+            "type": "Accordion"
         },
         "multiple": true,
         "sortOrder": 48
     },
     "name": "attachment",
-    "target": "attachment",
+    "target": "AttachmentFile",
     "title": "Додані файли"
 }

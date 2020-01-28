@@ -4,14 +4,14 @@
     "id": "AA757315-667A-4141-BC15-87330FED1F6E",
     "meta": {
         "container": {
-            "containerId": "37EE6BFB-6A20-469f-9677-BCE87A410AF3",
-            "containerTitle": "Інші дані, які представляють інтерес",
-            "containertype": "Accordion"
+            "id": "37EE6BFB-6A20-469f-9677-BCE87A410AF3",
+            "title": "Інші дані, які представляють інтерес",
+            "type": "Accordion"
         },
         "multiple": false,
         "sortOrder": 47
     },
     "name": "otherInterestingData",
-    "target": "otherInterestingData",
+    "target": "OtherInterestingDataString",
     "title": "Інші дані, які представляють інтерес"
 }

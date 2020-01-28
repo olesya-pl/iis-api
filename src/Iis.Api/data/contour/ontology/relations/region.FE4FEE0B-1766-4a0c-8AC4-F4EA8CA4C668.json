@@ -7,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "region",
-    "target": "region",
+    "target": "RegionString",
     "title": "Область"
 }

@@ -3,9 +3,9 @@
     "id": "35304AF6-2545-483e-B681-2C65944C3E6D",
     "meta": {
         "container": {
-            "containerId": "83985A1B-B32F-433c-8FB3-48E052FD22DE",
-            "containerTitle": "Поточне місце перебування",
-            "containertype": "Accordion"
+            "id": "83985A1B-B32F-433c-8FB3-48E052FD22DE",
+            "title": "Поточне місце перебування",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"

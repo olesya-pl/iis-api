@@ -8,6 +8,6 @@
         "title": "Географічні координати місце поточної дислокації (ПТД)"
     },
     "name": "temporaryDislocation",
-    "target": "temporaryDislocation",
+    "target": "TemporaryDislocationGeo",
     "title": "Пункт Тимчасової Дислокації (ПТД)"
 }

@@ -7,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "description",
-    "target": "description",
+    "target": "DescriptionString",
     "title": "примітка"
 }

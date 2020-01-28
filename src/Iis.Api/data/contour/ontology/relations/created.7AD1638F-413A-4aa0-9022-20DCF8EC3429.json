@@ -7,6 +7,6 @@
         "sortOrder": 35
     },
     "name": "created",
-    "target": "created",
+    "target": "CreatedDateTime",
     "title": "дата першої фіксації"
 }

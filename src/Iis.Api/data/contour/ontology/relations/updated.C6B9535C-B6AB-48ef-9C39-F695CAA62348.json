@@ -7,6 +7,6 @@
         "sortOrder": 36
     },
     "name": "updated",
-    "target": "updated",
+    "target": "UpdatedDateTime",
     "title": "дата оновлення інформації"
 }

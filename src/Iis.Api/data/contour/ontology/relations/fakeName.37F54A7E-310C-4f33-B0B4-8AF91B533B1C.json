@@ -3,9 +3,9 @@
     "id": "37F54A7E-310C-4f33-B0B4-8AF91B533B1C",
     "meta": {
         "container": {
-            "containerId": "F2C9BE02-3E0C-4f42-936E-6B1DE960C4E6",
-            "containerTitle": "ПІБ прикриття",
-            "containertype": "Accordion"
+            "id": "F2C9BE02-3E0C-4f42-936E-6B1DE960C4E6",
+            "title": "ПІБ прикриття",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"

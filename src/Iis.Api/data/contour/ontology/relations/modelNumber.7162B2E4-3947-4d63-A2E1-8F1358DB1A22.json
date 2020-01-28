@@ -7,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "modelNumber",
-    "target": "modelNumber",
+    "target": "ModelNumberString",
     "title": "Бортовий номер"
 }
