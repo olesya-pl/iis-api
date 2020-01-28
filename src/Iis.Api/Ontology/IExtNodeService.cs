@@ -9,6 +9,7 @@ namespace IIS.Core.Ontology
 {
     public interface IExtNodeService
     {
+        Task<ExtNode> GetExtNodeById(Guid id);
         Task<List<Guid>> GetNodeTypesForElastic();
         Task<List<ExtNode>> GetExtNodesByTypeIds(IEnumerable<Guid> nodeTypeIds);
     }

@@ -65,6 +65,7 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             await _context.SaveChangesAsync(cancellationToken);
+            await _elasticService.PutNode(source.Id);
         }
 
         public async Task SaveNodesAsync(IEnumerable<Node> nodes, CancellationToken cancellationToken = default)
@@ -112,6 +113,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         }
                     }
                 }
+                await _elasticService.PutNode(source.Id);
             }
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -264,11 +266,11 @@ namespace IIS.Core.Ontology.EntityFramework
                     filter.ExactMatch, cancellationToken);
                 if (filter.Suggestion == null)
                     return result;
-                var suggestedIds = (await GetNodesByElasticAllFields(derivedTypes, filter.Suggestion)).Select(n => n.Id).ToArray();
+                var suggestedIds = (await GetNodesByElasticAllFields(derivedTypes, filter.Suggestion, cancellationToken)).Select(n => n.Id).ToArray();
                 return result.Where(n => suggestedIds.Contains(n.Id));
             }
             if (filter.Suggestion != null)
-                return await GetNodesByElasticAllFields(derivedTypes, filter.Suggestion);
+                return await GetNodesByElasticAllFields(derivedTypes, filter.Suggestion, cancellationToken);
             return GetNodesInternal(derivedTypes.Select(t => t.Id));
         }
 
@@ -288,7 +290,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return relationsQ.Select(e => e.SourceNode);
         }
 
-        private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion)
+        private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion, CancellationToken cancellationToken = default)
         {
             var ids = await _elasticService.SearchByAllFields(types, suggestion);
             return _context.Nodes.Where(node => ids.Contains(node.Id));
