@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "4B726B9C-B7CD-46dd-96DE-564C5D92232B",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "470950D8-5550-4d48-A946-41AAEEDFDCA8",
             "title": "Контакти особи",

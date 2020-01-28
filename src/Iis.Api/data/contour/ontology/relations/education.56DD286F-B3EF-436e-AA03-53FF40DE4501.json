@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "56DD286F-B3EF-436e-AA03-53FF40DE4501",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "61A466B0-5178-468c-AB3A-B64B77F5C2B6",
             "title": "Освіта",

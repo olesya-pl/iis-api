@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "08980950-D4EF-41e9-A0D8-21B5E244E350",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "582DF971-DABD-4168-973B-7CAFEAFD8A23",
             "title": "Причетність до приватних військових, приватних охоронних або приватних безпекових компаній",

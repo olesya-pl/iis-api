@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "F338EDFC-E5DC-4507-B0F4-5438DDBD1882",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "6E72D533-9207-4149-B6C7-A4E802DE6D36",
             "title": "Ідентифікаційні номери",

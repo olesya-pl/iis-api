@@ -2,6 +2,16 @@
     "conceptType": "relations",
     "id": "E1C2EECC-F0E8-437a-9352-7758BD0E2407",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
+        "container": {
+            "id": "3CA195B6-033D-4717-A8AB-9BFC5DFBCCC3",
+            "title": "Причетність до резонансних подій/терактів/злочинів",
+            "type": "Accordion"
+        },
         "formField": {
             "type": "form"
         },

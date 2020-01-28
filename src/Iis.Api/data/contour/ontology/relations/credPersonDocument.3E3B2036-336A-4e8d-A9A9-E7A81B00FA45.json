@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "3E3B2036-336A-4e8d-A9A9-E7A81B00FA45",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "917F7737-FA64-4ee0-AE04-C250354B71D0",
             "title": "Посвідчення особи",

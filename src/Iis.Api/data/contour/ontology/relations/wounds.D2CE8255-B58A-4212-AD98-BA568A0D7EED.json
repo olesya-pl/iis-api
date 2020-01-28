@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "D2CE8255-B58A-4212-AD98-BA568A0D7EED",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "1FA1ED3F-4118-42a5-9CF5-FE027D678D8D",
             "title": "Поранення і контузії",

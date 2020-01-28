@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "37F54A7E-310C-4f33-B0B4-8AF91B533B1C",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "F2C9BE02-3E0C-4f42-936E-6B1DE960C4E6",
             "title": "ПІБ прикриття",

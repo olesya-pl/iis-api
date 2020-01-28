@@ -3,6 +3,11 @@
     "conceptType": "relations",
     "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
     "meta": {
+        "container": {
+            "id": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
+            "title": "Ідентифікаційні номери",
+            "type": "Accordion"
+        },
         "multiple": false,
         "sortOrder": 21
     },

@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "0FDD5857-31BD-4941-A23A-62C2D400C4B6",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "81783AB2-77C8-43b1-B544-354F346964E2",
             "title": "Установчі дані",

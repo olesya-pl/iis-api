@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "6DD1EC3F-AB4C-4362-B1C2-9B99A8E64A9B",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "3BD55143-A266-4e35-9E00-574FF61A456D",
             "title": "Участь у розробці ОіВТ",

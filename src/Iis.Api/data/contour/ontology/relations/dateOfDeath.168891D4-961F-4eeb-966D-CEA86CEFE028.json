@@ -2,6 +2,11 @@
     "conceptType": "relations",
     "id": "168891D4-961F-4eeb-966D-CEA86CEFE028",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
             "id": "D2D7C903-1636-4b94-91A5-9E140C399B49",
             "title": "Народження та смерть",
