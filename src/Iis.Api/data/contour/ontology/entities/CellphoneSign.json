@@ -1,11 +1,12 @@
 {
     "attributes": [
         {
+            "attrTypeName": "ValueString",
             "id": "ABFB0B5E-A942-4a5a-88D6-ADC09EA08FC3",
             "meta": {
                 "format": "phone",
                 "multiple": false,
-                "sortOrder": 145,
+                "sortOrder": 1,
                 "validation": {
                     "required": true
                 }
@@ -22,7 +23,7 @@
     "id": "4A5EFCB0-8B11-4142-91FC-AA20CCB8212B",
     "meta": {
         "exposeOnApi": false,
-        "sortOrder": 146
+        "sortOrder": 149
     },
     "name": "CellphoneSign",
     "title": "Мобільний телефон"

@@ -2,8 +2,16 @@
     "conceptType": "relations",
     "id": "18542667-2008-47e0-89DD-B7484B05887E",
     "meta": {
+        "container": {
+            "containerId": "B9B7EC0F-1BFE-4fe4-8D55-C8993EE58AEC",
+            "containerTitle": "Володіння іноземними мовами",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 38
+        "sortOrder": 32
     },
     "name": "foreignLang",
     "target": "ForeignLang",

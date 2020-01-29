@@ -7,8 +7,16 @@
             "Update",
             "Delete"
         ],
+        "container": {
+            "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+            "containerTitle": "Установчі дані",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 18
+        "sortOrder": 12
     },
     "name": "nicknameSign",
     "target": "NicknameSign",

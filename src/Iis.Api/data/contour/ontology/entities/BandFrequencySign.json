@@ -6,7 +6,7 @@
     "id": "7B742DA0-3241-45e8-89DC-7E2B26DAB613",
     "meta": {
         "exposeOnApi": false,
-        "sortOrder": 188
+        "sortOrder": 195
     },
     "name": "BandFrequencySign",
     "title": "Смуга, кГц."

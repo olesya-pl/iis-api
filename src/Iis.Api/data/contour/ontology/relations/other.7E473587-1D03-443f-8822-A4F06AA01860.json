@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "7E473587-1D03-443f-8822-A4F06AA01860",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 34
+    },
+    "name": "other",
+    "target": "Accordion",
+    "title": "Інше"
+}

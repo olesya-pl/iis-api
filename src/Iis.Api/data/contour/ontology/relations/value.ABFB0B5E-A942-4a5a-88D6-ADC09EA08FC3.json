@@ -1,10 +1,11 @@
 {
+    "attrTypeName": "ValueString",
     "conceptType": "relations",
     "id": "ABFB0B5E-A942-4a5a-88D6-ADC09EA08FC3",
     "meta": {
         "format": "phone",
         "multiple": false,
-        "sortOrder": 145,
+        "sortOrder": 1,
         "validation": {
             "required": true
         }

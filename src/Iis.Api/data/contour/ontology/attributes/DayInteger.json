@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "DayInteger",
+    "conceptType": "attributes",
+    "id": "A10D1697-8815-4f2a-993E-79E51D9B6A41",
+    "meta": {
+    },
+    "name": "day",
+    "title": "день",
+    "type": "Integer"
+}

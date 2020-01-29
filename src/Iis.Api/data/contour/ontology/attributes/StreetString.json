@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "StreetString",
+    "conceptType": "attributes",
+    "id": "433823c1-5220-4917-8124-31e7a91269f3",
+    "meta": {
+    },
+    "name": "street",
+    "title": "Вулиця",
+    "type": "String"
+}

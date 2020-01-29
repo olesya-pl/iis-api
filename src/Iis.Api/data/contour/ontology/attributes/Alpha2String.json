@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "Alpha2String",
+    "conceptType": "attributes",
+    "id": "3200d4aa-a6da-4d49-ab79-c7ea23958eef",
+    "meta": {
+    },
+    "name": "alpha2",
+    "title": "",
+    "type": "String"
+}

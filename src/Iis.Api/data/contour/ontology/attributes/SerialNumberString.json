@@ -1,0 +1,11 @@
+{
+    "attrTypeName": "SerialNumberString",
+    "conceptType": "attributes",
+    "id": "24263438-A60D-437a-B879-DE273B22E082",
+    "meta": {
+        "kind": "Keyword"
+    },
+    "name": "serialNumber",
+    "title": "Серійний номер",
+    "type": "String"
+}

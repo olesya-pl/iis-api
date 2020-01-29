@@ -2,8 +2,16 @@
     "conceptType": "relations",
     "id": "533FA3B8-CE40-4da5-9366-18120FDC2B07",
     "meta": {
+        "container": {
+            "containerId": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
+            "containerTitle": "Приналежність до політичних партій, громадських організацій, рухів",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 33
+        "sortOrder": 27
     },
     "name": "politicalParticipation",
     "target": "OrgParticipation",

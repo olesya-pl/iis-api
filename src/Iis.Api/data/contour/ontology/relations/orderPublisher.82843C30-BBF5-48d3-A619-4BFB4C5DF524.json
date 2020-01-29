@@ -3,7 +3,7 @@
     "id": "82843C30-BBF5-48d3-A619-4BFB4C5DF524",
     "meta": {
         "multiple": false,
-        "sortOrder": 325
+        "sortOrder": 3
     },
     "name": "orderPublisher",
     "target": "Position",

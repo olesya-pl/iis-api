@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "Sub_regionString",
     "conceptType": "relations",
     "id": "E2AD62AC-65F9-47c1-9DC5-2A2697F7B630",
     "meta": {
         "multiple": false,
-        "sortOrder": 199
+        "sortOrder": 8
     },
     "name": "sub_region",
     "target": "sub_region",

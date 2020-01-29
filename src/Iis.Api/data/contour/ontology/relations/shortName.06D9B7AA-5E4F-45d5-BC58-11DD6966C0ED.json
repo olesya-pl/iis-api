@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "ShortNameString",
     "conceptType": "relations",
     "id": "06D9B7AA-5E4F-45d5-BC58-11DD6966C0ED",
     "meta": {
         "multiple": false,
-        "sortOrder": 184
+        "sortOrder": 4
     },
     "name": "shortName",
     "target": "shortName",

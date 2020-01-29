@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
-using Iis.Domain;
-using Iis.Domain.Meta;
+using IIS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace IIS.Core.Ontology.Meta
+namespace Iis.Domain.Meta
 {
     public static class MetaExtensions
     {

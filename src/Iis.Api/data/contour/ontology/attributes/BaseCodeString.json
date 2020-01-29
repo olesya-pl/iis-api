@@ -1,0 +1,14 @@
+{
+    "attrTypeName": "BaseCodeString",
+    "conceptType": "attributes",
+    "id": "1D6C32FB-C14B-4a95-854A-1E2F2BB8CF00",
+    "meta": {
+        "kind": "Keyword",
+        "validation": {
+            "required": true
+        }
+    },
+    "name": "baseCode",
+    "title": "Номер військової частини",
+    "type": "String"
+}

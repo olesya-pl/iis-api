@@ -2,8 +2,11 @@
     "conceptType": "relations",
     "id": "1A2B6345-4AFB-41f9-919C-2E533A52852D",
     "meta": {
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 120
+        "sortOrder": 1
     },
     "name": "duration",
     "target": "FuzzyDateRange",

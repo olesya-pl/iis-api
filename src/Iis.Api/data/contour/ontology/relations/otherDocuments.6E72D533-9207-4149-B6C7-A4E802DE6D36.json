@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "6E72D533-9207-4149-B6C7-A4E802DE6D36",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 9
+    },
+    "name": "otherDocuments",
+    "target": "Accordion",
+    "title": "Ідентифікаційні номери"
+}

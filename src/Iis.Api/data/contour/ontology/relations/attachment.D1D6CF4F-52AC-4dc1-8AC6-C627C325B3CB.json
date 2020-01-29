@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D1D6CF4F-52AC-4dc1-8AC6-C627C325B3CB",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 33
+    },
+    "name": "attachment",
+    "target": "Accordion",
+    "title": "Додані файли"
+}

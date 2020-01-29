@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "81783AB2-77C8-43b1-B544-354F346964E2",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 5
+    },
+    "name": "identificationData",
+    "target": "Accordion",
+    "title": "Установчі дані"
+}

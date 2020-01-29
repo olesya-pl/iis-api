@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "DescriptionString",
     "conceptType": "relations",
     "id": "792C4AA0-62B5-428f-9B0D-446EF4B571E2",
     "meta": {
         "multiple": false,
-        "sortOrder": 254
+        "sortOrder": 11
     },
     "name": "description",
     "target": "description",

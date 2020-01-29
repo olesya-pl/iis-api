@@ -3,7 +3,7 @@
     "id": "B0535C18-B5CE-4889-90EA-F827B0B6B986",
     "meta": {
         "multiple": false,
-        "sortOrder": 142
+        "sortOrder": 12
     },
     "name": "bePartOf",
     "target": "MilitaryMachinery_bePartOf",

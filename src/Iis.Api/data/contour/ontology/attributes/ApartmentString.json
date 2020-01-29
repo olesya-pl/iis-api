@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "ApartmentString",
+    "conceptType": "attributes",
+    "id": "159a53c1-c3e7-401b-97ef-b9723d72cdca",
+    "meta": {
+    },
+    "name": "apartment",
+    "title": "Квартира",
+    "type": "String"
+}

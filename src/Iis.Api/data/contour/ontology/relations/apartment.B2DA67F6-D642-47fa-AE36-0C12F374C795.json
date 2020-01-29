@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "ApartmentString",
     "conceptType": "relations",
     "id": "B2DA67F6-D642-47fa-AE36-0C12F374C795",
     "meta": {
         "multiple": false,
-        "sortOrder": 210
+        "sortOrder": 9
     },
     "name": "apartment",
     "target": "apartment",

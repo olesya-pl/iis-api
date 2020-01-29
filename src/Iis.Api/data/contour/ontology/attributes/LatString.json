@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "LatString",
+    "conceptType": "attributes",
+    "id": "ec6ab439-3205-4b4a-9b35-511f73db3308",
+    "meta": {
+    },
+    "name": "lat",
+    "title": "",
+    "type": "String"
+}

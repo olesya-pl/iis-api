@@ -1,10 +1,11 @@
 {
+    "attrTypeName": "TitleString",
     "conceptType": "relations",
     "id": "CCBF1B82-9E2B-4fe9-AAE7-6B205933A4D3",
     "meta": {
         "formula": "h.fullTitle(entity.shortName, entity.name)",
         "multiple": false,
-        "sortOrder": 238
+        "sortOrder": 9
     },
     "name": "title",
     "target": "title",

@@ -1,20 +1,22 @@
 {
     "attributes": [
         {
+            "attrTypeName": "ModelNumberString",
             "id": "7162B2E4-3947-4d63-A2E1-8F1358DB1A22",
             "meta": {
                 "multiple": false,
-                "sortOrder": 131
+                "sortOrder": 1
             },
             "name": "modelNumber",
             "target": "modelNumber",
             "title": "Бортовий номер"
         },
         {
+            "attrTypeName": "SerialNumberString",
             "id": "0DBCCC4A-9517-4980-A11C-4B491A33DC07",
             "meta": {
                 "multiple": false,
-                "sortOrder": 132
+                "sortOrder": 2
             },
             "name": "serialNumber",
             "target": "serialNumber",
@@ -24,58 +26,63 @@
             "id": "E7FFD1E2-CC97-4b0d-B13D-F5CBA777C1B0",
             "meta": {
                 "multiple": false,
-                "sortOrder": 133
+                "sortOrder": 3
             },
             "name": "subtype",
             "target": "MachinerySubtype",
             "title": "Підтип"
         },
         {
+            "attrTypeName": "TitleString",
             "id": "892195A3-5CCF-4ebe-BA2A-43DF0D27A2BC",
             "meta": {
                 "formula": "h.fullTitle(entity.shortName, entity.name)",
                 "multiple": false,
-                "sortOrder": 134
+                "sortOrder": 4
             },
             "name": "title",
             "target": "title",
             "title": "Повна назва"
         },
         {
+            "attrTypeName": "NameString",
             "id": "9513855E-3E15-483a-8F3E-68E54A5024AD",
             "meta": {
                 "multiple": false,
-                "sortOrder": 135
+                "sortOrder": 5
             },
             "name": "name",
             "target": "name",
             "title": "Назва"
         },
         {
+            "attrTypeName": "ShortNameString",
             "id": "3A9AA472-6DF9-42bb-855E-6EFD32178A69",
             "meta": {
                 "multiple": false,
-                "sortOrder": 136
+                "sortOrder": 6
             },
             "name": "shortName",
             "target": "shortName",
             "title": "Скорочене найменування"
         },
         {
+            "attrTypeName": "ModelString",
             "id": "27FE0C36-4B89-4d39-A2AE-180FABB58043",
             "meta": {
                 "multiple": false,
-                "sortOrder": 137
+                "sortOrder": 7
             },
             "name": "model",
             "target": "model",
             "title": "Модель"
         },
         {
+            "attrTypeName": "DescriptionString",
             "id": "6BC6FD99-1DE0-4d1c-AE21-930A70A29273",
             "meta": {
                 "multiple": false,
-                "sortOrder": 138
+                "sortOrder": 8
             },
             "name": "description",
             "target": "description",
@@ -85,7 +92,7 @@
             "id": "44AE8787-8539-4e2d-97E8-35DF16B281B7",
             "meta": {
                 "multiple": false,
-                "sortOrder": 139
+                "sortOrder": 9
             },
             "name": "permanentDislocation",
             "target": "InfrastructureType",
@@ -95,7 +102,7 @@
             "id": "AA93E18F-FA72-425f-B32A-DA117EC7DA9F",
             "meta": {
                 "multiple": false,
-                "sortOrder": 140
+                "sortOrder": 10
             },
             "name": "militaryBase",
             "target": "MilitaryBase",
@@ -105,7 +112,7 @@
             "id": "D1426B6D-FE1B-4319-A778-28D41466F0B0",
             "meta": {
                 "multiple": false,
-                "sortOrder": 141
+                "sortOrder": 11
             },
             "name": "toBeInPlace",
             "target": "MilitaryMachinery_toBeInPlace",
@@ -115,7 +122,7 @@
             "id": "B0535C18-B5CE-4889-90EA-F827B0B6B986",
             "meta": {
                 "multiple": false,
-                "sortOrder": 142
+                "sortOrder": 12
             },
             "name": "bePartOf",
             "target": "MilitaryMachinery_bePartOf",
@@ -129,7 +136,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 143
+                "sortOrder": 13
             },
             "name": "relatesToCountry",
             "target": "Country",
@@ -142,7 +149,7 @@
     ],
     "id": "49B0F55D-1284-4358-867A-0C3011F765B8",
     "meta": {
-        "sortOrder": 144
+        "sortOrder": 147
     },
     "name": "MilitaryMachinery",
     "title": "Озброєння та військова техніка"

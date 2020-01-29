@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "8AC004FE-E197-4697-9095-D897FB0E74FA",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 6
+    },
+    "name": "passportData",
+    "target": "Accordion",
+    "title": "Внутрішні паспорти"
+}

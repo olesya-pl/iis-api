@@ -6,7 +6,7 @@
             "Create"
         ],
         "multiple": true,
-        "sortOrder": 93
+        "sortOrder": 13
     },
     "name": "tag",
     "target": "Tag",

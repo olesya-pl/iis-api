@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "TransliterationString",
+    "conceptType": "attributes",
+    "id": "fe28b7b7-0666-4911-9c3b-42a21d641f8c",
+    "meta": {
+    },
+    "name": "transliteration",
+    "title": "транслітерація",
+    "type": "String"
+}

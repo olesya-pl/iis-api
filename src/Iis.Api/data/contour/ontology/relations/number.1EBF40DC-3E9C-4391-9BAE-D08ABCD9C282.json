@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "NumberString",
     "conceptType": "relations",
     "id": "1EBF40DC-3E9C-4391-9BAE-D08ABCD9C282",
     "meta": {
         "multiple": false,
-        "sortOrder": 176
+        "sortOrder": 2
     },
     "name": "number",
     "target": "number",

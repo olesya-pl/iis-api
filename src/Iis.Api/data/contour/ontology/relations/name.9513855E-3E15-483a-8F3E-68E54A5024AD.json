@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "NameString",
     "conceptType": "relations",
     "id": "9513855E-3E15-483a-8F3E-68E54A5024AD",
     "meta": {
         "multiple": false,
-        "sortOrder": 135
+        "sortOrder": 5
     },
     "name": "name",
     "target": "name",

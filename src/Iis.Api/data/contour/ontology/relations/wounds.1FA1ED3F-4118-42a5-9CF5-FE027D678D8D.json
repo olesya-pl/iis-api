@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "1FA1ED3F-4118-42a5-9CF5-FE027D678D8D",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 24
+    },
+    "name": "wounds",
+    "target": "Accordion",
+    "title": "Поранення і контузії"
+}

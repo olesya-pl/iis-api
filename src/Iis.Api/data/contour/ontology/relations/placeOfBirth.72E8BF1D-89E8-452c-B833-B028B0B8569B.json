@@ -2,8 +2,16 @@
     "conceptType": "relations",
     "id": "72E8BF1D-89E8-452c-B833-B028B0B8569B",
     "meta": {
+        "container": {
+            "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+            "containerTitle": "Установчі дані",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 20
+        "sortOrder": 14
     },
     "name": "placeOfBirth",
     "target": "UniversalLocation",

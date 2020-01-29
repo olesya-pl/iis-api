@@ -1,0 +1,12 @@
+{
+    "conceptType": "entities",
+    "extends": [
+        "Container"
+    ],
+    "id": "72EA4828-34C1-4e66-B85E-357EF60753CF",
+    "meta": {
+        "sortOrder": 192
+    },
+    "name": "Accordion",
+    "title": ""
+}

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "PurposeString",
+    "conceptType": "attributes",
+    "id": "5C8743F3-1B06-439a-B537-E79588022B5A",
+    "meta": {
+    },
+    "name": "purpose",
+    "title": "Призначення",
+    "type": "String"
+}

@@ -8,7 +8,7 @@
             "multiple": false
         },
         "multiple": true,
-        "sortOrder": 150,
+        "sortOrder": 2,
         "type": "hierarchical"
     },
     "name": "child",

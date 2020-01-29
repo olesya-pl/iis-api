@@ -4,7 +4,7 @@
             "id": "A64AAB4B-57E6-4d60-A142-BDD3DCC8E718",
             "meta": {
                 "multiple": false,
-                "sortOrder": 225
+                "sortOrder": 1
             },
             "name": "dateRange",
             "target": "FuzzyDateRange",
@@ -14,17 +14,18 @@
             "id": "5583D102-B615-409b-9122-A32829F80B62",
             "meta": {
                 "multiple": false,
-                "sortOrder": 226
+                "sortOrder": 2
             },
             "name": "where",
             "target": "TaggableString",
             "title": "місце роботи"
         },
         {
+            "attrTypeName": "PositionString",
             "id": "F4353320-916B-43f8-9D91-03F9977341A5",
             "meta": {
                 "multiple": false,
-                "sortOrder": 227
+                "sortOrder": 3
             },
             "name": "position",
             "target": "position",
@@ -34,7 +35,7 @@
             "id": "30DE68A4-8C35-4f29-8A13-49408F94C8C9",
             "meta": {
                 "multiple": false,
-                "sortOrder": 228
+                "sortOrder": 4
             },
             "name": "order",
             "target": "Order",
@@ -44,7 +45,7 @@
     "conceptType": "entities",
     "id": "9B5E80C2-73FF-4f56-BDF1-90230CC421EF",
     "meta": {
-        "sortOrder": 229
+        "sortOrder": 275
     },
     "name": "WorkPlace",
     "title": "Місце роботи"

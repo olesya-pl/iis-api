@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "D2D7C903-1636-4b94-91A5-9E140C399B49",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 4
+    },
+    "name": "birthAndDeath",
+    "target": "Accordion",
+    "title": "Народження та смерть"
+}

@@ -1,0 +1,11 @@
+{
+    "attrTypeName": "ModelString",
+    "conceptType": "attributes",
+    "id": "A4246AA4-157C-438e-9476-2D4127B12A7C",
+    "meta": {
+        "kind": "Keyword"
+    },
+    "name": "model",
+    "title": "Модель",
+    "type": "String"
+}

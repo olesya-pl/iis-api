@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "AmountOfPersonnelInteger",
+    "conceptType": "attributes",
+    "id": "F6A97F05-EBE8-4bd6-9C57-A33664D804E8",
+    "meta": {
+    },
+    "name": "amountOfPersonnel",
+    "title": "Кiлькiсть особового складу",
+    "type": "Integer"
+}

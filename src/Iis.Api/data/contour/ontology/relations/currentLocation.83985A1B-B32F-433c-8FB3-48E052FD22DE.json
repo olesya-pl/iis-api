@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "83985A1B-B32F-433c-8FB3-48E052FD22DE",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 23
+    },
+    "name": "currentLocation",
+    "target": "Accordion",
+    "title": "Поточне місце перебування"
+}

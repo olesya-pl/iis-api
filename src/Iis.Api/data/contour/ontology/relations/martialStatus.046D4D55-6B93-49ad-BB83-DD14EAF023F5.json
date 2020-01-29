@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "046D4D55-6B93-49ad-BB83-DD14EAF023F5",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 29
+    },
+    "name": "martialStatus",
+    "target": "Accordion",
+    "title": "Сімейний стан"
+}

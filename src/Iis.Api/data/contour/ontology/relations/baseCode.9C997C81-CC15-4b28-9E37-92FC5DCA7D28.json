@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "BaseCodeString",
     "conceptType": "relations",
     "id": "9C997C81-CC15-4b28-9E37-92FC5DCA7D28",
     "meta": {
         "multiple": false,
-        "sortOrder": 181
+        "sortOrder": 1
     },
     "name": "baseCode",
     "target": "baseCode",

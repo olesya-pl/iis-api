@@ -1,9 +1,15 @@
 {
+    "attrTypeName": "ImportantDataChangesString",
     "conceptType": "relations",
     "id": "482D328C-F67C-4ba6-A93B-DE56924FE0A7",
     "meta": {
+        "container": {
+            "containerId": "31820E7A-C1D0-42a5-9E55-BB2724A7A95E",
+            "containerTitle": "Зміни установчих даних",
+            "containertype": "Accordion"
+        },
         "multiple": true,
-        "sortOrder": 11
+        "sortOrder": 4
     },
     "name": "importantDataChanges",
     "target": "importantDataChanges",

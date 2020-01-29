@@ -3,7 +3,7 @@
     "id": "0AA62A16-9A68-4464-9637-758935489E3E",
     "meta": {
         "multiple": false,
-        "sortOrder": 234
+        "sortOrder": 5
     },
     "name": "bePartOf",
     "target": "Infrastructure_bePartOf",

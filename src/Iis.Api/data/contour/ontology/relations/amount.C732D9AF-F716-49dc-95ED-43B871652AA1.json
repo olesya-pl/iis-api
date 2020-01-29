@@ -3,7 +3,7 @@
     "id": "C732D9AF-F716-49dc-95ED-43B871652AA1",
     "meta": {
         "multiple": false,
-        "sortOrder": 251
+        "sortOrder": 8
     },
     "name": "amount",
     "target": "MilitaryAmount",

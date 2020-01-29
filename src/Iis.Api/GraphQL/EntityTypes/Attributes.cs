@@ -6,7 +6,6 @@ using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.Meta;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Newtonsoft.Json;
@@ -56,6 +55,10 @@ namespace IIS.Core.GraphQL.EntityTypes
         bool Multiple { get; }
         string Format { get; }
         [GraphQLType(typeof(AnyType))] FormField FormField { get; }
+        [GraphQLType(typeof(AnyType))] ContainerMeta Container { get; }
+
+        int? SortOrder { get; }
+
         [GraphQLType(typeof(AnyType))] IValidation Validation { get; }
     }
 
@@ -89,6 +92,11 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(AnyType))]
         public FormField FormField => MetaObject?.FormField;
+        
+        [GraphQLType(typeof(AnyType))]
+        public ContainerMeta Container => MetaObject?.Container;
+
+        public int? SortOrder => MetaObject?.SortOrder;
 
         [GraphQLType(typeof(AnyType))]
         public IValidation Validation {

@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "ScopeString",
+    "conceptType": "relations",
+    "id": "335FEA0E-9B19-4b52-AF27-99FE336E735F",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 3
+    },
+    "name": "scope",
+    "target": "scope",
+    "title": "Область пошуку"
+}

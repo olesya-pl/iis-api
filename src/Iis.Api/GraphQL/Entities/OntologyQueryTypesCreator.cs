@@ -5,7 +5,6 @@ using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
-using IIS.Core.Ontology.Meta;
 using Iis.Domain;
 using RelationType = IIS.Core.GraphQL.Entities.ObjectTypes.RelationType;
 

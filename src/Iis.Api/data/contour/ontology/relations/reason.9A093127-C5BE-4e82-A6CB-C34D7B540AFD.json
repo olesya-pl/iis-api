@@ -6,7 +6,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 284
+        "sortOrder": 3
     },
     "name": "reason",
     "target": "TaggableString",

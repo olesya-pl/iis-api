@@ -3,7 +3,7 @@
     "id": "D4239010-7D42-42f6-A5AB-0C9C8FB508AD",
     "meta": {
         "multiple": false,
-        "sortOrder": 233
+        "sortOrder": 4
     },
     "name": "infrastructureType",
     "target": "InfrastructureType",

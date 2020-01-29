@@ -1,21 +1,23 @@
 {
     "attributes": [
         {
+            "attrTypeName": "BaseCodeString",
             "id": "9C997C81-CC15-4b28-9E37-92FC5DCA7D28",
             "meta": {
                 "multiple": false,
-                "sortOrder": 181
+                "sortOrder": 1
             },
             "name": "baseCode",
             "target": "baseCode",
             "title": "Номер військової частини"
         },
         {
+            "attrTypeName": "TitleString",
             "id": "3BC44BBC-C1E9-4523-A93C-BF4B7BE073F5",
             "meta": {
                 "formula": "h.fullTitle(entity.baseCode, entity.shortName)",
                 "multiple": false,
-                "sortOrder": 182
+                "sortOrder": 2
             },
             "name": "title",
             "target": "title",
@@ -29,7 +31,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 183,
+                "sortOrder": 3,
                 "title": "Громадянство"
             },
             "name": "relatesToCountry",
@@ -37,10 +39,11 @@
             "title": "Громадянство"
         },
         {
+            "attrTypeName": "ShortNameString",
             "id": "06D9B7AA-5E4F-45d5-BC58-11DD6966C0ED",
             "meta": {
                 "multiple": false,
-                "sortOrder": 184
+                "sortOrder": 4
             },
             "name": "shortName",
             "target": "shortName",
@@ -58,7 +61,7 @@
     ],
     "id": "6D2A5C7B-CF50-49d5-8EE8-51979ECC38BC",
     "meta": {
-        "sortOrder": 185
+        "sortOrder": 190
     },
     "name": "MilitaryBase",
     "title": "Військова частина"

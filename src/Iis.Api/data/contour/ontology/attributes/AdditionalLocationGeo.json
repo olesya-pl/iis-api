@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "AdditionalLocationGeo",
+    "conceptType": "attributes",
+    "id": "484D4A5F-D066-4dbc-8083-337DE47F41D6",
+    "meta": {
+    },
+    "name": "additionalLocation",
+    "title": "Додаткові географічні координати",
+    "type": "Geo"
+}

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "ImportantDataChangesString",
+    "conceptType": "attributes",
+    "id": "fab91629-837e-43af-bb2e-5f6b6d69209d",
+    "meta": {
+    },
+    "name": "importantDataChanges",
+    "title": "Зміни установчих даних",
+    "type": "String"
+}

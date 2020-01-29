@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "Alpha2String",
     "conceptType": "relations",
     "id": "BD75FC00-6C69-454e-9569-597D0499E9E8",
     "meta": {
         "multiple": false,
-        "sortOrder": 193
+        "sortOrder": 2
     },
     "name": "alpha2",
     "target": "alpha2",

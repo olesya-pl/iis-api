@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "CBA46310-B97C-46e1-9D71-B72D59231F76",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 1
+    },
+    "name": "layout",
+    "target": "Layout",
+    "title": ""
+}

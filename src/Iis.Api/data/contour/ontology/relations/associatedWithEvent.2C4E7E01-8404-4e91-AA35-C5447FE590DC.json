@@ -3,7 +3,7 @@
     "id": "2C4E7E01-8404-4e91-AA35-C5447FE590DC",
     "meta": {
         "multiple": true,
-        "sortOrder": 89
+        "sortOrder": 9
     },
     "name": "associatedWithEvent",
     "target": "ObjectOfStudy",

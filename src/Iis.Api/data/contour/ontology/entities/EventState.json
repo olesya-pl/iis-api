@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "CodeString",
             "id": "4F9A7555-FFE2-48d3-AAA8-8B5414C85CFC",
             "meta": {
                 "multiple": false,
-                "sortOrder": 65
+                "sortOrder": 1
             },
             "name": "code",
             "target": "code",
@@ -18,7 +19,7 @@
     "id": "1294C60D-C6E3-4187-BECC-A51017946EF0",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 66
+        "sortOrder": 67
     },
     "name": "EventState",
     "title": "Стан Події"

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "ReasonString",
+    "conceptType": "attributes",
+    "id": "6c3c06e3-4baf-47de-b9a5-c2c56875c618",
+    "meta": {
+    },
+    "name": "reason",
+    "title": "За що накладено",
+    "type": "String"
+}

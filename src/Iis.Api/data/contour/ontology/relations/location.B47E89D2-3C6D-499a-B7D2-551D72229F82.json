@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "LocationGeo",
     "conceptType": "relations",
     "id": "B47E89D2-3C6D-499a-B7D2-551D72229F82",
     "meta": {
         "multiple": false,
-        "sortOrder": 91
+        "sortOrder": 11
     },
     "name": "location",
     "target": "location",

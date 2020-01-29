@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "69D6C36A-595D-4858-A168-4D48DC976ADE",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 30
+    },
+    "name": "closePerson",
+    "target": "Accordion",
+    "title": "Оточення"
+}

@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "DislocationGeo",
     "conceptType": "relations",
     "id": "CBAC5FCB-D7D0-4b7d-AD6A-31951AD71365",
     "meta": {
         "multiple": false,
-        "sortOrder": 231
+        "sortOrder": 2
     },
     "name": "dislocation",
     "target": "dislocation",

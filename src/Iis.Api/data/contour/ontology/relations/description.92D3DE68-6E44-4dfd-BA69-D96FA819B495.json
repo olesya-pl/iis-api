@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "DescriptionString",
     "conceptType": "relations",
     "id": "92D3DE68-6E44-4dfd-BA69-D96FA819B495",
     "meta": {
         "multiple": false,
-        "sortOrder": 78,
+        "sortOrder": 2,
         "title": "Особливості"
     },
     "name": "description",

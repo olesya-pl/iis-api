@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "D98AA60D-91AA-4d14-AFD0-67EA2284B713",
     "meta": {
+        "container": {
+            "containerId": "CBFB512A-5698-40d0-A95D-951C42E03079",
+            "containerTitle": "Нерозібране (тимчасово)",
+            "containertype": "Accordion"
+        },
         "multiple": false,
-        "sortOrder": 8
+        "sortOrder": 1
     },
     "name": "kind",
     "target": "PersonType",
-    "title": ""
+    "title": "Поточний тип (військовий-цивільний)"
 }

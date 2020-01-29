@@ -2,8 +2,11 @@
     "conceptType": "relations",
     "id": "F07C03EF-1E92-4e72-8A41-E72C18784CB9",
     "meta": {
+        "formField": {
+            "type": "dropdown"
+        },
         "multiple": false,
-        "sortOrder": 218
+        "sortOrder": 1
     },
     "name": "kind",
     "target": "ForeignPassportType",

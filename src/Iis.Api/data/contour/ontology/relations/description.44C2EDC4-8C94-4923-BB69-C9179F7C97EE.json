@@ -1,4 +1,5 @@
 {
+    "attrTypeName": "DescriptionString",
     "conceptType": "relations",
     "id": "44C2EDC4-8C94-4923-BB69-C9179F7C97EE",
     "meta": {
@@ -7,7 +8,7 @@
             "lines": "5"
         },
         "multiple": false,
-        "sortOrder": 90,
+        "sortOrder": 10,
         "title": "Опис"
     },
     "name": "description",

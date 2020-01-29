@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "ZipCodeString",
+    "conceptType": "attributes",
+    "id": "3bba1f0b-e573-4d61-9a8f-586e6525f815",
+    "meta": {
+    },
+    "name": "zipCode",
+    "title": "Індекс",
+    "type": "String"
+}

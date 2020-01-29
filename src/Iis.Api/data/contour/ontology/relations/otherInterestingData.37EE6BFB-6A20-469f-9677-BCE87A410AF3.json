@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "37EE6BFB-6A20-469f-9677-BCE87A410AF3",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 32
+    },
+    "name": "otherInterestingData",
+    "target": "Accordion",
+    "title": "Інші дані, які представляють інтерес"
+}

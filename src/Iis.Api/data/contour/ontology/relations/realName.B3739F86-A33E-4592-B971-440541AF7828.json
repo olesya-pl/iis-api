@@ -2,8 +2,16 @@
     "conceptType": "relations",
     "id": "B3739F86-A33E-4592-B971-440541AF7828",
     "meta": {
+        "container": {
+            "containerId": "F5D17F31-3641-4c3b-86FC-487FDEC29268",
+            "containerTitle": "Реальне ПІБ",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 9
+        "sortOrder": 2
     },
     "name": "realName",
     "target": "FullNameI18n",

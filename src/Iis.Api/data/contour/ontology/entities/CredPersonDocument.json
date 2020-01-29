@@ -1,30 +1,33 @@
 {
     "attributes": [
         {
+            "attrTypeName": "SeriesString",
             "id": "3A7FA84F-A328-4d33-89E6-3E882786E20E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 175
+                "sortOrder": 1
             },
             "name": "series",
             "target": "series",
             "title": "Серія"
         },
         {
+            "attrTypeName": "NumberString",
             "id": "1EBF40DC-3E9C-4391-9BAE-D08ABCD9C282",
             "meta": {
                 "multiple": false,
-                "sortOrder": 176
+                "sortOrder": 2
             },
             "name": "number",
             "target": "number",
             "title": "Номер"
         },
         {
+            "attrTypeName": "DateOfIssueDateTime",
             "id": "1E90026A-A2A6-4e15-8C55-22D8B88DE07E",
             "meta": {
                 "multiple": false,
-                "sortOrder": 177
+                "sortOrder": 3
             },
             "name": "dateOfIssue",
             "target": "dateOfIssue",
@@ -33,8 +36,11 @@
         {
             "id": "72696BA8-B900-4a88-8C10-5FD1ED1B10D6",
             "meta": {
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
-                "sortOrder": 178
+                "sortOrder": 4
             },
             "name": "issuingAuthority",
             "target": "Organization",
@@ -47,7 +53,7 @@
     ],
     "id": "664650B5-EDD2-431b-9B36-26823A5CBD0C",
     "meta": {
-        "sortOrder": 179
+        "sortOrder": 182
     },
     "name": "CredPersonDocument",
     "title": "Посвідчення особи"

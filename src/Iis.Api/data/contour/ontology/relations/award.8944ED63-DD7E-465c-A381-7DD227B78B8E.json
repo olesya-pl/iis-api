@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "8944ED63-DD7E-465c-A381-7DD227B78B8E",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 26
+    },
+    "name": "award",
+    "target": "Accordion",
+    "title": "Заохочення (вид нагороди, медалі, цінні подарунки тощо)"
+}

@@ -1,10 +1,11 @@
 {
     "attributes": [
         {
+            "attrTypeName": "AuthorityOrganizationCodeString",
             "id": "0C2B882B-B827-4f9f-B6BB-B477FE5AEC10",
             "meta": {
                 "multiple": false,
-                "sortOrder": 156
+                "sortOrder": 1
             },
             "name": "authorityOrganizationCode",
             "target": "authorityOrganizationCode",
@@ -17,7 +18,7 @@
     ],
     "id": "52513CD1-DFF6-49a8-B218-EDF5C7321E05",
     "meta": {
-        "sortOrder": 157
+        "sortOrder": 160
     },
     "name": "Passport",
     "title": "Паспорт"

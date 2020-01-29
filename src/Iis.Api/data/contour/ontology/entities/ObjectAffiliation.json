@@ -1,20 +1,22 @@
 {
     "attributes": [
         {
+            "attrTypeName": "CodeString",
             "id": "2EE7C76F-1CC9-4156-84D3-1C82317EDE81",
             "meta": {
                 "multiple": false,
-                "sortOrder": 170
+                "sortOrder": 1
             },
             "name": "code",
             "target": "code",
             "title": "Код"
         },
         {
+            "attrTypeName": "SidcString",
             "id": "4D449DC0-7120-42b6-B0F2-7012F3C3EB1A",
             "meta": {
                 "multiple": false,
-                "sortOrder": 171
+                "sortOrder": 2
             },
             "name": "sidc",
             "target": "sidc",
@@ -28,7 +30,7 @@
     "id": "6595A815-C82A-4db5-A49F-B2634AC46622",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 172
+        "sortOrder": 175
     },
     "name": "ObjectAffiliation",
     "title": "Приналежність Об'єкта Розвідки"

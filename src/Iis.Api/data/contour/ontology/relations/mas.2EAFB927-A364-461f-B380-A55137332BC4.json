@@ -2,8 +2,16 @@
     "conceptType": "relations",
     "id": "2EAFB927-A364-461f-B380-A55137332BC4",
     "meta": {
+        "container": {
+            "containerId": "FBF3A236-9335-4f0d-A935-54F947EDD7CA",
+            "containerTitle": "Військово-облікова спеціальність",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 39
+        "sortOrder": 33
     },
     "name": "mas",
     "target": "MASItem",

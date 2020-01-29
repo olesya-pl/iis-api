@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "SpecializationString",
     "conceptType": "relations",
     "id": "AD7CEC88-E927-4369-9A80-19546B2989E4",
     "meta": {
         "multiple": false,
-        "sortOrder": 125
+        "sortOrder": 6
     },
     "name": "specialization",
     "target": "specialization",

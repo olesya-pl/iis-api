@@ -1,10 +1,11 @@
 {
+    "attrTypeName": "ValueString",
     "conceptType": "relations",
     "id": "4BE15E69-3747-437c-AD11-14A497E3FD18",
     "meta": {
         "format": "email",
         "multiple": false,
-        "sortOrder": 147,
+        "sortOrder": 1,
         "validation": {
             "email": true,
             "required": true

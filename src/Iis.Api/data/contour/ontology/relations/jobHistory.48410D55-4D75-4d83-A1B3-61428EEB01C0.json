@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "48410D55-4D75-4d83-A1B3-61428EEB01C0",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 13
+    },
+    "name": "jobHistory",
+    "target": "Accordion",
+    "title": "Місця проходження служби/роботи/безробіття"
+}

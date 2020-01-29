@@ -1,80 +1,88 @@
 {
     "attributes": [
         {
+            "attrTypeName": "CodeString",
             "id": "82FFCDC7-C406-4727-9030-5835B508A44B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 192
+                "sortOrder": 1
             },
             "name": "code",
             "target": "code",
             "title": "Код"
         },
         {
+            "attrTypeName": "Alpha2String",
             "id": "BD75FC00-6C69-454e-9569-597D0499E9E8",
             "meta": {
                 "multiple": false,
-                "sortOrder": 193
+                "sortOrder": 2
             },
             "name": "alpha2",
             "target": "alpha2",
             "title": ""
         },
         {
+            "attrTypeName": "Alpha3String",
             "id": "08EB5E21-47F4-4c09-AA64-C4AA2C9CDE7F",
             "meta": {
                 "multiple": false,
-                "sortOrder": 194
+                "sortOrder": 3
             },
             "name": "alpha3",
             "target": "alpha3",
             "title": ""
         },
         {
+            "attrTypeName": "TextString",
             "id": "77A58922-2228-47a6-B5DF-7AFADFC66D33",
             "meta": {
                 "multiple": false,
-                "sortOrder": 195
+                "sortOrder": 4
             },
             "name": "text",
             "target": "text",
             "title": ""
         },
         {
+            "attrTypeName": "LatString",
             "id": "F165C4FE-AE34-44ba-AB9E-5CE2289B034C",
             "meta": {
                 "multiple": false,
-                "sortOrder": 196
+                "sortOrder": 5
             },
             "name": "lat",
             "target": "lat",
             "title": ""
         },
         {
+            "attrTypeName": "LngString",
             "id": "11A56B29-9A8D-4bb9-AD5F-02F69071EF24",
             "meta": {
                 "multiple": false,
-                "sortOrder": 197
+                "sortOrder": 6
             },
             "name": "lng",
             "target": "lng",
             "title": ""
         },
         {
+            "attrTypeName": "RegionString",
             "id": "2EFF31EC-CA61-4d94-B1C7-FE068174625B",
             "meta": {
                 "multiple": false,
-                "sortOrder": 198
+                "sortOrder": 7
             },
             "name": "region",
             "target": "region",
             "title": ""
         },
         {
+            "attrTypeName": "Sub_regionString",
             "id": "E2AD62AC-65F9-47c1-9DC5-2A2697F7B630",
             "meta": {
                 "multiple": false,
-                "sortOrder": 199
+                "sortOrder": 8
             },
             "name": "sub_region",
             "target": "sub_region",
@@ -87,7 +95,7 @@
     ],
     "id": "819B5095-0730-4d2f-AF44-1A1A66E3000E",
     "meta": {
-        "sortOrder": 200
+        "sortOrder": 245
     },
     "name": "Country",
     "title": "Країна"

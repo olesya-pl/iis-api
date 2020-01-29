@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "RegionString",
+    "conceptType": "attributes",
+    "id": "bd63ac2b-860a-44f4-ab98-febcdbd256ad",
+    "meta": {
+    },
+    "name": "region",
+    "title": "Область",
+    "type": "String"
+}

@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "HeadquartersDislocationGeo",
     "conceptType": "relations",
     "id": "D6AB4AD9-81B1-4215-AE2E-4C93A951119E",
     "meta": {
         "multiple": false,
-        "sortOrder": 249
+        "sortOrder": 6
     },
     "name": "headquartersDislocation",
     "target": "headquartersDislocation",

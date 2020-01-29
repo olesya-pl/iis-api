@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "StartsAtDateTime",
+    "conceptType": "attributes",
+    "id": "5186350E-3875-4265-99CB-FC36D1A08847",
+    "meta": {
+    },
+    "name": "startsAt",
+    "title": "Початок",
+    "type": "DateTime"
+}

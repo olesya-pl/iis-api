@@ -6,7 +6,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 283
+        "sortOrder": 2
     },
     "name": "type",
     "target": "TypeOfAward",

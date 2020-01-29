@@ -1,10 +1,14 @@
 {
+    "attrTypeName": "TitleString",
     "conceptType": "relations",
     "id": "F0B073F5-FAF3-4c50-A8A6-1ADEA5072AE4",
     "meta": {
         "formula": "entity.name",
         "multiple": false,
-        "sortOrder": 60
+        "sortOrder": 4,
+        "validation": {
+            "required": true
+        }
     },
     "name": "title",
     "target": "title",

@@ -2,8 +2,11 @@
     "conceptType": "relations",
     "id": "14A3E4F2-E3D3-4956-ABC9-C003D3308B9E",
     "meta": {
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 291
+        "sortOrder": 4
     },
     "name": "previousName",
     "target": "StringI18n",

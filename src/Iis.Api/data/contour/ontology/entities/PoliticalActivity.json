@@ -4,7 +4,7 @@
             "id": "38F23011-8986-44c8-A4D3-BACE9815F54E",
             "meta": {
                 "multiple": true,
-                "sortOrder": 74
+                "sortOrder": 1
             },
             "name": "political",
             "target": "OrgParticipation",
@@ -14,7 +14,7 @@
             "id": "D2BD187C-CCAD-42b9-9EA9-8895B9EE1ED6",
             "meta": {
                 "multiple": true,
-                "sortOrder": 75
+                "sortOrder": 2
             },
             "name": "terroristic",
             "target": "OrgParticipation",
@@ -24,7 +24,7 @@
     "conceptType": "entities",
     "id": "18B3D024-74AF-4c85-A621-D17E0B327FC5",
     "meta": {
-        "sortOrder": 76
+        "sortOrder": 78
     },
     "name": "PoliticalActivity",
     "title": "Політична діяльність"

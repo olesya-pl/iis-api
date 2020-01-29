@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "DeathCircumstancesString",
+    "conceptType": "attributes",
+    "id": "e545a285-bd61-4db5-9cdd-19664453f838",
+    "meta": {
+    },
+    "name": "deathCircumstances",
+    "title": "Обставини смерті",
+    "type": "String"
+}

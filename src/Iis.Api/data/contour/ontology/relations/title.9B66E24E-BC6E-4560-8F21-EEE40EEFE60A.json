@@ -1,0 +1,13 @@
+{
+    "attrTypeName": "TitleString",
+    "conceptType": "relations",
+    "id": "9B66E24E-BC6E-4560-8F21-EEE40EEFE60A",
+    "meta": {
+        "formula": "h.join(entity.realName.ukraineName, entity.realName.ukraineName, entity.realName.ukraineName)",
+        "multiple": false,
+        "sortOrder": 7
+    },
+    "name": "title",
+    "target": "title",
+    "title": "Повна назва"
+}

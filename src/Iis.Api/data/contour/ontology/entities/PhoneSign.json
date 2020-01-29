@@ -1,11 +1,12 @@
 {
     "attributes": [
         {
+            "attrTypeName": "ValueString",
             "id": "E7C1DDC7-64D5-4bcb-8DE2-DBC8054EC057",
             "meta": {
                 "format": "phone",
                 "multiple": false,
-                "sortOrder": 212,
+                "sortOrder": 1,
                 "validation": {
                     "required": true
                 }
@@ -22,7 +23,7 @@
     "id": "89677A4C-DAB9-4858-AE99-2F6B68815B1D",
     "meta": {
         "exposeOnApi": false,
-        "sortOrder": 213
+        "sortOrder": 258
     },
     "name": "PhoneSign",
     "title": "Tелефон"

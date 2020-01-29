@@ -2,8 +2,16 @@
     "conceptType": "relations",
     "id": "7A23BEC8-8A75-499a-84DF-54803AED9823",
     "meta": {
+        "container": {
+            "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
+            "containerTitle": "Установчі дані",
+            "containertype": "Accordion"
+        },
+        "formField": {
+            "type": "form"
+        },
         "multiple": true,
-        "sortOrder": 19
+        "sortOrder": 13
     },
     "name": "persNickNameSign",
     "target": "PersonalNicknameSign",

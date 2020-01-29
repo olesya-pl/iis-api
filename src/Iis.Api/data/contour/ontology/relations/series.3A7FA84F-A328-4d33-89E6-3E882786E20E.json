@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "SeriesString",
     "conceptType": "relations",
     "id": "3A7FA84F-A328-4d33-89E6-3E882786E20E",
     "meta": {
         "multiple": false,
-        "sortOrder": 175
+        "sortOrder": 1
     },
     "name": "series",
     "target": "series",

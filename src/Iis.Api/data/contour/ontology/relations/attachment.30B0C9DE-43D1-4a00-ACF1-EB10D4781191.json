@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "AttachmentFile",
     "conceptType": "relations",
     "id": "30B0C9DE-43D1-4a00-ACF1-EB10D4781191",
     "meta": {
         "multiple": true,
-        "sortOrder": 82
+        "sortOrder": 2
     },
     "name": "attachment",
     "target": "attachment",

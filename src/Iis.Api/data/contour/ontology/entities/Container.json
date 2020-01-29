@@ -1,0 +1,27 @@
+{
+    "attributes": [
+        {
+            "id": "CBA46310-B97C-46e1-9D71-B72D59231F76",
+            "meta": {
+                "multiple": false,
+                "sortOrder": 1
+            },
+            "name": "layout",
+            "target": "Layout",
+            "title": ""
+        }
+    ],
+    "conceptType": "entities",
+    "extends": [
+        "UI"
+    ],
+    "id": "6B841ADD-6B8B-4950-BC3F-E2BBF2EC0BCB",
+    "meta": {
+        "formField": {
+            "type": "form"
+        },
+        "sortOrder": 185
+    },
+    "name": "Container",
+    "title": ""
+}

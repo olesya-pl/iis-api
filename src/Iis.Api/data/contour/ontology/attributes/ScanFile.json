@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "ScanFile",
+    "conceptType": "attributes",
+    "id": "c481d58a-872e-460f-9697-3187ad667b99",
+    "meta": {
+    },
+    "name": "scan",
+    "title": "Скан документа",
+    "type": "File"
+}

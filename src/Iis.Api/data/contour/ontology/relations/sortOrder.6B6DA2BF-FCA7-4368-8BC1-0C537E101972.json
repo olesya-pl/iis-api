@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "SortOrderInteger",
+    "conceptType": "relations",
+    "id": "6B6DA2BF-FCA7-4368-8BC1-0C537E101972",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 1
+    },
+    "name": "sortOrder",
+    "target": "sortOrder",
+    "title": ""
+}

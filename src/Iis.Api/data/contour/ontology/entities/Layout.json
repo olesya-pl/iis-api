@@ -1,0 +1,16 @@
+{
+    "abstract": true,
+    "conceptType": "entities",
+    "extends": [
+        "UI"
+    ],
+    "id": "73FDD7A1-B336-4d30-AAA5-32EF8B2BA1BE",
+    "meta": {
+        "formField": {
+            "type": "form"
+        },
+        "sortOrder": 193
+    },
+    "name": "Layout",
+    "title": ""
+}

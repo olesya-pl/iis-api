@@ -1,9 +1,10 @@
 {
+    "attrTypeName": "PlaceOfDislocationString",
     "conceptType": "relations",
     "id": "C5BD9336-783D-4529-88AE-8B54A00DE96C",
     "meta": {
         "multiple": false,
-        "sortOrder": 256,
+        "sortOrder": 13,
         "title": "Місце поточної дислокації"
     },
     "name": "placeOfDislocation",

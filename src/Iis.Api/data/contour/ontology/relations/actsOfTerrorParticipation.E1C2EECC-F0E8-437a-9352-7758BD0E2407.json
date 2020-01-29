@@ -2,8 +2,11 @@
     "conceptType": "relations",
     "id": "E1C2EECC-F0E8-437a-9352-7758BD0E2407",
     "meta": {
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
-        "sortOrder": 55
+        "sortOrder": 49
     },
     "name": "actsOfTerrorParticipation",
     "target": "TaggableString",

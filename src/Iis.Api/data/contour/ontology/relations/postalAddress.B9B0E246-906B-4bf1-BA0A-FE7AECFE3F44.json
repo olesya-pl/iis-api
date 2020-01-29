@@ -3,7 +3,7 @@
     "id": "B9B0E246-906B-4bf1-BA0A-FE7AECFE3F44",
     "meta": {
         "multiple": false,
-        "sortOrder": 302
+        "sortOrder": 2
     },
     "name": "postalAddress",
     "target": "PostalAddress",

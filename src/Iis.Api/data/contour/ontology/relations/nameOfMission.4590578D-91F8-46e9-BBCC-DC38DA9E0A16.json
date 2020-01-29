@@ -3,7 +3,7 @@
     "id": "4590578D-91F8-46e9-BBCC-DC38DA9E0A16",
     "meta": {
         "multiple": false,
-        "sortOrder": 319
+        "sortOrder": 2
     },
     "name": "nameOfMission",
     "target": "TaggableString",

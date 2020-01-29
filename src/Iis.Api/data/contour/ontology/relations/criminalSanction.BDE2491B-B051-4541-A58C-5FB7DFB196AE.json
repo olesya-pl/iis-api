@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "BDE2491B-B051-4541-A58C-5FB7DFB196AE",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 28
+    },
+    "name": "criminalSanction",
+    "target": "Accordion",
+    "title": "Притягнення до кримінальної та адміністративної відповідальності"
+}
