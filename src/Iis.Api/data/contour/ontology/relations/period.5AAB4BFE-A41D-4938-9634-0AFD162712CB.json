@@ -1,12 +1,19 @@
 {
-    "attrTypeName": "PeriodDateRange",
     "conceptType": "relations",
     "id": "5AAB4BFE-A41D-4938-9634-0AFD162712CB",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
         "sortOrder": 2
     },
     "name": "period",
-    "target": "PeriodDateRange",
+    "target": "FuzzyDateRange",
     "title": "часовий прогміжок"
 }

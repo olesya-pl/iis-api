@@ -9,7 +9,7 @@
             "type": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 43
+        "sortOrder": 42
     },
     "name": "criminalSanction",
     "target": "CriminalSanctionString",

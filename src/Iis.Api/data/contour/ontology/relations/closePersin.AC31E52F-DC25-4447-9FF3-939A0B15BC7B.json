@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 45
+        "sortOrder": 44
     },
     "name": "closePersin",
     "target": "ClosePerson",

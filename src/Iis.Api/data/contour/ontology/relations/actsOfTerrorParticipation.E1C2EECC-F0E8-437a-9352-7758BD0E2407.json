@@ -7,16 +7,11 @@
             "Update",
             "Delete"
         ],
-        "container": {
-            "id": "3CA195B6-033D-4717-A8AB-9BFC5DFBCCC3",
-            "title": "Причетність до резонансних подій/терактів/злочинів",
-            "type": "Accordion"
-        },
         "formField": {
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 49
+        "sortOrder": 48
     },
     "name": "actsOfTerrorParticipation",
     "target": "OrgParticipation",

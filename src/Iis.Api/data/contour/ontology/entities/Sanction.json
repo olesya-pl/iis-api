@@ -3,6 +3,14 @@
         {
             "id": "36CBF986-3AB5-4d64-985D-45A6F2C37156",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 1
             },
@@ -24,6 +32,14 @@
         {
             "id": "C235BE3A-9C22-4b90-B111-81ADE0CA7403",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 3
             },
@@ -46,7 +62,7 @@
     "conceptType": "entities",
     "id": "9A6F257A-54DF-4083-B8AC-93A284141E95",
     "meta": {
-        "sortOrder": 270
+        "sortOrder": 269
     },
     "name": "Sanction",
     "title": "Стягнення"

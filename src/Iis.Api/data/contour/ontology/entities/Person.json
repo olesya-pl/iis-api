@@ -419,11 +419,6 @@
             "attrTypeName": "TaxIDString",
             "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
             "meta": {
-                "container": {
-                    "id": "EBF17614-E41B-47a2-A5D6-43CBBF366580",
-                    "title": "Ідентифікаційні номери",
-                    "type": "Accordion"
-                },
                 "multiple": false,
                 "sortOrder": 21
             },
@@ -689,34 +684,11 @@
             "title": "Військово-облікова спеціальність"
         },
         {
-            "id": "582AA0A4-37C3-4df6-B0E7-AFA245C9884B",
-            "meta": {
-                "acceptsEntityOperations": [
-                    "Create",
-                    "Update",
-                    "Delete"
-                ],
-                "container": {
-                    "id": "144476F6-878D-4680-AEB4-5F61B8E6BCBC",
-                    "title": "Приналежність до політичних партій, громадських організацій, рухів",
-                    "type": "Accordion"
-                },
-                "formField": {
-                    "type": "form"
-                },
-                "multiple": false,
-                "sortOrder": 34
-            },
-            "name": "politicalActivity",
-            "target": "PoliticalActivity",
-            "title": "політична діяльність"
-        },
-        {
             "attrTypeName": "CreatedDateTime",
             "id": "7AD1638F-413A-4aa0-9022-20DCF8EC3429",
             "meta": {
                 "multiple": false,
-                "sortOrder": 35
+                "sortOrder": 34
             },
             "name": "created",
             "target": "created",
@@ -727,7 +699,7 @@
             "id": "C6B9535C-B6AB-48ef-9C39-F695CAA62348",
             "meta": {
                 "multiple": false,
-                "sortOrder": 36
+                "sortOrder": 35
             },
             "name": "updated",
             "target": "updated",
@@ -750,7 +722,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 37
+                "sortOrder": 36
             },
             "name": "warOperationParticipation",
             "target": "WarOperationParticipation",
@@ -773,7 +745,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 38
+                "sortOrder": 37
             },
             "name": "currentLocation",
             "target": "UniversalLocation",
@@ -796,7 +768,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 39
+                "sortOrder": 38
             },
             "name": "wounds",
             "target": "BattleWound",
@@ -819,7 +791,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 40
+                "sortOrder": 39
             },
             "name": "foreignMission",
             "target": "ForeignMission",
@@ -842,7 +814,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 41
+                "sortOrder": 40
             },
             "name": "award",
             "target": "Award",
@@ -865,7 +837,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 42
+                "sortOrder": 41
             },
             "name": "sanction",
             "target": "Sanction",
@@ -881,7 +853,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 43
+                "sortOrder": 42
             },
             "name": "criminalSanction",
             "target": "criminalSanction",
@@ -899,7 +871,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 44
+                "sortOrder": 43
             },
             "name": "martialStatus",
             "target": "MartialStatus",
@@ -922,7 +894,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 45
+                "sortOrder": 44
             },
             "name": "closePersin",
             "target": "ClosePerson",
@@ -945,7 +917,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 46
+                "sortOrder": 45
             },
             "name": "contacts",
             "target": "ObjectSign",
@@ -961,7 +933,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 47
+                "sortOrder": 46
             },
             "name": "otherInterestingData",
             "target": "otherInterestingData",
@@ -977,7 +949,7 @@
                     "type": "Accordion"
                 },
                 "multiple": true,
-                "sortOrder": 48
+                "sortOrder": 47
             },
             "name": "attachment",
             "target": "attachment",
@@ -991,16 +963,11 @@
                     "Update",
                     "Delete"
                 ],
-                "container": {
-                    "id": "3CA195B6-033D-4717-A8AB-9BFC5DFBCCC3",
-                    "title": "Причетність до резонансних подій/терактів/злочинів",
-                    "type": "Accordion"
-                },
                 "formField": {
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 49
+                "sortOrder": 48
             },
             "name": "actsOfTerrorParticipation",
             "target": "OrgParticipation",
@@ -1018,7 +985,7 @@
             "title": "Нерозібране (тимчасово)",
             "type": "Accordion"
         },
-        "sortOrder": 57
+        "sortOrder": 56
     },
     "name": "Person",
     "title": "Персона"

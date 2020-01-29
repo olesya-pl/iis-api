@@ -2,6 +2,14 @@
     "conceptType": "relations",
     "id": "CF6A6132-AABF-4fb7-9D1F-716C1B89281A",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
         "sortOrder": 1
     },

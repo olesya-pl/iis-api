@@ -25,6 +25,14 @@
         {
             "id": "82843C30-BBF5-48d3-A619-4BFB4C5DF524",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "hasIndexColumn": false
+                },
                 "multiple": false,
                 "sortOrder": 3
             },
@@ -47,7 +55,7 @@
     "conceptType": "entities",
     "id": "F2C66C04-6EFA-4992-8ED2-BD0AC3964EFF",
     "meta": {
-        "sortOrder": 374
+        "sortOrder": 373
     },
     "name": "Order",
     "title": "Наказ"

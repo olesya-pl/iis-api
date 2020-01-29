@@ -3,6 +3,14 @@
         {
             "id": "E8895B71-8F98-407e-96DC-0260D1BD1538",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": true,
                 "sortOrder": 1
             },
@@ -36,7 +44,7 @@
     "conceptType": "entities",
     "id": "4217AB5A-94D9-4e6d-86C8-49B4071EFC0C",
     "meta": {
-        "sortOrder": 120
+        "sortOrder": 119
     },
     "name": "TaggableString",
     "title": "Строка з посиланнями"

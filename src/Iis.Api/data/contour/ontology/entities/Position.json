@@ -24,7 +24,7 @@
         {
             "id": "4F1385FD-5657-4699-815A-5D035A8459A6",
             "meta": {
-                "multiple": false,
+                "multiple": true,
                 "sortOrder": 3
             },
             "name": "previousOwner",
@@ -35,7 +35,7 @@
     "conceptType": "entities",
     "id": "15648CDF-78DA-4963-976D-8E3757020664",
     "meta": {
-        "sortOrder": 71
+        "sortOrder": 70
     },
     "name": "Position",
     "title": "Посада"
