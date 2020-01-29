@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Security.Authentication;
+using AutoMapper;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -12,6 +13,7 @@ using HotChocolate.Execution.Batching;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.Language;
 using HotChocolate.Types.Relay;
+using Iis.Application.Ontology;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
@@ -30,6 +32,9 @@ using RabbitMQ.Client;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.Tools;
 using Iis.DataModel;
+using Iis.Ontology.DataRead;
+using Iis.Ontology.DataRead.Raw;
+using MediatR;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -62,6 +67,13 @@ namespace IIS.Core
                 .UseNpgsql(dbConnectionString)
             // .EnableSensitiveDataLogging()
             );
+
+            services.AddMediatR(
+                typeof(SaveOntologyCommandHandler).Assembly,
+                typeof(GetRawOntologyQueryHandler).Assembly);
+
+            services.AddAutoMapper(
+                typeof(GetRawOntologyQueryHandler).Assembly);
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();

@@ -13,12 +13,16 @@
     <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.3" />
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Flee" Version="1.2.2" />
     <PackageReference Include="GeoJSON.Net" Version="1.2.14" />
     <PackageReference Include="HotChocolate" Version="11.0.0-preview.62" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.62" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.62" />
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
+    <PackageReference Include="MediatR" Version="8.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1">
       <PrivateAssets>all</PrivateAssets>
@@ -41,8 +45,11 @@
     <Folder Include="Legacy\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Iis.Application.Implementation\Iis.Application.Implementation.csproj" />
+    <ProjectReference Include="..\Iis.Application\Iis.Application.csproj" />
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
+    <ProjectReference Include="..\Iis.Ontology.DataRead.Implementation\Iis.Ontology.DataRead.Implementation.csproj" />
     <ProjectReference Include="..\Iis\Iis.csproj" />
   </ItemGroup>
   <ItemGroup>

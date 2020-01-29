@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading.Tasks;
+using Iis.Application.Ontology;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,15 +14,18 @@ namespace IIS.Core.Tools
     internal sealed class RunUpTools
     {
         private readonly ILogger<RunUpTools> _logger;
+        private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
 
         public RunUpTools(
             ILogger<RunUpTools> logger,
+            IMediator mediator,
             IConfiguration configuration,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
+            _mediator = mediator;
             _configuration = configuration;
             _serviceProvider = serviceProvider;
         }
@@ -66,6 +71,12 @@ namespace IIS.Core.Tools
         public async Task DoActionAsync(string actionName)
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
+            if (actionName == "save-contour-ontology")
+            {
+                await _mediator.Send(new SaveOntologyCommand("contour"));
+                return;
+            }
+            
             ActionTools tools = scope.ServiceProvider.GetRequiredService<ActionTools>();
 
             switch (actionName)
