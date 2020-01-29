@@ -31,7 +31,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<bool> PutNode(Guid id, CancellationToken cancellationToken = default)
         {
-            var extNode = await _extNodeService.GetExtNodeById(id);
+            var extNode = await _extNodeService.GetExtNodeById(id, cancellationToken);
             return await _elasticManager.InsertExtNodeAsync(extNode, cancellationToken);
         }
     }
