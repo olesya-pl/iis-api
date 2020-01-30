@@ -18,10 +18,10 @@ namespace IIS.Core.Tools
             _elasticManager = elasticManager;
         }
 
-        public async Task RecreateElastic(CancellationToken cancellationToken = default)
+        public async Task RecreateElasticAsync(CancellationToken cancellationToken = default)
         {
-            var nodeTypeIds = await _extNodeService.GetNodeTypesForElastic(cancellationToken);
-            var extNodes = await _extNodeService.GetExtNodesByTypeIds(nodeTypeIds, cancellationToken);
+            var nodeTypeIds = await _extNodeService.GetNodeTypesForElasticAsync(cancellationToken);
+            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(nodeTypeIds, cancellationToken);
             foreach (var extNode in extNodes)
             {
                 await _elasticManager.InsertExtNodeAsync(extNode);

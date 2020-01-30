@@ -111,7 +111,7 @@ namespace IIS.Core.Tools
                     await tools.DumpOdysseusOntologyAsync();
                     break;
                 case "recreate-elastic":
-                    await elasticTools.RecreateElastic();
+                    await elasticTools.RecreateElasticAsync();
                     break;
                 case "help":
                     Help();

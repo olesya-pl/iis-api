@@ -18,7 +18,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _elasticManager = elasticManager;
             _extNodeService = extNodeService;
         }
-        public async Task<List<Guid>> SearchByAllFields(IEnumerable<NodeType> nodeTypes, string suggestion, CancellationToken cancellationToken = default)
+        public async Task<List<Guid>> SearchByAllFieldsAsync(IEnumerable<NodeType> nodeTypes, string suggestion, CancellationToken cancellationToken = default)
         {
             var searchParams = new IisElasticSearchParams
             {
@@ -29,9 +29,9 @@ namespace IIS.Core.Ontology.EntityFramework
             return ids.Select(id => new Guid(id)).ToList();
         }
 
-        public async Task<bool> PutNode(Guid id, CancellationToken cancellationToken = default)
+        public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var extNode = await _extNodeService.GetExtNodeById(id, cancellationToken);
+            var extNode = await _extNodeService.GetExtNodeByIdAsync(id, cancellationToken);
             return await _elasticManager.InsertExtNodeAsync(extNode, cancellationToken);
         }
     }

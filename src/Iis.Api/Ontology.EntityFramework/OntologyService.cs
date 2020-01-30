@@ -65,7 +65,7 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             await _context.SaveChangesAsync(cancellationToken);
-            await _elasticService.PutNode(source.Id);
+            await _elasticService.PutNodeAsync(source.Id);
         }
 
         public async Task SaveNodesAsync(IEnumerable<Node> nodes, CancellationToken cancellationToken = default)
@@ -113,7 +113,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         }
                     }
                 }
-                await _elasticService.PutNode(source.Id);
+                await _elasticService.PutNodeAsync(source.Id);
             }
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -292,7 +292,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion, CancellationToken cancellationToken = default)
         {
-            var ids = await _elasticService.SearchByAllFields(types, suggestion);
+            var ids = await _elasticService.SearchByAllFieldsAsync(types, suggestion);
             return _context.Nodes.Where(node => ids.Contains(node.Id));
         }
 
