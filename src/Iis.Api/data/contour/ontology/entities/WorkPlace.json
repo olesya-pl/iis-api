@@ -3,6 +3,14 @@
         {
             "id": "A64AAB4B-57E6-4d60-A142-BDD3DCC8E718",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 1
             },
@@ -13,6 +21,14 @@
         {
             "id": "5583D102-B615-409b-9122-A32829F80B62",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 2
             },
@@ -34,6 +50,14 @@
         {
             "id": "30DE68A4-8C35-4f29-8A13-49408F94C8C9",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 4
             },
@@ -45,7 +69,7 @@
     "conceptType": "entities",
     "id": "9B5E80C2-73FF-4f56-BDF1-90230CC421EF",
     "meta": {
-        "sortOrder": 275
+        "sortOrder": 274
     },
     "name": "WorkPlace",
     "title": "Місце роботи"

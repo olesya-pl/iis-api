@@ -7,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "number",
-    "target": "number",
+    "target": "NumberString",
     "title": "Номер"
 }

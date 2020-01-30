@@ -8,6 +8,6 @@
         "title": "Місце поточної дислокації"
     },
     "name": "placeOfDislocation",
-    "target": "placeOfDislocation",
+    "target": "PlaceOfDislocationString",
     "title": "Місце розташування"
 }

@@ -2,16 +2,21 @@
     "conceptType": "relations",
     "id": "AC31E52F-DC25-4447-9FF3-939A0B15BC7B",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
-            "containerId": "69D6C36A-595D-4858-A168-4D48DC976ADE",
-            "containerTitle": "Оточення",
-            "containertype": "Accordion"
+            "id": "69D6C36A-595D-4858-A168-4D48DC976ADE",
+            "title": "Оточення",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 45
+        "sortOrder": 44
     },
     "name": "closePersin",
     "target": "ClosePerson",

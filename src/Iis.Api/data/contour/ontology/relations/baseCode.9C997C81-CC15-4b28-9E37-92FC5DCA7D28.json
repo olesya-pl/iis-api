@@ -7,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "baseCode",
-    "target": "baseCode",
+    "target": "BaseCodeString",
     "title": "Номер військової частини"
 }

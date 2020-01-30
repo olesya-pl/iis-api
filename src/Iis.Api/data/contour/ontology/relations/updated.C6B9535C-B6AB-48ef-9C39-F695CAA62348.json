@@ -4,9 +4,9 @@
     "id": "C6B9535C-B6AB-48ef-9C39-F695CAA62348",
     "meta": {
         "multiple": false,
-        "sortOrder": 36
+        "sortOrder": 35
     },
     "name": "updated",
-    "target": "updated",
+    "target": "UpdatedDateTime",
     "title": "дата оновлення інформації"
 }

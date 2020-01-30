@@ -7,6 +7,6 @@
         "sortOrder": 7
     },
     "name": "region",
-    "target": "region",
+    "target": "RegionString",
     "title": ""
 }

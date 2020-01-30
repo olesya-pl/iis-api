@@ -3,15 +3,15 @@
     "id": "6E73D865-5B4F-4c0f-B44C-4B93B69997C7",
     "meta": {
         "container": {
-            "containerId": "046D4D55-6B93-49ad-BB83-DD14EAF023F5",
-            "containerTitle": "Сімейний стан",
-            "containertype": "Accordion"
+            "id": "046D4D55-6B93-49ad-BB83-DD14EAF023F5",
+            "title": "Сімейний стан",
+            "type": "Accordion"
         },
         "formField": {
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 44
+        "sortOrder": 43
     },
     "name": "martialStatus",
     "target": "MartialStatus",

@@ -7,6 +7,6 @@
         "sortOrder": 2
     },
     "name": "name",
-    "target": "name",
+    "target": "NameString",
     "title": "назва"
 }

@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "97243AA3-5A4B-4094-AAF7-8512E6F7F2FA",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
-            "containerId": "8AC004FE-E197-4697-9095-D897FB0E74FA",
-            "containerTitle": "Внутрішні паспорти",
-            "containertype": "Accordion"
+            "id": "8AC004FE-E197-4697-9095-D897FB0E74FA",
+            "title": "Внутрішні паспорти",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"

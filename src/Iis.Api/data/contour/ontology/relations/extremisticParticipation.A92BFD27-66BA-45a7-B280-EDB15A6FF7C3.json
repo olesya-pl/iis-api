@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "A92BFD27-66BA-45a7-B280-EDB15A6FF7C3",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
-            "containerId": "D39BCDB7-9374-47c6-B29A-6A96A112B8BE",
-            "containerTitle": "Причетність до терористичних, екстремістських або злочинних організацій (у т.ч., незареєстрованих приватних військових компаній)",
-            "containertype": "Accordion"
+            "id": "D39BCDB7-9374-47c6-B29A-6A96A112B8BE",
+            "title": "Причетність до терористичних, екстремістських або злочинних організацій (у т.ч., незареєстрованих приватних військових компаній)",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"

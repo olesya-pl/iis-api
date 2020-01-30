@@ -7,6 +7,6 @@
         "sortOrder": 21
     },
     "name": "taxID",
-    "target": "taxID",
+    "target": "TaxIDString",
     "title": "Ідентифікаційний код"
 }

@@ -14,6 +14,11 @@
         {
             "id": "B9B0E246-906B-4bf1-BA0A-FE7AECFE3F44",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "multiple": false,
                 "sortOrder": 2
             },
@@ -36,7 +41,7 @@
     "conceptType": "entities",
     "id": "DCBD9F20-4E87-4052-AD13-802CF81978A4",
     "meta": {
-        "sortOrder": 351
+        "sortOrder": 350
     },
     "name": "UniversalLocation",
     "title": "Універсальна адреса"

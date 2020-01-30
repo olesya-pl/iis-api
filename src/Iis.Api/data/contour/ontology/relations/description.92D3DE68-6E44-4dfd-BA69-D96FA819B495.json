@@ -8,6 +8,6 @@
         "title": "Особливості"
     },
     "name": "description",
-    "target": "description",
+    "target": "DescriptionString",
     "title": "Додаткові дані"
 }

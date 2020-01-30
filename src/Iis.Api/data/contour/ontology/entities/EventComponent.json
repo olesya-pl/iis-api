@@ -24,7 +24,7 @@
     "id": "5E364AF7-2612-4276-A895-ACFD787A3BCB",
     "meta": {
         "hasFewEntities": true,
-        "sortOrder": 166
+        "sortOrder": 165
     },
     "name": "EventComponent",
     "title": "Компонент події"

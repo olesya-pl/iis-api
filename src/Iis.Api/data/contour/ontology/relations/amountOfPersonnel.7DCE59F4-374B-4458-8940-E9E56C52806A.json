@@ -7,6 +7,6 @@
         "sortOrder": 18
     },
     "name": "amountOfPersonnel",
-    "target": "amountOfPersonnel",
+    "target": "AmountOfPersonnelInteger",
     "title": "Кiлькiсть особового складу"
 }

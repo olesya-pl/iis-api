@@ -37,7 +37,7 @@
     "conceptType": "entities",
     "id": "1596E8C0-ABAB-4862-B2F5-1EE250AC83D8",
     "meta": {
-        "sortOrder": 75
+        "sortOrder": 74
     },
     "name": "FuzzyDate",
     "title": "Неповна дата"

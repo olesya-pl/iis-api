@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "DF6C681F-3EC3-4f8c-9E5A-773DFEBAAEFE",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
-            "containerId": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
-            "containerTitle": "Поточне місце військової служби/роботи",
-            "containertype": "Accordion"
+            "id": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
+            "title": "Поточне місце військової служби/роботи",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"

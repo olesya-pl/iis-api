@@ -7,6 +7,6 @@
         "sortOrder": 7
     },
     "name": "model",
-    "target": "model",
+    "target": "ModelString",
     "title": "Модель"
 }

@@ -2,10 +2,15 @@
     "conceptType": "relations",
     "id": "7A23BEC8-8A75-499a-84DF-54803AED9823",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
-            "containerId": "81783AB2-77C8-43b1-B544-354F346964E2",
-            "containerTitle": "Установчі дані",
-            "containertype": "Accordion"
+            "id": "81783AB2-77C8-43b1-B544-354F346964E2",
+            "title": "Установчі дані",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"

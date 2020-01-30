@@ -7,6 +7,6 @@
         "sortOrder": 6
     },
     "name": "headquartersDislocation",
-    "target": "headquartersDislocation",
+    "target": "HeadquartersDislocationGeo",
     "title": "Географічні координати пункту дислокації штабу"
 }

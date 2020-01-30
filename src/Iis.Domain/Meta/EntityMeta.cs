@@ -14,8 +14,8 @@ namespace Iis.Domain.Meta
 
     public class ContainerMeta
     {
-        public Guid ContainerId { get; set; }
-        public string ContainerTitle { get; set; }
-        public string Containertype { get; set; }
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+        public string Type { get; set; }
     }
 }

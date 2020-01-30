@@ -7,6 +7,6 @@
         "sortOrder": 14
     },
     "name": "additionalLocation",
-    "target": "additionalLocation",
+    "target": "AdditionalLocationGeo",
     "title": "Додаткові географічні координати"
 }

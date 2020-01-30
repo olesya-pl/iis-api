@@ -2,13 +2,18 @@
     "conceptType": "relations",
     "id": "E1C2EECC-F0E8-437a-9352-7758BD0E2407",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "formField": {
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 49
+        "sortOrder": 48
     },
     "name": "actsOfTerrorParticipation",
-    "target": "TaggableString",
+    "target": "OrgParticipation",
     "title": "Причетність до резонансних подій/терактів/злочинів"
 }

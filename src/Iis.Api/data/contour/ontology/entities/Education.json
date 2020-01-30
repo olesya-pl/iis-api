@@ -3,6 +3,11 @@
         {
             "id": "1A2B6345-4AFB-41f9-919C-2E533A52852D",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "formField": {
                     "type": "form"
                 },
@@ -16,6 +21,11 @@
         {
             "id": "523C7159-127D-497e-8CE5-0F6F34B0D2AA",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "formField": {
                     "type": "form"
                 },
@@ -94,7 +104,7 @@
     "conceptType": "entities",
     "id": "43629937-AAA2-4be6-8531-97C439507ECB",
     "meta": {
-        "sortOrder": 131
+        "sortOrder": 130
     },
     "name": "Education",
     "title": "Освіта"

@@ -7,6 +7,6 @@
         "sortOrder": 14
     },
     "name": "placeOfHeadquartersDislocation",
-    "target": "placeOfHeadquartersDislocation",
+    "target": "PlaceOfHeadquartersDislocationString",
     "title": "Пункт постійної дислокації штабу"
 }

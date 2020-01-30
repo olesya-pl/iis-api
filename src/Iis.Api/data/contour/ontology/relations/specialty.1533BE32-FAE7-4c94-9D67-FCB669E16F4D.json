@@ -7,6 +7,6 @@
         "sortOrder": 5
     },
     "name": "specialty",
-    "target": "specialty",
+    "target": "SpecialtyString",
     "title": "спеціальність"
 }

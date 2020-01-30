@@ -7,6 +7,6 @@
         "sortOrder": 8
     },
     "name": "description",
-    "target": "description",
+    "target": "DescriptionString",
     "title": "Додаткові дані"
 }

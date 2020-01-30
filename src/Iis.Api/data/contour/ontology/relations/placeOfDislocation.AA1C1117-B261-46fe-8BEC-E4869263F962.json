@@ -7,6 +7,6 @@
         "sortOrder": 8
     },
     "name": "placeOfDislocation",
-    "target": "placeOfDislocation",
+    "target": "PlaceOfDislocationString",
     "title": "Місце розташування"
 }

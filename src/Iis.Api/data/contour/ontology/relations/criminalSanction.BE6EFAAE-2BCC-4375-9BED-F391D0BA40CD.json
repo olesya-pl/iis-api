@@ -4,14 +4,14 @@
     "id": "BE6EFAAE-2BCC-4375-9BED-F391D0BA40CD",
     "meta": {
         "container": {
-            "containerId": "BDE2491B-B051-4541-A58C-5FB7DFB196AE",
-            "containerTitle": "Притягнення до кримінальної та адміністративної відповідальності",
-            "containertype": "Accordion"
+            "id": "BDE2491B-B051-4541-A58C-5FB7DFB196AE",
+            "title": "Притягнення до кримінальної та адміністративної відповідальності",
+            "type": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 43
+        "sortOrder": 42
     },
     "name": "criminalSanction",
-    "target": "criminalSanction",
+    "target": "CriminalSanctionString",
     "title": "Кримінальна відповідальність"
 }

@@ -2,16 +2,21 @@
     "conceptType": "relations",
     "id": "89501CC7-C719-4624-966D-B14724ADF14B",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
-            "containerId": "85F3F0E4-02F6-46b8-A09A-B203DEFC2A39",
-            "containerTitle": "Стягнення",
-            "containertype": "Accordion"
+            "id": "85F3F0E4-02F6-46b8-A09A-B203DEFC2A39",
+            "title": "Стягнення",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 42
+        "sortOrder": 41
     },
     "name": "sanction",
     "target": "Sanction",

@@ -7,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "year",
-    "target": "year",
+    "target": "YearInteger",
     "title": "рік"
 }

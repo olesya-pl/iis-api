@@ -2,16 +2,21 @@
     "conceptType": "relations",
     "id": "4B726B9C-B7CD-46dd-96DE-564C5D92232B",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "container": {
-            "containerId": "470950D8-5550-4d48-A946-41AAEEDFDCA8",
-            "containerTitle": "Контакти особи",
-            "containertype": "Accordion"
+            "id": "470950D8-5550-4d48-A946-41AAEEDFDCA8",
+            "title": "Контакти особи",
+            "type": "Accordion"
         },
         "formField": {
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 46
+        "sortOrder": 45
     },
     "name": "contacts",
     "target": "ObjectSign",

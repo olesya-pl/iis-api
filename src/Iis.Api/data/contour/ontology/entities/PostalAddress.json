@@ -109,7 +109,7 @@
         "formField": {
             "type": "form"
         },
-        "sortOrder": 256
+        "sortOrder": 255
     },
     "name": "PostalAddress",
     "title": "Поштова адреса"

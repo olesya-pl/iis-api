@@ -7,6 +7,6 @@
         "sortOrder": 1
     },
     "name": "file",
-    "target": "file",
+    "target": "FileFile",
     "title": "Скан документа"
 }

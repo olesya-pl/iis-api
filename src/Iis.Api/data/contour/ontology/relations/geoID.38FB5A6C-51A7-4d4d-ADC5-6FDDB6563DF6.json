@@ -7,6 +7,6 @@
         "sortOrder": 3
     },
     "name": "geoID",
-    "target": "geoID",
+    "target": "GeoIDString",
     "title": "ID ArcGIS"
 }

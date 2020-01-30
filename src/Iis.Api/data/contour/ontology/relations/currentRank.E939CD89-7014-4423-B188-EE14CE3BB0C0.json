@@ -3,9 +3,9 @@
     "id": "E939CD89-7014-4423-B188-EE14CE3BB0C0",
     "meta": {
         "container": {
-            "containerId": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
-            "containerTitle": "Поточне місце військової служби/роботи",
-            "containertype": "Accordion"
+            "id": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
+            "title": "Поточне місце військової служби/роботи",
+            "type": "Accordion"
         },
         "formField": {
             "type": "dropdown"

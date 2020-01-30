@@ -7,6 +7,6 @@
         "sortOrder": 8
     },
     "name": "media",
-    "target": "media",
+    "target": "MediaFile",
     "title": "Додані файли"
 }

@@ -7,6 +7,6 @@
         "sortOrder": 4
     },
     "name": "text",
-    "target": "text",
+    "target": "TextString",
     "title": ""
 }

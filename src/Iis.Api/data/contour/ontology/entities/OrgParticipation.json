@@ -3,6 +3,14 @@
         {
             "id": "A596B06D-4DEE-45f6-AC21-6870432A98C3",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 1
             },
@@ -11,14 +19,21 @@
             "title": "організація"
         },
         {
-            "attrTypeName": "PeriodDateRange",
             "id": "5AAB4BFE-A41D-4938-9634-0AFD162712CB",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 2
             },
             "name": "period",
-            "target": "period",
+            "target": "FuzzyDateRange",
             "title": "часовий прогміжок"
         },
         {
@@ -35,6 +50,14 @@
         {
             "id": "15FE316A-F6E4-4b01-9D11-54EBE0322B4F",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "form"
+                },
                 "multiple": false,
                 "sortOrder": 4
             },
@@ -46,7 +69,7 @@
     "conceptType": "entities",
     "id": "CCC418D8-40D7-4c3d-9D34-7B8BC6201DA7",
     "meta": {
-        "sortOrder": 345
+        "sortOrder": 344
     },
     "name": "OrgParticipation",
     "title": "Відношення до організації"

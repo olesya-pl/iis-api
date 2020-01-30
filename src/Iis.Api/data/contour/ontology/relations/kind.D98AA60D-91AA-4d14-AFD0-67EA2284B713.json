@@ -3,9 +3,9 @@
     "id": "D98AA60D-91AA-4d14-AFD0-67EA2284B713",
     "meta": {
         "container": {
-            "containerId": "CBFB512A-5698-40d0-A95D-951C42E03079",
-            "containerTitle": "Нерозібране (тимчасово)",
-            "containertype": "Accordion"
+            "id": "CBFB512A-5698-40d0-A95D-951C42E03079",
+            "title": "Нерозібране (тимчасово)",
+            "type": "Accordion"
         },
         "multiple": false,
         "sortOrder": 1

@@ -7,6 +7,6 @@
         "sortOrder": 5
     },
     "name": "file",
-    "target": "file",
+    "target": "FileFile",
     "title": "Додані файли"
 }

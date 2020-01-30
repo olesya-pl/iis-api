@@ -8,6 +8,6 @@
         "title": "Повне найменування"
     },
     "name": "name",
-    "target": "name",
+    "target": "NameString",
     "title": "Назва"
 }
