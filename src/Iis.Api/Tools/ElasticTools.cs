@@ -24,7 +24,7 @@ namespace IIS.Core.Tools
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(nodeTypeIds, cancellationToken);
             foreach (var extNode in extNodes)
             {
-                await _elasticManager.InsertExtNodeAsync(extNode);
+                await _elasticManager.PutExtNodeAsync(extNode);
             }
         }
     }

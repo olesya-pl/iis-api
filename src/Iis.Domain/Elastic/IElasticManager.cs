@@ -9,7 +9,7 @@ namespace Iis.Domain.Elastic
 {
     public interface IElasticManager
     {
-        Task<bool> InsertExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default);
+        Task<bool> PutExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default);
         Task<List<string>> Search(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
     }
 }

@@ -27,7 +27,7 @@ namespace Iis.Elastic
             _lowLevelClient = new ElasticLowLevelClient(config);
         }
 
-        public async Task<bool> InsertJsonAsync(string baseIndexName, string id, string json, CancellationToken cancellationToken = default)
+        public async Task<bool> PutJsonAsync(string baseIndexName, string id, string json, CancellationToken cancellationToken = default)
         {
             var path = $"{GetRealIndexName(baseIndexName)}/_doc/{id}";
             PostData postData = json;
@@ -35,10 +35,10 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<bool> InsertExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default)
+        public async Task<bool> PutExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default)
         {
             var json = _serializer.GetJsonByExtNode(extNode);
-            return await InsertJsonAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
+            return await PutJsonAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
         public async Task<List<string>> Search(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
