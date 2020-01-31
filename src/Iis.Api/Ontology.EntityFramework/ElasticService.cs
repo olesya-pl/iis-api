@@ -1,4 +1,5 @@
-﻿using Iis.Domain;
+﻿using Iis.Api;
+using Iis.Domain;
 using Iis.Domain.Elastic;
 using Iis.Domain.ExtendedData;
 using System;
@@ -13,10 +14,12 @@ namespace IIS.Core.Ontology.EntityFramework
     {
         private IElasticManager _elasticManager;
         private IExtNodeService _extNodeService;
-        public ElasticService(IElasticManager elasticManager, IExtNodeService extNodeService)
+        private RunTimeSettings _runTimeSettings;
+        public ElasticService(IElasticManager elasticManager, IExtNodeService extNodeService, RunTimeSettings runTimeSettings)
         {
             _elasticManager = elasticManager;
             _extNodeService = extNodeService;
+            _runTimeSettings = runTimeSettings;
         }
         public async Task<List<Guid>> SearchByAllFieldsAsync(IEnumerable<NodeType> nodeTypes, string suggestion, CancellationToken cancellationToken = default)
         {
@@ -31,6 +34,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
+            if (!_runTimeSettings.PutSavedToElastic) return true;
             var extNode = await _extNodeService.GetExtNodeByIdAsync(id, cancellationToken);
             return await _elasticManager.PutExtNodeAsync(extNode, cancellationToken);
         }

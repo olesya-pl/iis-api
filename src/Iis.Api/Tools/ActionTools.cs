@@ -13,6 +13,7 @@ using IIS.Legacy.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using Iis.Api;
 
 namespace IIS.Core.Tools
 {
@@ -25,6 +26,7 @@ namespace IIS.Core.Tools
         private readonly OntologyTypeSaver _ontologyTypeSaver;
         private readonly Seeder _seeder;
         private readonly OntologyContext _ontologyContext;
+        private readonly RunTimeSettings _runtimeSettings;
 
         public ActionTools(
             ILogger<ActionTools> logger,
@@ -33,7 +35,8 @@ namespace IIS.Core.Tools
             IOntologyProvider ontologyProvider,
             OntologyTypeSaver ontologyTypeSaver,
             Seeder seeder,
-            OntologyContext ontologyContext)
+            OntologyContext ontologyContext,
+            RunTimeSettings runTimeSettings)
         {
             _logger = logger;
             _legacyOntologyProvider = legacyOntologyProvider;
@@ -42,6 +45,7 @@ namespace IIS.Core.Tools
             _ontologyTypeSaver = ontologyTypeSaver;
             _seeder = seeder;
             _ontologyContext = ontologyContext;
+            _runtimeSettings = runTimeSettings;
         }
 
         public async Task ClearTypesAsync()
@@ -102,8 +106,10 @@ namespace IIS.Core.Tools
 
         public async Task SeedDeveloperDataAsync()
         {
+            _runtimeSettings.PutSavedToElastic = false;
             await _seeder.SeedAsync(Path.Combine("develop", "entities"));
             _logger.LogInformation("Develop data seeded.");
+            _runtimeSettings.PutSavedToElastic = true;
         }
         
         public async Task SeedOdysseusDataAsync()

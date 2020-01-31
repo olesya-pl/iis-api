@@ -37,6 +37,7 @@ using Newtonsoft.Json;
 using Serilog;
 using Iis.Domain.Elastic;
 using Iis.Elastic;
+using Iis.Api;
 
 namespace IIS.Core
 {
@@ -77,6 +78,7 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<ElasticService>();
+            services.AddSingleton<RunTimeSettings>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
