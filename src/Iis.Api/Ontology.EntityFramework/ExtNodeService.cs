@@ -73,6 +73,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Include(n => n.Attribute)
                 .Include(n => n.NodeType)
                 .Include(n => n.OutgoingRelations)
+                .ThenInclude(r => r.Node)
+                .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode);
         }
 
