@@ -97,6 +97,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         private void SendIcaoEvent(IEnumerable<GraphQL.Materials.Node> nodes)
         {
+            if (nodes == null) return;
             var node = nodes.Where(n => n.UpdateField != null).SingleOrDefault();
             if (node == null) return;
 
