@@ -100,8 +100,10 @@ namespace IIS.Core.Tools
 
         public async Task SeedContourDataAsync()
         {
+            _runtimeSettings.PutSavedToElastic = false;
             await _seeder.SeedAsync(Path.Combine("contour", "entities"));
             _logger.LogInformation("Contour data seeded.");
+            _runtimeSettings.PutSavedToElastic = true;
         }
 
         public async Task SeedDeveloperDataAsync()
@@ -114,9 +116,11 @@ namespace IIS.Core.Tools
         
         public async Task SeedOdysseusDataAsync()
         {
+            _runtimeSettings.PutSavedToElastic = false;
             await _seeder.SeedAsync(Path.Combine("odysseus", "entities"));
             await SeedOdysseusAnalyticsIndicatorsAsync();
             _logger.LogInformation("Odysseus data seeded.");
+            _runtimeSettings.PutSavedToElastic = true;
         }
 
         private async Task SeedOdysseusAnalyticsIndicatorsAsync()
