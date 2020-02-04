@@ -31,7 +31,7 @@ namespace IIS.Core
             }
 
             string password = configuration[prefix + "PASSWORD"];
-            if (password != null)
+            if (string.IsNullOrEmpty(connectionStringBuilder.Password) && password != null)
             {
                 connectionStringBuilder.Password = password;
             }
