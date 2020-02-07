@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 10
+        "sortOrder": 9
     },
     "name": "nationality",
     "target": "Nationality",

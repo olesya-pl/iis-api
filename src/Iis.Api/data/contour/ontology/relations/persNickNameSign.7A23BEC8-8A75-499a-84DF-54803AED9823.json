@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 13
+        "sortOrder": 12
     },
     "name": "persNickNameSign",
     "target": "PersonalNicknameSign",

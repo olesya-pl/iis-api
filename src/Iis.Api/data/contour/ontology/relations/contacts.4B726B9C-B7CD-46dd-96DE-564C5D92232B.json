@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 45
+        "sortOrder": 44
     },
     "name": "contacts",
     "target": "ObjectSign",

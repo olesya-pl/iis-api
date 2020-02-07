@@ -1,32 +1,43 @@
 {
     "attributes": [
         {
-            "attrTypeName": "NameString",
             "id": "EFE6B452-E3AD-4098-AA77-F2F6C102A2F1",
             "meta": {
                 "multiple": false,
                 "sortOrder": 1
             },
-            "name": "name",
-            "target": "name",
-            "title": "Назва"
+            "name": "fullName",
+            "target": "StringI18n",
+            "title": "Повна назва організації"
         },
         {
-            "attrTypeName": "TitleString",
             "id": "D3433422-1175-4d4f-A913-D731167684F8",
             "meta": {
                 "multiple": false,
                 "sortOrder": 2
             },
-            "name": "title",
-            "target": "title",
-            "title": "Повна назва"
+            "name": "shortName",
+            "target": "StringI18n",
+            "title": "Скорочена назва, абревіатура"
+        },
+        {
+            "id": "2357286C-1C15-4844-9395-5AC86E121DF3",
+            "meta": {
+                "multiple": true,
+                "sortOrder": 3
+            },
+            "name": "otherNames",
+            "target": "StringI18n",
+            "title": "Інші назви"
         }
     ],
     "conceptType": "entities",
+    "extends": [
+        "ObjectOfStudy"
+    ],
     "id": "077946F8-C103-4238-AB29-B3D6B96BA349",
     "meta": {
-        "sortOrder": 6
+        "sortOrder": 7
     },
     "name": "Organization",
     "title": "Организація"

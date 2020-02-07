@@ -7,7 +7,7 @@
             "type": "dropdown"
         },
         "multiple": false,
-        "sortOrder": 5,
+        "sortOrder": 4,
         "validation": {
             "required": true
         }

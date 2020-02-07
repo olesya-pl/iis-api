@@ -9,7 +9,7 @@
             "type": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 23
+        "sortOrder": 22
     },
     "name": "otherPersonId",
     "target": "OtherPersonIdString",

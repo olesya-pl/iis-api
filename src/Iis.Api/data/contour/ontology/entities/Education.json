@@ -9,7 +9,7 @@
                     "Delete"
                 ],
                 "formField": {
-                    "type": "form"
+                    "type": "fuzzyDateRange"
                 },
                 "multiple": false,
                 "sortOrder": 1

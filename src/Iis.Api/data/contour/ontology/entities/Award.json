@@ -21,6 +21,11 @@
         {
             "id": "BFFE2201-4DC5-4f2b-A6B8-10F613D20251",
             "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
                 "formField": {
                     "type": "form"
                 },
@@ -40,7 +45,7 @@
                     "Delete"
                 ],
                 "formField": {
-                    "type": "form"
+                    "type": "taggableString"
                 },
                 "multiple": false,
                 "sortOrder": 3
@@ -58,7 +63,7 @@
                     "Delete"
                 ],
                 "formField": {
-                    "type": "form"
+                    "type": "taggableString"
                 },
                 "multiple": false,
                 "sortOrder": 4

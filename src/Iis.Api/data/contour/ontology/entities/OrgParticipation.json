@@ -4,12 +4,9 @@
             "id": "A596B06D-4DEE-45f6-AC21-6870432A98C3",
             "meta": {
                 "acceptsEntityOperations": [
-                    "Create",
-                    "Update",
-                    "Delete"
                 ],
                 "formField": {
-                    "type": "form"
+                    "type": "taggableString"
                 },
                 "multiple": false,
                 "sortOrder": 1
@@ -27,14 +24,14 @@
                     "Delete"
                 ],
                 "formField": {
-                    "type": "form"
+                    "type": "fuzzyDateRange"
                 },
                 "multiple": false,
                 "sortOrder": 2
             },
             "name": "period",
             "target": "FuzzyDateRange",
-            "title": "часовий прогміжок"
+            "title": "часовий проміжок"
         },
         {
             "attrTypeName": "DescriptionString",

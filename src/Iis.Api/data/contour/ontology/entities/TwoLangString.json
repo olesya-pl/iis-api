@@ -1,25 +1,25 @@
 {
     "attributes": [
         {
-            "attrTypeName": "OriginalNameString",
+            "attrTypeName": "OriginalString",
             "id": "9343CCFF-6659-4fb4-AD2B-8806787CA695",
             "meta": {
                 "multiple": false,
                 "sortOrder": 1
             },
-            "name": "originalName",
-            "target": "originalName",
+            "name": "original",
+            "target": "original",
             "title": "мовою оригіналу"
         },
         {
-            "attrTypeName": "UkraineNameString",
+            "attrTypeName": "UkrString",
             "id": "0CE20960-4481-4a85-AE67-B0BBF1022258",
             "meta": {
                 "multiple": false,
                 "sortOrder": 2
             },
-            "name": "ukraineName",
-            "target": "ukraineName",
+            "name": "ukr",
+            "target": "ukr",
             "title": "українською"
         }
     ],

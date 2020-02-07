@@ -8,12 +8,12 @@
             "Delete"
         ],
         "formField": {
-            "type": "form"
+            "type": "fuzzyDateRange"
         },
         "multiple": false,
         "sortOrder": 2
     },
     "name": "period",
     "target": "FuzzyDateRange",
-    "title": "часовий прогміжок"
+    "title": "часовий проміжок"
 }

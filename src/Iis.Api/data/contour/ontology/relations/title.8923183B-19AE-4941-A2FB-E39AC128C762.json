@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "TitleString",
+    "conceptType": "relations",
+    "id": "8923183B-19AE-4941-A2FB-E39AC128C762",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 7
+    },
+    "name": "title",
+    "target": "TitleString",
+    "title": "Повна назва"
+}

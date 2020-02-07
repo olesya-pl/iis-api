@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 32
+        "sortOrder": 31
     },
     "name": "foreignLang",
     "target": "ForeignLang",

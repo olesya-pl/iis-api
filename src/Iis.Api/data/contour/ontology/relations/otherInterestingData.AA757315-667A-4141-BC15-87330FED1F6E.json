@@ -9,7 +9,7 @@
             "type": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 46
+        "sortOrder": 45
     },
     "name": "otherInterestingData",
     "target": "OtherInterestingDataString",

@@ -9,7 +9,7 @@
             "type": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 8
+        "sortOrder": 7
     },
     "name": "deathCircumstances",
     "target": "DeathCircumstancesString",

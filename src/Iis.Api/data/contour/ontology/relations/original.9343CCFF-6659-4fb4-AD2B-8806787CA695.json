@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "OriginalString",
+    "conceptType": "relations",
+    "id": "9343CCFF-6659-4fb4-AD2B-8806787CA695",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 1
+    },
+    "name": "original",
+    "target": "OriginalString",
+    "title": "мовою оригіналу"
+}

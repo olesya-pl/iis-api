@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "EFE6B452-E3AD-4098-AA77-F2F6C102A2F1",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 1
+    },
+    "name": "fullName",
+    "target": "StringI18n",
+    "title": "Повна назва організації"
+}

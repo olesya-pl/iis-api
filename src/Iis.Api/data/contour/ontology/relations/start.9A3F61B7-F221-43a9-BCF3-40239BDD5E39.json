@@ -2,8 +2,13 @@
     "conceptType": "relations",
     "id": "9A3F61B7-F221-43a9-BCF3-40239BDD5E39",
     "meta": {
+        "acceptsEntityOperations": [
+            "Create",
+            "Update",
+            "Delete"
+        ],
         "formField": {
-            "type": "form"
+            "type": "fuzzyDate"
         },
         "multiple": false,
         "sortOrder": 1

@@ -13,10 +13,10 @@
             "type": "Accordion"
         },
         "formField": {
-            "type": "form"
+            "type": "taggableString"
         },
         "multiple": true,
-        "sortOrder": 28
+        "sortOrder": 27
     },
     "name": "OiVTParticipation",
     "target": "TaggableString",

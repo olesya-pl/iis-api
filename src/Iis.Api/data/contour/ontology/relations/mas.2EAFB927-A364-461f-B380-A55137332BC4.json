@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 33
+        "sortOrder": 32
     },
     "name": "mas",
     "target": "MASItem",

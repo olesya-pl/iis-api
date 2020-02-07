@@ -12,7 +12,7 @@
             "type": "dropdown"
         },
         "multiple": true,
-        "sortOrder": 11
+        "sortOrder": 10
     },
     "name": "citizenship",
     "target": "Country",

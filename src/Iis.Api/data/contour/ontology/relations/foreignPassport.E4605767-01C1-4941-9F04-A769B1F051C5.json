@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 18
+        "sortOrder": 17
     },
     "name": "foreignPassport",
     "target": "ForeignPassport",

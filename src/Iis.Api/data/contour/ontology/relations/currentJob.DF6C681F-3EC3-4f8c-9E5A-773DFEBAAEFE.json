@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 24
+        "sortOrder": 23
     },
     "name": "currentJob",
     "target": "WorkPlace",

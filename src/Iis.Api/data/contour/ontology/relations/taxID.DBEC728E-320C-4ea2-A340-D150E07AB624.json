@@ -4,7 +4,7 @@
     "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
     "meta": {
         "multiple": false,
-        "sortOrder": 21
+        "sortOrder": 20
     },
     "name": "taxID",
     "target": "TaxIDString",

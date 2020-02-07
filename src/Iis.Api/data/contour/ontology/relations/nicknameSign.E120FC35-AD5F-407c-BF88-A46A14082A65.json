@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 12
+        "sortOrder": 11
     },
     "name": "nicknameSign",
     "target": "NicknameSign",

@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 38
+        "sortOrder": 37
     },
     "name": "wounds",
     "target": "BattleWound",

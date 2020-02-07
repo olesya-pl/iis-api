@@ -1,0 +1,11 @@
+{
+    "conceptType": "relations",
+    "id": "2357286C-1C15-4844-9395-5AC86E121DF3",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 3
+    },
+    "name": "otherNames",
+    "target": "StringI18n",
+    "title": "Інші назви"
+}

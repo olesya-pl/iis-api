@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 15
+        "sortOrder": 14
     },
     "name": "registrationAddress",
     "target": "UniversalLocation",

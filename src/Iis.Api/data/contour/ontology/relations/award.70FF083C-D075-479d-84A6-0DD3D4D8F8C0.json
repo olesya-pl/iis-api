@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 40
+        "sortOrder": 39
     },
     "name": "award",
     "target": "Award",

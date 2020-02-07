@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 29
+        "sortOrder": 28
     },
     "name": "extremisticParticipation",
     "target": "OrgParticipation",

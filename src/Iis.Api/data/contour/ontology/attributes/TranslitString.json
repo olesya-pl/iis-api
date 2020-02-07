@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "TranslitString",
+    "conceptType": "attributes",
+    "id": "e2670a2d-a0ef-4723-ac89-a7c3557edfd3",
+    "meta": {
+    },
+    "name": "translit",
+    "title": "транслітерація",
+    "type": "String"
+}

@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 27
+        "sortOrder": 26
     },
     "name": "politicalParticipation",
     "target": "OrgParticipation",

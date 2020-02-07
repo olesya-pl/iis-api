@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "UkrString",
+    "conceptType": "relations",
+    "id": "0CE20960-4481-4a85-AE67-B0BBF1022258",
+    "meta": {
+        "multiple": false,
+        "sortOrder": 2
+    },
+    "name": "ukr",
+    "target": "UkrString",
+    "title": "українською"
+}

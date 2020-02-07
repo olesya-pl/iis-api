@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 36
+        "sortOrder": 35
     },
     "name": "warOperationParticipation",
     "target": "WarOperationParticipation",

@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "TaggedEntitiesString",
+    "conceptType": "attributes",
+    "id": "65357eec-1eba-4fa1-a5bc-ece2f0cfcd41",
+    "meta": {
+    },
+    "name": "taggedEntities",
+    "title": "Посилання на ОР",
+    "type": "String"
+}

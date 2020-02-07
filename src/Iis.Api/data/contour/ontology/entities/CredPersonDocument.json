@@ -37,7 +37,7 @@
             "id": "72696BA8-B900-4a88-8C10-5FD1ED1B10D6",
             "meta": {
                 "formField": {
-                    "type": "form"
+                    "type": "taggableString"
                 },
                 "multiple": false,
                 "sortOrder": 4

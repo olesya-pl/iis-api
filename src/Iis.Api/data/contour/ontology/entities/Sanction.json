@@ -38,7 +38,7 @@
                     "Delete"
                 ],
                 "formField": {
-                    "type": "form"
+                    "type": "taggableString"
                 },
                 "multiple": false,
                 "sortOrder": 3

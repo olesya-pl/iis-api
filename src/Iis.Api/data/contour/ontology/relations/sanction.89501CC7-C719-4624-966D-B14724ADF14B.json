@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 41
+        "sortOrder": 40
     },
     "name": "sanction",
     "target": "Sanction",

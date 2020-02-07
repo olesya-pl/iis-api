@@ -8,7 +8,7 @@
             "Delete"
         ],
         "formField": {
-            "type": "form"
+            "type": "fuzzyDate"
         },
         "multiple": false,
         "sortOrder": 2

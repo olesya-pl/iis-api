@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 16
+        "sortOrder": 15
     },
     "name": "actualAccommodation",
     "target": "UniversalLocation",

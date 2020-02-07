@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 37
+        "sortOrder": 36
     },
     "name": "currentLocation",
     "target": "UniversalLocation",

@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 14
+        "sortOrder": 13
     },
     "name": "placeOfBirth",
     "target": "UniversalLocation",

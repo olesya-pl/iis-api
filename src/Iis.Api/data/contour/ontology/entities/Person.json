@@ -91,7 +91,7 @@
                     "type": "Accordion"
                 },
                 "formField": {
-                    "type": "form"
+                    "type": "fuzzyDate"
                 },
                 "multiple": false,
                 "sortOrder": 5
@@ -114,7 +114,7 @@
                     "type": "Accordion"
                 },
                 "formField": {
-                    "type": "form"
+                    "type": "fuzzyDate"
                 },
                 "multiple": false,
                 "sortOrder": 6
@@ -122,18 +122,6 @@
             "name": "dateOfDeath",
             "target": "FuzzyDate",
             "title": "Дата смерті"
-        },
-        {
-            "attrTypeName": "TitleString",
-            "id": "9B66E24E-BC6E-4560-8F21-EEE40EEFE60A",
-            "meta": {
-                "formula": "h.join(entity.realName.ukraineName, entity.realName.ukraineName, entity.realName.ukraineName)",
-                "multiple": false,
-                "sortOrder": 7
-            },
-            "name": "title",
-            "target": "title",
-            "title": "Повна назва"
         },
         {
             "attrTypeName": "DeathCircumstancesString",
@@ -145,7 +133,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 8
+                "sortOrder": 7
             },
             "name": "deathCircumstances",
             "target": "deathCircumstances",
@@ -160,7 +148,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 9
+                "sortOrder": 8
             },
             "name": "gender",
             "target": "Gender",
@@ -183,7 +171,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 10
+                "sortOrder": 9
             },
             "name": "nationality",
             "target": "Nationality",
@@ -202,7 +190,7 @@
                     "type": "dropdown"
                 },
                 "multiple": true,
-                "sortOrder": 11
+                "sortOrder": 10
             },
             "name": "citizenship",
             "target": "Country",
@@ -225,7 +213,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 12
+                "sortOrder": 11
             },
             "name": "nicknameSign",
             "target": "NicknameSign",
@@ -248,7 +236,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 13
+                "sortOrder": 12
             },
             "name": "persNickNameSign",
             "target": "PersonalNicknameSign",
@@ -271,7 +259,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 14
+                "sortOrder": 13
             },
             "name": "placeOfBirth",
             "target": "UniversalLocation",
@@ -294,7 +282,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 15
+                "sortOrder": 14
             },
             "name": "registrationAddress",
             "target": "UniversalLocation",
@@ -317,7 +305,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 16
+                "sortOrder": 15
             },
             "name": "actualAccommodation",
             "target": "UniversalLocation",
@@ -340,7 +328,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 17
+                "sortOrder": 16
             },
             "name": "passportData",
             "target": "Passport",
@@ -363,7 +351,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 18
+                "sortOrder": 17
             },
             "name": "foreignPassport",
             "target": "ForeignPassport",
@@ -386,7 +374,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 19
+                "sortOrder": 18
             },
             "name": "credPersonDocument",
             "target": "CredPersonDocument",
@@ -409,7 +397,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 20
+                "sortOrder": 19
             },
             "name": "otherDocuments",
             "target": "OtherDocument",
@@ -420,7 +408,7 @@
             "id": "DBEC728E-320C-4ea2-A340-D150E07AB624",
             "meta": {
                 "multiple": false,
-                "sortOrder": 21
+                "sortOrder": 20
             },
             "name": "taxID",
             "target": "taxID",
@@ -436,7 +424,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 22
+                "sortOrder": 21
             },
             "name": "personArmyID",
             "target": "personArmyID",
@@ -452,7 +440,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 23
+                "sortOrder": 22
             },
             "name": "otherPersonId",
             "target": "otherPersonId",
@@ -475,7 +463,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 24
+                "sortOrder": 23
             },
             "name": "currentJob",
             "target": "WorkPlace",
@@ -493,7 +481,7 @@
                     "type": "dropdown"
                 },
                 "multiple": true,
-                "sortOrder": 25
+                "sortOrder": 24
             },
             "name": "currentRank",
             "target": "Rank",
@@ -516,7 +504,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 26
+                "sortOrder": 25
             },
             "name": "jobHistory",
             "target": "WorkPlace",
@@ -539,7 +527,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 27
+                "sortOrder": 26
             },
             "name": "politicalParticipation",
             "target": "OrgParticipation",
@@ -559,10 +547,10 @@
                     "type": "Accordion"
                 },
                 "formField": {
-                    "type": "form"
+                    "type": "taggableString"
                 },
                 "multiple": true,
-                "sortOrder": 28
+                "sortOrder": 27
             },
             "name": "OiVTParticipation",
             "target": "TaggableString",
@@ -585,7 +573,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 29
+                "sortOrder": 28
             },
             "name": "extremisticParticipation",
             "target": "OrgParticipation",
@@ -608,7 +596,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 30
+                "sortOrder": 29
             },
             "name": "privateMilitaryCompanyParticipation",
             "target": "OrgParticipation",
@@ -631,7 +619,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 31
+                "sortOrder": 30
             },
             "name": "education",
             "target": "Education",
@@ -654,7 +642,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 32
+                "sortOrder": 31
             },
             "name": "foreignLang",
             "target": "ForeignLang",
@@ -677,7 +665,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 33
+                "sortOrder": 32
             },
             "name": "mas",
             "target": "MASItem",
@@ -688,7 +676,7 @@
             "id": "7AD1638F-413A-4aa0-9022-20DCF8EC3429",
             "meta": {
                 "multiple": false,
-                "sortOrder": 34
+                "sortOrder": 33
             },
             "name": "created",
             "target": "created",
@@ -699,7 +687,7 @@
             "id": "C6B9535C-B6AB-48ef-9C39-F695CAA62348",
             "meta": {
                 "multiple": false,
-                "sortOrder": 35
+                "sortOrder": 34
             },
             "name": "updated",
             "target": "updated",
@@ -722,7 +710,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 36
+                "sortOrder": 35
             },
             "name": "warOperationParticipation",
             "target": "WarOperationParticipation",
@@ -745,7 +733,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 37
+                "sortOrder": 36
             },
             "name": "currentLocation",
             "target": "UniversalLocation",
@@ -768,7 +756,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 38
+                "sortOrder": 37
             },
             "name": "wounds",
             "target": "BattleWound",
@@ -791,7 +779,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 39
+                "sortOrder": 38
             },
             "name": "foreignMission",
             "target": "ForeignMission",
@@ -814,7 +802,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 40
+                "sortOrder": 39
             },
             "name": "award",
             "target": "Award",
@@ -837,7 +825,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 41
+                "sortOrder": 40
             },
             "name": "sanction",
             "target": "Sanction",
@@ -853,7 +841,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 42
+                "sortOrder": 41
             },
             "name": "criminalSanction",
             "target": "criminalSanction",
@@ -871,7 +859,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 43
+                "sortOrder": 42
             },
             "name": "martialStatus",
             "target": "MartialStatus",
@@ -894,7 +882,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 44
+                "sortOrder": 43
             },
             "name": "closePersin",
             "target": "ClosePerson",
@@ -917,7 +905,7 @@
                     "type": "form"
                 },
                 "multiple": true,
-                "sortOrder": 45
+                "sortOrder": 44
             },
             "name": "contacts",
             "target": "ObjectSign",
@@ -933,7 +921,7 @@
                     "type": "Accordion"
                 },
                 "multiple": false,
-                "sortOrder": 46
+                "sortOrder": 45
             },
             "name": "otherInterestingData",
             "target": "otherInterestingData",
@@ -949,7 +937,7 @@
                     "type": "Accordion"
                 },
                 "multiple": true,
-                "sortOrder": 47
+                "sortOrder": 46
             },
             "name": "attachment",
             "target": "attachment",
@@ -967,7 +955,7 @@
                     "type": "form"
                 },
                 "multiple": false,
-                "sortOrder": 48
+                "sortOrder": 47
             },
             "name": "actsOfTerrorParticipation",
             "target": "OrgParticipation",

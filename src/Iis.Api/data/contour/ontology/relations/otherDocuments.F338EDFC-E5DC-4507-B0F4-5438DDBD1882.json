@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 20
+        "sortOrder": 19
     },
     "name": "otherDocuments",
     "target": "OtherDocument",

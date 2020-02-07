@@ -11,7 +11,7 @@
             "type": "form"
         },
         "multiple": false,
-        "sortOrder": 48
+        "sortOrder": 47
     },
     "name": "actsOfTerrorParticipation",
     "target": "OrgParticipation",

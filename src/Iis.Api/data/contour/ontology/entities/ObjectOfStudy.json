@@ -48,21 +48,6 @@
             "title": "Ознаки"
         },
         {
-            "attrTypeName": "TitleString",
-            "id": "F0B073F5-FAF3-4c50-A8A6-1ADEA5072AE4",
-            "meta": {
-                "formula": "entity.name",
-                "multiple": false,
-                "sortOrder": 4,
-                "validation": {
-                    "required": true
-                }
-            },
-            "name": "title",
-            "target": "title",
-            "title": "Повна назва"
-        },
-        {
             "id": "027155F8-2404-40f6-9F0F-E13856BD0659",
             "meta": {
                 "formField": {
@@ -70,7 +55,7 @@
                     "type": "dropdown"
                 },
                 "multiple": false,
-                "sortOrder": 5,
+                "sortOrder": 4,
                 "validation": {
                     "required": true
                 }
@@ -84,7 +69,7 @@
             "id": "A5865C53-E147-477e-9493-ABDC0D2995EB",
             "meta": {
                 "multiple": false,
-                "sortOrder": 6
+                "sortOrder": 5
             },
             "name": "lastConfirmedAt",
             "target": "lastConfirmedAt",
@@ -95,11 +80,23 @@
             "id": "BA78FBF8-240D-43fb-9D10-799F8F1F0FEC",
             "meta": {
                 "multiple": false,
-                "sortOrder": 7
+                "sortOrder": 6
             },
             "name": "photo",
             "target": "photo",
             "title": "Фото"
+        },
+        {
+            "attrTypeName": "TitleString",
+            "id": "8923183B-19AE-4941-A2FB-E39AC128C762",
+            "meta": {
+                "editable": false,
+                "multiple": false,
+                "sortOrder": 7
+            },
+            "name": "title",
+            "target": "title",
+            "title": "Повна назва"
         }
     ],
     "conceptType": "entities",

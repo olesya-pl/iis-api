@@ -8,7 +8,7 @@
             "type": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 9
+        "sortOrder": 8
     },
     "name": "gender",
     "target": "Gender",

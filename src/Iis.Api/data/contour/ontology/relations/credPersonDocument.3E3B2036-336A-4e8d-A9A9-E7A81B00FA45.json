@@ -16,7 +16,7 @@
             "type": "form"
         },
         "multiple": true,
-        "sortOrder": 19
+        "sortOrder": 18
     },
     "name": "credPersonDocument",
     "target": "CredPersonDocument",

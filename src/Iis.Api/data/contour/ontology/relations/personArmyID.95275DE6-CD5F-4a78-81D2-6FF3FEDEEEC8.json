@@ -9,7 +9,7 @@
             "type": "Accordion"
         },
         "multiple": false,
-        "sortOrder": 22
+        "sortOrder": 21
     },
     "name": "personArmyID",
     "target": "PersonArmyIDString",
