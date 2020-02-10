@@ -1,6 +1,8 @@
 ﻿using Humanizer;
+using System.Text;
+using System.Linq;
 
-namespace IIS
+namespace Iis.Utility
 {
     public static class StringExtensions
     {
@@ -15,5 +17,24 @@ namespace IIS
         public static string ToLowerCamelcase(this string value) => value.Substring(0, 1).ToLower() + value.Substring(1);
 
         public static string ToUnderscore(this string str) => str.Underscore();
+        public static string EscapeSpecificSympols(this string value, string pattern)
+        {
+            var builder = new StringBuilder();
+
+            value.Select(c =>
+            {
+
+                if (pattern.Contains(c))
+                {
+                    builder.Append('\\');
+                }
+                builder.Append(c);
+
+                return c;
+            }).ToList();
+
+            return builder.ToString();
+        }
+
     }
 }

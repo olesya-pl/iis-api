@@ -1,18 +1,20 @@
-﻿using Elasticsearch.Net;
-using Iis.Domain.Elastic;
-using Iis.Domain.ExtendedData;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Elasticsearch.Net;
+using Newtonsoft.Json.Linq;
+
+using Iis.Domain.Elastic;
+using Iis.Domain.ExtendedData;
+using Iis.Utility;
 
 namespace Iis.Elastic
 {
     public class IisElasticManager: IElasticManager
     {
+        private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";;
         ElasticLowLevelClient _lowLevelClient;
         IisElasticConfiguration _configuration;
         IisElasticSerializer _serializer;
@@ -76,12 +78,13 @@ namespace Iis.Elastic
             json["_source"] = new JArray(searchParams.ResultFields);
             json["query"] = new JObject();
             var queryString = new JObject();
-            queryString["query"] = searchParams.Query;
+            queryString["query"] = searchParams.Query.EscapeSpecificSympols(EscapeSymbolsPattern);
             queryString["fields"] = new JArray(searchParams.SearchFields);
             queryString["lenient"] = searchParams.IsLenient;
 
             json["query"]["query_string"] = queryString;
-            return json.ToString();
+
+            return json.ToString(); ;
         }
 
         private string GetRealIndexName(string baseIndexName)

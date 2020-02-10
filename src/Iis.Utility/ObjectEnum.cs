@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IIS
+namespace Iis.Utility
 {
     public class ObjectEnum : IEquatable<ObjectEnum>
     {

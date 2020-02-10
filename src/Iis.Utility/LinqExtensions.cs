@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 
-namespace IIS
+namespace Iis.Utility
 {
     public static class LinqExtensions
     {
-        public static bool AnyDuplicate<T, TProperty>(this IEnumerable<T> collection, Func<T, TProperty> property) => 
+        public static bool AnyDuplicate<T, TProperty>(this IEnumerable<T> collection, Func<T, TProperty> property) =>
             collection.GroupBy(property).Any(_ => _.Count() > 1);
 
-        public static bool HaveSame<T, TProperty>(this IEnumerable<T> collection, Func<T, TProperty> property) => 
+        public static bool HaveSame<T, TProperty>(this IEnumerable<T> collection, Func<T, TProperty> property) =>
             collection.Select(property).Distinct().Count() == 1;
-            
+
         public static IEnumerable<T> Except<T, TProperty>(this IEnumerable<T> first, IEnumerable<T> second,
-            Func<T, TProperty> property) => 
+            Func<T, TProperty> property) =>
             first.Except(second, new GenericEqualityComparer<T, TProperty>(property));
 
         public static IEnumerable<(TLeft Left, TRight Right)> FullOuterJoin<TLeft, TRight>
@@ -24,7 +24,7 @@ namespace IIS
                 from left in leftCollection
                 join right in rightCollection on leftProperty(left) equals rightProperty(right) into se
                 from p in se.DefaultIfEmpty()
-                select (Left: left, Right: p );
+                select (Left: left, Right: p);
             var rightJoin =
                 from right in rightCollection
                 join left in leftCollection on rightProperty(right) equals leftProperty(left) into se

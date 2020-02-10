@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json.Linq;
-
+using Iis.Utility;
 // todo: Constraint 'EntityTypes_code_type_key' on table public.EntityTypes cannot be scaffolded because it includes a column that cannot be scaffolded(e.g. enum).
 // todo: Index 'EntityTypes_code_type_key' on table public.EntityTypes cannot be scaffolded because it includes a column that cannot be scaffolded(e.g. enum).
 
