@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Iis.DataModel
 {
@@ -20,6 +21,7 @@ namespace Iis.DataModel
         public virtual AttributeTypeEntity AttributeType { get; set; }
         public virtual RelationTypeEntity RelationType { get; set; }
 
+        [JsonIgnore]
         public virtual List<NodeEntity> Nodes { get; set; } = new List<NodeEntity>();
     }
 }

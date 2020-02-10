@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "FuzzyDate",
+    "conceptType": "relations",
+    "id": "D6F4B3F3-0775-4B21-94F2-CE04DD91FA34",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 48
+    },
+    "name": "dateOfJobPositionActualization",
+    "target": "FuzzyDate",
+    "title": "Дата актуальності посади"
+}

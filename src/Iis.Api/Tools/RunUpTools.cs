@@ -113,6 +113,9 @@ namespace IIS.Core.Tools
                 case "recreate-elastic":
                     await elasticTools.RecreateElasticAsync();
                     break;
+                case "migrate-ontology":
+                    await tools.MigrateOntologyAsync();
+                    break;
                 case "help":
                     Help();
                     break;

@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "FuzzyDate",
+    "conceptType": "relations",
+    "id": "97357EB7-A126-4F72-B2CD-4C4DF65112ED",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 49
+    },
+    "name": "dateOfServingPlaceActualization",
+    "target": "FuzzyDate",
+    "title": "Дата актуалізації місця служби"
+}

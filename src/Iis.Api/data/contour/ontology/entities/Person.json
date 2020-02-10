@@ -263,7 +263,7 @@
             },
             "name": "placeOfBirth",
             "target": "UniversalLocation",
-            "title": "місце народження"
+            "title": "Місце народження"
         },
         {
             "id": "494A3783-D520-4f33-8A77-C7EC2F516903",
@@ -960,7 +960,61 @@
             "name": "actsOfTerrorParticipation",
             "target": "OrgParticipation",
             "title": "Причетність до резонансних подій/терактів/злочинів"
-        }
+        },
+		{
+            "id": "D6F4B3F3-0775-4B21-94F2-CE04DD91FA34",
+            "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "fuzzyDate"
+                },
+                "multiple": false,
+                "sortOrder": 48
+            },
+            "name": "dateOfJobPositionActualization",
+            "target": "FuzzyDate",
+            "title": "Дата актуальності посади"
+        },
+		{
+            "id": "97357EB7-A126-4F72-B2CD-4C4DF65112ED",
+            "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "fuzzyDate"
+                },
+                "multiple": false,
+                "sortOrder": 49
+            },
+            "name": "dateOfServingPlaceActualization",
+            "target": "FuzzyDate",
+            "title": "Дата актуалізації місця служби"
+        },
+		{
+            "id": "348293BF-82F2-41E0-912C-BD2EAB2481B7",
+            "meta": {
+                "acceptsEntityOperations": [
+                    "Create",
+                    "Update",
+                    "Delete"
+                ],
+                "formField": {
+                    "type": "fuzzyDate"
+                },
+                "multiple": false,
+                "sortOrder": 50
+            },
+            "name": "dateOfRankActualization",
+            "target": "FuzzyDate",
+            "title": "Дата актуалізації звання"
+        },
     ],
     "conceptType": "entities",
     "extends": [

@@ -38,6 +38,8 @@ using Serilog;
 using Iis.Domain.Elastic;
 using Iis.Elastic;
 using Iis.Api;
+using Iis.Api.Ontology.Migration;
+using AutoMapper;
 
 namespace IIS.Core
 {
@@ -78,6 +80,7 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<ElasticService>();
+            services.AddTransient<MigrationService>();
             services.AddSingleton<RunTimeSettings>();
 
             // material processors
@@ -175,6 +178,7 @@ namespace IIS.Core
             services.AddHostedService<MaterialEventConsumer>();
 
             services.AddControllers();
+            services.AddAutoMapper(typeof(Startup));
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)

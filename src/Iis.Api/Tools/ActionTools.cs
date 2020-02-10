@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Iis.Api;
+using Iis.Api.Ontology.Migration;
 
 namespace IIS.Core.Tools
 {
@@ -27,6 +28,7 @@ namespace IIS.Core.Tools
         private readonly Seeder _seeder;
         private readonly OntologyContext _ontologyContext;
         private readonly RunTimeSettings _runtimeSettings;
+        private readonly MigrationService _migrationService;
 
         public ActionTools(
             ILogger<ActionTools> logger,
@@ -36,7 +38,8 @@ namespace IIS.Core.Tools
             OntologyTypeSaver ontologyTypeSaver,
             Seeder seeder,
             OntologyContext ontologyContext,
-            RunTimeSettings runTimeSettings)
+            RunTimeSettings runTimeSettings,
+            MigrationService migrationService)
         {
             _logger = logger;
             _legacyOntologyProvider = legacyOntologyProvider;
@@ -46,6 +49,7 @@ namespace IIS.Core.Tools
             _seeder = seeder;
             _ontologyContext = ontologyContext;
             _runtimeSettings = runTimeSettings;
+            _migrationService = migrationService;
         }
 
         public async Task ClearTypesAsync()
@@ -201,6 +205,11 @@ namespace IIS.Core.Tools
         public async Task DumpContourOntologyAsync()
         {
             await _dumpOntology("contour");
+        }
+
+        public async Task MigrateOntologyAsync()
+        {
+            await _migrationService.MigrateAsync();
         }
 
         private async Task _dumpOntology(string name)

@@ -1,0 +1,12 @@
+{
+    "attrTypeName": "FuzzyDate",
+    "conceptType": "relations",
+    "id": "348293BF-82F2-41E0-912C-BD2EAB2481B7",
+    "meta": {
+        "multiple": true,
+        "sortOrder": 50
+    },
+    "name": "dateOfRankActualization",
+    "target": "FuzzyDate",
+    "title": "Дата актуалізації звання"
+}
