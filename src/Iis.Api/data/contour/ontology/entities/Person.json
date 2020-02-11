@@ -157,18 +157,10 @@
         {
             "id": "0FDD5857-31BD-4941-A23A-62C2D400C4B6",
             "meta": {
-                "acceptsEntityOperations": [
-                    "Create",
-                    "Update",
-                    "Delete"
-                ],
                 "container": {
                     "id": "81783AB2-77C8-43b1-B544-354F346964E2",
                     "title": "Установчі дані",
                     "type": "Accordion"
-                },
-                "formField": {
-                    "type": "form"
                 },
                 "multiple": false,
                 "sortOrder": 9
@@ -788,18 +780,13 @@
         {
             "id": "70FF083C-D075-479d-84A6-0DD3D4D8F8C0",
             "meta": {
-                "acceptsEntityOperations": [
-                    "Create",
-                    "Update",
-                    "Delete"
-                ],
                 "container": {
                     "id": "8944ED63-DD7E-465c-A381-7DD227B78B8E",
                     "title": "Заохочення (вид нагороди, медалі, цінні подарунки тощо)",
                     "type": "Accordion"
                 },
                 "formField": {
-                    "type": "form"
+                    "type": "fuzzyDate"
                 },
                 "multiple": true,
                 "sortOrder": 39
@@ -822,10 +809,13 @@
                     "type": "Accordion"
                 },
                 "formField": {
-                    "type": "form"
+                    "type": "fuzzyDate"
                 },
                 "multiple": true,
                 "sortOrder": 40
+            },
+            "formField": {
+                "type": "fuzzyDate"
             },
             "name": "sanction",
             "target": "Sanction",
