@@ -20,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using IIS.Core.Ontology;
+using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration.Internal;
 
 namespace IIS.Core.Materials
 {
@@ -198,10 +199,25 @@ namespace IIS.Core.Materials
             public readonly double X;
             public readonly double Y;
 
+            private const double M_PI_4 = Math.PI / 4.0;
+            private const double D_R = Math.PI / 180.0;
+            private const double R_MAJOR = 6378137.0;
+
             public PointGeometry(double lng, double lat)
             {
-                X = lng;
-                Y = lat;
+                LatLong2SpherMerc(lng, lat, out X, out Y);
+            }
+
+            private static double deg_rad(double ang)
+            {
+                return ang * D_R;
+            }
+
+            void LatLong2SpherMerc(double lon, double lat, out double x, out double y)
+            {
+                lat = Math.Min(89.5, Math.Max(lat, -89.5));
+                x = R_MAJOR * deg_rad(lon);
+                y = R_MAJOR * Math.Log(Math.Tan(M_PI_4 + deg_rad(lat) / 2));
             }
         }
 
