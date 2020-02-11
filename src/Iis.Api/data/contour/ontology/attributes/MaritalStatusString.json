@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "MaritalStatusString",
+    "conceptType": "attributes",
+    "id": "3a884828-59f0-49f8-814d-ae324a79857a",
+    "meta": {
+    },
+    "name": "maritalStatus",
+    "title": "Сімейний стан",
+    "type": "String"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "06225b8e-a844-478e-b3b1-bfb516154bc5",
+  "conceptType": "relations",
+  "name": "maritalStatus",
+  "title": "Сімейний стан",
+  "meta": {
+    "sortOrder": 42,
+    "multiple": false
+  }
+}

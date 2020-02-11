@@ -847,24 +847,18 @@
             "target": "criminalSanction",
             "title": "Кримінальна відповідальність"
         },
-        {
-            "id": "6E73D865-5B4F-4c0f-B44C-4B93B69997C7",
-            "meta": {
-                "container": {
-                    "id": "046D4D55-6B93-49ad-BB83-DD14EAF023F5",
-                    "title": "Сімейний стан",
-                    "type": "Accordion"
-                },
-                "formField": {
-                    "type": "dropdown"
-                },
-                "multiple": false,
-                "sortOrder": 42
-            },
-            "name": "martialStatus",
-            "target": "MartialStatus",
-            "title": "Сімейний стан"
-        },
+	{
+		"attrTypeName": "MaritalStatusString",
+		"id": "b6339d90-9fd9-4ef7-a523-571b1cbf0ef8",
+		"name": "maritalStatus",
+		"title": "Сімейний стан",
+		"meta": {
+			"sortOrder": 42,
+			"multiple": false
+		},
+		"target": "maritalStatus"
+
+	},
         {
             "id": "AC31E52F-DC25-4447-9FF3-939A0B15BC7B",
             "meta": {
