@@ -119,7 +119,7 @@ namespace Iis.Api.Ontology.Migration
             {
                 node.IsMigrated = true;
             }
-            return node?.Attribute.Value;
+            return node?.Attribute.Value ?? string.Empty;
         }
 
         public PersonFullName GetPersonFullNameOldStyle(Guid personNodeId, bool markAsMigrated = false)
@@ -132,13 +132,10 @@ namespace Iis.Api.Ontology.Migration
             };
 
             var fullNameRu = GetPersonNameByTypeName(personNodeId, "fullNameRu", markAsMigrated);
-            if (!string.IsNullOrWhiteSpace(fullNameRu))
-            {
-                var parts = fullNameRu.Split(' ');
-                result.LastNameRu = parts.Length > 0 ? parts[0] : null;
-                result.FirstNameRu = parts.Length > 1 ? parts[1] : null;
-                result.FatherNameRu = parts.Length > 2 ? parts[2] : null;
-            }
+            var parts = fullNameRu.Split(' ');
+            result.LastNameRu = parts.Length > 0 ? parts[0] : string.Empty;
+            result.FirstNameRu = parts.Length > 1 ? parts[1] : string.Empty;
+            result.FatherNameRu = parts.Length > 2 ? parts[2] : string.Empty;
 
             return result;
         }

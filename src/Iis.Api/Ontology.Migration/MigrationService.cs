@@ -64,7 +64,7 @@ namespace Iis.Api.Ontology.Migration
             MigrateDirectMappedCases();
             MigratePersonNames();
             MigrateByConditions(conditions);
-            //SaveMigratedToDb();
+            SaveMigratedToDb();
             _snapshotOld.GetNotMappedNodeStatistics();
 
             await Task.Yield();
@@ -115,6 +115,10 @@ namespace Iis.Api.Ontology.Migration
             foreach (var person in persons)
             {
                 var fullName = _snapshotOld.GetPersonFullNameOldStyle(person.Id, true);
+                if (fullName.LastNameRu == null)
+                {
+                    SavePersonFullNameNewStyle(person.Id, fullName);
+                }
                 SavePersonFullNameNewStyle(person.Id, fullName);
             }
         }
@@ -186,7 +190,7 @@ namespace Iis.Api.Ontology.Migration
         private Guid AddMiddleNode(Guid sourceNodeId, Guid relationTypeId, Guid nodeTypeId, string value = null)
         {
             var node = CreateNodeEntity(nodeTypeId);
-            if (!string.IsNullOrEmpty(value))
+            if (value != null)
             {
                 node.Attribute = new AttributeEntity
                 {
@@ -220,13 +224,14 @@ namespace Iis.Api.Ontology.Migration
             }
             else
             {
+                var middleNodeId = AddMiddleNode(sourceNodeId, (Guid)lastRelation.RelationTypeId, lastRelation.NodeTypeId);
                 foreach (var devidedValue in devidedValues)
                 {
                     var shortRelation = _snapshotNew.GetChildTypeIdByName(lastRelation.NodeTypeId, devidedValue.TypeName);
                     var nodeEntity = CreateNodeEntity(shortRelation.NodeTypeId);
                     nodeEntity.Attribute = new AttributeEntity { Id = nodeEntity.Id, Value = devidedValue.Value };
                     AddMigratedNode(nodeEntity);
-                    AddRelation(sourceNodeId, nodeEntity.Id, (Guid)shortRelation.RelationTypeId, shortRelation.NodeTypeId);
+                    AddRelation(middleNodeId, nodeEntity.Id, (Guid)shortRelation.RelationTypeId, shortRelation.NodeTypeId);
                 }
             }
             node.IsMigrated = true;
