@@ -106,12 +106,8 @@ namespace Iis.Elastic
 
             var builder = new StringBuilder();
 
-            var length = input.Length - 1;
-
-            for (int i = 0; i < length; i++)
+            foreach (var ch in input)
             {
-                var ch = input[i];
-
                 if (escapePattern.Contains(ch))
                 {
                     builder.Append('\\');
