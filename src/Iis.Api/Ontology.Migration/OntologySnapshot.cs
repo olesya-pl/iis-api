@@ -29,6 +29,22 @@ namespace Iis.Api.Ontology.Migration
             return result;
         }
 
+        public List<SnapshotNode> GetNodesByTypeId(Guid typeId)
+        {
+            return Nodes.Values.Where(n => n.NodeTypeId == typeId).ToList();
+        }
+
+        public List<SnapshotNode> GetNodesByUniqueTypeName(string typeName)
+        {
+            var nodeType = GetNodeTypeByUniqueName(typeName);
+            return GetNodesByTypeId(nodeType.Id);
+        }
+
+        public SnapshotNodeType GetNodeTypeByUniqueName(string typeName)
+        {
+            return NodeTypes.Values.Where(nt => nt.Name == typeName).SingleOrDefault();
+        }
+
         public bool IsNodeMapped(Guid nodeId)
         {
             var node = Nodes[nodeId];
@@ -81,6 +97,50 @@ namespace Iis.Api.Ontology.Migration
                 }
             }
             return null;
+        }
+
+        private bool IsRelationMatchToTypes(SnapshotRelation relation, Guid sourceTypeId, Guid relationTypeId, Guid targetTypeId)
+        {
+            return Nodes[relation.SourceNodeId].NodeTypeId == sourceTypeId
+                && Nodes[relation.Id].NodeTypeId == relationTypeId
+                && Nodes[relation.TargetNodeId].NodeTypeId == targetTypeId;
+        }
+
+        private string GetPersonNameByTypeName(Guid personNodeId, string typeName, bool markAsMigrated = false)
+        {
+            var rels = GetNodeTypesByDotName("Person." + typeName);
+            var node = Nodes.Values
+                .Where(
+                    n => n.IncomingRelations
+                        .Any(r => IsRelationMatchToTypes(r, rels[0].NodeTypeId, (Guid)rels[1].RelationTypeId, rels[1].NodeTypeId)
+                            && r.SourceNodeId == personNodeId))
+                .FirstOrDefault();
+            if (node != null && markAsMigrated)
+            {
+                node.IsMigrated = true;
+            }
+            return node?.Attribute.Value;
+        }
+
+        public PersonFullName GetPersonFullNameOldStyle(Guid personNodeId, bool markAsMigrated = false)
+        {
+            var result = new PersonFullName
+            {
+                FirstNameUkr = GetPersonNameByTypeName(personNodeId, "firstName", markAsMigrated),
+                LastNameUkr = GetPersonNameByTypeName(personNodeId, "secondName", markAsMigrated),
+                FatherNameUkr = GetPersonNameByTypeName(personNodeId, "fatherName", markAsMigrated)
+            };
+
+            var fullNameRu = GetPersonNameByTypeName(personNodeId, "fullNameRu", markAsMigrated);
+            if (!string.IsNullOrWhiteSpace(fullNameRu))
+            {
+                var parts = fullNameRu.Split(' ');
+                result.LastNameRu = parts.Length > 0 ? parts[0] : null;
+                result.FirstNameRu = parts.Length > 1 ? parts[1] : null;
+                result.FatherNameRu = parts.Length > 2 ? parts[2] : null;
+            }
+
+            return result;
         }
 
         public List<ShortRelation> GetNodeTypesByDotName(string typeDotName)

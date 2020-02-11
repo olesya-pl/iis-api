@@ -19,7 +19,7 @@ namespace Iis.Api.Ontology.Migration
         private OntologySnapshot _snapshotOld;
         private OntologySnapshot _snapshotNew;
         private ILogger<MigrationService> _logger;
-        private MigrationValueDevider _devider;
+        private MigrationValueDivider _devider;
         private Dictionary<Guid, NodeEntity> _migratedNodes = new Dictionary<Guid, NodeEntity>();
         private List<RelationEntity> _migratedRelations = new List<RelationEntity>();
         public MigrationService(OntologyContext context, IMapper mapper, ILogger<MigrationService> logger)
@@ -27,7 +27,7 @@ namespace Iis.Api.Ontology.Migration
             _context = context;
             _mapper = mapper;
             _logger = logger;
-            _devider = new MigrationValueDevider();
+            _devider = new MigrationValueDivider();
         }
         public async Task MigrateAsync()
         {
@@ -48,9 +48,9 @@ namespace Iis.Api.Ontology.Migration
                 new MigrationCondition { TypeFrom = "Person.dateOfJobPositionActualization", TypeTo = "Person.dateOfJobPositionActualization" },
                 new MigrationCondition { TypeFrom = "Person.dateOfRankActualization", TypeTo = "Person.dateOfRankActualization" },
                 new MigrationCondition { TypeFrom = "Person.dateOfServingPlaceActualization", TypeTo = "Person.dateOfServingPlaceActualization" },
-                new MigrationCondition { TypeFrom = "Person.firstName", TypeTo = "Person.realName.firstName.ukr" },
-                new MigrationCondition { TypeFrom = "Person.secondName", TypeTo = "Person.realName.lastName.ukr" },
-                new MigrationCondition { TypeFrom = "Person.fatherName", TypeTo = "Person.realName.fatherName.ukr" },
+                //new MigrationCondition { TypeFrom = "Person.firstName", TypeTo = "Person.realName.firstName.ukr" },
+                //new MigrationCondition { TypeFrom = "Person.secondName", TypeTo = "Person.realName.lastName.ukr" },
+                //new MigrationCondition { TypeFrom = "Person.fatherName", TypeTo = "Person.realName.fatherName.ukr" },
                 new MigrationCondition { TypeFrom = "Person.position", TypeTo = "Person.currentJob.position" },
                 new MigrationCondition { TypeFrom = "Person.registrationPlace", TypeTo = "Person.registrationAddress.location" },
                 new MigrationCondition { TypeFrom = "Person.livingPlace", TypeTo = "Person.currentLocation.location" },
@@ -60,9 +60,11 @@ namespace Iis.Api.Ontology.Migration
                 //new MigrationCondition { TypeFrom = "Person.relatesToCountry", TypeTo = "Person.citizenship" },
 
             };
+            
             MigrateDirectMappedCases();
+            MigratePersonNames();
             MigrateByConditions(conditions);
-            SaveMigratedToDb();
+            //SaveMigratedToDb();
             _snapshotOld.GetNotMappedNodeStatistics();
 
             await Task.Yield();
@@ -89,9 +91,6 @@ namespace Iis.Api.Ontology.Migration
                 snapshotNode.IsMigrated = true;
             }
 
-            //var relations = snapshotNodes.SelectMany(n => n.IncomingRelations).ToList();
-            //var badRelations = relations.Where(r => !snapshotNodes.Any(n => n.Id == r.SourceNodeId)).ToList();
-
             var ignoredTypeIds = new List<Guid> { new Guid("177f4fbd-f2ea-4d7c-836e-738c48aece4c") };
 
             foreach (var snapshotNode in snapshotNodes)
@@ -108,6 +107,30 @@ namespace Iis.Api.Ontology.Migration
                     _migratedRelations.Add(relation);
                 }
             }
+        }
+
+        private void MigratePersonNames()
+        {
+            var persons = _snapshotOld.GetNodesByUniqueTypeName("Person");
+            foreach (var person in persons)
+            {
+                var fullName = _snapshotOld.GetPersonFullNameOldStyle(person.Id, true);
+                SavePersonFullNameNewStyle(person.Id, fullName);
+            }
+        }
+
+        private void SavePersonFullNameNewStyle(Guid personNodeId, PersonFullName fullName)
+        {
+            var realNameId = AddMiddleNode(personNodeId, "Person.realName");
+            var firstNameId = AddMiddleNode(realNameId, "Person.realName.firstName");
+            AddMiddleNode(firstNameId, "Person.realName.firstName.ukr", fullName.FirstNameUkr);
+            AddMiddleNode(firstNameId, "Person.realName.firstName.original", fullName.FirstNameRu);
+            var lastNameId = AddMiddleNode(realNameId, "Person.realName.lastName");
+            AddMiddleNode(lastNameId, "Person.realName.lastName.ukr", fullName.LastNameUkr);
+            AddMiddleNode(lastNameId, "Person.realName.lastName.original", fullName.LastNameRu);
+            var fatherNameId = AddMiddleNode(realNameId, "Person.realName.fatherName");
+            AddMiddleNode(fatherNameId, "Person.realName.fatherName.ukr", fullName.FatherNameUkr);
+            AddMiddleNode(fatherNameId, "Person.realName.fatherName.original", fullName.FatherNameRu);
         }
 
         private void MigrateByConditions(List<MigrationCondition> conditions)
@@ -154,9 +177,23 @@ namespace Iis.Api.Ontology.Migration
             _migratedRelations.Add(relation);
         }
 
-        private Guid AddMiddleNode(Guid sourceNodeId, Guid relationTypeId, Guid nodeTypeId)
+        private Guid AddMiddleNode(Guid sourceNodeId, string dotTypeName, string value = null)
+        {
+            var rels = _snapshotNew.GetNodeTypesByDotName(dotTypeName);
+            return AddMiddleNode(sourceNodeId, (Guid)rels.Last().RelationTypeId, rels.Last().NodeTypeId, value);
+        }
+
+        private Guid AddMiddleNode(Guid sourceNodeId, Guid relationTypeId, Guid nodeTypeId, string value = null)
         {
             var node = CreateNodeEntity(nodeTypeId);
+            if (!string.IsNullOrEmpty(value))
+            {
+                node.Attribute = new AttributeEntity
+                {
+                    Id = node.Id, 
+                    Value = value
+                };
+            }
             AddRelation(sourceNodeId, node.Id, relationTypeId, nodeTypeId);
             AddMigratedNode(node);
             return node.Id;
@@ -171,7 +208,7 @@ namespace Iis.Api.Ontology.Migration
             }
             var lastRelation = shortRelations.Last();
             var targetTypeName = _snapshotNew.NodeTypes[lastRelation.NodeTypeId].Name;
-            var devidedValues = _devider.DevideValue(node.Attribute.Value, targetTypeName);
+            var devidedValues = _devider.DivideValue(node.Attribute.Value, targetTypeName);
             if (devidedValues == null)
             {
                 var nodeEntity = _mapper.Map<NodeEntity>(node);

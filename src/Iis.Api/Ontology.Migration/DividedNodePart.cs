@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace Iis.Api.Ontology.Migration
 {
-    public class DevidedNodePart
+    public class DividedNodePart
     {
         public string TypeName { get; private set; }
         public string Value { get; private set; }
 
-        public DevidedNodePart() { }
-        public DevidedNodePart(string typeName, string value)
+        public DividedNodePart() { }
+        public DividedNodePart(string typeName, string value)
         {
             TypeName = typeName;
             Value = value;
