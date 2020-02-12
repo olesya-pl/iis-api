@@ -16,6 +16,7 @@ namespace Iis.Elastic
         ElasticLowLevelClient _lowLevelClient;
         IisElasticConfiguration _configuration;
         IisElasticSerializer _serializer;
+        List<string> _supportedIndexes = new List<string>();
         
         public IisElasticManager(IisElasticConfiguration configuration, IisElasticSerializer serializer)
         {
@@ -25,6 +26,21 @@ namespace Iis.Elastic
             var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
             var config = new ConnectionConfiguration(connectionPool);
             _lowLevelClient = new ElasticLowLevelClient(config);
+        }
+
+        public void SetSupportedIndexes(IEnumerable<string> indexNames)
+        {
+            _supportedIndexes.AddRange(indexNames);
+        }
+
+        public bool IndexIsSupported(string indexName)
+        {
+            return _supportedIndexes.Contains(indexName);
+        }
+
+        public bool IndexesAreSupported(IEnumerable<string> indexNames)
+        {
+            return indexNames.All(name => IndexIsSupported(name));
         }
 
         public async Task<bool> PutJsonAsync(string baseIndexName, string id, string json, CancellationToken cancellationToken = default)

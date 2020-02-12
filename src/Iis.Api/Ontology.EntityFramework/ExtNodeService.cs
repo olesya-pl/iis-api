@@ -61,10 +61,10 @@ namespace IIS.Core.Ontology.EntityFramework
             return result;
         }
 
-        public async Task<List<Guid>> GetNodeTypesForElasticAsync(CancellationToken cancellationToken = default)
+        public async Task<List<NodeTypeEntity>> GetNodeTypesForElasticAsync(CancellationToken cancellationToken = default)
         {
             var typeNames = new List<string> { "Person", "Subdivision", "MilitaryMachinery", "Infrastructure", "Radionetwork" };
-            return await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).Select(nt => nt.Id).ToListAsync();
+            return await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).ToListAsync();
         }
 
         private IQueryable<NodeEntity> GetNodeQuery()

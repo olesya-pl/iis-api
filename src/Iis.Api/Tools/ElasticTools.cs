@@ -20,8 +20,9 @@ namespace IIS.Core.Tools
 
         public async Task RecreateElasticAsync(CancellationToken cancellationToken = default)
         {
-            var nodeTypeIds = await _extNodeService.GetNodeTypesForElasticAsync(cancellationToken);
-            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(nodeTypeIds, cancellationToken);
+            var nodeTypes = await _extNodeService.GetNodeTypesForElasticAsync(cancellationToken);
+            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(nodeTypes.Select(nt => nt.Id), cancellationToken);
+            _elasticManager.SetSupportedIndexes(nodeTypes.Select(nt => nt.Name));
             foreach (var extNode in extNodes)
             {
                 await _elasticManager.PutExtNodeAsync(extNode);

@@ -38,5 +38,10 @@ namespace IIS.Core.Ontology.EntityFramework
             var extNode = await _extNodeService.GetExtNodeByIdAsync(id, cancellationToken);
             return await _elasticManager.PutExtNodeAsync(extNode, cancellationToken);
         }
+
+        public bool TypesAreSupported(IEnumerable<string> typeNames)
+        {
+            return _elasticManager.IndexesAreSupported(typeNames);
+        }
     }
 }
