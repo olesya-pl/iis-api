@@ -57,13 +57,30 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Where(node => nodeTypeIds.Contains(node.NodeTypeId))
                 .ToListAsync();
 
-            var result = await GetExtNodesAsync(nodes, cancellationToken);
+            int cnt = 0, total = nodes.Count();
+            var result = new List<ExtNode>();
+
+            foreach (var node in nodes)
+            {
+                var extNode = await GetExtNodeByIdAsync(node.Id);
+                Console.WriteLine($"{++cnt}/{total}: {extNode.NodeTypeName}; {extNode.Id}");
+                result.Add(extNode);
+            }
+
             return result;
         }
 
         public async Task<List<NodeTypeEntity>> GetNodeTypesForElasticAsync(CancellationToken cancellationToken = default)
         {
-            var typeNames = new List<string> { "Person", "Subdivision", "MilitaryMachinery", "Infrastructure", "Radionetwork" };
+            var typeNames = new List<string> { 
+                "Person", 
+                "Subdivision", 
+                "MilitaryMachinery", 
+                "Infrastructure", 
+                "Radionetwork", 
+                "Organization", 
+                "MilitaryBase" 
+            };
             return await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).ToListAsync();
         }
 

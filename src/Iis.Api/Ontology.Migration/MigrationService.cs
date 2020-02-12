@@ -37,7 +37,7 @@ namespace Iis.Api.Ontology.Migration
             _snapshotOld = GetSnapshotFromFiles();
             _snapshotNew = GetSnapshotFromDb(false);
             //_snapshot = GetSnapshotFromDb();
-            //Save(_snapshot, "snapshot");
+            //Save(_snapshotO, "snapshot");
 
             //MigrateDirectMappedCases();
             var migrationCondition = new MigrationCondition { TypeFrom = "Person.education", TypeTo = "Person.education.additionalInfo" };
@@ -48,17 +48,12 @@ namespace Iis.Api.Ontology.Migration
                 new MigrationCondition { TypeFrom = "Person.dateOfJobPositionActualization", TypeTo = "Person.dateOfJobPositionActualization" },
                 new MigrationCondition { TypeFrom = "Person.dateOfRankActualization", TypeTo = "Person.dateOfRankActualization" },
                 new MigrationCondition { TypeFrom = "Person.dateOfServingPlaceActualization", TypeTo = "Person.dateOfServingPlaceActualization" },
-                //new MigrationCondition { TypeFrom = "Person.firstName", TypeTo = "Person.realName.firstName.ukr" },
-                //new MigrationCondition { TypeFrom = "Person.secondName", TypeTo = "Person.realName.lastName.ukr" },
-                //new MigrationCondition { TypeFrom = "Person.fatherName", TypeTo = "Person.realName.fatherName.ukr" },
                 new MigrationCondition { TypeFrom = "Person.position", TypeTo = "Person.currentJob.position" },
-                new MigrationCondition { TypeFrom = "Person.registrationPlace", TypeTo = "Person.registrationAddress.location" },
-                new MigrationCondition { TypeFrom = "Person.livingPlace", TypeTo = "Person.currentLocation.location" },
-                new MigrationCondition { TypeFrom = "Person.placeOfBirth", TypeTo = "Person.actualAccommodation.location" },
+                new MigrationCondition { TypeFrom = "Person.registrationPlace", TypeTo = "Person.registrationAddress.postalAddress.street" },
+                new MigrationCondition { TypeFrom = "Person.livingPlace", TypeTo = "Person.currentLocation.postalAddress.street" },
+                new MigrationCondition { TypeFrom = "Person.placeOfBirth", TypeTo = "Person.actualAccommodation.postalAddress.street" },
                 
                 new MigrationCondition { TypeFrom = "Person.description", TypeTo = "Person.otherInterestingData" },
-                //new MigrationCondition { TypeFrom = "Person.relatesToCountry", TypeTo = "Person.citizenship" },
-
             };
             
             MigrateDirectMappedCases();

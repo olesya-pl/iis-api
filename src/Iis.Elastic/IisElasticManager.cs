@@ -53,6 +53,7 @@ namespace Iis.Elastic
 
         public async Task<bool> PutExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default)
         {
+            if (!IndexIsSupported(extNode.NodeTypeName)) return false;
             var json = _serializer.GetJsonByExtNode(extNode);
             return await PutJsonAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
