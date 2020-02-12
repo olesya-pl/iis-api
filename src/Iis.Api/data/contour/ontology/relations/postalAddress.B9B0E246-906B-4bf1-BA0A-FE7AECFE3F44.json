@@ -7,6 +7,9 @@
             "Update",
             "Delete"
         ],
+        "formField": {
+            "type": "form"
+        },
         "multiple": false,
         "sortOrder": 2
     },
