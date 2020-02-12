@@ -1,4 +1,6 @@
-﻿namespace IIS.Legacy.EntityFramework
+﻿using Iis.Utility;
+
+namespace IIS.Legacy.EntityFramework
 {
     public class EntityKind : ObjectEnum
     {

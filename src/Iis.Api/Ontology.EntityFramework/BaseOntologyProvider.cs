@@ -2,6 +2,7 @@ using System;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Utility;
 
 namespace IIS.Core.Ontology.EntityFramework
 {

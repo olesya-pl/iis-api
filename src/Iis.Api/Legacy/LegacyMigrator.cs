@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using N = IIS.Core.Ontology;
-
+using Iis.Utility;
 namespace IIS.Legacy.EntityFramework
 {
     public class LegacyMigrator : ILegacyMigrator

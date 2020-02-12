@@ -21,6 +21,7 @@ namespace IIS.Core.Controllers
         }
 
         [HttpPost]
+        [DisableRequestSizeLimit]
         public async Task<object> Post([Required] IFormFile file, CancellationToken token)
         {
             var id = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);

@@ -1,6 +1,8 @@
 ﻿using Humanizer;
+using System.Text;
+using System.Linq;
 
-namespace IIS
+namespace Iis.Utility
 {
     public static class StringExtensions
     {

@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
+    <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
 
 </Project>

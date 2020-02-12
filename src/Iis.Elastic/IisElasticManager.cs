@@ -1,18 +1,20 @@
-﻿using Elasticsearch.Net;
-using Iis.Domain.Elastic;
-using Iis.Domain.ExtendedData;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Elasticsearch.Net;
+using Newtonsoft.Json.Linq;
+
+using Iis.Domain.Elastic;
+using Iis.Domain.ExtendedData;
 
 namespace Iis.Elastic
 {
     public class IisElasticManager: IElasticManager
     {
+        private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
         ElasticLowLevelClient _lowLevelClient;
         IisElasticConfiguration _configuration;
         IisElasticSerializer _serializer;
@@ -93,12 +95,14 @@ namespace Iis.Elastic
             json["_source"] = new JArray(searchParams.ResultFields);
             json["query"] = new JObject();
             var queryString = new JObject();
-            queryString["query"] = searchParams.Query;
+
+            queryString["query"] = EscapeElasticSpecificSymbols(searchParams.Query, EscapeSymbolsPattern);
             queryString["fields"] = new JArray(searchParams.SearchFields);
             queryString["lenient"] = searchParams.IsLenient;
 
             json["query"]["query_string"] = queryString;
-            return json.ToString();
+
+            return json.ToString(); ;
         }
 
         private string GetRealIndexName(string baseIndexName)
@@ -109,6 +113,27 @@ namespace Iis.Elastic
         private string GetRealIndexNames(List<string> baseIndexNames)
         {
             return string.Join(',', baseIndexNames.Select(name => GetRealIndexName(name)));
+        }
+
+        private string EscapeElasticSpecificSymbols(string input, string escapePattern) 
+        {
+            if (string.IsNullOrWhiteSpace(input)) return input;
+
+            if (string.IsNullOrWhiteSpace(escapePattern)) throw new ArgumentNullException(nameof(escapePattern));
+
+            var builder = new StringBuilder();
+
+            foreach (var ch in input)
+            {
+                if (escapePattern.Contains(ch))
+                {
+                    builder.Append('\\');
+                }
+
+                builder.Append(ch);
+            }
+
+            return builder.ToString();
         }
 
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)

@@ -38,6 +38,8 @@ using Serilog;
 using Iis.Domain.Elastic;
 using Iis.Elastic;
 using Iis.Api;
+using Iis.Api.Configuration;
+using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
 using AutoMapper;
 
@@ -58,7 +60,8 @@ namespace IIS.Core
         {
             services
                 .RegisterRunUpTools()
-                .RegisterSeederTools();
+                .RegisterSeederTools()
+                .AddConfigurations(Configuration);
 
             services.AddMemoryCache();
 
@@ -89,7 +92,7 @@ namespace IIS.Core
 
             services.AddTransient<Ontology.Seeding.Seeder>();
             services.AddTransient(e => new ContextFactory(dbConnectionString));
-            services.AddTransient(e => new FileServiceFactory(dbConnectionString));
+            services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();

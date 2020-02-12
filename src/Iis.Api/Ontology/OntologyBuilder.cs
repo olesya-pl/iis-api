@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Iis.Domain;
 using Iis.Domain.Meta;
-using Newtonsoft.Json.Linq;
+using Iis.Utility;
 
 namespace IIS.Core.Ontology
 {
