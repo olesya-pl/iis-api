@@ -1,0 +1,10 @@
+{
+    "attrTypeName": "MilitaryRanktring",
+    "conceptType": "attributes",
+    "id": "7c54757e-8c74-4561-a935-50a0b525be4f",
+    "meta": {
+    },
+    "name": "militaryRank",
+    "title": "Військове звання",
+    "type": "String"
+}

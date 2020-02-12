@@ -1,0 +1,10 @@
+{
+  "id": "3833b1dc-ea63-46ea-a9ff-8d2b5d902dad",
+  "conceptType": "relations",
+  "name": "militaryRank",
+  "title": "Військове звання",
+  "meta": {
+    "sortOrder": 24,
+    "multiple": false
+  }
+}

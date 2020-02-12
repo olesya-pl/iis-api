@@ -461,24 +461,18 @@
             "target": "WorkPlace",
             "title": "Поточне місце військової служби/роботи"
         },
-        {
-            "id": "E939CD89-7014-4423-B188-EE14CE3BB0C0",
-            "meta": {
-                "container": {
-                    "id": "2DD5A468-0246-48d2-B86D-AA436A6C341C",
-                    "title": "Поточне місце військової служби/роботи",
-                    "type": "Accordion"
-                },
-                "formField": {
-                    "type": "dropdown"
-                },
-                "multiple": true,
-                "sortOrder": 24
-            },
-            "name": "currentRank",
-            "target": "Rank",
-            "title": "Поточне військове/спеціальне звання/ранг"
-        },
+	{
+		"attrTypeName": "MilitaryRankString",
+		"id": "3833b1dc-ea63-46ea-a9ff-8d2b5d902dad",
+		"name": "militaryRank",
+		"title": "Військове звання",
+		"meta": {
+			"sortOrder": 24,
+			"multiple": false
+		},
+		"target": "militaryRank"
+
+	},
         {
             "id": "BDD8F26B-DE33-4b5e-B28B-2C6C7903CDDA",
             "meta": {
