@@ -9,7 +9,7 @@
             },
             "name": "day",
             "target": "day",
-            "title": "день"
+            "title": "День"
         },
         {
             "attrTypeName": "MonthInteger",
@@ -20,7 +20,7 @@
             },
             "name": "month",
             "target": "month",
-            "title": "місяць"
+            "title": "Місяць"
         },
         {
             "attrTypeName": "YearInteger",
@@ -31,7 +31,7 @@
             },
             "name": "year",
             "target": "year",
-            "title": "рік"
+            "title": "Рік"
         }
     ],
     "conceptType": "entities",

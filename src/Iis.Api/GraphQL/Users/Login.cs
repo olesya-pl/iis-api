@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL.Users
         public LoginResponse Login([Required] string username, [Required] string password)
         {
             var hash = _configuration.GetPasswordHashAsBase64String(password);
-            var user = _context.Users.SingleOrDefault(x => x.Username == username); // && x.PasswordHash == hash);
+            var user = _context.Users.SingleOrDefault(x => x.Username == username && x.PasswordHash == hash);
 
             if (user == null || user.IsBlocked)
                 throw new InvalidCredentialException($"Wrong username or password");

@@ -98,7 +98,7 @@
             },
             "name": "dateOfBirth",
             "target": "FuzzyDate",
-            "title": "дата народження"
+            "title": "Дата народження"
         },
         {
             "id": "168891D4-961F-4eeb-966D-CEA86CEFE028",
@@ -152,7 +152,7 @@
             },
             "name": "gender",
             "target": "Gender",
-            "title": "стать"
+            "title": "Стать"
         },
         {
             "id": "0FDD5857-31BD-4941-A23A-62C2D400C4B6",
@@ -167,7 +167,7 @@
             },
             "name": "nationality",
             "target": "Nationality",
-            "title": "национальность"
+            "title": "Національність"
         },
         {
             "id": "88022D6C-B8DE-46b0-B621-8343554FDDFF",
@@ -186,7 +186,7 @@
             },
             "name": "citizenship",
             "target": "Country",
-            "title": "громадянство"
+            "title": "Громадянство"
         },
         {
             "id": "E120FC35-AD5F-407c-BF88-A46A14082A65",
@@ -209,7 +209,7 @@
             },
             "name": "nicknameSign",
             "target": "NicknameSign",
-            "title": "позивний"
+            "title": "Позивний"
         },
         {
             "id": "7A23BEC8-8A75-499a-84DF-54803AED9823",
@@ -278,7 +278,7 @@
             },
             "name": "registrationAddress",
             "target": "UniversalLocation",
-            "title": "адреса реєстрації"
+            "title": "Адреса реєстрації"
         },
         {
             "id": "6DC1C4B4-3042-45f1-8CFD-078422529683",
@@ -347,7 +347,7 @@
             },
             "name": "foreignPassport",
             "target": "ForeignPassport",
-            "title": "закордонний паспорт"
+            "title": "Закордонний паспорт"
         },
         {
             "id": "3E3B2036-336A-4e8d-A9A9-E7A81B00FA45",
@@ -672,7 +672,7 @@
             },
             "name": "created",
             "target": "created",
-            "title": "дата першої фіксації"
+            "title": "Дата першої фіксації"
         },
         {
             "attrTypeName": "UpdatedDateTime",
@@ -683,7 +683,7 @@
             },
             "name": "updated",
             "target": "updated",
-            "title": "дата оновлення інформації"
+            "title": "Дата оновлення інформації"
         },
         {
             "id": "474997D1-84A3-4252-9C2F-BFB0955DDFC9",

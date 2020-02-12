@@ -18,7 +18,6 @@
     },
     "IIS.Core": {
       "commandName": "Project",
-      "commandLineArgs": "--iis-actions migrate-ontology",
       "launchBrowser": true,
       "launchUrl": "playground",
       "environmentVariables": {

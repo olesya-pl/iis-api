@@ -9,7 +9,7 @@
             },
             "name": "code",
             "target": "code",
-            "title": "код"
+            "title": "Код"
         },
         {
             "attrTypeName": "NameString",
@@ -20,7 +20,7 @@
             },
             "name": "name",
             "target": "name",
-            "title": "назва"
+            "title": "Назва"
         }
     ],
     "conceptType": "entities",

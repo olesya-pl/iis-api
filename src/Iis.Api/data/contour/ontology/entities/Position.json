@@ -19,7 +19,7 @@
             },
             "name": "currentOwner",
             "target": "Person",
-            "title": "Сейчас занимает"
+            "title": "Зараз займає"
         },
         {
             "id": "4F1385FD-5657-4699-815A-5D035A8459A6",
@@ -29,7 +29,7 @@
             },
             "name": "previousOwner",
             "target": "Person",
-            "title": "занимавшие ранее"
+            "title": "Займали раніше"
         }
     ],
     "conceptType": "entities",

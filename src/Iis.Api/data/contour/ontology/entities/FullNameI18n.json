@@ -16,7 +16,7 @@
             },
             "name": "firstName",
             "target": "StringI18n",
-            "title": "ім'я"
+            "title": "Ім'я"
         },
         {
             "id": "5A574E72-BDBC-4760-9021-24C8D530D7D5",
@@ -34,7 +34,7 @@
             },
             "name": "lastName",
             "target": "StringI18n",
-            "title": "прізвище"
+            "title": "Прізвище"
         },
         {
             "id": "96F19368-4E99-40f7-BA78-E914A32DD250",
@@ -52,7 +52,7 @@
             },
             "name": "fatherName",
             "target": "StringI18n",
-            "title": "по батькові"
+            "title": "По батькові"
         },
         {
             "id": "14A3E4F2-E3D3-4956-ABC9-C003D3308B9E",

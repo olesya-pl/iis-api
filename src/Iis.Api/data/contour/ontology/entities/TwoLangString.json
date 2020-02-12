@@ -9,7 +9,7 @@
             },
             "name": "original",
             "target": "original",
-            "title": "мовою оригіналу"
+            "title": "Мовою оригіналу"
         },
         {
             "attrTypeName": "UkrString",
@@ -20,7 +20,7 @@
             },
             "name": "ukr",
             "target": "ukr",
-            "title": "українською"
+            "title": "Українською"
         }
     ],
     "conceptType": "entities",

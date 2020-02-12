@@ -34,7 +34,7 @@
             },
             "name": "where",
             "target": "TaggableString",
-            "title": "місце роботи"
+            "title": "Місце роботи"
         },
         {
             "attrTypeName": "PositionString",

@@ -8,7 +8,7 @@
             },
             "name": "lang",
             "target": "Language",
-            "title": "мова"
+            "title": "Мова"
         },
         {
             "attrTypeName": "LevelString",
@@ -19,7 +19,7 @@
             },
             "name": "level",
             "target": "level",
-            "title": "рівень володіння"
+            "title": "Рівень володіння"
         }
     ],
     "conceptType": "entities",

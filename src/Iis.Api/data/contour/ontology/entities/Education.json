@@ -16,7 +16,7 @@
             },
             "name": "duration",
             "target": "FuzzyDateRange",
-            "title": "термін навчання"
+            "title": "Термін навчання"
         },
         {
             "id": "523C7159-127D-497e-8CE5-0F6F34B0D2AA",
@@ -34,7 +34,7 @@
             },
             "name": "educationalInstitution",
             "target": "EducationalInstitution",
-            "title": "навчальний заклад"
+            "title": "Навчальний заклад"
         },
         {
             "id": "0FE0EAAB-4924-48e2-8FE5-8825A0A99A7E",
@@ -44,7 +44,7 @@
             },
             "name": "educationType",
             "target": "EducationLevel",
-            "title": "рівень освіти"
+            "title": "Рівень освіти"
         },
         {
             "id": "0588C89A-C22D-4a87-A4A1-DA7AF032F169",
@@ -54,7 +54,7 @@
             },
             "name": "grade",
             "target": "Grade",
-            "title": "здобута кваліфікація"
+            "title": "Здобута кваліфікація"
         },
         {
             "attrTypeName": "SpecialtyString",
@@ -65,7 +65,7 @@
             },
             "name": "specialty",
             "target": "specialty",
-            "title": "спеціальність"
+            "title": "Спеціальність"
         },
         {
             "attrTypeName": "SpecializationString",
@@ -76,7 +76,7 @@
             },
             "name": "specialization",
             "target": "specialization",
-            "title": "спеціалізація"
+            "title": "Спеціалізація"
         },
         {
             "attrTypeName": "AdditionalInfoString",
