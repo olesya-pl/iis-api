@@ -18,17 +18,17 @@ namespace IIS.Core.Ontology.EntityFramework
             _context = context;
         }
 
-        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, CancellationToken cancellationToken = default)
+        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, CancellationToken cancellationToken = default)
         {
             var extNode = new ExtNode
             {
                 Id = nodeEntity.Id.ToString("N"),
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
-                NodeTypeName = nodeEntity.NodeType?.Name,
+                NodeTypeName = nodeTypeName,
                 AttributeValue = nodeEntity.Attribute?.Value,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
-                Children = await GetExtNodesByIdsAsync(nodeEntity.OutgoingRelations.Select(r => r.TargetNodeId), cancellationToken)
+                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, cancellationToken)
             };
             return await Task.FromResult(extNode);
         }
@@ -38,23 +38,27 @@ namespace IIS.Core.Ontology.EntityFramework
             var nodeEntity = await GetNodeQuery()
                 .Where(n => n.Id == id)
                 .SingleOrDefaultAsync();
-            return await MapExtNodeAsync(nodeEntity, cancellationToken);
+            return await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, cancellationToken);
         }
 
-        public async Task<List<ExtNode>> GetExtNodesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        public async Task<List<ExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
         {
-            var nodes = await GetNodeQuery()
-                .Where(node => ids.Contains(node.Id))
-                .ToListAsync();
-
-            var result = await GetExtNodesAsync(nodes, cancellationToken);
+            var result = new List<ExtNode>();
+            foreach (var relation in relations)
+            {
+                var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
+                var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, cancellationToken);
+                result.Add(extNode);
+            }
             return result;
         }
 
-        public async Task<List<ExtNode>> GetExtNodesByTypeIdsAsync(IEnumerable<Guid> nodeTypeIds, CancellationToken cancellationToken = default)
+        public async Task<List<ExtNode>> GetExtNodesByTypeIdsAsync(List<string> typeNames, CancellationToken cancellationToken = default)
         {
+            var typeIds = await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).Select(nt => nt.Id).ToListAsync();
+
             var nodes = await GetNodeQuery()
-                .Where(node => nodeTypeIds.Contains(node.NodeTypeId))
+                .Where(node => typeIds.Contains(node.NodeTypeId))
                 .ToListAsync();
 
             int cnt = 0, total = nodes.Count();
@@ -63,25 +67,11 @@ namespace IIS.Core.Ontology.EntityFramework
             foreach (var node in nodes)
             {
                 var extNode = await GetExtNodeByIdAsync(node.Id);
-                Console.WriteLine($"{++cnt}/{total}: {extNode.NodeTypeName}; {extNode.Id}");
+                Console.WriteLine($"{++cnt}/{total}: {extNode.NodeTypeName}; {node.Id}");
                 result.Add(extNode);
             }
 
             return result;
-        }
-
-        public async Task<List<NodeTypeEntity>> GetNodeTypesForElasticAsync(CancellationToken cancellationToken = default)
-        {
-            var typeNames = new List<string> { 
-                "Person", 
-                "Subdivision", 
-                "MilitaryMachinery", 
-                "Infrastructure", 
-                "Radionetwork", 
-                "Organization", 
-                "MilitaryBase" 
-            };
-            return await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).ToListAsync();
         }
 
         private IQueryable<NodeEntity> GetNodeQuery()
@@ -91,19 +81,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Include(n => n.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
+                .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode);
-        }
-
-        private async Task<List<ExtNode>> GetExtNodesAsync(IEnumerable<NodeEntity> nodeEntities, CancellationToken cancellationToken = default)
-        {
-            var result = new List<ExtNode>();
-            foreach (var node in nodeEntities)
-            {
-                var extNode = await MapExtNodeAsync(node, cancellationToken);
-                result.Add(extNode);
-            }
-            return result;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Iis.Elastic
         ElasticLowLevelClient _lowLevelClient;
         IisElasticConfiguration _configuration;
         IisElasticSerializer _serializer;
-        List<string> _supportedIndexes = new List<string>();
+        public List<string> SupportedIndexes { get; private set; }
         
         public IisElasticManager(IisElasticConfiguration configuration, IisElasticSerializer serializer)
         {
@@ -28,16 +28,26 @@ namespace Iis.Elastic
             var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
             var config = new ConnectionConfiguration(connectionPool);
             _lowLevelClient = new ElasticLowLevelClient(config);
-        }
 
-        public void SetSupportedIndexes(IEnumerable<string> indexNames)
-        {
-            _supportedIndexes.AddRange(indexNames);
+            SupportedIndexes = new List<string> {
+                "Organization",
+                "Person",
+                "ObjectOfStudy",
+                "Radionetwork",
+                "MilitaryMachinery",
+                "Unknown",
+                "MilitaryBase",
+                "Infrastructure",
+                "Subdivision",
+                "SecondarySpecialEducationalInstitution",
+                "HigherEducationalInstitution",
+                "EducationalInstitution"
+            };
         }
 
         public bool IndexIsSupported(string indexName)
         {
-            return _supportedIndexes.Contains(indexName);
+            return SupportedIndexes.Contains(indexName);
         }
 
         public bool IndexesAreSupported(IEnumerable<string> indexNames)
