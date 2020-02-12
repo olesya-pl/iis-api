@@ -2,18 +2,13 @@
     "conceptType": "relations",
     "id": "70FF083C-D075-479d-84A6-0DD3D4D8F8C0",
     "meta": {
-        "acceptsEntityOperations": [
-            "Create",
-            "Update",
-            "Delete"
-        ],
         "container": {
             "id": "8944ED63-DD7E-465c-A381-7DD227B78B8E",
             "title": "Заохочення (вид нагороди, медалі, цінні подарунки тощо)",
             "type": "Accordion"
         },
         "formField": {
-            "type": "form"
+            "type": "fuzzyDate"
         },
         "multiple": true,
         "sortOrder": 39

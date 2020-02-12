@@ -13,7 +13,7 @@
             "type": "Accordion"
         },
         "formField": {
-            "type": "form"
+            "type": "fuzzyDate"
         },
         "multiple": true,
         "sortOrder": 40

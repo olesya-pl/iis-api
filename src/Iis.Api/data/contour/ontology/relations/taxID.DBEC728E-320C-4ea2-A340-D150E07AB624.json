@@ -8,5 +8,5 @@
     },
     "name": "taxID",
     "target": "TaxIDString",
-    "title": "Ідентифікаційний код"
+    "title": "Ідентифікаційний Код"
 }
