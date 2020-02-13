@@ -32,6 +32,8 @@ namespace Iis.DataModel
         public DbSet<AnalyticIndicatorEntity> AnalyticIndicators { get; set; }
         public DbSet<AnalyticQueryIndicatorEntity> AnalyticQueryIndicators { get; set; }
 
+        public DbSet<OntologyMigrationsEntity> OntologyMigrations { get; set; }
+
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
         {
@@ -58,6 +60,7 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new AnalyticQueryEntityConfiguration());
             modelBuilder.ApplyConfiguration(new AnalyticQueryIndicatorConfiguration());
             modelBuilder.ApplyConfiguration(new AnalyticIndicatorConfiguration());
+            modelBuilder.ApplyConfiguration(new OntologyMigrationsConfiguration());
         }
     }
 }
