@@ -27,7 +27,7 @@ namespace IIS.Core.Ontology.Seeding
             _ontologyService = ontologyService;
         }
 
-        public async Task SeedAsync(string subdir, CancellationToken cancellationToken = default)
+        public async Task SeedAsync(string subdir, List<string> allowedTypes = null, CancellationToken cancellationToken = default)
         {
             var firstNodes = new List<Node>();
             var nodes = new List<Node>();
@@ -38,6 +38,10 @@ namespace IIS.Core.Ontology.Seeding
             foreach (string fileName in fileNames)
             {
                 string typeName = Path.GetFileNameWithoutExtension(fileName);
+                if (allowedTypes != null && allowedTypes.Count > 0 && !allowedTypes.Contains(typeName))
+                {
+                    continue;
+                }
                 // tmp hardcode
                 //if (typeName == "EventType") continue;
 

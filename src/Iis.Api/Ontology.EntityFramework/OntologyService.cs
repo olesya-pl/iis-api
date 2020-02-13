@@ -114,10 +114,13 @@ namespace IIS.Core.Ontology.EntityFramework
                         }
                     }
                 }
-                await _elasticService.PutNodeAsync(source.Id);
             }
 
             await _context.SaveChangesAsync(cancellationToken);
+            foreach (Node source in nodes)
+            {
+                await _elasticService.PutNodeAsync(source.Id);
+            }
         }
 
         void ApplyChanges(NodeEntity existing, Relation sourceRelation, RelationEntity existingRelation)

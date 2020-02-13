@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Iis.Api;
 using Iis.Api.Ontology.Migration;
+using Newtonsoft.Json;
 
 namespace IIS.Core.Tools
 {
@@ -198,7 +199,7 @@ namespace IIS.Core.Tools
         }
 
         public async Task DumpOdysseusOntologyAsync()
-        {
+            {
             await _dumpOntology("odysseus");
         }
 
@@ -209,7 +210,40 @@ namespace IIS.Core.Tools
 
         public async Task MigrateOntologyAsync()
         {
-            await _migrationService.MigrateAsync();
+            _runtimeSettings.PutSavedToElastic = false;
+            ApplyEfMigrations();
+            var rulesFileName = Path.Combine(Environment.CurrentDirectory, "data", "contour", "migrations", "001", "rules.json");
+            var json = File.ReadAllText(rulesFileName);
+            var rules = JsonConvert.DeserializeObject<MigrationRules>(json);
+            var ontologyMigration = new OntologyMigrationsEntity
+            {
+                Id = Guid.NewGuid(),
+                OrderNumber = rules.OrderNumber, 
+                StartTime = DateTime.Now
+            };
+            _migrationService.SetRules(rules);
+            
+            _migrationService.MakeSnapshotOld();
+            
+            await ClearTypesAsync();
+            await FillContourTypesAsync();
+            
+            var migrationResult = await _migrationService.MigrateAsync();
+            ontologyMigration.StructureBefore = migrationResult.StructureBefore;
+            ontologyMigration.StructureAfter = migrationResult.StructureAfter;
+            ontologyMigration.MigrationRules = migrationResult.MigrationRules;
+            ontologyMigration.Log = migrationResult.Log;
+            ontologyMigration.IsSuccess = migrationResult.IsSuccess;
+            _ontologyContext.OntologyMigrations.Add(ontologyMigration);
+            _ontologyContext.SaveChanges();
+            if (!migrationResult.IsSuccess)
+            {
+                _logger.LogError("Error during migration: {error}", migrationResult.Log);
+                return;
+            }
+            await _seeder.SeedAsync(Path.Combine("contour", "entities"), rules.AllowedEntities);
+            _logger.LogInformation("Migration is Success!!!");
+            _runtimeSettings.PutSavedToElastic = true;
         }
 
         private async Task _dumpOntology(string name)

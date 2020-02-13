@@ -22,6 +22,7 @@ namespace Iis.Api.Ontology.Migration
         private MigrationValueDivider _devider;
         private Dictionary<Guid, NodeEntity> _migratedNodes = new Dictionary<Guid, NodeEntity>();
         private List<RelationEntity> _migratedRelations = new List<RelationEntity>();
+        private MigrationRules _rules;
         public MigrationService(OntologyContext context, IMapper mapper, ILogger<MigrationService> logger)
         {
             _context = context;
@@ -29,40 +30,53 @@ namespace Iis.Api.Ontology.Migration
             _logger = logger;
             _devider = new MigrationValueDivider();
         }
-        public async Task MigrateAsync()
+
+        public void SetRules(MigrationRules rules)
         {
-            _typeMappings = new TypeMappings();
-            _typeMappings.InitFromFile("typemapping.txt");
-
-            _snapshotOld = GetSnapshotFromFiles();
-            _snapshotNew = GetSnapshotFromDb(false);
-            //_snapshot = GetSnapshotFromDb();
-            //Save(_snapshotO, "snapshot");
-
-            //MigrateDirectMappedCases();
-            var migrationCondition = new MigrationCondition { TypeFrom = "Person.education", TypeTo = "Person.education.additionalInfo" };
-            var conditions = new List<MigrationCondition> 
+            _rules = rules;
+            _typeMappings = rules.DirectMappings;
+        }
+        public async Task<MigrationResult> MigrateAsync()
+        {
+            try
             {
-                new MigrationCondition { TypeFrom = "Person.education", TypeTo = "Person.education.additionalInfo" },
-                new MigrationCondition { TypeFrom = "Person.dateOfBirth", TypeTo = "Person.dateOfBirth" },
-                new MigrationCondition { TypeFrom = "Person.dateOfJobPositionActualization", TypeTo = "Person.dateOfJobPositionActualization" },
-                new MigrationCondition { TypeFrom = "Person.dateOfRankActualization", TypeTo = "Person.dateOfRankActualization" },
-                new MigrationCondition { TypeFrom = "Person.dateOfServingPlaceActualization", TypeTo = "Person.dateOfServingPlaceActualization" },
-                new MigrationCondition { TypeFrom = "Person.position", TypeTo = "Person.currentJob.position" },
-                new MigrationCondition { TypeFrom = "Person.registrationPlace", TypeTo = "Person.registrationAddress.postalAddress.street" },
-                new MigrationCondition { TypeFrom = "Person.livingPlace", TypeTo = "Person.currentLocation.postalAddress.street" },
-                new MigrationCondition { TypeFrom = "Person.placeOfBirth", TypeTo = "Person.actualAccommodation.postalAddress.street" },
-                
-                new MigrationCondition { TypeFrom = "Person.description", TypeTo = "Person.otherInterestingData" },
-            };
-            
-            MigrateDirectMappedCases();
-            MigratePersonNames();
-            MigrateByConditions(conditions);
-            SaveMigratedToDb();
-            _snapshotOld.GetNotMappedNodeStatistics();
+                _logger.LogInformation("Making snapshot...");
+                _snapshotNew = GetSnapshotFromDb(false);
+                _logger.LogInformation("Migrating simple cases...");
+                MigrateDirectMappedCases();
+                if (_rules.MigratePersonNames)
+                {
+                    _logger.LogInformation("Migrating persons names...");
+                    MigratePersonNames();
+                }
+                MigrateByConditions(_rules.Conditions);
+                _logger.LogInformation("Saving to db...");
+                SaveMigratedToDb();
+                //_snapshotOld.GetNotMappedNodeStatistics();
 
-            await Task.Yield();
+                return GetResult(true, "");
+            }
+            catch (Exception ex)
+            {
+                return GetResult(false, $"{ex.Message}; {ex.InnerException?.Message}");
+            }
+        }
+
+        private MigrationResult GetResult(bool isSuccess, string log)
+        {
+            return new MigrationResult
+            {
+                IsSuccess = isSuccess,
+                Log = log,
+                StructureBefore = JsonConvert.SerializeObject(_snapshotOld?.NodeTypes?.Values),
+                StructureAfter = JsonConvert.SerializeObject(_snapshotOld?.NodeTypes?.Values),
+                MigrationRules = JsonConvert.SerializeObject(_rules)
+            };
+        }
+
+        public void MakeSnapshotOld()
+        {
+            _snapshotOld = GetSnapshotFromDb(false);
         }
 
         private void AddMigratedNode(NodeEntity node)
@@ -75,7 +89,6 @@ namespace Iis.Api.Ontology.Migration
 
         private void MigrateDirectMappedCases()
         {
-            _logger.LogInformation("Start migrating...");
             var snapshotNodes = _snapshotOld.GetNodesReadyForMigration();
             foreach (var snapshotNode in snapshotNodes)
             {
@@ -136,6 +149,7 @@ namespace Iis.Api.Ontology.Migration
 
         private void MigrateByCondition(MigrationCondition condition)
         {
+            _logger.LogInformation("Migrating {from} ...", condition.TypeFrom);
             var tFrom = _snapshotOld.GetNodeTypesByDotName(condition.TypeFrom);
             var tTo = _snapshotNew.GetNodeTypesByDotName(condition.TypeTo);
             var migratingNodes = _snapshotOld.GetNodesByTypeId(tFrom.Last());
