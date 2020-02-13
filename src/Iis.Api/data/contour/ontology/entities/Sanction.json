@@ -3,13 +3,8 @@
         {
             "id": "36CBF986-3AB5-4d64-985D-45A6F2C37156",
             "meta": {
-                "acceptsEntityOperations": [
-                    "Create",
-                    "Update",
-                    "Delete"
-                ],
                 "formField": {
-                    "type": "form"
+                    "type": "fuzzyDate"
                 },
                 "multiple": false,
                 "sortOrder": 1
