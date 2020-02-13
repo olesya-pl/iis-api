@@ -49,6 +49,7 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new RelationConfiguration());
             modelBuilder.ApplyConfiguration(new AttributeConfiguration());
 
+            modelBuilder.ApplyConfiguration(new FileConfiguration());
             modelBuilder.ApplyConfiguration(new MaterialConfiguration());
             modelBuilder.ApplyConfiguration(new MaterialInfoConfiguration());
             modelBuilder.ApplyConfiguration(new MaterialFeatureConfiguration());

@@ -24,9 +24,14 @@ namespace IIS.Core.Controllers
         [DisableRequestSizeLimit]
         public async Task<object> Post([Required] IFormFile file, CancellationToken token)
         {
-            var id = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);
-            var url = Url.Action("Get", "Files", new {Id = id}, Request.Scheme);
-            return new {Id = id, Url = url};
+            FileId fileId = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
+            var url = Url.Action("Get", "Files", new {Id = fileId.Id}, Request.Scheme);
+            return new
+            {
+                fileId.Id,
+                Url = url,
+                fileId.IsDuplicate
+            };
         }
 
         [HttpGet("{id}")]
