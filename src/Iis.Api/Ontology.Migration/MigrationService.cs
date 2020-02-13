@@ -86,15 +86,12 @@ namespace Iis.Api.Ontology.Migration
                 snapshotNode.IsMigrated = true;
             }
 
-            var ignoredTypeIds = new List<Guid> { new Guid("177f4fbd-f2ea-4d7c-836e-738c48aece4c") };
-
             foreach (var snapshotNode in snapshotNodes)
             {
                 var relations = snapshotNode.IncomingRelations.Select(r => _mapper.Map<RelationEntity>(r)).ToList();
                 foreach (var relation in relations)
                 {
                     var snapshotRelationNode = _snapshotOld.Nodes[relation.Id];
-                    if (ignoredTypeIds.Contains(snapshotRelationNode.NodeTypeId)) continue;
                     var relationNode = _mapper.Map<NodeEntity>(snapshotRelationNode);
                     relationNode.NodeTypeId = _typeMappings.GetMapTypeId(relationNode.NodeTypeId);
                     AddMigratedNode(relationNode);

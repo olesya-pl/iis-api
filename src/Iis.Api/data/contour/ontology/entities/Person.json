@@ -1,4 +1,4 @@
-{
+	{
     "attributes": [
         {
             "id": "D98AA60D-91AA-4d14-AFD0-67EA2284B713",
@@ -438,6 +438,16 @@
             "target": "otherPersonId",
             "title": "Інші номери"
         },
+		{
+			  "id": "0434e86e-45cb-41a0-bf81-49a6454a98c4",
+			  "name": "militaryService",
+			  "title": "Нести військову службу",
+			  "meta": {
+				"sortOrder": 23,
+				"multiple": false
+			  },
+			  "target": "Person_militaryService"
+		},
         {
             "id": "DF6C681F-3EC3-4f8c-9E5A-773DFEBAAEFE",
             "meta": {
