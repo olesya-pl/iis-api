@@ -5,7 +5,10 @@
     "meta": {
         "multiple": false,
         "sortOrder": 6,
-        "title": "Назва"
+        "title": "Назва",
+        "validation": {
+            "required": true
+        }
     },
     "name": "name",
     "target": "NameString",
