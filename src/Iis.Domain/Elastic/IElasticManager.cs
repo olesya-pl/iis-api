@@ -11,6 +11,7 @@ namespace Iis.Domain.Elastic
     {
         Task<bool> PutExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default);
         Task<List<string>> Search(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<bool> DeleteAllIndexes(CancellationToken cancellationToken = default);
         List<string> SupportedIndexes { get; }
         bool IndexIsSupported(string indexName);
         bool IndexesAreSupported(IEnumerable<string> indexNames);
