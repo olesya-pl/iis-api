@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Iis.Api;
 using Iis.Api.Ontology.Migration;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace IIS.Core.Tools
@@ -22,6 +23,7 @@ namespace IIS.Core.Tools
     internal sealed class ActionTools
     {
         private readonly ILogger<ActionTools> _logger;
+        private readonly IConfiguration _configuration;
         private readonly ILegacyOntologyProvider _legacyOntologyProvider;
         private readonly ILegacyMigrator _legacyMigrator;
         private readonly IOntologyProvider _ontologyProvider;
@@ -33,6 +35,7 @@ namespace IIS.Core.Tools
 
         public ActionTools(
             ILogger<ActionTools> logger,
+            IConfiguration configuration,
             ILegacyOntologyProvider legacyOntologyProvider,
             ILegacyMigrator legacyMigrator,
             IOntologyProvider ontologyProvider,
@@ -43,6 +46,7 @@ namespace IIS.Core.Tools
             MigrationService migrationService)
         {
             _logger = logger;
+            _configuration = configuration;
             _legacyOntologyProvider = legacyOntologyProvider;
             _legacyMigrator = legacyMigrator;
             _ontologyProvider = ontologyProvider;
@@ -206,6 +210,17 @@ namespace IIS.Core.Tools
         public async Task DumpContourOntologyAsync()
         {
             await _dumpOntology("contour");
+        }
+
+        public async Task ResetPasswordsAsync()
+        {
+            List<UserEntity> userEntities = await _ontologyContext.Users.ToListAsync();
+            foreach (UserEntity userEntity in userEntities)
+            {
+                userEntity.PasswordHash = _configuration.GetPasswordHashAsBase64String("123");
+            }
+
+            await _ontologyContext.SaveChangesAsync();
         }
 
         public async Task MigrateOntologyAsync()

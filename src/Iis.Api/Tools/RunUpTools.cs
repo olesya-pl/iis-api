@@ -116,6 +116,9 @@ namespace IIS.Core.Tools
                 case "migrate-ontology":
                     await tools.MigrateOntologyAsync();
                     break;
+                case "reset-passwords":
+                    await tools.ResetPasswordsAsync();
+                    break;
                 case "help":
                     Help();
                     break;
@@ -144,6 +147,7 @@ namespace IIS.Core.Tools
                 "apply-ef-migrations",
                 "dump-contour-ontology",
                 "dump-odysseus-ontology",
+                "reset-passwords",
                 "help"
             };
             foreach (string actionName in actions)
