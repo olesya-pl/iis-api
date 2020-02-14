@@ -790,7 +790,7 @@
                     "type": "Accordion"
                 },
                 "formField": {
-                    "type": "fuzzyDate"
+                    "type": "form"
                 },
                 "multiple": true,
                 "sortOrder": 39
@@ -802,11 +802,6 @@
         {
             "id": "89501CC7-C719-4624-966D-B14724ADF14B",
             "meta": {
-                "acceptsEntityOperations": [
-                    "Create",
-                    "Update",
-                    "Delete"
-                ],
                 "container": {
                     "id": "85F3F0E4-02F6-46b8-A09A-B203DEFC2A39",
                     "title": "Стягнення",
@@ -819,7 +814,7 @@
                 "sortOrder": 40
             },
             "formField": {
-                "type": "fuzzyDate"
+                "type": "form"
             },
             "name": "sanction",
             "target": "Sanction",
@@ -1018,5 +1013,5 @@
         "sortOrder": 56
     },
     "name": "Person",
-    "title": "Людина"
+    "title": "Особа"
 }
