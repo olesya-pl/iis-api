@@ -81,6 +81,13 @@ namespace Iis.Elastic
             return GetIdsFromSearchResponse(response);
         }
 
+        public async Task<bool> DeleteAllIndexes(CancellationToken cancellationToken = default)
+        {
+            var path = $"{_configuration.IndexPreffix}*";
+            var response = await DoRequestAsync(HttpMethod.DELETE, path, string.Empty, cancellationToken);
+            return response.Success;
+        }
+
         private List<string> GetIdsFromSearchResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);
