@@ -8,7 +8,8 @@ namespace IIS.Core.GraphQL.Users
         public string Name { get; set; }
 
         public string Username { get; set; }
-        public bool IsBlocked { get; set; }
+
+        public bool? IsBlocked { get; set; }
 
         [StringLength(
             100,
