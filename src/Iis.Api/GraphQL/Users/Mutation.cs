@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.Users
             var user = new Iis.DataModel.UserEntity
             {
                 Id           = Guid.NewGuid(),
-                IsBlocked    = data.IsBlocked,
+                IsBlocked    = data.IsBlocked.GetValueOrDefault(),
                 Name         = data.Name,
                 Username     = data.Username,
                 PasswordHash = _configuration.GetPasswordHashAsBase64String(data.Password)
@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.Users
             if (user == null)
                 throw new InvalidOperationException($"Cannot find user with id = {id}");
 
-            user.IsBlocked    = data.IsBlocked;
+            user.IsBlocked    = data.IsBlocked.GetValueOrDefault();
             user.Name         = data.Name;
             user.PasswordHash = _configuration.GetPasswordHashAsBase64String(data.Password);
 

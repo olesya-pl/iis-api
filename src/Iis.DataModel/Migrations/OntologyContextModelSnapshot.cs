@@ -141,6 +141,9 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ContentHash")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ContentType")
                         .HasColumnType("text");
 
@@ -157,6 +160,8 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ContentHash");
 
                     b.ToTable("Files");
                 });

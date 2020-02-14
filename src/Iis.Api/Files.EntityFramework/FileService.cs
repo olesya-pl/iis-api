@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Iis.Api.Configuration;
 using Iis.DataModel;
@@ -24,19 +26,50 @@ namespace IIS.Core.Files.EntityFramework
             _logger = logger;
         }
 
-        public async Task<Guid> SaveFileAsync(Stream stream, string fileName, string contentType)
+        public async Task<FileId> SaveFileAsync(Stream stream, string fileName, string contentType, CancellationToken token)
         {
             byte[] contents;
             using (var ms = new MemoryStream())
             {
-                await stream.CopyToAsync(ms);
+                await stream.CopyToAsync(ms, token);
                 contents = ms.ToArray();
+            }
+
+            Guid hash = ComputeHash(contents);
+
+            // Check for duplicates
+            var query =
+                from f in _context.Files
+                where f.ContentHash == hash
+                select new
+                {
+                    f.Id,
+                    f.Contents
+                };
+            var files = await query.ToArrayAsync(token);
+            foreach (var fileData in files)
+            {
+                if (fileData.Contents.Length != contents.Length)
+                {
+                    continue;
+                }
+
+                if (contents.SequenceEqual(fileData.Contents))
+                {
+                    // Duplicate found.
+                    return new FileId
+                    {
+                        Id = fileData.Id,
+                        IsDuplicate = true
+                    };
+                }
             }
 
             var file = new FileEntity
             {
                 Name = fileName,
                 ContentType = contentType,
+                ContentHash = hash,
                 UploadTime = DateTime.Now, // todo: move to db or to datetime provider
                 IsTemporary = true,
             };
@@ -67,7 +100,10 @@ namespace IIS.Core.Files.EntityFramework
                 await File.WriteAllBytesAsync(path, contents);
             }
 
-            return file.Id;
+            return new FileId
+            {
+                Id = file.Id
+            };
         }
 
         public async Task<FileInfo> GetFileAsync(Guid id)
@@ -89,7 +125,14 @@ namespace IIS.Core.Files.EntityFramework
             if (_configuration.Storage == Storage.Folder && !string.IsNullOrEmpty(_configuration.Path))
             {
                 string path = Path.Combine(_configuration.Path, file.Id.ToString("D"));
-                contents = await File.ReadAllBytesAsync(path);
+                if (File.Exists(path))
+                {
+                    contents = await File.ReadAllBytesAsync(path);
+                }
+                else
+                {
+                    contents = file.Contents;
+                }
             }
             else
             {
@@ -114,6 +157,13 @@ namespace IIS.Core.Files.EntityFramework
                 throw new ArgumentException($"There is no temporary file with id {fileId}");
             file.IsTemporary = false;
             await _context.SaveChangesAsync();
+        }
+
+        private static Guid ComputeHash(byte[] data)
+        {
+            using HashAlgorithm algorithm = MD5.Create();
+            byte[] bytes = algorithm.ComputeHash(data);
+            return new Guid(bytes);
         }
     }
 }
