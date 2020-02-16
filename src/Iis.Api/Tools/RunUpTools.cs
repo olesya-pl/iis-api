@@ -74,15 +74,6 @@ namespace IIS.Core.Tools
                 case "clear-types":
                     await tools.ClearTypesAsync();
                     break;
-                case "migrate-legacy-types":
-                    await tools.MigrateLegacyTypesAsync();
-                    break;
-                case "migrate-legacy-entities":
-                    await tools.MigrateLegacyEntitiesAsync();
-                    break;
-                case "migrate-legacy-files":
-                    await tools.MigrateLegacyFilesAsync();
-                    break;
                 case "fill-odysseus-types":
                     await tools.FillOdysseusTypesAsync();
                     break;

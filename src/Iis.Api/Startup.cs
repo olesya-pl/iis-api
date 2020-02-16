@@ -19,7 +19,6 @@ using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Ontology;
 using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
-using IIS.Legacy.EntityFramework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -73,8 +72,6 @@ namespace IIS.Core
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
-            services.AddTransient<ILegacyOntologyProvider, LegacyOntologyProvider>();
-            services.AddTransient<ILegacyMigrator, LegacyMigrator>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
             services.AddTransient<OntologyTypeSaver>();

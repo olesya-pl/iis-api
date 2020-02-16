@@ -9,7 +9,6 @@ using IIS.Core.Ontology.Seeding;
 using Iis.DataModel;
 using Iis.DataModel.Analytics;
 using Iis.Domain;
-using IIS.Legacy.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -24,8 +23,6 @@ namespace IIS.Core.Tools
     {
         private readonly ILogger<ActionTools> _logger;
         private readonly IConfiguration _configuration;
-        private readonly ILegacyOntologyProvider _legacyOntologyProvider;
-        private readonly ILegacyMigrator _legacyMigrator;
         private readonly IOntologyProvider _ontologyProvider;
         private readonly OntologyTypeSaver _ontologyTypeSaver;
         private readonly Seeder _seeder;
@@ -36,8 +33,6 @@ namespace IIS.Core.Tools
         public ActionTools(
             ILogger<ActionTools> logger,
             IConfiguration configuration,
-            ILegacyOntologyProvider legacyOntologyProvider,
-            ILegacyMigrator legacyMigrator,
             IOntologyProvider ontologyProvider,
             OntologyTypeSaver ontologyTypeSaver,
             Seeder seeder,
@@ -47,8 +42,6 @@ namespace IIS.Core.Tools
         {
             _logger = logger;
             _configuration = configuration;
-            _legacyOntologyProvider = legacyOntologyProvider;
-            _legacyMigrator = legacyMigrator;
             _ontologyProvider = ontologyProvider;
             _ontologyTypeSaver = ontologyTypeSaver;
             _seeder = seeder;
@@ -62,26 +55,6 @@ namespace IIS.Core.Tools
             await _ontologyTypeSaver.ClearTypesAsync();
             _ontologyProvider.Invalidate();
             _logger.LogInformation("Types cleared.");
-        }
-
-        public async Task MigrateLegacyTypesAsync()
-        {
-            var ontology = await _legacyOntologyProvider.GetOntologyAsync();
-            _ontologyTypeSaver.SaveTypes(ontology.Types);
-            _ontologyProvider.Invalidate();
-            _logger.LogInformation("Legacy types migrated.");
-        }
-
-        public async Task MigrateLegacyEntitiesAsync()
-        {
-            await _legacyMigrator.Migrate();
-            _logger.LogInformation("Legacy entities migrated.");
-        }
-
-        public async Task MigrateLegacyFilesAsync()
-        {
-            await _legacyMigrator.MigrateFiles();
-            _logger.LogInformation("Legacy entities migrated.");
         }
 
         public async Task FillOdysseusTypesAsync()
