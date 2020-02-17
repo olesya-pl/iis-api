@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
@@ -106,7 +107,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     result.RelationType = new RelationTypeEntity
                     {
                         Kind = RelationKind.Inheritance,
-                        EmbeddingOptions = DataModel.EmbeddingOptions.None,
+                        EmbeddingOptions = Interfaces.Ontology.Schema.EmbeddingOptions.None,
                         TargetType = SaveType(irt.ParentType),
                     };
                 }
@@ -128,28 +129,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return result;
         }
 
-        private static DataModel.ScalarType Map(Domain.ScalarType scalarType)
+        private static Interfaces.Ontology.Schema.ScalarType Map(Domain.ScalarType scalarType)
         {
             switch (scalarType)
             {
-                case Domain.ScalarType.Boolean: return DataModel.ScalarType.Boolean;
-                case Domain.ScalarType.DateTime: return DataModel.ScalarType.Date;
-                case Domain.ScalarType.Decimal: return DataModel.ScalarType.Decimal;
-                case Domain.ScalarType.File: return DataModel.ScalarType.File;
-                case Domain.ScalarType.Geo: return DataModel.ScalarType.Geo;
-                case Domain.ScalarType.Integer: return DataModel.ScalarType.Int;
-                case Domain.ScalarType.String: return DataModel.ScalarType.String;
+                case Domain.ScalarType.Boolean: return Interfaces.Ontology.Schema.ScalarType.Boolean;
+                case Domain.ScalarType.DateTime: return Interfaces.Ontology.Schema.ScalarType.Date;
+                case Domain.ScalarType.Decimal: return Interfaces.Ontology.Schema.ScalarType.Decimal;
+                case Domain.ScalarType.File: return Interfaces.Ontology.Schema.ScalarType.File;
+                case Domain.ScalarType.Geo: return Interfaces.Ontology.Schema.ScalarType.Geo;
+                case Domain.ScalarType.Integer: return Interfaces.Ontology.Schema.ScalarType.Int;
+                case Domain.ScalarType.String: return Interfaces.Ontology.Schema.ScalarType.String;
                 default: throw new NotImplementedException();
             }
         }
 
-        private static DataModel.EmbeddingOptions Map(EmbeddingOptions embeddingOptions)
+        private static Interfaces.Ontology.Schema.EmbeddingOptions Map(EmbeddingOptions embeddingOptions)
         {
             switch (embeddingOptions)
             {
-                case EmbeddingOptions.Optional: return DataModel.EmbeddingOptions.Optional;
-                case EmbeddingOptions.Required: return DataModel.EmbeddingOptions.Required;
-                case EmbeddingOptions.Multiple: return DataModel.EmbeddingOptions.Multiple;
+                case EmbeddingOptions.Optional: return Interfaces.Ontology.Schema.EmbeddingOptions.Optional;
+                case EmbeddingOptions.Required: return Interfaces.Ontology.Schema.EmbeddingOptions.Required;
+                case EmbeddingOptions.Multiple: return Interfaces.Ontology.Schema.EmbeddingOptions.Multiple;
                 default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
             }
         }

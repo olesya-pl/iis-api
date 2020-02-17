@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
@@ -172,28 +173,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             ontologyType.UpdatedAt = type.UpdatedAt;
         }
 
-        private static Domain.ScalarType MapScalarType(DataModel.ScalarType scalarType)
+        private static Domain.ScalarType MapScalarType(Interfaces.Ontology.Schema.ScalarType scalarType)
         {
             switch (scalarType)
             {
-                case DataModel.ScalarType.Boolean: return Domain.ScalarType.Boolean;
-                case DataModel.ScalarType.Date: return Domain.ScalarType.DateTime;
-                case DataModel.ScalarType.Decimal: return Domain.ScalarType.Decimal;
-                case DataModel.ScalarType.File: return Domain.ScalarType.File;
-                case DataModel.ScalarType.Geo: return Domain.ScalarType.Geo;
-                case DataModel.ScalarType.Int: return Domain.ScalarType.Integer;
-                case DataModel.ScalarType.String: return Domain.ScalarType.String;
+                case Interfaces.Ontology.Schema.ScalarType.Boolean: return Domain.ScalarType.Boolean;
+                case Interfaces.Ontology.Schema.ScalarType.Date: return Domain.ScalarType.DateTime;
+                case Interfaces.Ontology.Schema.ScalarType.Decimal: return Domain.ScalarType.Decimal;
+                case Interfaces.Ontology.Schema.ScalarType.File: return Domain.ScalarType.File;
+                case Interfaces.Ontology.Schema.ScalarType.Geo: return Domain.ScalarType.Geo;
+                case Interfaces.Ontology.Schema.ScalarType.Int: return Domain.ScalarType.Integer;
+                case Interfaces.Ontology.Schema.ScalarType.String: return Domain.ScalarType.String;
                 default: throw new NotImplementedException();
             }
         }
 
-        private static EmbeddingOptions Map(DataModel.EmbeddingOptions embeddingOptions)
+        private static EmbeddingOptions Map(Interfaces.Ontology.Schema.EmbeddingOptions embeddingOptions)
         {
             switch (embeddingOptions)
             {
-                case DataModel.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
-                case DataModel.EmbeddingOptions.Required: return EmbeddingOptions.Required;
-                case DataModel.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
+                case Interfaces.Ontology.Schema.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
+                case Interfaces.Ontology.Schema.EmbeddingOptions.Required: return EmbeddingOptions.Required;
+                case Interfaces.Ontology.Schema.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
                 default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
             }
         }

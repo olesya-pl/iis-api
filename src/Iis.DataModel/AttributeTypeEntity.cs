@@ -1,6 +1,8 @@
+using Iis.Interfaces.Ontology.Schema;
+
 namespace Iis.DataModel
 {
-    public class AttributeTypeEntity : BaseEntity
+    public class AttributeTypeEntity : BaseEntity, IAttributeType
     {
         public virtual NodeTypeEntity NodeType { get; set; }
 

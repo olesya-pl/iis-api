@@ -14,6 +14,7 @@ using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 using Material = Iis.Domain.Materials.Material;
 using Node = Iis.Domain.Node;
 using IIS.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Materials.EntityFramework.Workers
 {
@@ -150,7 +151,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             ctxType.RelationType = new RelationTypeEntity
             {
                 Id = rt.Id, Kind = RelationKind.Embedding,
-                EmbeddingOptions = Iis.DataModel.EmbeddingOptions.Multiple,
+                EmbeddingOptions = Iis.Interfaces.Ontology.Schema.EmbeddingOptions.Multiple,
                 SourceTypeId = sourceTypeId, TargetTypeId = targetTypeId,
             };
             _context.Add(ctxType);

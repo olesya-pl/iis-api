@@ -1,4 +1,4 @@
-namespace Iis.DataModel
+namespace Iis.Interfaces.Ontology.Schema
 {
     public enum RelationKind
     {

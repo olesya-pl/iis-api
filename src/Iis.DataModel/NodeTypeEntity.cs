@@ -1,10 +1,11 @@
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Iis.DataModel
 {
-    public class NodeTypeEntity : BaseEntity
+    public class NodeTypeEntity : BaseEntity, INodeType
     {
         public string Name { get; set; }
         public string Title { get; set; }

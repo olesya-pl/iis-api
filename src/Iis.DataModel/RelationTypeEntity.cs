@@ -1,8 +1,9 @@
+using Iis.Interfaces.Ontology.Schema;
 using System;
 
 namespace Iis.DataModel
 {
-    public class RelationTypeEntity : BaseEntity
+    public class RelationTypeEntity : BaseEntity, IRelationType
     {
         public virtual NodeTypeEntity NodeType { get; set; }
 
