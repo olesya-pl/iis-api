@@ -9,6 +9,7 @@ using Iis.Domain;
 using Iis.Domain.Materials;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using IIS.Domain;
 
 namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 {

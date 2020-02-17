@@ -6,6 +6,7 @@ using HotChocolate.Resolvers;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
+using IIS.Domain;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

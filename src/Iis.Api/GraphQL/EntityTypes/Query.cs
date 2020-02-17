@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using IIS.Domain;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {

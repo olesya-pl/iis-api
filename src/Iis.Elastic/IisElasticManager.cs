@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
-
 using Iis.Domain.Elastic;
 using Iis.Domain.ExtendedData;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
 
 namespace Iis.Elastic
 {
@@ -63,14 +64,14 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<bool> PutExtNodeAsync(ExtNode extNode, CancellationToken cancellationToken = default)
+        public async Task<bool> PutExtNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default)
         {
             if (!IndexIsSupported(extNode.NodeTypeName)) return false;
             var json = _serializer.GetJsonByExtNode(extNode);
             return await PutJsonAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
-        public async Task<List<string>> Search(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public async Task<List<string>> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetSearchJson(searchParams);
             var path = searchParams.BaseIndexNames.Count == 0 ? 
@@ -106,7 +107,7 @@ namespace Iis.Elastic
             return ids;
         }
 
-        private string GetSearchJson(IisElasticSearchParams searchParams)
+        private string GetSearchJson(IIisElasticSearchParams searchParams)
         {
             var json = new JObject();
             json["_source"] = new JArray(searchParams.ResultFields);

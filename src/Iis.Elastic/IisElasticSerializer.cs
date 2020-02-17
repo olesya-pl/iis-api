@@ -1,4 +1,5 @@
 ﻿using Iis.Domain.ExtendedData;
+using Iis.Interfaces.Ontology;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -8,12 +9,12 @@ namespace Iis.Elastic
 {
     public class IisElasticSerializer
     {
-        public string GetJsonByExtNode(ExtNode extNode)
+        public string GetJsonByExtNode(IExtNode extNode)
         {
             return GetJsonObjectByExtNode(extNode).ToString();
         }
 
-        public JObject GetJsonObjectByExtNode(ExtNode extNode, bool IsHeadNode = true)
+        public JObject GetJsonObjectByExtNode(IExtNode extNode, bool IsHeadNode = true)
         {
             var json = new JObject();
 

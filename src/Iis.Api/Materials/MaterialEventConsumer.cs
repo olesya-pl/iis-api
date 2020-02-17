@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.GraphQL.Materials;
-using IIS.Core.Ontology.EntityFramework;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -21,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using IIS.Core.Ontology;
 using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration.Internal;
+using Iis.DbLayer.Ontology.EntityFramework;
 
 namespace IIS.Core.Materials
 {

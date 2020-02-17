@@ -5,23 +5,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Domain;
+using Iis.Interfaces.Elastic;
 using Iis.Utility;
+using IIS.Domain;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Attribute = Iis.Domain.Attribute;
 using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
-namespace IIS.Core.Ontology.EntityFramework
+namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class OntologyService : IOntologyService
     {
         private readonly OntologyContext _context;
         private readonly IOntologyProvider _ontologyProvider;
         private readonly IMemoryCache _cache;
-        private readonly ElasticService _elasticService;
+        private readonly IElasticService _elasticService;
 
-        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache, ElasticService elasticService)
+        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache, IElasticService elasticService)
         {
             _context = context;
             _ontologyProvider = ontologyProvider;
@@ -237,14 +239,14 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-            Iis.DataModel.NodeEntity[] ctxNodes;
+            NodeEntity[] ctxNodes;
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
             {
                 var relationsQ = await GetNodesQueryAsync(ontology, types, filter, cancellationToken);
                 // workaround because of wrong generated query with distinct and order by
-                var workaroundQ = (from a in relationsQ.Distinct()
-                          select new { Node = a, dummy = string.Empty });
+                var workaroundQ = from a in relationsQ.Distinct()
+                                  select new { Node = a, dummy = string.Empty };
 
                 ctxNodes = await workaroundQ
                     .Skip(filter.Offset)
@@ -259,7 +261,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
         }
 
-        private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesQueryAsync(OntologyModel ontology, IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
+        private async Task<IQueryable<NodeEntity>> GetNodesQueryAsync(OntologyModel ontology, IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
         {
             var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
@@ -308,11 +310,11 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion, CancellationToken cancellationToken = default)
         {
-            var ids = await _elasticService.SearchByAllFieldsAsync(types, suggestion);
+            var ids = await _elasticService.SearchByAllFieldsAsync(types.Select(t => t.Name), suggestion);
             return _context.Nodes.Where(node => ids.Contains(node.Id));
         }
 
-        private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesInternalWithCriteriaAsync(IEnumerable<Guid> derived,
+        private async Task<IQueryable<NodeEntity>> GetNodesInternalWithCriteriaAsync(IEnumerable<Guid> derived,
             List<Tuple<EmbeddingRelationType, string>> criteria, bool anyOfCriteria, bool exactMatch,
             CancellationToken cancellationToken = default)
         {
@@ -320,7 +322,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .Include(e => e.SourceNode)
                 .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
 
-            var predicate = PredicateBuilder.New<Iis.DataModel.RelationEntity>(false);
+            var predicate = PredicateBuilder.New<RelationEntity>(false);
             foreach (var c in criteria)
             {
                 var (relation, value) = c;
@@ -335,7 +337,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             relationsQ = relationsQ.Where(predicate);
 
-            Iis.DataModel.NodeEntity[] ctxNodes;
+            NodeEntity[] ctxNodes;
             if (anyOfCriteria)
                 return relationsQ.Select(e => e.SourceNode).Distinct();
 
@@ -392,7 +394,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 {
                     var directIds = relationTypes.Where(r => !r.IsInversed).Select(r => r.Id).ToArray();
                     var inversedIds = relationTypes.Where(r => r.IsInversed).Select(r => r.DirectRelationType.Id).ToArray();
-                    var relations = new List<Iis.DataModel.RelationEntity>();
+                    var relations = new List<RelationEntity>();
                     if (directIds.Length > 0)
                     {
                         var result = await GetDirectRelationsQuery(nodeIds, directIds).ToListAsync(cancellationToken);
@@ -405,7 +407,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         var map = relationTypes.Where(r => r.IsInversed).ToDictionary(r => r.DirectRelationType.Id, r => r.Id);
                         foreach (var rel in result)
                         {
-                            var r = new Iis.DataModel.RelationEntity
+                            var r = new RelationEntity
                             {
                                 Id = rel.Id,
                                 TargetNodeId = rel.SourceNodeId,
@@ -413,7 +415,7 @@ namespace IIS.Core.Ontology.EntityFramework
                                 SourceNodeId = rel.TargetNodeId,
                                 SourceNode = rel.TargetNode
                             };
-                            r.Node = new Iis.DataModel.NodeEntity
+                            r.Node = new NodeEntity
                             {
                                 Id = rel.Id,
                                 NodeTypeId = map[rel.Node.NodeTypeId],
@@ -434,7 +436,7 @@ namespace IIS.Core.Ontology.EntityFramework
             }
         }
 
-        private IQueryable<Iis.DataModel.RelationEntity> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
+        private IQueryable<RelationEntity> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
         {
             var relationsQ = _context.Relations
                 .Include(e => e.Node)
@@ -445,7 +447,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return relationsQ;
         }
 
-        private IQueryable<Iis.DataModel.RelationEntity> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
+        private IQueryable<RelationEntity> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
         {
             var relationsQ = _context.Relations
                 .Include(e => e.Node)
@@ -456,22 +458,22 @@ namespace IIS.Core.Ontology.EntityFramework
             return relationsQ;
         }
 
-        private void FillRelations(List<Iis.DataModel.NodeEntity> nodes, List<Iis.DataModel.RelationEntity> relations)
+        private void FillRelations(List<NodeEntity> nodes, List<RelationEntity> relations)
         {
             var nodesDict = nodes.ToDictionary(n => n.Id);
             foreach (var node in nodesDict.Values)
-                node.OutgoingRelations = new List<Iis.DataModel.RelationEntity>();
+                node.OutgoingRelations = new List<RelationEntity>();
             foreach (var relation in relations)
                 nodesDict[relation.SourceNodeId].OutgoingRelations.Add(relation);
         }
 
 
-        private Node MapNode(Iis.DataModel.NodeEntity ctxNode, OntologyModel ontology)
+        private Node MapNode(NodeEntity ctxNode, OntologyModel ontology)
         {
             return MapNode(ctxNode, ontology, new List<Node>());
         }
 
-        private Node MapNode(Iis.DataModel.NodeEntity ctxNode, OntologyModel ontology, List<Node> mappedNodes)
+        private Node MapNode(NodeEntity ctxNode, OntologyModel ontology, List<Node> mappedNodes)
         {
             var m = mappedNodes.SingleOrDefault(e => e.Id == ctxNode.Id);
             if (m != null) return m;

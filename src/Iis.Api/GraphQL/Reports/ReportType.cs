@@ -6,6 +6,7 @@ using IIS.Core.Ontology;
 using System;
 using System.Linq;
 using Iis.Domain;
+using IIS.Domain;
 
 namespace IIS.Core.GraphQL.Reports
 {

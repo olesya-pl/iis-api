@@ -1,6 +1,7 @@
 ﻿using System;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology

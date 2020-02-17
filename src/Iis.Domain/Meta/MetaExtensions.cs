@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Iis.Utility;
+using Iis.Interfaces.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -87,16 +87,6 @@ namespace Iis.Domain.Meta
                 if (t.MetaSource != null)
                     meta.Merge(t.MetaSource, settings);
             return meta;
-        }
-
-        public static void KeysToLowerCamelcase(this JObject jo)
-        {
-            // todo: think about custom serialization. This method is not recursive!
-            foreach (var property in jo.Properties().ToList())
-            {
-                var token = property.Value;
-                property.Replace(new JProperty(property.Name.ToLowerCamelcase(), token));
-            }
         }
     }
 }

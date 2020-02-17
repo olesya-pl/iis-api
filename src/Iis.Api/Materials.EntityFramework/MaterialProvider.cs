@@ -8,6 +8,7 @@ using Iis.DataModel;
 using Iis.Domain.Materials;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using Iis.Domain;
 
 namespace IIS.Core.Materials.EntityFramework
 {

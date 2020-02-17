@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using IIS.Core.Ontology;
 using Microsoft.EntityFrameworkCore;
-using IIS.Core.Ontology.EntityFramework;
 using Iis.DataModel;
 using Iis.DataModel.Analytics;
 using Newtonsoft.Json;
+using IIS.Domain;
+using Iis.DbLayer.Ontology.EntityFramework;
 
 namespace IIS.Core.Analytics.EntityFramework
 {

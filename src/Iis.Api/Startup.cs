@@ -41,6 +41,11 @@ using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
 using AutoMapper;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
+using IIS.Domain;
+using Iis.Domain;
+using Iis.DbLayer.Ontology.EntityFramework;
 
 namespace IIS.Core
 {
@@ -79,7 +84,7 @@ namespace IIS.Core
             services.AddTransient<IMaterialProvider, MaterialProvider>();
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
-            services.AddTransient<ElasticService>();
+            services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<MigrationService>();
             services.AddSingleton<RunTimeSettings>();
 

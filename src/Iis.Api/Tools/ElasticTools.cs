@@ -1,4 +1,6 @@
 ﻿using Iis.Domain.Elastic;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
 using IIS.Core.Ontology;
 using System;
 using System.Collections.Generic;

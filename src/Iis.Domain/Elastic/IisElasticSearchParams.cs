@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Iis.Interfaces.Elastic;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Iis.Domain.Elastic
 {
-    public class IisElasticSearchParams
+    public class IisElasticSearchParams: IIisElasticSearchParams
     {
         public List<string> BaseIndexNames { get; set; } = new List<string>();
         public string Query { get; set; }

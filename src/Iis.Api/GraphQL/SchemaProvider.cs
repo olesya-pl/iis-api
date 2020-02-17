@@ -10,6 +10,7 @@ using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
+using IIS.Domain;
 
 namespace IIS.Core.GraphQL
 {

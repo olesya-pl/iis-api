@@ -1,10 +1,9 @@
 using System;
-using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Utility;
 
-namespace IIS.Core.Ontology.EntityFramework
+namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public abstract class BaseOntologyProvider
     {
@@ -16,7 +15,8 @@ namespace IIS.Core.Ontology.EntityFramework
             var meta = relationType.GetInversed();
             var embeddingOptions = meta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
             var name = meta.Code ?? sourceType.Name.ToLowerCamelcase();
-            var inversedRelation = new EmbeddingRelationType(Guid.NewGuid(), name, embeddingOptions, isInversed: true) {
+            var inversedRelation = new EmbeddingRelationType(Guid.NewGuid(), name, embeddingOptions, isInversed: true)
+            {
                 Title = meta.Title ?? sourceType.Title ?? name
             };
 

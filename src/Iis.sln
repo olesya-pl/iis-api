@@ -15,7 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Elastic", "Iis.Elastic\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.UnitTests", "Iis.UnitTests\Iis.UnitTests.csproj", "{8F57E0BE-9380-4EA3-8298-F6BCC58BF01B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Utility", "Iis.Utility\Iis.Utility.csproj", "{AC42DD1B-D10E-4A75-A74A-B2C0B6B17765}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Utility", "Iis.Utility\Iis.Utility.csproj", "{AC42DD1B-D10E-4A75-A74A-B2C0B6B17765}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Interfaces", "Iis.Interfaces\Iis.Interfaces.csproj", "{47A34F15-9C10-459F-95A0-0E5439B4637A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.DbLayer", "Iis.DbLayer\Iis.DbLayer.csproj", "{DB939ECF-57D0-496E-91CB-97ECFCBD900C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{AC42DD1B-D10E-4A75-A74A-B2C0B6B17765}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC42DD1B-D10E-4A75-A74A-B2C0B6B17765}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC42DD1B-D10E-4A75-A74A-B2C0B6B17765}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47A34F15-9C10-459F-95A0-0E5439B4637A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47A34F15-9C10-459F-95A0-0E5439B4637A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47A34F15-9C10-459F-95A0-0E5439B4637A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47A34F15-9C10-459F-95A0-0E5439B4637A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB939ECF-57D0-496E-91CB-97ECFCBD900C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB939ECF-57D0-496E-91CB-97ECFCBD900C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB939ECF-57D0-496E-91CB-97ECFCBD900C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB939ECF-57D0-496E-91CB-97ECFCBD900C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

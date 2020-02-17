@@ -16,6 +16,8 @@ using Iis.Api;
 using Iis.Api.Ontology.Migration;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using IIS.Domain;
+using Iis.DbLayer.Ontology.EntityFramework;
 
 namespace IIS.Core.Tools
 {

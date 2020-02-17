@@ -1,7 +1,7 @@
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 
-namespace IIS.Core.Ontology.EntityFramework
+namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class ContextFactory
     {

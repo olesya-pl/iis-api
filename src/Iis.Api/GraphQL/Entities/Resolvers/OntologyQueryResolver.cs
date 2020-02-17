@@ -18,6 +18,7 @@ using Attribute = Iis.Domain.Attribute;
 using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
+using IIS.Domain;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

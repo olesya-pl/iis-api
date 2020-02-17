@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Iis.Domain;
 
-namespace IIS.Core.Ontology
+namespace Iis.Domain
 {
     public class NodeFilter
     {

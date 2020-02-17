@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using IIS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
-namespace IIS.Core.Ontology.EntityFramework
+namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class OntologyProvider : BaseOntologyProvider, IOntologyProvider
     {
@@ -86,12 +87,12 @@ namespace IIS.Core.Ontology.EntityFramework
         }
 
         private Dictionary<Guid, NodeType> _types = new Dictionary<Guid, NodeType>();
-        private NodeType MapType(Iis.DataModel.NodeTypeEntity ctxType)
+        private NodeType MapType(NodeTypeEntity ctxType)
         {
             var types = mapType(ctxType);
             return types;
 
-            NodeType mapType(Iis.DataModel.NodeTypeEntity type)
+            NodeType mapType(NodeTypeEntity type)
             {
                 if (_types.ContainsKey(type.Id))
                     return _types[type.Id];
@@ -121,7 +122,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 throw new Exception("Unsupported type.");
             }
 
-            NodeType mapRelation(Iis.DataModel.RelationTypeEntity relationType)
+            NodeType mapRelation(RelationTypeEntity relationType)
             {
                 if (_types.ContainsKey(relationType.Id))
                     return _types[relationType.Id];
@@ -163,7 +164,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return inversedRelation;
         }
 
-        private static void FillProperties(Iis.DataModel.NodeTypeEntity type, NodeType ontologyType)
+        private static void FillProperties(NodeTypeEntity type, NodeType ontologyType)
         {
             ontologyType.Title = type.Title;
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
@@ -171,28 +172,28 @@ namespace IIS.Core.Ontology.EntityFramework
             ontologyType.UpdatedAt = type.UpdatedAt;
         }
 
-        private static Iis.Domain.ScalarType MapScalarType(Iis.DataModel.ScalarType scalarType)
+        private static Domain.ScalarType MapScalarType(DataModel.ScalarType scalarType)
         {
             switch (scalarType)
             {
-                case Iis.DataModel.ScalarType.Boolean: return Iis.Domain.ScalarType.Boolean;
-                case Iis.DataModel.ScalarType.Date: return Iis.Domain.ScalarType.DateTime;
-                case Iis.DataModel.ScalarType.Decimal: return Iis.Domain.ScalarType.Decimal;
-                case Iis.DataModel.ScalarType.File: return Iis.Domain.ScalarType.File;
-                case Iis.DataModel.ScalarType.Geo: return Iis.Domain.ScalarType.Geo;
-                case Iis.DataModel.ScalarType.Int: return Iis.Domain.ScalarType.Integer;
-                case Iis.DataModel.ScalarType.String: return Iis.Domain.ScalarType.String;
+                case DataModel.ScalarType.Boolean: return Domain.ScalarType.Boolean;
+                case DataModel.ScalarType.Date: return Domain.ScalarType.DateTime;
+                case DataModel.ScalarType.Decimal: return Domain.ScalarType.Decimal;
+                case DataModel.ScalarType.File: return Domain.ScalarType.File;
+                case DataModel.ScalarType.Geo: return Domain.ScalarType.Geo;
+                case DataModel.ScalarType.Int: return Domain.ScalarType.Integer;
+                case DataModel.ScalarType.String: return Domain.ScalarType.String;
                 default: throw new NotImplementedException();
             }
         }
 
-        private static EmbeddingOptions Map(Iis.DataModel.EmbeddingOptions embeddingOptions)
+        private static EmbeddingOptions Map(DataModel.EmbeddingOptions embeddingOptions)
         {
             switch (embeddingOptions)
             {
-                case Iis.DataModel.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
-                case Iis.DataModel.EmbeddingOptions.Required: return EmbeddingOptions.Required;
-                case Iis.DataModel.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
+                case DataModel.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
+                case DataModel.EmbeddingOptions.Required: return EmbeddingOptions.Required;
+                case DataModel.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
                 default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
             }
         }

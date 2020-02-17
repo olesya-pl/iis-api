@@ -7,6 +7,7 @@ using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes.Mutations;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using IIS.Domain;
 
 namespace IIS.Core.GraphQL.Entities
 {

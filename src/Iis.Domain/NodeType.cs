@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain

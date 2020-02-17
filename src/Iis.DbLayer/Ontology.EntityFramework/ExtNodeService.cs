@@ -1,5 +1,6 @@
 ﻿using Iis.DataModel;
 using Iis.Domain.ExtendedData;
+using Iis.Interfaces.Ontology;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IIS.Core.Ontology.EntityFramework
+namespace Iis.DbLayer.Ontology.EntityFramework
 {
-    public class ExtNodeService: IExtNodeService
+    public class ExtNodeService : IExtNodeService
     {
         private readonly OntologyContext _context;
 
@@ -18,7 +19,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _context = context;
         }
 
-        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, CancellationToken cancellationToken = default)
+        public async Task<IExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, CancellationToken cancellationToken = default)
         {
             var extNode = new ExtNode
             {
@@ -32,8 +33,8 @@ namespace IIS.Core.Ontology.EntityFramework
             };
             return await Task.FromResult(extNode);
         }
-        
-        public async Task<ExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
+
+        public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var nodeEntity = await GetNodeQuery()
                 .Where(n => n.Id == id)
@@ -41,9 +42,9 @@ namespace IIS.Core.Ontology.EntityFramework
             return await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, cancellationToken);
         }
 
-        public async Task<List<ExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
+        public async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
         {
-            var result = new List<ExtNode>();
+            var result = new List<IExtNode>();
             foreach (var relation in relations)
             {
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
@@ -53,7 +54,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return result;
         }
 
-        public async Task<List<ExtNode>> GetExtNodesByTypeIdsAsync(List<string> typeNames, CancellationToken cancellationToken = default)
+        public async Task<List<IExtNode>> GetExtNodesByTypeIdsAsync(List<string> typeNames, CancellationToken cancellationToken = default)
         {
             var typeIds = await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).Select(nt => nt.Id).ToListAsync();
 
@@ -62,7 +63,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .ToListAsync();
 
             int cnt = 0, total = nodes.Count();
-            var result = new List<ExtNode>();
+            var result = new List<IExtNode>();
 
             foreach (var node in nodes)
             {

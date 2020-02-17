@@ -1,3 +1,4 @@
+using Iis.Interfaces.Meta;
 using System;
 
 namespace Iis.Domain.Meta

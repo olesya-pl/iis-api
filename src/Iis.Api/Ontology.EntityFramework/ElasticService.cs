@@ -2,6 +2,8 @@
 using Iis.Domain;
 using Iis.Domain.Elastic;
 using Iis.Domain.ExtendedData;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
-    public class ElasticService
+    public class ElasticService : IElasticService
     {
         private IElasticManager _elasticManager;
         private IExtNodeService _extNodeService;
@@ -21,11 +23,11 @@ namespace IIS.Core.Ontology.EntityFramework
             _extNodeService = extNodeService;
             _runTimeSettings = runTimeSettings;
         }
-        public async Task<List<Guid>> SearchByAllFieldsAsync(IEnumerable<NodeType> nodeTypes, string suggestion, CancellationToken cancellationToken = default)
+        public async Task<List<Guid>> SearchByAllFieldsAsync(IEnumerable<string> typeNames, string suggestion, CancellationToken cancellationToken = default)
         {
             var searchParams = new IisElasticSearchParams
             {
-                ResultFields = nodeTypes.Select(nt => nt.Name).ToList(),
+                BaseIndexNames = typeNames.ToList(),
                 Query = $"*{suggestion}*"
             };
             var ids = await _elasticManager.Search(searchParams, cancellationToken);

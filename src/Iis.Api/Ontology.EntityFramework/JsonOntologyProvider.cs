@@ -10,6 +10,8 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using IIS.Domain;
+using Iis.DbLayer.Ontology.EntityFramework;
 
 namespace IIS.Core.Ontology.EntityFramework
 {

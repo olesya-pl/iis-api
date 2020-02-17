@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Iis.Domain;
 
-namespace IIS.Core.Ontology
+namespace IIS.Domain
 {
     public interface IOntologyProvider
     {

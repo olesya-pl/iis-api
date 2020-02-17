@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 using Iis.Utility;
 
 namespace IIS.Core.Ontology

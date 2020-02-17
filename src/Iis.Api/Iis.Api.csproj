@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
+    <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />

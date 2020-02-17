@@ -5,16 +5,15 @@ using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
-using Microsoft.AspNetCore.Hosting;
 using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
-namespace IIS.Core.Ontology.EntityFramework
+namespace Iis.DbLayer.Ontology.EntityFramework
 {
     // Todo: move it to OntologyTypeService or create separate interface
     public class OntologyTypeSaver
     {
         private OntologyContext _ontologyContext;
-        private Dictionary<Guid, Iis.DataModel.NodeTypeEntity> _types = new Dictionary<Guid, Iis.DataModel.NodeTypeEntity>();
+        private Dictionary<Guid, NodeTypeEntity> _types = new Dictionary<Guid, NodeTypeEntity>();
 
         public OntologyTypeSaver(OntologyContext ontologyContext)
         {
@@ -53,7 +52,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _ontologyContext.SaveChanges();
         }
 
-        private Iis.DataModel.NodeTypeEntity SaveType(NodeType type, NodeType relationSourceType = null)
+        private NodeTypeEntity SaveType(NodeType type, NodeType relationSourceType = null)
         {
             if (type.Id == Guid.Empty)
                 throw new ArgumentException(nameof(type));
@@ -84,7 +83,7 @@ namespace IIS.Core.Ontology.EntityFramework
             else if (type is AttributeType at)
             {
                 result.Kind = Kind.Attribute;
-                result.AttributeType = new Iis.DataModel.AttributeTypeEntity
+                result.AttributeType = new AttributeTypeEntity
                 {
                     ScalarType = Map(at.ScalarTypeEnum),
                 };
@@ -95,7 +94,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
                 if (type is EmbeddingRelationType ert)
                 {
-                    result.RelationType = new Iis.DataModel.RelationTypeEntity
+                    result.RelationType = new RelationTypeEntity
                     {
                         Kind = RelationKind.Embedding,
                         EmbeddingOptions = Map(ert.EmbeddingOptions),
@@ -104,10 +103,10 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
                 else if (type is InheritanceRelationType irt)
                 {
-                    result.RelationType = new Iis.DataModel.RelationTypeEntity
+                    result.RelationType = new RelationTypeEntity
                     {
                         Kind = RelationKind.Inheritance,
-                        EmbeddingOptions = Iis.DataModel.EmbeddingOptions.None,
+                        EmbeddingOptions = DataModel.EmbeddingOptions.None,
                         TargetType = SaveType(irt.ParentType),
                     };
                 }
@@ -129,28 +128,28 @@ namespace IIS.Core.Ontology.EntityFramework
             return result;
         }
 
-        private static Iis.DataModel.ScalarType Map(Iis.Domain.ScalarType scalarType)
+        private static DataModel.ScalarType Map(Domain.ScalarType scalarType)
         {
             switch (scalarType)
             {
-                case Iis.Domain.ScalarType.Boolean: return Iis.DataModel.ScalarType.Boolean;
-                case Iis.Domain.ScalarType.DateTime: return Iis.DataModel.ScalarType.Date;
-                case Iis.Domain.ScalarType.Decimal: return Iis.DataModel.ScalarType.Decimal;
-                case Iis.Domain.ScalarType.File: return Iis.DataModel.ScalarType.File;
-                case Iis.Domain.ScalarType.Geo: return Iis.DataModel.ScalarType.Geo;
-                case Iis.Domain.ScalarType.Integer: return Iis.DataModel.ScalarType.Int;
-                case Iis.Domain.ScalarType.String: return Iis.DataModel.ScalarType.String;
+                case Domain.ScalarType.Boolean: return DataModel.ScalarType.Boolean;
+                case Domain.ScalarType.DateTime: return DataModel.ScalarType.Date;
+                case Domain.ScalarType.Decimal: return DataModel.ScalarType.Decimal;
+                case Domain.ScalarType.File: return DataModel.ScalarType.File;
+                case Domain.ScalarType.Geo: return DataModel.ScalarType.Geo;
+                case Domain.ScalarType.Integer: return DataModel.ScalarType.Int;
+                case Domain.ScalarType.String: return DataModel.ScalarType.String;
                 default: throw new NotImplementedException();
             }
         }
 
-        private static Iis.DataModel.EmbeddingOptions Map(EmbeddingOptions embeddingOptions)
+        private static DataModel.EmbeddingOptions Map(EmbeddingOptions embeddingOptions)
         {
             switch (embeddingOptions)
             {
-                case EmbeddingOptions.Optional: return Iis.DataModel.EmbeddingOptions.Optional;
-                case EmbeddingOptions.Required: return Iis.DataModel.EmbeddingOptions.Required;
-                case EmbeddingOptions.Multiple: return Iis.DataModel.EmbeddingOptions.Multiple;
+                case EmbeddingOptions.Optional: return DataModel.EmbeddingOptions.Optional;
+                case EmbeddingOptions.Required: return DataModel.EmbeddingOptions.Required;
+                case EmbeddingOptions.Multiple: return DataModel.EmbeddingOptions.Multiple;
                 default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
             }
         }

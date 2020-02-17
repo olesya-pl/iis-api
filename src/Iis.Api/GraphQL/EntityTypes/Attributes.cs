@@ -11,6 +11,7 @@ using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OScalarType = Iis.Domain.ScalarType;
+using IIS.Domain;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
