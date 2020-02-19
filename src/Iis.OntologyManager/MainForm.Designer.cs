@@ -34,6 +34,8 @@ namespace Iis.OntologyManager
             this.button1 = new System.Windows.Forms.Button();
             this.panelMain = new System.Windows.Forms.Panel();
             this.panelRight = new System.Windows.Forms.Panel();
+            this.panelTypeHeader = new System.Windows.Forms.Panel();
+            this.panelTypeMain = new System.Windows.Forms.Panel();
             this.nodeTypeTabControl = new System.Windows.Forms.TabControl();
             this.tabNodeTypeMain = new System.Windows.Forms.TabPage();
             this.tabNodeTypeInheritance = new System.Windows.Forms.TabPage();
@@ -48,6 +50,7 @@ namespace Iis.OntologyManager
             this.nodeTypeTabControl.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelMeta.SuspendLayout();
+            this.panelTypeMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridTypes)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,10 +86,26 @@ namespace Iis.OntologyManager
             this.panelMain.Size = new System.Drawing.Size(800, 350);
             this.panelMain.TabIndex = 1;
             // 
+            // panelTypeHeader
+            // 
+            //this.panelTypeHeader.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            //this.panelTypeHeader.Location = new System.Drawing.Point(0, 0);
+            //this.panelTypeHeader.Name = "panelTypeHeader";
+            //this.panelTypeHeader.TabIndex = 1;
+            //// 
+            //// panelTypeMain
+            //// 
+            //this.panelTypeMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            //this.panelTypeMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            //this.panelTypeMain.Name = "panelTypeHeader";
+            //this.panelTypeMain.TabIndex = 2;
+            //this.panelTypeMain.Controls.Add(this.nodeTypeTabControl);
+            // 
             // panelRight
             // 
             this.panelRight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelRight.Controls.Add(this.nodeTypeTabControl);
+            //this.panelRight.Controls.Add(panelTypeHeader);
+            //this.panelRight.Controls.Add(panelTypeMain);
             this.panelRight.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelRight.Location = new System.Drawing.Point(259, 0);
             this.panelRight.Name = "panelRight";
@@ -109,7 +128,7 @@ namespace Iis.OntologyManager
             this.nodeTypeTabControl.Location = new System.Drawing.Point(0, 0);
             this.nodeTypeTabControl.Name = "nodeTypeTabControl";
             this.nodeTypeTabControl.SelectedIndex = 0;
-            this.nodeTypeTabControl.Size = new System.Drawing.Size(537, 346);
+            //this.nodeTypeTabControl.Size = new System.Drawing.Size(537, 346);
             this.nodeTypeTabControl.TabIndex = 0;
             // 
             // tabNodeTypeMain
@@ -180,6 +199,7 @@ namespace Iis.OntologyManager
             this.nodeTypeTabControl.ResumeLayout(false);
             this.panelLeft.ResumeLayout(false);
             this.panelMeta.ResumeLayout();
+            this.panelTypeMain.ResumeLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridTypes)).EndInit();
             this.ResumeLayout(false);
 
@@ -207,6 +227,11 @@ namespace Iis.OntologyManager
         private CheckBox cbFilterEntities;
         private CheckBox cbFilterAttributes;
         private CheckBox cbFilterRelations;
+        private Label lblFilterName;
+        private TextBox txtFilterName;
+        private DataGridView gridChildren;
+        private Panel panelTypeHeader;
+        private Panel panelTypeMain;
     }
 }
 

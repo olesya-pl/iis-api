@@ -4,11 +4,22 @@ using System.Text;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
-    public interface INodeTypeLinked: INodeType
+    public interface INodeTypeLinked
     {
+        // workaround because of DataGridView bug
+        Guid Id { get; }
+        string Name { get; }
+        string Title { get; }
+        string Meta { get; }
+        DateTime CreatedAt { get; }
+        DateTime UpdatedAt { get; }
+        bool IsArchived { get; }
+        Kind Kind { get; }
+        bool IsAbstract { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
         IAttributeType AttributeType { get; set; }
         IRelationTypeLinked RelationType { get; set; }
+        IReadOnlyList<IChildNodeType> GetChildren();
     }
 }

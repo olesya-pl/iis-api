@@ -9,5 +9,7 @@ namespace Iis.Interfaces.Ontology.Schema
         Guid Id { get; }
         Guid SourceTypeId { get; }
         Guid TargetTypeId { get; }
+        public RelationKind Kind { get; set; }
+        public EmbeddingOptions EmbeddingOptions { get; set; }
     }
 }

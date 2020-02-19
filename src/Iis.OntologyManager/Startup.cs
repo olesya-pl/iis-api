@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Iis.DataModel;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyManager.Style;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,6 +18,7 @@ namespace Iis.OntologyManager
                 .UseNpgsql("Server = localhost; Database = contour_prod; Username = postgres; Password = 123"));
             services.AddTransient<IOntologySchema, Iis.OntologySchema.OntologySchema>();
             services.AddTransient<MainForm>();
+            services.AddSingleton<IOntologyManagerStyle>(OntologyManagerStyle.GetDefaultStyle());
             services.AddAutoMapper(typeof(Startup));
         }
 
