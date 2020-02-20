@@ -132,6 +132,12 @@ namespace Iis.Elastic
             return searchResponse.Body;
         }
 
+        public async Task<bool> DeleteAsync(string indexName, string id)
+        {
+            var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), id);
+            return searchResponse.Success;
+        }
+
         private List<string> GetIdsFromSearchResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);

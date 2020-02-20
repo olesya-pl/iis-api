@@ -17,5 +17,6 @@ namespace Iis.Domain.Elastic
         bool IndexesAreSupported(IEnumerable<string> indexNames);
         Task<List<string>> GetIndexIdsAsync(string indexName);
         Task<string> GetByIdAsync(string indexName, string id, string[] fields);
+        Task<bool> DeleteAsync(string indexName, string id);
     }
 }
