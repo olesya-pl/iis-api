@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,16 +14,20 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class ConfigController: Controller
     {
+        IConfiguration _configufation;
+        public ConfigController(IConfiguration configuration)
+        {
+            _configufation = configuration;
+        }
         [HttpGet("")]
         public async Task<IActionResult> Get(CancellationToken token)
         {
-            var configName = "appsettings.json";
-            if (!System.IO.File.Exists(configName))
+            var sb = new StringBuilder();
+            foreach (var child in _configufation.GetChildren())
             {
-                return Content($"There is noconfig file with name {configName}");
+                sb.AppendLine($"{child.Key} = {child.Value}");
             }
-            var configText = System.IO.File.ReadAllText(configName);
-            return Content(configText);
+            return Content(sb.ToString());
         }
     }
 }
