@@ -28,8 +28,8 @@ namespace Iis.Api.Ontology.Migration
             return new List<DividedNodePart> 
             { 
                 new DividedNodePart("day", date.Day.ToString()),
-                new DividedNodePart("month", date.Day.ToString()),
-                new DividedNodePart("year", date.Day.ToString())
+                new DividedNodePart("month", date.Month.ToString()),
+                new DividedNodePart("year", date.Year.ToString())
             };
         }
 

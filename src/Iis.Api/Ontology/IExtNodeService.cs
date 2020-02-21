@@ -10,7 +10,7 @@ namespace IIS.Core.Ontology
 {
     public interface IExtNodeService
     {
-        Task<ExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<ExtNode> GetExtNodeByIdAsync(Guid id, bool isTopObject = false, CancellationToken cancellationToken = default);
         Task<List<ExtNode>> GetExtNodesByTypeIdsAsync(List<string> typeNames, CancellationToken cancellationToken = default);
     }
 }
