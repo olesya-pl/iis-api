@@ -309,7 +309,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion, CancellationToken cancellationToken = default)
         {
             var ids = await _elasticService.SearchByAllFieldsAsync(types, suggestion);
-            return _context.Nodes.Where(node => ids.Contains(node.Id));
+            return _context.Nodes.Where(node => !node.IsArchived && ids.Contains(node.Id));
         }
 
         private async Task<IQueryable<Iis.DataModel.NodeEntity>> GetNodesInternalWithCriteriaAsync(IEnumerable<Guid> derived,
