@@ -21,6 +21,7 @@ namespace Iis.OntologyManager
         IOntologySchema _schema;
         IOntologyManagerStyle _style;
         Font SelectedFont { get; set; }
+        Font TypeHeaderNameFont { get; set; }
         INodeTypeLinked SelectedNodeType
         {
             get
@@ -37,6 +38,7 @@ namespace Iis.OntologyManager
             _schema = schema;
             _style = style;
             SelectedFont = new Font(DefaultFont, FontStyle.Bold);
+            TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold);
             InitSchema();
             SetBackColor();
             SetGridTypesStyle();
@@ -101,19 +103,47 @@ namespace Iis.OntologyManager
             pnlTop.Location = new Point(0, 0);
             pnlTop.Size = new Size(rootPanel.Width, 50);
             pnlTop.BorderStyle = BorderStyle.FixedSingle;
-            pnlTop.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlTop.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
             var pnlBottom = new Panel();
             pnlBottom.Location = new Point(0, 51);
             pnlBottom.Size = new Size(rootPanel.Width, rootPanel.Height - 51);
             pnlBottom.BorderStyle = BorderStyle.FixedSingle;
             pnlBottom.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            SetTypeViewHeader(pnlTop);
             SetTypeViewControls(pnlBottom);
 
+            rootPanel.SuspendLayout();
             rootPanel.Controls.Add(pnlTop);
             rootPanel.Controls.Add(pnlBottom);
+            rootPanel.ResumeLayout();
         }
 
+        private void SetTypeViewHeader(Panel rootPanel)
+        {
+            rootPanel.SuspendLayout();
+            
+            btnTypeBack = new Button
+            {
+                Location = new Point(_style.MarginHor, _style.MarginVer),
+                Width = 60,
+                Text = "Back"
+            };
+
+            lblTypeHeaderName = new Label
+            {
+                Location = new Point(btnTypeBack.Right + _style.MarginHor, _style.MarginVer),
+                ForeColor = Color.DarkBlue,
+                Font = TypeHeaderNameFont,
+                AutoSize = true,
+                Text = ""
+            };
+
+            rootPanel.Controls.Add(btnTypeBack);
+            rootPanel.Controls.Add(lblTypeHeaderName);
+            rootPanel.ResumeLayout();
+        }
+        
         private void SetTypeViewControls(Panel rootPanel)
         {
             rootPanel.SuspendLayout();
@@ -133,7 +163,7 @@ namespace Iis.OntologyManager
                 Left = _style.MarginHor,
                 Top = top,
                 Width = _style.ControlWidthDefault,
-                Enabled = false
+                ReadOnly = true
             };
             rootPanel.Controls.Add(txtId);
             top += txtId.Height + _style.MarginVer;
@@ -177,7 +207,6 @@ namespace Iis.OntologyManager
                 new List<string> { "RelationName", "RelationTitle", "Name", "EmbeddingOptions" });
             gridChildren.Width = rootPanel.Width;
             gridChildren.Height = rootPanel.Bottom - top - _style.MarginVer * 2;
-            //gridChildren.Dock = DockStyle.Bottom;
             gridChildren.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             
             gridChildren.ColumnHeadersVisible = true;
@@ -302,6 +331,7 @@ namespace Iis.OntologyManager
 
         private void SetNodeTypeView(INodeTypeLinked nodeType)
         {
+            lblTypeHeaderName.Text = nodeType.Name;
             txtId.Text = nodeType.Id.ToString();
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;

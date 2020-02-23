@@ -232,6 +232,8 @@ namespace Iis.OntologyManager
         private DataGridView gridChildren;
         private Panel panelTypeHeader;
         private Panel panelTypeMain;
+        private Button btnTypeBack;
+        private Label lblTypeHeaderName;
     }
 }
 
