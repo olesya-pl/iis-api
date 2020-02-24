@@ -42,7 +42,7 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (!_runTimeSettings.PutSavedToElastic) return true;
-            var extNode = await _extNodeService.GetExtNodeByIdAsync(id, true, cancellationToken);
+            var extNode = await _extNodeService.GetExtNodeByIdAsync(id, cancellationToken);
             return await _elasticManager.PutExtNodeAsync(extNode, cancellationToken);
         }
 

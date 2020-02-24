@@ -9,6 +9,7 @@ namespace Iis.Interfaces.Ontology
         string Id { get; }
         string NodeTypeId { get; }
         string NodeTypeName { get; }
+        string NodeTypeTitle { get; }
         string AttributeValue { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }

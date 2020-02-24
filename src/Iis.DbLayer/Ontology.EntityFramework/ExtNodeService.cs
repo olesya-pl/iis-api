@@ -50,6 +50,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 Id = nodeEntity.Id.ToString("N"),
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
                 NodeTypeName = nodeTypeName,
+                NodeTypeTitle = nodeEntity.NodeType.Title,
                 AttributeValue = nodeEntity.Attribute?.Value,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
@@ -58,16 +59,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return await Task.FromResult(extNode);
         }
         
-        public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, bool isTopNode = false, CancellationToken cancellationToken = default)
+        public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var nodeEntity = await GetNodeQuery()
                 .Where(n => n.Id == id)
                 .SingleOrDefaultAsync();
             var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, cancellationToken);
-            if (isTopNode)
-            {
-                extNode.NodeTypeTitle = nodeEntity.NodeType.Title;
-            }
             return extNode;
         }
 
@@ -102,7 +99,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 Console.WriteLine($"{++cnt}/{total}: {node.Id};{node.NodeType.Name}");
                 if (true) //(node.Id == new Guid("a6b3bf85fd7949ac8db8995e472c0f79"))
                 {
-                    var extNode = await GetExtNodeByIdAsync(node.Id, false, cancellationToken);
+                    var extNode = await GetExtNodeByIdAsync(node.Id, cancellationToken);
                     result.Add(extNode);
                 }
             }
