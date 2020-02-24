@@ -211,6 +211,7 @@ namespace Iis.OntologyManager
             
             gridChildren.ColumnHeadersVisible = true;
             gridChildren.AutoGenerateColumns = false;
+            gridChildren.DoubleClick += gridChildren_DoubleClick;
             rootPanel.Controls.Add(gridChildren);
 
             rootPanel.ResumeLayout();
@@ -383,6 +384,14 @@ namespace Iis.OntologyManager
             style.SelectionBackColor = color;
             style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
             style.Font = row.Selected ? SelectedFont : DefaultFont;
+        }
+
+        private void gridChildren_DoubleClick(object sender, EventArgs e)
+        {
+            var grid = (DataGridView)sender;
+            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
+            var childNodeType = (IChildNodeType)selectedRow.DataBoundItem;
+            SetNodeTypeView(childNodeType.TargetType);
         }
     }
 

@@ -16,5 +16,6 @@ namespace Iis.OntologySchema.DataTypes
         public string RelationTitle { get; set; }
         public string RelationMeta { get; set; }
         public EmbeddingOptions EmbeddingOptions { get; set; }
+        public INodeTypeLinked TargetType { get; set; }
     }
 }

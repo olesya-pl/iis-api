@@ -47,7 +47,8 @@ namespace Iis.OntologySchema.DataTypes
                     RelationName = r.NodeType.Name,
                     RelationTitle = r.NodeType.Title,
                     RelationMeta = r.NodeType.Meta,
-                    EmbeddingOptions = r.EmbeddingOptions
+                    EmbeddingOptions = r.EmbeddingOptions,
+                    TargetType = r.TargetType
                 }).ToList();
         }
     }

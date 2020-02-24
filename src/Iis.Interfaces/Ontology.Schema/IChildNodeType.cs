@@ -15,5 +15,6 @@ namespace Iis.Interfaces.Ontology.Schema
         string RelationTitle { get; }
         string RelationMeta { get; }
         EmbeddingOptions EmbeddingOptions { get; }
+        INodeTypeLinked TargetType { get; }
     }
 }
