@@ -8,5 +8,6 @@ namespace Iis.Interfaces.Ontology.Schema
     {
         void Initialize(IEnumerable<INodeType> nodeTypes, IEnumerable<IRelationType> relationTypes, IEnumerable<IAttributeType> attributeTypes);
         IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter);
+        INodeTypeLinked GetNodeTypeById(Guid id);
     }
 }

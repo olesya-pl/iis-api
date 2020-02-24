@@ -15,5 +15,17 @@ namespace Iis.OntologySchema.DataTypes
         public INodeTypeLinked NodeType { get; set; }
         public INodeTypeLinked SourceType { get; set; }
         public INodeTypeLinked TargetType { get; set; }
+        public override string ToString()
+        {
+            return $"{SourceType.Name}.{NodeType.Name}";
+        }
+        public bool IsEqual(IRelationType relationType)
+        {
+            return Id == relationType.Id
+                && Kind == relationType.Kind
+                && EmbeddingOptions == relationType.EmbeddingOptions
+                && SourceTypeId == relationType.SourceTypeId
+                && TargetTypeId == relationType.TargetTypeId;
+        }
     }
 }

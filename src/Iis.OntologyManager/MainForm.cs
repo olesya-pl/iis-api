@@ -1,6 +1,7 @@
 ﻿using Iis.DataModel;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
+using Iis.OntologyManager.UiControls;
 using Iis.OntologySchema.DataTypes;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,6 +21,9 @@ namespace Iis.OntologyManager
         OntologyContext _context;
         IOntologySchema _schema;
         IOntologyManagerStyle _style;
+        UiControlsCreator _uiControlsCreator;
+        INodeTypeLinked _currentNodeType;
+        IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         Font SelectedFont { get; set; }
         Font TypeHeaderNameFont { get; set; }
         INodeTypeLinked SelectedNodeType
@@ -31,17 +35,21 @@ namespace Iis.OntologyManager
                     (INodeTypeLinked)gridTypes.SelectedRows[0].DataBoundItem;
             }
         }
-        public MainForm(OntologyContext context, IOntologySchema schema, IOntologyManagerStyle style)
+        public MainForm(OntologyContext context, 
+            IOntologySchema schema, 
+            IOntologyManagerStyle style,
+            UiControlsCreator uiControlsCreator)
         {
             InitializeComponent();
             _context = context;
             _schema = schema;
             _style = style;
+            _uiControlsCreator = uiControlsCreator;
             SelectedFont = new Font(DefaultFont, FontStyle.Bold);
             TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold);
             InitSchema();
             SetBackColor();
-            SetGridTypesStyle();
+            _uiControlsCreator.SetGridTypesStyle(gridTypes);
             SetAdditionalControls();
             ReloadTypes();
         }
@@ -53,49 +61,6 @@ namespace Iis.OntologyManager
             panelLeft.BackColor = _style.BackgroundColor;
             panelRight.BackColor = _style.BackgroundColor;
         }
-
-        private void SetGridTypesStyle()
-        {
-            gridTypes.ColumnCount = 1;
-            gridTypes.Columns[0].DataPropertyName = "Name";
-            gridTypes.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridTypes.AllowUserToResizeRows = false;
-            gridTypes.MultiSelect = false;
-            gridTypes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            gridTypes.ForeColor = Color.Black;
-        }
-
-        private DataGridView GetDataGridView(string name, Point location, List<string> dataNames)
-        {
-            var grid = new DataGridView
-            {
-                AutoGenerateColumns = false,
-                ColumnHeadersVisible = false,
-                RowHeadersVisible = false,
-                Dock = DockStyle.None,
-                Location = location,
-                Name = name,
-                AllowUserToResizeRows = false,
-                MultiSelect = false,
-                ReadOnly = true,
-                ColumnCount = dataNames.Count,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                BackgroundColor = _style.BackgroundColor
-            };
-            grid.DefaultCellStyle.SelectionBackColor = grid.DefaultCellStyle.BackColor;
-            grid.DefaultCellStyle.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
-
-            for (int i = 0; i < dataNames.Count; i++)
-            {
-                grid.Columns[i].DataPropertyName = dataNames[i];
-                grid.Columns[i].HeaderText = dataNames[i];
-                grid.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            }
-            grid.CellFormatting += new DataGridViewCellFormattingEventHandler(gridChildren_CellFormatting);
-            return grid;
-        }
-
-        
 
         private void SetControlsTabMain(Panel rootPanel)
         {
@@ -129,6 +94,7 @@ namespace Iis.OntologyManager
                 Width = 60,
                 Text = "Back"
             };
+            btnTypeBack.Click += btnTypeBack_Click;
 
             lblTypeHeaderName = new Label
             {
@@ -148,7 +114,7 @@ namespace Iis.OntologyManager
         {
             rootPanel.SuspendLayout();
 
-            var top = _style.MarginVer;
+            var top = _style.MarginVer * 2;
             lblId = new Label
             {
                 Left = _style.MarginHor,
@@ -157,7 +123,7 @@ namespace Iis.OntologyManager
                 Text = "Id"
             };
             rootPanel.Controls.Add(lblId);
-            top += lblId.Height + _style.MarginVerSmall;
+            top += lblId.Height;
             txtId = new TextBox
             {
                 Left = _style.MarginHor,
@@ -175,7 +141,7 @@ namespace Iis.OntologyManager
                 Text = "Name"
             };
             rootPanel.Controls.Add(lblName);
-            top += lblName.Height + _style.MarginVerSmall;
+            top += lblName.Height;
             txtName = new TextBox
             {
                 Left = _style.MarginHor,
@@ -193,7 +159,7 @@ namespace Iis.OntologyManager
                 Text = "Title"
             };
             rootPanel.Controls.Add(lblTitle);
-            top += lblTitle.Height + _style.MarginVerSmall;
+            top += lblTitle.Height;
             txtTitle = new TextBox
             {
                 Left = _style.MarginHor,
@@ -201,18 +167,65 @@ namespace Iis.OntologyManager
                 Width = _style.ControlWidthDefault
             };
             rootPanel.Controls.Add(txtTitle);
-            top += txtTitle.Height + _style.MarginVerSmall;
+            top += txtTitle.Height + _style.MarginVer * 2;
 
-            gridChildren = GetDataGridView("gridChildren", new Point(0, top), 
-                new List<string> { "RelationName", "RelationTitle", "Name", "EmbeddingOptions" });
-            gridChildren.Width = rootPanel.Width;
+            menuChildren = new ContextMenuStrip();
+            menuChildren.Items.Add("Show Relation");
+            menuChildren.Items[0].Click += menuChildren_showRelationClick;
+
+            gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", new Point(_style.MarginHor, top), 
+                new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
+            gridChildren.Width = rootPanel.Width - _style.MarginHor * 2;
             gridChildren.Height = rootPanel.Bottom - top - _style.MarginVer * 2;
             gridChildren.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            
+                        
             gridChildren.ColumnHeadersVisible = true;
             gridChildren.AutoGenerateColumns = false;
             gridChildren.DoubleClick += gridChildren_DoubleClick;
+            gridChildren.CellFormatting += gridChildren_CellFormatting;
+            gridChildren.ContextMenuStrip = menuChildren;
+            
             rootPanel.Controls.Add(gridChildren);
+
+            top = _style.MarginVer;
+            var hor = lblId.Right + _style.MarginHor;
+            lblGridInheritance = new Label
+            {
+                Left = hor,
+                Top = top,
+                Width = _style.ControlWidthDefault,
+                Text = "Inherited from"
+            };
+            top += lblGridInheritance.Height;
+            
+            gridInheritance = _uiControlsCreator.GetDataGridView("gridChildren", new Point(hor, top),
+                new List<string> { "Name" });
+            gridInheritance.Width = _style.ControlWidthDefault;
+            gridInheritance.Height = txtTitle.Bottom - gridInheritance.Top;
+            gridInheritance.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            gridInheritance.CellFormatting += gridTypes_CellFormatting;
+            gridInheritance.DoubleClick += gridInheritance_DoubleClick;
+            rootPanel.Controls.Add(lblGridInheritance);
+            rootPanel.Controls.Add(gridInheritance);
+
+            top = _style.MarginVer;
+            hor = gridInheritance.Right + _style.MarginHor;
+            lblMeta = new Label
+            {
+                Left = hor,
+                Top = top,
+                Width = _style.ControlWidthDefault,
+                Text = "Metadata"
+            };
+            top += lblMeta.Height;
+            txtMeta = new RichTextBox
+            {
+                Location = new Point(hor, top),
+                Width = _style.ControlWidthDefault,
+                Height = txtTitle.Bottom - gridInheritance.Top
+            };
+            rootPanel.Controls.Add(lblMeta);
+            rootPanel.Controls.Add(txtMeta);
 
             rootPanel.ResumeLayout();
         }
@@ -327,18 +340,26 @@ namespace Iis.OntologyManager
         private void gridTypes_SelectionChanged(object sender, EventArgs e)
         {
             if (SelectedNodeType == null) return;
-            SetNodeTypeView(SelectedNodeType);
+            _history.Clear();
+            SetNodeTypeView(SelectedNodeType, false);
         }
 
-        private void SetNodeTypeView(INodeTypeLinked nodeType)
+        private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
+            if (addToHistory && _currentNodeType != null)
+            {
+                _history.Add(_currentNodeType);
+            }
             lblTypeHeaderName.Text = nodeType.Name;
-            txtId.Text = nodeType.Id.ToString();
+            txtId.Text = nodeType.Id.ToString("N");
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
-            var children = nodeType.GetChildren();
-            //var children = new List<TestA> { new TestA { Id = 1, Name = "fff" } };
+            var children = nodeType.GetAllChildren();
             gridChildren.DataSource = children;
+            var ancestors = nodeType.GetAllAncestors();
+            gridInheritance.DataSource = ancestors;
+            txtMeta.Text = nodeType.Meta;
+            _currentNodeType = nodeType;
         }
 
         private Color GetColorByNodeType(Kind kind)
@@ -386,18 +407,47 @@ namespace Iis.OntologyManager
             style.Font = row.Selected ? SelectedFont : DefaultFont;
         }
 
+        private void gridChildrenEvent(Action<IChildNodeType> action)
+        {
+            var grid = gridChildren;
+            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
+            if (selectedRow == null) return;
+            var childNodeType = (IChildNodeType)selectedRow.DataBoundItem;
+            action(childNodeType);
+        }
+
+        private void ChildrenShowRelation(IChildNodeType childNodeType)
+        {
+            var relationType = _schema.GetNodeTypeById(childNodeType.RelationId);
+            if (relationType == null) return;
+            SetNodeTypeView(relationType, true);
+        }
+
         private void gridChildren_DoubleClick(object sender, EventArgs e)
+        {
+            gridChildrenEvent(cnt => SetNodeTypeView(cnt.TargetType, true));
+        }
+
+        private void menuChildren_showRelationClick(object sender, EventArgs e)
+        {
+            gridChildrenEvent(ChildrenShowRelation);
+        }
+
+        private void gridInheritance_DoubleClick(object sender, EventArgs e)
         {
             var grid = (DataGridView)sender;
             var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            var childNodeType = (IChildNodeType)selectedRow.DataBoundItem;
-            SetNodeTypeView(childNodeType.TargetType);
+            if (selectedRow == null) return;
+            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
+            SetNodeTypeView(nodeType, true);
+        }
+
+        private void btnTypeBack_Click(object sender, EventArgs e)
+        {
+            if (_history.Count == 0) return;
+            var nodeType = _history[_history.Count - 1];
+            _history.RemoveAt(_history.Count - 1);
+            SetNodeTypeView(nodeType, false);
         }
     }
-
-    public class TestA
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    };
 }

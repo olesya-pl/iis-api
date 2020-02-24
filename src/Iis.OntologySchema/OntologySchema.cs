@@ -28,5 +28,20 @@ namespace Iis.OntologySchema
                 .Where(nt => (filter.Name == null || nt.Name.ToLower().Contains(filter.Name.ToLower().Trim()))
                     && filter.Kinds.Contains(nt.Kind));
         }
+
+        public INodeTypeLinked GetNodeTypeById(Guid id)
+        {
+            return _storage.NodeTypes.Values
+                .Where(nt => nt.Id == id)
+                .SingleOrDefault();
+        }
+
+        public void AddNodeType(INodeType nodeType)
+        {
+            var schemaNodeType = new SchemaNodeType();
+            schemaNodeType.CopyFrom(nodeType);
+            schemaNodeType.Id = nodeType.Id == default ? Guid.NewGuid() : nodeType.Id;
+            _storage.NodeTypes[schemaNodeType.Id] = schemaNodeType;
+        }
     }
 }

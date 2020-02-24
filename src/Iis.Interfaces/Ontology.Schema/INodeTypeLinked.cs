@@ -20,6 +20,9 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
         IAttributeType AttributeType { get; set; }
         IRelationTypeLinked RelationType { get; set; }
-        IReadOnlyList<IChildNodeType> GetChildren();
+        IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom);
+        IReadOnlyList<IChildNodeType> GetAllChildren();
+        IReadOnlyList<INodeTypeLinked> GetDirectAncestors();
+        IReadOnlyList<INodeTypeLinked> GetAllAncestors();
     }
 }

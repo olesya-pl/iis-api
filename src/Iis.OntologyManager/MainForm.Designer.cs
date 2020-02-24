@@ -36,18 +36,12 @@ namespace Iis.OntologyManager
             this.panelRight = new System.Windows.Forms.Panel();
             this.panelTypeHeader = new System.Windows.Forms.Panel();
             this.panelTypeMain = new System.Windows.Forms.Panel();
-            this.nodeTypeTabControl = new System.Windows.Forms.TabControl();
-            this.tabNodeTypeMain = new System.Windows.Forms.TabPage();
-            this.tabNodeTypeInheritance = new System.Windows.Forms.TabPage();
-            this.tabNodeTypeMeta = new System.Windows.Forms.TabPage();
             this.panelMeta = new System.Windows.Forms.Panel();
-            this.tabNodeTypeMeta.Controls.Add(panelMeta);
             this.panelLeft = new System.Windows.Forms.Panel();
             this.gridTypes = new System.Windows.Forms.DataGridView();
             this.panelTop.SuspendLayout();
             this.panelMain.SuspendLayout();
             this.panelRight.SuspendLayout();
-            this.nodeTypeTabControl.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelMeta.SuspendLayout();
             this.panelTypeMain.SuspendLayout();
@@ -86,21 +80,6 @@ namespace Iis.OntologyManager
             this.panelMain.Size = new System.Drawing.Size(800, 350);
             this.panelMain.TabIndex = 1;
             // 
-            // panelTypeHeader
-            // 
-            //this.panelTypeHeader.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            //this.panelTypeHeader.Location = new System.Drawing.Point(0, 0);
-            //this.panelTypeHeader.Name = "panelTypeHeader";
-            //this.panelTypeHeader.TabIndex = 1;
-            //// 
-            //// panelTypeMain
-            //// 
-            //this.panelTypeMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            //this.panelTypeMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            //this.panelTypeMain.Name = "panelTypeHeader";
-            //this.panelTypeMain.TabIndex = 2;
-            //this.panelTypeMain.Controls.Add(this.nodeTypeTabControl);
-            // 
             // panelRight
             // 
             this.panelRight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -118,46 +97,6 @@ namespace Iis.OntologyManager
             this.panelMeta.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelMeta.Name = "panelMeta";
             this.panelMeta.TabIndex = 1;
-            // 
-            // nodeTypeTabControl
-            // 
-            this.nodeTypeTabControl.Controls.Add(this.tabNodeTypeMain);
-            this.nodeTypeTabControl.Controls.Add(this.tabNodeTypeInheritance);
-            this.nodeTypeTabControl.Controls.Add(this.tabNodeTypeMeta);
-            this.nodeTypeTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.nodeTypeTabControl.Location = new System.Drawing.Point(0, 0);
-            this.nodeTypeTabControl.Name = "nodeTypeTabControl";
-            this.nodeTypeTabControl.SelectedIndex = 0;
-            //this.nodeTypeTabControl.Size = new System.Drawing.Size(537, 346);
-            this.nodeTypeTabControl.TabIndex = 0;
-            // 
-            // tabNodeTypeMain
-            // 
-            this.tabNodeTypeMain.Location = new System.Drawing.Point(4, 24);
-            this.tabNodeTypeMain.Name = "tabNodeTypeMain";
-            this.tabNodeTypeMain.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNodeTypeMain.Size = new System.Drawing.Size(529, 318);
-            this.tabNodeTypeMain.TabIndex = 0;
-            this.tabNodeTypeMain.Text = "Main";
-            this.tabNodeTypeMain.UseVisualStyleBackColor = true;
-            // 
-            // tabNodeTypeInheritance
-            // 
-            this.tabNodeTypeInheritance.Location = new System.Drawing.Point(4, 24);
-            this.tabNodeTypeInheritance.Name = "tabNodeTypeInheritance";
-            this.tabNodeTypeInheritance.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNodeTypeInheritance.Size = new System.Drawing.Size(529, 318);
-            this.tabNodeTypeInheritance.TabIndex = 1;
-            this.tabNodeTypeInheritance.Text = "Inheritance";
-            this.tabNodeTypeInheritance.UseVisualStyleBackColor = true;
-            // 
-            // tabNodeTypeMeta
-            // 
-            this.tabNodeTypeMeta.Location = new System.Drawing.Point(4, 24);
-            this.tabNodeTypeMeta.Name = "tabNodeTypeMeta";
-            this.tabNodeTypeMeta.Size = new System.Drawing.Size(529, 318);
-            this.tabNodeTypeMeta.TabIndex = 2;
-            this.tabNodeTypeMeta.Text = "MetaData";
             // 
             // panelLeft
             // 
@@ -196,13 +135,11 @@ namespace Iis.OntologyManager
             this.panelTop.ResumeLayout(false);
             this.panelMain.ResumeLayout(false);
             this.panelRight.ResumeLayout(false);
-            this.nodeTypeTabControl.ResumeLayout(false);
             this.panelLeft.ResumeLayout(false);
             this.panelMeta.ResumeLayout();
             this.panelTypeMain.ResumeLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridTypes)).EndInit();
             this.ResumeLayout(false);
-
         }
 
         #endregion
@@ -214,10 +151,6 @@ namespace Iis.OntologyManager
         private System.Windows.Forms.DataGridView gridTypes;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Panel panelMeta;
-        private TabControl nodeTypeTabControl;
-        private TabPage tabNodeTypeMain;
-        private TabPage tabNodeTypeInheritance;
-        private TabPage tabNodeTypeMeta;
         private Label lblId;
         private TextBox txtId;
         private Label lblName;
@@ -234,6 +167,11 @@ namespace Iis.OntologyManager
         private Panel panelTypeMain;
         private Button btnTypeBack;
         private Label lblTypeHeaderName;
+        private Label lblGridInheritance;
+        private DataGridView gridInheritance;
+        private Label lblMeta;
+        private RichTextBox txtMeta;
+        private ContextMenuStrip menuChildren;
     }
 }
 

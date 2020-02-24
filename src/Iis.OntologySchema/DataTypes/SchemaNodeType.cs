@@ -33,7 +33,7 @@ namespace Iis.OntologySchema.DataTypes
             _outgoingRelations.Add(relationType);
         }
 
-        public IReadOnlyList<IChildNodeType> GetChildren()
+        public IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom)
         {
             return OutgoingRelations
                 .Where(r => r.Kind == RelationKind.Embedding)
@@ -47,9 +47,68 @@ namespace Iis.OntologySchema.DataTypes
                     RelationName = r.NodeType.Name,
                     RelationTitle = r.NodeType.Title,
                     RelationMeta = r.NodeType.Meta,
+                    ScalarType = r.TargetType.AttributeType?.ScalarType,
                     EmbeddingOptions = r.EmbeddingOptions,
+                    InheritedFrom = setInheritedFrom ? this.Name : string.Empty,
                     TargetType = r.TargetType
                 }).ToList();
+        }
+
+        public IReadOnlyList<IChildNodeType> GetAllChildren()
+        {
+            var result = new List<IChildNodeType>();
+            result.AddRange(GetDirectChildren(false));
+            var ancestors = GetAllAncestors();
+            foreach (var ancestor in ancestors)
+            {
+                result.AddRange(ancestor.GetDirectChildren(true));
+            }
+
+            return result;
+        }
+
+        public IReadOnlyList<INodeTypeLinked> GetDirectAncestors()
+        {
+            return OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance).Select(r => r.TargetType).ToList();
+        }
+
+        public IReadOnlyList<INodeTypeLinked> GetAllAncestors()
+        {
+            var result = new List<INodeTypeLinked>();
+            var directAncestors = GetDirectAncestors();
+            foreach (var directAncestor in directAncestors)
+            {
+                result.Add(directAncestor);
+                result.AddRange(directAncestor.GetAllAncestors());
+            }
+
+            return result;
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        public bool IsEqual(INodeType nodeType)
+        {
+            return Id == nodeType.Id
+                && Name == nodeType.Name
+                && Title == nodeType.Title
+                && Meta == nodeType.Meta
+                && IsArchived == nodeType.IsArchived
+                && Kind == nodeType.Kind
+                && IsAbstract == nodeType.IsAbstract;
+        }
+
+        public void CopyFrom(INodeType nodeType)
+        {
+            Name = nodeType.Name;
+            Title = nodeType.Title;
+            Meta = nodeType.Meta;
+            IsArchived = nodeType.IsArchived;
+            Kind = nodeType.Kind;
+            IsAbstract = nodeType.IsAbstract;
         }
     }
 }
