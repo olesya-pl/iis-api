@@ -311,7 +311,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion, CancellationToken cancellationToken = default)
         {
             var ids = await _elasticService.SearchByAllFieldsAsync(types.Select(t => t.Name), suggestion);
-            return _context.Nodes.Where(node => ids.Contains(node.Id));
+            return _context.Nodes.Where(node => !node.IsArchived && ids.Contains(node.Id));
         }
 
         private async Task<IQueryable<NodeEntity>> GetNodesInternalWithCriteriaAsync(IEnumerable<Guid> derived,

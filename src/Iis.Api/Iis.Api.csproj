@@ -41,7 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="GraphQL\" />
   </ItemGroup>
   <ItemGroup>

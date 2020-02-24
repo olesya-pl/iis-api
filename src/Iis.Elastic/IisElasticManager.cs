@@ -89,6 +89,50 @@ namespace Iis.Elastic
             return response.Success;
         }
 
+
+        public async Task<List<string>> GetIndexIdsAsync(string indexName)
+        {
+            if (indexName == null) throw new ArgumentNullException(nameof(indexName));
+            
+            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
+            {
+                query = new
+                {
+                    match_all = new object()
+                },
+                stored_fields = Array.Empty<object>()
+            }));
+
+            if (!searchResponse.Success)
+            {
+                return new List<string>();
+            }
+            
+            return GetIdsFromSearchResponse(searchResponse);
+        }
+
+        public async Task<string> GetByIdAsync(string indexName, string id, string[] fields)
+        {
+            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
+            {
+                query = new
+                {
+                    match = new
+                    {
+                        _id = id
+                    }
+                },
+                _source = fields
+            }));
+
+            if (!searchResponse.Success)
+            {
+                return string.Empty;
+            }
+
+            return searchResponse.Body;
+        }
+
         private List<string> GetIdsFromSearchResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);
@@ -133,7 +177,7 @@ namespace Iis.Elastic
             return string.Join(',', baseIndexNames.Select(name => GetRealIndexName(name)));
         }
 
-        private string EscapeElasticSpecificSymbols(string input, string escapePattern) 
+        private string EscapeElasticSpecificSymbols(string input, string escapePattern)
         {
             if (string.IsNullOrWhiteSpace(input)) return input;
 

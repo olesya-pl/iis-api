@@ -15,5 +15,7 @@ namespace Iis.Interfaces.Elastic
         List<string> SupportedIndexes { get; }
         bool IndexIsSupported(string indexName);
         bool IndexesAreSupported(IEnumerable<string> indexNames);
+        Task<List<string>> GetIndexIdsAsync(string indexName);
+        Task<string> GetByIdAsync(string indexName, string id, string[] fields);
     }
 }

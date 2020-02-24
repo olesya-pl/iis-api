@@ -14,6 +14,19 @@ namespace Iis.Elastic
             return GetJsonObjectByExtNode(extNode).ToString();
         }
 
+        private string GetUniqueKey(JObject json, string baseKey)
+        {
+            if (!json.ContainsKey(baseKey)) return baseKey;
+            var n = 1;
+            string key;
+            do
+            {
+                key = $"{baseKey}{n++}";
+            }
+            while (json.ContainsKey(key));
+            return key;
+        }
+
         public JObject GetJsonObjectByExtNode(IExtNode extNode, bool IsHeadNode = true)
         {
             var json = new JObject();
@@ -22,19 +35,31 @@ namespace Iis.Elastic
             {
                 json[nameof(extNode.Id)] = extNode.Id;
                 json[nameof(extNode.NodeTypeName)] = extNode.NodeTypeName;
+                if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
+                {
+                    json[nameof(extNode.NodeTypeTitle)] = extNode.NodeTypeTitle;
+                }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
             }
 
             foreach (var child in extNode.Children)
             {
+                var key = GetUniqueKey(json, child.NodeTypeName);
                 if (child.IsAttribute)
                 {
-                    json[child.NodeTypeName] = child.AttributeValue;
+                    json[key] = child.AttributeValue;
                 }
                 else
                 {
-                    json[child.NodeTypeName] = GetJsonObjectByExtNode(child, false);
+                    if (child.Children.Count == 1 && child.Children[0].NodeTypeName == "value")
+                    {
+                        json[key] = child.Children[0].AttributeValue;
+                    }
+                    else
+                    {
+                        json[key] = GetJsonObjectByExtNode(child, false);
+                    }
                 }
             }
 

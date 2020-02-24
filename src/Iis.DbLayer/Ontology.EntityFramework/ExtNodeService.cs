@@ -1,7 +1,9 @@
 ﻿using Iis.DataModel;
 using Iis.Domain.ExtendedData;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +15,36 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public class ExtNodeService : IExtNodeService
     {
         private readonly OntologyContext _context;
+        private List<Guid> _objectOfStudyTypes;
+        private List<Guid> ObjectOfStudyTypes
+        {
+            get
+            {
+                return _objectOfStudyTypes ?? (_objectOfStudyTypes = GetObjectOfStudyTypes());
+            }
+        }
 
         public ExtNodeService(OntologyContext context)
         {
             _context = context;
         }
 
-        public async Task<IExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, CancellationToken cancellationToken = default)
+        private List<Guid> GetObjectOfStudyTypes()
         {
+            //TODO: 
+            var objectOfStudyType = _context.NodeTypes
+                .Include(nt => nt.IncomingRelations)
+                .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
+                .SingleOrDefault();
+            return objectOfStudyType.IncomingRelations
+                .Where(r => r.Kind == RelationKind.Inheritance)
+                .Select(r => r.SourceTypeId)
+                .ToList();
+        }
+
+        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, CancellationToken cancellationToken = default)
+        {
+            //Console.WriteLine($"=> {nodeEntity.Id}; {nodeEntity.NodeType.Name}");
             var extNode = new ExtNode
             {
                 Id = nodeEntity.Id.ToString("N"),
@@ -33,13 +57,18 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             };
             return await Task.FromResult(extNode);
         }
-
-        public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        
+        public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, bool isTopNode = false, CancellationToken cancellationToken = default)
         {
             var nodeEntity = await GetNodeQuery()
                 .Where(n => n.Id == id)
                 .SingleOrDefaultAsync();
-            return await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, cancellationToken);
+            var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, cancellationToken);
+            if (isTopNode)
+            {
+                extNode.NodeTypeTitle = nodeEntity.NodeType.Title;
+            }
+            return extNode;
         }
 
         public async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
@@ -48,8 +77,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             foreach (var relation in relations)
             {
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
-                var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, cancellationToken);
-                result.Add(extNode);
+                if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
+                {
+                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, cancellationToken);
+                    result.Add(extNode);
+                }
             }
             return result;
         }
@@ -67,9 +99,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             foreach (var node in nodes)
             {
-                var extNode = await GetExtNodeByIdAsync(node.Id);
-                Console.WriteLine($"{++cnt}/{total}: {extNode.NodeTypeName}; {node.Id}");
-                result.Add(extNode);
+                Console.WriteLine($"{++cnt}/{total}: {node.Id};{node.NodeType.Name}");
+                if (true) //(node.Id == new Guid("a6b3bf85fd7949ac8db8995e472c0f79"))
+                {
+                    var extNode = await GetExtNodeByIdAsync(node.Id, false, cancellationToken);
+                    result.Add(extNode);
+                }
             }
 
             return result;

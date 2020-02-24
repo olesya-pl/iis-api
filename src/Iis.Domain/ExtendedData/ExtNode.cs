@@ -11,6 +11,7 @@ namespace Iis.Domain.ExtendedData
         public string Id { get; set; }
         public string NodeTypeId { get; set; }
         public string NodeTypeName { get; set; }
+        public string NodeTypeTitle { get; set; }
         public string AttributeValue { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
