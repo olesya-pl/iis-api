@@ -42,7 +42,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToList();
         }
 
-        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, CancellationToken cancellationToken = default)
+        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
         {
             //Console.WriteLine($"=> {nodeEntity.Id}; {nodeEntity.NodeType.Name}");
             var extNode = new ExtNode
@@ -50,7 +50,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 Id = nodeEntity.Id.ToString("N"),
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
                 NodeTypeName = nodeTypeName,
-                NodeTypeTitle = nodeEntity.NodeType.Title,
+                NodeTypeTitle = nodeTypeTitle,
                 AttributeValue = nodeEntity.Attribute?.Value,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
@@ -64,7 +64,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var nodeEntity = await GetNodeQuery()
                 .Where(n => n.Id == id)
                 .SingleOrDefaultAsync();
-            var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, cancellationToken);
+            var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
             return extNode;
         }
 
@@ -76,7 +76,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
                 if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
                 {
-                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, cancellationToken);
+                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, relation.Node.NodeType.Title ,cancellationToken);
                     result.Add(extNode);
                 }
             }
