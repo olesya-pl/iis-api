@@ -139,6 +139,39 @@ namespace Iis.Elastic
             return searchResponse.Success;
         }
 
+        public async Task CreateSupportedIndexesAsync(CancellationToken token)
+        {
+            foreach (string index in SupportedIndexes)
+            {
+                if (!await IndexExistsAsync(index, token))
+                {
+                    await CreateIndexAsync(index, token);
+                }
+            }
+        }
+
+        private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
+        {
+            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
+            {
+                size = 1,
+                query = new
+                {
+                    match_all = new object()
+                },
+                stored_fields = Array.Empty<object>()
+            }),
+            ctx:token);
+
+            return searchResponse.Success || searchResponse.HttpStatusCode != 404;
+        }
+
+        private async Task<bool> CreateIndexAsync(string indexName, CancellationToken token)
+        {
+            StringResponse response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, GetRealIndexName(indexName), token);
+            return response.Success;
+        }
+
         private List<string> GetIdsFromSearchResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);
