@@ -51,6 +51,21 @@ namespace IIS.Core.Ontology.EntityFramework
             return _elasticManager.IndexesAreSupported(typeNames);
         }
 
+        public async Task UpdateElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
+        {
+            ElasticCompareResult compareResult = await CompareWithElasticAsync(nodeTypeId, indexName, cancellationToken);
+
+            foreach (Guid id in compareResult.NeedToDelete)
+            {
+                await _elasticManager.DeleteAsync(indexName, id.ToString("N"));
+            }
+
+            foreach (Guid id in compareResult.NeedToUpdate)
+            {
+                await PutNodeAsync(id, cancellationToken);
+            }
+        }
+
         public async Task<ElasticCompareResult> CompareWithElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
         {
             List<string> list = await _elasticManager.GetIndexIdsAsync(indexName);
