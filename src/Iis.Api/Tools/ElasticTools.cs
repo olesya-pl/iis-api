@@ -28,6 +28,8 @@ namespace IIS.Core.Tools
             {
                 await _elasticManager.PutExtNodeAsync(extNode);
             }
+
+            await _elasticManager.CreateSupportedIndexesAsync(cancellationToken);
         }
     }
 }
