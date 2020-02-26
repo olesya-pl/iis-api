@@ -6,8 +6,11 @@ namespace Iis.Interfaces.Ontology.Schema
 {
     public interface IOntologySchema
     {
-        void Initialize(IEnumerable<INodeType> nodeTypes, IEnumerable<IRelationType> relationTypes, IEnumerable<IAttributeType> attributeTypes);
+        void Initialize(IOntologyRawData ontologyRawData);
         IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter);
         INodeTypeLinked GetNodeTypeById(Guid id);
+        IOntologyRawData GetRawData();
+        void SetEmbeddingOptions(string entityName, string relationName, EmbeddingOptions embeddingOptions);
+        void SetRelationMeta(string entityName, string relationName, string meta);
     }
 }

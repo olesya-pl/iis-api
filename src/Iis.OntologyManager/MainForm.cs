@@ -2,6 +2,7 @@
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
+using Iis.OntologySchema;
 using Iis.OntologySchema.DataTypes;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -307,7 +308,8 @@ namespace Iis.OntologyManager
 
         private void InitSchema()
         {
-            _schema.Initialize(_context.NodeTypes.ToList(), _context.RelationTypes.ToList(), _context.AttributeTypes.ToList());
+            var ontologyRawData = new OntologyRawData(_context.NodeTypes, _context.RelationTypes, _context.AttributeTypes);
+            _schema.Initialize(ontologyRawData);
         }
 
         private IGetTypesFilter GetFilter()
@@ -332,9 +334,29 @@ namespace Iis.OntologyManager
             this.gridTypes.DataSource = ds;
         }
 
+        private void MakeSchemaChanges()
+        {
+            var schemaService = new OntologySchemaService();
+            _schema.SetEmbeddingOptions("Person", "currentJob", EmbeddingOptions.Multiple);
+            _schema.SetRelationMeta("Order", "orderPublisher", @"
+{
+  ""AcceptsEntityOperations"": [
+    0,
+    1,
+    2
+  ],
+  ""SortOrder"": 3,
+  ""FormField"": {
+                ""Type"": ""form""
+  },
+  ""Multiple"": false
+}");
+            
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            ReloadTypes();
+            MakeSchemaChanges();
         }
 
         private void gridTypes_SelectionChanged(object sender, EventArgs e)

@@ -11,15 +11,27 @@ namespace Iis.OntologySchema
     {
         IMapper _mapper;
         SchemaStorage _storage; 
-        public OntologySchema(IMapper mapper)
+        public OntologySchema()
         {
-            _mapper = mapper;
+            _mapper = GetMapper();
         }
 
-        public void Initialize(IEnumerable<INodeType> nodeTypes, IEnumerable<IRelationType> relationTypes, IEnumerable<IAttributeType> attributeTypes)
+        private IMapper GetMapper()
+        {
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<INodeType, SchemaNodeType>();
+                cfg.CreateMap<IRelationType, SchemaRelationType>();
+                cfg.CreateMap<IAttributeType, SchemaAttributeType>();
+            });
+
+            return new Mapper(configuration);
+        }
+
+        public void Initialize(IOntologyRawData ontologyRawData)
         {
             _storage = new SchemaStorage(_mapper);
-            _storage.Initialize(nodeTypes, relationTypes, attributeTypes);
+            _storage.Initialize(ontologyRawData);
         }
 
         public IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter)
@@ -36,6 +48,11 @@ namespace Iis.OntologySchema
                 .SingleOrDefault();
         }
 
+        public IOntologyRawData GetRawData()
+        {
+            return new OntologyRawData(_storage.NodeTypes.Values, _storage.RelationTypes.Values, _storage.AttributeTypes.Values);
+        }
+
         public void AddNodeType(INodeType nodeType)
         {
             var schemaNodeType = new SchemaNodeType();
@@ -43,5 +60,36 @@ namespace Iis.OntologySchema
             schemaNodeType.Id = nodeType.Id == default ? Guid.NewGuid() : nodeType.Id;
             _storage.NodeTypes[schemaNodeType.Id] = schemaNodeType;
         }
+
+        public void SetEmbeddingOptions(string entityName, string relationName, EmbeddingOptions embeddingOptions)
+        {
+            var relationType = GetRelationType(entityName, relationName);
+            relationType.EmbeddingOptions = embeddingOptions;
+        }
+        public void SetRelationMeta(string entityName, string relationName, string meta)
+        {
+            var relationType = GetRelationType(entityName, relationName);
+            relationType.SetMeta(meta);
+        }
+
+        private SchemaRelationType GetRelationType(string entityName, string relationName)
+        {
+            var relationType = GetRelationTypeOrNull(entityName, relationName);
+            if (relationType == null)
+            {
+                throw new ArgumentException($"There is no relation ({entityName}, {relationName})");
+            }
+            return relationType;
+        }
+
+        private SchemaRelationType GetRelationTypeOrNull(string entityName, string relationName)
+        {
+            SchemaNodeType nodeType = _storage.NodeTypes.Values
+                .Where(nt => nt.Kind == Kind.Entity
+                    && nt.Name == entityName).SingleOrDefault();
+            return nodeType?.GetRelationByName(relationName);
+        }
+
+        
     }
 }

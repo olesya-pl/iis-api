@@ -17,20 +17,26 @@ namespace Iis.OntologySchema.DataTypes
         public bool IsArchived { get; set; }
         public Kind Kind { get; set; }
         public bool IsAbstract { get; set; }
-        private List<IRelationTypeLinked> _incomingRelations = new List<IRelationTypeLinked>();
+        private List<SchemaRelationType> _incomingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> IncomingRelations => _incomingRelations;
-        private List<IRelationTypeLinked> _outgoingRelations = new List<IRelationTypeLinked>();
+        private List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
         
         public IAttributeType AttributeType { get; set; }
-        public IRelationTypeLinked RelationType { get; set; }
-        public void AddIncomingRelation(IRelationTypeLinked relationType)
+        private SchemaRelationType _relationType;
+        public IRelationTypeLinked RelationType => _relationType;
+        internal void AddIncomingRelation(SchemaRelationType relationType)
         {
             _incomingRelations.Add(relationType);
         }
-        public void AddOutgoingRelation(IRelationTypeLinked relationType)
+        internal void AddOutgoingRelation(SchemaRelationType relationType)
         {
             _outgoingRelations.Add(relationType);
+        }
+
+        internal void SetRelationType(SchemaRelationType relationType)
+        {
+            _relationType = relationType;
         }
 
         public IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom)
@@ -109,6 +115,13 @@ namespace Iis.OntologySchema.DataTypes
             IsArchived = nodeType.IsArchived;
             Kind = nodeType.Kind;
             IsAbstract = nodeType.IsAbstract;
+        }
+
+        internal SchemaRelationType GetRelationByName(string relationName)
+        {
+            return _outgoingRelations
+                .Where(r => r.NodeType.Name == relationName)
+                .SingleOrDefault();
         }
     }
 }
