@@ -1,15 +1,18 @@
 ﻿using Iis.DataModel;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyManager.Ontology;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
 using Iis.OntologySchema;
 using Iis.OntologySchema.DataTypes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,14 +22,16 @@ namespace Iis.OntologyManager
 {
     public partial class MainForm : Form
     {
-        OntologyContext _context;
+        IConfiguration _configuration;
         IOntologySchema _schema;
         IOntologyManagerStyle _style;
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
+        OntologySchemaService _schemaService;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         Font SelectedFont { get; set; }
         Font TypeHeaderNameFont { get; set; }
+        string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
         INodeTypeLinked SelectedNodeType
         {
             get
@@ -36,19 +41,19 @@ namespace Iis.OntologyManager
                     (INodeTypeLinked)gridTypes.SelectedRows[0].DataBoundItem;
             }
         }
-        public MainForm(OntologyContext context, 
-            IOntologySchema schema, 
+        public MainForm(IConfiguration configuration,
             IOntologyManagerStyle style,
-            UiControlsCreator uiControlsCreator)
+            UiControlsCreator uiControlsCreator,
+            OntologySchemaService schemaService)
         {
             InitializeComponent();
-            _context = context;
-            _schema = schema;
+            _configuration = configuration;
             _style = style;
             _uiControlsCreator = uiControlsCreator;
+            _schemaService = schemaService;
+            _schema = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("local"));
             SelectedFont = new Font(DefaultFont, FontStyle.Bold);
             TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold);
-            InitSchema();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
             SetAdditionalControls();
@@ -306,12 +311,6 @@ namespace Iis.OntologyManager
             SetControlsFilters();
         }
 
-        private void InitSchema()
-        {
-            var ontologyRawData = new OntologyRawData(_context.NodeTypes, _context.RelationTypes, _context.AttributeTypes);
-            _schema.Initialize(ontologyRawData);
-        }
-
         private IGetTypesFilter GetFilter()
         {
             var kinds = new List<Kind>();
@@ -336,27 +335,20 @@ namespace Iis.OntologyManager
 
         private void MakeSchemaChanges()
         {
-            var schemaService = new OntologySchemaService();
-            _schema.SetEmbeddingOptions("Person", "currentJob", EmbeddingOptions.Multiple);
-            _schema.SetRelationMeta("Order", "orderPublisher", @"
-{
-  ""AcceptsEntityOperations"": [
-    0,
-    1,
-    2
-  ],
-  ""SortOrder"": 3,
-  ""FormField"": {
-                ""Type"": ""form""
-  },
-  ""Multiple"": false
-}");
+            
+            
             
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            MakeSchemaChanges();
+            var fileName = Path.Combine(DefaultSchemaStorage, "dev.ont");
+            //var schemaNew = _schemaService.LoadFromFile(fileName);
+            var schemaNew = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("localprod"));
+            var schemaOld = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("local"));
+            schemaNew.CompareTo(schemaOld);
+            //schemaService.LoadFromFile();
+            //schemaService.SaveToFile(_schema, fileName);
         }
 
         private void gridTypes_SelectionChanged(object sender, EventArgs e)

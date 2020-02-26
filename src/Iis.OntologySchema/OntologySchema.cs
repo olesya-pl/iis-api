@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.Comparison;
 using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,13 @@ namespace Iis.OntologySchema
             _mapper = GetMapper();
         }
 
+        public static OntologySchema GetInstance(IOntologyRawData ontologyRawData)
+        {
+            var schema = new OntologySchema();
+            schema.Initialize(ontologyRawData);
+            return schema;
+        }
+
         private IMapper GetMapper()
         {
             var configuration = new MapperConfiguration(cfg =>
@@ -23,6 +31,9 @@ namespace Iis.OntologySchema
                 cfg.CreateMap<INodeType, SchemaNodeType>();
                 cfg.CreateMap<IRelationType, SchemaRelationType>();
                 cfg.CreateMap<IAttributeType, SchemaAttributeType>();
+                cfg.CreateMap<INodeType, SchemaNodeTypeRaw>();
+                cfg.CreateMap<IRelationType, SchemaRelationTypeRaw>();
+                cfg.CreateMap<IAttributeType, SchemaAttributeTypeRaw>();
             });
 
             return new Mapper(configuration);
@@ -50,7 +61,7 @@ namespace Iis.OntologySchema
 
         public IOntologyRawData GetRawData()
         {
-            return new OntologyRawData(_storage.NodeTypes.Values, _storage.RelationTypes.Values, _storage.AttributeTypes.Values);
+            return new OntologyRawData(_storage.GetNodeTypesRaw(), _storage.GetRelationTypesRaw(), _storage.GetAttributeTypesRaw());
         }
 
         public void AddNodeType(INodeType nodeType)
@@ -72,6 +83,11 @@ namespace Iis.OntologySchema
             relationType.SetMeta(meta);
         }
 
+        public Dictionary<string, INodeTypeLinked> GetStringCodes()
+        {
+            return _storage.GetStringCodes();
+        }
+
         private SchemaRelationType GetRelationType(string entityName, string relationName)
         {
             var relationType = GetRelationTypeOrNull(entityName, relationName);
@@ -90,6 +106,16 @@ namespace Iis.OntologySchema
             return nodeType?.GetRelationByName(relationName);
         }
 
-        
+        public ISchemaCompareResult CompareTo(IOntologySchema schema)
+        {
+            Dictionary<string, INodeTypeLinked> thisCodes = GetStringCodes();
+            Dictionary<string, INodeTypeLinked> otherCodes = schema.GetStringCodes();
+            var result = new SchemaCompareResult();
+            result.ItemsToAdd = thisCodes.Keys.Where(key => !otherCodes.ContainsKey(key)).Select(key => thisCodes[key]).ToList();
+            result.ItemsToDelete = otherCodes.Keys.Where(key => !thisCodes.ContainsKey(key)).Select(key => otherCodes[key]).ToList();
+            var commonKeys = thisCodes.Keys.Where(key => otherCodes.ContainsKey(key)).ToList();
+            result.ItemsToUpdate = commonKeys.Where(key => !thisCodes[key].IsIdentical(otherCodes[key])).Select(key => thisCodes[key]).ToList();
+            return result;
+        }
     }
 }

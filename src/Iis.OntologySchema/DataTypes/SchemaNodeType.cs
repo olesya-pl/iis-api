@@ -6,17 +6,8 @@ using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public class SchemaNodeType: INodeType, INodeTypeLinked
+    public class SchemaNodeType: SchemaNodeTypeRaw, INodeType, INodeTypeLinked
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Title { get; set; }
-        public string Meta { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public bool IsArchived { get; set; }
-        public Kind Kind { get; set; }
-        public bool IsAbstract { get; set; }
         private List<SchemaRelationType> _incomingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> IncomingRelations => _incomingRelations;
         private List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
@@ -91,20 +82,65 @@ namespace Iis.OntologySchema.DataTypes
             return result;
         }
 
-        public override string ToString()
+        public string GetStringCode()
         {
-            return Name;
+            switch (Kind)
+            {
+                case Kind.Entity:
+                    return Name;
+                case Kind.Attribute:
+                    return null;
+                case Kind.Relation:
+                    if (RelationType.Kind == RelationKind.Inheritance)
+                    {
+                        return $"{RelationType.SourceType.Name}=>{RelationType.TargetType.Name}";
+                    }
+                    else if (RelationType.TargetType.Kind == Kind.Entity)
+                    {
+                        return $"{RelationType.SourceType.Name}->{RelationType.NodeType.Name}";
+                    }
+                    else
+                    {
+                        return $"{RelationType.SourceType.Name}.{RelationType.NodeType.Name}";
+                    }
+            }
+                        
+            return null;
         }
 
-        public bool IsEqual(INodeType nodeType)
+        public bool IsIdentical(INodeTypeLinked nodeType)
         {
-            return Id == nodeType.Id
-                && Name == nodeType.Name
+            if (Kind == Kind.Entity || Kind == Kind.Attribute)
+            {
+                return IsIdenticalBase(nodeType);
+            }
+
+            if (_relationType.Kind == RelationKind.Inheritance || _relationType.TargetType.Kind == Kind.Entity)
+            {
+                return RelationType.IsIdentical(nodeType.RelationType, false);
+            }
+
+            if (_relationType.Kind == RelationKind.Embedding && _relationType.TargetType.Kind == Kind.Attribute)
+            {
+                return RelationType.IsIdentical(nodeType.RelationType, true);
+            }
+
+            throw new ArgumentException($"IsIdentical met sad situation with item {GetStringCode()}");
+        }
+
+        private bool IsIdenticalBase(INodeTypeLinked nodeType)
+        {
+            var scalarTypesAreEqual = Kind == Kind.Attribute ?
+                AttributeType.ScalarType == nodeType.AttributeType.ScalarType :
+                true;
+
+            return Name == nodeType.Name
                 && Title == nodeType.Title
                 && Meta == nodeType.Meta
                 && IsArchived == nodeType.IsArchived
                 && Kind == nodeType.Kind
-                && IsAbstract == nodeType.IsAbstract;
+                && IsAbstract == nodeType.IsAbstract
+                && scalarTypesAreEqual;
         }
 
         public void CopyFrom(INodeType nodeType)

@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Text;

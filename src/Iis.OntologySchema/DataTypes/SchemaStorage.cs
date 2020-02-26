@@ -42,5 +42,25 @@ namespace Iis.OntologySchema.DataTypes
                 NodeTypes[attributeType.Id].AttributeType = attributeType;
             }
         }
+
+        internal IEnumerable<SchemaNodeTypeRaw> GetNodeTypesRaw()
+        {
+            return NodeTypes.Values.Select(nt => _mapper.Map<SchemaNodeTypeRaw>(nt));
+        }
+
+        internal IEnumerable<SchemaRelationTypeRaw> GetRelationTypesRaw()
+        {
+            return RelationTypes.Values.Select(r => _mapper.Map<SchemaRelationTypeRaw>(r));
+        }
+
+        internal IEnumerable<SchemaAttributeTypeRaw> GetAttributeTypesRaw()
+        {
+            return AttributeTypes.Values.Select(at => _mapper.Map<SchemaAttributeTypeRaw>(at));
+        }
+
+        internal Dictionary<string, INodeTypeLinked> GetStringCodes()
+        {
+            return NodeTypes.Values.Where(nt => nt.GetStringCode() != null).ToDictionary(nt => nt.GetStringCode(), nt => (INodeTypeLinked)nt);
+        }
     }
 }

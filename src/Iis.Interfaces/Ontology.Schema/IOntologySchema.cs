@@ -12,5 +12,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IOntologyRawData GetRawData();
         void SetEmbeddingOptions(string entityName, string relationName, EmbeddingOptions embeddingOptions);
         void SetRelationMeta(string entityName, string relationName, string meta);
+        ISchemaCompareResult CompareTo(IOntologySchema schema);
+        Dictionary<string, INodeTypeLinked> GetStringCodes();
     }
 }

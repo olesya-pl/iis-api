@@ -5,13 +5,8 @@ using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public class SchemaRelationType: IRelationType, IRelationTypeLinked
+    public class SchemaRelationType: SchemaRelationTypeRaw, IRelationType, IRelationTypeLinked
     {
-        public Guid Id { get; set; }
-        public RelationKind Kind { get; set; }
-        public EmbeddingOptions EmbeddingOptions { get; set; }
-        public Guid SourceTypeId { get; set; }
-        public Guid TargetTypeId { get; set; }
         private SchemaNodeType _nodeType;
         private SchemaNodeType _sourceType;
         private SchemaNodeType _targetType;
@@ -22,13 +17,13 @@ namespace Iis.OntologySchema.DataTypes
         {
             return $"{SourceType.Name}.{NodeType.Name}";
         }
-        public bool IsEqual(IRelationType relationType)
+        public bool IsIdentical(IRelationTypeLinked relationType, bool includeTargetType)
         {
-            return Id == relationType.Id
-                && Kind == relationType.Kind
+            return Kind == relationType.Kind
                 && EmbeddingOptions == relationType.EmbeddingOptions
-                && SourceTypeId == relationType.SourceTypeId
-                && TargetTypeId == relationType.TargetTypeId;
+                && SourceType.Name == relationType.SourceType.Name
+                && TargetType.Name == relationType.TargetType.Name
+                && (!includeTargetType || TargetType.IsIdentical(relationType.TargetType));
         }
 
         internal void SetNodeType(SchemaNodeType nodeType)
