@@ -41,6 +41,7 @@ using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
 using AutoMapper;
+using Iis.Api.Export;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using IIS.Domain;
@@ -87,6 +88,7 @@ namespace IIS.Core
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<MigrationService>();
             services.AddSingleton<RunTimeSettings>();
+            services.AddScoped<ExportService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();

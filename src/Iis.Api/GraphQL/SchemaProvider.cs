@@ -7,6 +7,7 @@ using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
+using IIS.Core.GraphQL.Export;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
@@ -44,6 +45,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Users.Query>();
                 d.Include<AnalyticsQuery.Query>();
                 d.Include<AnalyticsIndicator.Query>();
+                d.Include<ExportQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
