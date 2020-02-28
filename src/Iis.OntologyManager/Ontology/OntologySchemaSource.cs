@@ -11,7 +11,7 @@ namespace Iis.OntologyManager.Ontology
     }
     public class OntologySchemaSource
     {
-        string Title { get; set; }
+        public string Title { get; set; }
         public SchemaSourceKind SourceKind { get; set; }
         public string Data { get; set; }
     }

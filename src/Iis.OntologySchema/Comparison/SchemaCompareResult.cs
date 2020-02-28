@@ -9,6 +9,6 @@ namespace Iis.OntologySchema.Comparison
     {
         public IReadOnlyList<INodeTypeLinked> ItemsToAdd { get; set; }
         public IReadOnlyList<INodeTypeLinked> ItemsToDelete { get; set; }
-        public IReadOnlyList<INodeTypeLinked> ItemsToUpdate { get; set; }
+        public IReadOnlyList<ISchemaCompareDiffItem> ItemsToUpdate { get; set; }
     }
 }

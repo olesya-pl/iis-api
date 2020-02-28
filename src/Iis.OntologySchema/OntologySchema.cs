@@ -114,7 +114,10 @@ namespace Iis.OntologySchema
             result.ItemsToAdd = thisCodes.Keys.Where(key => !otherCodes.ContainsKey(key)).Select(key => thisCodes[key]).ToList();
             result.ItemsToDelete = otherCodes.Keys.Where(key => !thisCodes.ContainsKey(key)).Select(key => otherCodes[key]).ToList();
             var commonKeys = thisCodes.Keys.Where(key => otherCodes.ContainsKey(key)).ToList();
-            result.ItemsToUpdate = commonKeys.Where(key => !thisCodes[key].IsIdentical(otherCodes[key])).Select(key => thisCodes[key]).ToList();
+            result.ItemsToUpdate = commonKeys
+                .Where(key => !thisCodes[key].IsIdentical(otherCodes[key]))
+                .Select(key => new SchemaCompareDiffItem { NewNode = thisCodes[key], OldNode = thisCodes[key] })
+                .ToList();
             return result;
         }
     }

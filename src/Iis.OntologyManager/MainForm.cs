@@ -28,6 +28,7 @@ namespace Iis.OntologyManager
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
         OntologySchemaService _schemaService;
+        List<OntologySchemaSource> _schemaSources;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         Font SelectedFont { get; set; }
         Font TypeHeaderNameFont { get; set; }
@@ -51,12 +52,17 @@ namespace Iis.OntologyManager
             _style = style;
             _uiControlsCreator = uiControlsCreator;
             _schemaService = schemaService;
-            _schema = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("local"));
+            _schemaSources = GetSchemaSources();
+            
             SelectedFont = new Font(DefaultFont, FontStyle.Bold);
             TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold);
+            SuspendLayout();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
             SetAdditionalControls();
+            CreateComparisonPanel();
+            LoadCurrentSchema();
+            ResumeLayout();
             ReloadTypes();
         }
 
@@ -236,7 +242,49 @@ namespace Iis.OntologyManager
             rootPanel.ResumeLayout();
         }
 
-        private void SetControlsFilters()
+        public void CreateComparisonPanel()
+        {
+            const int ComparisonMargin = 30;
+            const int BtnCloseSize = 20;
+            const int BtnCloseMargin = 5;
+            panelComparison = new Panel { 
+                Name = "panelComparison",
+                Location = new Point(ComparisonMargin, ComparisonMargin),
+                Size = new Size(this.ClientSize.Width - ComparisonMargin * 2, this.ClientSize.Height - ComparisonMargin * 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = _style.ComparisonBackColor,
+                Visible = false
+            };
+            panelComparison.SuspendLayout();
+            var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 100, 10);
+            var btnComparisonClose = new Button
+            {
+                Location = new Point(panels.panelTop.Width - BtnCloseSize - BtnCloseMargin*2, BtnCloseMargin),
+                Anchor = Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Size = new Size(BtnCloseSize, BtnCloseSize),
+                Text = "X"
+            };
+            btnComparisonClose.Click += (sender, e) => { panelComparison.Visible = false; };
+
+            var btnComparisonUpdate = new Button
+            {
+                Location = new Point(_style.MarginVer, _style.MarginHor),
+                Anchor = Anchor = AnchorStyles.Top | AnchorStyles.Left,
+                Width = _style.ControlWidthDefault,
+                Text = "Update database"
+            };
+            btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
+            panels.panelTop.Controls.Add(btnComparisonClose);
+
+            txtComparison = new RichTextBox { Dock = DockStyle.Fill, BackColor = panelComparison.BackColor };
+            panels.panelBottom.Controls.Add(txtComparison);
+
+            panelComparison.ResumeLayout();
+            this.Controls.Add(panelComparison);
+            panelComparison.BringToFront();
+        }
+        private void SetControlsTopPanel()
         {
             var top = _style.MarginVer;
             var left = _style.MarginHor;
@@ -297,7 +345,31 @@ namespace Iis.OntologyManager
             panelTop.Controls.Add(txtFilterName);
             txtFilterName.TextChanged += FilterChanged;
 
+            top = _style.MarginVer;
+            left = txtFilterName.Right + _style.MarginHor;
+            cmbSchemaSources = new ComboBox
+            {
+                Left = left,
+                Top = top,
+                Width = _style.ControlWidthDefault,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = "Title",
+                BackColor = panelTop.BackColor
+            };
+            cmbSchemaSources.DataSource = _schemaSources;
+            cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
+            panelTop.Controls.Add(cmbSchemaSources);
+
             panelTop.ResumeLayout();
+        }
+
+        private void LoadCurrentSchema()
+        {
+            var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ?? 
+                (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
+            if (currentSchemaSource == null) return;
+            _schema = _schemaService.GetOntologySchema(currentSchemaSource);
+            ReloadTypes();
         }
 
         private void FilterChanged(object sender, EventArgs e)
@@ -308,7 +380,7 @@ namespace Iis.OntologyManager
         private void SetAdditionalControls()
         {
             SetControlsTabMain(panelRight);
-            SetControlsFilters();
+            SetControlsTopPanel();
         }
 
         private IGetTypesFilter GetFilter()
@@ -326,6 +398,7 @@ namespace Iis.OntologyManager
 
         public void ReloadTypes()
         {
+            if (_schema == null) return;
             var filter = GetFilter();
             var ds = _schema.GetTypes(filter)
                 .OrderBy(t => t.Name)
@@ -346,9 +419,34 @@ namespace Iis.OntologyManager
             //var schemaNew = _schemaService.LoadFromFile(fileName);
             var schemaNew = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("localprod"));
             var schemaOld = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("local"));
-            schemaNew.CompareTo(schemaOld);
+            var compareResult = schemaNew.CompareTo(schemaOld);
+            txtComparison.Text = GetCompareText(compareResult);
+            panelComparison.Visible = true;
             //schemaService.LoadFromFile();
             //schemaService.SaveToFile(_schema, fileName);
+        }
+
+        private string GetCompareText(string title, IEnumerable<INodeTypeLinked> nodeTypes)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("===============");
+            sb.AppendLine(title);
+            sb.AppendLine("===============");
+            foreach (var nodeType in nodeTypes)
+            {
+                sb.AppendLine(nodeType.GetStringCode());
+            }
+
+            return sb.ToString();
+        }
+
+        private string GetCompareText(ISchemaCompareResult compareResult)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd));
+            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete));
+            sb.AppendLine(GetCompareText("NODES TO UPDATE", compareResult.ItemsToUpdate.Select(item => item.NewNode)));
+            return sb.ToString();
         }
 
         private void gridTypes_SelectionChanged(object sender, EventArgs e)
@@ -462,6 +560,34 @@ namespace Iis.OntologyManager
             var nodeType = _history[_history.Count - 1];
             _history.RemoveAt(_history.Count - 1);
             SetNodeTypeView(nodeType, false);
+        }
+
+        private void UpdateComparedDatabase()
+        {
+
+        }
+
+        private List<OntologySchemaSource> GetSchemaSources()
+        {
+            var result = new List<OntologySchemaSource> { 
+            };
+            var connectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
+            result.AddRange(connectionStrings.Select(section => new OntologySchemaSource
+            {
+                Title = $"(DB): {section.Key}",
+                SourceKind = SchemaSourceKind.Database,
+                Data = section.Value
+            }));
+
+            var filesNames = Directory.GetFiles(DefaultSchemaStorage, "*.ont");
+            result.AddRange(filesNames.Select(fileName => new OntologySchemaSource
+            {
+                Title = $"(FILE): {Path.GetFileNameWithoutExtension(fileName)}",
+                SourceKind = SchemaSourceKind.File,
+                Data = fileName
+            }));
+
+            return result;
         }
     }
 }

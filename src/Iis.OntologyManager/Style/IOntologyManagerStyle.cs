@@ -6,6 +6,7 @@ namespace Iis.OntologyManager.Style
     {
         Color AttributeTypeBackColor { get; }
         Color BackgroundColor { get; }
+        Color ComparisonBackColor { get; set; }
         int ControlWidthDefault { get; }
         Color EntityTypeBackColor { get; }
         int MarginHor { get; }

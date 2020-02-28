@@ -53,5 +53,30 @@ namespace Iis.OntologyManager.UiControls
             }
             return grid;
         }
+
+        public (Panel panelTop, Panel panelBottom) GetTopBottomPanels(Panel rootPanel, int topPanelWidth, int margin = 0)
+        {
+            var panelTop = new Panel
+            {
+                Location = new Point(margin, margin),
+                Size = new Size(rootPanel.Width - margin * 2, topPanelWidth),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = rootPanel.BackColor
+            };
+
+            var panelBottom = new Panel
+            {
+                Location = new Point(margin, panelTop.Bottom + margin),
+                Size = new Size(rootPanel.Width - margin * 2, rootPanel.Height - panelTop.Bottom - margin*2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = rootPanel.BackColor
+            };
+            rootPanel.Controls.Add(panelTop);
+            rootPanel.Controls.Add(panelBottom);
+
+            return (panelTop, panelBottom);
+        }
     }
 }

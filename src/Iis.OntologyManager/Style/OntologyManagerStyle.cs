@@ -12,6 +12,7 @@ namespace Iis.OntologyManager.Style
         public int MarginHor { get; set; }
         public int ControlWidthDefault { get; set; }
         public Color BackgroundColor { get; set; }
+        public Color ComparisonBackColor { get; set; }
         public Color EntityTypeBackColor { get; set; }
         public Color AttributeTypeBackColor { get; set; }
         public Color RelationTypeBackColor { get; set; }
@@ -28,6 +29,7 @@ namespace Iis.OntologyManager.Style
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,
                 RelationTypeBackColor = Color.Lavender,
+                ComparisonBackColor = Color.Honeydew
             };
         }
     }

@@ -31,7 +31,6 @@ namespace Iis.OntologyManager
         private void InitializeComponent()
         {
             this.panelTop = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
             this.panelMain = new System.Windows.Forms.Panel();
             this.panelRight = new System.Windows.Forms.Panel();
             this.panelTypeHeader = new System.Windows.Forms.Panel();
@@ -52,22 +51,11 @@ namespace Iis.OntologyManager
             // 
             this.panelTop.BackColor = System.Drawing.SystemColors.ControlLight;
             this.panelTop.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelTop.Controls.Add(this.button1);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(0, 0);
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(800, 100);
             this.panelTop.TabIndex = 0;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(400, 4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 25);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Load Data";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // panelMain
             // 
@@ -149,7 +137,9 @@ namespace Iis.OntologyManager
         private System.Windows.Forms.Panel panelRight;
         private System.Windows.Forms.Panel panelLeft;
         private System.Windows.Forms.DataGridView gridTypes;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnCompare;
+        private System.Windows.Forms.ComboBox cmbSchemaSources;
+        private System.Windows.Forms.ComboBox cmbSchemaSourcesCompare;
         private System.Windows.Forms.Panel panelMeta;
         private Label lblId;
         private TextBox txtId;
@@ -172,6 +162,8 @@ namespace Iis.OntologyManager
         private Label lblMeta;
         private RichTextBox txtMeta;
         private ContextMenuStrip menuChildren;
+        private Panel panelComparison;
+        private RichTextBox txtComparison;
     }
 }
 
