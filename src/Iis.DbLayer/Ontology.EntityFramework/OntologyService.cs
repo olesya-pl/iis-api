@@ -488,7 +488,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 {
                     throw new Exception($"Attribute does not exists for attribute type node id = {ctxNode.Id}");
                 }
-                var value = AttributeType.ParseValue(ctxNode.Attribute.Value, attrType.ScalarTypeEnum);
+                var value = AttributeType.ParseValue(attribute.Value, attrType.ScalarTypeEnum);
                 node = new Attribute(ctxNode.Id, attrType, value, ctxNode.CreatedAt, ctxNode.UpdatedAt);
             }
             else if (type is EntityType entityType)
