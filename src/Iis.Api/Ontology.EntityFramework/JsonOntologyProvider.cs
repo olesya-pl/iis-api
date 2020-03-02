@@ -33,6 +33,11 @@ namespace IIS.Core.Ontology.EntityFramework
             return new OntologyModel(types);
         }
 
+        public void ClearOntology()
+        {
+
+        }
+
         private void _loadRawTypes(LoadingContext ctx)
         {
             var files = Directory.GetFiles(_basePath, "*.json", SearchOption.AllDirectories);

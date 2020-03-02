@@ -59,5 +59,11 @@ namespace IIS.Core.GraphQL.Entities
                 CommonTypes.Add(typeof(T), new T());
             return (T) CommonTypes[typeof(T)];
         }
+
+        protected void ClearTypes()
+        {
+            InputTypes.Clear();
+            CommonTypes.Clear();
+        }
     }
 }

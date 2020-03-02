@@ -39,6 +39,8 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
+            ClearTypes();
+            _ontologyProvider.ClearOntology();
             _ontology = _ontologyProvider.GetOntologyAsync().Result; // todo: to async method
             var entityTypes = _ontology.EntityTypes.ToList();
             if (entityTypes.Count == 0)

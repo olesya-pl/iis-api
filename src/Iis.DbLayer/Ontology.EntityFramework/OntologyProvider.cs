@@ -74,6 +74,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }, cancellationToken);
         }
 
+        public void ClearOntology()
+        {
+            _ontology = null;
+        }
+
         public void Invalidate()
         {
             _locker.EnterWriteLock();
