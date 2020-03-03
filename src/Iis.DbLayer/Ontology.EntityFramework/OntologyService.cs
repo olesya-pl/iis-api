@@ -272,11 +272,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     filter.ExactMatch, cancellationToken);
                 if (filter.Suggestion == null)
                     return result;
-                var suggestedIds = (await GetNodesWithSuggestion(derivedTypes, filter.Suggestion, cancellationToken)).Select(n => n.Id).ToArray();
+                var suggestedIds = (await GetNodesWithSuggestion(derivedTypes, filter, cancellationToken)).Select(n => n.Id).ToArray();
                 return result.Where(n => suggestedIds.Contains(n.Id));
             }
             if (filter.Suggestion != null)
-                return await GetNodesWithSuggestion(derivedTypes, filter.Suggestion, cancellationToken);
+                return await GetNodesWithSuggestion(derivedTypes, filter, cancellationToken);
             return GetNodesInternal(derivedTypes.Select(t => t.Id));
         }
 
@@ -285,15 +285,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return _context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived);
         }
 
-        private async Task<IQueryable<NodeEntity>> GetNodesWithSuggestion(IEnumerable<NodeType> types, string suggestion, CancellationToken cancellationToken = default)
+        private async Task<IQueryable<NodeEntity>> GetNodesWithSuggestion(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
         {
             if (_elasticService.TypesAreSupported(types.Select(nt => nt.Name)))
             {
-                return await GetNodesByElasticAllFields(types, suggestion, cancellationToken);
+                return await GetNodesByElasticAllFields(types, filter, cancellationToken);
             }
             else
             {
-                return GetNodesInternalWithSuggestion(types.Select(nt => nt.Id), suggestion);
+                return GetNodesInternalWithSuggestion(types.Select(nt => nt.Id), filter.Suggestion);
             }
         }
 
@@ -308,9 +308,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return relationsQ.Select(e => e.SourceNode);
         }
 
-        private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, string suggestion, CancellationToken cancellationToken = default)
+        private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
         {
-            var ids = await _elasticService.SearchByAllFieldsAsync(types.Select(t => t.Name), suggestion);
+            var ids = await _elasticService.SearchByAllFieldsAsync(types.Select(t => t.Name), filter);
             return _context.Nodes.Where(node => !node.IsArchived && ids.Contains(node.Id));
         }
 
