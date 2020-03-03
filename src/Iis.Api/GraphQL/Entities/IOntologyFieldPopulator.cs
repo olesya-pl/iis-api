@@ -100,7 +100,6 @@ namespace IIS.Core.GraphQL.Entities
                 .Type(collectionType)
                 .Argument("pagination", d => d.Type<NonNullType<InputObjectType<PaginationInput>>>())
                 .Argument("filter", d => d.Type<InputObjectType<FilterInput>>())
-                .Argument("criteria", d => d.Type(criteriaInput))
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntityList(ctx, type));
         }
     }
