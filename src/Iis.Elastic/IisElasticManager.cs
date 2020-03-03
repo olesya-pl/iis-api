@@ -194,6 +194,8 @@ namespace Iis.Elastic
         {
             var json = new JObject();
             json["_source"] = new JArray(searchParams.ResultFields);
+            json["from"] = searchParams.From;
+            json["size"] = searchParams.Size;
             json["query"] = new JObject();
             var queryString = new JObject();
 

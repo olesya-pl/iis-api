@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Iis.Domain;
+using Iis.Interfaces.Elastic;
 
 namespace Iis.Domain
 {
-    public class NodeFilter
+    public class NodeFilter : IElasticNodeFilter
     {
         public int Limit { get; set; }
         public int Offset { get; set; }
