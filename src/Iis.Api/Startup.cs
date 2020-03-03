@@ -219,6 +219,7 @@ namespace IIS.Core
             {
                 app.UseDeveloperExceptionPage();
             }
+            UpdateDatabase(app);
 
             app.UseCors(builder =>
                 builder
@@ -238,6 +239,19 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+            .GetRequiredService<IServiceScopeFactory>()
+            .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<OntologyContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)
