@@ -41,6 +41,7 @@ using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
 using AutoMapper;
+using Iis.Api.Export;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using IIS.Domain;
@@ -87,6 +88,7 @@ namespace IIS.Core
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<MigrationService>();
             services.AddSingleton<RunTimeSettings>();
+            services.AddScoped<ExportService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
@@ -166,11 +168,12 @@ namespace IIS.Core
             services.AddTransient<IConnectionFactory>(s => factory);
 
             string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}";
-            
+            IisElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<IisElasticConfiguration>();
+
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
-                .AddRabbitMQ(mqString, (SslOption)null);
-                //.AddElasticsearch(es.Host);
+                .AddRabbitMQ(mqString, (SslOption)null)
+                .AddElasticsearch(elasticConfiguration.Uri);
 
             var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
@@ -178,7 +181,7 @@ namespace IIS.Core
 
             services.AddSingleton<IElasticManager, IisElasticManager>();
             services.AddSingleton<IisElasticSerializer>();
-            services.AddSingleton(Configuration.GetSection("elasticSearch").Get<IisElasticConfiguration>());
+            services.AddSingleton(elasticConfiguration);
 
             services.AddHostedService<MaterialEventConsumer>();
 
@@ -216,6 +219,7 @@ namespace IIS.Core
             {
                 app.UseDeveloperExceptionPage();
             }
+            UpdateDatabase(app);
 
             app.UseCors(builder =>
                 builder
@@ -235,6 +239,19 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+            .GetRequiredService<IServiceScopeFactory>()
+            .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<OntologyContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)

@@ -12,8 +12,9 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.3" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.4" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="2.10.0" />
     <PackageReference Include="Flee" Version="1.2.2" />
     <PackageReference Include="GeoJSON.Net" Version="1.2.14" />
     <PackageReference Include="HotChocolate" Version="11.0.0-preview.62" />
@@ -38,10 +39,6 @@
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GraphQL\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />

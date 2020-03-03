@@ -23,11 +23,21 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> Get(CancellationToken token)
         {
             var sb = new StringBuilder();
-            foreach (var child in _configufation.GetChildren())
-            {
-                sb.AppendLine($"{child.Key} = {child.Value}");
-            }
+            Format(sb, _configufation.GetChildren());
             return Content(sb.ToString());
+        }
+
+        private static void Format(StringBuilder sb, IEnumerable<IConfigurationSection> sections)
+        {
+            foreach (IConfigurationSection section in sections)
+            {
+                if (section.Value != null)
+                {
+                    sb.AppendLine($"{section.Path} = {section.Value}");
+                }
+
+                Format(sb, section.GetChildren());
+            }
         }
     }
 }
