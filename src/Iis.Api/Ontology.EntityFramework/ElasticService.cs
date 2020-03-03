@@ -28,7 +28,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _runTimeSettings = runTimeSettings;
             _context = context;
         }
-        public async Task<List<Guid>> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             var searchParams = new IisElasticSearchParams
             {
@@ -37,8 +37,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 From = filter.Offset,
                 Size = filter.Limit
             };
-            var ids = await _elasticManager.Search(searchParams, cancellationToken);
-            return ids.Select(id => new Guid(id)).ToList();
+            var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
+            return (searchResult.Ids.Select(id => new Guid(id)).ToList(), searchResult.Count);
         }
 
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
