@@ -10,7 +10,7 @@ namespace Iis.Interfaces.Elastic
     public interface IElasticManager
     {
         Task<bool> PutExtNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default);
-        Task<List<string>> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<IIisElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<bool> DeleteAllIndexes(CancellationToken cancellationToken = default);
         List<string> SupportedIndexes { get; }
         bool IndexIsSupported(string indexName);
