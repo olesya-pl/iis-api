@@ -24,7 +24,7 @@ namespace Iis.OntologyManager.Style
                 MarginVer = 4,
                 MarginVerSmall = 2,
                 MarginHor = 10,
-                ControlWidthDefault = 200,
+                ControlWidthDefault = 210,
                 BackgroundColor = Color.LightYellow,
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,

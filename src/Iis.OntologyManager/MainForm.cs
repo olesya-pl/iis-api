@@ -126,119 +126,41 @@ namespace Iis.OntologyManager
         {
             rootPanel.SuspendLayout();
 
-            var top = _style.MarginVer * 2;
-            lblId = new Label
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Id"
-            };
-            rootPanel.Controls.Add(lblId);
-            top += lblId.Height;
-            txtId = new TextBox
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                ReadOnly = true
-            };
-            rootPanel.Controls.Add(txtId);
-            top += txtId.Height + _style.MarginVer;
-            lblName = new Label
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Name"
-            };
-            rootPanel.Controls.Add(lblName);
-            top += lblName.Height;
-            txtName = new TextBox
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault
-            };
-            rootPanel.Controls.Add(txtName);
+            var container = new UiContainerManager(rootPanel, _style);
 
-            top += txtName.Height + _style.MarginVer;
-            lblTitle = new Label
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Title"
-            };
-            rootPanel.Controls.Add(lblTitle);
-            top += lblTitle.Height;
-            txtTitle = new TextBox
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault
-            };
-            rootPanel.Controls.Add(txtTitle);
-            top += txtTitle.Height + _style.MarginVer * 2;
+            container.Add(txtId = new TextBox { ReadOnly = true }, "Id");
+            container.Add(txtName = new TextBox(), "Name");
+            container.Add(txtTitle = new TextBox(), "Title");
+            container.GoToNewColumn();
+            
+            gridInheritance = _uiControlsCreator.GetDataGridView("gridChildren", null,
+                new List<string> { "Name" });
+            gridInheritance.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            gridInheritance.CellFormatting += gridTypes_CellFormatting;
+            gridInheritance.DoubleClick += gridInheritance_DoubleClick;
+            lblGridInheritance = container.Add(gridInheritance, "Inheritance", true);
+
+            container.GoToNewColumn();
+            container.Add(txtMeta = new RichTextBox(), "Meta", true);
+            
+            container.GoToBottom();
+            container.StepDown();
+            container.SetFullWidthColumn();
 
             menuChildren = new ContextMenuStrip();
             menuChildren.Items.Add("Show Relation");
             menuChildren.Items[0].Click += menuChildren_showRelationClick;
 
-            gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", new Point(_style.MarginHor, top), 
+            gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
-            gridChildren.Width = rootPanel.Width - _style.MarginHor * 2;
-            gridChildren.Height = rootPanel.Bottom - top - _style.MarginVer * 2;
             gridChildren.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-                        
             gridChildren.ColumnHeadersVisible = true;
             gridChildren.AutoGenerateColumns = false;
             gridChildren.DoubleClick += gridChildren_DoubleClick;
             gridChildren.CellFormatting += gridChildren_CellFormatting;
             gridChildren.ContextMenuStrip = menuChildren;
-            
-            rootPanel.Controls.Add(gridChildren);
 
-            top = _style.MarginVer;
-            var hor = lblId.Right + _style.MarginHor;
-            lblGridInheritance = new Label
-            {
-                Left = hor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Inherited from"
-            };
-            top += lblGridInheritance.Height;
-            
-            gridInheritance = _uiControlsCreator.GetDataGridView("gridChildren", new Point(hor, top),
-                new List<string> { "Name" });
-            gridInheritance.Width = _style.ControlWidthDefault;
-            gridInheritance.Height = txtTitle.Bottom - gridInheritance.Top;
-            gridInheritance.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridInheritance.CellFormatting += gridTypes_CellFormatting;
-            gridInheritance.DoubleClick += gridInheritance_DoubleClick;
-            rootPanel.Controls.Add(lblGridInheritance);
-            rootPanel.Controls.Add(gridInheritance);
-
-            top = _style.MarginVer;
-            hor = gridInheritance.Right + _style.MarginHor;
-            lblMeta = new Label
-            {
-                Left = hor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Metadata"
-            };
-            top += lblMeta.Height;
-            txtMeta = new RichTextBox
-            {
-                Location = new Point(hor, top),
-                Width = _style.ControlWidthDefault,
-                Height = txtTitle.Bottom - gridInheritance.Top
-            };
-            rootPanel.Controls.Add(lblMeta);
-            rootPanel.Controls.Add(txtMeta);
-
+            container.Add(gridChildren, null, true);
             rootPanel.ResumeLayout();
         }
 
@@ -286,90 +208,34 @@ namespace Iis.OntologyManager
         }
         private void SetControlsTopPanel()
         {
-            var top = _style.MarginVer;
-            var left = _style.MarginHor;
             panelTop.SuspendLayout();
-            cbFilterEntities = new CheckBox
-            {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Entities",
-                Checked = true
-            };
-            panelTop.Controls.Add(cbFilterEntities);
-            top += cbFilterEntities.Height + _style.MarginVerSmall;
+            var container = new UiContainerManager(panelTop, _style);
+            container.SetColWidth(100);
+            container.Add(cbFilterEntities = new CheckBox { Text = "Entities", Checked = true });
+            container.Add(cbFilterAttributes = new CheckBox { Text = "Attributes" });
+            container.Add(cbFilterRelations = new CheckBox { Text = "Relations" });
+
             cbFilterEntities.CheckedChanged += FilterChanged;
-
-            cbFilterAttributes = new CheckBox
-            {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Attributes",
-                Checked = false
-            };
-            panelTop.Controls.Add(cbFilterAttributes);
-            top += cbFilterAttributes.Height + _style.MarginVerSmall;
             cbFilterAttributes.CheckedChanged += FilterChanged;
-
-            cbFilterRelations = new CheckBox
-            {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Relations",
-                Checked = false
-            };
-            panelTop.Controls.Add(cbFilterRelations);
-            top += cbFilterAttributes.Height + _style.MarginVerSmall;
             cbFilterRelations.CheckedChanged += FilterChanged;
 
-            top = _style.MarginVer;
-            left = cbFilterEntities.Right + _style.MarginHor;
-            lblFilterName = new Label
-            {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Name"
-            };
-            panelTop.Controls.Add(lblFilterName);
-            top += lblFilterName.Height + _style.MarginVerSmall;
-            txtFilterName = new TextBox
-            {
-                Left = left,
-                Top = top,
-                Width = 100
-            };
-            panelTop.Controls.Add(txtFilterName);
+            container.GoToNewColumn();
+            container.Add(txtFilterName = new TextBox(), "Name");
             txtFilterName.TextChanged += FilterChanged;
 
-            top = _style.MarginVer;
-            left = txtFilterName.Right + _style.MarginHor;
+            container.GoToNewColumn(_style.ControlWidthDefault);
+
             cmbSchemaSources = new ComboBox
             {
-                Left = left,
-                Top = top,
-                Width = _style.ControlWidthDefault,
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 DisplayMember = "Title",
                 BackColor = panelTop.BackColor
             };
             cmbSchemaSources.DataSource = _schemaSources;
             cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
-            panelTop.Controls.Add(cmbSchemaSources);
+            container.Add(cmbSchemaSources);
 
-            top += cmbSchemaSources.Height + _style.MarginVerSmall;
-            btnCompare = new Button
-            {
-                Left = left,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Compare"
-            };
-            btnCompare.Click += button1_Click;
-            panelTop.Controls.Add(btnCompare);
+            container.Add(btnCompare = new Button { Text = "Compare" });
 
             panelTop.ResumeLayout();
         }
@@ -415,13 +281,6 @@ namespace Iis.OntologyManager
                 .OrderBy(t => t.Name)
                 .ToList();
             this.gridTypes.DataSource = ds;
-        }
-
-        private void MakeSchemaChanges()
-        {
-            
-            
-            
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -600,4 +459,8 @@ namespace Iis.OntologyManager
             return result;
         }
     }
+    // TODO: 
+    // separate view for relation
+    // separate view for attribute
+    // 
 }

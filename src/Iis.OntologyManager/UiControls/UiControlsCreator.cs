@@ -26,7 +26,7 @@ namespace Iis.OntologyManager.UiControls
             grid.ForeColor = Color.Black;
         }
 
-        public DataGridView GetDataGridView(string name, Point location, List<string> dataNames)
+        public DataGridView GetDataGridView(string name, Point? location, List<string> dataNames)
         {
             var grid = new DataGridView
             {
@@ -34,7 +34,6 @@ namespace Iis.OntologyManager.UiControls
                 ColumnHeadersVisible = false,
                 RowHeadersVisible = false,
                 Dock = DockStyle.None,
-                Location = location,
                 Name = name,
                 AllowUserToResizeRows = false,
                 MultiSelect = false,
@@ -43,6 +42,10 @@ namespace Iis.OntologyManager.UiControls
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 BackgroundColor = _style.BackgroundColor
             };
+            if (location != null)
+            {
+                grid.Location = (Point)location;
+            }
             grid.DefaultCellStyle.SelectionBackColor = grid.DefaultCellStyle.BackColor;
             grid.DefaultCellStyle.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
 
