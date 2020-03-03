@@ -28,12 +28,14 @@ namespace IIS.Core.Ontology.EntityFramework
             _runTimeSettings = runTimeSettings;
             _context = context;
         }
-        public async Task<List<Guid>> SearchByAllFieldsAsync(IEnumerable<string> typeNames, string suggestion, CancellationToken cancellationToken = default)
+        public async Task<List<Guid>> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
-                Query = $"*{suggestion}*"
+                Query = $"*{filter.Suggestion}*",
+                From = filter.Offset,
+                Size = filter.Limit
             };
             var ids = await _elasticManager.Search(searchParams, cancellationToken);
             return ids.Select(id => new Guid(id)).ToList();

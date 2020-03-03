@@ -12,5 +12,7 @@ namespace Iis.Domain.Elastic
         public List<string> ResultFields { get; set; } = new List<string> { "_id" };
         public List<string> SearchFields { get; set; } = new List<string> { "*" };
         public bool IsLenient { get; set; } = true;
+        public int From { get; set; }
+        public int Size { get; set; }
     }
 }
