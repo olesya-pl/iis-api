@@ -266,15 +266,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
-            if (filter.SearchCriteria.Count > 0)
-            {
-                var result = await GetNodesInternalWithCriteriaAsync(derivedTypes.Select(t => t.Id), filter.SearchCriteria, filter.AnyOfCriteria,
-                    filter.ExactMatch, cancellationToken);
-                if (filter.Suggestion == null)
-                    return result;
-                var suggestedIds = (await GetNodesWithSuggestion(derivedTypes, filter, cancellationToken)).Select(n => n.Id).ToArray();
-                return result.Where(n => suggestedIds.Contains(n.Id));
-            }
             if (filter.Suggestion != null)
                 return await GetNodesWithSuggestion(derivedTypes, filter, cancellationToken);
             return GetNodesInternal(derivedTypes.Select(t => t.Id));

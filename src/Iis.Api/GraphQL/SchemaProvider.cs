@@ -22,6 +22,7 @@ namespace IIS.Core.GraphQL
         private readonly IOntologyProvider _ontologyProvider;
         private readonly IOntologyFieldPopulator _populator;
         private readonly IConfiguration _configuration;
+        private ISchema _schema;
 
         public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyProvider ontologyProvider, IOntologyFieldPopulator populator, IConfiguration configuration)
         {
@@ -33,6 +34,16 @@ namespace IIS.Core.GraphQL
         }
 
         public ISchema GetSchema()
+        {
+            return _schema ?? (_schema = LoadSchema());
+        }
+
+        public void RecreateSchema()
+        {
+            _schema = LoadSchema();
+        }
+
+        private ISchema LoadSchema()
         {
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
             RegisterTypes(builder);
