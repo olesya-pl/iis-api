@@ -110,10 +110,9 @@ namespace Iis.OntologySchema.DataTypes
 
         public bool IsIdentical(INodeTypeLinked nodeType)
         {
-            if (Kind == Kind.Entity || Kind == Kind.Attribute)
-            {
-                return IsIdenticalBase(nodeType);
-            }
+            if (!IsIdenticalBase(nodeType)) return false;
+
+            if (_relationType == null) return true;
 
             if (_relationType.Kind == RelationKind.Inheritance || _relationType.TargetType.Kind == Kind.Entity)
             {

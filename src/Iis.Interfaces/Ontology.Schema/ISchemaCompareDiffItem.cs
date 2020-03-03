@@ -2,7 +2,7 @@
 {
     public interface ISchemaCompareDiffItem
     {
-        INodeTypeLinked NewNode { get; set; }
-        INodeTypeLinked OldNode { get; set; }
+        INodeTypeLinked NodeTypeFrom { get; set; }
+        INodeTypeLinked NodeTypeTo { get; set; }
     }
 }

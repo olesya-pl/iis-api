@@ -20,6 +20,7 @@ namespace Iis.OntologySchema.Saver
             AddNodes(context, compareResult.ItemsToAdd);
             DeleteNodes(context, compareResult.ItemsToDelete);
             UpdateNodes(context, compareResult.ItemsToUpdate);
+            context.SaveChanges();
         }
 
         private void AddNodes(OntologyContext context, IReadOnlyList<INodeTypeLinked> nodeTypesToAdd)
@@ -58,12 +59,31 @@ namespace Iis.OntologySchema.Saver
 
         private void UpdateNodes(OntologyContext context, IReadOnlyList<ISchemaCompareDiffItem> itemsToUpdate)
         {
-            //foreach (var nodeType in nodeTypesToDelete)
-            //{
-            //    var nodeTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)nodeType);
-            //    nodeTypeEntity.IsArchived = true;
-            //    context.NodeTypes.Update(nodeTypeEntity);
-            //}
+            foreach (var item in itemsToUpdate)
+            {
+                var nodeType = _mapper.Map<NodeTypeEntity>((INodeType)item.NodeTypeFrom);
+                nodeType.Id = item.NodeTypeTo.Id;
+                context.NodeTypes.Update(nodeType);
+
+                if (item.NodeTypeFrom.RelationType == null) continue;
+
+                var relationType = _mapper.Map<RelationTypeEntity>((IRelationType)item.NodeTypeFrom.RelationType);
+                relationType.Id = item.NodeTypeTo.RelationType.Id;
+                relationType.SourceTypeId = item.NodeTypeTo.RelationType.SourceTypeId;
+                relationType.TargetTypeId = item.NodeTypeTo.RelationType.TargetTypeId;
+                context.RelationTypes.Update(relationType);
+
+                if (item.NodeTypeFrom.RelationType.Kind == RelationKind.Embedding && item.NodeTypeFrom.RelationType.TargetType.Kind == Kind.Attribute)
+                {
+                    var attributeNodeType = _mapper.Map<NodeTypeEntity>((INodeType)item.NodeTypeFrom.RelationType.TargetType);
+                    attributeNodeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
+                    context.NodeTypes.Update(attributeNodeType);
+
+                    var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.AttributeType);
+                    attributeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
+                    context.AttributeTypes.Update(attributeType);
+                }
+            }
         }
 
         private IMapper GetMapper()

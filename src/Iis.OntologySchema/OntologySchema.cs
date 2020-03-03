@@ -116,7 +116,7 @@ namespace Iis.OntologySchema
             var commonKeys = thisCodes.Keys.Where(key => otherCodes.ContainsKey(key)).ToList();
             result.ItemsToUpdate = commonKeys
                 .Where(key => !thisCodes[key].IsIdentical(otherCodes[key]))
-                .Select(key => new SchemaCompareDiffItem { NewNode = thisCodes[key], OldNode = thisCodes[key] })
+                .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = thisCodes[key] })
                 .ToList();
             return result;
         }

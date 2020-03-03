@@ -7,7 +7,7 @@ namespace Iis.OntologySchema.Comparison
 {
     public class SchemaCompareDiffItem : ISchemaCompareDiffItem
     {
-        public INodeTypeLinked NewNode { get; set; }
-        public INodeTypeLinked OldNode { get; set; }
+        public INodeTypeLinked NodeTypeFrom { get; set; }
+        public INodeTypeLinked NodeTypeTo { get; set; }
     }
 }

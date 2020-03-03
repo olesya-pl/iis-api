@@ -360,6 +360,17 @@ namespace Iis.OntologyManager
             cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
             panelTop.Controls.Add(cmbSchemaSources);
 
+            top += cmbSchemaSources.Height + _style.MarginVerSmall;
+            btnCompare = new Button
+            {
+                Left = left,
+                Top = top,
+                Width = _style.ControlWidthDefault,
+                Text = "Compare"
+            };
+            btnCompare.Click += button1_Click;
+            panelTop.Controls.Add(btnCompare);
+
             panelTop.ResumeLayout();
         }
 
@@ -417,9 +428,8 @@ namespace Iis.OntologyManager
         {
             var fileName = Path.Combine(DefaultSchemaStorage, "dev.ont");
             //var schemaNew = _schemaService.LoadFromFile(fileName);
-            var schemaNew = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("localprod"));
-            var schemaOld = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("local"));
-            var compareResult = schemaNew.CompareTo(schemaOld);
+            var schemaOld = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("localprod"));
+            var compareResult = _schema.CompareTo(schemaOld);
             txtComparison.Text = GetCompareText(compareResult);
             panelComparison.Visible = true;
             //schemaService.LoadFromFile();
@@ -445,7 +455,7 @@ namespace Iis.OntologyManager
             var sb = new StringBuilder();
             sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd));
             sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete));
-            sb.AppendLine(GetCompareText("NODES TO UPDATE", compareResult.ItemsToUpdate.Select(item => item.NewNode)));
+            sb.AppendLine(GetCompareText("NODES TO UPDATE", compareResult.ItemsToUpdate.Select(item => item.NodeTypeFrom)));
             return sb.ToString();
         }
 
