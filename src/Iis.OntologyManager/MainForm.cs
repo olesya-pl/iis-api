@@ -5,6 +5,7 @@ using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
 using Iis.OntologySchema;
 using Iis.OntologySchema.DataTypes;
+using Iis.OntologySchema.Saver;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -30,6 +31,7 @@ namespace Iis.OntologyManager
         OntologySchemaService _schemaService;
         List<IOntologySchemaSource> _schemaSources;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
+        ISchemaCompareResult _compareResult;
         Font SelectedFont { get; set; }
         Font TypeHeaderNameFont { get; set; }
         string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
@@ -180,6 +182,8 @@ namespace Iis.OntologyManager
             };
             panelComparison.SuspendLayout();
             var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 100, 10);
+            var container = new UiContainerManager(panels.panelTop, _style);
+
             var btnComparisonClose = new Button
             {
                 Location = new Point(panels.panelTop.Width - BtnCloseSize - BtnCloseMargin*2, BtnCloseMargin),
@@ -188,16 +192,23 @@ namespace Iis.OntologyManager
                 Text = "X"
             };
             btnComparisonClose.Click += (sender, e) => { panelComparison.Visible = false; };
-
-            var btnComparisonUpdate = new Button
-            {
-                Location = new Point(_style.MarginVer, _style.MarginHor),
-                Anchor = Anchor = AnchorStyles.Top | AnchorStyles.Left,
-                Width = _style.ControlWidthDefault,
-                Text = "Update database"
-            };
-            btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
             panels.panelTop.Controls.Add(btnComparisonClose);
+
+            cmbSchemaSourcesCompare = new ComboBox
+            {
+                Name = "cmbSchemaSourcesCompare",
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = "Title",
+                BackColor = panelTop.BackColor
+            };
+            var src = new List<IOntologySchemaSource>(_schemaSources);
+            cmbSchemaSourcesCompare.DataSource = src;
+            cmbSchemaSourcesCompare.SelectedIndexChanged += (sender, e) => { CompareSchemas(); };
+            container.Add(cmbSchemaSourcesCompare);
+
+            var btnComparisonUpdate = new Button { Text = "Update database" };
+            btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); CompareSchemas(); };
+            container.Add(btnComparisonUpdate);
 
             txtComparison = new RichTextBox { Dock = DockStyle.Fill, BackColor = panelComparison.BackColor };
             panels.panelBottom.Controls.Add(txtComparison);
@@ -227,6 +238,7 @@ namespace Iis.OntologyManager
 
             cmbSchemaSources = new ComboBox
             {
+                Name = "cmbSchemaSources",
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 DisplayMember = "Title",
                 BackColor = panelTop.BackColor
@@ -287,16 +299,19 @@ namespace Iis.OntologyManager
             this.gridTypes.DataSource = ds;
         }
 
+        private void CompareSchemas()
+        {
+            var selectedSource = cmbSchemaSourcesCompare.SelectedItem;
+            if (selectedSource == null) return;
+            var schema = _schemaService.GetOntologySchema((IOntologySchemaSource)selectedSource);
+            _compareResult = _schema.CompareTo(schema);
+            txtComparison.Text = GetCompareText(_compareResult);
+        }
+
         private void btnCompare_Click(object sender, EventArgs e)
         {
-            var fileName = Path.Combine(DefaultSchemaStorage, "dev.ont");
-            //var schemaNew = _schemaService.LoadFromFile(fileName);
-            var schemaOld = _schemaService.GetOntologySchema(_schemaSources.Single(s => s.Title == "(DB): localprod"));
-            var compareResult = _schema.CompareTo(schemaOld);
-            txtComparison.Text = GetCompareText(compareResult);
+            CompareSchemas();
             panelComparison.Visible = true;
-            //schemaService.LoadFromFile();
-            //schemaService.SaveToFile(_schema, fileName);
         }
 
         private string GetCompareText(string title, IEnumerable<INodeTypeLinked> nodeTypes)
@@ -318,7 +333,19 @@ namespace Iis.OntologyManager
             var sb = new StringBuilder();
             sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd));
             sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete));
-            sb.AppendLine(GetCompareText("NODES TO UPDATE", compareResult.ItemsToUpdate.Select(item => item.NodeTypeFrom)));
+            sb.AppendLine("===============");
+            sb.AppendLine("NODES TO UPDATE");
+            sb.AppendLine("===============");
+            foreach (var item in compareResult.ItemsToUpdate)
+            {
+                sb.AppendLine(item.NodeTypeFrom.GetStringCode());
+                var differences = item.NodeTypeFrom.GetDifference(item.NodeTypeTo);
+                foreach (var diff in differences)
+                {
+                    sb.AppendLine($"{diff.PropertyName}:\n{diff.OldValue}\n{diff.NewValue}");
+                }
+                sb.AppendLine();
+            }
             return sb.ToString();
         }
 
@@ -453,14 +480,19 @@ namespace Iis.OntologyManager
 
         private void UpdateComparedDatabase()
         {
-
+            if (_compareResult == null) return;
+            using var context = OntologyContext.GetContext(_compareResult.SchemaSource.Data);
+            var schema = _schemaService.GetOntologySchema(_compareResult.SchemaSource);
+            var schemaSaver = new OntologySchemaSaver(context);
+            schemaSaver.SaveToDatabase(_compareResult, schema);
         }
 
         private void UpdateSchemaSources()
         {
             _schemaSources = GetSchemaSources();
             _uiControlsCreator.UpdateComboSource(cmbSchemaSources, _schemaSources);
-            //UpdateComboSource(cmb, _schemaSources);
+            var src = new List<IOntologySchemaSource>(_schemaSources);
+            _uiControlsCreator.UpdateComboSource(cmbSchemaSourcesCompare, src);
         }
 
         private List<IOntologySchemaSource> GetSchemaSources()

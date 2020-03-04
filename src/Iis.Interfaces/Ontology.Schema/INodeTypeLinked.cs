@@ -26,5 +26,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<INodeTypeLinked> GetAllAncestors();
         bool IsIdentical(INodeTypeLinked nodeType);
         string GetStringCode();
+        Dictionary<string, string> GetPropertiesDict();
+        IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
     }
 }

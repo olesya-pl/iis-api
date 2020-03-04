@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.Comparison;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -140,6 +141,43 @@ namespace Iis.OntologySchema.DataTypes
                 && Kind == nodeType.Kind
                 && IsAbstract == nodeType.IsAbstract
                 && scalarTypesAreEqual;
+        }
+
+        public Dictionary<string, string> GetPropertiesDict()
+        {
+            var dict = new Dictionary<string, string>();
+            dict[nameof(Name)] = Name;
+            dict[nameof(Title)] = Title;
+            dict[nameof(Meta)] = Meta;
+            dict[nameof(IsArchived)] = IsArchived.ToString();
+            dict[nameof(Kind)] = Kind.ToString();
+            dict[nameof(IsAbstract)] = IsAbstract.ToString();
+            dict["ScalarType"] = AttributeType?.ScalarType.ToString() ?? string.Empty;
+            dict["EmbeddingOptions"] = RelationType?.EmbeddingOptions.ToString() ?? string.Empty;
+            dict["RelationKind"] = RelationType?.Kind.ToString() ?? string.Empty;
+            dict["RelationSourceName"] = RelationType?.SourceType.Name ?? string.Empty;
+            dict["RelationTargetName"] = RelationType?.TargetType.Name ?? string.Empty;
+            return dict;
+        }
+
+        public IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType)
+        {
+            var result = new List<ISchemaCompareDiffInfo>();
+            var thisDict = GetPropertiesDict();
+            var anotherDict = nodeType.GetPropertiesDict();
+            foreach (var key in thisDict.Keys)
+            {
+                if (thisDict[key] != anotherDict[key])
+                {
+                    result.Add(new SchemaCompareDiffInfo
+                    {
+                        PropertyName = key,
+                        OldValue = anotherDict[key],
+                        NewValue = thisDict[key]
+                    });
+                }
+            }
+            return result;
         }
 
         public void CopyFrom(INodeType nodeType)

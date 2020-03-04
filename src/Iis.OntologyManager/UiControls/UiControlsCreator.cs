@@ -97,6 +97,5 @@ namespace Iis.OntologyManager.UiControls
             }
 
         }
-
     }
 }

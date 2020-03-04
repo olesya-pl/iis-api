@@ -90,6 +90,15 @@ namespace Iis.OntologySchema
             return _storage.GetStringCodes();
         }
 
+        public INodeTypeLinked GetEntityTypeByName(string entityTypeName)
+        {
+            return _storage.NodeTypes.Values
+                .Where(nt => !nt.IsArchived 
+                    && nt.Kind == Kind.Entity 
+                    && nt.Name == entityTypeName)
+                .SingleOrDefault();
+        }
+
         private SchemaRelationType GetRelationType(string entityName, string relationName)
         {
             var relationType = GetRelationTypeOrNull(entityName, relationName);
@@ -116,10 +125,12 @@ namespace Iis.OntologySchema
             result.ItemsToAdd = thisCodes.Keys.Where(key => !otherCodes.ContainsKey(key)).Select(key => thisCodes[key]).ToList();
             result.ItemsToDelete = otherCodes.Keys.Where(key => !thisCodes.ContainsKey(key)).Select(key => otherCodes[key]).ToList();
             var commonKeys = thisCodes.Keys.Where(key => otherCodes.ContainsKey(key)).ToList();
+            
             result.ItemsToUpdate = commonKeys
                 .Where(key => !thisCodes[key].IsIdentical(otherCodes[key]))
-                .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = thisCodes[key] })
+                .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = otherCodes[key] })
                 .ToList();
+            result.SchemaSource = schema.SchemaSource;
             return result;
         }
     }
