@@ -112,5 +112,20 @@ namespace Iis.OntologyManager.UiControls
         {
             _colWidth = width;
         }
+
+        public void AddInRow(IReadOnlyList<Control> controls)
+        {
+            if (controls.Count == 0) return;
+            var width = (_colWidth - (controls.Count - 1) * _style.MarginHor) / controls.Count;
+            var left = _left;
+            foreach (var control in controls)
+            {
+                control.Left = left;
+                control.Top = Top;
+                control.Width = width;
+                _rootControl.Controls.Add(control);
+                left += width + _style.MarginHor;
+            }
+        }
     }
 }

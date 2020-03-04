@@ -164,6 +164,7 @@ namespace Iis.OntologyManager
         private ContextMenuStrip menuChildren;
         private Panel panelComparison;
         private RichTextBox txtComparison;
+        private Button btnSaveSchema;
     }
 }
 

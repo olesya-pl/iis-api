@@ -11,15 +11,17 @@ namespace Iis.OntologySchema
     public class OntologySchema: IOntologySchema
     {
         IMapper _mapper;
-        SchemaStorage _storage; 
-        public OntologySchema()
+        SchemaStorage _storage;
+        public IOntologySchemaSource SchemaSource { get; private set; }
+        public OntologySchema(IOntologySchemaSource schemaSource)
         {
+            SchemaSource = schemaSource;
             _mapper = GetMapper();
         }
 
-        public static OntologySchema GetInstance(IOntologyRawData ontologyRawData)
+        public static OntologySchema GetInstance(IOntologyRawData ontologyRawData, IOntologySchemaSource schemaSource)
         {
-            var schema = new OntologySchema();
+            var schema = new OntologySchema(schemaSource);
             schema.Initialize(ontologyRawData);
             return schema;
         }

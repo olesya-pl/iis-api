@@ -28,7 +28,7 @@ namespace Iis.OntologyManager
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
         OntologySchemaService _schemaService;
-        List<OntologySchemaSource> _schemaSources;
+        List<IOntologySchemaSource> _schemaSources;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         Font SelectedFont { get; set; }
         Font TypeHeaderNameFont { get; set; }
@@ -235,7 +235,11 @@ namespace Iis.OntologyManager
             cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
             container.Add(cmbSchemaSources);
 
-            container.Add(btnCompare = new Button { Text = "Compare" });
+            btnSaveSchema = new Button { Text = "Save" };
+            btnSaveSchema.Click += btnSave_Click;
+            btnCompare = new Button { Text = "Compare" };
+            btnCompare.Click += btnCompare_Click;
+            container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
 
             panelTop.ResumeLayout();
         }
@@ -283,11 +287,11 @@ namespace Iis.OntologyManager
             this.gridTypes.DataSource = ds;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnCompare_Click(object sender, EventArgs e)
         {
             var fileName = Path.Combine(DefaultSchemaStorage, "dev.ont");
             //var schemaNew = _schemaService.LoadFromFile(fileName);
-            var schemaOld = _schemaService.LoadFromDatabase(_configuration.GetConnectionString("localprod"));
+            var schemaOld = _schemaService.GetOntologySchema(_schemaSources.Single(s => s.Title == "(DB): localprod"));
             var compareResult = _schema.CompareTo(schemaOld);
             txtComparison.Text = GetCompareText(compareResult);
             panelComparison.Visible = true;
@@ -431,14 +435,37 @@ namespace Iis.OntologyManager
             SetNodeTypeView(nodeType, false);
         }
 
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            var dialog = new SaveFileDialog
+            {
+                InitialDirectory = DefaultSchemaStorage,
+                Filter = "Ontology files (*.ont)|*.ont|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                _schemaService.SaveToFile(_schema, dialog.FileName);
+            }
+            UpdateSchemaSources();
+        }
+
         private void UpdateComparedDatabase()
         {
 
         }
 
-        private List<OntologySchemaSource> GetSchemaSources()
+        private void UpdateSchemaSources()
         {
-            var result = new List<OntologySchemaSource> { 
+            _schemaSources = GetSchemaSources();
+            _uiControlsCreator.UpdateComboSource(cmbSchemaSources, _schemaSources);
+            //UpdateComboSource(cmb, _schemaSources);
+        }
+
+        private List<IOntologySchemaSource> GetSchemaSources()
+        {
+            var result = new List<IOntologySchemaSource> { 
             };
             var connectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
             result.AddRange(connectionStrings.Select(section => new OntologySchemaSource

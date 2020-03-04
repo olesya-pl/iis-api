@@ -6,6 +6,7 @@ namespace Iis.Interfaces.Ontology.Schema
 {
     public interface IOntologySchema
     {
+        IOntologySchemaSource SchemaSource { get; }
         void Initialize(IOntologyRawData ontologyRawData);
         IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter);
         INodeTypeLinked GetNodeTypeById(Guid id);

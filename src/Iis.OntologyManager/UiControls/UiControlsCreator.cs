@@ -81,5 +81,22 @@ namespace Iis.OntologyManager.UiControls
 
             return (panelTop, panelBottom);
         }
+
+        public void UpdateComboSource(ComboBox comboBox, IEnumerable<object> source)
+        {
+            var selectedText = comboBox.Text;
+            comboBox.DataSource = source;
+            var index = comboBox.FindStringExact(selectedText);
+            if (!string.IsNullOrEmpty(selectedText) && index > -1)
+            {
+                comboBox.SelectedIndex = index;
+            }
+            else
+            {
+                comboBox.SelectedIndex = 0;
+            }
+
+        }
+
     }
 }
