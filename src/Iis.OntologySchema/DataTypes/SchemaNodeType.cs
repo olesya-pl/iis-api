@@ -66,6 +66,16 @@ namespace Iis.OntologySchema.DataTypes
             return result;
         }
 
+        public IReadOnlyList<INodeTypeLinked> GetDirectDescendants()
+        {
+            return IncomingRelations.Where(r => r.Kind == RelationKind.Inheritance).Select(r => r.SourceType).ToList();
+        }
+
+        public IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded()
+        {
+            return IncomingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(r => r.SourceType).ToList();
+        }
+
         public IReadOnlyList<INodeTypeLinked> GetDirectAncestors()
         {
             return OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance).Select(r => r.TargetType).ToList();

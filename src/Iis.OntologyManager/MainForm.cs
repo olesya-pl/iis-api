@@ -125,6 +125,16 @@ namespace Iis.OntologyManager
             rootPanel.ResumeLayout();
         }
         
+        private DataGridView GetRelationsGrid(string name)
+        {
+            var grid = _uiControlsCreator.GetDataGridView(name, null,
+                new List<string> { "Name" });
+            grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            grid.CellFormatting += gridTypes_CellFormatting;
+            grid.DoubleClick += gridInheritance_DoubleClick;
+            return grid;
+        }
+
         private void SetTypeViewControls(Panel rootPanel)
         {
             rootPanel.SuspendLayout();
@@ -135,13 +145,18 @@ namespace Iis.OntologyManager
             container.Add(txtName = new TextBox(), "Name");
             container.Add(txtTitle = new TextBox(), "Title");
             container.GoToNewColumn();
-            
-            gridInheritance = _uiControlsCreator.GetDataGridView("gridChildren", null,
-                new List<string> { "Name" });
-            gridInheritance.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridInheritance.CellFormatting += gridTypes_CellFormatting;
-            gridInheritance.DoubleClick += gridInheritance_DoubleClick;
-            lblGridInheritance = container.Add(gridInheritance, "Inheritance", true);
+
+            gridInheritedFrom = GetRelationsGrid(nameof(gridInheritedFrom));
+            container.Add(gridInheritedFrom, "Inherited From:", true);
+            container.GoToNewColumn();
+
+            gridInheritedBy = GetRelationsGrid(nameof(gridInheritedBy));
+            container.Add(gridInheritedBy, "Ancestor To:", true);
+            container.GoToNewColumn();
+
+            gridEmbeddence = GetRelationsGrid(nameof(gridEmbeddence));
+            container.Add(gridEmbeddence, "Embedded By:", true);
+            container.GoToNewColumn();
 
             container.GoToNewColumn();
             container.Add(txtMeta = new RichTextBox(), "Meta", true);
@@ -399,7 +414,9 @@ namespace Iis.OntologyManager
             var children = nodeType.GetAllChildren();
             gridChildren.DataSource = children;
             var ancestors = nodeType.GetAllAncestors();
-            gridInheritance.DataSource = ancestors;
+            gridInheritedFrom.DataSource = ancestors;
+            gridInheritedBy.DataSource = nodeType.GetDirectDescendants();
+            gridEmbeddence.DataSource = nodeType.GetNodeTypesThatEmbedded();
             txtMeta.Text = nodeType.Meta;
             _currentNodeType = nodeType;
         }

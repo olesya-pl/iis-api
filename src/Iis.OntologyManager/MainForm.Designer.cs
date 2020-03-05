@@ -158,7 +158,9 @@ namespace Iis.OntologyManager
         private Button btnTypeBack;
         private Label lblTypeHeaderName;
         private Label lblGridInheritance;
-        private DataGridView gridInheritance;
+        private DataGridView gridInheritedFrom;
+        private DataGridView gridInheritedBy;
+        private DataGridView gridEmbeddence;
         private Label lblMeta;
         private RichTextBox txtMeta;
         private ContextMenuStrip menuChildren;
