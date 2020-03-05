@@ -133,5 +133,37 @@ namespace Iis.OntologySchema
             result.SchemaSource = schema.SchemaSource;
             return result;
         }
+
+        public void UpdateNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            var nodeType = _storage.GetNodeTypeById(updateParameter.Id);
+
+            if (!string.IsNullOrEmpty(updateParameter.Title))
+            {
+                nodeType.Title = updateParameter.Title;
+            }
+
+            if (!string.IsNullOrEmpty(updateParameter.Meta))
+            {
+                nodeType.Meta = updateParameter.Meta;
+            }
+
+            if (updateParameter.EmbeddingOptions != null && nodeType._relationType != null)
+            {
+                nodeType._relationType.EmbeddingOptions = (EmbeddingOptions)updateParameter.EmbeddingOptions;
+            }
+
+            if (updateParameter.ScalarType != null && nodeType._attributeType != null)
+            {
+                nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
+            }
+        }
+
+        public void UpdateTargetType(Guid relationTypeId, Guid targetTypeId)
+        {
+            var nodeType = _storage.GetNodeTypeById(relationTypeId);
+            nodeType._relationType.TargetTypeId = targetTypeId;
+            nodeType._relationType._targetType = _storage.NodeTypes[targetTypeId];
+        }
     }
 }

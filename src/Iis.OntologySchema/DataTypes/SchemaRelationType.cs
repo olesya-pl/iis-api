@@ -7,9 +7,9 @@ namespace Iis.OntologySchema.DataTypes
 {
     public class SchemaRelationType: SchemaRelationTypeRaw, IRelationType, IRelationTypeLinked
     {
-        private SchemaNodeType _nodeType;
-        private SchemaNodeType _sourceType;
-        private SchemaNodeType _targetType;
+        internal SchemaNodeType _nodeType;
+        internal SchemaNodeType _sourceType;
+        internal SchemaNodeType _targetType;
         public INodeTypeLinked NodeType => _nodeType;
         public INodeTypeLinked SourceType => _sourceType;
         public INodeTypeLinked TargetType => _targetType;

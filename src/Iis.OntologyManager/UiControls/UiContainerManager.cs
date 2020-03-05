@@ -118,6 +118,7 @@ namespace Iis.OntologyManager.UiControls
             if (controls.Count == 0) return;
             var width = (_colWidth - (controls.Count - 1) * _style.MarginHor) / controls.Count;
             var left = _left;
+            var maxbottom = Top;
             foreach (var control in controls)
             {
                 control.Left = left;
@@ -125,7 +126,13 @@ namespace Iis.OntologyManager.UiControls
                 control.Width = width;
                 _rootControl.Controls.Add(control);
                 left += width + _style.MarginHor;
+
+                if (maxbottom < control.Bottom)
+                {
+                    maxbottom = control.Bottom;
+                }
             }
+            Top = maxbottom + _style.MarginVer;
         }
     }
 }

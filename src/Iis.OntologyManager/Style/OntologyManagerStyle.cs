@@ -11,6 +11,7 @@ namespace Iis.OntologyManager.Style
         public int MarginVerSmall { get; set; }
         public int MarginHor { get; set; }
         public int ControlWidthDefault { get; set; }
+        public int ButtonWidthDefault { get; set; }
         public Color BackgroundColor { get; set; }
         public Color ComparisonBackColor { get; set; }
         public Color EntityTypeBackColor { get; set; }
@@ -25,6 +26,7 @@ namespace Iis.OntologyManager.Style
                 MarginVerSmall = 2,
                 MarginHor = 10,
                 ControlWidthDefault = 210,
+                ButtonWidthDefault = 100,
                 BackgroundColor = Color.LightYellow,
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,

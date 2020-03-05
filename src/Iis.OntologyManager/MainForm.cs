@@ -4,6 +4,7 @@ using Iis.OntologyManager.Ontology;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
 using Iis.OntologySchema;
+using Iis.OntologySchema.ChangeParameters;
 using Iis.OntologySchema.DataTypes;
 using Iis.OntologySchema.Saver;
 using Microsoft.EntityFrameworkCore;
@@ -144,6 +145,12 @@ namespace Iis.OntologyManager
 
             container.GoToNewColumn();
             container.Add(txtMeta = new RichTextBox(), "Meta", true);
+
+            container.GoToNewColumn(_style.ButtonWidthDefault);
+            btnTypeSave = new Button { Text = "Save" };
+            btnTypeSave.Click += (sender, e) => { SaveTypeProperties(); };
+            container.Add(btnTypeSave);
+
             
             container.GoToBottom();
             container.StepDown();
@@ -151,7 +158,9 @@ namespace Iis.OntologyManager
 
             menuChildren = new ContextMenuStrip();
             menuChildren.Items.Add("Show Relation");
-            menuChildren.Items[0].Click += menuChildren_showRelationClick;
+            menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(ChildrenShowRelation); };
+            menuChildren.Items.Add("Change Target Type");
+            menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(ChildrenChangeTargetType); };
 
             gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
@@ -207,7 +216,7 @@ namespace Iis.OntologyManager
             container.Add(cmbSchemaSourcesCompare);
 
             var btnComparisonUpdate = new Button { Text = "Update database" };
-            btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); CompareSchemas(); };
+            btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
             container.Add(btnComparisonUpdate);
 
             txtComparison = new RichTextBox { Dock = DockStyle.Fill, BackColor = panelComparison.BackColor };
@@ -265,6 +274,18 @@ namespace Iis.OntologyManager
             ReloadTypes();
         }
 
+        private void SaveTypeProperties()
+        {
+            if (_currentNodeType == null) return;
+            var updateParameter = new NodeTypeUpdateParameter
+            {
+                Id = _currentNodeType.Id,
+                Title = txtTitle.Text,
+                Meta = txtMeta.Text
+            };
+            _schema.UpdateNodeType(updateParameter);
+        }
+
         private void FilterChanged(object sender, EventArgs e)
         {
             ReloadTypes();
@@ -274,6 +295,15 @@ namespace Iis.OntologyManager
         {
             SetControlsTabMain(panelRight);
             SetControlsTopPanel();
+        }
+
+        private INodeTypeLinked ChooseEntityTypeFromCombo()
+        {
+            var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
+            var entities = _schema.GetTypes(filter)
+                .OrderBy(t => t.Name)
+                .ToList();
+            return _uiControlsCreator.ChooseFromModalComboBox(entities, "Name");
         }
 
         private IGetTypesFilter GetFilter()
@@ -435,6 +465,19 @@ namespace Iis.OntologyManager
             SetNodeTypeView(relationType, true);
         }
 
+        private void ChildrenChangeTargetType(IChildNodeType childNodeType)
+        {
+            if (childNodeType.TargetType.Kind != Kind.Entity)
+            {
+                MessageBox.Show("Only properties of Entity type can be changed");
+                return;
+            }
+            var newTargetType = ChooseEntityTypeFromCombo();
+            if (newTargetType == null) return;
+            _schema.UpdateTargetType(childNodeType.RelationId, newTargetType.Id);
+            SetNodeTypeView(_currentNodeType, false);
+        }
+
         private void gridChildren_DoubleClick(object sender, EventArgs e)
         {
             gridChildrenEvent(cnt => SetNodeTypeView(cnt.TargetType, true));
@@ -481,10 +524,15 @@ namespace Iis.OntologyManager
         private void UpdateComparedDatabase()
         {
             if (_compareResult == null) return;
+            if (MessageBox.Show($"Are you sure you want to update database {_compareResult.SchemaSource.Title}?", "Update Database", MessageBoxButtons.YesNo) == DialogResult.No)
+            {
+                return;
+            }
             using var context = OntologyContext.GetContext(_compareResult.SchemaSource.Data);
             var schema = _schemaService.GetOntologySchema(_compareResult.SchemaSource);
             var schemaSaver = new OntologySchemaSaver(context);
             schemaSaver.SaveToDatabase(_compareResult, schema);
+            CompareSchemas();
         }
 
         private void UpdateSchemaSources()

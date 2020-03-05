@@ -95,7 +95,38 @@ namespace Iis.OntologyManager.UiControls
             {
                 comboBox.SelectedIndex = 0;
             }
+        }
 
+        public T ChooseFromModalComboBox<T>(IEnumerable<T> items, string dataPropertyName) where T: class
+        {
+            var form = new Form
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                Width = _style.ControlWidthDefault + _style.MarginHor * 2,
+                StartPosition = FormStartPosition.CenterParent
+            };
+            var rootPanel = new Panel 
+            {
+                Dock = DockStyle.Fill,
+                BackColor = _style.BackgroundColor
+            };
+            form.Controls.Add(rootPanel);
+            var container = new UiContainerManager(rootPanel, _style);
+            var comboBox = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = dataPropertyName,
+                BackColor = rootPanel.BackColor
+            };
+
+            var src = new List<T>(items);
+            comboBox.DataSource = src;
+            container.Add(comboBox);
+            var btnOk = new Button { Text = "Ok", DialogResult = DialogResult.OK };
+            var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel };
+            container.AddInRow(new List<Control> { btnOk, btnCancel });
+            form.Height = container.MaxTop + _style.MarginVer;
+            return form.ShowDialog() == DialogResult.OK ? (T)comboBox.SelectedItem : null;
         }
     }
 }

@@ -13,9 +13,10 @@ namespace Iis.OntologySchema.DataTypes
         public IReadOnlyList<IRelationTypeLinked> IncomingRelations => _incomingRelations;
         private List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
-        
-        public IAttributeType AttributeType { get; set; }
-        private SchemaRelationType _relationType;
+
+        internal SchemaAttributeType _attributeType;
+        public IAttributeType AttributeType => _attributeType;
+        internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
         internal void AddIncomingRelation(SchemaRelationType relationType)
         {

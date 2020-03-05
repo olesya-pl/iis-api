@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public class SchemaStorage
+    internal class SchemaStorage
     {
         IMapper _mapper;
         public SchemaStorage(IMapper mapper)
@@ -39,28 +39,33 @@ namespace Iis.OntologySchema.DataTypes
             }
             foreach (var attributeType in AttributeTypes.Values)
             {
-                NodeTypes[attributeType.Id].AttributeType = attributeType;
+                NodeTypes[attributeType.Id]._attributeType = attributeType;
             }
         }
 
-        internal IEnumerable<SchemaNodeTypeRaw> GetNodeTypesRaw()
+        public IEnumerable<SchemaNodeTypeRaw> GetNodeTypesRaw()
         {
             return NodeTypes.Values.Select(nt => _mapper.Map<SchemaNodeTypeRaw>(nt));
         }
 
-        internal IEnumerable<SchemaRelationTypeRaw> GetRelationTypesRaw()
+        public IEnumerable<SchemaRelationTypeRaw> GetRelationTypesRaw()
         {
             return RelationTypes.Values.Select(r => _mapper.Map<SchemaRelationTypeRaw>(r));
         }
 
-        internal IEnumerable<SchemaAttributeTypeRaw> GetAttributeTypesRaw()
+        public IEnumerable<SchemaAttributeTypeRaw> GetAttributeTypesRaw()
         {
             return AttributeTypes.Values.Select(at => _mapper.Map<SchemaAttributeTypeRaw>(at));
         }
 
-        internal Dictionary<string, INodeTypeLinked> GetStringCodes()
+        public Dictionary<string, INodeTypeLinked> GetStringCodes()
         {
             return NodeTypes.Values.Where(nt => nt.GetStringCode() != null).ToDictionary(nt => nt.GetStringCode(), nt => (INodeTypeLinked)nt);
+        }
+
+        public SchemaNodeType GetNodeTypeById(Guid id)
+        {
+            return NodeTypes.Values.SingleOrDefault(nt => nt.Id == id);
         }
     }
 }

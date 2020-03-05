@@ -165,6 +165,7 @@ namespace Iis.OntologyManager
         private Panel panelComparison;
         private RichTextBox txtComparison;
         private Button btnSaveSchema;
+        private Button btnTypeSave;
     }
 }
 
