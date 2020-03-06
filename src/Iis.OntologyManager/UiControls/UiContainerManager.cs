@@ -13,28 +13,16 @@ namespace Iis.OntologyManager.UiControls
         private IOntologyManagerStyle _style;
         private Rectangle _rect;
         private int _top;
-        public int MaxTop { get; private set; }
-        private int Top {
-            get 
-            {
-                return _top;
-            }
-            set 
-            {
-                _top = value;
-                if (_top > MaxTop)
-                {
-                    MaxTop = _top;
-                }
-            }
-        }
+        private int _bottom;
+        private int _right;
+        public int Width => _right - _rect.Left + _style.MarginHor;
+        public int Height => _bottom - _rect.Top + _style.MarginVer;
+        private int Top { get; set; }
 
         private int _left;
         private int _colWidth;
-        private int TopOfFirst => _style.MarginVer * 2;
-
+        private int TopOfFirst => _rect.Top + _style.MarginVer * 2;
         public bool AutoWidth { get; set; } = true;
-        
 
         public UiContainerManager(Control rootControl, IOntologyManagerStyle style, Rectangle? rect = null)
         {
@@ -42,8 +30,15 @@ namespace Iis.OntologyManager.UiControls
             _style = style;
             _rect = rect ?? rootControl.ClientRectangle;
             Top = TopOfFirst;
-            _left = _style.MarginHor;
+            _left = _rect.Left + _style.MarginHor;
             _colWidth = _style.ControlWidthDefault;
+        }
+
+        public void AddToRoot(Control control)
+        {
+            _rootControl.Controls.Add(control);
+            if (control.Right > _right) _right = control.Right;
+            if (control.Bottom > _bottom) _bottom = control.Bottom;
         }
 
         public Label Add(Control control, string labelText = null, bool stretchToDown = false)
@@ -58,7 +53,7 @@ namespace Iis.OntologyManager.UiControls
                     Width = _colWidth,
                     Text = labelText
                 };
-                _rootControl.Controls.Add(label);
+                AddToRoot(label);
                 Top += label.Height;
             }
 
@@ -67,8 +62,8 @@ namespace Iis.OntologyManager.UiControls
 
             if (stretchToDown)
             {
-                control.Height = MaxTop > control.Top ? 
-                    MaxTop - control.Top  :
+                control.Height = _bottom > control.Top ? 
+                    _bottom - control.Top  :
                     _rect.Height - control.Top;
             }
 
@@ -77,7 +72,7 @@ namespace Iis.OntologyManager.UiControls
                 control.Width = _colWidth;
             }
             Top = control.Bottom + _style.MarginVer;
-            _rootControl.Controls.Add(control);
+            AddToRoot(control);
             return label;
         }
 
@@ -92,10 +87,15 @@ namespace Iis.OntologyManager.UiControls
             }
         }
 
+        public void SetLeft(int left)
+        {
+            _left = left;
+        }
+
         public void GoToBottom()
         {
             _left = _style.MarginHor;
-            Top = MaxTop;
+            Top = _bottom;
         }
 
         public void StepDown(int cnt = 1)
@@ -124,7 +124,7 @@ namespace Iis.OntologyManager.UiControls
                 control.Left = left;
                 control.Top = Top;
                 control.Width = width;
-                _rootControl.Controls.Add(control);
+                AddToRoot(control);
                 left += width + _style.MarginHor;
 
                 if (maxbottom < control.Bottom)

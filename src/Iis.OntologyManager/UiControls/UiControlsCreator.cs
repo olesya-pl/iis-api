@@ -125,7 +125,7 @@ namespace Iis.OntologyManager.UiControls
             var btnOk = new Button { Text = "Ok", DialogResult = DialogResult.OK };
             var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel };
             container.AddInRow(new List<Control> { btnOk, btnCancel });
-            form.Height = container.MaxTop + _style.MarginVer;
+            form.Height = container.Height;
             return form.ShowDialog() == DialogResult.OK ? (T)comboBox.SelectedItem : null;
         }
     }

@@ -7,8 +7,6 @@ namespace Iis.Domain
     {
         public bool IsAbstract { get; }
 
-        public bool IsMarker => !RelatedTypes.Any();
-
         public override Type ClrType => typeof(Entity);
 
         public EntityType(Guid id, string name, bool isAbstract)
