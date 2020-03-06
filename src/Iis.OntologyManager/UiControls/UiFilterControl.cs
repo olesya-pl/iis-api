@@ -21,8 +21,8 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbFilterRelations;
         TextBox txtFilterName;
 
-        public int Width => _container.Width;
-        public int Height => _container.Height;
+        public int Width => _container.Right + _style.MarginHor * 2;
+        public int Height => _container.Bottom + _style.MarginVer * 2;
 
         public delegate void OnChangeHandler(IGetTypesFilter filter);
         public event OnChangeHandler OnChange;
@@ -43,6 +43,8 @@ namespace Iis.OntologyManager.UiControls
             _rootPanel.Controls.Add(_mainPanel);
             _container = new UiContainerManager(_mainPanel, style);
             CreateControls();
+            _mainPanel.Width = _container.Right + _style.MarginHor;
+            _mainPanel.Height = _container.Bottom + _style.MarginVer;
             _rootPanel.ResumeLayout();
         }
 
@@ -81,7 +83,6 @@ namespace Iis.OntologyManager.UiControls
                 Name = txtFilterName.Text
             };
         }
-
         public void SetModel(IGetTypesFilter model)
         {
             _model = model;

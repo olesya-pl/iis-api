@@ -12,11 +12,10 @@ namespace Iis.OntologyManager.UiControls
         private Control _rootControl;
         private IOntologyManagerStyle _style;
         private Rectangle _rect;
-        private int _top;
         private int _bottom;
         private int _right;
-        public int Width => _right - _rect.Left + _style.MarginHor;
-        public int Height => _bottom - _rect.Top + _style.MarginVer;
+        public int Right => _right - _rect.Left + _style.MarginHor;
+        public int Bottom => _bottom - _rect.Top + _style.MarginVer;
         private int Top { get; set; }
 
         private int _left;

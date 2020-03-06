@@ -255,20 +255,6 @@ namespace Iis.OntologyManager
             _filterControl = new UiFilterControl();
             _filterControl.Initialize(panelTop, _style);
             container.SetLeft(_filterControl.Width);
-            //container.SetColWidth(100);
-            //container.Add(cbFilterEntities = new CheckBox { Text = "Entities", Checked = true });
-            //container.Add(cbFilterAttributes = new CheckBox { Text = "Attributes" });
-            //container.Add(cbFilterRelations = new CheckBox { Text = "Relations" });
-
-            //cbFilterEntities.CheckedChanged += FilterChanged;
-            //cbFilterAttributes.CheckedChanged += FilterChanged;
-            //cbFilterRelations.CheckedChanged += FilterChanged;
-
-            //container.GoToNewColumn();
-            //container.Add(txtFilterName = new TextBox(), "Name");
-            //txtFilterName.TextChanged += FilterChanged;
-
-            //container.GoToNewColumn(_style.ControlWidthDefault);
 
             cmbSchemaSources = new ComboBox
             {
