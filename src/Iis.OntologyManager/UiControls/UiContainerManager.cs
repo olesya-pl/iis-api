@@ -75,11 +75,13 @@ namespace Iis.OntologyManager.UiControls
             return label;
         }
 
-        public void AddPanel(Panel panel, AddPanelOptions options)
+        public void AddPanel(Panel panel, AddPanelOptions options = null)
         {
             panel.Top = Top;
             panel.Left = _left;
-            panel.Height = _rootControl.Height - _style.MarginVer * 2;
+            panel.Height = _rootControl.Height - panel.Top - _style.MarginVer * 2;
+            _left = panel.Right + _style.MarginHor;
+            Top = TopOfFirst;
             //panel.Anchor = AnchorStyles.Left | AnchorStyles.Top;
             //if (options.Width != null) panel.Width = (int)options.Width;
             //if (options.Height != null) panel.Height = (int)options.Height;

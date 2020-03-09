@@ -69,7 +69,7 @@ namespace Iis.OntologyManager
             CreateComparisonPanel();
             LoadCurrentSchema();
             ResumeLayout();
-            ReloadTypes();
+            ReloadTypes(_filterControl.GetModel());
         }
 
         #endregion
@@ -249,12 +249,12 @@ namespace Iis.OntologyManager
         }
         private void SetControlsTopPanel()
         {
-
             panelTop.SuspendLayout();
             var container = new UiContainerManager(panelTop, _style);
             _filterControl = new UiFilterControl();
             _filterControl.Initialize(_style);
-            container.SetLeft(_filterControl.Width);
+            _filterControl.OnChange += ReloadTypes;
+            container.AddPanel(_filterControl.MainPanel);
 
             cmbSchemaSources = new ComboBox
             {
@@ -399,7 +399,7 @@ namespace Iis.OntologyManager
                 (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
             if (currentSchemaSource == null) return;
             _schema = _schemaService.GetOntologySchema(currentSchemaSource);
-            ReloadTypes();
+            ReloadTypes(_filterControl.GetModel());
         }
         private void UpdateSchemaSources()
         {
@@ -521,10 +521,6 @@ namespace Iis.OntologyManager
             };
             _schema.UpdateNodeType(updateParameter);
         }
-        private void FilterChanged(object sender, EventArgs e)
-        {
-            ReloadTypes();
-        }
         private INodeTypeLinked ChooseEntityTypeFromCombo()
         {
             var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
@@ -534,14 +530,9 @@ namespace Iis.OntologyManager
             return _uiControlsCreator.ChooseFromModalComboBox(entities, "Name");
         }
 
-        private IGetTypesFilter GetFilter()
-        {
-            return _filterControl.GetModel();
-        }
-        public void ReloadTypes()
+        public void ReloadTypes(IGetTypesFilter filter)
         {
             if (_schema == null) return;
-            var filter = GetFilter();
             var ds = _schema.GetTypes(filter)
                 .OrderBy(t => t.Name)
                 .ToList();
