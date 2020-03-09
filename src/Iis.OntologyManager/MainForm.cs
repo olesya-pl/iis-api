@@ -253,7 +253,7 @@ namespace Iis.OntologyManager
             panelTop.SuspendLayout();
             var container = new UiContainerManager(panelTop, _style);
             _filterControl = new UiFilterControl();
-            _filterControl.Initialize(panelTop, _style);
+            _filterControl.Initialize(_style);
             container.SetLeft(_filterControl.Width);
 
             cmbSchemaSources = new ComboBox

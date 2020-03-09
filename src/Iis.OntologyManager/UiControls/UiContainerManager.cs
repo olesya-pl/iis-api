@@ -75,6 +75,37 @@ namespace Iis.OntologyManager.UiControls
             return label;
         }
 
+        public void AddPanel(Panel panel, AddPanelOptions options)
+        {
+            panel.Top = Top;
+            panel.Left = _left;
+            panel.Height = _rootControl.Height - _style.MarginVer * 2;
+            //panel.Anchor = AnchorStyles.Left | AnchorStyles.Top;
+            //if (options.Width != null) panel.Width = (int)options.Width;
+            //if (options.Height != null) panel.Height = (int)options.Height;
+            //if (options.FitWidth)
+            //{
+            //    if (options.Width == null) panel.Width = _rootControl.Width - _style.MarginHor * 2;
+            //    panel.Anchor |= AnchorStyles.Right;
+            //}
+            //if (options.FitHeight)
+            //{
+            //    if (options.Height == null) panel.Height = _rootControl.Height - _style.MarginVer * 2;
+            //    panel.Anchor |= AnchorStyles.Bottom;
+            //}
+
+            //if (options.FitWidth)
+            //{
+            //    _left = _style.MarginHor;
+            //    Top = panel.Bottom + _style.MarginVer;
+            //}
+            //else
+            //{
+            //    _left = 
+            //}
+            AddToRoot(panel);
+        }
+
         public void GoToNewColumn(int colWidth = default)
         {
             Top = TopOfFirst;

@@ -11,8 +11,7 @@ namespace Iis.OntologyManager.UiControls
     public class UiFilterControl
     {
         IGetTypesFilter _model;
-        Panel _rootPanel;
-        Panel _mainPanel;
+        
         UiContainerManager _container;
         IOntologyManagerStyle _style;
         
@@ -21,31 +20,27 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbFilterRelations;
         TextBox txtFilterName;
 
-        public int Width => _container.Right + _style.MarginHor * 2;
+        public Panel MainPanel { get; private set; }
+        public int Width => _container.Right + _style.MarginHor;
         public int Height => _container.Bottom + _style.MarginVer * 2;
 
         public delegate void OnChangeHandler(IGetTypesFilter filter);
         public event OnChangeHandler OnChange;
 
-        public void Initialize(Panel rootPanel, IOntologyManagerStyle style)
+        public Panel Initialize(IOntologyManagerStyle style)
         {
             _style = style;
-            _rootPanel = rootPanel;
-            _mainPanel = new Panel
+            MainPanel = new Panel
             {
-                Left = _style.MarginHor,
-                Top = _style.MarginVer,
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor = _rootPanel.BackColor
+                BackColor = _style.BackgroundColor
             };
 
-            _rootPanel.SuspendLayout();
-            _rootPanel.Controls.Add(_mainPanel);
-            _container = new UiContainerManager(_mainPanel, style);
+            _container = new UiContainerManager(MainPanel, style);
             CreateControls();
-            _mainPanel.Width = _container.Right + _style.MarginHor;
-            _mainPanel.Height = _container.Bottom + _style.MarginVer;
-            _rootPanel.ResumeLayout();
+            MainPanel.Width = _container.Right;
+            MainPanel.Height = _container.Bottom + _style.MarginVer;
+            return MainPanel;
         }
 
         public void CreateControls()
