@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200310140737_MaterialSigns.cs" />
+    <Compile Remove="Migrations\20200310140737_MaterialSigns.Designer.cs" />
+    <Compile Remove="Migrations\20200310141625_MaterialSigns.cs" />
+    <Compile Remove="Migrations\20200310141625_MaterialSigns.Designer.cs" />
+    <Compile Remove="Migrations\20200310141751_MaterialSigns.cs" />
+    <Compile Remove="Migrations\20200310141751_MaterialSigns.Designer.cs" />
+    <Compile Remove="Migrations\20200310142737_MaterialSigns.cs" />
+    <Compile Remove="Migrations\20200310142737_MaterialSigns.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.1" />
