@@ -18,7 +18,12 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(NonNullType<IdType>))] public Guid Id { get; set; }
         [GraphQLIgnore] public Guid? FileId { get; set; }
         [GraphQLNonNullType] public Metadata Metadata { get; set; }
-        public IEnumerable<Data> Data { get; set; }
+        public MaterialSign Importance { get; set; }
+        public MaterialSign Reliability { get; set; }
+        public MaterialSign Relevance { get; set; }
+        public MaterialSign Completeness { get; set; }
+        public MaterialSign SourceReliability { get; set; }
+        public IEnumerable<Data > Data { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Transcriptions { get; set; }
 
@@ -38,4 +43,12 @@ namespace IIS.Core.GraphQL.Materials
             return f.ToView();
         }
     }
+
+    public class MaterialSign
+    {
+        public Guid Id { get; set; }
+        public string ShortTitle { get; set; }
+        public string Title { get; set; }
+    }
+
 }

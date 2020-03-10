@@ -47,6 +47,7 @@ using Iis.Interfaces.Ontology;
 using IIS.Domain;
 using Iis.Domain;
 using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.DataModel.Cache;
 
 namespace IIS.Core
 {
@@ -76,7 +77,10 @@ namespace IIS.Core
             // .EnableSensitiveDataLogging()
             );
 
+            
             services.AddHttpContextAccessor();
+            using var context = OntologyContext.GetContext(dbConnectionString);
+            services.AddSingleton<IOntologyCache>(new OntologyCache(context));
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<IExtNodeService, ExtNodeService>();

@@ -67,5 +67,12 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new AnalyticIndicatorConfiguration());
             modelBuilder.ApplyConfiguration(new OntologyMigrationsConfiguration());
         }
+        public static OntologyContext GetContext(string connectionString)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<OntologyContext>()
+                .UseNpgsql(connectionString);
+            var context = new OntologyContext(optionsBuilder.Options);
+            return context;
+        }
     }
 }
