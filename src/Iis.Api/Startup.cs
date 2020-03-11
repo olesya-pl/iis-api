@@ -80,6 +80,7 @@ namespace IIS.Core
             
             services.AddHttpContextAccessor();
             using var context = OntologyContext.GetContext(dbConnectionString);
+            context.Database.Migrate();
             services.AddSingleton<IOntologyCache>(new OntologyCache(context));
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
