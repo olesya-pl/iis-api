@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Iis.Interfaces.Materials;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Iis.DataModel.Materials
 {
-    public class MaterialSignEntity: BaseEntity
+    public class MaterialSignEntity: BaseEntity, IMaterialSign
     {
         public Guid MaterialSignTypeId { get; set; }
         public string ShortTitle { get; set; }

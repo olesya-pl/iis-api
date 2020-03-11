@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Iis.Interfaces.Materials;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Iis.Domain.Materials
 {
-    public class MaterialSign
+    public class MaterialSign: IMaterialSign
     {
         public Guid Id { get; set; }
         public Guid MaterialSignTypeId { get; set; }

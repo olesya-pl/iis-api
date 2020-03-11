@@ -6,6 +6,7 @@ using IIS.Core.Files;
 using Iis.DataModel;
 using Iis.Domain.Materials;
 using Microsoft.Extensions.DependencyInjection;
+using Iis.DataModel.Materials;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -116,7 +117,7 @@ namespace IIS.Core.Materials.EntityFramework
             await _context.Semaphore.WaitAsync();
             try
             {
-                var mi = new Iis.DataModel.Materials.MaterialInfoEntity
+                var mi = new MaterialInfoEntity
                 {
                     Id = materialInfo.Id, Data = materialInfo.Data?.ToString(), MaterialId = materialId,
                     Source = materialInfo.Source, SourceType = materialInfo.SourceType,
@@ -131,9 +132,23 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        private Iis.DataModel.Materials.MaterialEntity Map(Material material, Guid? parentId = null)
+        public async Task SaveAsync(MaterialEntity material)
         {
-            return new Iis.DataModel.Materials.MaterialEntity
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                _context.Update(material);
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
+        private MaterialEntity Map(Material material, Guid? parentId = null)
+        {
+            return new MaterialEntity
             {
                 Id = material.Id,
                 FileId = material.File?.Id,
@@ -145,9 +160,9 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        private Iis.DataModel.Materials.MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
+        private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
         {
-            return new Iis.DataModel.Materials.MaterialInfoEntity
+            return new MaterialInfoEntity
             {
                 Id = info.Id,
                 MaterialId = materialId,

@@ -26,7 +26,15 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<Data > Data { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Transcriptions { get; set; }
-
+        public string Title { get; set; } = "==title==";
+        public string From { get; set; } = "==from==";
+        public string LoadedBy { get; set; } = "==loadedby==";
+        public string Coordinates { get; set; } = "==coordinates==";
+        public string Code { get; set; } = "==code==";
+        public DateTime ReceivingDate { get; set; } = new DateTime(2013, 5, 20);
+        public IEnumerable<string> Objects { get; set; } = new List<string> { "==object1==", "==object2==" };
+        public IEnumerable<string> Tags { get; set; } = new List<string> { "==tag1==", "==tag2==" };
+        public IEnumerable<string> States { get; set; } = new List<string> { "==state1==", "==state2==" };
         [GraphQLNonNullType]
         public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialProvider materialProvider,
             [GraphQLNonNullType] PaginationInput pagination)
@@ -43,12 +51,4 @@ namespace IIS.Core.GraphQL.Materials
             return f.ToView();
         }
     }
-
-    public class MaterialSign
-    {
-        public Guid Id { get; set; }
-        public string ShortTitle { get; set; }
-        public string Title { get; set; }
-    }
-
 }

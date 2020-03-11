@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Iis.Api.Ontology.Migration;
 using Iis.DataModel;
+using Iis.DataModel.Materials;
+using Iis.Interfaces.Materials;
 
 namespace Iis.Api
 {
@@ -14,6 +16,10 @@ namespace Iis.Api
             CreateMap<RelationTypeEntity, SnatshotRelationType>().ReverseMap();
             CreateMap<NodeTypeEntity, SnapshotNodeType>().ReverseMap();
             CreateMap<AttributeTypeEntity, SnapshotAttributeType>().ReverseMap();
+            CreateMap<IMaterialSignType, MaterialSignTypeEntity>();
+            CreateMap<IMaterialSign, MaterialSignEntity>();
+            CreateMap<IMaterialSign, Iis.Domain.Materials.MaterialSign>();
+            CreateMap<IMaterialSign, IIS.Core.GraphQL.Materials.MaterialSign>();
         }
     }
 }

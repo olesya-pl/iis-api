@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Iis.Domain;
 using Iis.DataModel.Cache;
+using AutoMapper;
+using Iis.DataModel.Materials;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -18,22 +20,24 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly OntologyContext _context;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyCache _cache;
+        private readonly IMapper _mapper;
 
-        public MaterialProvider(OntologyContext context, IOntologyService ontologyService, IOntologyCache cache)
+        public MaterialProvider(OntologyContext context, IOntologyService ontologyService, IOntologyCache cache, IMapper mapper)
         {
             _context = context;
             _ontologyService = ontologyService;
             _cache = cache;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Material>> GetMaterialsAsync(int limit, int offset,
             Guid? parentId = null, IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
-            IEnumerable<Iis.DataModel.Materials.MaterialEntity> materials;
+            IEnumerable<MaterialEntity> materials;
             await _context.Semaphore.WaitAsync();
             try
             {
-                IQueryable<Iis.DataModel.Materials.MaterialEntity> materialsQ;
+                IQueryable<MaterialEntity> materialsQ;
                 if (nodeIds == null)
                 {
                     materialsQ = GetMaterialQuery();
@@ -67,30 +71,33 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        public async Task<Material> GetMaterialAsync(Guid id)
+        public async Task<MaterialEntity> GetMaterialEntityAsync(Guid id)
         {
-            Iis.DataModel.Materials.MaterialEntity material;
             await _context.Semaphore.WaitAsync();
             try
             {
-                material = GetMaterialQuery().SingleOrDefault(m => m.Id == id);
+                return await GetMaterialQuery().SingleOrDefaultAsync(m => m.Id == id);
             }
             finally
             {
                 _context.Semaphore.Release();
             }
-            if (material == null) return null;
+        }
+
+        public async Task<Material> GetMaterialAsync(Guid id)
+        {
+            var material = await GetMaterialEntityAsync(id);
             return await MapAsync(material);
         }
 
-        public IReadOnlyCollection<Iis.DataModel.Materials.MaterialSignEntity> MaterialSigns => _cache.MaterialSigns;
+        public IReadOnlyCollection<MaterialSignEntity> MaterialSigns => _cache.MaterialSigns;
 
-        public Iis.DataModel.Materials.MaterialSignEntity GetMaterialSign(Guid id)
+        public MaterialSignEntity GetMaterialSign(Guid id)
         {
             return _cache.GetMaterialSign(id);
         }
 
-        private IQueryable<Iis.DataModel.Materials.MaterialEntity> GetMaterialQuery()
+        private IQueryable<MaterialEntity> GetMaterialQuery()
         {
             return _context.Materials
                     .Include(m => m.Importance)
@@ -103,8 +110,10 @@ namespace IIS.Core.Materials.EntityFramework
         }
 
         // Todo: think about enumerable.Select(MapAsync) trouble
-        private async Task<Material> MapAsync(Iis.DataModel.Materials.MaterialEntity material)
+        public async Task<Material> MapAsync(MaterialEntity material)
         {
+            if (material == null) return null;
+
             var result = new Material(material.Id,
                 JObject.Parse(material.Metadata),
                 material.Data == null ? null : JArray.Parse(material.Data),
@@ -123,19 +132,12 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        private MaterialSign MapSign(Iis.DataModel.Materials.MaterialSignEntity sign)
+        private MaterialSign MapSign(MaterialSignEntity sign)
         {
-            return sign == null ? null : new MaterialSign
-            {
-                Id = sign.Id,
-                MaterialSignTypeId = sign.MaterialSignTypeId,
-                ShortTitle = sign.ShortTitle,
-                Title = sign.Title,
-                OrderNumber = sign.OrderNumber
-            };
+            return _mapper.Map<MaterialSign>(sign);
         }
 
-        private async Task<MaterialInfo> MapAsync(Iis.DataModel.Materials.MaterialInfoEntity info)
+        private async Task<MaterialInfo> MapAsync(MaterialInfoEntity info)
         {
             var result = new MaterialInfo(info.Id, JObject.Parse(info.Data), info.Source, info.SourceType, info.SourceVersion);
             foreach (var feature in info.MaterialFeatures)
@@ -143,7 +145,7 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        private async Task<MaterialFeature> MapAsync(Iis.DataModel.Materials.MaterialFeatureEntity feature)
+        private async Task<MaterialFeature> MapAsync(MaterialFeatureEntity feature)
         {
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
             result.Node = await _ontologyService.LoadNodesAsync(feature.Id, null);
