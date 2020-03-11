@@ -12,7 +12,7 @@ namespace IIS.Core.Materials
         Task<MaterialEntity> GetMaterialEntityAsync(Guid id);
         Task<IEnumerable<Material>> GetMaterialsAsync(int limit, int offset, Guid? parentId = null,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null);
-        IReadOnlyCollection<Iis.DataModel.Materials.MaterialSignEntity> MaterialSigns { get; }
+        IReadOnlyCollection<MaterialSignEntity> MaterialSigns { get; }
         MaterialSignEntity GetMaterialSign(Guid id);
         Task<Material> MapAsync(MaterialEntity material);
     }

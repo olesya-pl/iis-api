@@ -20,6 +20,9 @@ namespace Iis.Api
             CreateMap<IMaterialSign, MaterialSignEntity>();
             CreateMap<IMaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<IMaterialSign, IIS.Core.GraphQL.Materials.MaterialSign>();
+            CreateMap<MaterialSignEntity, IIS.Core.GraphQL.Materials.MaterialSignFull>()
+                .ForMember(dest => dest.TypeName, opts => opts.MapFrom(src => src.MaterialSignType.Name))
+                .ForMember(dest => dest.TypeTitle, opts => opts.MapFrom(src => src.MaterialSignType.Title));
         }
     }
 }

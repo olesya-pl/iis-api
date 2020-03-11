@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
@@ -31,6 +32,12 @@ namespace IIS.Core.GraphQL.Materials
         {
             var material = await materialProvider.GetMaterialAsync(materialId);
             return material?.ToView();
+        }
+
+        public async Task<IEnumerable<MaterialSignFull>> GetMaterialSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            await Task.Yield();
+            return materialProvider.MaterialSigns.Select(ms => mapper.Map<MaterialSignFull>(ms));
         }
     }
 
