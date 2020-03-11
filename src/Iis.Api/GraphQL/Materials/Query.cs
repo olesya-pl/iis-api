@@ -18,6 +18,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(MaterialWrapperType))]
         public async Task<IEnumerable<Material>> GetMaterials(
             [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
             [GraphQLType(typeof(IdType))] Guid? parentId = null,
             IEnumerable<Guid> nodeIds = null,
@@ -25,13 +26,16 @@ namespace IIS.Core.GraphQL.Materials
         {
             var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
                 pagination.Offset(), parentId, nodeIds, types);
-            return materials.Select(m => m.ToView());
+            return materials.Select(m => mapper.Map<Material>(m));
         }
 
-        public async Task<Material> GetMaterial([Service] IMaterialProvider materialProvider, [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
+        public async Task<Material> GetMaterial(
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
         {
             var material = await materialProvider.GetMaterialAsync(materialId);
-            return material?.ToView();
+            return mapper.Map<Material>(material);
         }
 
         public async Task<IEnumerable<MaterialSignFull>> GetMaterialSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)

@@ -35,14 +35,14 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> Objects { get; set; } = new List<string> { "==object1==", "==object2==" };
         public IEnumerable<string> Tags { get; set; } = new List<string> { "==tag1==", "==tag2==" };
         public IEnumerable<string> States { get; set; } = new List<string> { "==state1==", "==state2==" };
-        [GraphQLNonNullType]
-        public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialProvider materialProvider,
-            [GraphQLNonNullType] PaginationInput pagination)
-        {
-            var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
-                pagination.Offset(), Id);
-            return materials.Select(m => m.ToView()).ToList();
-        }
+        //[GraphQLNonNullType]
+        //public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialProvider materialProvider,
+        //    [GraphQLNonNullType] PaginationInput pagination)
+        //{
+        //    var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
+        //        pagination.Offset(), Id);
+        //    return materials.Select(m => m.ToView()).ToList();
+        //}
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

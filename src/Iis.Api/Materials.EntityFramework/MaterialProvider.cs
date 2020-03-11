@@ -121,6 +121,8 @@ namespace IIS.Core.Materials.EntityFramework
             if (material.FileId.HasValue)
                 result.File = new FileInfo(material.FileId.Value);
 
+            result.LoadData = MapLoadData(material.LoadData);
+
             result.Importance = MapSign(material.Importance);
             result.Reliability = MapSign(material.Reliability);
             result.Relevance = MapSign(material.Relevance);
@@ -135,6 +137,23 @@ namespace IIS.Core.Materials.EntityFramework
         private MaterialSign MapSign(MaterialSignEntity sign)
         {
             return _mapper.Map<MaterialSign>(sign);
+        }
+
+        private MaterialLoadData MapLoadData(string loadData)
+        {
+            if (string.IsNullOrEmpty(loadData)) return null;
+            var result = new MaterialLoadData();
+            var json = JObject.Parse(loadData);
+            if (json.ContainsKey("from")) result.From = (string)json["from"];
+            if (json.ContainsKey("code")) result.Code = (string)json["code"];
+            if (json.ContainsKey("coordinates")) result.Coordinates = (string)json["coordinates"];
+            if (json.ContainsKey("loadedBy")) result.LoadedBy = (string)json["loadedBy"];
+            if (json.ContainsKey("receivingDate")) result.ReceivingDate = (DateTime)json["receivingDate"];
+            if (json.ContainsKey("objects")) result.Objects = json["objects"].Value<JArray>().ToObject<List<string>>();
+            if (json.ContainsKey("tags")) result.Tags = json["tags"].Value<JArray>().ToObject<List<string>>();
+            if (json.ContainsKey("states")) result.States = json["states"].Value<JArray>().ToObject<List<string>>();
+
+            return result;
         }
 
         private async Task<MaterialInfo> MapAsync(MaterialInfoEntity info)

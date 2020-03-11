@@ -27,6 +27,8 @@ namespace Iis.DataModel.Materials
         public MaterialSignEntity Relevance { get; set; }
         public MaterialSignEntity Completeness { get; set; }
         public MaterialSignEntity SourceReliability { get; set; }
+        public string Title { get; set; }
+        public string LoadData { get; set; }
 
         public virtual ICollection<MaterialEntity> Children { get; set; }
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; }

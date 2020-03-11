@@ -20,6 +20,8 @@ namespace Iis.Domain.Materials
         public FileInfo File { get; set; }
         public ICollection<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
         public DateTime CreatedDate { get; }
+        public string Title { get; set; }
+        public MaterialLoadData LoadData { get; set; }
 
         public Material(Guid id, JObject metadata, JArray data, string type, string source)
         {
