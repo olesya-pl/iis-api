@@ -35,13 +35,28 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
         {
             var material = await materialProvider.GetMaterialAsync(materialId);
-            return mapper.Map<Material>(material);
+            var res = mapper.Map<Material>(material);
+            return res;
         }
-
-        public async Task<IEnumerable<MaterialSignFull>> GetMaterialSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        public Task<IEnumerable<MaterialSignFull>> GetImportanceSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
         {
-            await Task.Yield();
-            return materialProvider.MaterialSigns.Select(ms => mapper.Map<MaterialSignFull>(ms));
+            return Task.FromResult(materialProvider.GetMaterialSigns("Importance").Select(ms => mapper.Map<MaterialSignFull>(ms)));
+        }
+        public Task<IEnumerable<MaterialSignFull>> GetReliabilitySigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            return Task.FromResult(materialProvider.GetMaterialSigns("Reliability").Select(ms => mapper.Map<MaterialSignFull>(ms)));
+        }
+        public Task<IEnumerable<MaterialSignFull>> GetRelevanceSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            return Task.FromResult(materialProvider.GetMaterialSigns("Relevance").Select(ms => mapper.Map<MaterialSignFull>(ms)));
+        }
+        public Task<IEnumerable<MaterialSignFull>> GetCompletenessSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            return Task.FromResult(materialProvider.GetMaterialSigns("Completeness").Select(ms => mapper.Map<MaterialSignFull>(ms)));
+        }
+        public Task<IEnumerable<MaterialSignFull>> GetSourceReliabilitySigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            return Task.FromResult(materialProvider.GetMaterialSigns("SourceReliability").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
     }
 

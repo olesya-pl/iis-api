@@ -11,8 +11,7 @@ namespace IIS.Core.Materials
     public interface IMaterialService
     {
         Task SaveAsync(Material material);
-        Task SaveAsync(Material material, Guid? parentId);
-        Task SaveAsync(Material material, Guid? parentId, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes);
+        Task SaveAsync(Material material, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes);
         Task SaveAsync(Guid materialId, MaterialInfo materialInfo);
         Task SaveAsync(MaterialEntity material);
     }

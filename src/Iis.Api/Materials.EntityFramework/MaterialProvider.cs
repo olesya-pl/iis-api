@@ -12,6 +12,7 @@ using Iis.Domain;
 using Iis.DataModel.Cache;
 using AutoMapper;
 using Iis.DataModel.Materials;
+using Iis.Interfaces.Materials;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -90,23 +91,47 @@ namespace IIS.Core.Materials.EntityFramework
             return await MapAsync(material);
         }
 
-        public IReadOnlyCollection<MaterialSignEntity> MaterialSigns => _cache.MaterialSigns;
-
-        public MaterialSignEntity GetMaterialSign(Guid id)
+        public IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName)
         {
-            return _cache.GetMaterialSign(id);
+            return _cache.MaterialSigns
+                .Where(ms => ms.MaterialSignType.Name == typeName)
+                .OrderBy(ms => ms.OrderNumber)
+                .ToList();
+        }
+
+        public MaterialSign GetMaterialSign(Guid id)
+        {
+            var materialSignEntity = _cache.GetMaterialSign(id);
+            return _mapper.Map<MaterialSign>(materialSignEntity);
+        }
+
+        public async Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input)
+        {
+            var material = await GetMaterialAsync(input.Id);
+            if (input.Title != null) material.Title = input.Title;
+            if (input.ImportanceId != null) material.Importance = GetMaterialSign((Guid)input.ImportanceId);
+            if (input.ReliabilityId != null) material.Reliability = GetMaterialSign((Guid)input.ReliabilityId);
+            if (input.RelevanceId != null) material.Relevance = GetMaterialSign((Guid)input.RelevanceId);
+            if (input.CompletenessId != null) material.Completeness = GetMaterialSign((Guid)input.CompletenessId);
+            if (input.SourceReliabilityId != null) material.SourceReliability = GetMaterialSign((Guid)input.SourceReliabilityId);
+            if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
+            if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
+            if (input.States != null) material.LoadData.States = new List<string>(input.States);
+            return _mapper.Map<MaterialEntity>(material);
         }
 
         private IQueryable<MaterialEntity> GetMaterialQuery()
         {
             return _context.Materials
+                    .AsNoTracking()
                     .Include(m => m.Importance)
                     .Include(m => m.Reliability)
                     .Include(m => m.Relevance)
                     .Include(m => m.Completeness)
                     .Include(m => m.SourceReliability)
                     .Include(m => m.MaterialInfos)
-                    .ThenInclude(m => m.MaterialFeatures);
+                    .ThenInclude(m => m.MaterialFeatures)
+                    .AsNoTracking();
         }
 
         // Todo: think about enumerable.Select(MapAsync) trouble
@@ -121,12 +146,14 @@ namespace IIS.Core.Materials.EntityFramework
             if (material.FileId.HasValue)
                 result.File = new FileInfo(material.FileId.Value);
 
+            result.Title = material.Title;
+            result.ParentId = material.ParentId;
             result.LoadData = MapLoadData(material.LoadData);
 
             result.Importance = MapSign(material.Importance);
             result.Reliability = MapSign(material.Reliability);
             result.Relevance = MapSign(material.Relevance);
-            result.Completness = MapSign(material.Completeness);
+            result.Completeness = MapSign(material.Completeness);
             result.SourceReliability = MapSign(material.SourceReliability);
 
             foreach (var info in material.MaterialInfos)

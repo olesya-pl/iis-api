@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Interfaces.Materials;
 using IIS.Core.Files;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Scalars;
@@ -13,11 +14,12 @@ using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 
 namespace IIS.Core.GraphQL.Materials
 {
-    public class Material
+    public class Material: IMaterialLoadData
     {
         [GraphQLType(typeof(NonNullType<IdType>))] public Guid Id { get; set; }
         [GraphQLIgnore] public Guid? FileId { get; set; }
         [GraphQLNonNullType] public Metadata Metadata { get; set; }
+        public DateTime CreatedDate { get; set; }
         public MaterialSign Importance { get; set; }
         public MaterialSign Reliability { get; set; }
         public MaterialSign Relevance { get; set; }
@@ -26,15 +28,16 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<Data > Data { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Transcriptions { get; set; }
-        public string Title { get; set; } = "==title==";
-        public string From { get; set; } = "==from==";
-        public string LoadedBy { get; set; } = "==loadedby==";
-        public string Coordinates { get; set; } = "==coordinates==";
-        public string Code { get; set; } = "==code==";
-        public DateTime ReceivingDate { get; set; } = new DateTime(2013, 5, 20);
-        public IEnumerable<string> Objects { get; set; } = new List<string> { "==object1==", "==object2==" };
-        public IEnumerable<string> Tags { get; set; } = new List<string> { "==tag1==", "==tag2==" };
-        public IEnumerable<string> States { get; set; } = new List<string> { "==state1==", "==state2==" };
+        public string Title { get; set; }
+        public string From { get; set; }
+        public string LoadedBy { get; set; }
+        public string Coordinates { get; set; }
+        public string Code { get; set; }
+        public DateTime ReceivingDate { get; set; }
+        public IEnumerable<string> Objects { get; set; } = new List<string>();
+        public IEnumerable<string> Tags { get; set; } = new List<string>();
+        public IEnumerable<string> States { get; set; } = new List<string>();
+
         //[GraphQLNonNullType]
         //public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialProvider materialProvider,
         //    [GraphQLNonNullType] PaginationInput pagination)

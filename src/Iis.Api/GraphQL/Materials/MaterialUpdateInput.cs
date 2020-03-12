@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Iis.Interfaces.Materials;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace IIS.Core.GraphQL.Materials
 {
-    public class MaterialUpdateInput
+    public class MaterialUpdateInput : IMaterialUpdateInput
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
