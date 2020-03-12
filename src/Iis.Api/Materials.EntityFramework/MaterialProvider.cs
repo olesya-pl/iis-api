@@ -148,7 +148,9 @@ namespace IIS.Core.Materials.EntityFramework
 
             result.Title = material.Title;
             result.ParentId = material.ParentId;
-            result.LoadData = MapLoadData(material.LoadData);
+            result.LoadData = string.IsNullOrEmpty(material.LoadData) ? 
+                new MaterialLoadData() : 
+                MapLoadData(material.LoadData);
 
             result.Importance = MapSign(material.Importance);
             result.Reliability = MapSign(material.Reliability);
@@ -168,7 +170,6 @@ namespace IIS.Core.Materials.EntityFramework
 
         private MaterialLoadData MapLoadData(string loadData)
         {
-            if (string.IsNullOrEmpty(loadData)) return null;
             var result = new MaterialLoadData();
             var json = JObject.Parse(loadData);
             if (json.ContainsKey("from")) result.From = (string)json["from"];

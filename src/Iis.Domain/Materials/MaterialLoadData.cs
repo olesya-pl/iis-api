@@ -12,7 +12,7 @@ namespace Iis.Domain.Materials
         public string LoadedBy { get; set; }
         public string Coordinates { get; set; }
         public string Code { get; set; }
-        public DateTime ReceivingDate { get; set; }
+        public DateTime? ReceivingDate { get; set; }
         public IEnumerable<string> Objects { get; set; } = new List<string>();
         public IEnumerable<string> Tags { get; set; } = new List<string>();
         public IEnumerable<string> States { get; set; } = new List<string>();

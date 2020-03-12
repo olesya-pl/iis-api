@@ -10,7 +10,7 @@ namespace Iis.Interfaces.Materials
         string From { get; }
         string LoadedBy { get; }
         IEnumerable<string> Objects { get; }
-        DateTime ReceivingDate { get; }
+        DateTime? ReceivingDate { get; }
         IEnumerable<string> States { get; }
         IEnumerable<string> Tags { get; }
     }

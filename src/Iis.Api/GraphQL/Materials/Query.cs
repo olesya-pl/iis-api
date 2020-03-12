@@ -26,7 +26,8 @@ namespace IIS.Core.GraphQL.Materials
         {
             var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
                 pagination.Offset(), parentId, nodeIds, types);
-            return materials.Select(m => mapper.Map<Material>(m));
+            var result = materials.Select(m => mapper.Map<Material>(m)).ToList();
+            return result;
         }
 
         public async Task<Material> GetMaterial(
