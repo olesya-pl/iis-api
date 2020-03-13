@@ -71,15 +71,15 @@ namespace Iis.Elastic
             return await PutJsonAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
-        public async Task<List<string>> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public async Task<IIisElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetSearchJson(searchParams);
-            var path = searchParams.BaseIndexNames.Count == 0 ? 
+            var path = searchParams.BaseIndexNames.Count == 0 ?
                 "_search" : 
                 $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
             var response = await GetAsync(path, jsonString, cancellationToken);
-            return GetIdsFromSearchResponse(response);
+            return GetSearchResultFromResponse(response);
         }
 
         public async Task<bool> DeleteAllIndexes(CancellationToken cancellationToken = default)
@@ -108,7 +108,7 @@ namespace Iis.Elastic
                 return new List<string>();
             }
             
-            return GetIdsFromSearchResponse(searchResponse);
+            return GetSearchResultFromResponse(searchResponse).Ids;
         }
 
         public async Task<string> GetByIdAsync(string indexName, string id, string[] fields)
@@ -172,28 +172,34 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        private List<string> GetIdsFromSearchResponse(StringResponse response)
+        private IisElasticSearchResult GetSearchResultFromResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);
             var ids = new List<string>();
 
             var hits = json["hits"]["hits"];
-            if (hits == null) return ids;
-
-            foreach (var hit in hits)
+            if (hits != null)
             {
-                var hitObj = JObject.Parse(hit.ToString());
-                ids.Add(hit["_id"].ToString());
-                
+                foreach (var hit in hits)
+                {
+                    var hitObj = JObject.Parse(hit.ToString());
+                    ids.Add(hit["_id"].ToString());
+
+                }
             }
-
-            return ids;
+            var total = json["hits"]["total"]["value"];
+            return new IisElasticSearchResult
+            {
+                Count = (int)total, 
+                Ids = ids
+            };
         }
-
         private string GetSearchJson(IIisElasticSearchParams searchParams)
         {
             var json = new JObject();
             json["_source"] = new JArray(searchParams.ResultFields);
+            json["from"] = searchParams.From;
+            json["size"] = searchParams.Size;
             json["query"] = new JObject();
             var queryString = new JObject();
 

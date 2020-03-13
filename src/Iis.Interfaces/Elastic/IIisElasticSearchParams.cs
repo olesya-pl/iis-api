@@ -11,5 +11,7 @@ namespace Iis.Interfaces.Elastic
         List<string> ResultFields { get; }
         List<string> SearchFields { get; }
         bool IsLenient { get; }
+        int From { get; }
+        int Size { get; }
     }
 }
