@@ -176,7 +176,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (json.ContainsKey("code")) result.Code = (string)json["code"];
             if (json.ContainsKey("coordinates")) result.Coordinates = (string)json["coordinates"];
             if (json.ContainsKey("loadedBy")) result.LoadedBy = (string)json["loadedBy"];
-            if (json.ContainsKey("receivingDate")) result.ReceivingDate = (DateTime)json["receivingDate"];
+            if (json.ContainsKey("receivingDate")) result.ReceivingDate = (DateTime?)json["receivingDate"];
             if (json.ContainsKey("objects")) result.Objects = json["objects"].Value<JArray>().ToObject<List<string>>();
             if (json.ContainsKey("tags")) result.Tags = json["tags"].Value<JArray>().ToObject<List<string>>();
             if (json.ContainsKey("states")) result.States = json["states"].Value<JArray>().ToObject<List<string>>();
