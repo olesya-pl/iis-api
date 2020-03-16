@@ -21,6 +21,7 @@ build_job:
     - master
     - /^v.+$/
     - /^sprint\..+$/
+    - /^Release_*/
 
 .deploy:
   stage: deploy
@@ -38,6 +39,7 @@ build_job:
   only:
     - /^v.+$/
     - /^sprint\..+$/
+    - /^Release_*/
 
 .deploy_contour_dev:
   extends: .deploy
@@ -55,15 +57,26 @@ build_job:
     name: dev_odysseus
     url: http://od-dev.contour.net
 
-deploy_contour_dev:
+#deploy_contour_dev:
+#  extends: .deploy_contour_dev
+#  only:
+#    - master
+
+deploy_contour_dev_auto:
   extends: .deploy_contour_dev
   only:
-    - master
+    - /^Release_*/
+
+
+#deploy_od_dev:
+#  extends: .deploy_od_dev
+#  only:
+#    - master
 
 deploy_od_dev:
   extends: .deploy_od_dev
   only:
-    - master
+    - /^Release_*/
 
 deploy_contour_dev_manual:
   extends: .deploy_contour_dev
@@ -72,6 +85,7 @@ deploy_contour_dev_manual:
 deploy_od_dev_manual:
   extends: .deploy_od_dev
   when: manual
+
 
 deploy_contour_qa:
   extends: .deploy
