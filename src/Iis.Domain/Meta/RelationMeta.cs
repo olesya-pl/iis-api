@@ -19,6 +19,7 @@ namespace Iis.Domain.Meta
         public EntityOperation[] AcceptsEntityOperations { get; set; } // remake to flags
         public string Type { get; set; }
         public InversedRelationMeta Inversed { get; set; }
+        public string[] TargetTypes { get; set; }
     }
 
     public class AttributeRelationMeta : RelationMetaBase
