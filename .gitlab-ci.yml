@@ -62,30 +62,29 @@ build_job:
 #  only:
 #    - master
 
+deploy_contour_dev_auto:
+  extends: .deploy_contour_dev
+  only:
+    - /^Release_*/
+
+
 #deploy_od_dev:
 #  extends: .deploy_od_dev
 #  only:
 #    - master
 
-#deploy_contour_dev_manual:
-#  extends: .deploy_contour_dev
-#  when: manual
-
-#deploy_od_dev_manual:
-#  extends: .deploy_od_dev
-#  when: manual
-
-
-deploy_contour_qa_auto_tob:
-  extends: .deploy
-  variables:
-    DEPLOYMENT_FILE: qa_con.yml
-  environment:
-    name: qa_contour
-    url: http://qa-app.contour.net
-#  when: manual
+deploy_od_dev:
+  extends: .deploy_od_dev
   only:
-    - /^Release_*/ 
+    - /^Release_*/
+
+deploy_contour_dev_manual:
+  extends: .deploy_contour_dev
+  when: manual
+
+deploy_od_dev_manual:
+  extends: .deploy_od_dev
+  when: manual
 
 
 deploy_contour_qa:
