@@ -36,12 +36,12 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             [GraphQLNonNullType]
             public async Task<string> GetTitle([Parent] Guid fileId, [Service] IFileService fileService)
             {
-                return (await fileService.GetFileAsync(fileId)).Name;
+                return (await fileService.GetFileAsync(fileId))?.Name ?? "File is not found";
             }
 
             public async Task<string> GetType([Parent] Guid fileId, [Service] IFileService fileService)
             {
-                return (await fileService.GetFileAsync(fileId)).ContentType;
+                return (await fileService.GetFileAsync(fileId))?.ContentType ?? "File is not found";
             }
 
             [GraphQLNonNullType]
