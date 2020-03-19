@@ -18,11 +18,18 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsAbstract { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
-        IAttributeType AttributeType { get; set; }
-        IRelationTypeLinked RelationType { get; set; }
+        IAttributeType AttributeType { get; }
+        IRelationTypeLinked RelationType { get; }
         IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom);
         IReadOnlyList<IChildNodeType> GetAllChildren();
         IReadOnlyList<INodeTypeLinked> GetDirectAncestors();
         IReadOnlyList<INodeTypeLinked> GetAllAncestors();
+        IReadOnlyList<INodeTypeLinked> GetDirectDescendants();
+        IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded();
+
+        bool IsIdentical(INodeTypeLinked nodeType);
+        string GetStringCode();
+        Dictionary<string, string> GetPropertiesDict();
+        IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
     }
 }

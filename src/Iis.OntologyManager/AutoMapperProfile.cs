@@ -8,9 +8,7 @@ namespace Iis.OntologyManager
     {
         public AutoMapperProfile()
         {
-            CreateMap<INodeType, SchemaNodeType>();
-            CreateMap<IRelationType, SchemaRelationType>();
-            CreateMap<IAttributeType, SchemaAttributeType>();
+            
         }
     }
 }

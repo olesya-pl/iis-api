@@ -110,6 +110,9 @@ namespace IIS.Core.Tools
                 case "reset-passwords":
                     await tools.ResetPasswordsAsync();
                     break;
+                case "update-ontology":
+                    tools.UpdateOntology();
+                    break;
                 case "help":
                     Help();
                     break;
