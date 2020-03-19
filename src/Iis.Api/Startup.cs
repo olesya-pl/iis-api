@@ -120,7 +120,7 @@ namespace IIS.Core
                 {
                     try
                     {
-                        // _authenticate(context, publiclyAccesible);
+                        _authenticate(context, publiclyAccesible);
                     }
                     catch (Exception e)
                     {
