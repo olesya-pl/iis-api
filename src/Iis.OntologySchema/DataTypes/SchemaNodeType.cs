@@ -207,5 +207,7 @@ namespace Iis.OntologySchema.DataTypes
                 .Where(r => r.NodeType.Name == relationName)
                 .SingleOrDefault();
         }
+
+        public override string ToString() => Name;
     }
 }

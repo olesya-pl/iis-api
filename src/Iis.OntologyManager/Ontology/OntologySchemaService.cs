@@ -1,10 +1,12 @@
 ﻿using Iis.DataModel;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Iis.OntologyManager.Ontology
@@ -30,7 +32,10 @@ namespace Iis.OntologyManager.Ontology
         public IOntologySchema LoadFromDatabase(IOntologySchemaSource schemaSource)
         {
             using var context = OntologyContext.GetContext(schemaSource.Data);
-            var ontologyRawData = new OntologyRawData(context.NodeTypes, context.RelationTypes, context.AttributeTypes);
+            var ontologyRawData = new OntologyRawData(
+                context.NodeTypes.AsNoTracking(), 
+                context.RelationTypes.AsNoTracking(), 
+                context.AttributeTypes.AsNoTracking());
             var ontologySchema = OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
             return ontologySchema;
         }

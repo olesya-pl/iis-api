@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Iis.DataModel;
 using Iis.Interfaces.Ontology.Schema;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.OntologySchema.Saver
@@ -14,6 +16,7 @@ namespace Iis.OntologySchema.Saver
         public OntologySchemaSaver(OntologyContext context)
         {
             _context = context;
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             _mapper = GetMapper();
         }
 
@@ -34,14 +37,17 @@ namespace Iis.OntologySchema.Saver
 
                 if (nodeType.Kind == Kind.Relation)
                 {
-                    if (nodeType.RelationType.TargetType.Kind == Kind.Attribute)
+                    if (nodeType.RelationType.TargetType.Kind == Kind.Attribute)                        
                     {
                         var targetType = nodeType.RelationType.TargetType;
-                        var targetTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)targetType);
-                        _context.NodeTypes.Add(targetTypeEntity);
+                        if (!_context.NodeTypes.Local.Any(nt => nt.Id == targetType.Id))
+                        {
+                            var targetTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)targetType);
+                            _context.NodeTypes.Add(targetTypeEntity);
 
-                        var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.AttributeType);
-                        _context.AttributeTypes.Add(attributeTypeEntity);
+                            var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.AttributeType);
+                            _context.AttributeTypes.Add(attributeTypeEntity);
+                        }
                     }
                     var relationType = _mapper.Map<RelationTypeEntity>((IRelationType)nodeType.RelationType);
                     _context.RelationTypes.Add(relationType);
@@ -61,11 +67,13 @@ namespace Iis.OntologySchema.Saver
 
         private void UpdateNodes(IReadOnlyList<ISchemaCompareDiffItem> itemsToUpdate, ISchemaEntityTypeFinder entityTypeFinder)
         {
+            var updatedAttributesIds = new List<Guid>();
             foreach (var item in itemsToUpdate)
             {
                 var nodeType = _mapper.Map<NodeTypeEntity>((INodeType)item.NodeTypeFrom);
                 nodeType.Id = item.NodeTypeTo.Id;
                 _context.NodeTypes.Update(nodeType);
+                updatedAttributesIds.Add(nodeType.Id);
 
                 if (item.NodeTypeFrom.RelationType == null) continue;
 
@@ -90,11 +98,16 @@ namespace Iis.OntologySchema.Saver
                 {
                     var attributeNodeType = _mapper.Map<NodeTypeEntity>((INodeType)item.NodeTypeFrom.RelationType.TargetType);
                     attributeNodeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
-                    _context.NodeTypes.Update(attributeNodeType);
+                    if (!updatedAttributesIds.Contains(attributeNodeType.Id))
+                    {
+                        _context.NodeTypes.Update(attributeNodeType);
 
-                    var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.AttributeType);
-                    attributeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
-                    _context.AttributeTypes.Update(attributeType);
+                        var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.AttributeType);
+                        attributeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
+                        _context.AttributeTypes.Update(attributeType);
+                        
+                        updatedAttributesIds.Add(attributeNodeType.Id);
+                    }
                 }
             }
         }
