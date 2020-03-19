@@ -6,6 +6,7 @@ using IIS.Core.Files;
 using Iis.DataModel;
 using Iis.Domain.Materials;
 using Microsoft.Extensions.DependencyInjection;
+using Iis.DataModel.Materials;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -33,12 +34,7 @@ namespace IIS.Core.Materials.EntityFramework
             await SaveAsync(material, null);
         }
 
-        public async Task SaveAsync(Material material, Guid? parentId)
-        {
-            await SaveAsync(material, parentId, null);
-        }
-
-        public async Task SaveAsync(Material material, Guid? parentId, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes)
+        public async Task SaveAsync(Material material, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes)
         {
             if (material.File != null) // if material has attached file
             {
@@ -53,13 +49,16 @@ namespace IIS.Core.Materials.EntityFramework
                     throw new ArgumentException($"\"{material.Type}\" material expects audio file to be attached. Got \"{file.ContentType}\"");
             }
 
-            if (parentId.HasValue && _materialProvider.GetMaterialAsync(parentId.Value) == null)
-                throw new ArgumentException($"Material with guid {parentId.Value} does not exist");
+            if (material.ParentId.HasValue && _materialProvider.GetMaterialAsync(material.ParentId.Value) == null)
+                throw new ArgumentException($"Material with guid {material.ParentId.Value} does not exist");
 
-            _context.Add(Map(material, parentId));
+            _context.Add(Map(material));
 
             foreach (var child in material.Children)
-                await SaveAsync(child, material.Id);
+            {
+                child.ParentId = material.Id;
+                await SaveAsync(child);
+            }
 
             foreach (var info in material.Infos)
                 _context.Add(Map(info, material.Id));
@@ -116,7 +115,7 @@ namespace IIS.Core.Materials.EntityFramework
             await _context.Semaphore.WaitAsync();
             try
             {
-                var mi = new Iis.DataModel.Materials.MaterialInfoEntity
+                var mi = new MaterialInfoEntity
                 {
                     Id = materialInfo.Id, Data = materialInfo.Data?.ToString(), MaterialId = materialId,
                     Source = materialInfo.Source, SourceType = materialInfo.SourceType,
@@ -131,13 +130,27 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        private Iis.DataModel.Materials.MaterialEntity Map(Material material, Guid? parentId = null)
+        public async Task SaveAsync(MaterialEntity material)
         {
-            return new Iis.DataModel.Materials.MaterialEntity
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                _context.Update(material);
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
+        private MaterialEntity Map(Material material)
+        {
+            return new MaterialEntity
             {
                 Id = material.Id,
                 FileId = material.File?.Id,
-                ParentId = parentId,
+                ParentId = material.ParentId,
                 Metadata = material.Metadata.ToString(),
                 Data = material.Data?.ToString(),
                 Type = material.Type,
@@ -145,9 +158,9 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        private Iis.DataModel.Materials.MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
+        private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
         {
-            return new Iis.DataModel.Materials.MaterialInfoEntity
+            return new MaterialInfoEntity
             {
                 Id = info.Id,
                 MaterialId = materialId,

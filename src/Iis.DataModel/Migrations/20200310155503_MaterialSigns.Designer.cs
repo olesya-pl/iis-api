@@ -3,15 +3,17 @@ using System;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Iis.DataModel.Migrations
+namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20200310155503_MaterialSigns")]
+    partial class MaterialSigns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,9 +189,6 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid?>("ImportanceSignId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("LoadData")
-                        .HasColumnType("text");
-
                     b.Property<string>("Metadata")
                         .HasColumnType("text");
 
@@ -207,9 +206,6 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<Guid?>("SourceReliabilitySignId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
 
                     b.Property<string>("Type")
                         .HasColumnType("text");

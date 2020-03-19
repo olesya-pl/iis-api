@@ -47,7 +47,7 @@ using Iis.Interfaces.Ontology;
 using IIS.Domain;
 using Iis.Domain;
 using Iis.DbLayer.Ontology.EntityFramework;
-using Iis.OntologyManager.Ontology;
+using Iis.DataModel.Cache;
 
 namespace IIS.Core
 {
@@ -75,9 +75,13 @@ namespace IIS.Core
             services.AddDbContext<OntologyContext>(options => options
                 .UseNpgsql(dbConnectionString)
             // .EnableSensitiveDataLogging()
-            );
+            , ServiceLifetime.Transient);
 
+            
             services.AddHttpContextAccessor();
+            using var context = OntologyContext.GetContext(dbConnectionString);
+            context.Database.Migrate();
+            services.AddSingleton<IOntologyCache>(new OntologyCache(context));
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
@@ -88,7 +92,6 @@ namespace IIS.Core
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<MigrationService>();
-            services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
 
@@ -117,7 +120,7 @@ namespace IIS.Core
                 {
                     try
                     {
-                        // _authenticate(context, publiclyAccesible);
+                        _authenticate(context, publiclyAccesible);
                     }
                     catch (Exception e)
                     {
