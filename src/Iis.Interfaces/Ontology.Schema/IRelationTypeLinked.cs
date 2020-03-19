@@ -9,5 +9,6 @@ namespace Iis.Interfaces.Ontology.Schema
         INodeTypeLinked NodeType { get; }
         INodeTypeLinked SourceType { get; }
         INodeTypeLinked TargetType { get; }
+        bool IsIdentical(IRelationTypeLinked relationType, bool includeTargetType);
     }
 }

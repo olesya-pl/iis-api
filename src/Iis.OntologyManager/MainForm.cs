@@ -1,14 +1,20 @@
 ﻿using Iis.DataModel;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyManager.Ontology;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
+using Iis.OntologySchema;
+using Iis.OntologySchema.ChangeParameters;
 using Iis.OntologySchema.DataTypes;
+using Iis.OntologySchema.Saver;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,14 +24,21 @@ namespace Iis.OntologyManager
 {
     public partial class MainForm : Form
     {
-        OntologyContext _context;
+        #region Properties and Constructors
+
+        IConfiguration _configuration;
         IOntologySchema _schema;
         IOntologyManagerStyle _style;
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
+        OntologySchemaService _schemaService;
+        List<IOntologySchemaSource> _schemaSources;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
+        ISchemaCompareResult _compareResult;
+        UiFilterControl _filterControl;
         Font SelectedFont { get; set; }
         Font TypeHeaderNameFont { get; set; }
+        string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
         INodeTypeLinked SelectedNodeType
         {
             get
@@ -35,25 +48,33 @@ namespace Iis.OntologyManager
                     (INodeTypeLinked)gridTypes.SelectedRows[0].DataBoundItem;
             }
         }
-        public MainForm(OntologyContext context, 
-            IOntologySchema schema, 
+        public MainForm(IConfiguration configuration,
             IOntologyManagerStyle style,
-            UiControlsCreator uiControlsCreator)
+            UiControlsCreator uiControlsCreator,
+            OntologySchemaService schemaService)
         {
             InitializeComponent();
-            _context = context;
-            _schema = schema;
+            _configuration = configuration;
             _style = style;
             _uiControlsCreator = uiControlsCreator;
+            _schemaService = schemaService;
+            _schemaSources = GetSchemaSources();
+            
             SelectedFont = new Font(DefaultFont, FontStyle.Bold);
             TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold);
-            InitSchema();
+            SuspendLayout();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
             SetAdditionalControls();
-            ReloadTypes();
+            CreateComparisonPanel();
+            LoadCurrentSchema();
+            ResumeLayout();
+            ReloadTypes(_filterControl.GetModel());
         }
 
+        #endregion
+
+        #region UI Control Creators
         private void SetBackColor()
         {
             panelTop.BackColor = _style.BackgroundColor;
@@ -110,231 +131,202 @@ namespace Iis.OntologyManager
             rootPanel.ResumeLayout();
         }
         
+        private DataGridView GetRelationsGrid(string name)
+        {
+            var grid = _uiControlsCreator.GetDataGridView(name, null,
+                new List<string> { "Name" });
+            grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            grid.CellFormatting += gridTypes_CellFormatting;
+            grid.DoubleClick += gridInheritance_DoubleClick;
+            return grid;
+        }
+
         private void SetTypeViewControls(Panel rootPanel)
         {
             rootPanel.SuspendLayout();
 
-            var top = _style.MarginVer * 2;
-            lblId = new Label
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Id"
-            };
-            rootPanel.Controls.Add(lblId);
-            top += lblId.Height;
-            txtId = new TextBox
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                ReadOnly = true
-            };
-            rootPanel.Controls.Add(txtId);
-            top += txtId.Height + _style.MarginVer;
-            lblName = new Label
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Name"
-            };
-            rootPanel.Controls.Add(lblName);
-            top += lblName.Height;
-            txtName = new TextBox
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault
-            };
-            rootPanel.Controls.Add(txtName);
+            var container = new UiContainerManager(rootPanel, _style);
 
-            top += txtName.Height + _style.MarginVer;
-            lblTitle = new Label
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Title"
-            };
-            rootPanel.Controls.Add(lblTitle);
-            top += lblTitle.Height;
-            txtTitle = new TextBox
-            {
-                Left = _style.MarginHor,
-                Top = top,
-                Width = _style.ControlWidthDefault
-            };
-            rootPanel.Controls.Add(txtTitle);
-            top += txtTitle.Height + _style.MarginVer * 2;
+            container.Add(txtId = new TextBox { ReadOnly = true }, "Id");
+            container.Add(txtName = new TextBox(), "Name");
+            container.Add(txtTitle = new TextBox(), "Title");
+            container.GoToNewColumn();
+
+            gridInheritedFrom = GetRelationsGrid(nameof(gridInheritedFrom));
+            container.Add(gridInheritedFrom, "Inherited From:", true);
+            container.GoToNewColumn();
+
+            gridInheritedBy = GetRelationsGrid(nameof(gridInheritedBy));
+            container.Add(gridInheritedBy, "Ancestor To:", true);
+            container.GoToNewColumn();
+
+            gridEmbeddence = GetRelationsGrid(nameof(gridEmbeddence));
+            container.Add(gridEmbeddence, "Embedded By:", true);
+            container.GoToNewColumn();
+
+            container.GoToNewColumn();
+            container.Add(txtMeta = new RichTextBox(), "Meta", true);
+
+            container.GoToNewColumn(_style.ButtonWidthDefault);
+            btnTypeSave = new Button { Text = "Save" };
+            btnTypeSave.Click += (sender, e) => { SaveTypeProperties(); };
+            container.Add(btnTypeSave);
+
+            
+            container.GoToBottom();
+            container.StepDown();
+            container.SetFullWidthColumn();
 
             menuChildren = new ContextMenuStrip();
             menuChildren.Items.Add("Show Relation");
-            menuChildren.Items[0].Click += menuChildren_showRelationClick;
+            menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(ChildrenShowRelation); };
+            menuChildren.Items.Add("Change Target Type");
+            menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(ChildrenChangeTargetType); };
 
-            gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", new Point(_style.MarginHor, top), 
+            gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
-            gridChildren.Width = rootPanel.Width - _style.MarginHor * 2;
-            gridChildren.Height = rootPanel.Bottom - top - _style.MarginVer * 2;
             gridChildren.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-                        
             gridChildren.ColumnHeadersVisible = true;
             gridChildren.AutoGenerateColumns = false;
             gridChildren.DoubleClick += gridChildren_DoubleClick;
             gridChildren.CellFormatting += gridChildren_CellFormatting;
             gridChildren.ContextMenuStrip = menuChildren;
-            
-            rootPanel.Controls.Add(gridChildren);
 
-            top = _style.MarginVer;
-            var hor = lblId.Right + _style.MarginHor;
-            lblGridInheritance = new Label
-            {
-                Left = hor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Inherited from"
-            };
-            top += lblGridInheritance.Height;
-            
-            gridInheritance = _uiControlsCreator.GetDataGridView("gridChildren", new Point(hor, top),
-                new List<string> { "Name" });
-            gridInheritance.Width = _style.ControlWidthDefault;
-            gridInheritance.Height = txtTitle.Bottom - gridInheritance.Top;
-            gridInheritance.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridInheritance.CellFormatting += gridTypes_CellFormatting;
-            gridInheritance.DoubleClick += gridInheritance_DoubleClick;
-            rootPanel.Controls.Add(lblGridInheritance);
-            rootPanel.Controls.Add(gridInheritance);
-
-            top = _style.MarginVer;
-            hor = gridInheritance.Right + _style.MarginHor;
-            lblMeta = new Label
-            {
-                Left = hor,
-                Top = top,
-                Width = _style.ControlWidthDefault,
-                Text = "Metadata"
-            };
-            top += lblMeta.Height;
-            txtMeta = new RichTextBox
-            {
-                Location = new Point(hor, top),
-                Width = _style.ControlWidthDefault,
-                Height = txtTitle.Bottom - gridInheritance.Top
-            };
-            rootPanel.Controls.Add(lblMeta);
-            rootPanel.Controls.Add(txtMeta);
-
+            container.Add(gridChildren, null, true);
             rootPanel.ResumeLayout();
         }
 
-        private void SetControlsFilters()
+        public void CreateComparisonPanel()
         {
-            var top = _style.MarginVer;
-            var left = _style.MarginHor;
+            const int ComparisonMargin = 30;
+            const int BtnCloseSize = 20;
+            const int BtnCloseMargin = 5;
+            panelComparison = new Panel { 
+                Name = "panelComparison",
+                Location = new Point(ComparisonMargin, ComparisonMargin),
+                Size = new Size(this.ClientSize.Width - ComparisonMargin * 2, this.ClientSize.Height - ComparisonMargin * 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = _style.ComparisonBackColor,
+                Visible = false
+            };
+            panelComparison.SuspendLayout();
+            var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 100, 10);
+            var container = new UiContainerManager(panels.panelTop, _style);
+
+            var btnComparisonClose = new Button
+            {
+                Location = new Point(panels.panelTop.Width - BtnCloseSize - BtnCloseMargin*2, BtnCloseMargin),
+                Anchor = Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Size = new Size(BtnCloseSize, BtnCloseSize),
+                Text = "X"
+            };
+            btnComparisonClose.Click += (sender, e) => { panelComparison.Visible = false; };
+            panels.panelTop.Controls.Add(btnComparisonClose);
+
+            cmbSchemaSourcesCompare = new ComboBox
+            {
+                Name = "cmbSchemaSourcesCompare",
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = "Title",
+                BackColor = panelTop.BackColor
+            };
+            var src = new List<IOntologySchemaSource>(_schemaSources);
+            cmbSchemaSourcesCompare.DataSource = src;
+            cmbSchemaSourcesCompare.SelectedIndexChanged += (sender, e) => { CompareSchemas(); };
+            container.Add(cmbSchemaSourcesCompare);
+
+            var btnComparisonUpdate = new Button { Text = "Update database" };
+            btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
+            container.Add(btnComparisonUpdate);
+
+            txtComparison = new RichTextBox { Dock = DockStyle.Fill, BackColor = panelComparison.BackColor };
+            panels.panelBottom.Controls.Add(txtComparison);
+
+            panelComparison.ResumeLayout();
+            this.Controls.Add(panelComparison);
+            panelComparison.BringToFront();
+        }
+        private void SetControlsTopPanel()
+        {
             panelTop.SuspendLayout();
-            cbFilterEntities = new CheckBox
-            {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Entities",
-                Checked = true
-            };
-            panelTop.Controls.Add(cbFilterEntities);
-            top += cbFilterEntities.Height + _style.MarginVerSmall;
-            cbFilterEntities.CheckedChanged += FilterChanged;
+            var container = new UiContainerManager(panelTop, _style);
+            _filterControl = new UiFilterControl();
+            _filterControl.Initialize(_style);
+            _filterControl.OnChange += ReloadTypes;
+            container.AddPanel(_filterControl.MainPanel);
 
-            cbFilterAttributes = new CheckBox
+            cmbSchemaSources = new ComboBox
             {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Attributes",
-                Checked = false
+                Name = "cmbSchemaSources",
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = "Title",
+                BackColor = panelTop.BackColor
             };
-            panelTop.Controls.Add(cbFilterAttributes);
-            top += cbFilterAttributes.Height + _style.MarginVerSmall;
-            cbFilterAttributes.CheckedChanged += FilterChanged;
+            cmbSchemaSources.DataSource = _schemaSources;
+            cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
+            container.Add(cmbSchemaSources);
 
-            cbFilterRelations = new CheckBox
-            {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Relations",
-                Checked = false
-            };
-            panelTop.Controls.Add(cbFilterRelations);
-            top += cbFilterAttributes.Height + _style.MarginVerSmall;
-            cbFilterRelations.CheckedChanged += FilterChanged;
-
-            top = _style.MarginVer;
-            left = cbFilterEntities.Right + _style.MarginHor;
-            lblFilterName = new Label
-            {
-                Left = left,
-                Top = top,
-                Width = 100,
-                Text = "Name"
-            };
-            panelTop.Controls.Add(lblFilterName);
-            top += lblFilterName.Height + _style.MarginVerSmall;
-            txtFilterName = new TextBox
-            {
-                Left = left,
-                Top = top,
-                Width = 100
-            };
-            panelTop.Controls.Add(txtFilterName);
-            txtFilterName.TextChanged += FilterChanged;
+            btnSaveSchema = new Button { Text = "Save" };
+            btnSaveSchema.Click += btnSave_Click;
+            btnCompare = new Button { Text = "Compare" };
+            btnCompare.Click += btnCompare_Click;
+            container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
 
             panelTop.ResumeLayout();
-        }
-
-        private void FilterChanged(object sender, EventArgs e)
-        {
-            ReloadTypes();
         }
 
         private void SetAdditionalControls()
         {
             SetControlsTabMain(panelRight);
-            SetControlsFilters();
+            SetControlsTopPanel();
         }
 
-        private void InitSchema()
-        {
-            _schema.Initialize(_context.NodeTypes.ToList(), _context.RelationTypes.ToList(), _context.AttributeTypes.ToList());
-        }
+        #endregion
 
-        private IGetTypesFilter GetFilter()
+        #region UI Control Events
+        private void gridChildren_DoubleClick(object sender, EventArgs e)
         {
-            var kinds = new List<Kind>();
-            if (cbFilterEntities.Checked) kinds.Add(Kind.Entity);
-            if (cbFilterAttributes.Checked) kinds.Add(Kind.Attribute);
-            if (cbFilterRelations.Checked) kinds.Add(Kind.Relation);
-            return new GetTypesFilter
+            gridChildrenEvent(cnt => SetNodeTypeView(cnt.TargetType, true));
+        }
+        private void menuChildren_showRelationClick(object sender, EventArgs e)
+        {
+            gridChildrenEvent(ChildrenShowRelation);
+        }
+        private void gridInheritance_DoubleClick(object sender, EventArgs e)
+        {
+            var grid = (DataGridView)sender;
+            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
+            if (selectedRow == null) return;
+            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
+            SetNodeTypeView(nodeType, true);
+        }
+        private void btnTypeBack_Click(object sender, EventArgs e)
+        {
+            if (_history.Count == 0) return;
+            var nodeType = _history[_history.Count - 1];
+            _history.RemoveAt(_history.Count - 1);
+            SetNodeTypeView(nodeType, false);
+        }
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            var dialog = new SaveFileDialog
             {
-                Kinds = kinds,
-                Name = txtFilterName.Text
+                InitialDirectory = DefaultSchemaStorage,
+                Filter = "Ontology files (*.ont)|*.ont|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
             };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                _schemaService.SaveToFile(_schema, dialog.FileName);
+            }
+            UpdateSchemaSources();
         }
-
-        public void ReloadTypes()
+        private void btnCompare_Click(object sender, EventArgs e)
         {
-            var filter = GetFilter();
-            var ds = _schema.GetTypes(filter)
-                .OrderBy(t => t.Name)
-                .ToList();
-            this.gridTypes.DataSource = ds;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            ReloadTypes();
+            CompareSchemas();
+            panelComparison.Visible = true;
         }
 
         private void gridTypes_SelectionChanged(object sender, EventArgs e)
@@ -342,24 +334,6 @@ namespace Iis.OntologyManager
             if (SelectedNodeType == null) return;
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
-        }
-
-        private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
-        {
-            if (addToHistory && _currentNodeType != null)
-            {
-                _history.Add(_currentNodeType);
-            }
-            lblTypeHeaderName.Text = nodeType.Name;
-            txtId.Text = nodeType.Id.ToString("N");
-            txtName.Text = nodeType.Name;
-            txtTitle.Text = nodeType.Title;
-            var children = nodeType.GetAllChildren();
-            gridChildren.DataSource = children;
-            var ancestors = nodeType.GetAllAncestors();
-            gridInheritance.DataSource = ancestors;
-            txtMeta.Text = nodeType.Meta;
-            _currentNodeType = nodeType;
         }
 
         private Color GetColorByNodeType(Kind kind)
@@ -385,7 +359,7 @@ namespace Iis.OntologyManager
             var color = GetColorByNodeType(nodeType.Kind);
             var row = (DataGridViewRow)grid.Rows[e.RowIndex];
             var style = row.DefaultCellStyle;
-            
+
             style.BackColor = color;
             style.SelectionBackColor = color;
             style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
@@ -416,38 +390,172 @@ namespace Iis.OntologyManager
             action(childNodeType);
         }
 
+        #endregion
+
+        #region Schema Logic
+        private void LoadCurrentSchema()
+        {
+            var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
+                (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
+            if (currentSchemaSource == null) return;
+            _schema = _schemaService.GetOntologySchema(currentSchemaSource);
+            ReloadTypes(_filterControl.GetModel());
+        }
+        private void UpdateSchemaSources()
+        {
+            _schemaSources = GetSchemaSources();
+            _uiControlsCreator.UpdateComboSource(cmbSchemaSources, _schemaSources);
+            var src = new List<IOntologySchemaSource>(_schemaSources);
+            _uiControlsCreator.UpdateComboSource(cmbSchemaSourcesCompare, src);
+        }
+        private List<IOntologySchemaSource> GetSchemaSources()
+        {
+            var result = new List<IOntologySchemaSource>
+            {
+            };
+            var connectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
+            result.AddRange(connectionStrings.Select(section => new OntologySchemaSource
+            {
+                Title = $"(DB): {section.Key}",
+                SourceKind = SchemaSourceKind.Database,
+                Data = section.Value
+            }));
+
+            var filesNames = Directory.GetFiles(DefaultSchemaStorage, "*.ont");
+            result.AddRange(filesNames.Select(fileName => new OntologySchemaSource
+            {
+                Title = $"(FILE): {Path.GetFileNameWithoutExtension(fileName)}",
+                SourceKind = SchemaSourceKind.File,
+                Data = fileName
+            }));
+
+            return result;
+        }
+        #endregion
+
+        #region Compare Logic
+        private void CompareSchemas()
+        {
+            var selectedSource = cmbSchemaSourcesCompare.SelectedItem;
+            if (selectedSource == null) return;
+            var schema = _schemaService.GetOntologySchema((IOntologySchemaSource)selectedSource);
+            _compareResult = _schema.CompareTo(schema);
+            txtComparison.Text = GetCompareText(_compareResult);
+        }
+        private string GetCompareText(string title, IEnumerable<INodeTypeLinked> nodeTypes)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("===============");
+            sb.AppendLine(title);
+            sb.AppendLine("===============");
+            foreach (var nodeType in nodeTypes)
+            {
+                sb.AppendLine(nodeType.GetStringCode());
+            }
+
+            return sb.ToString();
+        }
+        private string GetCompareText(ISchemaCompareResult compareResult)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd));
+            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete));
+            sb.AppendLine("===============");
+            sb.AppendLine("NODES TO UPDATE");
+            sb.AppendLine("===============");
+            foreach (var item in compareResult.ItemsToUpdate)
+            {
+                sb.AppendLine(item.NodeTypeFrom.GetStringCode());
+                var differences = item.NodeTypeFrom.GetDifference(item.NodeTypeTo);
+                foreach (var diff in differences)
+                {
+                    sb.AppendLine($"{diff.PropertyName}:\n{diff.OldValue}\n{diff.NewValue}");
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
+        }
+        private void UpdateComparedDatabase()
+        {
+            if (_compareResult == null) return;
+            if (MessageBox.Show($"Are you sure you want to update database {_compareResult.SchemaSource.Title}?", "Update Database", MessageBoxButtons.YesNo) == DialogResult.No)
+            {
+                return;
+            }
+            using var context = OntologyContext.GetContext(_compareResult.SchemaSource.Data);
+            var schema = _schemaService.GetOntologySchema(_compareResult.SchemaSource);
+            var schemaSaver = new OntologySchemaSaver(context);
+            schemaSaver.SaveToDatabase(_compareResult, schema);
+            CompareSchemas();
+        }
+        #endregion
+
+        #region Node Type Logic
+        private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
+        {
+            if (addToHistory && _currentNodeType != null)
+            {
+                _history.Add(_currentNodeType);
+            }
+            lblTypeHeaderName.Text = nodeType.Name;
+            txtId.Text = nodeType.Id.ToString("N");
+            txtName.Text = nodeType.Name;
+            txtTitle.Text = nodeType.Title;
+            var children = nodeType.GetAllChildren();
+            gridChildren.DataSource = children;
+            var ancestors = nodeType.GetAllAncestors();
+            gridInheritedFrom.DataSource = ancestors;
+            gridInheritedBy.DataSource = nodeType.GetDirectDescendants();
+            gridEmbeddence.DataSource = nodeType.GetNodeTypesThatEmbedded();
+            txtMeta.Text = nodeType.Meta;
+            _currentNodeType = nodeType;
+        }
+        private void SaveTypeProperties()
+        {
+            if (_currentNodeType == null) return;
+            var updateParameter = new NodeTypeUpdateParameter
+            {
+                Id = _currentNodeType.Id,
+                Title = txtTitle.Text,
+                Meta = txtMeta.Text
+            };
+            _schema.UpdateNodeType(updateParameter);
+        }
+        private INodeTypeLinked ChooseEntityTypeFromCombo()
+        {
+            var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
+            var entities = _schema.GetTypes(filter)
+                .OrderBy(t => t.Name)
+                .ToList();
+            return _uiControlsCreator.ChooseFromModalComboBox(entities, "Name");
+        }
+
+        public void ReloadTypes(IGetTypesFilter filter)
+        {
+            if (_schema == null) return;
+            var ds = _schema.GetTypes(filter)
+                .OrderBy(t => t.Name)
+                .ToList();
+            this.gridTypes.DataSource = ds;
+        }
         private void ChildrenShowRelation(IChildNodeType childNodeType)
         {
             var relationType = _schema.GetNodeTypeById(childNodeType.RelationId);
             if (relationType == null) return;
             SetNodeTypeView(relationType, true);
         }
-
-        private void gridChildren_DoubleClick(object sender, EventArgs e)
+        private void ChildrenChangeTargetType(IChildNodeType childNodeType)
         {
-            gridChildrenEvent(cnt => SetNodeTypeView(cnt.TargetType, true));
+            if (childNodeType.TargetType.Kind != Kind.Entity)
+            {
+                MessageBox.Show("Only properties of Entity type can be changed");
+                return;
+            }
+            var newTargetType = ChooseEntityTypeFromCombo();
+            if (newTargetType == null) return;
+            _schema.UpdateTargetType(childNodeType.RelationId, newTargetType.Id);
+            SetNodeTypeView(_currentNodeType, false);
         }
-
-        private void menuChildren_showRelationClick(object sender, EventArgs e)
-        {
-            gridChildrenEvent(ChildrenShowRelation);
-        }
-
-        private void gridInheritance_DoubleClick(object sender, EventArgs e)
-        {
-            var grid = (DataGridView)sender;
-            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            if (selectedRow == null) return;
-            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
-            SetNodeTypeView(nodeType, true);
-        }
-
-        private void btnTypeBack_Click(object sender, EventArgs e)
-        {
-            if (_history.Count == 0) return;
-            var nodeType = _history[_history.Count - 1];
-            _history.RemoveAt(_history.Count - 1);
-            SetNodeTypeView(nodeType, false);
-        }
+        #endregion
     }
 }

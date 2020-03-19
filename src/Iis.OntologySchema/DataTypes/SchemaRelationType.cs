@@ -5,27 +5,45 @@ using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public class SchemaRelationType: IRelationType, IRelationTypeLinked
+    public class SchemaRelationType: SchemaRelationTypeRaw, IRelationType, IRelationTypeLinked
     {
-        public Guid Id { get; set; }
-        public RelationKind Kind { get; set; }
-        public EmbeddingOptions EmbeddingOptions { get; set; }
-        public Guid SourceTypeId { get; set; }
-        public Guid TargetTypeId { get; set; }
-        public INodeTypeLinked NodeType { get; set; }
-        public INodeTypeLinked SourceType { get; set; }
-        public INodeTypeLinked TargetType { get; set; }
+        internal SchemaNodeType _nodeType;
+        internal SchemaNodeType _sourceType;
+        internal SchemaNodeType _targetType;
+        public INodeTypeLinked NodeType => _nodeType;
+        public INodeTypeLinked SourceType => _sourceType;
+        public INodeTypeLinked TargetType => _targetType;
         public override string ToString()
         {
             return $"{SourceType.Name}.{NodeType.Name}";
         }
-        public bool IsEqual(IRelationType relationType)
+        public bool IsIdentical(IRelationTypeLinked relationType, bool includeTargetType)
         {
-            return Id == relationType.Id
-                && Kind == relationType.Kind
+            return Kind == relationType.Kind
                 && EmbeddingOptions == relationType.EmbeddingOptions
-                && SourceTypeId == relationType.SourceTypeId
-                && TargetTypeId == relationType.TargetTypeId;
+                && SourceType.Name == relationType.SourceType.Name
+                && TargetType.Name == relationType.TargetType.Name
+                && (!includeTargetType || TargetType.IsIdentical(relationType.TargetType));
+        }
+
+        internal void SetNodeType(SchemaNodeType nodeType)
+        {
+            _nodeType = nodeType;
+        }
+
+        internal void SetSourceType(SchemaNodeType sourceType)
+        {
+            _sourceType = sourceType;
+        }
+
+        internal void SetTargetType(SchemaNodeType targetType)
+        {
+            _targetType = targetType;
+        }
+
+        internal void SetMeta(string meta)
+        {
+            _nodeType.Meta = meta;
         }
     }
 }

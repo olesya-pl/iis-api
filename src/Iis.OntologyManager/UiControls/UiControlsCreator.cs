@@ -26,7 +26,7 @@ namespace Iis.OntologyManager.UiControls
             grid.ForeColor = Color.Black;
         }
 
-        public DataGridView GetDataGridView(string name, Point location, List<string> dataNames)
+        public DataGridView GetDataGridView(string name, Point? location, List<string> dataNames)
         {
             var grid = new DataGridView
             {
@@ -34,7 +34,6 @@ namespace Iis.OntologyManager.UiControls
                 ColumnHeadersVisible = false,
                 RowHeadersVisible = false,
                 Dock = DockStyle.None,
-                Location = location,
                 Name = name,
                 AllowUserToResizeRows = false,
                 MultiSelect = false,
@@ -43,6 +42,10 @@ namespace Iis.OntologyManager.UiControls
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 BackgroundColor = _style.BackgroundColor
             };
+            if (location != null)
+            {
+                grid.Location = (Point)location;
+            }
             grid.DefaultCellStyle.SelectionBackColor = grid.DefaultCellStyle.BackColor;
             grid.DefaultCellStyle.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
 
@@ -52,6 +55,78 @@ namespace Iis.OntologyManager.UiControls
                 grid.Columns[i].HeaderText = dataNames[i];
             }
             return grid;
+        }
+
+        public (Panel panelTop, Panel panelBottom) GetTopBottomPanels(Panel rootPanel, int topPanelWidth, int margin = 0)
+        {
+            var panelTop = new Panel
+            {
+                Location = new Point(margin, margin),
+                Size = new Size(rootPanel.Width - margin * 2, topPanelWidth),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = rootPanel.BackColor
+            };
+
+            var panelBottom = new Panel
+            {
+                Location = new Point(margin, panelTop.Bottom + margin),
+                Size = new Size(rootPanel.Width - margin * 2, rootPanel.Height - panelTop.Bottom - margin*2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = rootPanel.BackColor
+            };
+            rootPanel.Controls.Add(panelTop);
+            rootPanel.Controls.Add(panelBottom);
+
+            return (panelTop, panelBottom);
+        }
+
+        public void UpdateComboSource(ComboBox comboBox, IEnumerable<object> source)
+        {
+            var selectedText = comboBox.Text;
+            comboBox.DataSource = source;
+            var index = comboBox.FindStringExact(selectedText);
+            if (!string.IsNullOrEmpty(selectedText) && index > -1)
+            {
+                comboBox.SelectedIndex = index;
+            }
+            else
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
+
+        public T ChooseFromModalComboBox<T>(IEnumerable<T> items, string dataPropertyName) where T: class
+        {
+            var form = new Form
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                Width = _style.ControlWidthDefault + _style.MarginHor * 2,
+                StartPosition = FormStartPosition.CenterParent
+            };
+            var rootPanel = new Panel 
+            {
+                Dock = DockStyle.Fill,
+                BackColor = _style.BackgroundColor
+            };
+            form.Controls.Add(rootPanel);
+            var container = new UiContainerManager(rootPanel, _style);
+            var comboBox = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = dataPropertyName,
+                BackColor = rootPanel.BackColor
+            };
+
+            var src = new List<T>(items);
+            comboBox.DataSource = src;
+            container.Add(comboBox);
+            var btnOk = new Button { Text = "Ok", DialogResult = DialogResult.OK };
+            var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel };
+            container.AddInRow(new List<Control> { btnOk, btnCancel });
+            form.Height = container.Bottom;
+            return form.ShowDialog() == DialogResult.OK ? (T)comboBox.SelectedItem : null;
         }
     }
 }

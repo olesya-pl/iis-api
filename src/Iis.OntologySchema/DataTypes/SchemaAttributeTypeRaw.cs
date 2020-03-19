@@ -5,7 +5,9 @@ using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public class SchemaAttributeType: SchemaAttributeTypeRaw, IAttributeType
+    public class SchemaAttributeTypeRaw : IAttributeType
     {
+        public Guid Id { get; set; }
+        public ScalarType ScalarType { get; set; }
     }
 }
