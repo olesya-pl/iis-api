@@ -7,10 +7,10 @@ namespace Iis.DataModel.Materials
     {
         public void Configure(EntityTypeBuilder<MaterialFeatureEntity> builder)
         {
-            builder
-                .HasOne(e => e.Node)
-                .WithMany(e => e.MaterialFeatures)
-                .HasForeignKey(e => e.NodeId);
+            //builder
+            //    .HasOne(e => e.Node)
+            //    .WithMany()
+            //    .HasForeignKey(e => e.NodeId);
         }
     }
 }

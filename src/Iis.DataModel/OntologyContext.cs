@@ -1,5 +1,4 @@
 using System.Threading;
-using System.Threading.Tasks;
 using Iis.DataModel.Analytics;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
@@ -23,8 +22,6 @@ namespace Iis.DataModel
         public DbSet<MaterialEntity> Materials { get; set; }
         public DbSet<MaterialInfoEntity> MaterialInfos { get; set; }
         public DbSet<MaterialFeatureEntity> MaterialFeatures { get; set; }
-        public DbSet<MaterialSignTypeEntity> MaterialSignTypes { get; set; }
-        public DbSet<MaterialSignEntity> MaterialSigns { get; set; }
 
         public DbSet<ReportEntity> Reports { get; set; }
         public DbSet<ReportEventEntity> ReportEvents { get; set; }
@@ -56,8 +53,6 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new MaterialConfiguration());
             modelBuilder.ApplyConfiguration(new MaterialInfoConfiguration());
             modelBuilder.ApplyConfiguration(new MaterialFeatureConfiguration());
-            modelBuilder.ApplyConfiguration(new MaterialSignTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new MaterialSignConfiguration());
 
             modelBuilder.ApplyConfiguration(new ReportEventConfiguration());
 

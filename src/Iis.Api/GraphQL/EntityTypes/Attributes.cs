@@ -158,13 +158,6 @@ namespace IIS.Core.GraphQL.EntityTypes
                 types = new[] {Source.EntityType};
             else
                 types = types.Union(new[] {Source.EntityType});
-
-            var metaTargetTypes = (Source.Meta as EntityRelationMeta)?.TargetTypes;
-            if (metaTargetTypes != null && metaTargetTypes.Length > 0)
-            {
-                types = types.Where(t => metaTargetTypes.Contains(t.Name));
-            }
-
             if (concreteTypes == true)
                 types = types.Where(t => !t.IsAbstract);
             return types.Select(t => new EntityType(t, _ontology));

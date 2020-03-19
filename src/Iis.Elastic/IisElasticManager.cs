@@ -16,7 +16,6 @@ namespace Iis.Elastic
     public class IisElasticManager: IElasticManager
     {
         private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
-        private const string RemoveSymbolsPattern = "№";
         ElasticLowLevelClient _lowLevelClient;
         IisElasticConfiguration _configuration;
         IisElasticSerializer _serializer;
@@ -204,7 +203,7 @@ namespace Iis.Elastic
             json["query"] = new JObject();
             var queryString = new JObject();
 
-            queryString["query"] = EscapeElasticSpecificSymbols(RemoveSymbols(searchParams.Query, RemoveSymbolsPattern), EscapeSymbolsPattern);
+            queryString["query"] = EscapeElasticSpecificSymbols(searchParams.Query, EscapeSymbolsPattern);
             queryString["fields"] = new JArray(searchParams.SearchFields);
             queryString["lenient"] = searchParams.IsLenient;
 
@@ -244,22 +243,6 @@ namespace Iis.Elastic
             return builder.ToString();
         }
 
-        private string RemoveSymbols(string input, string removeSymbols)
-        {
-            if(string.IsNullOrWhiteSpace(input)) return input;
-
-            if(string.IsNullOrWhiteSpace(removeSymbols)) throw new ArgumentNullException(nameof(removeSymbols));
-
-            var builder = new StringBuilder();
-
-            foreach (var ch in input)
-            {
-                if(removeSymbols.Contains(ch)) continue;
-
-                builder.Append(ch);
-            }
-            return builder.ToString();
-        }
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
         {
             PostData postData = data;
