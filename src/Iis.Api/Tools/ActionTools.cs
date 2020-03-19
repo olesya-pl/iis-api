@@ -252,6 +252,19 @@ namespace IIS.Core.Tools
             var compareResult = schemaFrom.CompareTo(schemaTo);
             var schemaSaver = new OntologySchemaSaver(OntologyContext.GetContext(connectionString));
             schemaSaver.SaveToDatabase(compareResult, schemaTo);
+            var ontologyMigration = new OntologyMigrationsEntity
+            {
+                Id = Guid.NewGuid(),
+                OrderNumber = 2,
+                StartTime = DateTime.Now
+            };
+            ontologyMigration.StructureBefore = JsonConvert.SerializeObject(schemaTo.GetRawData(), Formatting.Indented);
+            ontologyMigration.StructureAfter = JsonConvert.SerializeObject(schemaTo.GetRawData(), Formatting.Indented);
+            ontologyMigration.MigrationRules = string.Empty;
+            ontologyMigration.Log = string.Empty;
+            ontologyMigration.IsSuccess = true;
+            _ontologyContext.OntologyMigrations.Add(ontologyMigration);
+            _ontologyContext.SaveChanges();
         }
 
         private async Task _dumpOntology(string name)
