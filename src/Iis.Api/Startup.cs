@@ -47,6 +47,7 @@ using Iis.Interfaces.Ontology;
 using IIS.Domain;
 using Iis.Domain;
 using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.OntologyManager.Ontology;
 
 namespace IIS.Core
 {
@@ -87,6 +88,7 @@ namespace IIS.Core
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<MigrationService>();
+            services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
 

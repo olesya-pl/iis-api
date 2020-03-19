@@ -18,6 +18,10 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using IIS.Domain;
 using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.OntologyManager.Ontology;
+using Iis.Interfaces.Ontology.Schema;
+using System.Configuration;
+using Iis.OntologySchema.Saver;
 
 namespace IIS.Core.Tools
 {
@@ -31,6 +35,7 @@ namespace IIS.Core.Tools
         private readonly OntologyContext _ontologyContext;
         private readonly RunTimeSettings _runtimeSettings;
         private readonly MigrationService _migrationService;
+        OntologySchemaService _ontologySchemaService;
 
         public ActionTools(
             ILogger<ActionTools> logger,
@@ -40,7 +45,8 @@ namespace IIS.Core.Tools
             Seeder seeder,
             OntologyContext ontologyContext,
             RunTimeSettings runTimeSettings,
-            MigrationService migrationService)
+            MigrationService migrationService,
+            OntologySchemaService ontologySchemaService)
         {
             _logger = logger;
             _configuration = configuration;
@@ -50,6 +56,7 @@ namespace IIS.Core.Tools
             _ontologyContext = ontologyContext;
             _runtimeSettings = runTimeSettings;
             _migrationService = migrationService;
+            _ontologySchemaService = ontologySchemaService;
         }
 
         public async Task ClearTypesAsync()
@@ -234,6 +241,17 @@ namespace IIS.Core.Tools
             await _seeder.SeedAsync(Path.Combine("contour", "entities"), rules.AllowedEntities);
             _logger.LogInformation("Migration is Success!!!");
             _runtimeSettings.PutSavedToElastic = true;
+        }
+
+        public void UpdateOntology()
+        {
+            var schemaFileName = Path.Combine(Environment.CurrentDirectory, "data", "contour", "migrations", "002", "migration-002.ont");
+            var schemaFrom = _ontologySchemaService.GetOntologySchema(new OntologySchemaSource { SourceKind = SchemaSourceKind.File, Data = schemaFileName });
+            var connectionString = _configuration.GetConnectionString("db", "DB_");
+            var schemaTo = _ontologySchemaService.GetOntologySchema(new OntologySchemaSource { SourceKind = SchemaSourceKind.Database, Data = connectionString });
+            var compareResult = schemaFrom.CompareTo(schemaTo);
+            var schemaSaver = new OntologySchemaSaver(OntologyContext.GetContext(connectionString));
+            schemaSaver.SaveToDatabase(compareResult, schemaTo);
         }
 
         private async Task _dumpOntology(string name)
