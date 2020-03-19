@@ -75,7 +75,7 @@ namespace IIS.Core
             services.AddDbContext<OntologyContext>(options => options
                 .UseNpgsql(dbConnectionString)
             // .EnableSensitiveDataLogging()
-            );
+            , ServiceLifetime.Transient);
 
             
             services.AddHttpContextAccessor();
