@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Iis.DataModel;
+using IIS.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -19,15 +21,17 @@ namespace Iis.Api.Ontology.Migration
         private OntologySnapshot _snapshotOld;
         private OntologySnapshot _snapshotNew;
         private ILogger<MigrationService> _logger;
+        private IConfiguration _configuration;
         private MigrationValueDivider _devider;
         private Dictionary<Guid, NodeEntity> _migratedNodes = new Dictionary<Guid, NodeEntity>();
         private List<RelationEntity> _migratedRelations = new List<RelationEntity>();
         private MigrationRules _rules;
-        public MigrationService(OntologyContext context, IMapper mapper, ILogger<MigrationService> logger)
+        public MigrationService(OntologyContext context, IMapper mapper, ILogger<MigrationService> logger, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _logger = logger;
+            _configuration = configuration;
             _devider = new MigrationValueDivider();
         }
 
@@ -279,10 +283,11 @@ namespace Iis.Api.Ontology.Migration
 
         private void SaveMigratedToDb()
         {
-            _context.Nodes.AddRange(_migratedNodes.Values);
-            _context.SaveChanges();
-            _context.Relations.AddRange(_migratedRelations);
-            _context.SaveChanges();
+            using var context = OntologyContext.GetContext(_configuration.GetConnectionString("db", "DB_"));
+            context.Nodes.AddRange(_migratedNodes.Values);
+            context.SaveChanges();
+            context.Relations.AddRange(_migratedRelations);
+            context.SaveChanges();
         }
 
         private void Save(object obj, string name)
