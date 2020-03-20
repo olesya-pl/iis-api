@@ -50,4 +50,9 @@
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="data\contour\migrations\002\migration-002.ont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
