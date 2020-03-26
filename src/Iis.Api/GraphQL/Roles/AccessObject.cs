@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Iis.Api.GraphQL.Roles
+namespace IIS.Core.GraphQL.Roles
 {
     public class AccessEntity
     {
