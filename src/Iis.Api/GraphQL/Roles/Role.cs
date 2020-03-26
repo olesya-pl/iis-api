@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Iis.Api.GraphQL.Roles
+namespace IIS.Core.GraphQL.Roles
 {
     public class Role
     {
@@ -14,6 +14,7 @@ namespace Iis.Api.GraphQL.Roles
 
         [GraphQLNonNullType]
         public string Name { get; set; }
+        public string Description { get; set; }
 
         [GraphQLNonNullType]
         public bool IsAdmin { get; set; }

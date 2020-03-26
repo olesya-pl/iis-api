@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.Roles
+namespace Iis.DataModel.Roles
 {
     public class AccessOperations : IAccessOperations
     {

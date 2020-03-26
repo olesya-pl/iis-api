@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Roles;
+﻿using Iis.DataModel.Roles;
+using Iis.Interfaces.Roles;
 using System;
 using System.Collections.Generic;
 using System.Text;
