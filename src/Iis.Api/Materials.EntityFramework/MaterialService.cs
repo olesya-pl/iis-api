@@ -1,12 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+
 using IIS.Core.Files;
-using Iis.DataModel;
 using Iis.Domain.Materials;
-using Microsoft.Extensions.DependencyInjection;
+using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -14,15 +15,17 @@ namespace IIS.Core.Materials.EntityFramework
     {
         private readonly OntologyContext _context;
         private readonly IFileService _fileService;
+        private readonly IElasticService _elasticService;
         private readonly IMaterialEventProducer _eventProducer;
         private readonly IMaterialProvider _materialProvider;
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
 
-        public MaterialService(OntologyContext context, IFileService fileService, IMaterialEventProducer eventProducer,
+        public MaterialService(OntologyContext context, IFileService fileService, IElasticService elasticService, IMaterialEventProducer eventProducer,
             IMaterialProvider materialProvider, IEnumerable<IMaterialProcessor> materialProcessors)
         {
             _context = context;
             _fileService = fileService;
+            _elasticService = elasticService;
             _eventProducer = eventProducer;
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
@@ -52,7 +55,9 @@ namespace IIS.Core.Materials.EntityFramework
             if (material.ParentId.HasValue && _materialProvider.GetMaterialAsync(material.ParentId.Value) == null)
                 throw new ArgumentException($"Material with guid {material.ParentId.Value} does not exist");
 
-            _context.Add(Map(material));
+            var materialEntity = Map(material);
+
+            _context.Add(materialEntity);
 
             foreach (var child in material.Children)
             {
@@ -64,6 +69,8 @@ namespace IIS.Core.Materials.EntityFramework
                 _context.Add(Map(info, material.Id));
 
             await _context.SaveChangesAsync();
+
+            await _elasticService.PutMaterialAsync(materialEntity);
 
             // todo: put message to rabbit instead of calling another service directly
 
@@ -121,7 +128,9 @@ namespace IIS.Core.Materials.EntityFramework
                     Source = materialInfo.Source, SourceType = materialInfo.SourceType,
                     SourceVersion = materialInfo.SourceVersion
                 };
+                
                 _context.Add(mi);
+                
                 await _context.SaveChangesAsync();
             }
             finally
@@ -136,7 +145,10 @@ namespace IIS.Core.Materials.EntityFramework
             try
             {
                 _context.Update(material);
+                
                 await _context.SaveChangesAsync();
+
+                await _elasticService.PutMaterialAsync(material);
             }
             finally
             {

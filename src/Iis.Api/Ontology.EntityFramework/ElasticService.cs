@@ -1,16 +1,19 @@
-﻿using Iis.Api;
-using Iis.Domain;
-using Iis.Domain.Elastic;
-using Iis.Domain.ExtendedData;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using Iis.Api;
+using Iis.Domain;
+using Iis.Domain.Elastic;
+using Iis.DataModel;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Materials;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -21,13 +24,33 @@ namespace IIS.Core.Ontology.EntityFramework
         private RunTimeSettings _runTimeSettings;
         private readonly OntologyContext _context;
 
+        public IEnumerable<string> MaterialIndexes => new[] { "Materials" };
+
+        public IEnumerable<string> OntologyIndexes { get; }
+
         public ElasticService(IElasticManager elasticManager, IExtNodeService extNodeService, RunTimeSettings runTimeSettings, OntologyContext context)
         {
             _elasticManager = elasticManager;
             _extNodeService = extNodeService;
             _runTimeSettings = runTimeSettings;
             _context = context;
+
+            OntologyIndexes = new List<string> {
+                "Organization",
+                "Person",
+                "ObjectOfStudy",
+                "Radionetwork",
+                "MilitaryMachinery",
+                "Unknown",
+                "MilitaryBase",
+                "Infrastructure",
+                "Subdivision",
+                "SecondarySpecialEducationalInstitution",
+                "HigherEducationalInstitution",
+                "EducationalInstitution"
+            };
         }
+
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             var searchParams = new IisElasticSearchParams
@@ -38,7 +61,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = filter.Limit
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
-            return (searchResult.Ids.Select(id => new Guid(id)).ToList(), searchResult.Count);
+            return (searchResult.Identifiers.Select(id => new Guid(id)).ToList(), searchResult.Count);
         }
 
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
@@ -48,18 +71,64 @@ namespace IIS.Core.Ontology.EntityFramework
             return await _elasticManager.PutExtNodeAsync(extNode, cancellationToken);
         }
 
-        public bool TypesAreSupported(IEnumerable<string> typeNames)
+        public async Task<bool> PutMaterialAsync(IMaterialEntity material, CancellationToken cancellation = default)
         {
-            return _elasticManager.IndexesAreSupported(typeNames);
+            if (!_runTimeSettings.PutSavedToElastic) return false;
+
+            var jDocument = new JObject(
+                new JProperty(nameof(material.Source).ToLower(), material.Source),
+                new JProperty(nameof(material.Type).ToLower(), material.Type)
+            );
+
+            if (!string.IsNullOrWhiteSpace(material.Title))
+            {
+                jDocument.Add(nameof(material.Title), material.Title);
+            }
+
+            if (!string.IsNullOrWhiteSpace(material.Data))
+            {
+                JArray
+                .Parse(material.Data)
+                .Select(token => new JProperty(token.Value<string>("Type"), token.Value<string>("Text")))
+                .Select(property =>
+                {
+                    jDocument.Add(property);
+                    return property;
+                })
+                .ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(material.LoadData))
+            {
+                jDocument.Merge(JObject.Parse(material.LoadData));
+            }
+
+            
+            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), material.Id.ToString("N"), jDocument.ToString(Formatting.None));
         }
 
-        public async Task UpdateElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
+        public bool TypesAreSupported(IEnumerable<string> typeNames)
+        {
+            return OntologyIndexesAreSupported(typeNames);
+        }
+
+        private bool OntologyIndexIsSupported(string indexName)
+        {
+            return OntologyIndexes.Any(index => index.Equals(indexName));
+        }
+        
+        private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
+        {
+            return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
+        }
+        
+        private async Task UpdateElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
         {
             ElasticCompareResult compareResult = await CompareWithElasticAsync(nodeTypeId, indexName, cancellationToken);
 
             foreach (Guid id in compareResult.NeedToDelete)
             {
-                await _elasticManager.DeleteAsync(indexName, id.ToString("N"));
+                await _elasticManager.DeleteDocumentAsync(indexName, id.ToString("N"));
             }
 
             foreach (Guid id in compareResult.NeedToUpdate)
@@ -68,9 +137,9 @@ namespace IIS.Core.Ontology.EntityFramework
             }
         }
 
-        public async Task<ElasticCompareResult> CompareWithElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
+        private async Task<ElasticCompareResult> CompareWithElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
         {
-            List<string> list = await _elasticManager.GetIndexIdsAsync(indexName);
+            IEnumerable<string> list = await _elasticManager.GetDocumentIdListFromIndexAsync(indexName);
             var elasticIds = list.Select(x => Guid.ParseExact(x, "N"));
 
             var query =
@@ -89,9 +158,9 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
-        public Task<string> GetNodeByIdAsync(string indexName, string id, IEnumerable<NodeType> nodeTypes)
+        private Task<string> GetNodeByIdAsync(string indexName, string id, IEnumerable<NodeType> nodeTypes)
         {
-            return _elasticManager.GetByIdAsync(indexName, id, nodeTypes.Select(nt => nt.Name).ToArray());
+            return _elasticManager.GetDocumentByIdAsync(indexName, id, nodeTypes.Select(nt => nt.Name).ToArray());
         }
     }
 }

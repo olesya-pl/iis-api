@@ -73,10 +73,9 @@ namespace IIS.Core
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
-            services.AddDbContext<OntologyContext>(options => options
-                .UseNpgsql(dbConnectionString)
-            // .EnableSensitiveDataLogging()
-               , ServiceLifetime.Transient);
+            services.AddDbContext<OntologyContext>(
+                options => options.UseNpgsql(dbConnectionString),
+                ServiceLifetime.Transient);
 
             
             services.AddHttpContextAccessor();
@@ -175,7 +174,7 @@ namespace IIS.Core
             services.AddTransient<IConnectionFactory>(s => factory);
 
             string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}";
-            IisElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<IisElasticConfiguration>();
+            ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
 
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
@@ -186,8 +185,8 @@ namespace IIS.Core
             services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
 
-            services.AddSingleton<IElasticManager, IisElasticManager>();
-            services.AddSingleton<IisElasticSerializer>();
+            services.AddSingleton<IElasticManager, ElasticManager>();
+            services.AddSingleton<ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);
 
             services.AddHostedService<MaterialEventConsumer>();

@@ -83,7 +83,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return result;
         }
 
-        public async Task<List<IExtNode>> GetExtNodesByTypeIdsAsync(List<string> typeNames, CancellationToken cancellationToken = default)
+        public async Task<List<IExtNode>> GetExtNodesByTypeIdsAsync(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
         {
             var typeIds = await _context.NodeTypes.Where(nt => typeNames.Contains(nt.Name)).Select(nt => nt.Id).ToListAsync();
 
@@ -97,11 +97,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             foreach (var node in nodes)
             {
                 Console.WriteLine($"{++cnt}/{total}: {node.Id};{node.NodeType.Name}");
-                if (true) //(node.Id == new Guid("a6b3bf85fd7949ac8db8995e472c0f79"))
-                {
-                    var extNode = await GetExtNodeByIdAsync(node.Id, cancellationToken);
-                    result.Add(extNode);
-                }
+                var extNode = await GetExtNodeByIdAsync(node.Id, cancellationToken);
+                result.Add(extNode);
             }
 
             return result;

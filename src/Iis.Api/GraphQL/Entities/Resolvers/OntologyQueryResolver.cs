@@ -47,7 +47,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node as Entity; // return null if node was not entity
         }
 
-        public async Task<Tuple<IEnumerable<EntityType>, NodeFilter>> ResolveEntityList(IResolverContext ctx, EntityType type)
+        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter>> ResolveEntityList(IResolverContext ctx, EntityType type)
         {
             var nf = ctx.CreateNodeFilter(type);
             return Tuple.Create((IEnumerable<EntityType>) new[] {type}, nf);
@@ -148,7 +148,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ------ All entities ----- //
 
-        public async Task<Tuple<IEnumerable<EntityType>, NodeFilter>> GetAllEntities(IResolverContext ctx)
+        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
             var ontologyService = ctx.Service<IOntologyService>();

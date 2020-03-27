@@ -1,23 +1,21 @@
-﻿using Iis.Interfaces.Ontology;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+
+using Iis.Interfaces.Ontology;
 
 namespace Iis.Interfaces.Elastic
 {
     public interface IElasticManager
     {
         Task<bool> PutExtNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default);
-        Task<IIisElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
-        Task<bool> DeleteAllIndexes(CancellationToken cancellationToken = default);
-        List<string> SupportedIndexes { get; }
-        bool IndexIsSupported(string indexName);
-        bool IndexesAreSupported(IEnumerable<string> indexNames);
-        Task<List<string>> GetIndexIdsAsync(string indexName);
-        Task<string> GetByIdAsync(string indexName, string id, string[] fields);
-        Task<bool> DeleteAsync(string indexName, string id);
-        Task CreateSupportedIndexesAsync(CancellationToken token);
+        Task<bool> PutDocumentAsync(string indexName, string id, string jsonDocument, CancellationToken cancellationToken = default);
+        Task<bool> DeleteDocumentAsync(string indexName, string documentId);
+        Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<IEnumerable<string>> GetDocumentIdListFromIndexAsync(string indexName);
+        Task<string> GetDocumentByIdAsync(string indexName, string id, string[] fields);
+        Task CreateIndexesAsync(IEnumerable<string> indexNames, CancellationToken token);
+        Task<bool> DeleteIndexAsync(string indexName, CancellationToken cancellationToken = default);
+        Task<bool> DeleteIndexesAsync(IEnumerable<string> indexNames, CancellationToken cancellationToken = default);
     }
 }
