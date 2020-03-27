@@ -26,17 +26,17 @@ namespace IIS.Core.GraphQL.Roles
                     {
                         Kind = AccessKind.Material.ToString(),
                         Title = "Матеріали",
-                        AllowedOperations = new List<string>{"Update", "Read" }
+                        AllowedOperations = new List<string>{"update", "read" }
                     },
                     new AccessEntity
                     {
                         Kind = AccessKind.Dor.ToString(),
                         Title = "Об'єкти розвідки",
-                        AllowedOperations = new List<string>{"Read" }
+                        AllowedOperations = new List<string>{"read" }
                     },
                     new AccessEntity
                     {
-                        Kind = AccessKind.Dor.ToString(),
+                        Kind = AccessKind.Event.ToString(),
                         Title = "Події",
                         AllowedOperations = new List<string>()
                     }
@@ -80,7 +80,61 @@ namespace IIS.Core.GraphQL.Roles
                 Id = "99a1ac90-523d-4b95-bf61-0b04e1e35ba1",
                 Name = "Администратор",
                 Description = "Может все",
-                IsAdmin = true
+                IsAdmin = true,
+                Entities = new List<AccessEntity>
+                {
+                    new AccessEntity
+                    {
+                        Kind = AccessKind.Material.ToString(),
+                        Title = "Матеріали",
+                        AllowedOperations = new List<string>()
+                    },
+                    new AccessEntity
+                    {
+                        Kind = AccessKind.Dor.ToString(),
+                        Title = "Об'єкти розвідки",
+                        AllowedOperations = new List<string>()
+                    },
+                    new AccessEntity
+                    {
+                        Kind = AccessKind.Event.ToString(),
+                        Title = "Події",
+                        AllowedOperations = new List<string>()
+                    }
+                },
+                Tabs = new List<AccessTab>
+                {
+                    new AccessTab
+                    {
+                        Kind = AccessKind.MapTab.ToString(),
+                        Title = "Мапа",
+                        Visible = false
+                    },
+                    new AccessTab
+                    {
+                        Kind = AccessKind.AdminTab.ToString(),
+                        Title = "Адміністрування",
+                        Visible = false
+                    },
+                    new AccessTab
+                    {
+                        Kind = AccessKind.EventsTab.ToString(),
+                        Title = "Події",
+                        Visible = true
+                    },
+                    new AccessTab
+                    {
+                        Kind = AccessKind.DorTab.ToString(),
+                        Title = "Об'єкти розвідки",
+                        Visible = true
+                    },
+                    new AccessTab
+                    {
+                        Kind = AccessKind.MaterialsTab.ToString(),
+                        Title = "Вхідний поток",
+                        Visible = true
+                    }
+                }
             },
         };
         public Task<GraphQLCollection<Role>> GetRoles([Service] OntologyContext context)

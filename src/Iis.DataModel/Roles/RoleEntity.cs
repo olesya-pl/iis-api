@@ -10,5 +10,8 @@ namespace Iis.DataModel.Roles
         public string Description { get; set; }
         public bool IsAdmin { get; set; } = false;
         public bool IsArchived { get; set; } = false;
+        
+        public List<RoleAccessEntity> RoleAccessEntities;
+        public List<UserRoleEntity> Users { get; set; }
     }
 }
