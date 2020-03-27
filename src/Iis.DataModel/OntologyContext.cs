@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Iis.DataModel.Analytics;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
+using Iis.DataModel.Roles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DataModel
@@ -37,6 +38,11 @@ namespace Iis.DataModel
 
         public DbSet<OntologyMigrationsEntity> OntologyMigrations { get; set; }
 
+        public DbSet<RoleEntity> Roles { get; set; }
+        public DbSet<RoleAccessEntity> RoleAccess { get; set; }
+        public DbSet<AccessObjectEntity> AccessObjects { get; set; }
+        public DbSet<UserRoleEntity> UserRoles { get; set; }
+
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
         {
@@ -67,6 +73,9 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new AnalyticQueryIndicatorConfiguration());
             modelBuilder.ApplyConfiguration(new AnalyticIndicatorConfiguration());
             modelBuilder.ApplyConfiguration(new OntologyMigrationsConfiguration());
+
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

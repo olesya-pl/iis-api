@@ -10,6 +10,6 @@ namespace Iis.DataModel
         public string Name { get; set; }
         public string PasswordHash { get; set; }
         public bool IsBlocked { get; set; }
-        public List<UserRoleEntity> Roles { get; set; }
+        public List<UserRoleEntity> UserRoles { get; set; }
     }
 }
