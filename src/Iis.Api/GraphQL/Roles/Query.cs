@@ -26,14 +26,53 @@ namespace IIS.Core.GraphQL.Roles
                         new AccessEntity
                         {
                             Kind = AccessKind.Material.ToString(),
-                            Title = "Материалы",
+                            Title = "Матеріали",
                             AllowedOperations = new List<string>{"Update", "Read" }
                         },
                         new AccessEntity
                         {
                             Kind = AccessKind.Dor.ToString(),
-                            Title = "Объекты разведки",
+                            Title = "Об'єкти розвідки",
                             AllowedOperations = new List<string>{"Read" }
+                        },
+                        new AccessEntity
+                        {
+                            Kind = AccessKind.Dor.ToString(),
+                            Title = "Події",
+                            AllowedOperations = new List<string>()
+                        }
+                    },
+                    Tabs = new List<AccessTab>
+                    {
+                        new AccessTab
+                        {
+                            Kind = AccessKind.MapTab.ToString(),
+                            Title = "Мапа",
+                            Visible = false
+                        },
+                        new AccessTab
+                        {
+                             Kind = AccessKind.AdminTab.ToString(),
+                            Title = "Адміністрування",
+                            Visible = false
+                        },
+                        new AccessTab
+                        {
+                            Kind = AccessKind.EventsTab.ToString(),
+                            Title = "Події",
+                            Visible = true
+                        },
+                        new AccessTab
+                        {
+                            Kind = AccessKind.DorTab.ToString(),
+                            Title = "Об'єкти розвідки",
+                            Visible = true
+                        },
+                        new AccessTab
+                        {
+                            Kind = AccessKind.MaterialsTab.ToString(),
+                            Title = "Вхідний поток",
+                            Visible = true
                         }
                     }
 
@@ -49,5 +88,13 @@ namespace IIS.Core.GraphQL.Roles
             };
             return Task.FromResult(new GraphQLCollection<Role>(roles, roles.Count));
         }
+
+        //public Task<GraphQLCollection<AccessTab>> GetAccessTabs([Service] OntologyContext context)
+        //{
+        //    var tabs = new List<AccessTab>
+        //    {
+        //        new AccessTab { Kind = AccessKind.}
+        //    }
+        //}
     }
 }

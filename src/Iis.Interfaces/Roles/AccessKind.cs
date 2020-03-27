@@ -9,6 +9,10 @@ namespace Iis.Interfaces.Roles
         Dor = 1, 
         Material = 2, 
         Event = 3, 
-
+        MapTab = 4,
+        AdminTab = 5,
+        EventsTab = 6,
+        DorTab = 7,
+        MaterialsTab = 8
     }
 }

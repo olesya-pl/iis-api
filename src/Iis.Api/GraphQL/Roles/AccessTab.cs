@@ -13,5 +13,6 @@ namespace IIS.Core.GraphQL.Roles
 
         [GraphQLNonNullType]
         public string Title { get; set; }
+        public bool Visible { get; set; }
     }
 }
