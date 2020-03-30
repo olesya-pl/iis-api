@@ -186,7 +186,7 @@ namespace IIS.Core
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
 
             services.AddSingleton<IElasticManager, ElasticManager>();
-            services.AddSingleton<ElasticSerializer>();
+            services.AddSingleton<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);
 
             services.AddHostedService<MaterialEventConsumer>();

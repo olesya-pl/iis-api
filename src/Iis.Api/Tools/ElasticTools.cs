@@ -34,7 +34,7 @@ namespace IIS.Core.Tools
             
             foreach (var extNode in extNodes)
             {
-                await _elasticManager.PutExtNodeAsync(extNode, cancellationToken);
+                await _elasticService.PutNodeAsync(extNode, cancellationToken);
             }
 
             await _elasticManager.CreateIndexesAsync(ontologyIndexes, cancellationToken);

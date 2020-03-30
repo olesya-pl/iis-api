@@ -18,25 +18,16 @@ namespace Iis.Elastic
         private const string RemoveSymbolsPattern = "№";
         ElasticLowLevelClient _lowLevelClient;
         ElasticConfiguration _configuration;
-        ElasticSerializer _serializer;
 
-        public ElasticManager(ElasticConfiguration configuration, ElasticSerializer serializer)
+        public ElasticManager(ElasticConfiguration configuration)
         {
             _configuration = configuration;
-            _serializer = serializer;
 
             var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
 
             var config = new ConnectionConfiguration(connectionPool);
             
             _lowLevelClient = new ElasticLowLevelClient(config);
-        }
-
-        public async Task<bool> PutExtNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default)
-        {
-            var json = _serializer.GetJsonByExtNode(extNode);
-            
-            return await PutDocumentAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
         public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)

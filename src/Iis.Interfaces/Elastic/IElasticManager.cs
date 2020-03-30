@@ -8,7 +8,6 @@ namespace Iis.Interfaces.Elastic
 {
     public interface IElasticManager
     {
-        Task<bool> PutExtNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default);
         Task<bool> PutDocumentAsync(string indexName, string id, string jsonDocument, CancellationToken cancellationToken = default);
         Task<bool> DeleteDocumentAsync(string indexName, string documentId);
         Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);

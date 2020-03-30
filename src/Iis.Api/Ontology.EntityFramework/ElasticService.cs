@@ -20,22 +20,24 @@ namespace IIS.Core.Ontology.EntityFramework
     public class ElasticService : IElasticService
     {
         private IElasticManager _elasticManager;
+        private IElasticSerializer _elasticSerializer;
         private IExtNodeService _extNodeService;
         private RunTimeSettings _runTimeSettings;
         private readonly OntologyContext _context;
 
-        public IEnumerable<string> MaterialIndexes => new[] { "Materials" };
+        public IEnumerable<string> MaterialIndexes { get; }
 
         public IEnumerable<string> OntologyIndexes { get; }
 
-        public ElasticService(IElasticManager elasticManager, IExtNodeService extNodeService, RunTimeSettings runTimeSettings, OntologyContext context)
+        public ElasticService(IElasticManager elasticManager, IElasticSerializer elasticSerializer, IExtNodeService extNodeService, RunTimeSettings runTimeSettings, OntologyContext context)
         {
             _elasticManager = elasticManager;
+            _elasticSerializer = elasticSerializer;
             _extNodeService = extNodeService;
             _runTimeSettings = runTimeSettings;
             _context = context;
 
-            OntologyIndexes = new List<string> {
+            OntologyIndexes = new [] {
                 "Organization",
                 "Person",
                 "ObjectOfStudy",
@@ -49,6 +51,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 "HigherEducationalInstitution",
                 "EducationalInstitution"
             };
+
+            MaterialIndexes = new[] { "Materials" };
         }
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
@@ -67,8 +71,17 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (!_runTimeSettings.PutSavedToElastic) return true;
+
             var extNode = await _extNodeService.GetExtNodeByIdAsync(id, cancellationToken);
-            return await _elasticManager.PutExtNodeAsync(extNode, cancellationToken);
+
+            return await PutNodeAsync(extNode, cancellationToken);
+        }
+
+        public async Task<bool> PutNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default)
+        {
+            var json = _elasticSerializer.GetJsonByExtNode(extNode);
+            
+            return await _elasticManager.PutDocumentAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
         public async Task<bool> PutMaterialAsync(IMaterialEntity material, CancellationToken cancellation = default)
@@ -103,7 +116,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 jDocument.Merge(JObject.Parse(material.LoadData));
             }
 
-            
+
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), material.Id.ToString("N"), jDocument.ToString(Formatting.None));
         }
 
@@ -116,12 +129,12 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             return OntologyIndexes.Any(index => index.Equals(indexName));
         }
-        
+
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
         {
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
         }
-        
+
         private async Task UpdateElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
         {
             ElasticCompareResult compareResult = await CompareWithElasticAsync(nodeTypeId, indexName, cancellationToken);
