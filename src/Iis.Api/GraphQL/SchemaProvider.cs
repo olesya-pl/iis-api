@@ -53,6 +53,7 @@ namespace IIS.Core.GraphQL
                 d.Name("QueryType");
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
+                d.Include<Roles.Query>();
                 d.Include<Users.Query>();
                 d.Include<AnalyticsQuery.Query>();
                 d.Include<AnalyticsIndicator.Query>();
