@@ -36,5 +36,10 @@ namespace Iis.Roles
             }
             return roles;
         }
+
+        public async Task<User> GetUserAsync(Guid id)
+        {
+            return null;
+        }
     }
 }

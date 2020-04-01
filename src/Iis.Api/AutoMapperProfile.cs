@@ -63,6 +63,9 @@ namespace Iis.Api
                 .ForMember(dest => dest.Visible, opts => opts.MapFrom(src => src.ReadGranted));
             CreateMap<Roles.AccessGranted, AccessEntity>();
             CreateMap<Roles.Role, IIS.Core.GraphQL.Roles.Role>();
+
+            CreateMap<UserEntity, Roles.User>()
+                .ForMember(dest => dest.AccessGrantedItems, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role.RoleAccessEntities)));
         }
     }
 }

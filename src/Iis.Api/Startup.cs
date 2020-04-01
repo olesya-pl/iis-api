@@ -121,6 +121,7 @@ namespace IIS.Core
 
 
             var publiclyAccesible = new HashSet<string> { "login", "__schema" };
+
             QueryExecutionBuilder.New()
                 .Use(next => context =>
                 {
@@ -200,7 +201,7 @@ namespace IIS.Core
             services.AddAutoMapper(typeof(Startup));
         }
 
-        private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
+        private async Task _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {
             // TODO: remove this method when hotchocolate will allow to add attribute for authentication
             var qd = context.Request.Query as QueryDocument;
@@ -219,7 +220,8 @@ namespace IIS.Core
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var validatedToken = TokenHelper.ValidateToken(token, Configuration);
+                var roleLoader = context.Services.GetService<RoleLoader>();
+                var validatedToken = await TokenHelper.ValidateToken(token, Configuration, roleLoader);
                 context.ContextData.Add("token", validatedToken);
             }
         }
