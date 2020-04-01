@@ -47,7 +47,10 @@ namespace IIS.Core.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     RoleId = table.Column<Guid>(nullable: false),
                     AccessObjectId = table.Column<Guid>(nullable: false),
-                    Operations = table.Column<string>(nullable: true)
+                    CreateGranted = table.Column<bool>(nullable: false),
+                    ReadGranted = table.Column<bool>(nullable: false),
+                    UpdateGranted = table.Column<bool>(nullable: false),
+                    DeleteGranted = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

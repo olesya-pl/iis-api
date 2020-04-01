@@ -49,6 +49,8 @@ using Iis.Domain;
 using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.DataModel.Cache;
 using Iis.DbLayer.OntologySchema;
+using Iis.DataModel.Roles;
+using Iis.Roles;
 
 namespace IIS.Core
 {
@@ -82,6 +84,7 @@ namespace IIS.Core
             services.AddHttpContextAccessor();
             using var context = OntologyContext.GetContext(dbConnectionString);
             context.Database.Migrate();
+            (new FillDataForRoles(context)).Execute();
             services.AddSingleton<IOntologyCache>(new OntologyCache(context));
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
@@ -96,6 +99,7 @@ namespace IIS.Core
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
+            services.AddTransient<RoleLoader>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();

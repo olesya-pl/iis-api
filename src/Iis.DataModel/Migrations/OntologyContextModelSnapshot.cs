@@ -769,11 +769,20 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("AccessObjectId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Operations")
-                        .HasColumnType("text");
+                    b.Property<bool>("CreateGranted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("DeleteGranted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReadGranted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("UpdateGranted")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

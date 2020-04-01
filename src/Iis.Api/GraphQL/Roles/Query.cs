@@ -1,7 +1,9 @@
-﻿using HotChocolate;
+﻿using AutoMapper;
+using HotChocolate;
 using HotChocolate.Types;
 using Iis.DataModel;
 using Iis.Interfaces.Roles;
+using Iis.Roles;
 using IIS.Core.GraphQL.Common;
 using System;
 using System.Collections.Generic;
@@ -137,9 +139,12 @@ namespace IIS.Core.GraphQL.Roles
                 }
             },
         };
-        public Task<GraphQLCollection<Role>> GetRoles([Service] OntologyContext context)
+        public async Task<GraphQLCollection<Role>> GetRoles([Service] RoleLoader roleLoader, [Service] IMapper mapper)
         {
-            return Task.FromResult(new GraphQLCollection<Role>(_roles, _roles.Count));
+            var roles = await roleLoader.GetRolesAsync();
+            var rolesQl = roles.Select(r => mapper.Map<Role>(r)).ToList();
+            return new GraphQLCollection<Role>(rolesQl, roles.Count);
+            //return Task.FromResult(new GraphQLCollection<Role>(_roles, _roles.Count));
         }
 
         public Task<Role> GetRole([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)

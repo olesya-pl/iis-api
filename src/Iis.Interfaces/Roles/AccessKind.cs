@@ -13,6 +13,8 @@ namespace Iis.Interfaces.Roles
         AdminTab = 5,
         EventsTab = 6,
         DorTab = 7,
-        MaterialsTab = 8
+        MaterialsTab = 8,
+        MaterialDorLink = 9,
+        EventLink = 10,
     }
 }

@@ -3,11 +3,10 @@ using System;
 
 namespace Iis.Roles
 {
-    public class RoleManager
+    public class RoleSaver
     {
         private OntologyContext _context;
-        private AccessObjects _accessObjects = new AccessObjects();
-        public RoleManager(OntologyContext ontologyContext)
+        public RoleSaver(OntologyContext ontologyContext)
         {
             _context = ontologyContext;
         }

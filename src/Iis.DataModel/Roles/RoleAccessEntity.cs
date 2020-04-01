@@ -9,7 +9,10 @@ namespace Iis.DataModel.Roles
     {
         public Guid RoleId { get; set; }
         public Guid AccessObjectId { get; set; }
-        public string Operations { get; set; }
+        public bool CreateGranted { get; set; }
+        public bool ReadGranted { get; set; }
+        public bool UpdateGranted { get; set; }
+        public bool DeleteGranted { get; set; }
         public RoleEntity Role { get; set; }
         public AccessObjectEntity AccessObject { get; set; }
     }

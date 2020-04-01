@@ -2,7 +2,10 @@
 using Iis.Api.Ontology.Migration;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.DataModel.Roles;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Roles;
+using IIS.Core.GraphQL.Roles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +51,18 @@ namespace Iis.Api
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata.ToString()))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : src.Data.ToString()))
                 .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => src.LoadData.ToJson()))
-                .ForMember(dest => dest.MaterialInfos, opts => opts.MapFrom(src => src.Infos)); 
+                .ForMember(dest => dest.MaterialInfos, opts => opts.MapFrom(src => src.Infos));
+
+            CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
+                .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
+                .ForMember(dest => dest.Category, opts => opts.MapFrom(src => src.AccessObject.Category))
+                .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.AccessObject.Title)); 
+            CreateMap<RoleEntity, Iis.Roles.Role>()
+                .ForMember(dest => dest.AccessGrantedItems, opts => opts.MapFrom(src => src.RoleAccessEntities));
+            CreateMap<Roles.AccessGranted, AccessTab>()
+                .ForMember(dest => dest.Visible, opts => opts.MapFrom(src => src.ReadGranted));
+            CreateMap<Roles.AccessGranted, AccessEntity>();
+            CreateMap<Roles.Role, IIS.Core.GraphQL.Roles.Role>();
         }
     }
 }

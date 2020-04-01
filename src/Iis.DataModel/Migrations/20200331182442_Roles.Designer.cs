@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    [Migration("20200327174259_RolesData")]
-    partial class RolesData
+    [Migration("20200331182442_Roles")]
+    partial class Roles
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -771,11 +771,20 @@ namespace IIS.Core.Migrations
                     b.Property<Guid>("AccessObjectId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Operations")
-                        .HasColumnType("text");
+                    b.Property<bool>("CreateGranted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("DeleteGranted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReadGranted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("UpdateGranted")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

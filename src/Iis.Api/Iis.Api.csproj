@@ -48,6 +48,7 @@
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
+    <ProjectReference Include="..\Iis.Roles\Iis.Roles.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
   <ItemGroup>
