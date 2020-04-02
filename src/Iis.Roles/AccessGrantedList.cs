@@ -8,7 +8,7 @@ namespace Iis.Roles
 {
     public class AccessGrantedList: List<AccessGranted>
     {
-        public AccessGrantedList Add(IEnumerable<AccessGranted> otherList)
+        public AccessGrantedList Merge(IEnumerable<AccessGranted> otherList)
         {
             foreach (var otherItem in otherList)
             {
@@ -23,6 +23,12 @@ namespace Iis.Roles
                 }
             }
             return this;
+        }
+
+        public bool IsGranted(AccessKind kind, AccessOperation operation)
+        {
+            var item = this.SingleOrDefault(ag => ag.Kind == kind);
+            return item == null ? false : item.IsGranted(operation);
         }
     }
 }

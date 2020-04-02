@@ -32,14 +32,44 @@ namespace Iis.Roles
             var roles = roleEntities.Select(r => _mapper.Map<Role>(r)).ToList();
             foreach (var role in roles)
             {
-                role.AccessGrantedItems.Add(_defaultAccessGrantedList);
+                role.AccessGrantedItems.Merge(_defaultAccessGrantedList);
             }
             return roles;
         }
 
-        public async Task<User> GetUserAsync(Guid id)
+        public User GetUser(Guid id)
         {
-            return null;
+            var userEntity = _context.Users.Where(u => u.Id == id)
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ThenInclude(r => r.RoleAccessEntities)
+                .ThenInclude(ra => ra.AccessObject)
+                .SingleOrDefault();
+
+            if (userEntity == null)
+            {
+                throw new ArgumentException($"User does not exist for id = {id}");
+            }
+
+            var roleEntityList = userEntity.UserRoles.Select(ur => ur.Role).ToList();
+            var user = _mapper.Map<User>(userEntity);
+            foreach (var roleEntity in roleEntityList)
+            {
+                if (roleEntity.IsAdmin)
+                {
+                    user.IsAdmin = true;
+                }
+                var accessGrantedList = roleEntity.RoleAccessEntities.Select(r => _mapper.Map<AccessGranted>(r));
+                user.AccessGrantedItems.Merge(accessGrantedList);
+            }
+
+            return user;
+        }
+
+        public User GetUser(string userName, string passwordHash)
+        {
+            var userEntity = _context.Users.SingleOrDefault(x => x.Username == userName && x.PasswordHash == passwordHash);
+            return userEntity == null ? null : GetUser(userEntity.Id);
         }
     }
 }

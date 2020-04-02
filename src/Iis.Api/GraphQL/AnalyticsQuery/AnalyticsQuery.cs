@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Iis.DataModel;
 using User = IIS.Core.GraphQL.Users.User;
+using AutoMapper;
 
 namespace IIS.Core.GraphQL.AnalyticsQuery
 {
@@ -42,17 +43,17 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         }
 
         [GraphQLNonNullType]
-        public async Task<User> GetCreator([Service] OntologyContext context)
+        public async Task<User> GetCreator([Service] OntologyContext context, [Service] IMapper mapper)
         {
             var user = await context.Users.FindAsync(_query.CreatorId);
-            return new User(user);
+            return mapper.Map<User>(user);
         }
 
         [GraphQLNonNullType]
-        public async Task<User> GetLastUpdater([Service] OntologyContext context)
+        public async Task<User> GetLastUpdater([Service] OntologyContext context, [Service] IMapper mapper)
         {
             var user = await context.Users.FindAsync(_query.LastUpdaterId);
-            return new User(user);
+            return mapper.Map<User>(user);
         }
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<ObjectType<AnalyticsQueryIndicator>>>>))]

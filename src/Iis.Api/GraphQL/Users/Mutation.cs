@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
+using AutoMapper;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -22,9 +23,9 @@ namespace IIS.Core.GraphQL.Users
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<User> CreateUser([Service] OntologyContext context, [GraphQLNonNullType] UserInput data)
+        public async Task<User> CreateUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLNonNullType] UserInput data)
         {
-            Validator.ValidateObject(data, new ValidationContext(data), true);
+            Validator.ValidateObject(data, new System.ComponentModel.DataAnnotations.ValidationContext(data), true);
             if (context.Users.Any(u => u.Username == data.Username))
                 throw new InvalidOperationException($"User {data.Username} already exists");
 
@@ -39,13 +40,17 @@ namespace IIS.Core.GraphQL.Users
 
             context.Users.Add(user);
             await context.SaveChangesAsync();
-            return new User(user);
+            return mapper.Map<User>(user);
         }
 
-        public async Task<User> UpdateUser([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] string id, [GraphQLNonNullType] UserInput data)
+        public async Task<User> UpdateUser(
+            [Service] OntologyContext context, 
+            [Service] IMapper mapper, 
+            [GraphQLType(typeof(NonNullType<IdType>))] string id, 
+            [GraphQLNonNullType] UserInput data)
         {
             //TODO: should not be able to block yourself
-            Validator.ValidateObject(data, new ValidationContext(data), true);
+            Validator.ValidateObject(data, new System.ComponentModel.DataAnnotations.ValidationContext(data), true);
             var user = await context.Users.FindAsync(Guid.Parse(id));
             if (user == null)
                 throw new InvalidOperationException($"Cannot find user with id = {id}");
@@ -56,10 +61,10 @@ namespace IIS.Core.GraphQL.Users
 
             await context.SaveChangesAsync();
 
-            return new User(user);
+            return mapper.Map<User>(user);
         }
 
-        public async Task<User> DeleteUser([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
+        public async Task<User> DeleteUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
             //TODO: should not be able to delete yourself
             var dbUser = await context.Users.FindAsync(id);
@@ -68,7 +73,7 @@ namespace IIS.Core.GraphQL.Users
             context.Users.Remove(dbUser);
             await context.SaveChangesAsync();
 
-            return new User(dbUser);
+            return mapper.Map<User>(dbUser);
         }
     }
 }

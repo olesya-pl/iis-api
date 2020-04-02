@@ -6,23 +6,24 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace IIS.Core.GraphQL.Users
 {
     public class Query
     {
-        public async Task<User> GetUser([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
+        public async Task<User> GetUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
             var user = await context.Users.FindAsync(id);
             if (user == null)
                 throw new InvalidOperationException($"Cannot find user with id \"{id}\"");
 
-            return new User(user);
+            return mapper.Map<User>(user);
         }
 
-        public async Task<GraphQLCollection<User>> GetUsers([Service] OntologyContext context, [GraphQLNonNullType] PaginationInput pagination)
+        public async Task<GraphQLCollection<User>> GetUsers([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLNonNullType] PaginationInput pagination)
         {
-            var users = context.Users.GetPage(pagination).Select(user => new User(user));
+            var users = context.Users.GetPage(pagination).Select(user => mapper.Map<User>(user));
             return new GraphQLCollection<User>(await users.ToListAsync(), await context.Users.CountAsync());
         }
     }

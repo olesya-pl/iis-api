@@ -51,6 +51,7 @@ using Iis.DataModel.Cache;
 using Iis.DbLayer.OntologySchema;
 using Iis.DataModel.Roles;
 using Iis.Roles;
+using Iis.Api.GraphQL.Access;
 
 namespace IIS.Core
 {
@@ -199,9 +200,10 @@ namespace IIS.Core
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton<GraphQLAccessList>();
         }
 
-        private async Task _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
+        private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {
             // TODO: remove this method when hotchocolate will allow to add attribute for authentication
             var qd = context.Request.Query as QueryDocument;
@@ -221,7 +223,19 @@ namespace IIS.Core
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
                 var roleLoader = context.Services.GetService<RoleLoader>();
-                var validatedToken = await TokenHelper.ValidateToken(token, Configuration, roleLoader);
+                var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
+                
+                var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName);
+                var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
+
+                if (graphQLAccessItem != null)
+                {
+                    if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
+                    {
+                        throw new AuthenticationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
+                    }
+                }
+
                 context.ContextData.Add("token", validatedToken);
             }
         }

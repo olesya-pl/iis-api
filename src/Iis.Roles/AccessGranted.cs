@@ -35,5 +35,21 @@ namespace Iis.Roles
             DeleteGranted |= other.DeleteGranted;
             return this;
         }
+
+        public bool IsGranted(AccessOperation operation)
+        {
+            switch (operation)
+            {
+                case AccessOperation.Create:
+                    return CreateGranted;
+                case AccessOperation.Read:
+                    return ReadGranted;
+                case AccessOperation.Update:
+                    return UpdateGranted;
+                case AccessOperation.Delete:
+                    return DeleteGranted;
+            }
+            return false;
+        }
     }
 }

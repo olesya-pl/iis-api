@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using HotChocolate;
 using HotChocolate.Types;
+using IIS.Core.GraphQL.Roles;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -17,13 +19,8 @@ namespace IIS.Core.GraphQL.Users
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use latin letters only please")]
         public string Username  { get; set; }
         public bool IsBlocked { get; set; }
-
-        public User(Iis.DataModel.UserEntity dbUser)
-        {
-            Id        = dbUser.Id.ToString();
-            Name      = dbUser.Name;
-            Username  = dbUser.Username;
-            IsBlocked = dbUser.IsBlocked;
-        }
+        public bool IsAdmin { get; set; }
+        public IEnumerable<AccessEntity> Entities { get; set; }
+        public IEnumerable<AccessTab> Tabs { get; set; }
     }
 }

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Iis.Roles;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -15,24 +17,28 @@ namespace IIS.Core.GraphQL.Users
     {
         private IConfiguration _configuration;
         private readonly OntologyContext _context;
+        private IMapper _mapper;
+        private RoleLoader _roleLoader;
 
-        public LoginResolver(IConfiguration configuration, OntologyContext context)
+        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, RoleLoader roleLoader)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapper = mapper;
+            _roleLoader = roleLoader;
         }
 
         public LoginResponse Login([Required] string username, [Required] string password)
         {
             var hash = _configuration.GetPasswordHashAsBase64String(password);
-            var user = _context.Users.SingleOrDefault(x => x.Username == username && x.PasswordHash == hash);
+            var user = _roleLoader.GetUser(username, hash);
 
             if (user == null || user.IsBlocked)
                 throw new InvalidCredentialException($"Wrong username or password");
 
             return new LoginResponse
             {
-                User = new User(user),
+                User = _mapper.Map<User>(user),
                 Token = TokenHelper.NewToken(_configuration, user.Id)
             };
         }
@@ -51,7 +57,7 @@ namespace IIS.Core.GraphQL.Users
 
             return new LoginResponse
             {
-                User = new User(user),
+                User = _mapper.Map<User>(user),
                 Token = TokenHelper.NewToken(_configuration, Guid.NewGuid())
             };
         }
