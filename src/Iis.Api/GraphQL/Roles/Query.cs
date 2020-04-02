@@ -144,7 +144,6 @@ namespace IIS.Core.GraphQL.Roles
             var roles = await roleLoader.GetRolesAsync();
             var rolesQl = roles.Select(r => mapper.Map<Role>(r)).ToList();
             return new GraphQLCollection<Role>(rolesQl, roles.Count);
-            //return Task.FromResult(new GraphQLCollection<Role>(_roles, _roles.Count));
         }
 
         public Task<Role> GetRole([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
