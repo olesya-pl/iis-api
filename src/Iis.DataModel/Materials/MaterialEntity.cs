@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Iis.Interfaces.Materials;
 
 namespace Iis.DataModel.Materials
 {
-    public class MaterialEntity : BaseEntity
+    public class MaterialEntity : BaseEntity, IMaterialEntity
     {
         public Guid? ParentId { get; set; }
         public virtual MaterialEntity Parent { get; set; }

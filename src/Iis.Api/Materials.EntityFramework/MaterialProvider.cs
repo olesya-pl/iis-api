@@ -13,6 +13,7 @@ using Iis.DataModel.Cache;
 using AutoMapper;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -22,54 +23,80 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyCache _cache;
         private readonly IMapper _mapper;
+        private readonly IElasticService _elasticService;
 
-        public MaterialProvider(OntologyContext context, IOntologyService ontologyService, IOntologyCache cache, IMapper mapper)
+        public MaterialProvider(OntologyContext context, IOntologyService ontologyService, IElasticService elasticService, IOntologyCache cache, IMapper mapper)
         {
             _context = context;
             _ontologyService = ontologyService;
+            _elasticService = elasticService;
             _cache = cache;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Material>> GetMaterialsAsync(int limit, int offset,
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsAsync(int limit, int offset, string filterQuery,
             Guid? parentId = null, IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
-            IEnumerable<MaterialEntity> materials;
             await _context.Semaphore.WaitAsync();
+            
             try
             {
-                IQueryable<MaterialEntity> materialsQ;
+                IQueryable<MaterialEntity> materialsQuery;
+                IQueryable<MaterialEntity> materialsCountQuery;
+                IEnumerable<Task<Material>> mappingTasks;
+                IEnumerable<Material> materials;
+                if(!string.IsNullOrWhiteSpace(filterQuery))
+                {
+                    materialsQuery = GetMaterialQuery();
+
+                    var searchResult = await _elasticService.SearchByAllFieldsAsync(_elasticService.MaterialIndexes, new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
+                    
+                    mappingTasks =  (await materialsQuery
+                                        .Where(e => searchResult.ids.Contains(e.Id))
+                                        .ToArrayAsync())
+                                            .Select(async entity => await MapAsync(entity));
+
+                    materials = await Task.WhenAll(mappingTasks);
+
+                    return (materials, searchResult.count);
+                }
+
                 if (nodeIds == null)
                 {
-                    materialsQ = GetMaterialQuery();
-                    if (parentId != null)
-                        materialsQ = materialsQ.Where(e => e.ParentId == parentId);
-                    if (types != null)
-                        materialsQ = materialsQ.Where(e => types.Contains(e.Type));
-                    materialsQ = materialsQ.Skip(offset).Take(limit);
+                    materialsQuery = GetMaterialQuery();
+
+                    if (parentId != null) materialsQuery = materialsQuery.Where(e => e.ParentId == parentId);
+
+                    if (types != null) materialsQuery = materialsQuery.Where(e => types.Contains(e.Type));
                 }
                 else
                 {
                     var nodeIdsArr = nodeIds.ToArray();
-                    materialsQ = GetMaterialQuery()
-                        .Where(m => m.MaterialInfos.Any(i => i.MaterialFeatures.Any(f => nodeIdsArr.Contains(f.NodeId))))
-                        .OrderByDescending(m => m.CreatedDate)
-                        .Skip(offset)
-                        .Take(limit)
-                    ;
-                }
 
-                materials = await materialsQ
-                    .ToArrayAsync();
+                    materialsQuery = GetMaterialQuery()
+                        .Where(m => m.MaterialInfos.Any(i => i.MaterialFeatures.Any(f => nodeIdsArr.Contains(f.NodeId))))
+                        .OrderByDescending(m => m.CreatedDate);
+                }
+                
+                materialsCountQuery = materialsQuery;
+
+                materialsQuery = materialsQuery
+                                    .Skip(offset)
+                                    .Take(limit);
+
+                mappingTasks = (await materialsQuery.ToArrayAsync())
+                                    .Select(async entity => await MapAsync(entity));
+
+                materials = await Task.WhenAll(mappingTasks);
+
+                var materialsCount = await materialsCountQuery.CountAsync();
+
+                return (materials, materialsCount);
             }
             finally
             {
                 _context.Semaphore.Release();
             }
-            var result = new List<Material>();
-            foreach (var material in materials)
-                result.Add(await MapAsync(material));
-            return result;
         }
 
         public async Task<MaterialEntity> GetMaterialEntityAsync(Guid id)
@@ -89,6 +116,19 @@ namespace IIS.Core.Materials.EntityFramework
         {
             var material = await GetMaterialEntityAsync(id);
             return await MapAsync(material);
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
+        {
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                return await GetMaterialQuery().ToArrayAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
         public IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName)
@@ -134,7 +174,6 @@ namespace IIS.Core.Materials.EntityFramework
                     .AsNoTracking();
         }
 
-        // Todo: think about enumerable.Select(MapAsync) trouble
         public async Task<Material> MapAsync(MaterialEntity material)
         {
             if (material == null) return null;
@@ -172,6 +211,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             var result = new MaterialLoadData();
             var json = JObject.Parse(loadData);
+
             if (json.ContainsKey("from")) result.From = (string)json["from"];
             if (json.ContainsKey("code")) result.Code = (string)json["code"];
             if (json.ContainsKey("coordinates")) result.Coordinates = (string)json["coordinates"];

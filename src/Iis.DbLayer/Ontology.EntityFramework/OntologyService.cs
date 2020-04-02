@@ -221,7 +221,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             node.UpdatedAt = DateTime.UtcNow;
         }
 
-        private async Task<IEnumerable<Node>> GetNodesAsync(IQueryable<NodeEntity> relationsQ, NodeFilter filter, CancellationToken cancellationToken = default)
+        private async Task<IEnumerable<Node>> GetNodesAsync(IQueryable<NodeEntity> relationsQ, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             NodeEntity[] ctxNodes;
@@ -237,7 +237,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
         }
 
-        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
@@ -268,7 +268,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 _context.Semaphore.Release();
             }
         }
-        public async Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
@@ -298,7 +298,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        private async Task<IQueryable<NodeEntity>> GetNodesQueryAsync(OntologyModel ontology, IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
+        private async Task<IQueryable<NodeEntity>> GetNodesQueryAsync(OntologyModel ontology, IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
@@ -315,7 +315,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return _context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived);
         }
 
-        private async Task<IQueryable<NodeEntity>> GetNodesWithSuggestion(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
+        private async Task<IQueryable<NodeEntity>> GetNodesWithSuggestion(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             if (_elasticService.TypesAreSupported(types.Select(nt => nt.Name)))
             {
@@ -338,7 +338,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return relationsQ.Select(e => e.SourceNode);
         }
 
-        private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, NodeFilter filter, CancellationToken cancellationToken = default)
+        private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var searchResult = await _elasticService.SearchByAllFieldsAsync(types.Select(t => t.Name), filter);
             return _context.Nodes.Where(node => !node.IsArchived && searchResult.ids.Contains(node.Id));

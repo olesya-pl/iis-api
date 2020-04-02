@@ -11,11 +11,16 @@ namespace IIS.Core.Materials
     {
         Task<Material> GetMaterialAsync(Guid id);
         Task<MaterialEntity> GetMaterialEntityAsync(Guid id);
-        Task<IEnumerable<Material>> GetMaterialsAsync(int limit, int offset, Guid? parentId = null,
-            IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsAsync(int limit, 
+            int offset,
+            string filterQuery,
+            Guid? parentId = null,
+            IEnumerable<Guid> nodeIds = null,
+            IEnumerable<string> types = null);
+        Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(Guid id);
-        Task<Material> MapAsync(MaterialEntity material);
         Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input);
+        Task<Material> MapAsync(MaterialEntity material);
     }
 }

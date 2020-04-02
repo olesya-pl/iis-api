@@ -50,15 +50,15 @@ namespace IIS.Core.GraphQL.Entities
             return existingNode;
         }
 
-        public static NodeFilter CreateNodeFilter(this IResolverContext ctx)
+        public static ElasticFilter CreateNodeFilter(this IResolverContext ctx)
         {
             var pagination = ctx.Argument<PaginationInput>("pagination");
             var filter = ctx.Argument<FilterInput>("filter");
-            return new NodeFilter {Limit = pagination.PageSize, Offset = pagination.Offset(),
+            return new ElasticFilter {Limit = pagination.PageSize, Offset = pagination.Offset(),
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery};
         }
 
-        public static NodeFilter CreateNodeFilter(this IResolverContext ctx, EntityType criteriaType)
+        public static ElasticFilter CreateNodeFilter(this IResolverContext ctx, EntityType criteriaType)
         {
             var result = ctx.CreateNodeFilter();
             return result;

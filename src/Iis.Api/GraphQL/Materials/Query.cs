@@ -6,28 +6,33 @@ using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.Common;
-using IIS.Core.GraphQL.Files;
 using IIS.Core.Materials;
+using IIS.Core.GraphQL.Files;
+using IIS.Core.GraphQL.Common;
+using IIS.Core.GraphQL.Entities.InputTypes;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public class Query
     {
 
-        [GraphQLType(typeof(MaterialWrapperType))]
-        public async Task<IEnumerable<Material>> GetMaterials(
+        [GraphQLType(typeof(MaterialCollection))]
+        public async Task<(IEnumerable<Material> materials, int totalCount)> GetMaterials(
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
+            FilterInput filter,
             [GraphQLType(typeof(IdType))] Guid? parentId = null,
             IEnumerable<Guid> nodeIds = null,
             IEnumerable<string> types = null)
         {
-            var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
-                pagination.Offset(), parentId, nodeIds, types);
-            var result = materials.Select(m => mapper.Map<Material>(m)).ToList();
-            return result;
+            var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
+
+            var materialsResult = await materialProvider.GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, parentId, nodeIds, types);
+
+            var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+
+            return (materials, materialsResult.Count);
         }
 
         public async Task<Material> GetMaterial(
@@ -39,41 +44,30 @@ namespace IIS.Core.GraphQL.Materials
             var res = mapper.Map<Material>(material);
             return res;
         }
+
         public Task<IEnumerable<MaterialSignFull>> GetImportanceSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
         {
             return Task.FromResult(materialProvider.GetMaterialSigns("Importance").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
+        
         public Task<IEnumerable<MaterialSignFull>> GetReliabilitySigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
         {
             return Task.FromResult(materialProvider.GetMaterialSigns("Reliability").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
+        
         public Task<IEnumerable<MaterialSignFull>> GetRelevanceSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
         {
             return Task.FromResult(materialProvider.GetMaterialSigns("Relevance").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
+        
         public Task<IEnumerable<MaterialSignFull>> GetCompletenessSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
         {
             return Task.FromResult(materialProvider.GetMaterialSigns("Completeness").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
+        
         public Task<IEnumerable<MaterialSignFull>> GetSourceReliabilitySigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
         {
             return Task.FromResult(materialProvider.GetMaterialSigns("SourceReliability").Select(ms => mapper.Map<MaterialSignFull>(ms)));
-        }
-    }
-
-    public class MaterialWrapperType : ObjectType<IEnumerable<Material>>
-    {
-        protected override void Configure(IObjectTypeDescriptor<IEnumerable<Material>> descriptor)
-        {
-            descriptor.Name("MaterialWrapper");
-            descriptor.BindFieldsExplicitly().Include<Resolvers>();
-        }
-
-        public class Resolvers
-        {
-            public int Count => 0;
-            [GraphQLType(typeof(NonNullType<ListType<NonNullType<ObjectType<Material>>>>))]
-            public IEnumerable<Material> Items([Parent] IEnumerable<Material> parent) => parent;
         }
     }
 }

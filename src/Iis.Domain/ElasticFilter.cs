@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using Iis.Interfaces.Elastic;
+﻿using Iis.Interfaces.Elastic;
 
 namespace Iis.Domain
 {
-    public class NodeFilter : IElasticNodeFilter
+    public class ElasticFilter : IElasticNodeFilter
     {
         public int Limit { get; set; }
         public int Offset { get; set; }
