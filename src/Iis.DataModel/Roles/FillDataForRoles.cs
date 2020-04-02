@@ -122,7 +122,7 @@ namespace Iis.DataModel.Roles
                 new RoleEntity { Id = new Guid("a120c2b8d6f84338ab0e5d177951f119"), Name = "Оператор", Description = "Редактує матеріали та прив'язуває їх до об'єктів розвідки" },
                 new RoleEntity { Id = new Guid("a25012ad140643c08ab5ff3d682b7179"), Name = "Аналітик 1", Description = "Створений для первинної обробки матеріалів" },
                 new RoleEntity { Id = new Guid("a3b1917a46be437689819c8c9f97ee19"), Name = "Аналітик 2", Description = "Володіе подіями" },
-                new RoleEntity { Id = new Guid("a4826f2fdf4e42b6b1d89dffed5a5c13"), Name = "Адміністратор", Description = "Всемогутній" }
+                new RoleEntity { Id = new Guid("a4826f2fdf4e42b6b1d89dffed5a5c13"), Name = "Адміністратор", Description = "Всемогутній", IsAdmin = true }
             };
             _context.Roles.AddRange(roles);
 

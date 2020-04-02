@@ -52,6 +52,7 @@ using Iis.DbLayer.OntologySchema;
 using Iis.DataModel.Roles;
 using Iis.Roles;
 using Iis.Api.GraphQL.Access;
+using Iis.Interfaces.Roles;
 
 namespace IIS.Core
 {
@@ -227,7 +228,7 @@ namespace IIS.Core
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName);
                 var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
 
-                if (graphQLAccessItem != null)
+                if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
