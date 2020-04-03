@@ -132,7 +132,7 @@ namespace IIS.Core
                     }
                     catch (Exception e)
                     {
-                        if (!(e is AuthenticationException) && !(e is InvalidOperationException))
+                        if (!(e is AuthenticationException) && !(e is InvalidOperationException) && !(e is AccessViolationException))
                             throw e;
 
                         var errorHandler = context.Services.GetService<IErrorHandler>();
@@ -232,7 +232,7 @@ namespace IIS.Core
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
-                        throw new AuthenticationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
+                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
                     }
                 }
 
@@ -329,6 +329,11 @@ namespace IIS.Core
             if (error.Exception is AuthenticationException)
             {
                 return error.WithCode("UNAUTHENTICATED");
+            }
+
+            if (error.Exception is AccessViolationException)
+            {
+                return error.WithCode("ACCESS_DENIED");
             }
 
             return error;
