@@ -37,6 +37,18 @@ namespace Iis.Roles
             return roles;
         }
 
+        public async Task<Role> GetRoleAsync(Guid id)
+        {
+            var roleEntity = await _context.Roles
+                .Where(r => r.Id == id)
+                .Include(r => r.RoleAccessEntities)
+                .ThenInclude(ra => ra.AccessObject)
+                .SingleOrDefaultAsync();
+            var role = _mapper.Map<Role>(roleEntity);
+            role.AccessGrantedItems.Merge(_defaultAccessGrantedList);
+            return role;
+        }
+
         public User GetUser(Guid id)
         {
             var userEntity = _context.Users.Where(u => u.Id == id)
