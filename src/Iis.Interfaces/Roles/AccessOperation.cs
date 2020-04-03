@@ -6,6 +6,7 @@ namespace Iis.Interfaces.Roles
 {
     public enum AccessOperation
     {
+        None,
         Create,
         Read,
         Update,
