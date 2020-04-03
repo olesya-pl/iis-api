@@ -224,7 +224,7 @@ namespace IIS.Core
                 var roleLoader = context.Services.GetService<RoleLoader>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
                 
-                var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName);
+                var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);
                 var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
 
                 if (graphQLAccessItem != null)
