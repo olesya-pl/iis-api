@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
@@ -34,5 +35,20 @@ namespace Iis.OntologyManager.Style
                 ComparisonBackColor = Color.Honeydew
             };
         }
+        public Color GetColorByNodeType(Kind kind)
+        {
+            switch (kind)
+            {
+                case Kind.Entity:
+                    return EntityTypeBackColor;
+                case Kind.Attribute:
+                    return AttributeTypeBackColor;
+                case Kind.Relation:
+                    return RelationTypeBackColor;
+                default:
+                    return BackgroundColor;
+            }
+        }
+
     }
 }

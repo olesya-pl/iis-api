@@ -8,42 +8,22 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiFilterControl
+    public class UiFilterControl: UIBaseControl
     {
         IGetTypesFilter _model;
-        
-        UiContainerManager _container;
-        IOntologyManagerStyle _style;
         
         CheckBox cbFilterEntities;
         CheckBox cbFilterAttributes;
         CheckBox cbFilterRelations;
         TextBox txtFilterName;
 
-        public Panel MainPanel { get; private set; }
         public int Width => _container.Right + _style.MarginHor;
         public int Height => _container.Bottom + _style.MarginVer * 2;
 
         public delegate void OnChangeHandler(IGetTypesFilter filter);
         public event OnChangeHandler OnChange;
 
-        public Panel Initialize(IOntologyManagerStyle style)
-        {
-            _style = style;
-            MainPanel = new Panel
-            {
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = _style.BackgroundColor
-            };
-
-            _container = new UiContainerManager(MainPanel, style);
-            CreateControls();
-            MainPanel.Width = _container.Right;
-            MainPanel.Height = _container.Bottom + _style.MarginVer;
-            return MainPanel;
-        }
-
-        public void CreateControls()
+        protected override void CreateControls()
         {
             _container.SetColWidth(_style.ButtonWidthDefault);
             _container.Add(cbFilterEntities = new CheckBox { Text = "Entities", Checked = true });

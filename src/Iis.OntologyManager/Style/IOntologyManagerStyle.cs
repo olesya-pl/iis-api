@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System.Drawing;
 
 namespace Iis.OntologyManager.Style
 {
@@ -14,5 +15,6 @@ namespace Iis.OntologyManager.Style
         int MarginVer { get; }
         int MarginVerSmall { get; }
         Color RelationTypeBackColor { get; }
+        Color GetColorByNodeType(Kind kind);
     }
 }

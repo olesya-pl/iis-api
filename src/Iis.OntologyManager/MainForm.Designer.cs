@@ -141,33 +141,19 @@ namespace Iis.OntologyManager
         private System.Windows.Forms.ComboBox cmbSchemaSources;
         private System.Windows.Forms.ComboBox cmbSchemaSourcesCompare;
         private System.Windows.Forms.Panel panelMeta;
-        private Label lblId;
         private TextBox txtId;
-        private Label lblName;
         private TextBox txtName;
-        private Label lblTitle;
         private TextBox txtTitle;
-        private CheckBox cbFilterEntities;
-        private CheckBox cbFilterAttributes;
-        private CheckBox cbFilterRelations;
-        private Label lblFilterName;
-        private TextBox txtFilterName;
-        private DataGridView gridChildren;
+        
         private Panel panelTypeHeader;
         private Panel panelTypeMain;
         private Button btnTypeBack;
         private Label lblTypeHeaderName;
-        private Label lblGridInheritance;
-        private DataGridView gridInheritedFrom;
-        private DataGridView gridInheritedBy;
-        private DataGridView gridEmbeddence;
-        private Label lblMeta;
-        private RichTextBox txtMeta;
-        private ContextMenuStrip menuChildren;
+        
         private Panel panelComparison;
         private RichTextBox txtComparison;
         private Button btnSaveSchema;
-        private Button btnTypeSave;
+        
     }
 }
 

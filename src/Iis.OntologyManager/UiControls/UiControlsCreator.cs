@@ -128,5 +128,12 @@ namespace Iis.OntologyManager.UiControls
             form.Height = container.Bottom;
             return form.ShowDialog() == DialogResult.OK ? (T)comboBox.SelectedItem : null;
         }
+
+        public Panel GetFillPanel(Panel parent, bool visible = true)
+        {
+            var panel = new Panel { Dock = DockStyle.Fill, Visible = visible };
+            parent.Controls.Add(panel);
+            return panel;
+        }
     }
 }
