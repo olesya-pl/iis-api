@@ -8,11 +8,11 @@ namespace IIS.Core.GraphQL.Export
     public class ExportQuery
     {
         [GraphQLNonNullType]
-        public async Task<byte[]> ExportPerson(
+        public async Task<byte[]> ExportNode(
             [Service]ExportService exportService,
-            [GraphQLNonNullType] Guid personId)
+            [GraphQLNonNullType] Guid id)
         {
-            return await exportService.ExportPersonAsync(personId);
+            return await exportService.ExportNodeAsync(id);
         }
     }
 }
