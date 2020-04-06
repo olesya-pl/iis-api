@@ -22,6 +22,9 @@ namespace Iis.OntologyManager.UiControls
         private Button btnTypeSave;
         private UiControlsCreator _uiControlsCreator;
 
+        public event Action<IChildNodeType> OnShowRelationType;
+        public event Action<IChildNodeType> OnShowTargetType;
+
         public UiEntityTypeControl(UiControlsCreator uiControlsCreator)
         {
             _uiControlsCreator = uiControlsCreator;
@@ -67,14 +70,13 @@ namespace Iis.OntologyManager.UiControls
             //btnTypeSave.Click += (sender, e) => { SaveTypeProperties(); };
             _container.Add(btnTypeSave);
 
-
             _container.GoToBottom();
             _container.StepDown();
             _container.SetFullWidthColumn();
 
             menuChildren = new ContextMenuStrip();
             menuChildren.Items.Add("Show Relation");
-            //menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(ChildrenShowRelation); };
+            menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(OnShowRelationType); };
             menuChildren.Items.Add("Change Target Type");
             //menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(ChildrenChangeTargetType); };
 
@@ -100,19 +102,16 @@ namespace Iis.OntologyManager.UiControls
         }
         private void gridChildrenEvent(Action<IChildNodeType> action)
         {
+            if (action == null) return;
             var grid = gridChildren;
             var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
             if (selectedRow == null) return;
             var childNodeType = (IChildNodeType)selectedRow.DataBoundItem;
             action(childNodeType);
         }
-        private void menuChildren_showRelationClick(object sender, EventArgs e)
-        {
-            //gridChildrenEvent(ChildrenShowRelation);
-        }
         private void gridChildren_DoubleClick(object sender, EventArgs e)
         {
-            //gridChildrenEvent(cnt => SetNodeTypeView(cnt.TargetType, true));
+            gridChildrenEvent(OnShowTargetType);
         }
         private void gridChildren_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
@@ -126,10 +125,7 @@ namespace Iis.OntologyManager.UiControls
             style.BackColor = color;
             style.SelectionBackColor = color;
             style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
-            //style.Font = row.Selected ? SelectedFont : DefaultFont;
+            style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
         }
-        
-
-
     }
 }

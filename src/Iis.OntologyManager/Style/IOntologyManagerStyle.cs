@@ -16,5 +16,8 @@ namespace Iis.OntologyManager.Style
         int MarginVerSmall { get; }
         Color RelationTypeBackColor { get; }
         Color GetColorByNodeType(Kind kind);
+        Font DefaultFont { get; }
+        Font SelectedFont { get; }
+        Font TypeHeaderNameFont { get; }
     }
 }

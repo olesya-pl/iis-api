@@ -18,7 +18,9 @@ namespace Iis.OntologyManager.Style
         public Color EntityTypeBackColor { get; set; }
         public Color AttributeTypeBackColor { get; set; }
         public Color RelationTypeBackColor { get; set; }
+        public Font DefaultFont { get; set; }
         public Font SelectedFont { get; set; }
+        public Font TypeHeaderNameFont { get; set; }
         public static IOntologyManagerStyle GetDefaultStyle()
         {
             return new OntologyManagerStyle
@@ -32,8 +34,11 @@ namespace Iis.OntologyManager.Style
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,
                 RelationTypeBackColor = Color.Lavender,
-                ComparisonBackColor = Color.Honeydew
-            };
+                ComparisonBackColor = Color.Honeydew,
+                DefaultFont = SystemFonts.DefaultFont,
+                SelectedFont = new Font(SystemFonts.DefaultFont, FontStyle.Bold),
+                TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold)
+        };
         }
         public Color GetColorByNodeType(Kind kind)
         {

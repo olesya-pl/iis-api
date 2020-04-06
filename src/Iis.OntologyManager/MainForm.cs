@@ -37,8 +37,7 @@ namespace Iis.OntologyManager
         ISchemaCompareResult _compareResult;
         UiFilterControl _filterControl;
         UiEntityTypeControl _uiEntityTypeControl;
-        Font SelectedFont { get; set; }
-        Font TypeHeaderNameFont { get; set; }
+        
         string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
         INodeTypeLinked SelectedNodeType
         {
@@ -61,8 +60,6 @@ namespace Iis.OntologyManager
             _schemaService = schemaService;
             _schemaSources = GetSchemaSources();
             
-            SelectedFont = new Font(DefaultFont, FontStyle.Bold);
-            TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold);
             SuspendLayout();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
@@ -102,6 +99,8 @@ namespace Iis.OntologyManager
             var pnlEntityType = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiEntityTypeControl = new UiEntityTypeControl(_uiControlsCreator);
             _uiEntityTypeControl.Initialize(_style, pnlEntityType);
+            _uiEntityTypeControl.OnShowRelationType += ChildrenShowRelation;
+            _uiEntityTypeControl.OnShowTargetType += (childNodeType) => SetNodeTypeView(childNodeType.TargetType, true);
             //SetTypeViewControls(pnlBottom);
 
             rootPanel.SuspendLayout();
@@ -126,7 +125,7 @@ namespace Iis.OntologyManager
             {
                 Location = new Point(btnTypeBack.Right + _style.MarginHor, _style.MarginVer),
                 ForeColor = Color.DarkBlue,
-                Font = TypeHeaderNameFont,
+                Font = _style.TypeHeaderNameFont,
                 AutoSize = true,
                 Text = ""
             };
@@ -273,7 +272,7 @@ namespace Iis.OntologyManager
             style.BackColor = color;
             style.SelectionBackColor = color;
             style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
-            style.Font = row.Selected ? SelectedFont : DefaultFont;
+            style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
         }
         #endregion
 
@@ -382,6 +381,7 @@ namespace Iis.OntologyManager
             {
                 _history.Add(_currentNodeType);
             }
+            _uiEntityTypeControl.SetUiValues(nodeType);
             lblTypeHeaderName.Text = nodeType.Name;
             _currentNodeType = nodeType;
         }
