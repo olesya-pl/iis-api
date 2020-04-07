@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
+using Iis.OntologySchema.ChangeParameters;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiEntityTypeControl: UIBaseControl
+    public class UiEntityTypeControl: UIBaseControl, IUiNodeTypeControl
     {
         private TextBox txtId;
         private TextBox txtName;
@@ -19,11 +20,14 @@ namespace Iis.OntologyManager.UiControls
         private RichTextBox txtMeta;
         private ContextMenuStrip menuChildren;
         private DataGridView gridChildren;
-        private Button btnTypeSave;
+        private Button btnSave;
         private UiControlsCreator _uiControlsCreator;
 
         public event Action<IChildNodeType> OnShowRelationType;
         public event Action<IChildNodeType> OnShowTargetType;
+        public event Action<INodeTypeLinked> OnShowEntityType;
+        public event Action<IChildNodeType> OnChangeTargetType;
+        public event Action<INodeTypeUpdateParameter> OnSave;
 
         public UiEntityTypeControl(UiControlsCreator uiControlsCreator)
         {
@@ -66,9 +70,9 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(txtMeta = new RichTextBox(), "Meta", true);
 
             _container.GoToNewColumn(_style.ButtonWidthDefault);
-            btnTypeSave = new Button { Text = "Save" };
-            //btnTypeSave.Click += (sender, e) => { SaveTypeProperties(); };
-            _container.Add(btnTypeSave);
+            btnSave = new Button { Text = "Save" };
+            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
+            _container.Add(btnSave);
 
             _container.GoToBottom();
             _container.StepDown();
@@ -78,7 +82,7 @@ namespace Iis.OntologyManager.UiControls
             menuChildren.Items.Add("Show Relation");
             menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(OnShowRelationType); };
             menuChildren.Items.Add("Change Target Type");
-            //menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(ChildrenChangeTargetType); };
+            menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(OnChangeTargetType); };
 
             gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
@@ -91,14 +95,32 @@ namespace Iis.OntologyManager.UiControls
 
             _container.Add(gridChildren, null, true);
         }
+        private INodeTypeUpdateParameter GetUpdateParameter()
+        {
+            return new NodeTypeUpdateParameter
+            {
+                Id = new Guid(txtId.Text),
+                Title = txtTitle.Text,
+                Meta = txtMeta.Text
+            };
+        }
         private DataGridView GetRelationsGrid(string name)
         {
             var grid = _uiControlsCreator.GetDataGridView(name, null,
                 new List<string> { "Name" });
             grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            //grid.CellFormatting += gridTypes_CellFormatting;
-            //grid.DoubleClick += gridInheritance_DoubleClick;
+            grid.CellFormatting += _style.GridTypes_CellFormatting;
+            grid.DoubleClick += gridInheritance_DoubleClick;
             return grid;
+        }
+        private void gridInheritance_DoubleClick(object sender, EventArgs e)
+        {
+            if (OnShowEntityType == null) return;
+            var grid = (DataGridView)sender;
+            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
+            if (selectedRow == null) return;
+            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
+            OnShowEntityType(nodeType);
         }
         private void gridChildrenEvent(Action<IChildNodeType> action)
         {

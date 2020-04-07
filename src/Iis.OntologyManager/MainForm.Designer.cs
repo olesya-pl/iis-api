@@ -109,7 +109,6 @@ namespace Iis.OntologyManager
             this.gridTypes.TabIndex = 0;
             this.gridTypes.ReadOnly = true;
             this.gridTypes.SelectionChanged += new System.EventHandler(this.gridTypes_SelectionChanged);
-            this.gridTypes.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.gridTypes_CellFormatting);
             // 
             // MainForm
             // 

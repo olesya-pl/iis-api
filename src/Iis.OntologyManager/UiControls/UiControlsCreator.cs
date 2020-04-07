@@ -71,7 +71,7 @@ namespace Iis.OntologyManager.UiControls
             var panelBottom = new Panel
             {
                 Location = new Point(margin, panelTop.Bottom + margin),
-                Size = new Size(rootPanel.Width - margin * 2, rootPanel.Height - panelTop.Bottom - margin*2),
+                Size = new Size(rootPanel.Width - margin * 2, rootPanel.Height - panelTop.Bottom - margin * 2),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 BorderStyle = BorderStyle.FixedSingle,
                 BackColor = rootPanel.BackColor
@@ -97,7 +97,7 @@ namespace Iis.OntologyManager.UiControls
             }
         }
 
-        public T ChooseFromModalComboBox<T>(IEnumerable<T> items, string dataPropertyName) where T: class
+        public T ChooseFromModalComboBox<T>(IEnumerable<T> items, string dataPropertyName) where T : class
         {
             var form = new Form
             {
@@ -105,7 +105,7 @@ namespace Iis.OntologyManager.UiControls
                 Width = _style.ControlWidthDefault + _style.MarginHor * 2,
                 StartPosition = FormStartPosition.CenterParent
             };
-            var rootPanel = new Panel 
+            var rootPanel = new Panel
             {
                 Dock = DockStyle.Fill,
                 BackColor = _style.BackgroundColor
@@ -135,5 +135,30 @@ namespace Iis.OntologyManager.UiControls
             parent.Controls.Add(panel);
             return panel;
         }
-    }
+        public ComboBox GetEnumComboBox(Type enumType)
+        {
+            var comboBox = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = "Name",
+                ValueMember = "Value",
+                BackColor = _style.BackgroundColor,
+                DataSource = Enum.GetValues(enumType)
+            };
+
+            return comboBox;
+        }
+
+        public void SetSelectedValue(ComboBox comboBox, string value)
+        {
+            for (int i = 0; i < comboBox.Items.Count; i++)
+            {
+                if (comboBox.Items[i].ToString() == value)
+                {
+                    comboBox.SelectedIndex = i;
+                    return;
+                }
+            }
+        }
+    };
 }

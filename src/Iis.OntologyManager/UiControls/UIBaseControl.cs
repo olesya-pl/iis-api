@@ -11,6 +11,11 @@ namespace Iis.OntologyManager.UiControls
         protected UiContainerManager _container;
         protected IOntologyManagerStyle _style;
         public Panel MainPanel { get; private set; }
+        public bool Visible
+        {
+            get { return MainPanel.Visible; }
+            set { MainPanel.Visible = value; }
+        }
         public Panel Initialize(IOntologyManagerStyle style, Panel mainPanel)
         {
             _style = style;

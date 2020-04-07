@@ -37,7 +37,17 @@ namespace Iis.OntologyManager
         ISchemaCompareResult _compareResult;
         UiFilterControl _filterControl;
         UiEntityTypeControl _uiEntityTypeControl;
-        
+        UiRelationAttributeControl _uiRelationAttributeControl;
+        UiRelationEntityControl _uiRelationEntityControl;
+        Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
+
+        private enum NodeViewType
+        {
+            Entity,
+            RelationEntity,
+            RelationAttribute
+        }
+
         string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
         INodeTypeLinked SelectedNodeType
         {
@@ -63,6 +73,7 @@ namespace Iis.OntologyManager
             SuspendLayout();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
+            gridTypes.CellFormatting += _style.GridTypes_CellFormatting;
             SetControlsTabMain(panelRight);
             SetControlsTopPanel();
             CreateComparisonPanel();
@@ -96,12 +107,26 @@ namespace Iis.OntologyManager
             pnlBottom.BorderStyle = BorderStyle.FixedSingle;
             pnlBottom.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             SetTypeViewHeader(pnlTop);
-            var pnlEntityType = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            var pnlEntityType = _uiControlsCreator.GetFillPanel(pnlBottom, false);
             _uiEntityTypeControl = new UiEntityTypeControl(_uiControlsCreator);
             _uiEntityTypeControl.Initialize(_style, pnlEntityType);
             _uiEntityTypeControl.OnShowRelationType += ChildrenShowRelation;
             _uiEntityTypeControl.OnShowTargetType += (childNodeType) => SetNodeTypeView(childNodeType.TargetType, true);
-            //SetTypeViewControls(pnlBottom);
+            _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
+            _uiEntityTypeControl.OnChangeTargetType += ChildrenChangeTargetType;
+            _uiEntityTypeControl.OnSave += (updateParameter) => { _schema.UpdateNodeType(updateParameter); };
+
+            var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiRelationAttributeControl = new UiRelationAttributeControl(_uiControlsCreator);
+            _uiRelationAttributeControl.Initialize(_style, pnlRelationAttribute);
+
+            var pnlRelationEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator);
+            _uiRelationEntityControl.Initialize(_style, pnlRelationEntity);
+
+            _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
+            _nodeTypeControls[NodeViewType.RelationEntity] = _uiRelationEntityControl;
+            _nodeTypeControls[NodeViewType.RelationAttribute] = _uiRelationAttributeControl;
 
             rootPanel.SuspendLayout();
             rootPanel.Controls.Add(pnlTop);
@@ -217,15 +242,6 @@ namespace Iis.OntologyManager
 
         #region UI Control Events
         
-        
-        private void gridInheritance_DoubleClick(object sender, EventArgs e)
-        {
-            var grid = (DataGridView)sender;
-            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            if (selectedRow == null) return;
-            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
-            SetNodeTypeView(nodeType, true);
-        }
         private void btnTypeBack_Click(object sender, EventArgs e)
         {
             if (_history.Count == 0) return;
@@ -260,20 +276,7 @@ namespace Iis.OntologyManager
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
         }
-        private void gridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            var grid = (DataGridView)sender;
-            var nodeType = (INodeTypeLinked)grid.Rows[e.RowIndex].DataBoundItem;
-            if (nodeType == null) return;
-            var color = _style.GetColorByNodeType(nodeType.Kind);
-            var row = (DataGridViewRow)grid.Rows[e.RowIndex];
-            var style = row.DefaultCellStyle;
-
-            style.BackColor = color;
-            style.SelectionBackColor = color;
-            style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
-            style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
-        }
+        
         #endregion
 
         #region Schema Logic
@@ -375,26 +378,34 @@ namespace Iis.OntologyManager
         #endregion
 
         #region Node Type Logic
+        private NodeViewType GetNodeViewType(INodeTypeLinked nodeType)
+        {
+            if (nodeType.Kind == Kind.Entity) return NodeViewType.Entity;
+
+            if (nodeType.Kind == Kind.Relation)
+            {
+                return nodeType.RelationType.TargetType.Kind == Kind.Entity ?
+                    NodeViewType.RelationEntity :
+                    NodeViewType.RelationAttribute;
+            }
+
+            throw new ArgumentException($"Cannot get NodeViewType for {nodeType.Id}");
+        }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
             if (addToHistory && _currentNodeType != null)
             {
                 _history.Add(_currentNodeType);
             }
-            _uiEntityTypeControl.SetUiValues(nodeType);
+            var nodeViewType = GetNodeViewType(nodeType);
+            foreach (var key in _nodeTypeControls.Keys)
+            {
+                _nodeTypeControls[key].Visible = nodeViewType == key;
+            }
+            _nodeTypeControls[nodeViewType].SetUiValues(nodeType);
+
             lblTypeHeaderName.Text = nodeType.Name;
             _currentNodeType = nodeType;
-        }
-        private void SaveTypeProperties()
-        {
-            if (_currentNodeType == null) return;
-            var updateParameter = new NodeTypeUpdateParameter
-            {
-                Id = _currentNodeType.Id,
-                Title = txtTitle.Text,
-                //Meta = txtMeta.Text
-            };
-            _schema.UpdateNodeType(updateParameter);
         }
         private INodeTypeLinked ChooseEntityTypeFromCombo()
         {
