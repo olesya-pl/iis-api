@@ -14,7 +14,6 @@ namespace IIS.Core.Materials
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsAsync(int limit, 
             int offset,
             string filterQuery,
-            Guid? parentId = null,
             IEnumerable<Guid> nodeIds = null,
             IEnumerable<string> types = null);
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();

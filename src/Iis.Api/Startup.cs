@@ -69,6 +69,11 @@ namespace IIS.Core
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            ConfigureServices(services, true);
+        }
+
+        public void ConfigureServices(IServiceCollection services, bool enableContext)
+        {
             services
                 .RegisterRunUpTools()
                 .RegisterSeederTools()
@@ -77,11 +82,14 @@ namespace IIS.Core
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
-            services.AddDbContext<OntologyContext>(
-                options => options.UseNpgsql(dbConnectionString),
-                ServiceLifetime.Transient);
 
-            
+            if (enableContext)
+            {
+                services.AddDbContext<OntologyContext>(
+                    options => options.UseNpgsql(dbConnectionString),
+                    ServiceLifetime.Transient);
+            }
+
             services.AddHttpContextAccessor();
             using var context = OntologyContext.GetContext(dbConnectionString);
             context.Database.Migrate();
@@ -202,6 +210,7 @@ namespace IIS.Core
             services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<GraphQLAccessList>();
         }
+
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {

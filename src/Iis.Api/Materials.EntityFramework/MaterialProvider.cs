@@ -35,21 +35,21 @@ namespace IIS.Core.Materials.EntityFramework
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsAsync(int limit, int offset, string filterQuery,
-            Guid? parentId = null, IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
+            IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
             await _context.Semaphore.WaitAsync();
             
             try
             {
-                IQueryable<MaterialEntity> materialsQuery;
+                IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery();
                 IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
                 if(!string.IsNullOrWhiteSpace(filterQuery))
                 {
-                    materialsQuery = GetMaterialQuery();
-
-                    var searchResult = await _elasticService.SearchByAllFieldsAsync(_elasticService.MaterialIndexes, new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
+                    var searchResult = await _elasticService.SearchByAllFieldsAsync(
+                        _elasticService.MaterialIndexes, 
+                        new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
                     
                     mappingTasks =  (await materialsQuery
                                         .Where(e => searchResult.ids.Contains(e.Id))
@@ -63,17 +63,13 @@ namespace IIS.Core.Materials.EntityFramework
 
                 if (nodeIds == null)
                 {
-                    materialsQuery = GetMaterialQuery();
-
-                    if (parentId != null) materialsQuery = materialsQuery.Where(e => e.ParentId == parentId);
-
                     if (types != null) materialsQuery = materialsQuery.Where(e => types.Contains(e.Type));
                 }
                 else
                 {
                     var nodeIdsArr = nodeIds.ToArray();
 
-                    materialsQuery = GetMaterialQuery()
+                    materialsQuery = materialsQuery
                         .Where(m => m.MaterialInfos.Any(i => i.MaterialFeatures.Any(f => nodeIdsArr.Contains(f.NodeId))))
                         .OrderByDescending(m => m.CreatedDate);
                 }
@@ -158,6 +154,20 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
             if (input.States != null) material.LoadData.States = new List<string>(input.States);
             return _mapper.Map<MaterialEntity>(material);
+        }
+
+        private IQueryable<MaterialEntity> GetParentMaterialsQuery()
+        {
+            return _context.Materials
+                    .AsNoTracking()
+                    .Include(m => m.Importance)
+                    .Include(m => m.Reliability)
+                    .Include(m => m.Relevance)
+                    .Include(m => m.Completeness)
+                    .Include(m => m.SourceReliability)
+                    .Include(m => m.MaterialInfos)
+                    .ThenInclude(m => m.MaterialFeatures)
+                    .Where(p => p.ParentId == null);
         }
 
         private IQueryable<MaterialEntity> GetMaterialQuery()

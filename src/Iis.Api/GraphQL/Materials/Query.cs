@@ -22,13 +22,12 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
             FilterInput filter,
-            [GraphQLType(typeof(IdType))] Guid? parentId = null,
             IEnumerable<Guid> nodeIds = null,
             IEnumerable<string> types = null)
         {
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
 
-            var materialsResult = await materialProvider.GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, parentId, nodeIds, types);
+            var materialsResult = await materialProvider.GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
 
