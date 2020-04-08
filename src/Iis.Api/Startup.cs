@@ -69,10 +69,10 @@ namespace IIS.Core
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            ConfigureServices(services, true);
+            RegisterServices(services, true);
         }
 
-        public void ConfigureServices(IServiceCollection services, bool enableContext)
+        public void RegisterServices(IServiceCollection services, bool enableContext)
         {
             services
                 .RegisterRunUpTools()

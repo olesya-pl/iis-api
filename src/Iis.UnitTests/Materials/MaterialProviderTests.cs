@@ -76,7 +76,7 @@ namespace Iis.UnitTests.Materials
             serviceCollection.AddDbContext<OntologyContext>(
                 options => options.UseInMemoryDatabase("db"),
                 ServiceLifetime.Transient);
-            startup.ConfigureServices(serviceCollection, false);
+            startup.RegisterServices(serviceCollection, false);
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;
