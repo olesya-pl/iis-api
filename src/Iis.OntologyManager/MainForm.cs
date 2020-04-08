@@ -114,15 +114,17 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnShowTargetType += (childNodeType) => SetNodeTypeView(childNodeType.TargetType, true);
             _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
             _uiEntityTypeControl.OnChangeTargetType += ChildrenChangeTargetType;
-            _uiEntityTypeControl.OnSave += (updateParameter) => { _schema.UpdateNodeType(updateParameter); };
+            _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiRelationAttributeControl = new UiRelationAttributeControl(_uiControlsCreator);
             _uiRelationAttributeControl.Initialize(_style, pnlRelationAttribute);
+            _uiRelationAttributeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            _uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator);
+            _uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator, GetAllEntities);
             _uiRelationEntityControl.Initialize(_style, pnlRelationEntity);
+            _uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
 
             _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
             _nodeTypeControls[NodeViewType.RelationEntity] = _uiRelationEntityControl;
@@ -132,6 +134,12 @@ namespace Iis.OntologyManager
             rootPanel.Controls.Add(pnlTop);
             rootPanel.Controls.Add(pnlBottom);
             rootPanel.ResumeLayout();
+        }
+
+        private void OnNodeTypeSaveClick(INodeTypeUpdateParameter updateParameter)
+        {
+            _schema.UpdateNodeType(updateParameter);
+            GoBack();
         }
 
         private void SetTypeViewHeader(Panel rootPanel)
@@ -144,7 +152,7 @@ namespace Iis.OntologyManager
                 Width = 60,
                 Text = "Back"
             };
-            btnTypeBack.Click += btnTypeBack_Click;
+            btnTypeBack.Click += (sender, e) => { GoBack(); };
 
             lblTypeHeaderName = new Label
             {
@@ -242,7 +250,7 @@ namespace Iis.OntologyManager
 
         #region UI Control Events
         
-        private void btnTypeBack_Click(object sender, EventArgs e)
+        private void GoBack()
         {
             if (_history.Count == 0) return;
             var nodeType = _history[_history.Count - 1];
@@ -317,6 +325,12 @@ namespace Iis.OntologyManager
             }));
 
             return result;
+        }
+
+        private List<INodeTypeLinked> GetAllEntities()
+        {
+            var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
+            return _schema.GetTypes(filter).OrderBy(t => t.Name).ToList();
         }
         #endregion
 
@@ -409,13 +423,8 @@ namespace Iis.OntologyManager
         }
         private INodeTypeLinked ChooseEntityTypeFromCombo()
         {
-            var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
-            var entities = _schema.GetTypes(filter)
-                .OrderBy(t => t.Name)
-                .ToList();
-            return _uiControlsCreator.ChooseFromModalComboBox(entities, "Name");
+            return _uiControlsCreator.ChooseFromModalComboBox(GetAllEntities(), "Name");
         }
-
         public void ReloadTypes(IGetTypesFilter filter)
         {
             if (_schema == null) return;

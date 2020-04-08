@@ -17,7 +17,6 @@ namespace Iis.OntologyManager.UiControls
         private DataGridView gridInheritedFrom;
         private DataGridView gridInheritedBy;
         private DataGridView gridEmbeddence;
-        private RichTextBox txtMeta;
         private ContextMenuStrip menuChildren;
         private DataGridView gridChildren;
         private Button btnSave;
@@ -45,7 +44,6 @@ namespace Iis.OntologyManager.UiControls
             gridInheritedFrom.DataSource = ancestors;
             gridInheritedBy.DataSource = nodeType.GetDirectDescendants();
             gridEmbeddence.DataSource = nodeType.GetNodeTypesThatEmbedded();
-            txtMeta.Text = nodeType.Meta;
         }
         protected override void CreateControls()
         {
@@ -66,10 +64,6 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(gridEmbeddence, "Embedded By:", true);
             _container.GoToNewColumn();
 
-            _container.GoToNewColumn();
-            _container.Add(txtMeta = new RichTextBox(), "Meta", true);
-
-            _container.GoToNewColumn(_style.ButtonWidthDefault);
             btnSave = new Button { Text = "Save" };
             btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
             _container.Add(btnSave);
@@ -79,8 +73,8 @@ namespace Iis.OntologyManager.UiControls
             _container.SetFullWidthColumn();
 
             menuChildren = new ContextMenuStrip();
-            menuChildren.Items.Add("Show Relation");
-            menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(OnShowRelationType); };
+            menuChildren.Items.Add("Show Target Type");
+            menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(OnShowTargetType); };
             menuChildren.Items.Add("Change Target Type");
             menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(OnChangeTargetType); };
 
@@ -101,7 +95,6 @@ namespace Iis.OntologyManager.UiControls
             {
                 Id = new Guid(txtId.Text),
                 Title = txtTitle.Text,
-                Meta = txtMeta.Text
             };
         }
         private DataGridView GetRelationsGrid(string name)
@@ -133,7 +126,7 @@ namespace Iis.OntologyManager.UiControls
         }
         private void gridChildren_DoubleClick(object sender, EventArgs e)
         {
-            gridChildrenEvent(OnShowTargetType);
+            gridChildrenEvent(OnShowRelationType);
         }
         private void gridChildren_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {

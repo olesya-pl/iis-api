@@ -9,5 +9,6 @@ namespace Iis.Interfaces.Ontology.Schema
         string Meta { get; }
         ScalarType? ScalarType { get; }
         string Title { get; }
+        Guid? TargetTypeId { get; }
     }
 }

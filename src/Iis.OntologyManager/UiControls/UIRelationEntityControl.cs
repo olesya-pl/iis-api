@@ -15,12 +15,15 @@ namespace Iis.OntologyManager.UiControls
         private TextBox txtTitle;
         private RichTextBox txtMeta;
         private ComboBox cmbEmbedding;
+        private ComboBox cmbTargetType;
         private Button btnSave;
+        Func<List<INodeTypeLinked>> _getAllEntities;
         UiControlsCreator _uiControlsCreator;
         public event Action<INodeTypeUpdateParameter> OnSave;
-        public UiRelationEntityControl(UiControlsCreator uiControlsCreator)
+        public UiRelationEntityControl(UiControlsCreator uiControlsCreator, Func<List<INodeTypeLinked>> getAllEntities)
         {
             _uiControlsCreator = uiControlsCreator;
+            _getAllEntities = getAllEntities;
         }
         protected override void CreateControls()
         {
@@ -28,6 +31,15 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(txtName = new TextBox(), "Name");
             _container.Add(txtTitle = new TextBox(), "Title");
             _container.Add(cmbEmbedding = _uiControlsCreator.GetEnumComboBox(typeof(EmbeddingOptions)), "Embedding Options");
+            cmbTargetType = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = "Name",
+                ValueMember = "Id",
+                BackColor = _style.BackgroundColor
+            };
+            _container.Add(cmbTargetType);
+
             btnSave = new Button { Text = "Save" };
             btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
             _container.Add(btnSave);
@@ -41,6 +53,8 @@ namespace Iis.OntologyManager.UiControls
             txtTitle.Text = nodeType.Title;
             txtMeta.Text = nodeType.Meta;
             _uiControlsCreator.SetSelectedValue(cmbEmbedding, nodeType.RelationType.EmbeddingOptions.ToString());
+            cmbTargetType.DataSource = _getAllEntities();
+            _uiControlsCreator.SetSelectedValue(cmbTargetType, nodeType.RelationType.TargetType.Name);
         }
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
@@ -49,7 +63,8 @@ namespace Iis.OntologyManager.UiControls
                 Id = new Guid(txtId.Text),
                 Title = txtTitle.Text,
                 Meta = txtMeta.Text,
-                EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem
+                EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
+                TargetTypeId = (Guid)cmbTargetType.SelectedValue
             };
         }
     }

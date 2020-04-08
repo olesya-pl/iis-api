@@ -12,5 +12,6 @@ namespace Iis.OntologySchema.ChangeParameters
         public string Meta { get; set; }
         public EmbeddingOptions? EmbeddingOptions { get; set; }
         public ScalarType? ScalarType { get; set; }
+        public Guid? TargetTypeId { get; set; }
     }
 }

@@ -133,29 +133,57 @@ namespace Iis.OntologySchema
             result.SchemaSource = schema.SchemaSource;
             return result;
         }
-
-        public void UpdateNodeType(INodeTypeUpdateParameter updateParameter)
+        
+        private void UpdateNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
         {
-            var nodeType = _storage.GetNodeTypeById(updateParameter.Id);
-
             if (!string.IsNullOrEmpty(updateParameter.Title))
             {
                 nodeType.Title = updateParameter.Title;
             }
 
-            if (!string.IsNullOrEmpty(updateParameter.Meta))
+            if (nodeType.Kind == Kind.Relation && !string.IsNullOrEmpty(updateParameter.Meta))
             {
                 nodeType.Meta = updateParameter.Meta;
-            }
-
-            if (updateParameter.EmbeddingOptions != null && nodeType._relationType != null)
-            {
-                nodeType._relationType.EmbeddingOptions = (EmbeddingOptions)updateParameter.EmbeddingOptions;
             }
 
             if (updateParameter.ScalarType != null && nodeType._attributeType != null)
             {
                 nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
+            }
+        }
+        private void UpdateRelationNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
+        {
+            UpdateNodeType(nodeType, updateParameter);
+
+            if (updateParameter.EmbeddingOptions != null)
+            {
+                nodeType._relationType.EmbeddingOptions = (EmbeddingOptions)updateParameter.EmbeddingOptions;
+            }
+
+            if (updateParameter.TargetTypeId != null && nodeType.RelationType.TargetType.Kind == Kind.Entity)
+            {
+                nodeType._relationType.TargetTypeId = (Guid)updateParameter.TargetTypeId;
+                nodeType._relationType._targetType = _storage.NodeTypes[(Guid)updateParameter.TargetTypeId];
+            }
+
+            UpdateNodeType(nodeType._relationType._targetType, updateParameter);
+        }
+
+        public void UpdateNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            var nodeType = _storage.GetNodeTypeById(updateParameter.Id);
+            
+            switch (nodeType.Kind)
+            {
+                case Kind.Entity:
+                    UpdateNodeType(nodeType, updateParameter);
+                    break;
+                case Kind.Relation:
+                    UpdateRelationNodeType(nodeType, updateParameter);
+                    break;
+                case Kind.Attribute:
+                    UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
+                    break;
             }
         }
 
