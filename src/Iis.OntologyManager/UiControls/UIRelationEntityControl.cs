@@ -8,9 +8,8 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiRelationEntityControl: UIBaseControl, IUiNodeTypeControl
+    public class UiRelationEntityControl: UiTypeViewControl, IUiNodeTypeControl
     {
-        private TextBox txtId;
         private TextBox txtName;
         private TextBox txtTitle;
         private RichTextBox txtMeta;
@@ -56,15 +55,28 @@ namespace Iis.OntologyManager.UiControls
             cmbTargetType.DataSource = _getAllEntities();
             _uiControlsCreator.SetSelectedValue(cmbTargetType, nodeType.RelationType.TargetType.Name);
         }
+        public void CreateNew()
+        {
+            txtId.Clear();
+            txtName.Clear();
+            txtTitle.Clear();
+            txtMeta.Clear();
+            cmbEmbedding.SelectedIndex = 0;
+            cmbTargetType.DataSource = _getAllEntities();
+            cmbTargetType.SelectedIndex = -1;
+        }
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
+            var isNew = string.IsNullOrEmpty(txtId.Text);
             return new NodeTypeUpdateParameter
             {
-                Id = new Guid(txtId.Text),
+                Id = isNew ? (Guid?)null : new Guid(txtId.Text),
+                Name = isNew ? txtName.Text : null,
                 Title = txtTitle.Text,
                 Meta = txtMeta.Text,
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
-                TargetTypeId = (Guid)cmbTargetType.SelectedValue
+                TargetTypeId = (Guid)cmbTargetType.SelectedValue,
+                ParentTypeId = _parentTypeId
             };
         }
     }

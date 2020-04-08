@@ -8,6 +8,8 @@ namespace Iis.OntologyManager.UiControls
     public interface IUiNodeTypeControl
     {
         void SetUiValues(INodeTypeLinked nodeType);
+        void CreateNew();
+        void SetParentTypeId(Guid? parentTypeId);
         bool Visible { get; set; }
     }
 }

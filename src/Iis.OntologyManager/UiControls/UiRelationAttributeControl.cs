@@ -8,9 +8,8 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiRelationAttributeControl: UIBaseControl, IUiNodeTypeControl
+    public class UiRelationAttributeControl: UiTypeViewControl, IUiNodeTypeControl
     {
-        private TextBox txtId;
         private TextBox txtName;
         private TextBox txtTitle;
         private RichTextBox txtMeta;
@@ -40,11 +39,18 @@ namespace Iis.OntologyManager.UiControls
             _container.GoToNewColumn();
             _container.Add(txtMeta = new RichTextBox(), "Meta", true);
             _container.GoToNewColumn();
-            
+        }
+        public void CreateNew()
+        {
+            txtId.Clear();
+            txtName.Clear();
+            txtTitle.Clear();
+            txtMeta.Clear();
+            cmbEmbedding.SelectedIndex = 0;
+            cmbScalarType.SelectedIndex = 0;
         }
         public void SetUiValues(INodeTypeLinked nodeType)
         {
-
             txtId.Text = nodeType.Id.ToString("N");
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
@@ -54,13 +60,16 @@ namespace Iis.OntologyManager.UiControls
         }
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
+            var isNew = string.IsNullOrEmpty(txtId.Text);
             return new NodeTypeUpdateParameter
             {
-                Id = new Guid(txtId.Text),
+                Id = isNew ? (Guid?)null : new Guid(txtId.Text),
+                Name = isNew ? txtName.Text : null,
                 Title = txtTitle.Text,
                 Meta = txtMeta.Text,
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
-                ScalarType = (ScalarType)cmbScalarType.SelectedItem
+                ScalarType = (ScalarType)cmbScalarType.SelectedItem,
+                ParentTypeId = _parentTypeId
             };
         }
     }

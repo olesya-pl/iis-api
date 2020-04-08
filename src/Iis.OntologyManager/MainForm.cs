@@ -74,6 +74,7 @@ namespace Iis.OntologyManager
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
             gridTypes.CellFormatting += _style.GridTypes_CellFormatting;
+            AddGridTypesMenu();
             SetControlsTabMain(panelRight);
             SetControlsTopPanel();
             CreateComparisonPanel();
@@ -113,7 +114,8 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnShowRelationType += ChildrenShowRelation;
             _uiEntityTypeControl.OnShowTargetType += (childNodeType) => SetNodeTypeView(childNodeType.TargetType, true);
             _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
-            _uiEntityTypeControl.OnChangeTargetType += ChildrenChangeTargetType;
+            _uiEntityTypeControl.OnCreateAttribute += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationAttribute, parentTypeId);
+            _uiEntityTypeControl.OnCreateRelationEntity += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationEntity, parentTypeId);
             _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
@@ -136,10 +138,12 @@ namespace Iis.OntologyManager
             rootPanel.ResumeLayout();
         }
 
-        private void OnNodeTypeSaveClick(INodeTypeUpdateParameter updateParameter)
+        private void AddGridTypesMenu()
         {
-            _schema.UpdateNodeType(updateParameter);
-            GoBack();
+            var menu = new ContextMenuStrip();
+            menu.Items.Add("Add New Entity Type");
+            menu.Items[0].Click += (sender, e) => { CreateNewNodeType(NodeViewType.Entity, null); };
+            gridTypes.ContextMenuStrip = menu;
         }
 
         private void SetTypeViewHeader(Panel rootPanel)
@@ -172,7 +176,7 @@ namespace Iis.OntologyManager
             const int ComparisonMargin = 30;
             const int BtnCloseSize = 20;
             const int BtnCloseMargin = 5;
-            panelComparison = new Panel { 
+            panelComparison = new Panel {
                 Name = "panelComparison",
                 Location = new Point(ComparisonMargin, ComparisonMargin),
                 Size = new Size(this.ClientSize.Width - ComparisonMargin * 2, this.ClientSize.Height - ComparisonMargin * 2),
@@ -249,7 +253,6 @@ namespace Iis.OntologyManager
         #endregion
 
         #region UI Control Events
-        
         private void GoBack()
         {
             if (_history.Count == 0) return;
@@ -284,7 +287,7 @@ namespace Iis.OntologyManager
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
         }
-        
+
         #endregion
 
         #region Schema Logic
@@ -326,11 +329,22 @@ namespace Iis.OntologyManager
 
             return result;
         }
-
         private List<INodeTypeLinked> GetAllEntities()
         {
             var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
             return _schema.GetTypes(filter).OrderBy(t => t.Name).ToList();
+        }
+        private void OnNodeTypeSaveClick(INodeTypeUpdateParameter updateParameter)
+        {
+            _schema.UpdateNodeType(updateParameter);
+            if (updateParameter.Id == null && updateParameter.ParentTypeId == null)
+            {
+                ReloadTypes(_filterControl.GetModel());
+            }
+            else
+            {
+                GoBack();
+            }
         }
         #endregion
 
@@ -405,6 +419,20 @@ namespace Iis.OntologyManager
 
             throw new ArgumentException($"Cannot get NodeViewType for {nodeType.Id}");
         }
+        private void SetNodeTypeViewVisibility(NodeViewType nodeViewType)
+        {
+            foreach (var key in _nodeTypeControls.Keys)
+            {
+                _nodeTypeControls[key].Visible = nodeViewType == key;
+            }
+        }
+        private void CreateNewNodeType(NodeViewType nodeViewType, Guid? parentTypeId)
+        {
+            SetNodeTypeViewVisibility(nodeViewType);
+            _nodeTypeControls[nodeViewType].SetParentTypeId(parentTypeId);
+            _nodeTypeControls[nodeViewType].CreateNew();
+            _history.Add(_currentNodeType);
+        }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
             if (addToHistory && _currentNodeType != null)
@@ -412,10 +440,7 @@ namespace Iis.OntologyManager
                 _history.Add(_currentNodeType);
             }
             var nodeViewType = GetNodeViewType(nodeType);
-            foreach (var key in _nodeTypeControls.Keys)
-            {
-                _nodeTypeControls[key].Visible = nodeViewType == key;
-            }
+            SetNodeTypeViewVisibility(nodeViewType);
             _nodeTypeControls[nodeViewType].SetUiValues(nodeType);
 
             lblTypeHeaderName.Text = nodeType.Name;

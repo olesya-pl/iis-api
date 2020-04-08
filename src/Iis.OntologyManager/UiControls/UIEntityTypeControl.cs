@@ -9,9 +9,8 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiEntityTypeControl: UIBaseControl, IUiNodeTypeControl
+    public class UiEntityTypeControl: UiTypeViewControl, IUiNodeTypeControl
     {
-        private TextBox txtId;
         private TextBox txtName;
         private TextBox txtTitle;
         private DataGridView gridInheritedFrom;
@@ -25,8 +24,18 @@ namespace Iis.OntologyManager.UiControls
         public event Action<IChildNodeType> OnShowRelationType;
         public event Action<IChildNodeType> OnShowTargetType;
         public event Action<INodeTypeLinked> OnShowEntityType;
-        public event Action<IChildNodeType> OnChangeTargetType;
         public event Action<INodeTypeUpdateParameter> OnSave;
+        public event Action<Guid> OnCreateAttribute;
+        public event Action<Guid> OnCreateRelationEntity;
+
+        public IChildNodeType SelectedChild
+        {
+            get
+            {
+                var selectedRow = gridChildren.SelectedRows.Count > 0 ? gridChildren.SelectedRows[0] : null;
+                return selectedRow == null ? null : (IChildNodeType)selectedRow.DataBoundItem;
+            }
+        }
 
         public UiEntityTypeControl(UiControlsCreator uiControlsCreator)
         {
@@ -44,6 +53,16 @@ namespace Iis.OntologyManager.UiControls
             gridInheritedFrom.DataSource = ancestors;
             gridInheritedBy.DataSource = nodeType.GetDirectDescendants();
             gridEmbeddence.DataSource = nodeType.GetNodeTypesThatEmbedded();
+        }
+        public void CreateNew()
+        {
+            txtId.Clear();
+            txtName.Clear();
+            txtTitle.Clear();
+            gridChildren.DataSource = null;
+            gridInheritedFrom.DataSource = null;
+            gridInheritedBy.DataSource = null;
+            gridEmbeddence.DataSource = null;
         }
         protected override void CreateControls()
         {
@@ -75,8 +94,10 @@ namespace Iis.OntologyManager.UiControls
             menuChildren = new ContextMenuStrip();
             menuChildren.Items.Add("Show Target Type");
             menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(OnShowTargetType); };
-            menuChildren.Items.Add("Change Target Type");
-            menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(OnChangeTargetType); };
+            menuChildren.Items.Add("Create Attribute");
+            menuChildren.Items[1].Click += (sender, e) => { if (Id != null) OnCreateAttribute((Guid)Id); };
+            menuChildren.Items.Add("Create Relation to Entity");
+            menuChildren.Items[2].Click += (sender, e) => { if (Id != null) OnCreateRelationEntity((Guid)Id); };
 
             gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
@@ -91,10 +112,13 @@ namespace Iis.OntologyManager.UiControls
         }
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
+            var isNew = string.IsNullOrEmpty(txtId.Text);
             return new NodeTypeUpdateParameter
             {
-                Id = new Guid(txtId.Text),
+                Id =  isNew ? (Guid?)null : new Guid(txtId.Text),
+                Name = isNew ? txtName.Text : null,
                 Title = txtTitle.Text,
+                ParentTypeId = null
             };
         }
         private DataGridView GetRelationsGrid(string name)
@@ -118,11 +142,10 @@ namespace Iis.OntologyManager.UiControls
         private void gridChildrenEvent(Action<IChildNodeType> action)
         {
             if (action == null) return;
-            var grid = gridChildren;
-            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            if (selectedRow == null) return;
-            var childNodeType = (IChildNodeType)selectedRow.DataBoundItem;
-            action(childNodeType);
+            if (SelectedChild != null)
+            {
+                action(SelectedChild);
+            }
         }
         private void gridChildren_DoubleClick(object sender, EventArgs e)
         {

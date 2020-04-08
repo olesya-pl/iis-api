@@ -168,10 +168,95 @@ namespace Iis.OntologySchema
 
             UpdateNodeType(nodeType._relationType._targetType, updateParameter);
         }
-
+        private void CreateEntityNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            var nodeType = new SchemaNodeType
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Entity,
+                IsArchived = false,
+                IsAbstract = false
+            };
+            _storage.AddNodeType(nodeType);
+            UpdateNodeType(nodeType, updateParameter);
+        }
+        private void CreateAttributeNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            var attributeNodeType = new SchemaNodeType
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Attribute,
+            };
+            _storage.AddNodeType(attributeNodeType);
+            var attribute = new SchemaAttributeType 
+            { 
+                Id = attributeNodeType.Id, 
+                ScalarType = (ScalarType)updateParameter.ScalarType 
+            };
+            _storage.AddAttributeType(attribute);
+            var relationNodeType = new SchemaNodeType()
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Relation,
+            };
+            _storage.AddNodeType(relationNodeType);
+            var relationType = new SchemaRelationType
+            {
+                Id = relationNodeType.Id,
+                SourceTypeId = (Guid)updateParameter.ParentTypeId,
+                TargetTypeId = attributeNodeType.Id
+            };
+            _storage.AddRelationType(relationType);
+            UpdateRelationNodeType(relationNodeType, updateParameter);
+        }
+        private void CreateRelationToEntity(INodeTypeUpdateParameter updateParameter)
+        {
+            var relationNodeType = new SchemaNodeType()
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Relation,
+            };
+            _storage.AddNodeType(relationNodeType);
+            var relationType = new SchemaRelationType
+            {
+                Id = relationNodeType.Id,
+                SourceTypeId = (Guid)updateParameter.ParentTypeId,
+                TargetTypeId = (Guid)updateParameter.TargetTypeId,
+            };
+            _storage.AddRelationType(relationType);
+            UpdateRelationNodeType(relationNodeType, updateParameter);
+        }
+        private void CreateNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            if (updateParameter.EmbeddingOptions == null)
+            {
+                CreateEntityNodeType(updateParameter);
+            }
+            else if (updateParameter.ScalarType != null)
+            {
+                CreateAttributeNodeType(updateParameter);
+            }
+            else if (updateParameter.TargetTypeId != null)
+            {
+                CreateRelationToEntity(updateParameter);
+            }
+            else
+            {
+                throw new ArgumentException("Bad updateParameter");
+            }
+        }
         public void UpdateNodeType(INodeTypeUpdateParameter updateParameter)
         {
-            var nodeType = _storage.GetNodeTypeById(updateParameter.Id);
+            if (updateParameter.Id == null)
+            {
+                CreateNodeType(updateParameter);
+                return;
+            }
+            var nodeType = _storage.GetNodeTypeById((Guid)updateParameter.Id);
             
             switch (nodeType.Kind)
             {
