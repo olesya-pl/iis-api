@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Iis.Api.GraphQL.Roles;
 using Iis.Api.Ontology.Migration;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
@@ -56,13 +57,38 @@ namespace Iis.Api
             CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
                 .ForMember(dest => dest.Category, opts => opts.MapFrom(src => src.AccessObject.Category))
-                .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.AccessObject.Title)); 
+                .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.AccessObject.Title))
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.AccessObjectId));
+            CreateMap<Iis.Roles.AccessGranted, RoleAccessEntity>()
+                .ForMember(dest => dest.AccessObjectId, opts => opts.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+            CreateMap<Iis.Roles.AccessGranted, AccessObjectEntity>();
             CreateMap<RoleEntity, Iis.Roles.Role>()
                 .ForMember(dest => dest.AccessGrantedItems, opts => opts.MapFrom(src => src.RoleAccessEntities));
+            CreateMap<Roles.Role, RoleEntity>()
+                .ForMember(dest => dest.RoleAccessEntities, opts => opts.MapFrom(src => new List<RoleAccessEntity>()));
             CreateMap<Roles.AccessGranted, AccessTab>()
                 .ForMember(dest => dest.Visible, opts => opts.MapFrom(src => src.ReadGranted));
+            CreateMap<AccessTab, Roles.AccessGranted>()
+                .ForMember(dest => dest.ReadGranted, opts => opts.MapFrom(src => src.Visible))
+                .ForMember(dest => dest.Category, opts => opts.MapFrom(src => AccessCategory.Tab));
             CreateMap<Roles.AccessGranted, AccessEntity>();
+            CreateMap<AccessEntity, Roles.AccessGranted>()
+                .ForMember(dest => dest.Category, opts => opts.MapFrom(src => AccessCategory.Entity))
+                .ForMember(dest => dest.ReadGranted, opts => opts
+                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.ReadAccessName)))
+                .ForMember(dest => dest.CreateGranted, opts => opts
+                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.CreateAccessName)))
+                .ForMember(dest => dest.UpdateGranted, opts => opts
+                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.UpdateAccessName)))
+                .ForMember(dest => dest.DeleteGranted, opts => opts
+                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.DeleteAccessName)));
+
             CreateMap<Roles.Role, IIS.Core.GraphQL.Roles.Role>();
+            CreateMap<CreateRoleModel, Roles.Role>()                
+                .ForMember(dest => dest.Tabs, opts => opts.Ignore())
+                .ForMember(dest => dest.Entities, opts => opts.Ignore())
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
 
             CreateMap<UserEntity, Roles.User>();
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();

@@ -2,13 +2,14 @@
 using HotChocolate.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IIS.Core.GraphQL.Roles
 {
     public class AccessEntity
     {
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public Guid Id { get; set; }
+        
         [GraphQLNonNullType]
         public string Kind { get; set; }
 

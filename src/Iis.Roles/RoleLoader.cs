@@ -19,7 +19,12 @@ namespace Iis.Roles
             _context = context;
             _mapper = mapper;
             _defaultAccessGrantedList = _context.AccessObjects
-                .Select(ag => new AccessGranted { Kind = ag.Kind, Category = ag.Category, Title = ag.Title }).ToList();
+                .Select(ag => new AccessGranted { 
+                    Id = ag.Id, 
+                    Kind = ag.Kind, 
+                    Category = ag.Category, 
+                    Title = ag.Title })
+                .ToList();
         }
 
         public async Task<List<Role>> GetRolesAsync()

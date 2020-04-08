@@ -71,6 +71,7 @@ namespace IIS.Core.GraphQL
                 d.Name("MutationType");
                 d.Include<Materials.Mutation>();
                 d.Include<Users.Mutation>();
+                d.Include<Roles.Mutation>();
                 d.Include<Users.LoginResolver>();
                 d.Include<AnalyticsQuery.Mutation>();
 
