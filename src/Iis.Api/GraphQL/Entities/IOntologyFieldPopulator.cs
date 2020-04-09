@@ -100,6 +100,7 @@ namespace IIS.Core.GraphQL.Entities
                 .Type(collectionType)
                 .Argument("pagination", d => d.Type<NonNullType<InputObjectType<PaginationInput>>>())
                 .Argument("filter", d => d.Type<InputObjectType<FilterInput>>())
+                .Argument("criteria", d => d.Type(criteriaInput)) // TODO: it does nothing, backward compatibility with odyssey front
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntityList(ctx, type));
         }
     }
