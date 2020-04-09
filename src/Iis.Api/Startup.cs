@@ -108,8 +108,7 @@ namespace IIS.Core
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
-            services.AddTransient<RoleLoader>();
-            services.AddTransient<RoleSaver>();
+            services.AddTransient<RoleService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
@@ -232,7 +231,7 @@ namespace IIS.Core
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var roleLoader = context.Services.GetService<RoleLoader>();
+                var roleLoader = context.Services.GetService<RoleService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
                 
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);

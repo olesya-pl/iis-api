@@ -18,9 +18,9 @@ namespace IIS.Core.GraphQL.Users
         private IConfiguration _configuration;
         private readonly OntologyContext _context;
         private IMapper _mapper;
-        private RoleLoader _roleLoader;
+        private RoleService _roleLoader;
 
-        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, RoleLoader roleLoader)
+        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, RoleService roleLoader)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _context = context ?? throw new ArgumentNullException(nameof(context));

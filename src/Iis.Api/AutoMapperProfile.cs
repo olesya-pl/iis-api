@@ -89,6 +89,9 @@ namespace Iis.Api
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+            CreateMap<UpdateRoleModel, Roles.Role>()
+                .ForMember(dest => dest.Tabs, opts => opts.Ignore())
+                .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
             CreateMap<UserEntity, Roles.User>();
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
