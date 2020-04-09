@@ -27,6 +27,7 @@ namespace Iis.OntologyManager.UiControls
         public event Action<INodeTypeUpdateParameter> OnSave;
         public event Action<Guid> OnCreateAttribute;
         public event Action<Guid> OnCreateRelationEntity;
+        public event Action OnSetInheritance;
 
         public IChildNodeType SelectedChild
         {
@@ -90,6 +91,11 @@ namespace Iis.OntologyManager.UiControls
             _container.GoToBottom();
             _container.StepDown();
             _container.SetFullWidthColumn();
+
+            var menuInheritance = new ContextMenuStrip();
+            menuInheritance.Items.Add("Set Inheritance");
+            menuInheritance.Items[0].Click += (sender, e) => { OnSetInheritance?.Invoke(); };
+            gridInheritedFrom.ContextMenuStrip = menuInheritance;
 
             menuChildren = new ContextMenuStrip();
             menuChildren.Items.Add("Show Target Type");

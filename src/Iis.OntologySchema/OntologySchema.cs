@@ -278,5 +278,28 @@ namespace Iis.OntologySchema
             nodeType._relationType.TargetTypeId = targetTypeId;
             nodeType._relationType._targetType = _storage.NodeTypes[targetTypeId];
         }
+        public void SetInheritance(Guid sourceTypeId, Guid targetTypeId)
+        {
+            var sourceNodeType = _storage.GetNodeTypeById(sourceTypeId);
+            if (!sourceNodeType.OutgoingRelations.Any(r => r.TargetTypeId == targetTypeId && r.Kind == RelationKind.Inheritance))
+            {
+                var relationNodeType = new SchemaNodeType()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Is",
+                    Kind = Kind.Relation,
+                };
+                _storage.AddNodeType(relationNodeType);
+                var relationType = new SchemaRelationType
+                {
+                    Id = relationNodeType.Id,
+                    SourceTypeId = sourceTypeId,
+                    TargetTypeId = targetTypeId,
+                    Kind = RelationKind.Inheritance,
+                    EmbeddingOptions = EmbeddingOptions.None
+                };
+                _storage.AddRelationType(relationType);
+            }
+        }
     }
 }

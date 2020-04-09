@@ -17,5 +17,6 @@ namespace Iis.Interfaces.Ontology.Schema
         Dictionary<string, INodeTypeLinked> GetStringCodes();
         void UpdateNodeType(INodeTypeUpdateParameter updateParameter);
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
+        void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
     }
 }

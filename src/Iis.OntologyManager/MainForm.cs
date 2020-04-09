@@ -116,6 +116,7 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
             _uiEntityTypeControl.OnCreateAttribute += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationAttribute, parentTypeId);
             _uiEntityTypeControl.OnCreateRelationEntity += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationEntity, parentTypeId);
+            _uiEntityTypeControl.OnSetInheritance += SetInheritance;
             _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
@@ -418,6 +419,13 @@ namespace Iis.OntologyManager
             }
 
             throw new ArgumentException($"Cannot get NodeViewType for {nodeType.Id}");
+        }
+        private void SetInheritance()
+        {
+            var newTargetType = ChooseEntityTypeFromCombo();
+            if (newTargetType == null) return;
+            _schema.SetInheritance(_currentNodeType.Id, newTargetType.Id);
+            SetNodeTypeView(_currentNodeType, false);
         }
         private void SetNodeTypeViewVisibility(NodeViewType nodeViewType)
         {

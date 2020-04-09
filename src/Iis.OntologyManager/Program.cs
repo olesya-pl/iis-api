@@ -23,7 +23,14 @@ namespace Iis.OntologyManager
             var services = new ServiceCollection();
             new Startup().ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
             Application.Run(ServiceProvider.GetService<MainForm>());
+        }
+
+        static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            var i = 0;
         }
     }
 }
