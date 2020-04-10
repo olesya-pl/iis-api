@@ -49,7 +49,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 "Subdivision",
                 "SecondarySpecialEducationalInstitution",
                 "HigherEducationalInstitution",
-                "EducationalInstitution"
+                "EducationalInstitution",
+                "MilitaryOrganization"
             };
 
             MaterialIndexes = new[] { "Materials" };
