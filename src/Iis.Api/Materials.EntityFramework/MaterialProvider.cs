@@ -220,7 +220,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 mapChildrenTasks.Add(MapAsync(child));
             }
-            return await Task.WhenAll(mapChildrenTasks));
+            return await Task.WhenAll(mapChildrenTasks);
         }
 
         private async Task<MaterialInfo[]> MapInfos(MaterialEntity material)
