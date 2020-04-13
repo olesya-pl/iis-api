@@ -45,6 +45,11 @@ namespace IIS.Core.Materials.EntityFramework
                 IEnumerable<Material> materials;
                 if(!string.IsNullOrWhiteSpace(filterQuery))
                 {
+                    if (!_elasticService.UseElastic)
+                    {
+                        return (new List<Material>(), 0);
+                    }
+
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(
                         _elasticService.MaterialIndexes, 
                         new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
