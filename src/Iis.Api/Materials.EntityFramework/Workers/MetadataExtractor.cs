@@ -15,6 +15,8 @@ using Material = Iis.Domain.Materials.Material;
 using Node = Iis.Domain.Node;
 using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
+using MaterialInfo = Iis.Domain.Materials.MaterialInfo;
+using MaterialFeature = Iis.Domain.Materials.MaterialFeature;
 
 namespace IIS.Core.Materials.EntityFramework.Workers
 {

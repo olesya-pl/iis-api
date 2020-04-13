@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IIS.Core.Files;
-using IIS.Core.Ontology;
 using Iis.DataModel;
 using Iis.Domain.Materials;
 using Microsoft.EntityFrameworkCore;
@@ -158,16 +156,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         private IQueryable<MaterialEntity> GetParentMaterialsQuery()
         {
-            return _context.Materials
-                    .AsNoTracking()
-                    .Include(m => m.Importance)
-                    .Include(m => m.Reliability)
-                    .Include(m => m.Relevance)
-                    .Include(m => m.Completeness)
-                    .Include(m => m.SourceReliability)
-                    .Include(m => m.Children)
-                    .Include(m => m.MaterialInfos)
-                        .ThenInclude(m => m.MaterialFeatures)
+            return GetMaterialQuery()
                     .Where(p => p.ParentId == null);
         }
 
@@ -267,7 +256,7 @@ namespace IIS.Core.Materials.EntityFramework
         private async Task<MaterialFeature> MapAsync(MaterialFeatureEntity feature)
         {
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
-            result.Node = await _ontologyService.LoadNodesAsync(feature.Id, null);
+            result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
             return result;
         }
     }
