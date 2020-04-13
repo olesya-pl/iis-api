@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Iis.Ontology.OntologyEnum\" />
+  </ItemGroup>
+
 </Project>
