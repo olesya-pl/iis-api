@@ -180,6 +180,7 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.Relevance)
                     .Include(m => m.Completeness)
                     .Include(m => m.SourceReliability)
+                    .Include(m => m.Children)
                     .Include(m => m.MaterialInfos)
                     .ThenInclude(m => m.MaterialFeatures)
                     .AsNoTracking();
