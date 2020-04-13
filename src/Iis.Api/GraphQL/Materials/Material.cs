@@ -37,15 +37,7 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> Objects { get; set; } = new List<string>();
         public IEnumerable<string> Tags { get; set; } = new List<string>();
         public IEnumerable<string> States { get; set; } = new List<string>();
-
-        //[GraphQLNonNullType]
-        //public async Task<IEnumerable<Material>> GetChildren([Service] IMaterialProvider materialProvider,
-        //    [GraphQLNonNullType] PaginationInput pagination)
-        //{
-        //    var materials = await materialProvider.GetMaterialsAsync(pagination.PageSize,
-        //        pagination.Offset(), Id);
-        //    return materials.Select(m => m.ToView()).ToList();
-        //}
+        public IEnumerable<Material> Children { get; set; } = new List<Material>();
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

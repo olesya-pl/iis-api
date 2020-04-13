@@ -22,10 +22,10 @@ namespace Iis.Domain.Materials
         public Guid? CompletenessSignId => Completeness?.Id;
         public MaterialSign SourceReliability { get; set; }
         public Guid? SourceReliabilitySignId => SourceReliability?.Id;
-        public ICollection<Material> Children { get; } = new List<Material>();
+        public List<Material> Children { get; } = new List<Material>();
         public FileInfo File { get; set; }
         public Guid? FileId => File?.Id;
-        public ICollection<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
+        public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
         public DateTime CreatedDate { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }

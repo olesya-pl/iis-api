@@ -41,6 +41,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
                 .ForMember(dest => dest.Transcriptions, opts => opts.MapFrom(src => src.Infos.Select(info => info.Data)))
+                .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -85,7 +86,7 @@ namespace Iis.Api
                     .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.DeleteAccessName)));
 
             CreateMap<Roles.Role, IIS.Core.GraphQL.Roles.Role>();
-            CreateMap<CreateRoleModel, Roles.Role>()                
+            CreateMap<CreateRoleModel, Roles.Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));

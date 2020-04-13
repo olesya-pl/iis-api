@@ -165,8 +165,9 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.Relevance)
                     .Include(m => m.Completeness)
                     .Include(m => m.SourceReliability)
+                    .Include(m => m.Children)
                     .Include(m => m.MaterialInfos)
-                    .ThenInclude(m => m.MaterialFeatures)
+                        .ThenInclude(m => m.MaterialFeatures)
                     .Where(p => p.ParentId == null);
         }
 
@@ -197,8 +198,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             result.Title = material.Title;
             result.ParentId = material.ParentId;
-            result.LoadData = string.IsNullOrEmpty(material.LoadData) ? 
-                new MaterialLoadData() : 
+            result.LoadData = string.IsNullOrEmpty(material.LoadData) ?
+                new MaterialLoadData() :
                 MapLoadData(material.LoadData);
 
             result.Importance = MapSign(material.Importance);
@@ -207,9 +208,29 @@ namespace IIS.Core.Materials.EntityFramework
             result.Completeness = MapSign(material.Completeness);
             result.SourceReliability = MapSign(material.SourceReliability);
 
-            foreach (var info in material.MaterialInfos)
-                result.Infos.Add(await MapAsync(info));
+            result.Infos.AddRange(await MapInfos(material));
+            result.Children.AddRange(await MapChildren(material));
             return result;
+        }
+
+        private async Task<Material[]> MapChildren(MaterialEntity material)
+        {
+            var mapChildrenTasks = new List<Task<Material>>();
+            foreach (var child in material.Children ?? new List<MaterialEntity>())
+            {
+                mapChildrenTasks.Add(MapAsync(child));
+            }
+            return await Task.WhenAll(mapChildrenTasks));
+        }
+
+        private async Task<MaterialInfo[]> MapInfos(MaterialEntity material)
+        {
+            var mapInfoTasks = new List<Task<MaterialInfo>>();
+            foreach (var info in material.MaterialInfos ?? new List<MaterialInfoEntity>())
+            {
+                mapInfoTasks.Add(MapAsync(info));
+            }
+            return await Task.WhenAll(mapInfoTasks);
         }
 
         private MaterialSign MapSign(MaterialSignEntity sign)
