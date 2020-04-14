@@ -72,6 +72,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             await _elasticService.PutMaterialAsync(materialEntity);
 
+            _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
             // todo: put message to rabbit instead of calling another service directly
 
             if (material.Metadata.SelectToken("Features.Nodes") != null)

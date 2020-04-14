@@ -37,6 +37,7 @@ using Serilog;
 using Iis.Domain.Elastic;
 using Iis.Elastic;
 using Iis.Api;
+using Iis.Api.Modules;
 using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
@@ -170,41 +171,22 @@ namespace IIS.Core
             // end of graphql engine registration
             services.AddDataLoaderRegistry();
 
-            var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
-            if (mq == null) throw new Exception("mq config not found");
-            var factory = new ConnectionFactory
-            {
-                HostName = mq.Host,
-                RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
-            };
-            if (mq.Username != null)
-            {
-                factory.UserName = mq.Username;
-            }
-            if (mq.Password != null)
-            {
-                factory.Password = mq.Password;
-            }
+            /* message queue registration*/
+            services.RegisterMqFactory(Configuration, out string mqConnectionString)
+                    .RegisterMaterialEventServices(Configuration);
+                    
 
-            services.AddTransient<IConnectionFactory>(s => factory);
-
-            string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}";
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
 
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
-                .AddRabbitMQ(mqString, (SslOption)null)
+                .AddRabbitMQ(mqConnectionString, (SslOption)null)
                 .AddElasticsearch(elasticConfiguration.Uri);
 
-            var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
-            services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
-            services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
 
             services.AddSingleton<IElasticManager, ElasticManager>();
             services.AddSingleton<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);
-
-            services.AddHostedService<MaterialEventConsumer>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));

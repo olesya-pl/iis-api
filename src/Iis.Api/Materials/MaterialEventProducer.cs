@@ -1,18 +1,20 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using IIS.Core.GraphQL.Materials;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
+
+using Iis.Api.Configuration;
 
 namespace IIS.Core.Materials
 {
     public interface IMaterialEventProducer : IDisposable
     {
         void SendMaterialAddedEventAsync(MaterialAddedEvent eventData);
+        void SendMaterialEvent(MaterialEventMessage eventMessage);
     }
 
     public class MaterialEventProducer : IMaterialEventProducer
@@ -21,11 +23,18 @@ namespace IIS.Core.Materials
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
+        private readonly IModel _messageEventChannel;   
+        private readonly MaterialEventConfiguration _eventConfiguration;  
 
-        public MaterialEventProducer(IConnectionFactory connectionFactory, ILoggerFactory loggerFactory)
+        public MaterialEventProducer(IConnectionFactory connectionFactory,
+            ILoggerFactory loggerFactory,
+            MaterialEventConfiguration eventConfiguration)
         {
             _logger = loggerFactory.CreateLogger<MaterialEventProducer>();
+            
             _connectionFactory = connectionFactory;
+            _eventConfiguration = eventConfiguration;
+
 
             while (true)
             {
@@ -42,6 +51,8 @@ namespace IIS.Core.Materials
                 }
             }
             _channel = _connection.CreateModel();
+
+            _messageEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
         }
 
         public void SendMaterialAddedEventAsync(MaterialAddedEvent eventData)
@@ -57,10 +68,37 @@ namespace IIS.Core.Materials
                                 body: body);
         }
 
+        public void SendMaterialEvent(MaterialEventMessage eventMessage)
+        {
+            var routingKey = $"processing.ml.{eventMessage.Type}";
+
+            var json = JObject.FromObject(eventMessage).ToString();
+            var body = Encoding.UTF8.GetBytes(json);
+            var properties = _messageEventChannel.CreateBasicProperties();
+
+            properties.Persistent = true;
+            
+            _messageEventChannel.BasicPublish(exchange: _eventConfiguration.TargetChannel.ExchangeName,
+                                routingKey: routingKey,
+                                basicProperties: null,
+                                body: body);
+        }
+
+        private IModel ConfigChannel(IModel channel, ChannelConfig config)
+        {
+            if(config is null) return channel;
+
+            channel.ExchangeDeclare(config.ExchangeName, config.ExchangeType ?? ExchangeType.Topic);
+
+            return channel;
+        }
+
         public void Dispose()
         {
             _channel.Dispose();
+
             _connection.Dispose();
         }
+
     }
 }

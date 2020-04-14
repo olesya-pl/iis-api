@@ -16,8 +16,11 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLNonNullType] MaterialInput input)
         {
             Iis.Domain.Materials.Material inputMaterial = input.ToDomain();
+            
             await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
+            
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
+            
             return mapper.Map<Material>(material);
         }
 
