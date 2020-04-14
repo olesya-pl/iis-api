@@ -16,6 +16,6 @@ namespace Iis.Interfaces.Elastic
         Task<bool> PutMaterialAsync(IMaterialEntity material, CancellationToken cancellation = default);
         Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         bool TypesAreSupported(IEnumerable<string> typeNames);
-
+        bool UseElastic { get; }
     }
 }

@@ -342,7 +342,7 @@ namespace IIS.Core.Ontology {
                         paramNames[i] = $"{paramName}{i}";
                         _sqlParams.Add(paramNames[i], node.TypeIds[i]);
                     }
-                    conditions.Add($"\"{conditionsAlias}\".\"TypeId\" IN ({string.Join(',', paramNames)})");
+                    conditions.Add($"\"{conditionsAlias}\".\"NodeTypeId\" IN ({string.Join(',', paramNames)})");
                 }
 
                 conditions.Add($"\"{conditionsAlias}\".\"IsArchived\" = false");

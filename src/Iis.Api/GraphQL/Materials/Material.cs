@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Interfaces.Materials;
 using IIS.Core.Files;
-using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Scalars;
-using IIS.Core.Materials;
 using Newtonsoft.Json.Linq;
 using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 
@@ -38,6 +35,7 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> Tags { get; set; } = new List<string>();
         public IEnumerable<string> States { get; set; } = new List<string>();
         public IEnumerable<Material> Children { get; set; } = new List<Material>();
+        public IEnumerable<MaterialInfo> Infos { get; set; } = new List<MaterialInfo>();
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

@@ -61,7 +61,6 @@ namespace IIS.Core.Analytics.EntityFramework
                     )
                     SELECT * FROM children
                     ORDER BY level DESC
-                    LIMIT 1
                 ", childId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();

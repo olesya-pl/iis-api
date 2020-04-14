@@ -36,12 +36,17 @@ namespace Iis.Api
             CreateMap<IMaterialLoadData, IIS.Core.GraphQL.Materials.MaterialLoadData>();
             CreateMap<IMaterialLoadData, IIS.Core.GraphQL.Materials.Material>();
 
+            CreateMap<Iis.Domain.Materials.MaterialFeature, IIS.Core.GraphQL.Materials.MaterialFeature>()
+                .ForMember(dest => dest.NodeId, opts => opts.MapFrom(src => src.Node.Id));
+            CreateMap<Iis.Domain.Materials.MaterialInfo, IIS.Core.GraphQL.Materials.MaterialInfo>()
+                .ForMember(dest => dest.Features, opts => opts.MapFrom(src => src.Features));
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata.ToObject<IIS.Core.GraphQL.Materials.Metadata>()))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
                 .ForMember(dest => dest.Transcriptions, opts => opts.MapFrom(src => src.Infos.Select(info => info.Data)))
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
+                .ForMember(dest => dest.Infos, opts => opts.MapFrom(src => src.Infos))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();

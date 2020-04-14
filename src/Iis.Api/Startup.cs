@@ -110,6 +110,7 @@ namespace IIS.Core
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
             services.AddTransient<RoleService>();
+            services.AddTransient<AccessObjectService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();

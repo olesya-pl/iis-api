@@ -24,10 +24,11 @@ namespace IIS.Core.Ontology.EntityFramework
         private IExtNodeService _extNodeService;
         private RunTimeSettings _runTimeSettings;
         private readonly OntologyContext _context;
+        private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
 
         public IEnumerable<string> MaterialIndexes { get; }
-
         public IEnumerable<string> OntologyIndexes { get; }
+        public bool UseElastic { get; private set; }
 
         public ElasticService(IElasticManager elasticManager, IElasticSerializer elasticSerializer, IExtNodeService extNodeService, RunTimeSettings runTimeSettings, OntologyContext context)
         {
@@ -53,11 +54,18 @@ namespace IIS.Core.Ontology.EntityFramework
                 "MilitaryOrganization"
             };
 
+            UseElastic = _context.NodeTypes.Any(nt => nt.Name == "ObjectOfStudy");
+
             MaterialIndexes = new[] { "Materials" };
         }
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
+            if (!UseElastic)
+            {
+                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
+            }
+
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
@@ -71,7 +79,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic) return true;
+            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return true;
 
             var extNode = await _extNodeService.GetExtNodeByIdAsync(id, cancellationToken);
 
@@ -80,6 +88,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<bool> PutNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default)
         {
+            if (!UseElastic) return true;
+
             var json = _elasticSerializer.GetJsonByExtNode(extNode);
             
             return await _elasticManager.PutDocumentAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
@@ -87,6 +97,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<bool> PutMaterialAsync(IMaterialEntity material, CancellationToken cancellation = default)
         {
+            if (!UseElastic) return true;
+
             if (!_runTimeSettings.PutSavedToElastic) return false;
 
             var jDocument = new JObject(
@@ -133,6 +145,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
         {
+            if (!UseElastic) return false;
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
         }
 
