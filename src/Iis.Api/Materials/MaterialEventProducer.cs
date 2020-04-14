@@ -23,7 +23,7 @@ namespace IIS.Core.Materials
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
-        private readonly IModel _messageEventChannel;   
+        private readonly IModel _materialEventChannel;   
         private readonly MaterialEventConfiguration _eventConfiguration;  
 
         public MaterialEventProducer(IConnectionFactory connectionFactory,
@@ -52,7 +52,7 @@ namespace IIS.Core.Materials
             }
             _channel = _connection.CreateModel();
 
-            _messageEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
+            _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
         }
 
         public void SendMaterialAddedEventAsync(MaterialAddedEvent eventData)
@@ -74,11 +74,11 @@ namespace IIS.Core.Materials
 
             var json = JObject.FromObject(eventMessage).ToString();
             var body = Encoding.UTF8.GetBytes(json);
-            var properties = _messageEventChannel.CreateBasicProperties();
+            var properties = _materialEventChannel.CreateBasicProperties();
 
             properties.Persistent = true;
             
-            _messageEventChannel.BasicPublish(exchange: _eventConfiguration.TargetChannel.ExchangeName,
+            _materialEventChannel.BasicPublish(exchange: _eventConfiguration.TargetChannel.ExchangeName,
                                 routingKey: routingKey,
                                 basicProperties: null,
                                 body: body);

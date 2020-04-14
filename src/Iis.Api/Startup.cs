@@ -299,13 +299,6 @@ namespace IIS.Core
         }
     }
 
-    public class MqConfiguration
-    {
-        public string Host { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
     class AppErrorFilter : IErrorFilter
     {
         public IError OnError(IError error)
