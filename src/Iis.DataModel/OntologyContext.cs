@@ -43,6 +43,8 @@ namespace Iis.DataModel
         public DbSet<AccessObjectEntity> AccessObjects { get; set; }
         public DbSet<UserRoleEntity> UserRoles { get; set; }
 
+        public DbSet<MLResponseEntity> MLResponses { get; set; }
+
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
         {
@@ -75,7 +77,8 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new OntologyMigrationsConfiguration());
 
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+
+            modelBuilder.ApplyConfiguration(new MLResponseConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

@@ -135,6 +135,26 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("AttributeTypes");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.MLResponseEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MLHandlerName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OriginalResponse")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MLResponses");
+                });
+
             modelBuilder.Entity("Iis.DataModel.Materials.FileEntity", b =>
                 {
                     b.Property<Guid>("Id")
