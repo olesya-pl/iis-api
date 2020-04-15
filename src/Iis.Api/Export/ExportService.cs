@@ -50,6 +50,8 @@ namespace Iis.Api.Export
 
                     AppendNodeType(node, body);
                     AppendNodes(node.Children, body);
+
+                    doc.Close();
                 }
 
                 return memoryStream.ToArray();
