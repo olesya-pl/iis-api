@@ -75,6 +75,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Roles.Mutation>();
                 d.Include<Users.LoginResolver>();
                 d.Include<AnalyticsQuery.Mutation>();
+                d.Include<ML.Mutation>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
