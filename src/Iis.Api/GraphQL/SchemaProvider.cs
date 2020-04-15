@@ -58,6 +58,7 @@ namespace IIS.Core.GraphQL
                 d.Include<AnalyticsQuery.Query>();
                 d.Include<AnalyticsIndicator.Query>();
                 d.Include<ExportQuery>();
+                d.Include<ML.Query>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {

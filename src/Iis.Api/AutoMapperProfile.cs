@@ -102,6 +102,9 @@ namespace Iis.Api
             CreateMap<UserEntity, Roles.User>();
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
             CreateMap<Roles.User, IIS.Core.GraphQL.Users.User>();
+
+            CreateMap<IIS.Core.ML.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
+            CreateMap<MLResponseEntity, IIS.Core.ML.MlProcessingResult>();
         }
     }
 }

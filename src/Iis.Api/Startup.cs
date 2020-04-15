@@ -34,7 +34,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
-using Iis.Domain.Elastic;
 using Iis.Elastic;
 using Iis.Api;
 using Iis.Api.Modules;
@@ -54,6 +53,7 @@ using Iis.DataModel.Roles;
 using Iis.Roles;
 using Iis.Api.GraphQL.Access;
 using Iis.Interfaces.Roles;
+using IIS.Core.ML;
 
 namespace IIS.Core
 {
@@ -111,6 +111,7 @@ namespace IIS.Core
             services.AddScoped<ExportService>();
             services.AddTransient<RoleService>();
             services.AddTransient<AccessObjectService>();
+            services.AddTransient<MlProcessingService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
@@ -175,7 +176,7 @@ namespace IIS.Core
             /* message queue registration*/
             services.RegisterMqFactory(Configuration, out string mqConnectionString)
                     .RegisterMaterialEventServices(Configuration);
-                    
+
 
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
 
@@ -216,7 +217,7 @@ namespace IIS.Core
 
                 var roleLoader = context.Services.GetService<RoleService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
-                
+
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);
                 var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
 
