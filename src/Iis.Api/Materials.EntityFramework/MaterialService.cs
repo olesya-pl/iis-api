@@ -150,6 +150,9 @@ namespace IIS.Core.Materials.EntityFramework
                 await _context.SaveChangesAsync();
 
                 await _elasticService.PutMaterialAsync(material);
+                
+                _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = material.Id, Source = material.Source, Type = material.Type});
+
             }
             finally
             {
