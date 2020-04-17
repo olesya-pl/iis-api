@@ -46,7 +46,6 @@ namespace Iis.Api.Export
                         Body = new Body()
                     };
                     var body = mainPart.Document.Body;
-                    var container = body.AppendChild(new Run());
 
                     AppendNodeType(node, body);
                     AppendNodes(node.Children, body);
