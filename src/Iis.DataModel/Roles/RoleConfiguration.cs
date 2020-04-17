@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DataModel.Roles
 {
@@ -13,6 +10,11 @@ namespace Iis.DataModel.Roles
             builder
                 .Property(p => p.Id)
                 .ValueGeneratedNever();
+
+            builder
+                .Property(p => p.AdGroup)
+                .IsRequired(false)
+                .HasMaxLength(1024);
 
             builder.HasMany(r => r.RoleAccessEntities)
                 .WithOne(ra => ra.Role)
