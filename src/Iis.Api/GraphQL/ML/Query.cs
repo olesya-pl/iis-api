@@ -14,6 +14,7 @@ namespace IIS.Core.GraphQL.ML
             Guid materialId)
         {
             var mlResults = service.GetMlHandlingResults(materialId);
+            
             return mlResults.Select(p => mapper.Map<MlProcessingResult>(p)).ToList();
         } 
     }

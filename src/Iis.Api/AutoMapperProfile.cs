@@ -103,10 +103,22 @@ namespace Iis.Api
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
             CreateMap<Roles.User, IIS.Core.GraphQL.Users.User>();
 
-            CreateMap<IIS.Core.ML.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
-            CreateMap<MLResponseEntity, IIS.Core.ML.MlProcessingResult>()
+            CreateMap<Iis.Domain.MachineLearning.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
+
+            CreateMap<MLResponseEntity, Iis.Domain.MachineLearning.MlProcessingResult>()
                 .ForMember(dest => dest.MlHandlerName, opts => opts.MapFrom(src => src.MLHandlerName))
                 .ForMember(dest => dest.ResponseText, opts => opts.MapFrom(src => src.OriginalResponse));
+
+            CreateMap<IIS.Core.GraphQL.ML.MachineLearningResponseInput,Iis.Domain.MachineLearning.MlResponse>();
+
+            CreateMap<Iis.Domain.MachineLearning.MlResponse, Iis.DataModel.MLResponseEntity>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(o => Guid.NewGuid()))
+                .ForMember(dest => dest.MLHandlerName, opts => opts.MapFrom(src => src.HandlerName));
+
+            CreateMap<Iis.DataModel.MLResponseEntity, Iis.Domain.MachineLearning.MlResponse>()
+                .ForMember(dest => dest.HandlerName, opts => opts.MapFrom(src => src.MLHandlerName));
+
+            CreateMap<Iis.Domain.MachineLearning.MlResponse, IIS.Core.GraphQL.ML.MachineLearningResult>();
         }
     }
 }
