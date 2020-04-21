@@ -107,6 +107,11 @@ namespace Iis.Api
             CreateMap<MLResponseEntity, IIS.Core.ML.MlProcessingResult>()
                 .ForMember(dest => dest.MlHandlerName, opts => opts.MapFrom(src => src.MLHandlerName))
                 .ForMember(dest => dest.ResponseText, opts => opts.MapFrom(src => src.OriginalResponse));
+
+            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput,
+                IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
+            CreateMap<IIS.Core.NodeMaterialRelation.NodeMaterialRelation,
+                IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelation>();
         }
     }
 }

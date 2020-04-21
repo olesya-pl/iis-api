@@ -54,6 +54,7 @@ using Iis.Roles;
 using Iis.Api.GraphQL.Access;
 using Iis.Interfaces.Roles;
 using IIS.Core.ML;
+using IIS.Core.NodeMaterialRelation;
 
 namespace IIS.Core
 {
@@ -112,6 +113,7 @@ namespace IIS.Core
             services.AddTransient<RoleService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<MlProcessingService>();
+            services.AddTransient<NodeMaterialRelationService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
