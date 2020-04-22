@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
+using Iis.Domain.MachineLearning;
 using Iis.Interfaces.Materials;
 
 namespace IIS.Core.Materials
@@ -21,5 +23,6 @@ namespace IIS.Core.Materials
         MaterialSign GetMaterialSign(Guid id);
         Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input);
         Task<Material> MapAsync(MaterialEntity material);
+        IEnumerable<MlProcessingResult> GetMlProcessingResults(Guid materialId);
     }
 }

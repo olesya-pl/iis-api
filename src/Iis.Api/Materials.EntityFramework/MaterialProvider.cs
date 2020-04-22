@@ -1,17 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Iis.DataModel;
-using Iis.Domain.Materials;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using Iis.Domain;
-using Iis.DataModel.Cache;
 using AutoMapper;
+
+using Iis.Domain;
+using Iis.Domain.Materials;
+using Iis.DataModel;
+using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
-using Iis.Interfaces.Materials;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Materials;
+using Iis.Domain.MachineLearning;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -157,6 +159,15 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
             if (input.States != null) material.LoadData.States = new List<string>(input.States);
             return _mapper.Map<MaterialEntity>(material);
+        }
+
+        public IEnumerable<MlProcessingResult> GetMlProcessingResults(Guid materialId)
+        {
+            return _context.MLResponses
+                .AsNoTracking()
+                .Where(p => p.MaterialId == materialId)
+                .Select(p => _mapper.Map<MlProcessingResult>(p))
+                .ToList();
         }
 
         private IQueryable<MaterialEntity> GetParentMaterialsQuery()

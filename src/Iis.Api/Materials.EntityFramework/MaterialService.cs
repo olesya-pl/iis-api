@@ -2,18 +2,20 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
+using AutoMapper;
 using IIS.Core.Files;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Elastic;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
-using Iis.Interfaces.Elastic;
+using Iis.Domain.MachineLearning;
 
 namespace IIS.Core.Materials.EntityFramework
 {
     public class MaterialService : IMaterialService
     {
         private readonly OntologyContext _context;
+        private readonly IMapper _mapper;
         private readonly IFileService _fileService;
         private readonly IElasticService _elasticService;
         private readonly IMaterialEventProducer _eventProducer;
@@ -30,7 +32,6 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
         }
-
 
         public async Task SaveAsync(Material material)
         {
@@ -89,6 +90,36 @@ namespace IIS.Core.Materials.EntityFramework
             SendIcaoEvent(nodes);
         }
 
+        public async Task SaveAsync(MaterialEntity material)
+        {
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                _context.Update(material);
+                
+                await _context.SaveChangesAsync();
+
+                await _elasticService.PutMaterialAsync(material);
+                
+                _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = material.Id, Source = material.Source, Type = material.Type});
+
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
+        public Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
+        {
+            var entity = _mapper.Map<MlResponse, MLResponseEntity>(response);
+
+            _context.MLResponses.Add(entity);
+
+            _context.SaveChanges();
+
+            return Task.FromResult(_mapper.Map<MlResponse>(entity));
+        }
         private Guid GetIcaoNode(string icaoValue)
         {
             var q = from n in _context.Nodes
@@ -118,48 +149,6 @@ namespace IIS.Core.Materials.EntityFramework
             _eventProducer.SendMaterialAddedEventAsync(materialAddedEvent);
         }
 
-        public async Task SaveAsync(Guid materialId, MaterialInfo materialInfo)
-        {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                var mi = new MaterialInfoEntity
-                {
-                    Id = materialInfo.Id, Data = materialInfo.Data?.ToString(), MaterialId = materialId,
-                    Source = materialInfo.Source, SourceType = materialInfo.SourceType,
-                    SourceVersion = materialInfo.SourceVersion
-                };
-                
-                _context.Add(mi);
-                
-                await _context.SaveChangesAsync();
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
-        }
-
-        public async Task SaveAsync(MaterialEntity material)
-        {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                _context.Update(material);
-                
-                await _context.SaveChangesAsync();
-
-                await _elasticService.PutMaterialAsync(material);
-                
-                _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = material.Id, Source = material.Source, Type = material.Type});
-
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
-        }
-
         private MaterialEntity Map(Material material)
         {
             return new MaterialEntity
@@ -186,5 +175,6 @@ namespace IIS.Core.Materials.EntityFramework
                 SourceVersion = info.SourceVersion,
             };
         }
+    
     }
 }
