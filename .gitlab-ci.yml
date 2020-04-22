@@ -35,8 +35,8 @@ unit_test:
     reports:
       junit:
         - ./*test-result.xml
-    tags:
-    - ci
+ tags:
+   - ci
 
 
 .deploy:
