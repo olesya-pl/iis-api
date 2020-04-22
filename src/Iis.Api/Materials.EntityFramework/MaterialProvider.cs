@@ -188,10 +188,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             if (material == null) return null;
 
-            var result = new Material(material.Id,
-                JObject.Parse(material.Metadata),
-                material.Data == null ? null : JArray.Parse(material.Data),
-                material.Type, material.Source);
+            var result = _mapper.Map<Material>(material);
             if (material.FileId.HasValue)
                 result.File = new FileInfo(material.FileId.Value);
 

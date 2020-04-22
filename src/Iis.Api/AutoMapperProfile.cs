@@ -4,10 +4,12 @@ using Iis.Api.Ontology.Migration;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Roles;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +65,17 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : src.Data.ToString()))
                 .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => src.LoadData.ToJson()))
                 .ForMember(dest => dest.MaterialInfos, opts => opts.MapFrom(src => src.Infos));
+
+            CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.Type, opts => opts.MapFrom(src => src.Metadata.Type))
+                .ForMember(dest => dest.Source, opts => opts.MapFrom(src => src.Metadata.Source))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
+                .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+
+
 
             CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
