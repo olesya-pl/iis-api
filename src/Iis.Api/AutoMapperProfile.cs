@@ -6,6 +6,7 @@ using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Roles;
+using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
 using System;
 using System.Collections.Generic;
@@ -36,8 +37,11 @@ namespace Iis.Api
             CreateMap<IMaterialLoadData, IIS.Core.GraphQL.Materials.MaterialLoadData>();
             CreateMap<IMaterialLoadData, IIS.Core.GraphQL.Materials.Material>();
 
-            CreateMap<Iis.Domain.Materials.MaterialFeature, IIS.Core.GraphQL.Materials.MaterialFeature>()
-                .ForMember(dest => dest.NodeId, opts => opts.MapFrom(src => src.Node.Id));
+            CreateMap<Iis.Domain.Node, MaterialFeatureNode>()
+                .ForMember(dest => dest.NodeTypeId, opts => opts.MapFrom(src => src.Type.Id))
+                .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Type.Name))
+                .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Type.Title));
+            CreateMap<Iis.Domain.Materials.MaterialFeature, IIS.Core.GraphQL.Materials.MaterialFeature>();
             CreateMap<Iis.Domain.Materials.MaterialInfo, IIS.Core.GraphQL.Materials.MaterialInfo>()
                 .ForMember(dest => dest.Features, opts => opts.MapFrom(src => src.Features));
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()

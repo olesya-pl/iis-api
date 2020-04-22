@@ -31,7 +31,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private List<Guid> GetObjectOfStudyTypes()
         {
-            //TODO: 
+            //TODO:
             var objectOfStudyType = _context.NodeTypes
                 .Include(nt => nt.IncomingRelations)
                 .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
@@ -42,7 +42,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToList();
         }
 
-        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
+        private async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
         {
             //Console.WriteLine($"=> {nodeEntity.Id}; {nodeEntity.NodeType.Name}");
             var extNode = new ExtNode
@@ -58,7 +58,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             };
             return await Task.FromResult(extNode);
         }
-        
+
         public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var nodeEntity = await GetNodeQuery()
