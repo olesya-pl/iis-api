@@ -95,7 +95,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return await _elasticManager.PutDocumentAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
-        public async Task<bool> PutMaterialAsync(IMaterialEntity material, CancellationToken cancellation = default)
+        public async Task<bool> PutMaterialAsync(IMaterialEntity material, List<IMLResponseEntity> mLResponses, CancellationToken cancellation = default)
         {
             if (!UseElastic) return true;
 

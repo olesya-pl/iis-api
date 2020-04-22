@@ -13,7 +13,7 @@ namespace Iis.Interfaces.Elastic
         IEnumerable<string> OntologyIndexes { get; }
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default);
-        Task<bool> PutMaterialAsync(IMaterialEntity material, CancellationToken cancellation = default);
+        Task<bool> PutMaterialAsync(IMaterialEntity material, List<IMLResponseEntity> mLResponses, CancellationToken cancellation = default);
         Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         bool TypesAreSupported(IEnumerable<string> typeNames);
         bool UseElastic { get; }

@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace Iis.DataModel
+namespace Iis.DataModel.Materials
 {
     internal sealed class MLResponseConfiguration : IEntityTypeConfiguration<MLResponseEntity>
     {

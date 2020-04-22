@@ -161,36 +161,6 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MaterialEntity>(material);
         }
 
-        public IEnumerable<MlProcessingResult> GetMlProcessingResults(Guid materialId)
-        {
-            return _context.MLResponses
-                .AsNoTracking()
-                .Where(p => p.MaterialId == materialId)
-                .Select(p => _mapper.Map<MlProcessingResult>(p))
-                .ToList();
-        }
-
-        private IQueryable<MaterialEntity> GetParentMaterialsQuery()
-        {
-            return GetMaterialQuery()
-                    .Where(p => p.ParentId == null);
-        }
-
-        private IQueryable<MaterialEntity> GetMaterialQuery()
-        {
-            return _context.Materials
-                    .AsNoTracking()
-                    .Include(m => m.Importance)
-                    .Include(m => m.Reliability)
-                    .Include(m => m.Relevance)
-                    .Include(m => m.Completeness)
-                    .Include(m => m.SourceReliability)
-                    .Include(m => m.Children)
-                    .Include(m => m.MaterialInfos)
-                    .ThenInclude(m => m.MaterialFeatures)
-                    .AsNoTracking();
-        }
-
         public async Task<Material> MapAsync(MaterialEntity material)
         {
             if (material == null) return null;
@@ -219,6 +189,51 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
+        public Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId)
+        {
+            return GetMLEntitiesByMaterialId(materialId)
+                    .Select(p => _mapper.Map<MlProcessingResult>(p))
+                    .ToListAsync();
+        }
+
+        public async Task<(MaterialEntity material, List<IMLResponseEntity> mLResponses)> GetMaterialWithMLResponsesAsync(Guid materialId)
+        {
+            var material = await GetMaterialEntityAsync(materialId);
+
+            var mLResponses = await GetMLEntitiesByMaterialId(materialId)
+                                    .ToListAsync<IMLResponseEntity>();
+
+            return (material, mLResponses);
+        }
+
+        private IQueryable<MaterialEntity> GetParentMaterialsQuery()
+        {
+            return GetMaterialQuery()
+                    .Where(p => p.ParentId == null);
+        }
+
+        private IQueryable<MaterialEntity> GetMaterialQuery()
+        {
+            return _context.Materials
+                    .AsNoTracking()
+                    .Include(m => m.Importance)
+                    .Include(m => m.Reliability)
+                    .Include(m => m.Relevance)
+                    .Include(m => m.Completeness)
+                    .Include(m => m.SourceReliability)
+                    .Include(m => m.Children)
+                    .Include(m => m.MaterialInfos)
+                    .ThenInclude(m => m.MaterialFeatures)
+                    .AsNoTracking();
+        }
+
+        private IQueryable<MLResponseEntity> GetMLEntitiesByMaterialId(Guid materialId)
+        {
+            return _context.MLResponses
+                        .Where(p => p.MaterialId == materialId)
+                        .AsNoTracking();
+        }
+        
         private async Task<Material[]> MapChildren(MaterialEntity material)
         {
             var mapChildrenTasks = new List<Task<Material>>();

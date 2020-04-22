@@ -111,11 +111,11 @@ namespace Iis.Api
 
             CreateMap<IIS.Core.GraphQL.ML.MachineLearningResponseInput,Iis.Domain.MachineLearning.MlResponse>();
 
-            CreateMap<Iis.Domain.MachineLearning.MlResponse, Iis.DataModel.MLResponseEntity>()
+            CreateMap<Iis.Domain.MachineLearning.MlResponse, Iis.DataModel.Materials.MLResponseEntity>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(o => Guid.NewGuid()))
                 .ForMember(dest => dest.MLHandlerName, opts => opts.MapFrom(src => src.HandlerName));
 
-            CreateMap<Iis.DataModel.MLResponseEntity, Iis.Domain.MachineLearning.MlResponse>()
+            CreateMap<Iis.DataModel.Materials.MLResponseEntity, Iis.Domain.MachineLearning.MlResponse>()
                 .ForMember(dest => dest.HandlerName, opts => opts.MapFrom(src => src.MLHandlerName));
 
             CreateMap<Iis.Domain.MachineLearning.MlResponse, IIS.Core.GraphQL.ML.MachineLearningResult>();

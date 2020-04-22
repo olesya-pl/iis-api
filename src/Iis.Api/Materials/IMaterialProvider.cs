@@ -23,6 +23,7 @@ namespace IIS.Core.Materials
         MaterialSign GetMaterialSign(Guid id);
         Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input);
         Task<Material> MapAsync(MaterialEntity material);
-        IEnumerable<MlProcessingResult> GetMlProcessingResults(Guid materialId);
+        Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId);
+        Task<(MaterialEntity material, List<IMLResponseEntity> mLResponses)> GetMaterialWithMLResponsesAsync(Guid materialId);
     }
 }

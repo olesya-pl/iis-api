@@ -47,7 +47,7 @@ namespace IIS.Core.Tools
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
             var entityTasks = materialEntities
-                                .Select(async entity => await _elasticService.PutMaterialAsync(entity, cancellationToken));
+                                .Select(async entity => await _elasticService.PutMaterialAsync(entity, null, cancellationToken));
 
             await Task.WhenAll(entityTasks);
         }

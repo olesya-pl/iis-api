@@ -71,7 +71,9 @@ namespace IIS.Core.Materials.EntityFramework
 
             await _context.SaveChangesAsync();
 
-            await _elasticService.PutMaterialAsync(materialEntity);
+            var (entity, mlEntities) = await _materialProvider.GetMaterialWithMLResponsesAsync(material.Id);
+
+            await _elasticService.PutMaterialAsync(entity, mlEntities);
 
             _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
             // todo: put message to rabbit instead of calling another service directly
@@ -99,7 +101,9 @@ namespace IIS.Core.Materials.EntityFramework
                 
                 await _context.SaveChangesAsync();
 
-                await _elasticService.PutMaterialAsync(material);
+                var (entity, mlEntities) = await _materialProvider.GetMaterialWithMLResponsesAsync(material.Id);
+
+                await _elasticService.PutMaterialAsync(entity, mlEntities);
                 
                 _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = material.Id, Source = material.Source, Type = material.Type});
 
@@ -110,16 +114,21 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        public Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
+        public async Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
         {
-            var entity = _mapper.Map<MlResponse, MLResponseEntity>(response);
+            var responseEntity = _mapper.Map<MlResponse, MLResponseEntity>(response);
 
-            _context.MLResponses.Add(entity);
+            _context.MLResponses.Add(responseEntity);
 
             _context.SaveChanges();
+            
+            var (entity, mlEntities) = await _materialProvider.GetMaterialWithMLResponsesAsync(responseEntity.MaterialId);
 
-            return Task.FromResult(_mapper.Map<MlResponse>(entity));
+            await _elasticService.PutMaterialAsync(entity, mlEntities);
+
+            return _mapper.Map<MlResponse>(entity);
         }
+        
         private Guid GetIcaoNode(string icaoValue)
         {
             var q = from n in _context.Nodes
@@ -175,6 +184,5 @@ namespace IIS.Core.Materials.EntityFramework
                 SourceVersion = info.SourceVersion,
             };
         }
-    
     }
 }
