@@ -127,8 +127,6 @@ namespace Iis.Api
 
             CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput,
                 IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
-            CreateMap<IIS.Core.NodeMaterialRelation.NodeMaterialRelation,
-                IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelation>();
         }
     }
 }
