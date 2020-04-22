@@ -35,8 +35,7 @@ unit_test:
     reports:
       junit:
         - ./*test-result.xml
-  on_failure_script:
-    - echo "Test feild"
+
 
 .deploy:
   stage: deploy
