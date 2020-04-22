@@ -29,15 +29,5 @@ namespace Iis.Domain.Materials
         public DateTime CreatedDate { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
-
-        public Material(Guid id, JObject metadata, JArray data, string type, string source)
-        {
-            Id = id;
-            Metadata = metadata;
-            Data = data;
-            Type = type;
-            Source = source;
-            CreatedDate = DateTime.Now;
-        }
     }
 }
