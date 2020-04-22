@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AutoFixture;
+using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
 using Iis.DataModel;
 using IIS.Core;
@@ -18,6 +19,17 @@ namespace Iis.UnitTests
                     .ToList().ForEach(b => fixture.Behaviors.Remove(b));
                 fixture.Behaviors.Add(new OmitOnRecursionBehavior());
                 return fixture;
+            }
+
+            )
+        { }
+    }
+
+    public class AutoMoqDataAttribute : AutoDataAttribute
+    {
+        public AutoMoqDataAttribute()
+            : base(() => {
+                return new Fixture().Customize(new AutoMoqCustomization());
             }
 
             )

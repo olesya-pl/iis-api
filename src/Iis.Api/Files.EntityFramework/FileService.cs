@@ -163,6 +163,8 @@ namespace IIS.Core.Files.EntityFramework
                 contents = file.Contents;
             }
 
+            if (contents == null) return null;
+
             var ms = new MemoryStream(contents);
             return new FileInfo(id, file.Name, file.ContentType, ms, file.IsTemporary);
         }

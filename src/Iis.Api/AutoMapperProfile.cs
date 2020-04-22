@@ -4,9 +4,12 @@ using Iis.Api.Ontology.Migration;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Roles;
+using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,8 +39,11 @@ namespace Iis.Api
             CreateMap<IMaterialLoadData, IIS.Core.GraphQL.Materials.MaterialLoadData>();
             CreateMap<IMaterialLoadData, IIS.Core.GraphQL.Materials.Material>();
 
-            CreateMap<Iis.Domain.Materials.MaterialFeature, IIS.Core.GraphQL.Materials.MaterialFeature>()
-                .ForMember(dest => dest.NodeId, opts => opts.MapFrom(src => src.Node.Id));
+            CreateMap<Iis.Domain.Node, MaterialFeatureNode>()
+                .ForMember(dest => dest.NodeTypeId, opts => opts.MapFrom(src => src.Type.Id))
+                .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Type.Name))
+                .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Type.Title));
+            CreateMap<Iis.Domain.Materials.MaterialFeature, IIS.Core.GraphQL.Materials.MaterialFeature>();
             CreateMap<Iis.Domain.Materials.MaterialInfo, IIS.Core.GraphQL.Materials.MaterialInfo>()
                 .ForMember(dest => dest.Features, opts => opts.MapFrom(src => src.Features));
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
@@ -59,6 +65,17 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : src.Data.ToString()))
                 .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => src.LoadData.ToJson()))
                 .ForMember(dest => dest.MaterialInfos, opts => opts.MapFrom(src => src.Infos));
+
+            CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.Type, opts => opts.MapFrom(src => src.Metadata.Type))
+                .ForMember(dest => dest.Source, opts => opts.MapFrom(src => src.Metadata.Source))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
+                .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+
+
 
             CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
@@ -119,6 +136,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.HandlerName, opts => opts.MapFrom(src => src.MLHandlerName));
 
             CreateMap<Iis.Domain.MachineLearning.MlResponse, IIS.Core.GraphQL.ML.MachineLearningResult>();
+            
+            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
         }
     }
 }

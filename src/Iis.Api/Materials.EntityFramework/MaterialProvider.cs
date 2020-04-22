@@ -25,7 +25,11 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMapper _mapper;
         private readonly IElasticService _elasticService;
 
-        public MaterialProvider(OntologyContext context, IOntologyService ontologyService, IElasticService elasticService, IOntologyCache cache, IMapper mapper)
+        public MaterialProvider(OntologyContext context,
+            IOntologyService ontologyService,
+            IElasticService elasticService,
+            IOntologyCache cache,
+            IMapper mapper)
         {
             _context = context;
             _ontologyService = ontologyService;
@@ -38,7 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
             await _context.Semaphore.WaitAsync();
-            
+
             try
             {
                 IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery();
@@ -53,9 +57,9 @@ namespace IIS.Core.Materials.EntityFramework
                     }
 
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(
-                        _elasticService.MaterialIndexes, 
+                        _elasticService.MaterialIndexes,
                         new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
-                    
+
                     mappingTasks =  (await materialsQuery
                                         .Where(e => searchResult.ids.Contains(e.Id))
                                         .ToArrayAsync())
@@ -78,7 +82,7 @@ namespace IIS.Core.Materials.EntityFramework
                         .Where(m => m.MaterialInfos.Any(i => i.MaterialFeatures.Any(f => nodeIdsArr.Contains(f.NodeId))))
                         .OrderByDescending(m => m.CreatedDate);
                 }
-                
+
                 materialsCountQuery = materialsQuery;
 
                 materialsQuery = materialsQuery
@@ -165,10 +169,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             if (material == null) return null;
 
-            var result = new Material(material.Id,
-                JObject.Parse(material.Metadata),
-                material.Data == null ? null : JArray.Parse(material.Data),
-                material.Type, material.Source);
+            var result = _mapper.Map<Material>(material);
             if (material.FileId.HasValue)
                 result.File = new FileInfo(material.FileId.Value);
 

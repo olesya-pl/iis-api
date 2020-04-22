@@ -53,6 +53,7 @@ using Iis.DataModel.Roles;
 using Iis.Roles;
 using Iis.Api.GraphQL.Access;
 using Iis.Interfaces.Roles;
+using IIS.Core.NodeMaterialRelation;
 
 namespace IIS.Core
 {
@@ -108,8 +109,10 @@ namespace IIS.Core
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
+            services.AddScoped<ExportToJsonService>();
             services.AddTransient<RoleService>();
             services.AddTransient<AccessObjectService>();
+            services.AddTransient<NodeMaterialRelationService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();

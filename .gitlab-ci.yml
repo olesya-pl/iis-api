@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - deploy
 
 build_job:
@@ -14,14 +15,34 @@ build_job:
     paths:
       - publish
     expire_in: 1 month
-
   tags:
     - ci
-  only:
-    - master
-    - /^v.+$/
-    - /^sprint\..+$/
-    - /^Release_*/
+  # only:
+  #   - master
+  #   - /^v.+$/
+  #   - /^sprint\..+$/
+  #   - /^Release_*/
+
+unit_test:
+  stage: test
+  script:
+    - dotnet test --logger:"junit;LogFilePath=../../{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose" src/Iis.UnitTests/Iis.UnitTests.csproj
+  artifacts:
+    when: always
+    paths:
+      - ./*test-result.xml
+    reports:
+      junit:
+        - ./*test-result.xml
+  allow_failure: true
+  tags:
+    - ci
+  # only:
+  #   - master
+  #   - /^v.+$/
+  #   - /^sprint\..+$/
+  #   - /^Release_*/
+
 
 .deploy:
   stage: deploy

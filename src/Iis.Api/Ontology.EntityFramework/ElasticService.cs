@@ -52,7 +52,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 "SecondarySpecialEducationalInstitution",
                 "HigherEducationalInstitution",
                 "EducationalInstitution",
-                "MilitaryOrganization"
+                "MilitaryOrganization",
+                "TerrorOrganization"
             };
 
             UseElastic = _context.NodeTypes.Any(nt => nt.Name == "ObjectOfStudy");
@@ -89,7 +90,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<bool> PutNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default)
         {
-            if (!UseElastic) return true;
+            if (!UseElastic || !OntologyIndexIsSupported(extNode.NodeTypeName)) return true;
 
             var json = _elasticSerializer.GetJsonByExtNode(extNode);
             

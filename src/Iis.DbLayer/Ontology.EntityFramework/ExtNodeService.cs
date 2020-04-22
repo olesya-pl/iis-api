@@ -31,7 +31,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private List<Guid> GetObjectOfStudyTypes()
         {
-            //TODO: 
+            //TODO:
             var objectOfStudyType = _context.NodeTypes
                 .Include(nt => nt.IncomingRelations)
                 .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
@@ -42,7 +42,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToList();
         }
 
-        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
+        private async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
         {
             //Console.WriteLine($"=> {nodeEntity.Id}; {nodeEntity.NodeType.Name}");
             var extNode = new ExtNode
@@ -58,7 +58,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             };
             return await Task.FromResult(extNode);
         }
-        
+
         public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var nodeEntity = await GetNodeQuery()
@@ -71,7 +71,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
         {
             var result = new List<IExtNode>();
-            foreach (var relation in relations)
+            foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.TargetNode.IsArchived))
             {
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
                 if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
@@ -113,7 +113,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
-                .ThenInclude(r => r.TargetNode);
+                .ThenInclude(r => r.TargetNode)
+                .Where(n => !n.IsArchived);
         }
     }
 }
