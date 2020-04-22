@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -101,6 +102,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
             if (!_runTimeSettings.PutSavedToElastic) return false;
 
+            if(material is null) return false;
+
             var jDocument = new JObject(
                 new JProperty(nameof(material.Source).ToLower(), material.Source),
                 new JProperty(nameof(material.Type).ToLower(), material.Type)
@@ -129,6 +132,17 @@ namespace IIS.Core.Ontology.EntityFramework
                 jDocument.Merge(JObject.Parse(material.LoadData));
             }
 
+            if(mLResponses != null && mLResponses.Any())
+            {
+                foreach (var response in mLResponses)
+                {
+                    var handlerName = RemoveWhiteSpace(ToLowerCamelCase(response.MLHandlerName));
+
+                    var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
+
+                    jDocument.Add(new JProperty(propertyName, response.OriginalResponse));
+                }
+            }
 
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), material.Id.ToString("N"), jDocument.ToString(Formatting.None));
         }
@@ -188,6 +202,21 @@ namespace IIS.Core.Ontology.EntityFramework
         private Task<string> GetNodeByIdAsync(string indexName, string id, IEnumerable<NodeType> nodeTypes)
         {
             return _elasticManager.GetDocumentByIdAsync(indexName, id, nodeTypes.Select(nt => nt.Name).ToArray());
+        }
+
+        private static string RemoveWhiteSpace(string input)
+        {
+            return new string(input.Where(ch => !char.IsWhiteSpace(ch)).ToArray());
+        }
+        private static string ToLowerCamelCase(string input)
+        {
+            input = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input);
+
+            var chanrArray = input.ToCharArray();
+
+            chanrArray[0] = char.ToLowerInvariant(chanrArray[0]);
+
+            return new string(chanrArray);
         }
     }
 }

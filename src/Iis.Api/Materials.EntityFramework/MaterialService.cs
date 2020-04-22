@@ -22,12 +22,18 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialProvider _materialProvider;
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
 
-        public MaterialService(OntologyContext context, IFileService fileService, IElasticService elasticService, IMaterialEventProducer eventProducer,
-            IMaterialProvider materialProvider, IEnumerable<IMaterialProcessor> materialProcessors)
+        public MaterialService(OntologyContext context, 
+            IFileService fileService, 
+            IElasticService elasticService, 
+            IMapper mapper,
+            IMaterialEventProducer eventProducer,
+            IMaterialProvider materialProvider, 
+            IEnumerable<IMaterialProcessor> materialProcessors)
         {
             _context = context;
             _fileService = fileService;
             _elasticService = elasticService;
+            _mapper = mapper;
             _eventProducer = eventProducer;
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
