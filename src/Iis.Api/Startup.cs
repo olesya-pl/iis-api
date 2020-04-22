@@ -110,6 +110,7 @@ namespace IIS.Core
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
+            services.AddScoped<ExportToJsonService>();
             services.AddTransient<RoleService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<MlProcessingService>();
