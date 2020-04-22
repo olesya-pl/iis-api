@@ -17,7 +17,11 @@ build_job:
     expire_in: 1 month
   tags:
     - ci
-
+  # only:
+  #   - master
+  #   - /^v.+$/
+  #   - /^sprint\..+$/
+  #   - /^Release_*/
 
 unit_test:
   stage: test
@@ -30,15 +34,13 @@ unit_test:
     reports:
       junit:
         - ./*test-result.xml
-  allow_failure: true
   tags:
     - ci
-  only:
-    - master
-    - /^v.+$/
-    - /^sprint\..+$/
-    - /^Release_*/
-
+  # only:
+  #   - master
+  #   - /^v.+$/
+  #   - /^sprint\..+$/
+  #   - /^Release_*/
 
 
 .deploy:
