@@ -15,14 +15,9 @@ build_job:
     paths:
       - publish
     expire_in: 1 month
-
   tags:
     - ci
-  only:
-    - master
-    - /^v.+$/
-    - /^sprint\..+$/
-    - /^Release_*/
+
 
 unit_test:
   stage: test
