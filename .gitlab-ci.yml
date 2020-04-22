@@ -35,8 +35,13 @@ unit_test:
     reports:
       junit:
         - ./*test-result.xml
-    tags:
+  tags:
     - ci
+  only:
+    - master
+    - /^v.+$/
+    - /^sprint\..+$/
+    - /^Release_*/
 
 
 .deploy:
