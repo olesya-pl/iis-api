@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - deploy
 
 build_job:
@@ -22,6 +23,20 @@ build_job:
     - /^v.+$/
     - /^sprint\..+$/
     - /^Release_*/
+
+unit_test:
+  stage: test
+  script:
+    - dotnet test --logger:"junit;LogFilePath=../../{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose" src/Iis.UnitTests/Iis.UnitTests.csproj
+  artifacts:
+    when: always
+    paths:
+      - ./*test-result.xml
+    reports:
+      junit:
+        - ./*test-result.xml
+  on_failure_script:
+    - echo "Test feild"
 
 .deploy:
   stage: deploy
