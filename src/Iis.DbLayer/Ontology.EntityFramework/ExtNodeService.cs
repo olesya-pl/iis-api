@@ -71,7 +71,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
         {
             var result = new List<IExtNode>();
-            foreach (var relation in relations)
+            foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.TargetNode.IsArchived))
             {
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
                 if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
@@ -113,7 +113,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
-                .ThenInclude(r => r.TargetNode);
+                .ThenInclude(r => r.TargetNode)
+                .Where(n => !n.IsArchived);
         }
     }
 }
