@@ -66,6 +66,13 @@ namespace Iis.Api
                 .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => src.LoadData.ToJson()))
                 .ForMember(dest => dest.MaterialInfos, opts => opts.MapFrom(src => src.Infos));
 
+            CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.File, opts => opts.Ignore())
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
+                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => src.LoadData.ToString()))
+                .ForMember(dest => dest.Infos, opts => opts.MapFrom(src => src.MaterialInfos));
+
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.Type, opts => opts.MapFrom(src => src.Metadata.Type))

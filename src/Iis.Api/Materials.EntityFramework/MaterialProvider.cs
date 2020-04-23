@@ -192,8 +192,6 @@ namespace IIS.Core.Materials.EntityFramework
             if (material.FileId.HasValue)
                 result.File = new FileInfo(material.FileId.Value);
 
-            result.Title = material.Title;
-            result.ParentId = material.ParentId;
             result.LoadData = string.IsNullOrEmpty(material.LoadData) ?
                 new MaterialLoadData() :
                 MapLoadData(material.LoadData);

@@ -6,10 +6,10 @@ namespace Iis.Domain.Materials
 {
     public class Material
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
         public JArray Data { get; }
-        public JObject Metadata { get; }
+        public JObject Metadata { get; set; }
         public string Type { get; }
         public string Source { get; }
         public MaterialSign Importance { get; set; }
