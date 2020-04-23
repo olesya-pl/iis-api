@@ -122,7 +122,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             _context.MLResponses.Add(responseEntity);
 
-            //_context.SaveChanges();
+            _context.SaveChanges();
             
             await PutMaterialToElasticSearch(responseEntity.MaterialId);
 
