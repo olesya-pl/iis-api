@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -190,21 +191,75 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        public Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId)
+        public async Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId)
         {
-            return GetMLEntitiesByMaterialId(materialId)
-                    .Select(p => _mapper.Map<MlProcessingResult>(p))
-                    .ToListAsync();
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                return await _context.MLResponses
+                                .Where(p => p.MaterialId == materialId)
+                                .AsNoTracking()
+                                .Select(p => _mapper.Map<MlProcessingResult>(p))
+                                .ToListAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
-        public async Task<(MaterialEntity material, List<IMLResponseEntity> mLResponses)> GetMaterialWithMLResponsesAsync(Guid materialId)
+        public async Task<JObject> GetMaterialDocumentAsync(Guid materialId)
         {
-            var material = await GetMaterialEntityAsync(materialId);
+            var materialTask = GetMaterialAsync(materialId);
 
-            var mLResponses = await GetMLEntitiesByMaterialId(materialId)
-                                    .ToListAsync<IMLResponseEntity>();
+            var mLResponsesTask = GetMlProcessingResultsAsync(materialId);
+            
+            Task.WaitAll(materialTask, mLResponsesTask);
+            
+            var material = await materialTask;
+            var mLResponses = await mLResponsesTask;
 
-            return (material, mLResponses);
+            var jDocument = new JObject(
+                new JProperty(nameof(material.Source).ToLower(), material.Source),
+                new JProperty(nameof(material.Type).ToLower(), material.Type)
+            );
+
+            if (!string.IsNullOrWhiteSpace(material.Title))
+            {
+                jDocument.Add(nameof(material.Title), material.Title);
+            }
+
+            if (!(material.Data is null) && material.Data.HasValues)
+            {
+                material.Data
+                    .Select(token => new JProperty(token.Value<string>("Type"), token.Value<string>("Text")))
+                    .Select(property =>
+                    {
+                        jDocument.Add(property);
+                        return property;
+                    })
+                    .ToList();
+            }
+
+            if (!(material.LoadData is null))
+            {
+                jDocument.Merge(JObject.Parse(material.LoadData.ToJson()));
+            }
+
+            if(mLResponses != null && mLResponses.Any())
+            {
+                foreach (var response in mLResponses)
+                {
+                    var handlerName = RemoveWhiteSpace(ToLowerCamelCase(response.MlHandlerName));
+
+                    var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
+
+                    jDocument.Add(new JProperty(propertyName, response.ResponseText));
+                }
+            }
+            
+
+            return jDocument;
         }
 
         private IQueryable<MaterialEntity> GetParentMaterialsQuery()
@@ -226,13 +281,6 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.MaterialInfos)
                     .ThenInclude(m => m.MaterialFeatures)
                     .AsNoTracking();
-        }
-
-        private IQueryable<MLResponseEntity> GetMLEntitiesByMaterialId(Guid materialId)
-        {
-            return _context.MLResponses
-                        .Where(p => p.MaterialId == materialId)
-                        .AsNoTracking();
         }
         
         private async Task<Material[]> MapChildren(MaterialEntity material)
@@ -291,5 +339,20 @@ namespace IIS.Core.Materials.EntityFramework
             result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
             return result;
         }
+        private static string RemoveWhiteSpace(string input)
+        {
+            return new string(input.Where(ch => !char.IsWhiteSpace(ch)).ToArray());
+        }
+        private static string ToLowerCamelCase(string input)
+        {
+            input = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input);
+
+            var chanrArray = input.ToCharArray();
+
+            chanrArray[0] = char.ToLowerInvariant(chanrArray[0]);
+
+            return new string(chanrArray);
+        }
+
     }
 }

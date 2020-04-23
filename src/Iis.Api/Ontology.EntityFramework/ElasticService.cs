@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,7 +13,6 @@ using Iis.Domain.Elastic;
 using Iis.DataModel;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
-using Iis.Interfaces.Materials;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -97,55 +95,15 @@ namespace IIS.Core.Ontology.EntityFramework
             return await _elasticManager.PutDocumentAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
         }
 
-        public async Task<bool> PutMaterialAsync(IMaterialEntity material, List<IMLResponseEntity> mLResponses, CancellationToken cancellation = default)
+        public async Task<bool> PutMaterialAsync(Guid materialId, JObject materialDocument, CancellationToken cancellation = default)
         {
             if (!UseElastic) return true;
 
             if (!_runTimeSettings.PutSavedToElastic) return false;
 
-            if(material is null) return false;
+            if(materialDocument is null) return false;
 
-            var jDocument = new JObject(
-                new JProperty(nameof(material.Source).ToLower(), material.Source),
-                new JProperty(nameof(material.Type).ToLower(), material.Type)
-            );
-
-            if (!string.IsNullOrWhiteSpace(material.Title))
-            {
-                jDocument.Add(nameof(material.Title), material.Title);
-            }
-
-            if (!string.IsNullOrWhiteSpace(material.Data))
-            {
-                JArray
-                .Parse(material.Data)
-                .Select(token => new JProperty(token.Value<string>("Type"), token.Value<string>("Text")))
-                .Select(property =>
-                {
-                    jDocument.Add(property);
-                    return property;
-                })
-                .ToList();
-            }
-
-            if (!string.IsNullOrWhiteSpace(material.LoadData))
-            {
-                jDocument.Merge(JObject.Parse(material.LoadData));
-            }
-
-            if(mLResponses != null && mLResponses.Any())
-            {
-                foreach (var response in mLResponses)
-                {
-                    var handlerName = RemoveWhiteSpace(ToLowerCamelCase(response.MLHandlerName));
-
-                    var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
-
-                    jDocument.Add(new JProperty(propertyName, response.OriginalResponse));
-                }
-            }
-
-            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), material.Id.ToString("N"), jDocument.ToString(Formatting.None));
+            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), materialId.ToString("N"), materialDocument.ToString(Formatting.None));
         }
 
         public bool TypesAreSupported(IEnumerable<string> typeNames)
@@ -203,21 +161,6 @@ namespace IIS.Core.Ontology.EntityFramework
         private Task<string> GetNodeByIdAsync(string indexName, string id, IEnumerable<NodeType> nodeTypes)
         {
             return _elasticManager.GetDocumentByIdAsync(indexName, id, nodeTypes.Select(nt => nt.Name).ToArray());
-        }
-
-        private static string RemoveWhiteSpace(string input)
-        {
-            return new string(input.Where(ch => !char.IsWhiteSpace(ch)).ToArray());
-        }
-        private static string ToLowerCamelCase(string input)
-        {
-            input = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input);
-
-            var chanrArray = input.ToCharArray();
-
-            chanrArray[0] = char.ToLowerInvariant(chanrArray[0]);
-
-            return new string(chanrArray);
         }
     }
 }

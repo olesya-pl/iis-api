@@ -77,9 +77,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             await _context.SaveChangesAsync();
 
-            var (entity, mlEntities) = await _materialProvider.GetMaterialWithMLResponsesAsync(material.Id);
-
-            await _elasticService.PutMaterialAsync(entity, mlEntities);
+            await PutMaterialToElasticSearch(materialEntity.Id);
 
             _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
             // todo: put message to rabbit instead of calling another service directly
@@ -107,10 +105,8 @@ namespace IIS.Core.Materials.EntityFramework
                 
                 await _context.SaveChangesAsync();
 
-                var (entity, mlEntities) = await _materialProvider.GetMaterialWithMLResponsesAsync(material.Id);
+                await PutMaterialToElasticSearch(material.Id);
 
-                await _elasticService.PutMaterialAsync(entity, mlEntities);
-                
                 _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = material.Id, Source = material.Source, Type = material.Type});
 
             }
@@ -126,15 +122,20 @@ namespace IIS.Core.Materials.EntityFramework
 
             _context.MLResponses.Add(responseEntity);
 
-            _context.SaveChanges();
+            //_context.SaveChanges();
             
-            var (entity, mlEntities) = await _materialProvider.GetMaterialWithMLResponsesAsync(responseEntity.MaterialId);
+            await PutMaterialToElasticSearch(responseEntity.MaterialId);
 
-            await _elasticService.PutMaterialAsync(entity, mlEntities);
-
-            return _mapper.Map<MlResponse>(entity);
+            return _mapper.Map<MlResponse>(responseEntity);
         }
         
+        private async Task<bool> PutMaterialToElasticSearch(Guid materialId)
+        {
+            var materialDocument = await _materialProvider.GetMaterialDocumentAsync(materialId);
+
+            return await _elasticService.PutMaterialAsync(materialId, materialDocument);
+        }
+
         private Guid GetIcaoNode(string icaoValue)
         {
             var q = from n in _context.Nodes
