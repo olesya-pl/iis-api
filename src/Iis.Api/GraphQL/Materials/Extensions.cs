@@ -7,7 +7,25 @@ using Newtonsoft.Json.Linq;
 namespace IIS.Core.GraphQL.Materials
 {
     public static class Extensions
-    {        
+    {
+        public static Iis.Domain.Materials.Material ToDomain(this MaterialInput input)
+        {
+            Iis.Domain.Materials.Material result = new Iis.Domain.Materials.Material(
+                Guid.NewGuid(),
+                JObject.FromObject(input.Metadata),
+                input.Data == null ? null : JArray.FromObject(input.Data),
+                input.Metadata.Type,
+                input.Metadata.Source);
+
+            if (input.FileId != null)
+            {
+                result.File = new FileInfo((Guid)input.FileId);
+            }
+            result.ParentId = input.ParentId;
+
+            return result;
+        }
+
         public static Material ToView(this Iis.Domain.Materials.Material material)
         {
             MaterialSign MapSign(Iis.Domain.Materials.MaterialSign sign) =>

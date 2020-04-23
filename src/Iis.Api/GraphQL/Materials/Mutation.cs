@@ -8,7 +8,6 @@ namespace IIS.Core.GraphQL.Materials
 {
     public class Mutation
     {
-        private readonly IMapper _mapper;
         // ReSharper disable once UnusedMember.Global
         public async Task<Material> CreateMaterial(
             [Service] IMaterialProvider materialProvider,
@@ -16,8 +15,8 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialInput input)
         {
-            Iis.Domain.Materials.Material inputMaterial = _mapper.Map<Iis.Domain.Materials.Material>(input);
-            
+            Iis.Domain.Materials.Material inputMaterial = input.ToDomain();
+
             await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
 
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);

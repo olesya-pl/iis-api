@@ -170,12 +170,15 @@ namespace IIS.Core.Materials.EntityFramework
         {
             if (material == null) return null;
 
-            var result = _mapper.Map<Material>(material);
+            var result = new Material(material.Id,
+                JObject.Parse(material.Metadata),
+                material.Data == null ? null : JArray.Parse(material.Data),
+                material.Type, material.Source);
+            result.Title = material.Title;
+            result.ParentId = material.ParentId;
             if (material.FileId.HasValue)
                 result.File = new FileInfo(material.FileId.Value);
 
-            result.Title = material.Title;
-            result.ParentId = material.ParentId;
             result.LoadData = string.IsNullOrEmpty(material.LoadData) ?
                 new MaterialLoadData() :
                 MapLoadData(material.LoadData);

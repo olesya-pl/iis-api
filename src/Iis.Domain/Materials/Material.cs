@@ -6,10 +6,10 @@ namespace Iis.Domain.Materials
 {
     public class Material
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
         public JArray Data { get; }
-        public JObject Metadata { get; }
+        public JObject Metadata { get; set; }
         public string Type { get; }
         public string Source { get; }
         public MaterialSign Importance { get; set; }
@@ -29,5 +29,15 @@ namespace Iis.Domain.Materials
         public DateTime CreatedDate { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
+        public Material(Guid id, JObject metadata, JArray data, string type, string source)
+        {
+            Id = id;
+            Metadata = metadata;
+            Data = data;
+            Type = type;
+            Source = source;
+            CreatedDate = DateTime.Now;
+        }
+
     }
 }

@@ -26,7 +26,7 @@ build_job:
 unit_test:
   stage: test
   script:
-    - dotnet test --logger:"junit;LogFilePath=../../{assembly}-test-result.xml" src/Iis.UnitTests/Iis.UnitTests.csproj
+    - dotnet test --test-adapter-path:. --logger:"junit;LogFilePath=../../{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose" src/Iis.UnitTests/Iis.UnitTests.csproj
   artifacts:
     when: always
     paths:

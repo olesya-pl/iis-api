@@ -31,6 +31,7 @@ namespace Iis.Api
             CreateMap<IMaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<IMaterialSign, IIS.Core.GraphQL.Materials.MaterialSign>();
 
+
             CreateMap<MaterialSignEntity, IIS.Core.GraphQL.Materials.MaterialSignFull>()
                 .ForMember(dest => dest.TypeName, opts => opts.MapFrom(src => src.MaterialSignType.Name))
                 .ForMember(dest => dest.TypeTitle, opts => opts.MapFrom(src => src.MaterialSignType.Title));
@@ -58,24 +59,6 @@ namespace Iis.Api
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
             CreateMap<Iis.Domain.Materials.MaterialInfo, MaterialInfoEntity>()
                 .ForMember(dest => dest.MaterialFeatures, opts => opts.MapFrom(src => src.Features));
-
-            CreateMap<Iis.Domain.Materials.Material, MaterialEntity>()
-                .ForMember(dest => dest.File, opts => opts.Ignore())
-                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata.ToString()))
-                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : src.Data.ToString()))
-                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => src.LoadData.ToJson()))
-                .ForMember(dest => dest.MaterialInfos, opts => opts.MapFrom(src => src.Infos));
-
-            CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.Type, opts => opts.MapFrom(src => src.Metadata.Type))
-                .ForMember(dest => dest.Source, opts => opts.MapFrom(src => src.Metadata.Source))
-                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
-                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
-                .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
-
-
 
             CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
