@@ -250,7 +250,7 @@ namespace IIS.Core.Materials.EntityFramework
                 jDocument.Merge(JObject.Parse(material.LoadData.ToJson()));
             }
 
-            if(mLResponses != null && mLResponses.Any())
+            if(mLResponses.Any())
             {
                 foreach (var response in mLResponses)
                 {
