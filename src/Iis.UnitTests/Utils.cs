@@ -3,10 +3,12 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
 using Iis.DataModel;
+using Iis.DataModel.Cache;
 using IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace Iis.UnitTests
 {
@@ -48,6 +50,7 @@ namespace Iis.UnitTests
                 options => options.UseInMemoryDatabase("db"),
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
+            serviceCollection.AddSingleton<IOntologyCache>(new Mock<IOntologyCache>().Object);
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;
