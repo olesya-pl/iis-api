@@ -223,8 +223,14 @@ namespace IIS.Core.Materials.EntityFramework
             var mLResponses = await mLResponsesTask;
 
             var jDocument = new JObject(
-                new JProperty(nameof(material.Source).ToLower(), material.Source),
-                new JProperty(nameof(material.Type).ToLower(), material.Type)
+                new JProperty(nameof(Material.Source).ToLower(), material.Source),
+                new JProperty(nameof(Material.Type).ToLower(), material.Type),
+                new JProperty(nameof(Material.Importance).ToLower(), material.Importance?.Title),
+                new JProperty(nameof(Material.Reliability).ToLower(), material.Reliability?.Title),
+                new JProperty(nameof(Material.Relevance).ToLower(), material.Relevance?.Title),
+                new JProperty(nameof(Material.Completeness).ToLower(), material.Completeness?.Title),
+                new JProperty(nameof(Material.SourceReliability).ToLower(), material.SourceReliability?.Title),
+                new JProperty(nameof(Material.Id).ToLower(), material.Id.ToString("N"))
             );
 
             if (!string.IsNullOrWhiteSpace(material.Title))
