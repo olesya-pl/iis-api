@@ -287,7 +287,10 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Data")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("{}");
 
                     b.Property<Guid>("MaterialId")
                         .HasColumnType("uuid");

@@ -89,13 +89,13 @@ namespace IIS.Core
                 services.AddDbContext<OntologyContext>(
                     options => options.UseNpgsql(dbConnectionString),
                     ServiceLifetime.Transient);
+                using var context = OntologyContext.GetContext(dbConnectionString);
+                context.Database.Migrate();
+                (new FillDataForRoles(context)).Execute();
+                services.AddSingleton<IOntologyCache>(new OntologyCache(context));
             }
 
             services.AddHttpContextAccessor();
-            using var context = OntologyContext.GetContext(dbConnectionString);
-            context.Database.Migrate();
-            (new FillDataForRoles(context)).Execute();
-            services.AddSingleton<IOntologyCache>(new OntologyCache(context));
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
