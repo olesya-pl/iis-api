@@ -1,20 +1,21 @@
 using System;
 using System.Linq;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using AutoMapper;
 
+
+using Iis.Utility;
 using Iis.Domain;
 using Iis.Domain.Materials;
+using Iis.Domain.MachineLearning;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-using Iis.Domain.MachineLearning;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -253,7 +254,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 foreach (var response in mLResponses)
                 {
-                    var handlerName = RemoveWhiteSpace(ToLowerCamelCase(response.MlHandlerName));
+                    var handlerName = response.MlHandlerName.ToLowerCamelCase().RemoveWhiteSpace();
 
                     var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
 
@@ -342,20 +343,5 @@ namespace IIS.Core.Materials.EntityFramework
             result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
             return result;
         }
-        private static string RemoveWhiteSpace(string input)
-        {
-            return new string(input.Where(ch => !char.IsWhiteSpace(ch)).ToArray());
-        }
-        private static string ToLowerCamelCase(string input)
-        {
-            input = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input);
-
-            var chanrArray = input.ToCharArray();
-
-            chanrArray[0] = char.ToLowerInvariant(chanrArray[0]);
-
-            return new string(chanrArray);
-        }
-
     }
 }
