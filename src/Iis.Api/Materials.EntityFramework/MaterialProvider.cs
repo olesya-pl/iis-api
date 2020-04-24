@@ -218,8 +218,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             var mLResponsesTask = GetMlProcessingResultsAsync(materialId);
             
-            Task.WaitAll(materialTask, mLResponsesTask);
-            
+            await Task.WhenAll(materialTask, mLResponsesTask);
+
             var material = await materialTask;
             var mLResponses = await mLResponsesTask;
 

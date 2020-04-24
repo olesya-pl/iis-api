@@ -103,7 +103,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 _context.Update(material);
                 
-                //await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
                 await PutMaterialToElasticSearch(material.Id);
 
