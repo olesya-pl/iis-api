@@ -16,6 +16,7 @@ using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -270,6 +271,25 @@ namespace IIS.Core.Materials.EntityFramework
             
 
             return jDocument;
+        }
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
+        {
+            IEnumerable<Task<Material>> mappingTasks;
+            IEnumerable<Material> materials;
+
+            var q = _context.Materials
+                .Join(_context.MaterialInfos, u => u.Id, uir => uir.MaterialId, (u, uir) => new { u, uir })
+                .Join(_context.MaterialFeatures, r => r.uir.Id, ro => ro.MaterialInfoId, (r, ro) => new { r, ro })
+                .Where(m => m.ro.NodeId == nodeId)
+                .Select(m => m.r.u);
+
+            mappingTasks = (await q
+                                   .ToArrayAsync())
+                                        .Select(async entity => await MapAsync(entity));
+
+            materials = await Task.WhenAll(mappingTasks);
+
+            return (materials, materials.Count());
         }
 
         private IQueryable<MaterialEntity> GetParentMaterialsQuery()
