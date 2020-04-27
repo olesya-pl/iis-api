@@ -1,18 +1,21 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using AutoMapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using Iis.Api.GraphQL.Roles;
 using Iis.Api.Ontology.Migration;
-using Iis.DataModel;
-using Iis.DataModel.Materials;
-using Iis.DataModel.Roles;
-using Iis.Domain.Materials;
-using Iis.Interfaces.Materials;
-using Iis.Interfaces.Roles;
-using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using IIS.Core.GraphQL.Materials;
+using Iis.DataModel;
+using Iis.DataModel.Roles;
+using Iis.DataModel.Materials;
+using Iis.Domain.Materials;
+using Iis.Interfaces.Roles;
+using Iis.Interfaces.Materials;
+
 
 namespace Iis.Api
 {
@@ -58,7 +61,8 @@ namespace Iis.Api
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
             CreateMap<Iis.Domain.Materials.MaterialInfo, MaterialInfoEntity>()
-                .ForMember(dest => dest.MaterialFeatures, opts => opts.MapFrom(src => src.Features));
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToString()))
+                .ForMember(dest => dest.MaterialFeatures, opts => opts.Ignore());
 
             CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
@@ -121,6 +125,12 @@ namespace Iis.Api
             CreateMap<Iis.Domain.MachineLearning.MlResponse, IIS.Core.GraphQL.ML.MachineLearningResult>();
             
             CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
+
+            CreateMap<Iis.Domain.Materials.Material, Iis.DataModel.Materials.MaterialEntity>()
+                .ForMember(dest => dest.File, opt => opt.Ignore())
+                .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string) null: src.Metadata.ToString(Formatting.None)))
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string) null : src.Data.ToString(Formatting.None)))
+                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null? (string) null : src.LoadData.ToJson()));
         }
     }
 }
