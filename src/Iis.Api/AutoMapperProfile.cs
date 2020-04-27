@@ -62,7 +62,7 @@ namespace Iis.Api
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
             CreateMap<Iis.Domain.Materials.MaterialInfo, MaterialInfoEntity>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToString()))
-                .ForMember(dest => dest.MaterialFeatures, opts => opts.Ignore());
+                .ForMember(dest => dest.MaterialFeatures, opts => opts.MapFrom(src => src.Features));
 
             CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
