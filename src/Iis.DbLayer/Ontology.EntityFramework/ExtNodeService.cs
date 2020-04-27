@@ -36,15 +36,30 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Include(nt => nt.IncomingRelations)
                 .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
                 .SingleOrDefault();
-            return objectOfStudyType.IncomingRelations
-                .Where(r => r.Kind == RelationKind.Inheritance)
-                .Select(r => r.SourceTypeId)
-                .ToList();
+            
+            if(objectOfStudyType != null)
+            {
+                return objectOfStudyType.IncomingRelations
+                    .Where(r => r.Kind == RelationKind.Inheritance)
+                    .Select(r => r.SourceTypeId)
+                    .ToList();
+            }
+            else
+            //TODO: we need some staff to do a check Contour or Odyssey    
+            {
+                var types = _context.NodeTypes
+                                .Include(nt => nt.IncomingRelations)
+                                .Where(nt => nt.Kind == Kind.Entity && (nt.Name == "Organization" || nt.Name == "Person"))
+                                .ToList();
+                
+                return types.SelectMany(t => t.IncomingRelations)
+                            .Select(r => r.SourceTypeId)
+                            .ToList();   
+            }
         }
 
         private async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
         {
-            //Console.WriteLine($"=> {nodeEntity.Id}; {nodeEntity.NodeType.Name}");
             var extNode = new ExtNode
             {
                 Id = nodeEntity.Id.ToString("N"),
