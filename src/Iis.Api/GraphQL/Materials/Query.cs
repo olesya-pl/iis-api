@@ -65,5 +65,17 @@ namespace IIS.Core.GraphQL.Materials
         {
             return Task.FromResult(materialProvider.GetMaterialSigns("SourceReliability").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
+
+        [GraphQLType(typeof(MaterialCollection))]
+        public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByNodeId(
+           [Service] IMaterialProvider materialProvider,
+           [Service] IMapper mapper,
+           Guid nodeId)
+        {
+            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(nodeId);
+
+            var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+            return (materials, materialsResult.Count);
+        }
     }
 }

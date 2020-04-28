@@ -7,6 +7,7 @@ using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Materials;
+using System.Linq;
 
 namespace IIS.Core.Materials
 {
@@ -26,5 +27,6 @@ namespace IIS.Core.Materials
         Task<Material> MapAsync(MaterialEntity material);
         Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId);
         Task<JObject> GetMaterialDocumentAsync(Guid materialId);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
     }
 }
