@@ -236,7 +236,24 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToArrayAsync(cancellationToken);
             return ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
         }
+        public async Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
+        {
+            await _context.Semaphore.WaitAsync(cancellationToken);
 
+            try
+            {
+                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+                var nodeEntities = await _context.Nodes
+                                            .Where(node => !node.IsArchived && matchList.Contains(node.Id))
+                                            .ToListAsync();
+                var nodes = nodeEntities.Select(e => MapNode(e, ontology));
+                return (nodes, nodes.Count());
+            }
+            finally
+            {
+                _context.Semaphore.Release();    
+            }
+        }
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
