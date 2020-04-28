@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologySchema", "Iis.O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologySchema.Saver", "Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj", "{6F190731-7F7D-4D5D-959E-AC687A729BB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Roles", "Iis.Roles\Iis.Roles.csproj", "{205868E4-13F8-4420-8433-AC6B7CDC3F7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Roles", "Iis.Roles\Iis.Roles.csproj", "{205868E4-13F8-4420-8433-AC6B7CDC3F7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.ApiTests", "Iis.ApiTests\Iis.ApiTests.csproj", "{E13FAF75-0CFD-41BE-A8B6-7CFCF992BA8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{205868E4-13F8-4420-8433-AC6B7CDC3F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{205868E4-13F8-4420-8433-AC6B7CDC3F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{205868E4-13F8-4420-8433-AC6B7CDC3F7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E13FAF75-0CFD-41BE-A8B6-7CFCF992BA8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E13FAF75-0CFD-41BE-A8B6-7CFCF992BA8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E13FAF75-0CFD-41BE-A8B6-7CFCF992BA8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E13FAF75-0CFD-41BE-A8B6-7CFCF992BA8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
