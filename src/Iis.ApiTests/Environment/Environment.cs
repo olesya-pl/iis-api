@@ -5,11 +5,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Iis.ApiTests
 {
-    abstract public class BaseAPITest
+    abstract public class Environment
     {
         public class LoginResponse
         {
@@ -31,7 +30,7 @@ namespace Iis.ApiTests
                                 .Select(e => e.Message)
                                 .ToArray();
 
-            var errorMessage = string.Join(Environment.NewLine, errorMessages);
+            var errorMessage = string.Join(System.Environment.NewLine, errorMessages);
 
             if (hasUnAuthenticatedCode)
             {
@@ -43,10 +42,27 @@ namespace Iis.ApiTests
             }
 
         }
+        protected TResponce ExecureGraphQlRequest<TResponce>(string apiUri, GraphQLRequest request, string authToken = null, CancellationToken cancellationToken = default)
+            where TResponce : class
+        {
+            using var httpClient = new HttpClient();
+            if(!string.IsNullOrWhiteSpace(authToken))
+                httpClient.DefaultRequestHeaders.Add("Authorization", authToken);
 
-        protected async Task<(bool state, string token, string exceptionMessage)> Login(string username,
+            using var graphQlClient = httpClient.AsGraphQLClient(apiUri);
+            var response = graphQlClient.SendMutationAsync<TResponce>(request, cancellationToken).GetAwaiter().GetResult();
+
+            if (response.Errors != null && response.Errors.Any())
+            {
+                ProcessGraphQlErrors(response.Errors);
+            }
+
+            return response.Data;
+        }
+        protected (bool state, string token, string exceptionMessage) Login(string username,
             string password, string uri, CancellationToken cancellationToken = default)
         {
+            
             var request = new GraphQLRequest
             {
                 Query =
@@ -70,17 +86,9 @@ namespace Iis.ApiTests
 
             try
             {
-                using var graphQlClient = new HttpClient().AsGraphQLClient(uri);
+                var response = ExecureGraphQlRequest<LoginResponse>(uri, request, null, cancellationToken);
 
-
-                var response = await graphQlClient.SendMutationAsync<LoginResponse>(request, cancellationToken);
-
-                if (response.Errors != null && response.Errors.Any())
-                {
-                    ProcessGraphQlErrors(response.Errors);
-                }
-
-                return (true, response.Data.Login.Token, null);
+                return (true, response.Login.Token, null);
             }
 
             catch (Exception ex)
