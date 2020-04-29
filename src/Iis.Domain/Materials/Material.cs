@@ -8,7 +8,7 @@ namespace Iis.Domain.Materials
     {
         public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
-        public JArray Data { get; }
+        public JArray Data { get; set; }
         public JObject Metadata { get; set; }
         public string Type { get; }
         public string Source { get; }
@@ -29,15 +29,6 @@ namespace Iis.Domain.Materials
         public DateTime CreatedDate { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
-        public Material(Guid id, JObject metadata, JArray data, string type, string source)
-        {
-            Id = id;
-            Metadata = metadata;
-            Data = data;
-            Type = type;
-            Source = source;
-            CreatedDate = DateTime.Now;
-        }
 
     }
 }

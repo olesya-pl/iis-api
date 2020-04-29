@@ -139,6 +139,50 @@ namespace Iis.Api
                 .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string) null: src.Metadata.ToString(Formatting.None)))
                 .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string) null : src.Data.ToString(Formatting.None)))
                 .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null? (string) null : src.LoadData.ToJson()));
+
+            CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.File, opts => {
+                    opts.PreCondition(src => (src.FileId.HasValue));
+                    opts.MapFrom(src => new FileInfo(src.FileId.Value));
+                })
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.Parse(src.Data)))
+                .ForMember(dest => dest.Importance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Importance)))
+                .ForMember(dest => dest.Reliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Reliability)))
+                .ForMember(dest => dest.Relevance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Relevance)))
+                .ForMember(dest => dest.Completeness, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Completeness)))
+                .ForMember(dest => dest.SourceReliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SourceReliability)))
+                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => string.IsNullOrEmpty(src.LoadData) ? new Domain.Materials.MaterialLoadData() : MapLoadData(src.LoadData)));
+
+            CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.Type, opts => opts.MapFrom(src => src.Metadata.Type))
+                .ForMember(dest => dest.Source, opts => opts.MapFrom(src => src.Metadata.Source))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
+                .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+        }
+        private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
+        {
+            var result = new Domain.Materials.MaterialLoadData();
+            var json = JObject.Parse(loadData);
+
+            if (json.ContainsKey("from")) result.From = (string)json["from"];
+            if (json.ContainsKey("code")) result.Code = (string)json["code"];
+            if (json.ContainsKey("coordinates")) result.Coordinates = (string)json["coordinates"];
+            if (json.ContainsKey("loadedBy")) result.LoadedBy = (string)json["loadedBy"];
+            if (json.ContainsKey("receivingDate")) result.ReceivingDate = (DateTime?)json["receivingDate"];
+            if (json.ContainsKey("objects")) result.Objects = json["objects"].Value<JArray>().ToObject<List<string>>();
+            if (json.ContainsKey("tags")) result.Tags = json["tags"].Value<JArray>().ToObject<List<string>>();
+            if (json.ContainsKey("states")) result.States = json["states"].Value<JArray>().ToObject<List<string>>();
+
+            return result;
         }
     }
 }
