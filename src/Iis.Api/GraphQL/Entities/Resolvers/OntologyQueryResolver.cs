@@ -49,7 +49,16 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var nf = ctx.CreateNodeFilter(type);
 
-            return Tuple.Create((IEnumerable<EntityType>) new[] {type}, nf, (IEnumerable<Guid>) null);
+            var filter = ctx.Argument<FilterInput>("filter");
+
+            IEnumerable<Guid> ids = new List<Guid>();
+
+            if (filter != null && filter.MatchList.Any())
+            {
+                ids = filter.MatchList;
+            }
+
+            return Tuple.Create((IEnumerable<EntityType>) new[] {type}, nf, ids);
         }
 
         // ----- Relations to attributes ----- //
@@ -164,7 +173,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 ids = filter.MatchList;
             }
-            
+
             return Tuple.Create(types, ctx.CreateNodeFilter(), ids);
         }
     }
