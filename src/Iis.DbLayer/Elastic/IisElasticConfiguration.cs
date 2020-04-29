@@ -1,4 +1,5 @@
-﻿using Iis.Domain.Elastic;
+﻿using Iis.DataModel.Cache;
+using Iis.Domain.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using System;
@@ -10,10 +11,12 @@ namespace Iis.DbLayer.Elastic
     public class IisElasticConfiguration : IElasticConfiguration
     {
         IOntologySchema _ontologySchema;
+        IOntologyCache _ontologyCache;
         List<IElasticFieldEntity> _elasticFields = new List<IElasticFieldEntity>();
-        public IisElasticConfiguration(IOntologySchema ontologySchema)
+        public IisElasticConfiguration(IOntologySchema ontologySchema, IOntologyCache ontologyCache)
         {
             _ontologySchema = ontologySchema;
+            _ontologyCache = ontologyCache;
         }
 
         public void ReloadFields(IEnumerable<IElasticFieldEntity> elasticFields, string typeName = null)
@@ -27,9 +30,6 @@ namespace Iis.DbLayer.Elastic
             var fieldNames = new List<string>();
             foreach (var typeName in typeNames)
             {
-                if (typeName == "Person" || typeName == "MilitaryOrganization" || typeName == "Subdivision")
-                    continue;
-
                 fieldNames.AddRange(GetFieldNamesByNodeType(typeName));
             }
             if (fieldNames.Count == 0) return new List<IIisElasticField>();
@@ -58,10 +58,18 @@ namespace Iis.DbLayer.Elastic
 
         private List<string> GetFieldNamesByNodeType(string typeName)
         {
+            var cachedItems = _ontologyCache.GetFieldNamesByNodeType(typeName);
+            if (cachedItems != null && cachedItems.Any())
+            {
+                return cachedItems.ToList();
+            }
+
             var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
             if (nodeType != null)
             {
-                return nodeType.GetAttributeDotNamesRecursive();
+                var dbItems = nodeType.GetAttributeDotNamesRecursiveWithLimit();
+                _ontologyCache.PutFieldNamesByNodeType(typeName, dbItems);
+                return dbItems;
             }
 
             return new List<string>();

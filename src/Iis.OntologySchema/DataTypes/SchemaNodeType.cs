@@ -116,7 +116,7 @@ namespace Iis.OntologySchema.DataTypes
                         return $"{RelationType.SourceType.Name}.{RelationType.NodeType.Name}";
                     }
             }
-                        
+
             return null;
         }
 
@@ -214,6 +214,30 @@ namespace Iis.OntologySchema.DataTypes
             {
                 string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity ? relation.NodeType.Name : null;
                 result.AddRange(relation.TargetType.GetAttributeDotNamesRecursive(relationName));
+            }
+
+            return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
+        }
+
+        public List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)
+        {
+            const int MaxRecursionLevel = 2;
+            var result = new List<string>();
+
+            if (Kind == Kind.Attribute)
+            {
+                result.Add(Name);
+            }
+
+            if (recursionLevel == MaxRecursionLevel)
+            {
+                return result;
+            }
+
+            foreach (var relation in OutgoingRelations)
+            {
+                string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity ? relation.NodeType.Name : null;
+                result.AddRange(relation.TargetType.GetAttributeDotNamesRecursiveWithLimit(relationName, recursionLevel + 1));
             }
 
             return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();

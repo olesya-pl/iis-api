@@ -94,7 +94,8 @@ namespace IIS.Core
                 using var context = OntologyContext.GetContext(dbConnectionString);
                 context.Database.Migrate();
                 (new FillDataForRoles(context)).Execute();
-                services.AddSingleton<IOntologyCache>(new OntologyCache(context));
+                var ontologyCache = new OntologyCache(context);
+                services.AddSingleton<IOntologyCache>(ontologyCache);
 
                 var schemaSource = new OntologySchemaSource
                 {
@@ -104,7 +105,7 @@ namespace IIS.Core
                 };
                 var ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
                 services.AddSingleton(ontologySchema);
-                var iisElasticConfiguration = new IisElasticConfiguration(ontologySchema);
+                var iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                 iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
                 services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
             }
@@ -256,6 +257,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
+            PopulateEntityFieldsCache(app);
 
             app.UseCors(builder =>
                 builder
@@ -275,6 +277,30 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void PopulateEntityFieldsCache(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                var serviceProvider = serviceScope.ServiceProvider;
+                var ontologyProvider = serviceProvider.GetRequiredService<IOntologyProvider>();
+                var ontology = ontologyProvider.GetOntologyAsync().GetAwaiter().GetResult();
+                var types = ontology.EntityTypes.Where(p => p.Name == "ObjectOfStudy");
+                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                    .Concat(types).Distinct().ToArray();
+
+                var ontologySchema = serviceProvider.GetRequiredService<IOntologySchema>();
+                var cache = serviceProvider.GetRequiredService<IOntologyCache>();
+
+                foreach (var type in derivedTypes)
+                {
+                    var nodeType = ontologySchema.GetEntityTypeByName(type.Name);
+                    cache.PutFieldNamesByNodeType(type.Name, nodeType.GetAttributeDotNamesRecursiveWithLimit());
+                }
+            }
         }
 
         private void UpdateDatabase(IApplicationBuilder app)
