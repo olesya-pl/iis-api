@@ -27,6 +27,9 @@ namespace Iis.DbLayer.Elastic
             var fieldNames = new List<string>();
             foreach (var typeName in typeNames)
             {
+                if (typeName == "Person" || typeName == "MilitaryOrganization" || typeName == "Subdivision")
+                    continue;
+
                 var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
                 if (nodeType != null)
                 {
