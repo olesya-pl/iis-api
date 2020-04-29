@@ -80,7 +80,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
-                Query = $"{filter.Suggestion}",
+                Query = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}",
                 From = filter.Offset,
                 Size = filter.Limit,
                 SearchFields = fields
