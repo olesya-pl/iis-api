@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Domain;
+using IIS.Core.GraphQL.Common;
+using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Scalars;
 using Newtonsoft.Json.Linq;
 
@@ -19,10 +21,16 @@ namespace IIS.Core.GraphQL.Entities
     {
         public async Task<ObjectOfStudyFilterableQueryReponse> EntityObjectOfStudyFilterableList(
             [Service] IOntologyService ontologyService,
-            ElasticFilter filter
+            PaginationInput pagination,
+            FilterInput filter
             )
         {
-            var response = await ontologyService.FilterObjectsOfStudyAsync(filter);
+            var response = await ontologyService.FilterObjectsOfStudyAsync(new ElasticFilter
+            {
+                Limit = pagination.PageSize,
+                Offset = pagination.Offset(),
+                Suggestion = filter.Suggestion ?? filter.SearchQuery
+            });
             return new ObjectOfStudyFilterableQueryReponse
             {
                 Items = response.nodes,
