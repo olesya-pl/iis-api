@@ -211,7 +211,7 @@ namespace Iis.Elastic
             var columns = new JArray();
 
             json["query"]["bool"]["should"] = columns;
-            foreach (var searchField in searchParams.SearchFields)
+            foreach (var searchFieldGroup in searchParams.SearchFields.GroupBy(p => new { p.Fuzziness, p.Boost }))
             {
                 var query = new JObject();
                 var queryString = new JObject();
@@ -219,10 +219,10 @@ namespace Iis.Elastic
                     EscapeElasticSpecificSymbols(
                         RemoveSymbols(searchParams.Query, RemoveSymbolsPattern),
                     EscapeSymbolsPattern));
-                queryString["fuzziness"] = searchField.Fuzziness;
-                queryString["boost"] = searchField.Boost;
+                queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
+                queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = searchParams.IsLenient;
-                queryString["fields"] = new JArray(searchField.Name);
+                queryString["fields"] = new JArray(searchFieldGroup.Select(p => p.Name));
                 query["query_string"] = queryString;
                 columns.Add(query);
             }
