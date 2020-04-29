@@ -201,6 +201,24 @@ namespace Iis.OntologySchema.DataTypes
             IsAbstract = nodeType.IsAbstract;
         }
 
+        public List<string> GetAttributeDotNamesRecursive(string parentName = null)
+        {
+            var result = new List<string>();
+
+            if (Kind == Kind.Attribute)
+            {
+                result.Add(Name);
+            }
+
+            foreach (var relation in OutgoingRelations)
+            {
+                string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity ? relation.NodeType.Name : null;
+                result.AddRange(relation.TargetType.GetAttributeDotNamesRecursive(relationName));
+            }
+
+            return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
+        }
+
         internal SchemaRelationType GetRelationByName(string relationName)
         {
             return _outgoingRelations

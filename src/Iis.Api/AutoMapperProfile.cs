@@ -10,9 +10,13 @@ using Iis.Api.Ontology.Migration;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Materials;
 using Iis.DataModel;
+using Iis.DataModel.Elastic;
+using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Materials;
 using Iis.Interfaces.Roles;
 using Iis.Interfaces.Materials;
 
@@ -57,6 +61,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Transcriptions, opts => opts.MapFrom(src => src.Infos.Select(info => info.Data)))
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Infos, opts => opts.MapFrom(src => src.Infos))
+                .ForMember(dest => dest.Highlight, opts => opts.Ignore())
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -123,9 +128,12 @@ namespace Iis.Api
                 .ForMember(dest => dest.HandlerName, opts => opts.MapFrom(src => src.MLHandlerName));
 
             CreateMap<Iis.Domain.MachineLearning.MlResponse, IIS.Core.GraphQL.ML.MachineLearningResult>();
-            
+
             CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
 
+            CreateMap<IIisElasticField, ElasticFieldEntity>();
+            CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();
+            CreateMap<IIisElasticField, IIS.Core.GraphQL.ElasticConfig.ElasticField>();
             CreateMap<Iis.Domain.Materials.Material, Iis.DataModel.Materials.MaterialEntity>()
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string) null: src.Metadata.ToString(Formatting.None)))

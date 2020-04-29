@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Iis.Interfaces.Elastic
 {
@@ -9,7 +7,7 @@ namespace Iis.Interfaces.Elastic
         List<string> BaseIndexNames { get; }
         string Query { get; }
         List<string> ResultFields { get; }
-        List<string> SearchFields { get; }
+        IReadOnlyList<IIisElasticField> SearchFields { get; }
         bool IsLenient { get; }
         int From { get; }
         int Size { get; }

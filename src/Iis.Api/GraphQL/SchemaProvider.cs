@@ -8,7 +8,6 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.GraphQL.Export;
-using IIS.Core.Ontology;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
 using IIS.Domain;
@@ -54,11 +53,13 @@ namespace IIS.Core.GraphQL
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
                 d.Include<Roles.Query>();
+                d.Include<Entities.ObjectOfStudyFilterableQuery>();
                 d.Include<Users.Query>();
                 d.Include<AnalyticsQuery.Query>();
                 d.Include<AnalyticsIndicator.Query>();
                 d.Include<ExportQuery>();
                 d.Include<ML.Query>();
+                d.Include<ElasticConfig.Query>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
@@ -77,6 +78,7 @@ namespace IIS.Core.GraphQL
                 d.Include<AnalyticsQuery.Mutation>();
                 d.Include<ML.Mutation>();
                 d.Include<NodeMaterialRelation.Mutation>();
+                d.Include<ElasticConfig.Mutation>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {

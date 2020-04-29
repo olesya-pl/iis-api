@@ -4,6 +4,7 @@ using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
+using Iis.Interfaces.Elastic;
 using IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +51,8 @@ namespace Iis.UnitTests
                 options => options.UseInMemoryDatabase("db"),
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
-            serviceCollection.AddSingleton<IOntologyCache>(new Mock<IOntologyCache>().Object);
+            serviceCollection.AddSingleton(new Mock<IOntologyCache>().Object);
+            serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;

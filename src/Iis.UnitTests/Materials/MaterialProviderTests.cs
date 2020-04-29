@@ -37,12 +37,12 @@ namespace Iis.UnitTests.Materials
 
             //act
             var sut = _serviceProvider.GetRequiredService<IMaterialProvider>();
-            var (items, count) = await sut.GetMaterialsAsync(50, 0, null);
-            
+            var (items, count, _) = await sut.GetMaterialsAsync(50, 0, null);
+
             //assert
             Assert.Equal(data.Count(p => p.ParentId == null), count);
             Assert.DoesNotContain(items, p => p.ParentId != null);
             Assert.Contains(items, p => p.Id == parentGuid);
-        }        
+        }
     }
 }

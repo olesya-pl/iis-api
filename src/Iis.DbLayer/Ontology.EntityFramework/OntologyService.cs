@@ -8,9 +8,9 @@ using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Utility;
 using IIS.Domain;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
 using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
@@ -267,7 +267,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (isElasticSearch)
                 {
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                    var nodeEntities = await _context.Nodes.Where(node => !node.IsArchived && searchResult.ids.Contains(node.Id)).ToListAsync();
+                    var foundIds = searchResult.Items.Keys.ToList();
+                    var nodeEntities = await _context.Nodes
+                        .Where(node => !node.IsArchived && foundIds.Contains(node.Id)).ToListAsync();
                     var nodes = nodeEntities.Select(e => MapNode(e, ontology));
                     return nodes;
                 }
@@ -285,6 +287,34 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 _context.Semaphore.Release();
             }
         }
+
+        public async Task<IEnumerable<JObject>> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
+        {
+            await _context.Semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+                var types = ontology.EntityTypes.Where(p => p.Name == "ObjectOfStudy");
+                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                    .Concat(types).Distinct().ToArray();
+
+                var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+                if (isElasticSearch)
+                {
+                    var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                    return searchResult.Items.Values.Select(p => p.SearchResult);
+                }
+                else
+                {
+                    return new List<JObject>();
+                }
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
         public async Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
@@ -298,7 +328,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (isElasticSearch)
                 {
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                    return searchResult.count;
+                    return searchResult.Count;
                 }
                 else
                 {
@@ -315,33 +345,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        private async Task<IQueryable<NodeEntity>> GetNodesQueryAsync(OntologyModel ontology, IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
-                .Concat(types).Distinct().ToArray();
-
-            if (filter.Suggestion != null)
-            {
-                return await GetNodesWithSuggestion(derivedTypes, filter, cancellationToken);
-            }
-            return GetNodesInternal(derivedTypes.Select(t => t.Id));
-        }
-
         private IQueryable<NodeEntity> GetNodesInternal(IEnumerable<Guid> derived)
         {
             return _context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived);
-        }
-
-        private async Task<IQueryable<NodeEntity>> GetNodesWithSuggestion(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            if (_elasticService.TypesAreSupported(types.Select(nt => nt.Name)))
-            {
-                return await GetNodesByElasticAllFields(types, filter, cancellationToken);
-            }
-            else
-            {
-                return GetNodesInternalWithSuggestion(types.Select(nt => nt.Id), filter.Suggestion);
-            }
         }
 
         private IQueryable<NodeEntity> GetNodesInternalWithSuggestion(IEnumerable<Guid> derived, string suggestion)
@@ -353,12 +359,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 relationsQ = relationsQ.Where(e =>
                     EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
             return relationsQ.Select(e => e.SourceNode);
-        }
-
-        private async Task<IQueryable<NodeEntity>> GetNodesByElasticAllFields(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            var searchResult = await _elasticService.SearchByAllFieldsAsync(types.Select(t => t.Name), filter);
-            return _context.Nodes.Where(node => !node.IsArchived && searchResult.ids.Contains(node.Id));
         }
 
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)

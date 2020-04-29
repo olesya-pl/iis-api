@@ -26,7 +26,7 @@ namespace Iis.Elastic
             var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
 
             var config = new ConnectionConfiguration(connectionPool);
-            
+
             _lowLevelClient = new ElasticLowLevelClient(config);
         }
 
@@ -46,7 +46,7 @@ namespace Iis.Elastic
         public async Task<bool> DeleteDocumentAsync(string indexName, string documentId)
         {
             var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId);
-            
+
             return searchResponse.Success;
         }
 
@@ -54,17 +54,17 @@ namespace Iis.Elastic
         {
             var jsonString = GetSearchJson(searchParams);
             var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_search" : 
+                "_search" :
                 $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
             var response = await GetAsync(path, jsonString, cancellationToken);
             return GetSearchResultFromResponse(response);
         }
 
-        public async Task<IEnumerable<string>> GetDocumentIdListFromIndexAsync(string indexName)
+        public async Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName)
         {
             if (indexName == null) throw new ArgumentNullException(nameof(indexName));
-            
+
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
             {
                 query = new
@@ -76,10 +76,10 @@ namespace Iis.Elastic
 
             if (!searchResponse.Success)
             {
-                return new List<string>();
+                return new ElasticSearchResult();
             }
-            
-            return GetSearchResultFromResponse(searchResponse).Identifiers;
+
+            return GetSearchResultFromResponse(searchResponse);
         }
 
         public async Task<string> GetDocumentByIdAsync(string indexName, string documentId, string[] documentFields)
@@ -120,7 +120,7 @@ namespace Iis.Elastic
             var path = $"{GetRealIndexNames(indexNames)}";
 
             var response = await DoRequestAsync(HttpMethod.DELETE, path, string.Empty, cancellationToken);
-            
+
             return response.Success;
         }
 
@@ -129,7 +129,7 @@ namespace Iis.Elastic
             var indexUrl = $"{GetRealIndexName(indexName)}";
 
             var response = await DoRequestAsync(HttpMethod.DELETE, indexUrl, string.Empty, cancellationToken);
-            
+
             return response.Success;
         }
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
@@ -157,23 +157,29 @@ namespace Iis.Elastic
         private IElasticSearchResult GetSearchResultFromResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);
-            var ids = new List<string>();
+            var items = new List<ElasticSearchResultItem>();
 
             var hits = json["hits"]["hits"];
             if (hits != null)
             {
                 foreach (var hit in hits)
                 {
-                    var hitObj = JObject.Parse(hit.ToString());
-                    ids.Add(hit["_id"].ToString());
+                    var resultItem = new ElasticSearchResultItem
+                    {
+                        Identifier = hit["_id"].ToString(),
+                        Higlight = hit["highlight"],
+                        SearchResult = hit["_source"] as JObject
+                    };
+                    resultItem.SearchResult["highlight"] = resultItem.Higlight;
+                    items.Add(resultItem);
 
                 }
             }
             var total = json["hits"]["total"]["value"];
             return new ElasticSearchResult
             {
-                Count = (int)total, 
-                Identifiers = ids
+                Count = (int)total,
+                Items = items
             };
         }
 
@@ -184,15 +190,59 @@ namespace Iis.Elastic
             json["from"] = searchParams.From;
             json["size"] = searchParams.Size;
             json["query"] = new JObject();
+
+            PrepareHighlights(json);
+
+            if (!searchParams.SearchFields.Any())
+            {
+                PrepareFallbackQuery(searchParams, json);
+            }
+            else
+            {
+                PopulateFallbackIntoQuery(searchParams, json);
+            }
+
+            return json.ToString();
+        }
+
+        private void PopulateFallbackIntoQuery(IIisElasticSearchParams searchParams, JObject json)
+        {
+            json["query"]["bool"] = new JObject();
+            var columns = new JArray();
+
+            json["query"]["bool"]["should"] = columns;
+            foreach (var searchField in searchParams.SearchFields)
+            {
+                var query = new JObject();
+                var queryString = new JObject();
+                queryString["query"] = ApplyFuzzinessOperator(
+                    EscapeElasticSpecificSymbols(
+                        RemoveSymbols(searchParams.Query, RemoveSymbolsPattern),
+                    EscapeSymbolsPattern));
+                queryString["fuzziness"] = searchField.Fuzziness;
+                queryString["boost"] = searchField.Boost;
+                queryString["lenient"] = searchParams.IsLenient;
+                queryString["fields"] = new JArray(searchField.Name);
+                query["query_string"] = queryString;
+                columns.Add(query);
+            }
+        }
+
+        private void PrepareFallbackQuery(IIisElasticSearchParams searchParams, JObject json)
+        {
             var queryString = new JObject();
-
-            queryString["query"] = EscapeElasticSpecificSymbols(RemoveSymbols(searchParams.Query, RemoveSymbolsPattern), EscapeSymbolsPattern);
-            queryString["fields"] = new JArray(searchParams.SearchFields);
+            queryString["query"] = EscapeElasticSpecificSymbols(
+                RemoveSymbols(searchParams.Query, RemoveSymbolsPattern), EscapeSymbolsPattern);
+            queryString["fields"] = new JArray("*");
             queryString["lenient"] = searchParams.IsLenient;
-
             json["query"]["query_string"] = queryString;
+        }
 
-            return json.ToString(); ;
+        private static void PrepareHighlights(JObject json)
+        {
+            json["highlight"] = new JObject();
+            json["highlight"]["fields"] = new JObject();
+            json["highlight"]["fields"]["*"] = JObject.Parse("{\"type\" : \"plain\"}");
         }
 
         private string GetRealIndexName(string baseIndexName)
@@ -203,6 +253,11 @@ namespace Iis.Elastic
         private string GetRealIndexNames(IEnumerable<string> baseIndexNames)
         {
             return string.Join(',', baseIndexNames.Select(name => GetRealIndexName(name)));
+        }
+
+        private string ApplyFuzzinessOperator(string input)
+        {
+            return $"{input}~";
         }
 
         private string EscapeElasticSpecificSymbols(string input, string escapePattern)

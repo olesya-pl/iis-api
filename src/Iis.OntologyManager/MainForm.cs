@@ -493,6 +493,7 @@ namespace Iis.OntologyManager
         #region Node Type Logic
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
+            var a = nodeType.GetAttributeDotNamesRecursive();
             if (addToHistory && _currentNodeType != null)
             {
                 _history.Add(_currentNodeType);

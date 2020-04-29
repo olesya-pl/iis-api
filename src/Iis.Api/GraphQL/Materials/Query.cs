@@ -7,6 +7,7 @@ using HotChocolate;
 using IIS.Core.Materials;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -27,8 +28,20 @@ namespace IIS.Core.GraphQL.Materials
             var materialsResult = await materialProvider.GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+            MapHighlights(materials, materialsResult.Highlights);
 
             return (materials, materialsResult.Count);
+        }
+
+        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchByAllFieldsResultItem> materialsResult)
+        {
+            foreach (var material in materials)
+            {
+                if (materialsResult.ContainsKey(material.Id))
+                {
+                    material.Highlight = materialsResult[material.Id].Highlight;
+                }
+            }
         }
 
         public async Task<Material> GetMaterial(

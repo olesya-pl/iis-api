@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel.Analytics;
+using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
 using Iis.DataModel.Roles;
@@ -44,6 +45,7 @@ namespace Iis.DataModel
         public DbSet<UserRoleEntity> UserRoles { get; set; }
 
         public DbSet<MLResponseEntity> MLResponses { get; set; }
+        public DbSet<ElasticFieldEntity> ElasticFields { get; set; }
 
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
@@ -79,6 +81,7 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
 
             modelBuilder.ApplyConfiguration(new MLResponseConfiguration());
+            modelBuilder.ApplyConfiguration(new ElasticFieldConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

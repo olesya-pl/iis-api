@@ -54,6 +54,8 @@ using Iis.Roles;
 using Iis.Api.GraphQL.Access;
 using Iis.Interfaces.Roles;
 using IIS.Core.NodeMaterialRelation;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.DbLayer.Elastic;
 
 namespace IIS.Core
 {
@@ -93,6 +95,18 @@ namespace IIS.Core
                 context.Database.Migrate();
                 (new FillDataForRoles(context)).Execute();
                 services.AddSingleton<IOntologyCache>(new OntologyCache(context));
+
+                var schemaSource = new OntologySchemaSource
+                {
+                    Title = "DB",
+                    SourceKind = SchemaSourceKind.Database,
+                    Data = dbConnectionString
+                };
+                var ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                services.AddSingleton(ontologySchema);
+                var iisElasticConfiguration = new IisElasticConfiguration(ontologySchema);
+                iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
+                services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
             }
 
             services.AddHttpContextAccessor();
@@ -190,6 +204,7 @@ namespace IIS.Core
             services.AddSingleton<IElasticManager, ElasticManager>();
             services.AddSingleton<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);
+            services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));

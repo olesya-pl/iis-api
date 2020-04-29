@@ -6,7 +6,9 @@ using Newtonsoft.Json.Linq;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
+using Newtonsoft.Json.Linq;
 using System.Linq;
 
 namespace IIS.Core.Materials
@@ -15,7 +17,9 @@ namespace IIS.Core.Materials
     {
         Task<Material> GetMaterialAsync(Guid id);
         Task<MaterialEntity> GetMaterialEntityAsync(Guid id);
-        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsAsync(int limit, 
+        Task<(IEnumerable<Material> Materials,
+            int Count,
+            Dictionary<Guid, SearchByAllFieldsResultItem> Highlights)> GetMaterialsAsync(int limit,
             int offset,
             string filterQuery,
             IEnumerable<Guid> nodeIds = null,

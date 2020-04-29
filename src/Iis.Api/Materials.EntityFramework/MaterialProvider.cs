@@ -41,7 +41,10 @@ namespace IIS.Core.Materials.EntityFramework
             _mapper = mapper;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsAsync(int limit, int offset, string filterQuery,
+        public async Task<(
+            IEnumerable<Material> Materials,
+            int Count,
+            Dictionary<Guid, SearchByAllFieldsResultItem> Highlights)> GetMaterialsAsync(int limit, int offset, string filterQuery,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
             await _context.Semaphore.WaitAsync();
@@ -56,21 +59,22 @@ namespace IIS.Core.Materials.EntityFramework
                 {
                     if (!_elasticService.UseElastic)
                     {
-                        return (new List<Material>(), 0);
+                        return (new List<Material>(), 0, new Dictionary<Guid, SearchByAllFieldsResultItem>());
                     }
 
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(
                         _elasticService.MaterialIndexes,
                         new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
 
+                    var foundIds = searchResult.Items.Keys.ToList();
                     mappingTasks =  (await materialsQuery
-                                        .Where(e => searchResult.ids.Contains(e.Id))
+                                        .Where(e => foundIds.Contains(e.Id))
                                         .ToArrayAsync())
                                             .Select(async entity => await MapAsync(entity));
 
                     materials = await Task.WhenAll(mappingTasks);
 
-                    return (materials, searchResult.count);
+                    return (materials, searchResult.Count, searchResult.Items);
                 }
 
                 if (nodeIds == null)
@@ -99,7 +103,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 var materialsCount = await materialsCountQuery.CountAsync();
 
-                return (materials, materialsCount);
+                return (materials, materialsCount, new Dictionary<Guid, SearchByAllFieldsResultItem>());
             }
             finally
             {
