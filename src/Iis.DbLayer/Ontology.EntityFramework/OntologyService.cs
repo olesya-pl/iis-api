@@ -251,7 +251,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             finally
             {
-                _context.Semaphore.Release();    
+                _context.Semaphore.Release();
             }
         }
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
@@ -288,7 +288,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public async Task<IEnumerable<JObject>> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
@@ -302,11 +302,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (isElasticSearch)
                 {
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                    return searchResult.Items.Values.Select(p => p.SearchResult);
+                    return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
                 }
                 else
                 {
-                    return new List<JObject>();
+                    return (new List<JObject>(), 0);
                 }
             }
             finally

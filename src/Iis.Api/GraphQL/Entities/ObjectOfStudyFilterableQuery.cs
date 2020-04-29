@@ -12,6 +12,7 @@ namespace IIS.Core.GraphQL.Entities
     {
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Items { get; set; }
+        public int Count { get; set; }
     }
 
     public class ObjectOfStudyFilterableQuery
@@ -21,10 +22,11 @@ namespace IIS.Core.GraphQL.Entities
             ElasticFilter filter
             )
         {
-            var items = await ontologyService.FilterObjectsOfStudyAsync(filter);
+            var response = await ontologyService.FilterObjectsOfStudyAsync(filter);
             return new ObjectOfStudyFilterableQueryReponse
             {
-                Items = items
+                Items = response.nodes,
+                Count = response.count
             };
         }
     }
