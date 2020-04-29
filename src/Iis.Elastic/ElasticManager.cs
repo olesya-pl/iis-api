@@ -171,6 +171,10 @@ namespace Iis.Elastic
                         SearchResult = hit["_source"] as JObject
                     };
                     resultItem.SearchResult["highlight"] = resultItem.Higlight;
+                    if (resultItem.SearchResult["NodeTypeName"] != null)
+                    {
+                        resultItem.SearchResult["__typename"] = $"Entity{resultItem.SearchResult["NodeTypeName"]}";
+                    }
                     items.Add(resultItem);
 
                 }

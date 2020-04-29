@@ -30,11 +30,7 @@ namespace Iis.DbLayer.Elastic
                 if (typeName == "Person" || typeName == "MilitaryOrganization" || typeName == "Subdivision")
                     continue;
 
-                var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
-                if (nodeType != null)
-                {
-                    fieldNames.AddRange(nodeType.GetAttributeDotNamesRecursive());
-                }
+                fieldNames.AddRange(GetFieldNamesByNodeType(typeName));
             }
             if (fieldNames.Count == 0) return new List<IIisElasticField>();
 
@@ -58,6 +54,17 @@ namespace Iis.DbLayer.Elastic
                 .Select(name => new IisElasticField { Name = name })
                 );
             return result;
+        }
+
+        private List<string> GetFieldNamesByNodeType(string typeName)
+        {
+            var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
+            if (nodeType != null)
+            {
+                return nodeType.GetAttributeDotNamesRecursive();
+            }
+
+            return new List<string>();
         }
     }
 }
