@@ -197,13 +197,13 @@ namespace Iis.Elastic
 
             PrepareHighlights(json);
 
-            if (!searchParams.SearchFields.Any())
+            if (searchParams.SearchFields?.Any() == true)
             {
-                PrepareFallbackQuery(searchParams, json);
+                PopulateFallbackIntoQuery(searchParams, json);
             }
             else
             {
-                PopulateFallbackIntoQuery(searchParams, json);
+                PrepareFallbackQuery(searchParams, json);
             }
 
             return json.ToString();

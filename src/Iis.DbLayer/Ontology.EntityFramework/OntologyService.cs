@@ -267,11 +267,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (isElasticSearch)
                 {
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                    var foundIds = searchResult.Items.Keys.ToList();
                     var nodeEntities = await _context.Nodes
-                        .Where(node => !node.IsArchived && foundIds.Contains(node.Id)).ToListAsync();
+                        .Where(node => !node.IsArchived && searchResult.ids.Contains(node.Id))
+                        .ToListAsync();
                     var nodes = nodeEntities.Select(e => MapNode(e, ontology));
                     return nodes;
+
                 }
                 else
                 {
@@ -301,7 +302,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
                 if (isElasticSearch)
                 {
-                    var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                    var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
                     return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
                 }
                 else
@@ -328,7 +329,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (isElasticSearch)
                 {
                     var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                    return searchResult.Count;
+                    return searchResult.count;
                 }
                 else
                 {

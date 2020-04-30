@@ -19,7 +19,7 @@ namespace IIS.Core.Materials
         Task<MaterialEntity> GetMaterialEntityAsync(Guid id);
         Task<(IEnumerable<Material> Materials,
             int Count,
-            Dictionary<Guid, SearchByAllFieldsResultItem> Highlights)> GetMaterialsAsync(int limit,
+            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(int limit,
             int offset,
             string filterQuery,
             IEnumerable<Guid> nodeIds = null,

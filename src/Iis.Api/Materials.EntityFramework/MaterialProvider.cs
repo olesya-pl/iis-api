@@ -44,7 +44,7 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<(
             IEnumerable<Material> Materials,
             int Count,
-            Dictionary<Guid, SearchByAllFieldsResultItem> Highlights)> GetMaterialsAsync(int limit, int offset, string filterQuery,
+            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(int limit, int offset, string filterQuery,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
             await _context.Semaphore.WaitAsync();
@@ -59,10 +59,10 @@ namespace IIS.Core.Materials.EntityFramework
                 {
                     if (!_elasticService.UseElastic)
                     {
-                        return (new List<Material>(), 0, new Dictionary<Guid, SearchByAllFieldsResultItem>());
+                        return (new List<Material>(), 0, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
                     }
 
-                    var searchResult = await _elasticService.SearchByAllFieldsAsync(
+                    var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
                         _elasticService.MaterialIndexes,
                         new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
 
@@ -103,7 +103,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 var materialsCount = await materialsCountQuery.CountAsync();
 
-                return (materials, materialsCount, new Dictionary<Guid, SearchByAllFieldsResultItem>());
+                return (materials, materialsCount, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
             }
             finally
             {

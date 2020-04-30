@@ -67,7 +67,26 @@ namespace IIS.Core.Ontology.EntityFramework
             MaterialIndexes = new[] { "Materials" };
         }
 
-        public async Task<SearchByAllFieldsResult> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        {
+            if (!UseElastic)
+            {
+                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
+            }
+
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = typeNames.ToList(),
+                Query = $"*{filter.Suggestion}*",
+                From = filter.Offset,
+                Size = filter.Limit
+            };
+
+            var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
+            return (searchResult.Items.Select(p => new Guid(p.Identifier)).ToList(), searchResult.Count);
+        }
+
+        public async Task<SearchByConfiguredFieldsResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             if (!UseElastic)
             {
@@ -86,12 +105,12 @@ namespace IIS.Core.Ontology.EntityFramework
                 SearchFields = fields
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
-            return new SearchByAllFieldsResult
+            return new SearchByConfiguredFieldsResult
             {
                 Count = searchResult.Count,
                 Items = searchResult.Items
                     .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchByAllFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                    v => new SearchByConfiguredFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
 
