@@ -179,7 +179,9 @@ namespace IIS.Core.Materials.EntityFramework
             var result = _mapper.Map<Material>(material);
 
             result.Infos.AddRange(await MapInfos(material));
+
             result.Children.AddRange(await MapChildren(material));
+            
             return result;
         }
 
