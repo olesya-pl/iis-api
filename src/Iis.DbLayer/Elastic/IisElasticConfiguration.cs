@@ -37,7 +37,7 @@ namespace Iis.DbLayer.Elastic
             fieldNames = fieldNames.Distinct().ToList();
 
             var elasticFields = _elasticFields
-                .Where(ef => typeNames.Contains(ef.TypeName) && !ef.IsExcluded)
+                .Where(ef => typeNames.Contains(ef.TypeName))
                 .ToList();
             var result = elasticFields.Select(ef => new IisElasticField
             {
@@ -53,7 +53,7 @@ namespace Iis.DbLayer.Elastic
                 .Where(name => !elasticFields.Any(ef => ef.Name == name))
                 .Select(name => new IisElasticField { Name = name })
                 );
-            return result;
+            return result.Where(p => !p.IsExcluded).ToList();
         }
 
         private List<string> GetFieldNamesByNodeType(string typeName)
