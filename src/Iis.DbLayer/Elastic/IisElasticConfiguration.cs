@@ -58,12 +58,6 @@ namespace Iis.DbLayer.Elastic
 
         private List<string> GetFieldNamesByNodeType(string typeName)
         {
-            var cachedItems = _ontologyCache.GetFieldNamesByNodeType(typeName);
-            if (cachedItems != null && cachedItems.Any())
-            {
-                return cachedItems.ToList();
-            }
-
             var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
             if (nodeType != null)
             {
