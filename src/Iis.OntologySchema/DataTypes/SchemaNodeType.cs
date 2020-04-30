@@ -221,7 +221,7 @@ namespace Iis.OntologySchema.DataTypes
 
         public List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)
         {
-            const int MaxRecursionLevel = 2;
+            const int MaxRecursionLevel = 4;
             var result = new List<string>();
 
             if (Kind == Kind.Attribute)
