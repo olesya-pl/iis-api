@@ -158,7 +158,7 @@ namespace Iis.Elastic
             var json = JObject.Parse(response.Body);
             var items = new List<ElasticSearchResultItem>();
 
-            var hits = json["hits"]["hits"];
+            var hits = json["hits"]?["hits"];
             if (hits != null)
             {
                 foreach (var hit in hits)
@@ -178,10 +178,10 @@ namespace Iis.Elastic
 
                 }
             }
-            var total = json["hits"]["total"]["value"];
+            var total = json["hits"]?["total"]?["value"];
             return new ElasticSearchResult
             {
-                Count = (int)total,
+                Count = (int?)total ?? 0,
                 Items = items
             };
         }
@@ -196,9 +196,13 @@ namespace Iis.Elastic
 
             PrepareHighlights(json);
 
-            if (searchParams.SearchFields?.Any() == true)
+            if (IsExactQuery(searchParams.Query))
             {
-                PopulateFallbackIntoQuery(searchParams, json);
+                PopulateExactQuery(searchParams, json);
+            }
+            else if (searchParams.SearchFields?.Any() == true)
+            {
+                PopulateFieldsIntoQuery(searchParams, json);
             }
             else
             {
@@ -208,7 +212,20 @@ namespace Iis.Elastic
             return json.ToString();
         }
 
-        private void PopulateFallbackIntoQuery(IIisElasticSearchParams searchParams, JObject json)
+        private bool IsExactQuery(string query)
+        {
+            return query.Contains(":");
+        }
+
+        private void PopulateExactQuery(IIisElasticSearchParams searchParams, JObject json)
+        {
+            var queryString = new JObject();
+            queryString["query"] = searchParams.Query;
+            queryString["lenient"] = searchParams.IsLenient;
+            json["query"]["query_string"] = queryString;
+        }
+
+        private void PopulateFieldsIntoQuery(IIisElasticSearchParams searchParams, JObject json)
         {
             json["query"]["bool"] = new JObject();
             var columns = new JArray();
