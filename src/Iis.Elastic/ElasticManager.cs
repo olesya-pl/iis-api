@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
-
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
+
 
 namespace Iis.Elastic
 {

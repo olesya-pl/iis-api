@@ -94,7 +94,9 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             var searchFields = new List<IisElasticField>();
-            var fields = _elasticConfiguration.GetIncludedFieldsByTypeNames(typeNames);
+            var ontologyFields
+                = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => OntologyIndexes.Contains(p)));
+            var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(typeNames.Where(p => MaterialIndexes.Contains(p)));
 
             var searchParams = new IisElasticSearchParams
             {
@@ -102,7 +104,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Query = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}",
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchFields = fields
+                SearchFields = ontologyFields.Union(materialFields).ToList()
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
             return new SearchByConfiguredFieldsResult
