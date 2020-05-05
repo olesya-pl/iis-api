@@ -14,7 +14,7 @@ namespace IIS.Core.GraphQL.ElasticConfig
         public Task<GraphQLCollection<ElasticField>> GetElasticFields([Service] IElasticConfiguration configuration, [Service] IMapper mapper,
             [GraphQLNonNullType] string typeName)
         {
-            var elasticFields = configuration.GetIncludedFieldsByTypeNames(new[] { typeName });
+            var elasticFields = configuration.GetOntologyIncludedFields(new[] { typeName });
             var result = elasticFields.Select(ef => mapper.Map<ElasticField>(ef)).ToList();
             return Task.FromResult(new GraphQLCollection<ElasticField>(result, result.Count));
         }

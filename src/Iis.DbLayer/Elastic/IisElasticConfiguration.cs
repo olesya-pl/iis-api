@@ -1,5 +1,6 @@
 ﻿using Iis.DataModel.Cache;
 using Iis.Domain.Elastic;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using System;
@@ -25,7 +26,7 @@ namespace Iis.DbLayer.Elastic
             _elasticFields.AddRange(elasticFields);
         }
 
-        public IReadOnlyList<IIisElasticField> GetIncludedFieldsByTypeNames(IEnumerable<string> typeNames)
+        public IReadOnlyList<IIisElasticField> GetOntologyIncludedFields(IEnumerable<string> typeNames)
         {
             var fieldNames = new List<string>();
             foreach (var typeName in typeNames)
@@ -36,9 +37,19 @@ namespace Iis.DbLayer.Elastic
 
             fieldNames = fieldNames.Distinct().ToList();
 
+            var result = GetConfiguredElasticFields(typeNames);
+            result.AddRange(fieldNames
+                .Where(name => !result.Any(ef => ef.Name == name))
+                .Select(name => new IisElasticField { Name = name })
+                );
+            return result.Where(p => !p.IsExcluded).ToList();
+        }
+
+        private List<IisElasticField> GetConfiguredElasticFields(IEnumerable<string> typeNames)
+        {
             var elasticFields = _elasticFields
-                .Where(ef => typeNames.Contains(ef.TypeName))
-                .ToList();
+                            .Where(ef => typeNames.Contains(ef.TypeName))
+                            .ToList();
             var result = elasticFields.Select(ef => new IisElasticField
             {
                 Name = ef.Name,
@@ -49,11 +60,26 @@ namespace Iis.DbLayer.Elastic
                 .GroupBy(p => p.Name)
                 .Select(group => group.First())
                 .ToList();
-            result.AddRange(fieldNames
-                .Where(name => !elasticFields.Any(ef => ef.Name == name))
-                .Select(name => new IisElasticField { Name = name })
-                );
-            return result.Where(p => !p.IsExcluded).ToList();
+            return result;
+        }
+
+        private List<string> GetMaterialFieldNames()
+        {
+            return new List<string>()
+            {
+                nameof(Material.Source).ToLower(),
+                nameof(Material.Type).ToLower(),
+                nameof(Material.Importance).ToLower(),
+                nameof(Material.Reliability).ToLower(),
+                nameof(Material.Relevance).ToLower(),
+                nameof(Material.Completeness).ToLower(),
+                nameof(Material.SourceReliability).ToLower(),
+                nameof(Material.Id).ToLower(),
+                nameof(Material.Title).ToLower(),
+                "mlResponses.*",
+                $"{nameof(Material.Data)}.*",
+                $"{nameof(Material.LoadData)}.*",
+            };
         }
 
         private List<string> GetFieldNamesByNodeType(string typeName)
@@ -67,6 +93,17 @@ namespace Iis.DbLayer.Elastic
             }
 
             return new List<string>();
+        }
+
+        public IReadOnlyList<IIisElasticField> GetMaterialsIncludedFields(IEnumerable<string> typeNames)
+        {
+            var fieldNames = GetMaterialFieldNames();
+            var result = GetConfiguredElasticFields(typeNames);
+            result.AddRange(fieldNames
+                .Where(name => !result.Any(ef => ef.Name == name))
+                .Select(name => new IisElasticField { Name = name })
+                );
+            return result;
         }
     }
 }

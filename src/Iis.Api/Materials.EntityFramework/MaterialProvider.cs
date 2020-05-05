@@ -181,7 +181,7 @@ namespace IIS.Core.Materials.EntityFramework
             result.Infos.AddRange(await MapInfos(material));
 
             result.Children.AddRange(await MapChildren(material));
-            
+
             return result;
         }
 
@@ -207,7 +207,7 @@ namespace IIS.Core.Materials.EntityFramework
             var materialTask = GetMaterialAsync(materialId);
 
             var mLResponsesTask = GetMlProcessingResultsAsync(materialId);
-            
+
             await Task.WhenAll(materialTask, mLResponsesTask);
 
             var material = await materialTask;
@@ -231,33 +231,37 @@ namespace IIS.Core.Materials.EntityFramework
 
             if (!(material.Data is null) && material.Data.HasValues)
             {
+                var materialData = new JObject();
                 material.Data
                     .Select(token => new JProperty(token.Value<string>("Type"), token.Value<string>("Text")))
                     .Select(property =>
                     {
-                        jDocument.Add(property);
+                        materialData.Add(property);
                         return property;
                     })
                     .ToList();
+                jDocument.Add(new JProperty(nameof(Material.Data), materialData));
             }
 
             if (!(material.LoadData is null))
             {
-                jDocument.Merge(JObject.Parse(material.LoadData.ToJson()));
+                jDocument.Add(new JProperty(nameof(Material.LoadData), JObject.Parse(material.LoadData.ToJson())));
             }
 
             if(mLResponses.Any())
             {
+                var mlResponses = new JObject();
+                jDocument.Add(new JProperty(nameof(mlResponses), mlResponses));
                 foreach (var response in mLResponses)
                 {
                     var handlerName = response.MlHandlerName.ToLowerCamelCase().RemoveWhiteSpace();
 
                     var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
 
-                    jDocument.Add(new JProperty(propertyName, response.ResponseText));
+                    mlResponses.Add(new JProperty(propertyName, response.ResponseText));
                 }
             }
-            
+
 
             return jDocument;
         }
@@ -301,7 +305,7 @@ namespace IIS.Core.Materials.EntityFramework
                     .ThenInclude(m => m.MaterialFeatures)
                     .AsNoTracking();
         }
-        
+
         private async Task<Material[]> MapChildren(MaterialEntity material)
         {
             var mapChildrenTasks = new List<Task<Material>>();
