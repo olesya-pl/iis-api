@@ -15,12 +15,40 @@ namespace IIS.Core.GraphQL.Users
     public class Mutation
     {
         private IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public Mutation(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public Mutation(IConfiguration configuration)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public async Task<User2> CreateUser2(
+            [Service] OntologyContext context,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] User2Input user)
+        {
+            return new User2
+            {
+                Id = System.Guid.NewGuid(),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Patronymic = user.Patronymic,
+                Username = user.UserName,
+                Comment = user.Comment
+            };
+        }
+        public async Task<User2> UpdateUser2(
+            [Service] OntologyContext context,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] User2Input user)
+        {
+            return new User2
+            {
+                Id = user.Id.HasValue ? user.Id.Value : System.Guid.NewGuid(),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Patronymic = user.Patronymic,
+                Username = user.UserName,
+                Comment = user.Comment
+            };
         }
 
         public async Task<User> CreateUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLNonNullType] UserInput data)
