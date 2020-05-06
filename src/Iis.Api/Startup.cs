@@ -242,7 +242,7 @@ namespace IIS.Core
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
-                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
+                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.UserName}");
                     }
                 }
 

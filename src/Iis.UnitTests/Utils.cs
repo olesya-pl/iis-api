@@ -1,15 +1,16 @@
 ﻿using System.Linq;
+using AutoMapper;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
-using Iis.DataModel;
-using Iis.DataModel.Cache;
-using Iis.Interfaces.Elastic;
-using IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using IIS.Core;
+using Iis.DataModel;
+using Iis.DataModel.Cache;
+using Iis.Interfaces.Elastic;
 
 namespace Iis.UnitTests
 {
@@ -53,6 +54,7 @@ namespace Iis.UnitTests
             startup.RegisterServices(serviceCollection, false);
             serviceCollection.AddSingleton(new Mock<IOntologyCache>().Object);
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
+            serviceCollection.AddAutoMapper(typeof(Startup));
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;

@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.Users
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Patronymic = user.Patronymic,
-                Username = user.UserName,
+                UserName = user.UserName,
                 Comment = user.Comment
             };
         }
@@ -46,7 +46,7 @@ namespace IIS.Core.GraphQL.Users
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Patronymic = user.Patronymic,
-                Username = user.UserName,
+                UserName = user.UserName,
                 Comment = user.Comment
             };
         }

@@ -26,9 +26,9 @@ namespace IIS.Core.GraphQL.Users
                 FirstName = "Александр",
                 LastName = "Подервянский ",
                 Patronymic = "Сергеевич",
-                Username = "artist",
+                UserName = "artist",
                 Comment = "no comments",
-                Roles = new List<Role>{ new Role{ Id = System.Guid.NewGuid().ToString(), Name = "Администратор"}}
+                Roles = new List<Role>{ new Role{ Id = System.Guid.NewGuid(), Name = "Администратор"}}
             };
         }
         public async Task<GraphQLCollection<User2>> GetUsers2(
@@ -44,9 +44,9 @@ namespace IIS.Core.GraphQL.Users
                         FirstName = "Александр",
                         LastName = "Подервянский ",
                         Patronymic = "Сергеевич",
-                        Username = "artist",
+                        UserName = "artist",
                         Comment = "no comments",
-                        Roles = new List<Role>{ new Role{ Id = System.Guid.NewGuid().ToString(), Name = "Администратор"}}
+                        Roles = new List<Role>{ new Role{ Id = System.Guid.NewGuid(), Name = "Администратор"}}
                     }
                 }, 1);
         }

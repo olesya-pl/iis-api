@@ -8,16 +8,15 @@ using Newtonsoft.Json.Linq;
 using Iis.Api.GraphQL.Roles;
 using Iis.Api.Ontology.Migration;
 using IIS.Core.GraphQL.Roles;
+using IIS.Core.GraphQL.Users;
 using IIS.Core.GraphQL.Materials;
 using Iis.DataModel;
 using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
-using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Materials;
 using Iis.Interfaces.Roles;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 
 
@@ -167,6 +166,13 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+
+            //mapping: GraphQl.UserInput -> Roles.User
+            CreateMap<User2Input, Iis.Roles.User>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id.HasValue ? src.Id.Value : Guid.NewGuid()))
+                .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Iis.Roles.Role{ Id = id})));
+            //mapping: Roles.User -> GraphQl.User
+            CreateMap<Iis.Roles.User, User2>();
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

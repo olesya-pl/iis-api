@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Iis.DataModel;
-using Iis.DataModel.Roles;
-using Iis.Roles;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Iis.Roles;
+using Iis.DataModel;
+using Iis.DataModel.Roles;
 
 namespace Iis.UnitTests.Roles
 {
