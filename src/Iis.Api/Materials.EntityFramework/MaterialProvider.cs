@@ -276,9 +276,9 @@ namespace IIS.Core.Materials.EntityFramework
                 .Where(m => m.ro.NodeId == nodeId)
                 .Select(m => m.r.u);
 
-            mappingTasks = (await q
-                                   .ToArrayAsync())
-                                        .Select(async entity => await MapAsync(entity));
+            mappingTasks =  (await q
+                                 .ToArrayAsync())
+                                 .Select(async e => await MapAsync(await GetMaterialEntityAsync(e.Id)));
 
             materials = await Task.WhenAll(mappingTasks);
 
