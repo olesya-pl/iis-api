@@ -19,7 +19,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Roles;
 using Iis.Interfaces.Materials;
-
+using Iis.Interfaces.Ontology;
 
 namespace Iis.Api
 {
@@ -167,6 +167,9 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+
+            CreateMap<IChangeHistoryItem, Iis.DataModel.ChangeHistory.ChangeHistoryEntity>();
+            CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

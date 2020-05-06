@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel.Analytics;
+using Iis.DataModel.ChangeHistory;
 using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
@@ -46,6 +47,7 @@ namespace Iis.DataModel
 
         public DbSet<MLResponseEntity> MLResponses { get; set; }
         public DbSet<ElasticFieldEntity> ElasticFields { get; set; }
+        public DbSet<ChangeHistoryEntity> ChangeHistory { get; set; }
 
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
@@ -82,6 +84,7 @@ namespace Iis.DataModel
 
             modelBuilder.ApplyConfiguration(new MLResponseConfiguration());
             modelBuilder.ApplyConfiguration(new ElasticFieldConfiguration());
+            modelBuilder.ApplyConfiguration(new ChangeHistoryConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

@@ -65,5 +65,19 @@ namespace Iis.Domain
         {
             return $"Instance of type {Type.Name} with ID: {Id}.";
         }
+
+        public List<Attribute> GetChildAttributes()
+        {
+            var result = new List<Attribute>();
+            if (this is Attribute)
+            {
+                result.Add(this as Attribute);
+            }
+            foreach (var childNode in Nodes)
+            {
+                result.AddRange(childNode.GetChildAttributes());
+            }
+            return result;
+        }
     }
 }
