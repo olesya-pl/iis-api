@@ -83,10 +83,9 @@ namespace Iis.UnitTests.UserManagement
 
             //assert
             Assert.Equal(userEntity.Id, user.Id);
-            //TODO: this asserts should be uncommented after changes in Entity
-            //Assert.Equal(userEntity., user.LastName);
-            //Assert.Equal(userEntity., user.FirstName);
-            //Assert.Equal(userEntity., user.Patronymic);
+            Assert.Equal(userEntity.LastName, user.LastName);
+            Assert.Equal(userEntity.FirstName, user.FirstName);
+            Assert.Equal(userEntity.Patronymic, user.Patronymic);
             Assert.Equal(userEntity.Username, user.UserName);
             Assert.Equal(userEntity.PasswordHash, user.PasswordHash);
             Assert.Equal(userEntity.IsBlocked, user.IsBlocked);

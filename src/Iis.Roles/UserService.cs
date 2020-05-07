@@ -30,7 +30,7 @@ namespace Iis.Roles
             }
 
             var userEntity = _mapper.Map<UserEntity>(user);
-            
+
             //TODO: temporaly solution
             userEntity.Name = $"{user.LastName} {user.FirstName} {user.Patronymic}";
 

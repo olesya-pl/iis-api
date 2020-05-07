@@ -54,26 +54,6 @@ namespace IIS.Core.GraphQL.Users
             return mapper.Map<User>(domainUser);
         }
 
-        // public async Task<User> CreateUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLNonNullType] UserInput data)
-        // {
-        //     Validator.ValidateObject(data, new System.ComponentModel.DataAnnotations.ValidationContext(data), true);
-        //     if (context.Users.Any(u => u.Username == data.Username))
-        //         throw new InvalidOperationException($"User {data.Username} already exists");
-
-        //     var user = new Iis.DataModel.UserEntity
-        //     {
-        //         Id           = Guid.NewGuid(),
-        //         IsBlocked    = data.IsBlocked.GetValueOrDefault(),
-        //         Name         = data.Name,
-        //         Username     = data.Username,
-        //         PasswordHash = _configuration.GetPasswordHashAsBase64String(data.Password)
-        //     };
-
-        //     context.Users.Add(user);
-        //     await context.SaveChangesAsync();
-        //     return mapper.Map<User>(user);
-        // }
-
         // public async Task<User> UpdateUser(
         //     [Service] OntologyContext context, 
         //     [Service] IMapper mapper, 
