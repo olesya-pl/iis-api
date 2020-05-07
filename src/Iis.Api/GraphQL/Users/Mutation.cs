@@ -1,16 +1,15 @@
 using System;
-using System.Linq;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 using Iis.Roles;
 using Iis.DataModel;
+using DomainRoles = Iis.Roles;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -27,30 +26,32 @@ namespace IIS.Core.GraphQL.Users
             [Service] IMapper mapper,
             [GraphQLNonNullType] UserCreateInput user)
         {
-            return new User
-            {
-                Id = System.Guid.NewGuid(),
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Patronymic = user.Patronymic,
-                UserName = user.UserName,
-                Comment = user.Comment
-            };
+            Validator.ValidateObject(user, new ValidationContext(user), true);
+
+            var domainUser = mapper.Map<DomainRoles.User>(user);
+
+            domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+
+            var userId = await userService.CreateUserAsync(domainUser);
+            
+            domainUser = await userService.GetUserAsync(userId);
+
+            return mapper.Map<User>(domainUser);
         }
         public async Task<User> UpdateUser(
-            [Service] OntologyContext context,
+            [Service] UserService userService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] UserUpdateInput user)
         {
-            return new User
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Patronymic = user.Patronymic,
-                UserName = user.UserName,
-                Comment = user.Comment
-            };
+            var domainUser = mapper.Map<DomainRoles.User>(user);
+
+            domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+
+            await userService.UpdateUserAsync(domainUser);
+
+            domainUser = await userService.GetUserAsync(new Guid("d86f8961-817b-4494-b0a8-330c037b5053"));
+
+            return mapper.Map<User>(domainUser);
         }
 
         // public async Task<User> CreateUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLNonNullType] UserInput data)

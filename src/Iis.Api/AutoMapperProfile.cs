@@ -107,9 +107,6 @@ namespace Iis.Api
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
-            CreateMap<UserEntity, Roles.User>()
-                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
-
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
 
             CreateMap<Iis.Domain.MachineLearning.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
@@ -180,6 +177,13 @@ namespace Iis.Api
 
             //mapping: Roles.User -> GraphQl.User
             CreateMap<Iis.Roles.User, User>();
+            
+            //mappring: UserEntity -> Roles.User  
+            CreateMap<UserEntity, Roles.User>()
+                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
+
+            //mapping: Roles.User -> UserEntity
+            CreateMap<Roles.User, UserEntity>();
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

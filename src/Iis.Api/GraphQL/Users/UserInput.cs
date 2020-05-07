@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using HotChocolate;
 using HotChocolate.Types;
 
@@ -18,6 +19,7 @@ namespace IIS.Core.GraphQL.Users
         public string Patronymic { get; set; }
         public string Comment { get; set; }
         [GraphQLNonNullType]
+        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Use only latin letters and numbers please")]
         public string UserName { get; set; }
         public string UserNameActiveDirectory { get; set; }
         public bool? IsBlocked { get; set; }
@@ -31,6 +33,7 @@ namespace IIS.Core.GraphQL.Users
     public class UserCreateInput : BaseUserInput
     {
         [GraphQLNonNullType]
+        [Required, DataType(DataType.Password)]
         public string Password { get; set; }
     }
 
@@ -41,6 +44,7 @@ namespace IIS.Core.GraphQL.Users
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id { get; set; }
+        [DataType(DataType.Password)]
         public string Password { get; set; }
     }
 }

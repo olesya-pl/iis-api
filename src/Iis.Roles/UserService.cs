@@ -20,14 +20,44 @@ namespace Iis.Roles
             _context = context;
             _mapper = mapper;
         }
-        public Task<User> CreateUserAsync(User user)
+        public async Task<Guid> CreateUserAsync(User user)
         {
-            return Task.FromResult(user);
+            var entityExists= await _context.Users
+                                            .AnyAsync(u => u.Username == user.UserName);
+            if (entityExists) 
+            {
+                throw new InvalidOperationException($"User with Username:'{user.UserName}' already exists");
+            }
+
+            var userEntity = _mapper.Map<UserEntity>(user);
+            
+            //TODO: temporaly solution
+            userEntity.Name = $"{user.LastName} {user.FirstName} {user.Patronymic}";
+
+            var userRolesEntitiesList = user.Roles
+                                    .Select(role => CreateUserRole(userEntity.Id, role.Id))
+                                    .ToList();
+
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                
+                _context.Add(userEntity);
+                _context.AddRange(userRolesEntitiesList);
+                
+                 await _context.SaveChangesAsync();
+
+                return userEntity.Id;
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
-        public Task<User> UpdateUserAsync(User user)
+        public Task UpdateUserAsync(User user)
         {
-            return Task.FromResult(user);
+            return Task.CompletedTask;
         }
 
         public async Task<User> GetUserAsync(Guid userId)
@@ -99,5 +129,14 @@ namespace Iis.Roles
             return user;
 
         }
+        private UserRoleEntity CreateUserRole(Guid userId, Guid roleId) 
+        {
+            return new UserRoleEntity
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                RoleId = roleId
+            };
+        } 
     }
 }
