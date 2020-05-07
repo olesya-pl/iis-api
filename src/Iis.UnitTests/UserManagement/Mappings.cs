@@ -20,13 +20,30 @@ namespace Iis.UnitTests.UserManagement
         }
         public void Dispose(){}
         
-        [Theory(DisplayName = "Checks Automapper mapping: GraphQL UserInput -> Domain User")]
+        [Theory(DisplayName = "Checks Automapper mapping: GraphQL UserCreateInput -> Domain User")]
         [RecursiveAutoData]
-        public void MapUserInputToUser(GraphUsers.User2Input input)
+        public void MapUserCreateInputToUser(GraphUsers.UserCreateInput input)
         {
             var user = _mapper.Map<DomainRoles.User>(input);
 
             Assert.NotEqual(user.Id, Guid.Empty);
+            Assert.Equal(input.LastName, user.LastName);
+            Assert.Equal(input.FirstName, user.FirstName);
+            Assert.Equal(input.Patronymic, user.Patronymic);
+            Assert.Equal(input.Comment, user.Comment);
+            Assert.Equal(input.UserName, user.UserName);
+            Assert.Equal(input.UserNameActiveDirectory, user.UserNameActiveDirectory);
+            
+            Assert.Equal(input.Roles.Count(), user.Roles.Count());
+            Assert.Equal(input.Roles, user.Roles.Select(r => r.Id));
+        }
+        [Theory(DisplayName = "Checks Automapper mapping: GraphQL UserUpdateInput -> Domain User")]
+        [RecursiveAutoData]
+        public void MapUserUpdateInputToUser(GraphUsers.UserUpdateInput input)
+        {
+            var user = _mapper.Map<DomainRoles.User>(input);
+
+            Assert.Equal(input.Id, user.Id);
             Assert.Equal(input.LastName, user.LastName);
             Assert.Equal(input.FirstName, user.FirstName);
             Assert.Equal(input.Patronymic, user.Patronymic);
@@ -42,7 +59,7 @@ namespace Iis.UnitTests.UserManagement
         [RecursiveAutoData]
         public void MapUserToUserOutput(DomainRoles.User domainUser)
         {
-            var graphQlUser = _mapper.Map<GraphUsers.User2>(domainUser);
+            var graphQlUser = _mapper.Map<GraphUsers.User>(domainUser);
 
             Assert.Equal(domainUser.Id, graphQlUser.Id);
             Assert.Equal(domainUser.LastName, graphQlUser.LastName);

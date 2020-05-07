@@ -10,7 +10,7 @@ namespace IIS.Core.GraphQL.Users
     /// <summary>
     /// Represents output model for User 
     /// </summary>
-    public class User2
+    public class User
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id { get; set; }
@@ -24,22 +24,6 @@ namespace IIS.Core.GraphQL.Users
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
         public IEnumerable<Role> Roles { get; set; }
-        public IEnumerable<AccessEntity> Entities { get; set; }
-        public IEnumerable<AccessTab> Tabs { get; set; }
-    }
-    public class User
-    {
-        [GraphQLType(typeof(NonNullType<IdType>))]
-        public string Id { get; set; }
-
-        [GraphQLNonNullType]
-        public string Name { get; set; }
-
-        [GraphQLNonNullType]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use latin letters only please")]
-        public string Username { get; set; }
-        public bool IsBlocked { get; set; }
-        public bool IsAdmin { get; set; }
         public IEnumerable<AccessEntity> Entities { get; set; }
         public IEnumerable<AccessTab> Tabs { get; set; }
     }

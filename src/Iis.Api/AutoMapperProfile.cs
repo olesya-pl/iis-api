@@ -107,9 +107,10 @@ namespace Iis.Api
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
-            CreateMap<UserEntity, Roles.User>();
+            CreateMap<UserEntity, Roles.User>()
+                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
+
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
-            CreateMap<Roles.User, IIS.Core.GraphQL.Users.User>();
 
             CreateMap<Iis.Domain.MachineLearning.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
 
@@ -168,11 +169,17 @@ namespace Iis.Api
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
 
             //mapping: GraphQl.UserInput -> Roles.User
-            CreateMap<User2Input, Iis.Roles.User>()
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id.HasValue ? src.Id.Value : Guid.NewGuid()))
+            CreateMap<BaseUserInput, Iis.Roles.User>()
                 .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Iis.Roles.Role{ Id = id})));
+            CreateMap<UserCreateInput, Iis.Roles.User>()
+                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+            CreateMap<UserUpdateInput, Iis.Roles.User>()
+                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id));
+
             //mapping: Roles.User -> GraphQl.User
-            CreateMap<Iis.Roles.User, User2>();
+            CreateMap<Iis.Roles.User, User>();
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

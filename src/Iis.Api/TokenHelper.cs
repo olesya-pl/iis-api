@@ -45,7 +45,7 @@ namespace IIS.Core
             );
         }
 
-        public static TokenPayload ValidateToken(string token, IConfiguration config, RoleService roleLoader)
+        public static TokenPayload ValidateToken(string token, IConfiguration config, UserService userService)
         {
             if (!_securityTokenHandler.CanReadToken(token))
                 throw new AuthenticationException("Unable to read token");
@@ -61,7 +61,7 @@ namespace IIS.Core
                 };
 
                 _securityTokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-                return TokenPayload.From(validatedToken as JwtSecurityToken, roleLoader);
+                return TokenPayload.From(validatedToken as JwtSecurityToken, userService);
             }
             catch (SecurityTokenException)
             {
@@ -77,10 +77,10 @@ namespace IIS.Core
         public readonly Guid UserId;
         public User User;
 
-        static public TokenPayload From(JwtSecurityToken token, RoleService roleLoader)
+        static public TokenPayload From(JwtSecurityToken token, UserService userService)
         {
             var userId = Guid.Parse(token.Payload[TokenHelper.CLAIM_TYPE_UID] as string);
-            var user = roleLoader.GetUser(userId);
+            var user = userService.GetUser(userId);
             return new TokenPayload(userId, user);
         }
 
