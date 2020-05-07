@@ -90,5 +90,14 @@ namespace IIS.Core.GraphQL.Materials
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             return (materials, materialsResult.Count);
         }
+
+        public async Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            Guid nodeId)
+        {
+            var items = await materialProvider.CountMaterialsByTypeAndNodeAsync(nodeId);
+            return mapper.Map<List<MaterialsCountByType>>(items);
+        }
     }
 }

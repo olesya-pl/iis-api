@@ -167,6 +167,10 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+
+            CreateMap<Iis.Domain.Materials.MaterialsCountByType, IIS.Core.GraphQL.Materials.MaterialsCountByType>();
+
+
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

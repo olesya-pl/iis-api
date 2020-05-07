@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using AutoMapper;
 
-
 using Iis.Utility;
 using Iis.Domain;
 using Iis.Domain.Materials;
@@ -16,7 +15,6 @@ using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -51,7 +49,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             try
             {
-                IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery();
+                IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery(GetMaterialQuery());
                 IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
@@ -270,13 +268,9 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Task<Material>> mappingTasks;
             IEnumerable<Material> materials;
 
-            var q = _context.Materials
-                .Join(_context.MaterialInfos, u => u.Id, uir => uir.MaterialId, (u, uir) => new { u, uir })
-                .Join(_context.MaterialFeatures, r => r.uir.Id, ro => ro.MaterialInfoId, (r, ro) => new { r, ro })
-                .Where(m => m.ro.NodeId == nodeId)
-                .Select(m => m.r.u);
+            IQueryable<MaterialEntity> materialsByNode = GetMaterialByNodeIdQuery(nodeId);
 
-            mappingTasks =  (await q
+            mappingTasks = (await materialsByNode
                                  .ToArrayAsync())
                                  .Select(async e => await MapAsync(await GetMaterialEntityAsync(e.Id)));
 
@@ -285,9 +279,20 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, materials.Count());
         }
 
-        private IQueryable<MaterialEntity> GetParentMaterialsQuery()
+        private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
         {
-            return GetMaterialQuery()
+            return _context.Materials
+                            .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                                (Material, MaterialInfo) => new { Material, MaterialInfo })
+                            .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                                (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                            .Where(m => m.MaterialFeature.NodeId == nodeId)
+                            .Select(m => m.MaterialInfoJoined.Material);
+        }
+
+        private IQueryable<MaterialEntity> GetParentMaterialsQuery(IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery
                     .Where(p => p.ParentId == null);
         }
 
@@ -339,6 +344,18 @@ namespace IIS.Core.Materials.EntityFramework
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
             result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
             return result;
+        }
+
+        public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
+        {
+            return GetParentMaterialsQuery(GetMaterialByNodeIdQuery(nodeId))
+                .GroupBy(p => p.Type)
+                .Select(group => new MaterialsCountByType
+                {
+                    Count = group.Count(),
+                    Type = group.Key
+                })
+                .ToListAsync();
         }
     }
 }
