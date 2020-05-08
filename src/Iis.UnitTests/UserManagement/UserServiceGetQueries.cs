@@ -30,6 +30,8 @@ namespace Iis.UnitTests.UserManagement
             context.Roles.RemoveRange(context.Roles);
             context.Users.RemoveRange(context.Users);
             context.SaveChanges();
+
+            _serviceProvider.Dispose();
         }
 
         [Fact(DisplayName = "No such user with exception")]

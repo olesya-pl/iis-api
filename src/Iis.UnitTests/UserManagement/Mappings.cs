@@ -18,8 +18,11 @@ namespace Iis.UnitTests.UserManagement
             _serviceProvider = Utils.SetupInMemoryDb();
             _mapper = _serviceProvider.GetRequiredService<IMapper>();
         }
-        public void Dispose(){}
-        
+        public void Dispose()
+        {
+            _serviceProvider.Dispose();
+        }
+
         [Theory(DisplayName = "Checks Automapper mapping: GraphQL UserCreateInput -> Domain User")]
         [RecursiveAutoData]
         public void MapUserCreateInputToUser(GraphUsers.UserCreateInput input)

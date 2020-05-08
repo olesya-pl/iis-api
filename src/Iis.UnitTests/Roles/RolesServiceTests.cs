@@ -24,6 +24,8 @@ namespace Iis.UnitTests.Roles
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
             context.AccessObjects.RemoveRange(context.AccessObjects);
             context.SaveChanges();
+
+            _serviceProvider.Dispose();
         }
 
 
