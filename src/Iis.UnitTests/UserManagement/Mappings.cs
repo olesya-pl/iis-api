@@ -48,7 +48,7 @@ namespace Iis.UnitTests.UserManagement
             Assert.Equal(input.FirstName, user.FirstName);
             Assert.Equal(input.Patronymic, user.Patronymic);
             Assert.Equal(input.Comment, user.Comment);
-            Assert.Equal(input.UserName, user.UserName);
+            Assert.Null(user.UserName);
             Assert.Equal(input.UserNameActiveDirectory, user.UserNameActiveDirectory);
             
             Assert.Equal(input.Roles.Count(), user.Roles.Count());
