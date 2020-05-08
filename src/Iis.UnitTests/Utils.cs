@@ -11,6 +11,7 @@ using IIS.Core;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.Interfaces.Elastic;
+using System;
 
 namespace Iis.UnitTests
 {
@@ -49,12 +50,11 @@ namespace Iis.UnitTests
                             .Build());
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddDbContext<OntologyContext>(
-                options => options.UseInMemoryDatabase("db"),
+                options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()),
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
             serviceCollection.AddSingleton(new Mock<IOntologyCache>().Object);
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
-            serviceCollection.AddAutoMapper(typeof(Startup));
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;
