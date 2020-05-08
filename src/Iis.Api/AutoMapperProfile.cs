@@ -189,6 +189,7 @@ namespace Iis.Api
             CreateMap<UserEntity, UserEntity>()
                 .ForMember(dest => dest.Username, opts => opts.Ignore())
                 .ForAllMembers(opts => opts.Condition((src, dest, sourceValue, targetValue) => sourceValue != null));
+            CreateMap<Iis.Domain.Materials.MaterialsCountByType, IIS.Core.GraphQL.Materials.MaterialsCountByType>();
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

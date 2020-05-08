@@ -8,8 +8,6 @@ using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-using Newtonsoft.Json.Linq;
-using System.Linq;
 
 namespace IIS.Core.Materials
 {
@@ -32,5 +30,6 @@ namespace IIS.Core.Materials
         Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId);
         Task<JObject> GetMaterialDocumentAsync(Guid materialId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
+        Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
     }
 }

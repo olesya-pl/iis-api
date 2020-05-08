@@ -205,6 +205,7 @@ namespace IIS.Core
 
             services.AddSingleton<IElasticManager, ElasticManager>();
             services.AddSingleton<IElasticSerializer, ElasticSerializer>();
+            services.AddTransient<SearchResultExtractor>();
             services.AddSingleton(elasticConfiguration);
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
 namespace IIS.Core.NodeMaterialRelation
@@ -39,6 +40,16 @@ namespace IIS.Core.NodeMaterialRelation
             {
                 throw new Exception(UniqueConstraintViolationMessage);
             }
+        }
+
+        public async Task Delete(NodeMaterialRelation relation)
+        {
+            var featureToRemove = await _context.MaterialFeatures
+                .Include(p => p.MaterialInfo)
+                .FirstOrDefaultAsync(p => p.NodeId == relation.NodeId && p.MaterialInfo.MaterialId == relation.MaterialId);
+            _context.MaterialInfos.Remove(featureToRemove.MaterialInfo);
+            _context.MaterialFeatures.Remove(featureToRemove);
+            await _context.SaveChangesAsync();
         }
     }
 }

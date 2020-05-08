@@ -19,6 +19,17 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             var material = await materialProvider.GetMaterialAsync(input.MaterialId);
             return mapper.Map<Material>(material);
         }
+
+        public async Task<Material> DeleteNodeMaterialRelation(
+            [Service] NodeMaterialRelationService relationService,
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] NodeMaterialRelationInput input)
+        {
+            await relationService.Delete(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input));
+            var material = await materialProvider.GetMaterialAsync(input.MaterialId);
+            return mapper.Map<Material>(material);
+        }
     }
 }
 

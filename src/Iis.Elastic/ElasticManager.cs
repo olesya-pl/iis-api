@@ -17,8 +17,10 @@ namespace Iis.Elastic
         private const string RemoveSymbolsPattern = "№";
         ElasticLowLevelClient _lowLevelClient;
         ElasticConfiguration _configuration;
+        SearchResultExtractor _resultExtractor;
 
-        public ElasticManager(ElasticConfiguration configuration)
+        public ElasticManager(ElasticConfiguration configuration,
+            SearchResultExtractor resultExtractor)
         {
             _configuration = configuration;
 
@@ -27,6 +29,7 @@ namespace Iis.Elastic
             var config = new ConnectionConfiguration(connectionPool);
 
             _lowLevelClient = new ElasticLowLevelClient(config);
+            _resultExtractor = resultExtractor;
         }
 
         public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
@@ -57,7 +60,7 @@ namespace Iis.Elastic
                 $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
             var response = await GetAsync(path, jsonString, cancellationToken);
-            return GetSearchResultFromResponse(response);
+            return _resultExtractor.GetFromResponse(response);
         }
 
         public async Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName)
@@ -78,7 +81,7 @@ namespace Iis.Elastic
                 return new ElasticSearchResult();
             }
 
-            return GetSearchResultFromResponse(searchResponse);
+            return _resultExtractor.GetFromResponse(searchResponse);
         }
 
         public async Task<string> GetDocumentByIdAsync(string indexName, string documentId, string[] documentFields)
@@ -153,39 +156,6 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        private IElasticSearchResult GetSearchResultFromResponse(StringResponse response)
-        {
-            var json = JObject.Parse(response.Body);
-            var items = new List<ElasticSearchResultItem>();
-
-            var hits = json["hits"]?["hits"];
-            if (hits != null)
-            {
-                foreach (var hit in hits)
-                {
-                    var resultItem = new ElasticSearchResultItem
-                    {
-                        Identifier = hit["_id"].ToString(),
-                        Higlight = hit["highlight"],
-                        SearchResult = hit["_source"] as JObject
-                    };
-                    resultItem.SearchResult["highlight"] = resultItem.Higlight;
-                    if (resultItem.SearchResult["NodeTypeName"] != null)
-                    {
-                        resultItem.SearchResult["__typename"] = $"Entity{resultItem.SearchResult["NodeTypeName"]}";
-                    }
-                    items.Add(resultItem);
-
-                }
-            }
-            var total = json["hits"]?["total"]?["value"];
-            return new ElasticSearchResult
-            {
-                Count = (int?)total ?? 0,
-                Items = items
-            };
-        }
-
         private string GetSearchJson(IIisElasticSearchParams searchParams)
         {
             var json = new JObject();
@@ -214,7 +184,9 @@ namespace Iis.Elastic
 
         private bool IsExactQuery(string query)
         {
-            return query.Contains(":");
+            return query.Contains(":")
+                || query.Contains(" AND ")
+                || query.Contains(" OR ");
         }
 
         private void PopulateExactQuery(IIisElasticSearchParams searchParams, JObject json)
