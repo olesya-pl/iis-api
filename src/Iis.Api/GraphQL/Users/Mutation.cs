@@ -43,37 +43,21 @@ namespace IIS.Core.GraphQL.Users
             [Service] IMapper mapper,
             [GraphQLNonNullType] UserUpdateInput user)
         {
+            Validator.ValidateObject(user, new ValidationContext(user), true);
+
             var domainUser = mapper.Map<DomainRoles.User>(user);
 
-            domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+            if (!string.IsNullOrWhiteSpace(user.Password)) 
+            {
+                domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+            }
 
-            await userService.UpdateUserAsync(domainUser);
+            var userId = await userService.UpdateUserAsync(domainUser);
 
-            domainUser = await userService.GetUserAsync(new Guid("d86f8961-817b-4494-b0a8-330c037b5053"));
+            domainUser = await userService.GetUserAsync(userId);
 
             return mapper.Map<User>(domainUser);
         }
-
-        // public async Task<User> UpdateUser(
-        //     [Service] OntologyContext context, 
-        //     [Service] IMapper mapper, 
-        //     [GraphQLType(typeof(NonNullType<IdType>))] string id, 
-        //     [GraphQLNonNullType] UserInput data)
-        // {
-        //     //TODO: should not be able to block yourself
-        //     Validator.ValidateObject(data, new System.ComponentModel.DataAnnotations.ValidationContext(data), true);
-        //     var user = await context.Users.FindAsync(Guid.Parse(id));
-        //     if (user == null)
-        //         throw new InvalidOperationException($"Cannot find user with id = {id}");
-
-        //     user.IsBlocked    = data.IsBlocked.GetValueOrDefault();
-        //     user.Name         = data.Name;
-        //     user.PasswordHash = _configuration.GetPasswordHashAsBase64String(data.Password);
-
-        //     await context.SaveChangesAsync();
-
-        //     return mapper.Map<User>(user);
-        // }
 
         public async Task<User> DeleteUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {

@@ -173,7 +173,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
             CreateMap<UserUpdateInput, Iis.Roles.User>()
                 .IncludeBase<BaseUserInput, Iis.Roles.User>()
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id));
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, opts => opts.Ignore());
 
             //mapping: Roles.User -> GraphQl.User
             CreateMap<Iis.Roles.User, User>();
@@ -184,6 +185,10 @@ namespace Iis.Api
 
             //mapping: Roles.User -> UserEntity
             CreateMap<Roles.User, UserEntity>();
+
+            CreateMap<UserEntity, UserEntity>()
+                .ForMember(dest => dest.Username, opts => opts.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, sourceValue, targetValue) => sourceValue != null));
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

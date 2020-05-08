@@ -14,6 +14,7 @@ namespace IIS.Core
     public static class TokenHelper
     {
         public static string CLAIM_TYPE_UID = "uid";
+        public static string CLAIM_TYPE_PASSHASH = "passhash";
 
         public static SymmetricSecurityKey GetSymmetricSecurityKey(string key)
         {
@@ -32,7 +33,7 @@ namespace IIS.Core
                     new SigningCredentials(GetSymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256));
             return _securityTokenHandler.WriteToken(token);
         }
-        public static string NewToken(IConfiguration configuration, Guid userId)
+        public static string NewToken(IConfiguration configuration, Guid userId, string userPasswordHash)
         {
             return NewToken(
                 configuration.GetValue<string>("jwt:issuer"),
@@ -40,7 +41,8 @@ namespace IIS.Core
                 configuration.GetValue<string>("jwt:signingKey"),
                 configuration.GetValue<TimeSpan>("jwt:lifeTime"),
                 new Claim[] {
-                    new Claim(CLAIM_TYPE_UID, userId.ToString())
+                    new Claim(CLAIM_TYPE_UID, userId.ToString()),
+                    new Claim(CLAIM_TYPE_PASSHASH, userPasswordHash)
                 }
             );
         }
@@ -57,11 +59,19 @@ namespace IIS.Core
                     ValidAudience = config.GetValue<string>("jwt:audience"),
                     IssuerSigningKey = GetSymmetricSecurityKey(config.GetValue<string>("jwt:signingKey")),
                     ValidateIssuerSigningKey = true,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
                 };
 
                 _securityTokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-                return TokenPayload.From(validatedToken as JwtSecurityToken, userService);
+
+                var userClaims = TokenPayload.GetUserClaims(validatedToken as JwtSecurityToken);
+
+                var user = userService.GetUser(userClaims.userId, userClaims.userPasswordHash);
+
+                if (user is null) throw new SecurityTokenException();
+
+                return TokenPayload.From(validatedToken as JwtSecurityToken, user);
             }
             catch (SecurityTokenException)
             {
@@ -77,13 +87,18 @@ namespace IIS.Core
         public readonly Guid UserId;
         public User User;
 
-        static public TokenPayload From(JwtSecurityToken token, UserService userService)
+        public static TokenPayload From(JwtSecurityToken token, User user)
         {
-            var userId = Guid.Parse(token.Payload[TokenHelper.CLAIM_TYPE_UID] as string);
-            var user = userService.GetUser(userId);
-            return new TokenPayload(userId, user);
+            return new TokenPayload(user.Id, user);
         }
 
+        public static (Guid userId, string userPasswordHash) GetUserClaims(JwtSecurityToken token) 
+        {
+            var userId = Guid.Parse(token.Payload[TokenHelper.CLAIM_TYPE_UID] as string);
+            var userHash = token.Payload[TokenHelper.CLAIM_TYPE_PASSHASH] as string;
+
+            return (userId, userHash);
+        }
         public TokenPayload(Guid userId, User user)
         {
             UserId = userId;

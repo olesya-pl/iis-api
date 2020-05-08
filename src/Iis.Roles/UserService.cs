@@ -20,21 +20,21 @@ namespace Iis.Roles
             _context = context;
             _mapper = mapper;
         }
-        public async Task<Guid> CreateUserAsync(User user)
+        public async Task<Guid> CreateUserAsync(User newUser)
         {
             var entityExists= await _context.Users
-                                            .AnyAsync(u => u.Username == user.UserName);
+                                            .AnyAsync(u => u.Username == newUser.UserName);
             if (entityExists) 
             {
-                throw new InvalidOperationException($"User with Username:'{user.UserName}' already exists");
+                throw new InvalidOperationException($"User with Username:'{newUser.UserName}' already exists");
             }
 
-            var userEntity = _mapper.Map<UserEntity>(user);
+            var userEntity = _mapper.Map<UserEntity>(newUser);
 
             //TODO: temporaly solution
-            userEntity.Name = $"{user.LastName} {user.FirstName} {user.Patronymic}";
+            userEntity.Name = $"{userEntity.LastName} {userEntity.FirstName} {userEntity.Patronymic}";
 
-            var userRolesEntitiesList = user.Roles
+            var userRolesEntitiesList = newUser.Roles
                                     .Select(role => CreateUserRole(userEntity.Id, role.Id))
                                     .ToList();
 
@@ -43,6 +43,7 @@ namespace Iis.Roles
             {
                 
                 _context.Add(userEntity);
+
                 _context.AddRange(userRolesEntitiesList);
                 
                  await _context.SaveChangesAsync();
@@ -55,9 +56,50 @@ namespace Iis.Roles
             }
         }
 
-        public Task UpdateUserAsync(User user)
+        public async Task<Guid> UpdateUserAsync(User updatedUser)
         {
-            return Task.CompletedTask;
+            var userEntity = GetUsersQuery()
+                                        .FirstOrDefaultAsync(e => e.Id == updatedUser.Id)
+                                        .GetAwaiter().GetResult();
+
+            if (userEntity is null) 
+            {
+                throw new InvalidOperationException($"Cannot find User with id:'{updatedUser.Id}'.");
+            }
+
+            if (userEntity.PasswordHash == updatedUser.PasswordHash) 
+            {
+                throw new InvalidOperationException($"New password must not match old.");
+            }
+
+            var updatedEntity = _mapper.Map<UserEntity>(updatedUser);
+
+            var newUserRolesEntitiesList = updatedUser.Roles
+                                            .Select(role => CreateUserRole(updatedUser.Id, role.Id))
+                                            .ToList();
+
+            _mapper.Map(updatedEntity, userEntity);
+
+            //TODO: temporaly solution
+            userEntity.Name = $"{userEntity.LastName} {userEntity.FirstName} {userEntity.Patronymic}";
+
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                _context.RemoveRange(_context.UserRoles.Where(ur => ur.UserId == userEntity.Id));
+
+                _context.Update(userEntity);
+
+                _context.UserRoles.AddRange(newUserRolesEntitiesList);
+
+                await _context.SaveChangesAsync();
+
+                return userEntity.Id;
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
         public async Task<User> GetUserAsync(Guid userId)
@@ -83,6 +125,13 @@ namespace Iis.Roles
             var userEntity = GetUsersQuery()
                                     .SingleOrDefault(x => x.Username == userName && x.PasswordHash == passwordHash);
             
+            return userEntity == null ? null : Map(userEntity);
+        }
+        public User GetUser(Guid userId, string passwordHash)
+        {
+            var userEntity = GetUsersQuery()
+                                    .SingleOrDefault(x => x.Id == userId && x.PasswordHash == passwordHash);
+
             return userEntity == null ? null : Map(userEntity);
         }
         public async Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(int offset, int pageSize)

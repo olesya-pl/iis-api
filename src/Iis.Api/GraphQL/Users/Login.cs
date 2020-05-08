@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.Users
             return new LoginResponse
             {
                 User = _mapper.Map<User>(user),
-                Token = TokenHelper.NewToken(_configuration, user.Id)
+                Token = TokenHelper.NewToken(_configuration, user.Id, user.PasswordHash)
             };
         }
 
@@ -58,7 +58,7 @@ namespace IIS.Core.GraphQL.Users
             return new LoginResponse
             {
                 User = _mapper.Map<User>(user),
-                Token = TokenHelper.NewToken(_configuration, Guid.NewGuid())
+                Token = TokenHelper.NewToken(_configuration, Guid.NewGuid(), user.PasswordHash)
             };
         }
     }

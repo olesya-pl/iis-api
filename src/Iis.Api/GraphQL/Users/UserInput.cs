@@ -34,6 +34,8 @@ namespace IIS.Core.GraphQL.Users
     {
         [GraphQLNonNullType]
         [Required, DataType(DataType.Password)]
+        [StringLength(255, MinimumLength = 6, ErrorMessage = "{0} must have at least {2} symbols, maximum length is {1}")]
+        [RegularExpression(@"^[a-zA-Z0-9_=-]+$", ErrorMessage = "Use only latin letters, numbers and symbols '_' '=' '-' please")]
         public string Password { get; set; }
     }
 
@@ -45,6 +47,8 @@ namespace IIS.Core.GraphQL.Users
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id { get; set; }
         [DataType(DataType.Password)]
+        [StringLength(255, MinimumLength = 6, ErrorMessage = "{0} must have at least {2} symbols, maximum length is {1}")]
+        [RegularExpression(@"^[a-zA-Z0-9_=-]+$", ErrorMessage = "Use only latin letters, numbers and symbols '_' '=' '-' please")]
         public string Password { get; set; }
     }
 }
