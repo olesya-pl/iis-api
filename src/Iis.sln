@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologySchema.Saver", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Roles", "Iis.Roles\Iis.Roles.csproj", "{205868E4-13F8-4420-8433-AC6B7CDC3F7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.ApiTests", "Iis.ApiTests\Iis.ApiTests.csproj", "{E13FAF75-0CFD-41BE-A8B6-7CFCF992BA8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AcceptanceTests", "Iis.ApiTests\AcceptanceTests.csproj", "{E13FAF75-0CFD-41BE-A8B6-7CFCF992BA8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
