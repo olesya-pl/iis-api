@@ -35,19 +35,19 @@ namespace Iis.UnitTests.UserManagement
         }
 
         [Fact(DisplayName = "No such user with exception")]
-        public void GetUserById_NoSuchUser()
+        public async Task GetUserById_NoSuchUser()
         {
             var service = _serviceProvider.GetRequiredService<UserService>();
 
             //act
-            Exception exception = Assert.Throws<ArgumentException>(() => service.GetUserAsync(Guid.Empty).GetAwaiter().GetResult());
+            ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(() => service.GetUserAsync(Guid.Empty));
 
             //assert
             Assert.Equal($"User does not exist for id = {Guid.Empty}", exception.Message);
         }
 
         [Theory(DisplayName = "Get User by Id"), RecursiveAutoData]
-        public void GetUserById(
+        public async Task GetUserById(
             List<AccessObjectEntity> existingAccesses,
             RoleEntity roleEntity,
             UserEntity userEntity)
@@ -80,8 +80,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var user = service.GetUserAsync(userEntity.Id)
-                                    .GetAwaiter().GetResult();
+            var user = await service.GetUserAsync(userEntity.Id);
 
             //assert
             Assert.Equal(userEntity.Id, user.Id);
@@ -96,7 +95,7 @@ namespace Iis.UnitTests.UserManagement
         }
 
         [Theory(DisplayName ="Get User list (size:1)"), RecursiveAutoData]
-        public void GetUsersSize1(
+        public async Task GetUsersSize1(
             List<AccessObjectEntity> existingAccesses,
             List<UserEntity> userEntities,
             RoleEntity roleEntity)
@@ -129,8 +128,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = service.GetUsersAsync(0, 1)
-                                .GetAwaiter().GetResult();
+            var usersResult = await service.GetUsersAsync(0, 1);
 
             //assert
             Assert.Equal(userEntities.Count, usersResult.TotalCount);
@@ -138,7 +136,7 @@ namespace Iis.UnitTests.UserManagement
         }
 
         [Theory(DisplayName = "Get User list (size:10)"), RecursiveAutoData]
-        public void GetUsersSize10(
+        public async Task GetUsersSize10(
             List<AccessObjectEntity> existingAccesses,
             List<UserEntity> userEntities,
             RoleEntity roleEntity)
@@ -171,8 +169,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = service.GetUsersAsync(0, 10)
-                                .GetAwaiter().GetResult();
+            var usersResult = await service.GetUsersAsync(0, 10);
 
             //assert
             Assert.Equal(userEntities.Count, usersResult.TotalCount);

@@ -14,7 +14,7 @@ namespace Iis.Roles
     {
         private OntologyContext _context;
         private IMapper _mapper;
-
+        public static User EmptyUser = new User();
         public UserService(OntologyContext context, IMapper mapper)
         {
             _context = context;
@@ -41,7 +41,6 @@ namespace Iis.Roles
             await _context.Semaphore.WaitAsync();
             try
             {
-                
                 _context.Add(userEntity);
 
                 _context.AddRange(userRolesEntitiesList);
@@ -55,7 +54,6 @@ namespace Iis.Roles
                 _context.Semaphore.Release();
             }
         }
-
         public async Task<Guid> UpdateUserAsync(User updatedUser)
         {
             var userEntity = GetUsersQuery()
@@ -101,7 +99,6 @@ namespace Iis.Roles
                 _context.Semaphore.Release();
             }
         }
-
         public async Task<User> GetUserAsync(Guid userId)
         {
             var userEntity = await GetUsersQuery()
@@ -114,25 +111,16 @@ namespace Iis.Roles
 
             return Map(userEntity);
         }
-
         public User GetUser(Guid userId)
         {
             return GetUserAsync(userId).GetAwaiter().GetResult();
         }
-
         public User GetUser(string userName, string passwordHash)
         {
             var userEntity = GetUsersQuery()
                                     .SingleOrDefault(x => x.Username == userName && x.PasswordHash == passwordHash);
             
-            return userEntity == null ? null : Map(userEntity);
-        }
-        public User GetUser(Guid userId, string passwordHash)
-        {
-            var userEntity = GetUsersQuery()
-                                    .SingleOrDefault(x => x.Id == userId && x.PasswordHash == passwordHash);
-
-            return userEntity == null ? null : Map(userEntity);
+            return Map(userEntity);
         }
         public async Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(int offset, int pageSize)
         {
@@ -158,6 +146,8 @@ namespace Iis.Roles
         }
         private User Map(UserEntity entity)
         {
+            if(entity is null) return EmptyUser;
+
             var roleEntityList = entity.UserRoles
                                     .Select(ur => ur.Role);
 
@@ -165,18 +155,15 @@ namespace Iis.Roles
 
             foreach (var roleEntity in roleEntityList)
             {
-                if (roleEntity.IsAdmin)
-                {
-                    user.IsAdmin = true;
-                }
                 var accessGrantedList = roleEntity.RoleAccessEntities
                                             .Select(r => _mapper.Map<AccessGranted>(r));
                 
                 user.AccessGrantedItems.Merge(accessGrantedList);
             }
 
-            return user;
+            user.IsAdmin = roleEntityList.Any(re => re.IsAdmin);
 
+            return user;
         }
         private UserRoleEntity CreateUserRole(Guid userId, Guid roleId) 
         {
