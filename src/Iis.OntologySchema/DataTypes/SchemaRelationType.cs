@@ -1,18 +1,12 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
     public class SchemaRelationType: SchemaRelationTypeRaw, IRelationType, IRelationTypeLinked
     {
-        internal SchemaNodeType _nodeType;
-        internal SchemaNodeType _sourceType;
-        internal SchemaNodeType _targetType;
-        public INodeTypeLinked NodeType => _nodeType;
-        public INodeTypeLinked SourceType => _sourceType;
-        public INodeTypeLinked TargetType => _targetType;
+        public INodeTypeLinked NodeType { get; internal set; }
+        public INodeTypeLinked SourceType { get; internal set; }
+        public INodeTypeLinked TargetType { get; internal set; }
         public override string ToString()
         {
             return $"{SourceType.Name}.{NodeType.Name}";
@@ -24,26 +18,6 @@ namespace Iis.OntologySchema.DataTypes
                 && SourceType.Name == relationType.SourceType.Name
                 && TargetType.Name == relationType.TargetType.Name
                 && (!includeTargetType || TargetType.IsIdentical(relationType.TargetType));
-        }
-
-        internal void SetNodeType(SchemaNodeType nodeType)
-        {
-            _nodeType = nodeType;
-        }
-
-        internal void SetSourceType(SchemaNodeType sourceType)
-        {
-            _sourceType = sourceType;
-        }
-
-        internal void SetTargetType(SchemaNodeType targetType)
-        {
-            _targetType = targetType;
-        }
-
-        internal void SetMeta(string meta)
-        {
-            _nodeType.Meta = meta;
         }
     }
 }

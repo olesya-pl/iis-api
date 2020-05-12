@@ -191,16 +191,6 @@ namespace Iis.OntologySchema.DataTypes
             return result;
         }
 
-        public void CopyFrom(INodeType nodeType)
-        {
-            Name = nodeType.Name;
-            Title = nodeType.Title;
-            Meta = nodeType.Meta;
-            IsArchived = nodeType.IsArchived;
-            Kind = nodeType.Kind;
-            IsAbstract = nodeType.IsAbstract;
-        }
-
         public List<string> GetAttributeDotNamesRecursive(string parentName = null)
         {
             var result = new List<string>();
@@ -241,13 +231,6 @@ namespace Iis.OntologySchema.DataTypes
             }
 
             return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
-        }
-
-        internal SchemaRelationType GetRelationByName(string relationName)
-        {
-            return _outgoingRelations
-                .Where(r => r.NodeType.Name == relationName)
-                .SingleOrDefault();
         }
 
         public override string ToString() => Name;

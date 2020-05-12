@@ -3,7 +3,6 @@ using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
@@ -25,17 +24,14 @@ namespace Iis.OntologySchema.DataTypes
             AttributeTypes = ontologyRawData.AttributeTypes.ToDictionary(at => at.Id, at => _mapper.Map<SchemaAttributeType>(at));
             foreach (var relationType in RelationTypes.Values)
             {
-                var nodeType = NodeTypes[relationType.Id];
-                relationType.SetNodeType(nodeType);
-                nodeType.SetRelationType(relationType);
-                
-                var sourceType = NodeTypes[relationType.SourceTypeId];
-                relationType.SetSourceType(sourceType);
-                sourceType.AddOutgoingRelation(relationType);
-                
-                var targetType = NodeTypes[relationType.TargetTypeId];
-                relationType.SetTargetType(targetType);
-                targetType.AddIncomingRelation(relationType);
+                relationType.NodeType = NodeTypes[relationType.Id];
+                NodeTypes[relationType.Id].SetRelationType(relationType);
+
+                relationType.SourceType = NodeTypes[relationType.SourceTypeId];
+                NodeTypes[relationType.SourceTypeId].AddOutgoingRelation(relationType);
+
+                relationType.TargetType = NodeTypes[relationType.TargetTypeId];
+                NodeTypes[relationType.TargetTypeId].AddIncomingRelation(relationType);
             }
             foreach (var attributeType in AttributeTypes.Values)
             {

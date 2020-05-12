@@ -66,55 +66,17 @@ namespace Iis.OntologySchema
             return new OntologyRawData(_storage.GetNodeTypesRaw(), _storage.GetRelationTypesRaw(), _storage.GetAttributeTypesRaw());
         }
 
-        public void AddNodeType(INodeType nodeType)
-        {
-            var schemaNodeType = new SchemaNodeType();
-            schemaNodeType.CopyFrom(nodeType);
-            schemaNodeType.Id = nodeType.Id == default ? Guid.NewGuid() : nodeType.Id;
-            _storage.NodeTypes[schemaNodeType.Id] = schemaNodeType;
-        }
-
-        public void SetEmbeddingOptions(string entityName, string relationName, EmbeddingOptions embeddingOptions)
-        {
-            var relationType = GetRelationType(entityName, relationName);
-            relationType.EmbeddingOptions = embeddingOptions;
-        }
-        public void SetRelationMeta(string entityName, string relationName, string meta)
-        {
-            var relationType = GetRelationType(entityName, relationName);
-            relationType.SetMeta(meta);
-        }
-
         public Dictionary<string, INodeTypeLinked> GetStringCodes()
         {
             return _storage.GetStringCodes();
         }
-
         public INodeTypeLinked GetEntityTypeByName(string entityTypeName)
         {
             return _storage.NodeTypes.Values
-                .Where(nt => !nt.IsArchived 
-                    && nt.Kind == Kind.Entity 
+                .Where(nt => !nt.IsArchived
+                    && nt.Kind == Kind.Entity
                     && nt.Name == entityTypeName)
                 .SingleOrDefault();
-        }
-
-        private SchemaRelationType GetRelationType(string entityName, string relationName)
-        {
-            var relationType = GetRelationTypeOrNull(entityName, relationName);
-            if (relationType == null)
-            {
-                throw new ArgumentException($"There is no relation ({entityName}, {relationName})");
-            }
-            return relationType;
-        }
-
-        private SchemaRelationType GetRelationTypeOrNull(string entityName, string relationName)
-        {
-            SchemaNodeType nodeType = _storage.NodeTypes.Values
-                .Where(nt => nt.Kind == Kind.Entity
-                    && nt.Name == entityName).SingleOrDefault();
-            return nodeType?.GetRelationByName(relationName);
         }
 
         public ISchemaCompareResult CompareTo(IOntologySchema schema)
@@ -125,7 +87,7 @@ namespace Iis.OntologySchema
             result.ItemsToAdd = thisCodes.Keys.Where(key => !otherCodes.ContainsKey(key)).Select(key => thisCodes[key]).ToList();
             result.ItemsToDelete = otherCodes.Keys.Where(key => !thisCodes.ContainsKey(key)).Select(key => otherCodes[key]).ToList();
             var commonKeys = thisCodes.Keys.Where(key => otherCodes.ContainsKey(key)).ToList();
-            
+
             result.ItemsToUpdate = commonKeys
                 .Where(key => !thisCodes[key].IsIdentical(otherCodes[key]))
                 .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = otherCodes[key] })
@@ -148,7 +110,7 @@ namespace Iis.OntologySchema
                 nodeType.Meta = updateParameter.Meta;
             }
 
-            if (updateParameter.EmbeddingOptions != null && nodeType._relationType != null)
+            if (updateParameter.EmbeddingOptions != null && nodeType.RelationType != null)
             {
                 nodeType._relationType.EmbeddingOptions = (EmbeddingOptions)updateParameter.EmbeddingOptions;
             }
@@ -163,7 +125,7 @@ namespace Iis.OntologySchema
         {
             var nodeType = _storage.GetNodeTypeById(relationTypeId);
             nodeType._relationType.TargetTypeId = targetTypeId;
-            nodeType._relationType._targetType = _storage.NodeTypes[targetTypeId];
+            nodeType._relationType.TargetType = _storage.NodeTypes[targetTypeId];
         }
     }
 }
