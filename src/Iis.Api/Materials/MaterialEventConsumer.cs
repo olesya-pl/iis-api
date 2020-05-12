@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Files.EntityFramework;
@@ -18,9 +17,7 @@ using Iis.DataModel.Materials;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using IIS.Core.Ontology;
-using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration.Internal;
-using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.DataModel;
 
 namespace IIS.Core.Materials
 {
@@ -32,7 +29,7 @@ namespace IIS.Core.Materials
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly FileServiceFactory _fileServiceFactory;
-        private readonly ContextFactory _contextFactory;
+        private readonly OntologyContext _context;
         private readonly IGsmTranscriber _gsmTranscriber;
         private readonly IConfiguration _config;
 
@@ -41,7 +38,7 @@ namespace IIS.Core.Materials
             ILogger<MaterialEventConsumer> logger,
             IConnectionFactory connectionFactory,
             FileServiceFactory fileServiceFactory,
-            ContextFactory contextFactory,
+            OntologyContext context,
             IGsmTranscriber gsmTranscriber,
             IConfiguration config
         )
@@ -49,7 +46,7 @@ namespace IIS.Core.Materials
             _logger = logger;
             _connectionFactory = connectionFactory;
             _fileServiceFactory = fileServiceFactory;
-            _contextFactory = contextFactory;
+            _context = context;
             _gsmTranscriber = gsmTranscriber;
             _config = config;
 
@@ -119,20 +116,17 @@ namespace IIS.Core.Materials
                 else
                 {
                     var data = JObject.Parse("{ 'transcription': '" + mlResponse["transcription"][0][0].Value<string>() + "' }");
-                    using (var context = _contextFactory.CreateContext())
+                    var mi = new MaterialInfoEntity
                     {
-                        var mi = new MaterialInfoEntity
-                        {
-                            Id = Guid.NewGuid(),
-                            Data = data?.ToString(),
-                            MaterialId = eventData.MaterialId,
-                            Source = "ML",
-                            SourceType = "GSM",
-                            SourceVersion = "xz"
-                        };
-                        context.Add(mi);
-                        await context.SaveChangesAsync();
-                    }
+                        Id = Guid.NewGuid(),
+                        Data = data?.ToString(),
+                        MaterialId = eventData.MaterialId,
+                        Source = "ML",
+                        SourceType = "GSM",
+                        SourceVersion = "xz"
+                    };
+                    _context.Add(mi);
+                    await _context.SaveChangesAsync();
                     _channel.BasicAck(ea.DeliveryTag, false);
                     _logger.LogInformation("*************************** JOB DONE **********************************");
                 }

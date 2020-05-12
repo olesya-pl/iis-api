@@ -90,7 +90,8 @@ namespace IIS.Core
             {
                 services.AddDbContext<OntologyContext>(
                     options => options.UseNpgsql(dbConnectionString),
-                    ServiceLifetime.Transient);
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Singleton);
                 using var context = OntologyContext.GetContext(dbConnectionString);
                 context.Database.Migrate();
                 (new FillDataForRoles(context)).Execute();
@@ -134,7 +135,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
             services.AddTransient<Ontology.Seeding.Seeder>();
-            services.AddTransient(e => new ContextFactory(dbConnectionString));
             services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
