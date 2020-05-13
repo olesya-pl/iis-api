@@ -95,7 +95,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                             node.AddNode(r);
                             foreach (var attribute in r.Target.GetChildAttributes())
                             { 
-                                await _changeHistoryService.SaveChange(_rootEntityType.Id, _rootEntityType.Id, _rootNodeId, 
+                                await _changeHistoryService.SaveChange(attribute.Type.Id, _rootEntityType.Id, _rootNodeId,
                                     GetCurrentUserName(), string.Empty, (string)attribute.Value);
                             }
                         }
@@ -113,7 +113,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                             node.RemoveNode(relation);
                             foreach (var attribute in relation.Target.GetChildAttributes())
                             {
-                                await _changeHistoryService.SaveChange(_rootEntityType.Id, _rootEntityType.Id, _rootNodeId,
+                                await _changeHistoryService.SaveChange(attribute.Type.Id, _rootEntityType.Id, _rootNodeId,
                                     GetCurrentUserName(), (string)attribute.Value, string.Empty);
                             }
                         }
@@ -210,7 +210,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 var oldValue = (string)(relation.Target as Attribute).Value;
                 if (oldValue != (string)value)
                 {
-                    await _changeHistoryService.SaveChange(_rootEntityType.Id, _rootEntityType.Id, _rootNodeId, GetCurrentUserName(), oldValue, (string)value);
+                    await _changeHistoryService.SaveChange(relation.Target.Type.Id, _rootEntityType.Id, _rootNodeId, GetCurrentUserName(), oldValue, (string)value);
                 }
             }
         }
@@ -218,7 +218,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private string GetCurrentUserName()
         {
             var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
-            return tokenPayload?.User?.Username;
+            return tokenPayload?.User?.UserName;
         }
     }
 }
