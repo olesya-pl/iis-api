@@ -127,6 +127,7 @@ namespace IIS.Core
             services.AddScoped<ExportService>();
             services.AddScoped<ExportToJsonService>();
             services.AddTransient<RoleService>();
+            services.AddTransient<UserService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
 
@@ -233,17 +234,18 @@ namespace IIS.Core
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var roleLoader = context.Services.GetService<RoleService>();
+                var userService = context.Services.GetService<UserService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
 
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);
-                var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
+
+                var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
 
                 if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
-                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
+                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.UserName}");
                     }
                 }
 

@@ -8,16 +8,15 @@ using Newtonsoft.Json.Linq;
 using Iis.Api.GraphQL.Roles;
 using Iis.Api.Ontology.Migration;
 using IIS.Core.GraphQL.Roles;
+using IIS.Core.GraphQL.Users;
 using IIS.Core.GraphQL.Materials;
 using Iis.DataModel;
 using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
-using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Materials;
 using Iis.Interfaces.Roles;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 
 
@@ -108,9 +107,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
-            CreateMap<UserEntity, Roles.User>();
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
-            CreateMap<Roles.User, IIS.Core.GraphQL.Users.User>();
 
             CreateMap<Iis.Domain.MachineLearning.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
 
@@ -168,9 +165,31 @@ namespace Iis.Api
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
 
+            //mapping: GraphQl.UserInput -> Roles.User
+            CreateMap<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Iis.Roles.Role{ Id = id})));
+            CreateMap<UserCreateInput, Iis.Roles.User>()
+                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+            CreateMap<UserUpdateInput, Iis.Roles.User>()
+                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, opts => opts.Ignore());
+
+            //mapping: Roles.User -> GraphQl.User
+            CreateMap<Iis.Roles.User, User>();
+            
+            //mappring: UserEntity -> Roles.User  
+            CreateMap<UserEntity, Roles.User>()
+                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
+
+            //mapping: Roles.User -> UserEntity
+            CreateMap<Roles.User, UserEntity>();
+
+            CreateMap<UserEntity, UserEntity>()
+                .ForMember(dest => dest.Username, opts => opts.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, sourceValue, targetValue) => sourceValue != null));
             CreateMap<Iis.Domain.Materials.MaterialsCountByType, IIS.Core.GraphQL.Materials.MaterialsCountByType>();
-
-
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

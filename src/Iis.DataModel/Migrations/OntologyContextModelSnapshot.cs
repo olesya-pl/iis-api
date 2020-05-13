@@ -898,8 +898,17 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -907,13 +916,19 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("Patronymic")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserNameActiveDirectory")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Username");
+                    b.HasAlternateKey("UserName");
 
                     b.ToTable("Users");
                 });

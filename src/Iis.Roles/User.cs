@@ -1,19 +1,24 @@
-﻿using Iis.Interfaces.Roles;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
+using System.Collections.Generic;
+
+using Iis.Interfaces.Roles;
 
 namespace Iis.Roles
 {
     public class User
     {
         public Guid Id { get; set; }
-        public string Username { get; set; }
-        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public string Patronymic { get; set; }
+        public string Comment { get; set; }
+        public string UserName { get; set; }
         public string PasswordHash { get; set; }
+        public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
+        public IEnumerable<Role> Roles {get;set;} = new List<Role>();
         public AccessGrantedList AccessGrantedItems { get; set; } = new AccessGrantedList();
         public List<AccessGranted> Tabs => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Tab).ToList();
         public List<AccessGranted> Entities => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Entity).ToList();
