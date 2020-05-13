@@ -18,20 +18,20 @@ namespace IIS.Core.GraphQL.Users
         private IConfiguration _configuration;
         private readonly OntologyContext _context;
         private IMapper _mapper;
-        private RoleService _roleLoader;
+        private UserService _userService;
 
-        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, RoleService roleLoader)
+        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, UserService userService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper;
-            _roleLoader = roleLoader;
+            _userService = userService;
         }
 
         public LoginResponse Login([Required] string username, [Required] string password)
         {
             var hash = _configuration.GetPasswordHashAsBase64String(password);
-            var user = _roleLoader.GetUser(username, hash);
+            var user = _userService.GetUser(username, hash);
 
             if (user == null || user.IsBlocked)
                 throw new InvalidCredentialException($"Wrong username or password");

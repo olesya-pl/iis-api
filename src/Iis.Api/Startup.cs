@@ -90,7 +90,8 @@ namespace IIS.Core
             {
                 services.AddDbContext<OntologyContext>(
                     options => options.UseNpgsql(dbConnectionString),
-                    ServiceLifetime.Transient);
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Singleton);
                 using var context = OntologyContext.GetContext(dbConnectionString);
                 context.Database.Migrate();
                 (new FillDataForRoles(context)).Execute();
@@ -126,6 +127,7 @@ namespace IIS.Core
             services.AddScoped<ExportService>();
             services.AddScoped<ExportToJsonService>();
             services.AddTransient<RoleService>();
+            services.AddTransient<UserService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
 
@@ -134,7 +136,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
             services.AddTransient<Ontology.Seeding.Seeder>();
-            services.AddTransient(e => new ContextFactory(dbConnectionString));
             services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
@@ -234,17 +235,18 @@ namespace IIS.Core
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var roleLoader = context.Services.GetService<RoleService>();
+                var userService = context.Services.GetService<UserService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
 
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);
-                var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
+
+                var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
 
                 if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
-                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
+                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.UserName}");
                     }
                 }
 

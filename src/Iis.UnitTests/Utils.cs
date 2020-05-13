@@ -1,15 +1,17 @@
 ﻿using System.Linq;
+using AutoMapper;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
-using Iis.DataModel;
-using Iis.DataModel.Cache;
-using Iis.Interfaces.Elastic;
-using IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using IIS.Core;
+using Iis.DataModel;
+using Iis.DataModel.Cache;
+using Iis.Interfaces.Elastic;
+using System;
 
 namespace Iis.UnitTests
 {
@@ -48,7 +50,7 @@ namespace Iis.UnitTests
                             .Build());
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddDbContext<OntologyContext>(
-                options => options.UseInMemoryDatabase("db"),
+                options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()),
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
             serviceCollection.AddSingleton(new Mock<IOntologyCache>().Object);

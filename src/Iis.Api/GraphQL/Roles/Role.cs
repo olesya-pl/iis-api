@@ -1,13 +1,14 @@
-﻿using HotChocolate;
-using HotChocolate.Types;
+﻿using System;
 using System.Collections.Generic;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.Roles
 {
     public class Role
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [GraphQLNonNullType]
         public string Name { get; set; }
