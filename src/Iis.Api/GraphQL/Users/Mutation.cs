@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using AutoMapper;
+using Iis.Roles;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -103,5 +104,16 @@ namespace IIS.Core.GraphQL.Users
 
             return mapper.Map<User>(dbUser);
         }
+
+        public async Task<User> AssignRole([Service] RoleService roleSaver,
+            [Service] IMapper mapper,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId,
+            [GraphQLNonNullType] bool isActive)
+        {
+            var user = await roleSaver.AssignRole(userId, roleId, isActive);
+            return mapper.Map<User>(user);
+        }
+
     }
 }

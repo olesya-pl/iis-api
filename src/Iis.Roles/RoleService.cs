@@ -121,5 +121,38 @@ namespace Iis.Roles
             _context.RoleAccess.AddRange(roleAccessEntities);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<User> AssignRole(Guid userId, Guid roleId, bool isActive)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(user => user.Id == userId);
+            if (user == null)
+            {
+                throw new Exception($"User is not found for id = {userId.ToString()}");
+            }
+            var role = await _context.Roles.SingleOrDefaultAsync(role => role.Id == roleId);
+            if (role == null)
+            {
+                throw new Exception($"Role is not found for id = {roleId.ToString()}");
+            }
+
+            var existing = _context.UserRoles?.SingleOrDefault(ur => ur.RoleId == roleId);
+            if (existing == null && isActive)
+            {
+                _context.UserRoles.Add(new UserRoleEntity
+                {
+                    UserId = userId,
+                    RoleId = roleId
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            if (existing != null && !isActive)
+            {
+                _context.UserRoles.Remove(existing);
+                await _context.SaveChangesAsync();
+            }
+
+            return GetUser(userId);
+        }
     }
 }
