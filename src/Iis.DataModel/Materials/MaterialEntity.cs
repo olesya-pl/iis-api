@@ -27,7 +27,8 @@ namespace Iis.DataModel.Materials
         public string Title { get; set; }
         public string LoadData { get; set; }
         public bool IsImportantSession { get; set; }
-        public bool IsProcessed { get; set; }
+        public Guid? ProcessedStatusSignId { get; set; }
+        public MaterialSignEntity ProcessedStatus { get; set; }
         public virtual ICollection<MaterialEntity> Children { get; set; }
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; }
     }

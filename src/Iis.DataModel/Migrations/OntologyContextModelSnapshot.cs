@@ -238,9 +238,6 @@ namespace Iis.DataModel.Migrations
                     b.Property<bool>("IsImportantSession")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsProcessed")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("LoadData")
                         .HasColumnType("text");
 
@@ -248,6 +245,9 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("text");
 
                     b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ProcessedStatusSignId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("RelevanceSignId")
@@ -277,6 +277,8 @@ namespace Iis.DataModel.Migrations
                     b.HasIndex("ImportanceSignId");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("ProcessedStatusSignId");
 
                     b.HasIndex("RelevanceSignId");
 
@@ -1011,6 +1013,10 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.Materials.MaterialEntity", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
+
+                    b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "ProcessedStatus")
+                        .WithMany()
+                        .HasForeignKey("ProcessedStatusSignId");
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Relevance")
                         .WithMany()
