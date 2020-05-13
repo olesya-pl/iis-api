@@ -71,5 +71,87 @@ namespace Iis.UnitTests.UserManagement
             Assert.Single(user.Roles);
             Assert.Equal(roleEntity.Id, user.Roles.FirstOrDefault().Id);
         }
+        [Theory(DisplayName = "Update user with exception Cannot find user with Id"), RecursiveAutoData]
+        public async Task UpdateUser_Exception_CannotFindUser(
+            List<AccessObjectEntity> existingAccesses,
+            RoleEntity roleEntity,
+            UserEntity userEntity)
+        {
+            // arrange:begin
+            var service = _serviceProvider.GetRequiredService<UserService>();
+
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+
+            roleEntity.RoleAccessEntities = new List<RoleAccessEntity>();
+
+            userEntity.UserRoles = null;
+            roleEntity.UserRoles = null;
+            existingAccesses.ForEach(e => e.RoleAccessEntities = null);
+
+            context.Users.Add(userEntity);
+            context.Roles.Add(roleEntity);
+            context.UserRoles.Add(new UserRoleEntity { Id = Guid.NewGuid(), UserId = userEntity.Id, RoleId = roleEntity.Id });
+            context.AccessObjects.AddRange(existingAccesses);
+            context.SaveChanges();
+            foreach (var access in existingAccesses)
+            {
+                context.RoleAccess.Add(new RoleAccessEntity
+                {
+                    AccessObjectId = access.Id,
+                    RoleId = roleEntity.Id
+                });
+            }
+            context.SaveChanges();
+            // arrange: end
+
+            var updatedUser = await service.GetUserAsync(userEntity.Id);
+            
+            updatedUser.Id = Guid.NewGuid();
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateUserAsync(updatedUser));
+
+            Assert.Equal($"Cannot find User with id:'{updatedUser.Id}'.", exception.Message);
+        }
+        [Theory(DisplayName = "Update user with exception new password must not match old"), RecursiveAutoData]
+        public async Task UpdateUser_Exception_NewPasswordIsMatchedOld(
+            List<AccessObjectEntity> existingAccesses,
+            RoleEntity roleEntity,
+            UserEntity userEntity)
+        {
+            // arrange:begin
+            var service = _serviceProvider.GetRequiredService<UserService>();
+
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+
+            roleEntity.RoleAccessEntities = new List<RoleAccessEntity>();
+
+            userEntity.UserRoles = null;
+            roleEntity.UserRoles = null;
+            existingAccesses.ForEach(e => e.RoleAccessEntities = null);
+
+            context.Users.Add(userEntity);
+            context.Roles.Add(roleEntity);
+            context.UserRoles.Add(new UserRoleEntity { Id = Guid.NewGuid(), UserId = userEntity.Id, RoleId = roleEntity.Id });
+            context.AccessObjects.AddRange(existingAccesses);
+            context.SaveChanges();
+            foreach (var access in existingAccesses)
+            {
+                context.RoleAccess.Add(new RoleAccessEntity
+                {
+                    AccessObjectId = access.Id,
+                    RoleId = roleEntity.Id
+                });
+            }
+            context.SaveChanges();
+            // arrange: end
+            var updatedUser = await service.GetUserAsync(userEntity.Id);
+
+            updatedUser.FirstName = "Leonid";
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateUserAsync(updatedUser));
+
+            Assert.Equal("New password must not match old.", exception.Message);
+        }
+
     }
 }

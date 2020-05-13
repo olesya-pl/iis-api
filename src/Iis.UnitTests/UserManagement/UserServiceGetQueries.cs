@@ -52,7 +52,7 @@ namespace Iis.UnitTests.UserManagement
             RoleEntity roleEntity,
             UserEntity userEntity)
         {
-            // arrange:begin
+            // arrange: begin
             var service = _serviceProvider.GetRequiredService<UserService>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
