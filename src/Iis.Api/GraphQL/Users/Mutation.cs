@@ -72,20 +72,20 @@ namespace IIS.Core.GraphQL.Users
             return mapper.Map<User>(dbUser);
         }
 
-        public async Task<User> AssignRole([Service] RoleService roleSaver,
+        public async Task<User> AssignRole([Service] UserService userService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)
         {
-            var user = await roleSaver.AssignRole(userId, roleId);
+            var user = await userService.AssignRole(userId, roleId);
             return mapper.Map<User>(user);
         }
-        public async Task<User> RejectRole([Service] RoleService roleSaver,
+        public async Task<User> RejectRole([Service] UserService userService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)
         {
-            var user = await roleSaver.RejectRole(userId, roleId);
+            var user = await userService.RejectRole(userId, roleId);
             return mapper.Map<User>(user);
         }
     }
