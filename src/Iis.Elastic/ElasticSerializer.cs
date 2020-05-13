@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Linq;
 
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+
 namespace Iis.Elastic
 {
     public class ElasticSerializer : IElasticSerializer
@@ -26,40 +28,38 @@ namespace Iis.Elastic
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
             }
 
-            foreach (var child in extNode.Children)
+            foreach (var childGroup in extNode.Children.GroupBy(p => p.NodeTypeName))
             {
-                var key = GetUniqueKey(json, child.NodeTypeName);
-                if (child.IsAttribute)
+                var key = childGroup.Key;
+                if (childGroup.Count() == 1)
                 {
-                    json[key] = child.AttributeValue;
+                    var child = childGroup.First();
+                    json[key] = GetExtNodeValue(child);
                 }
                 else
                 {
-                    if (child.Children.Count == 1 && child.Children[0].NodeTypeName == "value")
+                    var items = new JArray();
+                    json[key] = items;
+                    foreach (var child in childGroup)
                     {
-                        json[key] = child.Children[0].AttributeValue;
-                    }
-                    else
-                    {
-                        json[key] = GetJsonObjectByExtNode(child, false);
+                        items.Add(GetExtNodeValue(child));
                     }
                 }
             }
 
             return json;
         }
-        private string GetUniqueKey(JObject json, string baseKey)
-        {
-            if (!json.ContainsKey(baseKey)) return baseKey;
-            var n = 1;
-            string key;
-            do
-            {
-                key = $"{baseKey}{n++}";
-            }
-            while (json.ContainsKey(key));
-            return key;
-        }
 
+        private JToken GetExtNodeValue(IExtNode extNode)
+        {
+            if (extNode.IsAttribute)
+            {
+                return extNode.AttributeValue;
+            }
+            else
+            {
+                return GetJsonObjectByExtNode(extNode, false);
+            }
+        }
     }
 }

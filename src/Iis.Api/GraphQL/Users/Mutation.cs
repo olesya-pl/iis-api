@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Configuration;
 using AutoMapper;
+using Iis.Roles;
 using HotChocolate;
 using HotChocolate.Types;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
@@ -69,6 +70,23 @@ namespace IIS.Core.GraphQL.Users
             await context.SaveChangesAsync();
 
             return mapper.Map<User>(dbUser);
+        }
+
+        public async Task<User> AssignRole([Service] UserService userService,
+            [Service] IMapper mapper,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)
+        {
+            var user = await userService.AssignRole(userId, roleId);
+            return mapper.Map<User>(user);
+        }
+        public async Task<User> RejectRole([Service] UserService userService,
+            [Service] IMapper mapper,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)
+        {
+            var user = await userService.RejectRole(userId, roleId);
+            return mapper.Map<User>(user);
         }
     }
 }
