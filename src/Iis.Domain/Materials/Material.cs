@@ -22,6 +22,8 @@ namespace Iis.Domain.Materials
         public Guid? CompletenessSignId => Completeness?.Id;
         public MaterialSign SourceReliability { get; set; }
         public Guid? SourceReliabilitySignId => SourceReliability?.Id;
+        public MaterialSign ProcessedStatus { get; set; }
+        public Guid? ProcessedStatusSignId => ProcessedStatus.Id;
         public List<Material> Children { get; } = new List<Material>();
         public FileInfo File { get; set; }
         public Guid? FileId => File?.Id;

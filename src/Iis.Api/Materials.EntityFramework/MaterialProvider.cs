@@ -158,15 +158,18 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input)
         {
             var material = await GetMaterialAsync(input.Id);
-            if (input.Title != null) material.Title = input.Title;
-            if (input.ImportanceId != null) material.Importance = GetMaterialSign((Guid)input.ImportanceId);
-            if (input.ReliabilityId != null) material.Reliability = GetMaterialSign((Guid)input.ReliabilityId);
-            if (input.RelevanceId != null) material.Relevance = GetMaterialSign((Guid)input.RelevanceId);
-            if (input.CompletenessId != null) material.Completeness = GetMaterialSign((Guid)input.CompletenessId);
-            if (input.SourceReliabilityId != null) material.SourceReliability = GetMaterialSign((Guid)input.SourceReliabilityId);
+
+            if (string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
+            if (input.ImportanceId.HasValue) material.Importance = GetMaterialSign(input.ImportanceId.Value);
+            if (input.ReliabilityId.HasValue) material.Reliability = GetMaterialSign(input.ReliabilityId.Value);
+            if (input.RelevanceId.HasValue) material.Relevance = GetMaterialSign(input.RelevanceId.Value);
+            if (input.CompletenessId.HasValue) material.Completeness = GetMaterialSign(input.CompletenessId.Value);
+            if (input.SourceReliabilityId.HasValue) material.SourceReliability = GetMaterialSign(input.SourceReliabilityId.Value);
+            if (input.ProcessedStatusId.HasValue) material.ProcessedStatus = GetMaterialSign(input.ProcessedStatusId.Value); 
             if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
             if (input.States != null) material.LoadData.States = new List<string>(input.States);
+
             return _mapper.Map<MaterialEntity>(material);
         }
 

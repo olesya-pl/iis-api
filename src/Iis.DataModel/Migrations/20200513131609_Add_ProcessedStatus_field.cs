@@ -12,7 +12,7 @@ namespace IIS.Core.Migrations
                 columns: new[] { "Id", "Name", "Title" },
                 values: new object[,]
                 {
-                    { new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34"), "Processingtatus", "Обробка" },
+                    { new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34"), "ProcessingStatus", "Обробка" },
                 });
 
             migrationBuilder.InsertData(

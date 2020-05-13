@@ -154,6 +154,8 @@ namespace Iis.Api
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Completeness)))
                 .ForMember(dest => dest.SourceReliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SourceReliability)))
+                .ForMember(dest => dest.ProcessedStatus, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.ProcessedStatus)))
                 .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => string.IsNullOrEmpty(src.LoadData) ? new Domain.Materials.MaterialLoadData() : MapLoadData(src.LoadData)));
 
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
