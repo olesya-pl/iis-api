@@ -122,7 +122,7 @@ namespace Iis.Roles
             await _context.SaveChangesAsync();
         }
 
-        public async Task<User> AssignRole(Guid userId, Guid roleId, bool isActive)
+        public async Task<User> AssignRole(Guid userId, Guid roleId)
         {
             var user = await _context.Users.SingleOrDefaultAsync(user => user.Id == userId);
             if (user == null)
@@ -136,7 +136,7 @@ namespace Iis.Roles
             }
 
             var existing = _context.UserRoles?.SingleOrDefault(ur => ur.RoleId == roleId);
-            if (existing == null && isActive)
+            if (existing == null)
             {
                 _context.UserRoles.Add(new UserRoleEntity
                 {
@@ -146,7 +146,25 @@ namespace Iis.Roles
                 await _context.SaveChangesAsync();
             }
 
-            if (existing != null && !isActive)
+            return GetUser(userId);
+        }
+
+        public async Task<User> RejectRole(Guid userId, Guid roleId)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(user => user.Id == userId);
+            if (user == null)
+            {
+                throw new Exception($"User is not found for id = {userId.ToString()}");
+            }
+            var role = await _context.Roles.SingleOrDefaultAsync(role => role.Id == roleId);
+            if (role == null)
+            {
+                throw new Exception($"Role is not found for id = {roleId.ToString()}");
+            }
+
+            var existing = _context.UserRoles?.SingleOrDefault(ur => ur.RoleId == roleId);
+
+            if (existing != null)
             {
                 _context.UserRoles.Remove(existing);
                 await _context.SaveChangesAsync();
