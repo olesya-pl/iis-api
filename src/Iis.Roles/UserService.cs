@@ -14,7 +14,7 @@ namespace Iis.Roles
     {
         private OntologyContext _context;
         private IMapper _mapper;
-        public static User EmptyUser = new User();
+
         public UserService(OntologyContext context, IMapper mapper)
         {
             _context = context;
@@ -146,7 +146,7 @@ namespace Iis.Roles
         }
         private User Map(UserEntity entity)
         {
-            if(entity is null) return EmptyUser;
+            if(entity is null) return null;
 
             var roleEntityList = entity.UserRoles
                                     .Select(ur => ur.Role);
