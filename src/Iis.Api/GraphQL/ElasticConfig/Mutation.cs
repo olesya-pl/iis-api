@@ -2,8 +2,6 @@
 using HotChocolate;
 using Iis.Interfaces.Elastic;
 using IIS.Core.GraphQL.Common;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

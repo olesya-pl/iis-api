@@ -7,6 +7,7 @@ using IIS.Core.Ontology;
 using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
+using Iis.Interfaces.Ontology;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -16,16 +17,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly MutationDeleteResolver _mutationDeleteResolver;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyProvider _ontologyProvider;
-
-        public MutationUpdateResolver(MutationCreateResolver mutationCreateResolver,
-            MutationDeleteResolver mutationDeleteResolver, IOntologyProvider ontologyProvider,
-            IOntologyService ontologyService)
-        {
-            _mutationCreateResolver = mutationCreateResolver;
-            _mutationDeleteResolver = mutationDeleteResolver;
-            _ontologyProvider = ontologyProvider;
-            _ontologyService = ontologyService;
-        }
+        private readonly IChangeHistoryService _changeHistoryService;
+        private readonly IResolverContext _resolverContext;
+        private EntityType _rootEntityType;
+        private Guid _rootNodeId;
 
         public MutationUpdateResolver(IResolverContext ctx)
         {
@@ -33,6 +28,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _mutationDeleteResolver = new MutationDeleteResolver(ctx);
             _ontologyProvider = ctx.Service<IOntologyProvider>();
             _ontologyService = ctx.Service<IOntologyService>();
+            _changeHistoryService = ctx.Service<IChangeHistoryService>();
+            _resolverContext = ctx;
         }
 
         public async Task<Entity> UpdateEntity(IResolverContext ctx, string typeName)
@@ -42,6 +39,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             var ontology = await _ontologyProvider.GetOntologyAsync();
             var type = ontology.GetEntityType(typeName);
+            _rootEntityType = type;
+            _rootNodeId = id;
             return await UpdateEntity(type, id, data);
         }
 
@@ -92,7 +91,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     case "create":
                         var relations = await _mutationCreateResolver.CreateMultipleProperties(embed, v);
                         foreach (var r in relations)
+                        {
                             node.AddNode(r);
+                            foreach (var attribute in r.Target.GetChildAttributes())
+                            { 
+                                await _changeHistoryService.SaveChange(attribute.Type.Id, _rootEntityType.Id, _rootNodeId,
+                                    GetCurrentUserName(), string.Empty, (string)attribute.Value);
+                            }
+                        }
                         break;
                     case "update":
                         foreach (var uv in list)
@@ -105,6 +111,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                             var id = InputExtensions.ParseGuid(dv);
                             var relation = node.GetRelation(embed, id);
                             node.RemoveNode(relation);
+                            foreach (var attribute in relation.Target.GetChildAttributes())
+                            {
+                                await _changeHistoryService.SaveChange(attribute.Type.Id, _rootEntityType.Id, _rootNodeId,
+                                    GetCurrentUserName(), (string)attribute.Value, string.Empty);
+                            }
                         }
 
                         break;
@@ -194,6 +205,20 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 node.RemoveNode(relation);
             if (value != null)
                 node.AddNode(await _mutationCreateResolver.CreateSingleProperty(embed, value));
+            if (relation != null && relation.Target is Attribute)
+            {
+                var oldValue = (string)(relation.Target as Attribute).Value;
+                if (oldValue != (string)value)
+                {
+                    await _changeHistoryService.SaveChange(relation.Target.Type.Id, _rootEntityType.Id, _rootNodeId, GetCurrentUserName(), oldValue, (string)value);
+                }
+            }
+        }
+
+        private string GetCurrentUserName()
+        {
+            var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
+            return tokenPayload?.User?.UserName;
         }
     }
 }

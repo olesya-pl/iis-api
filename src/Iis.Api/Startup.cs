@@ -139,6 +139,7 @@ namespace IIS.Core
             services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
+            services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();

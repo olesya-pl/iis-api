@@ -64,7 +64,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     {
                         ApplyChanges(existing, pair.Left, pair.Right);
                     }
-                }
+                } 
             }
 
             await _context.SaveChangesAsync(cancellationToken);

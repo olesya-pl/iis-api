@@ -3,15 +3,17 @@ using System;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Iis.DataModel.Migrations
+namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20200507094143_ChangeHistory")]
+    partial class ChangeHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,9 +267,6 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid?>("ImportanceSignId")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsImportantSession")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("LoadData")
                         .HasColumnType("text");
 
@@ -275,9 +274,6 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("text");
 
                     b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ProcessedStatusSignId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("RelevanceSignId")
@@ -307,8 +303,6 @@ namespace Iis.DataModel.Migrations
                     b.HasIndex("ImportanceSignId");
 
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("ProcessedStatusSignId");
 
                     b.HasIndex("RelevanceSignId");
 
@@ -936,17 +930,8 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Comment")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -954,19 +939,13 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
-                    b.Property<string>("Patronymic")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserName")
+                    b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserNameActiveDirectory")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("UserName");
+                    b.HasAlternateKey("Username");
 
                     b.ToTable("Users");
                 });
@@ -1043,10 +1022,6 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.Materials.MaterialEntity", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
-
-                    b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "ProcessedStatus")
-                        .WithMany()
-                        .HasForeignKey("ProcessedStatusSignId");
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Relevance")
                         .WithMany()
