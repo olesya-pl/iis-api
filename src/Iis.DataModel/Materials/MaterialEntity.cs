@@ -26,6 +26,8 @@ namespace Iis.DataModel.Materials
         public MaterialSignEntity SourceReliability { get; set; }
         public string Title { get; set; }
         public string LoadData { get; set; }
+        public bool IsImportantSession { get; set; }
+        public bool IsProcessed { get; set; }
         public virtual ICollection<MaterialEntity> Children { get; set; }
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; }
     }
