@@ -228,15 +228,21 @@ namespace Iis.OntologySchema.DataTypes
             {
                 result.Add(Name);
             }
+            var isTopLevel = recursionLevel == 0;
+            if (isTopLevel)
+            {
+                result.AddRange(new[] { "NodeTypeName", "NodeTypeTitle", "CreatedAt", "UpdatedAt" });
+            }
 
             if (recursionLevel == MaxRecursionLevel)
             {
                 return result;
             }
-
             foreach (var relation in OutgoingRelations)
             {
-                string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity ? relation.NodeType.Name : null;
+                string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity
+                    ? relation.NodeType.Name
+                    : null;
                 result.AddRange(relation.TargetType.GetAttributeDotNamesRecursiveWithLimit(relationName, recursionLevel + 1));
             }
 
