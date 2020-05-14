@@ -133,9 +133,10 @@ namespace Iis.Api
             CreateMap<IIisElasticField, IIS.Core.GraphQL.ElasticConfig.ElasticField>();
             CreateMap<Iis.Domain.Materials.Material, Iis.DataModel.Materials.MaterialEntity>()
                 .ForMember(dest => dest.File, opt => opt.Ignore())
-                .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string) null: src.Metadata.ToString(Formatting.None)))
-                .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string) null : src.Data.ToString(Formatting.None)))
-                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null? (string) null : src.LoadData.ToJson()));
+                .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string)null : src.Metadata.ToString(Formatting.None)))
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string)null : src.Data.ToString(Formatting.None)))
+                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null ? (string)null : src.LoadData.ToJson()))
+                .ForMember(dest => dest.IsImportantSession, opt => opt.MapFrom(src => src.IsImportantSession == null ? false : src.IsImportantSession));
 
             CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => {

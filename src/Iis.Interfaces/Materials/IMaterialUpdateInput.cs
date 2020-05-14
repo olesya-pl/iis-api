@@ -16,5 +16,6 @@ namespace Iis.Interfaces.Materials
         IEnumerable<string> States { get; set; }
         IEnumerable<string> Tags { get; set; }
         string Title { get; set; }
+        bool? IsImportantSession { get; set; }
     }
 }
