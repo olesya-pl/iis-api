@@ -23,6 +23,7 @@ namespace IIS.Core.GraphQL.Materials
         public MaterialSign Relevance { get; set; }
         public MaterialSign Completeness { get; set; }
         public MaterialSign SourceReliability { get; set; }
+        public MaterialSign ProcessedStatus {get;set;}
         public IEnumerable<Data > Data { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Transcriptions { get; set; }
