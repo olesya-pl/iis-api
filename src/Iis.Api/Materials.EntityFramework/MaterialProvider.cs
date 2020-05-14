@@ -167,6 +167,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
             if (input.States != null) material.LoadData.States = new List<string>(input.States);
+            if (input.IsImportantSession != null) material.IsImportantSession = input.IsImportantSession;
             return _mapper.Map<MaterialEntity>(material);
         }
 

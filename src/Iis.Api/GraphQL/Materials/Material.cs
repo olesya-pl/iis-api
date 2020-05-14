@@ -40,6 +40,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(JsonScalarType))]
         public JToken Highlight { get; set; }
         public IEnumerable<MaterialFeatureNode> Nodes => Infos.SelectMany(p => p.Features.Select(x => x.Node));
+        public bool? IsImportantSession { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

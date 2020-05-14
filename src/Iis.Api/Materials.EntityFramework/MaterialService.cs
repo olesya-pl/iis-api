@@ -62,7 +62,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (material.ParentId.HasValue && _materialProvider.GetMaterialAsync(material.ParentId.Value) == null)
                 throw new ArgumentException($"Material with guid {material.ParentId.Value} does not exist");
 
-            var materialEntity = Map(material);
+            var materialEntity = _mapper.Map<MaterialEntity>(material);
 
             _context.Add(materialEntity);
 
@@ -163,20 +163,6 @@ namespace IIS.Core.Materials.EntityFramework
             };
 
             _eventProducer.SendMaterialAddedEventAsync(materialAddedEvent);
-        }
-
-        private MaterialEntity Map(Material material)
-        {
-            return new MaterialEntity
-            {
-                Id = material.Id,
-                FileId = material.File?.Id,
-                ParentId = material.ParentId,
-                Metadata = material.Metadata.ToString(),
-                Data = material.Data?.ToString(),
-                Type = material.Type,
-                Source = material.Source,
-            };
         }
 
         private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
