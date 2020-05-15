@@ -3,11 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using AutoMapper;
 
 using Xunit;
-using Iis.Roles;
+using Iis.Domain.Materials;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using IIS.Core.Materials;
 
 namespace Iis.UnitTests.Materials
 {
@@ -30,12 +32,13 @@ namespace Iis.UnitTests.Materials
 
             _serviceProvider.Dispose();
         }
-        [Theory(DisplayName = "Get ProcessedStatus list"), RecursiveAutoData]
-        public async Task GetProcessedStatuses(MaterialSignTypeEntity typeEntity,
+         [Theory(DisplayName = "Set status as Оброблено"), RecursiveAutoData]
+        public async Task SetProcessStatusAsProcessed(MaterialSignTypeEntity typeEntity,
             MaterialSignEntity processed,
-            MaterialSignEntity notProcessed
-        )
+            MaterialSignEntity notProcessed,
+            MaterialEntity materialEntity)
         {
+            //arrange:begin
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
             typeEntity.Name = "ProcessedStatus";
@@ -44,24 +47,73 @@ namespace Iis.UnitTests.Materials
 
             processed.MaterialSignType = null;
             processed.MaterialSignTypeId = typeEntity.Id;
-            processed.Title = "processed";
+            processed.OrderNumber = 1;
+            processed.ShortTitle = "1";
+            processed.Title = "Оброблено";
 
             notProcessed.MaterialSignType = null;
             notProcessed.MaterialSignTypeId = typeEntity.Id;
-            notProcessed.Title = "not" 
+            notProcessed.OrderNumber = 2;
+            notProcessed.ShortTitle = "2";
+            notProcessed.Title = "Не оброблено";
+
+            materialEntity.File = null;
+            materialEntity.FileId = null;
+
+            materialEntity.Data = null;
+            materialEntity.Metadata = null;
+            materialEntity.LoadData = null;
+            materialEntity.MaterialInfos = null;
+
+            materialEntity.Completeness = null;
+            materialEntity.CompletenessSignId = null;
+            
+            materialEntity.Importance = null;
+            materialEntity.ImportanceSignId = null;
+            
+            materialEntity.Relevance = null;
+            materialEntity.RelevanceSignId = null;
+
+            materialEntity.Reliability = null;
+            materialEntity.ReliabilitySignId = null;
+
+            materialEntity.Parent = null;
+            materialEntity.ParentId = null;
+
+            materialEntity.SourceReliability = null;
+            materialEntity.SourceReliabilitySignId = null;
+
+            materialEntity.ProcessedStatus = null;
+            materialEntity.ProcessedStatusSignId = notProcessed.Id;
 
             context.MaterialSignTypes.Add(typeEntity);
             context.MaterialSigns.Add(processed);
             context.MaterialSigns.Add(notProcessed);
+            context.Materials.Add(materialEntity);
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
+
+            var materialProvider = _serviceProvider.GetRequiredService<IMaterialProvider>();
+            var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
+            var mapper = _serviceProvider.GetRequiredService<IMapper>();
+            //arrange:end
+
+            var material = await materialProvider.GetMaterialAsync(materialEntity.Id);
             
+            var entity = mapper.Map<MaterialEntity>(material);
 
+            //assert
+            Assert.Equal(notProcessed.Id, material.ProcessedStatusSignId.Value);
+
+            entity.ProcessedStatus = null;
+            entity.ProcessedStatusSignId = processed.Id;
+
+            await materialService.SaveAsync(entity);
+
+            material = await materialProvider.GetMaterialAsync(materialEntity.Id);
+
+            //assert
+            Assert.Equal(processed.Id, material.ProcessedStatusSignId.Value);
         }
-        // [Theory(DisplayName = "")]
-        // public async Task UodateProcessStatus()
-        // {
-
-        // }
     }
 }
