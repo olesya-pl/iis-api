@@ -32,6 +32,5 @@ namespace Iis.Domain.Materials
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
         public bool? IsImportantSession { get; set; }
-
     }
 }
