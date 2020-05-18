@@ -12,6 +12,8 @@ using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.Interfaces.Elastic;
 using System;
+using IIS.Core.Materials;
+using IIS.Core.Files;
 
 namespace Iis.UnitTests
 {
@@ -53,9 +55,12 @@ namespace Iis.UnitTests
                 options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()),
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
-            serviceCollection.AddSingleton(new Mock<IOntologyCache>().Object);
+            serviceCollection.AddSingleton<IOntologyCache, OntologyCache>();
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
-
+            serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
+            serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
+            serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
+            
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;
         }

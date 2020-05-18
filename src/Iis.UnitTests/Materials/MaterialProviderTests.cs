@@ -11,13 +11,24 @@ using Xunit;
 
 namespace Iis.UnitTests.Materials
 {
-    public class MaterialProviderTests
+    public class MaterialProviderTests : IDisposable
     {
         public readonly ServiceProvider _serviceProvider;
 
         public MaterialProviderTests()
         {
             _serviceProvider = Utils.SetupInMemoryDb();
+        }
+        public void Dispose()
+        {
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            
+            context.MaterialSigns.RemoveRange(context.MaterialSigns);
+            context.MaterialSignTypes.RemoveRange(context.MaterialSignTypes);
+            context.Materials.RemoveRange(context.Materials);
+            context.SaveChanges();
+
+            _serviceProvider.Dispose();
         }
 
         [Theory, RecursiveAutoData]
@@ -121,6 +132,53 @@ namespace Iis.UnitTests.Materials
             Assert.Equal(1, items.First(p => p.Type == "audio").Count);
             Assert.Equal(1, items2.First(p => p.Type == "image").Count);
             Assert.Null(items2.FirstOrDefault(p => p.Type == "audio"));
+        }
+
+        [Theory(DisplayName = "Get ProcessedStatus list"), RecursiveAutoData]
+        public async Task GetProcessedStatuses(MaterialSignTypeEntity typeEntity,
+            MaterialSignEntity processed,
+            MaterialSignEntity notProcessed)
+        {
+            //arrange:begin
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+
+            typeEntity.Name = "ProcessedStatus";
+            typeEntity.Title = "Обробка";
+            typeEntity.MaterialSigns = null;
+
+            processed.MaterialSignType = null;
+            processed.MaterialSignTypeId = typeEntity.Id;
+            processed.OrderNumber = 1;
+            processed.ShortTitle = "1";
+            processed.Title = "Оброблено";
+
+            notProcessed.MaterialSignType = null;
+            notProcessed.MaterialSignTypeId = typeEntity.Id;
+            notProcessed.OrderNumber = 2;
+            notProcessed.ShortTitle = "2";
+            notProcessed.Title = "Не оброблено";
+
+            context.MaterialSignTypes.Add(typeEntity);
+            context.MaterialSigns.Add(processed);
+            context.MaterialSigns.Add(notProcessed);
+
+            await context.SaveChangesAsync();
+
+            var materialProvider = _serviceProvider.GetRequiredService<IMaterialProvider>();
+            //arrange:end
+            
+            //act
+            var result = materialProvider.GetMaterialSigns("ProcessedStatus");
+
+            //assert
+            var expected = new List<(Guid Id, string Name)>
+            {
+                (Id : processed.Id, Name: processed.Title),
+                (Id : notProcessed.Id, Name: notProcessed.Title)
+            };
+
+            Assert.Equal(2, result.Count());
+            Assert.Equal(expected,result.Select(item => (Id: item.Id, Name: item.Title)) );
         }
     }
 }
