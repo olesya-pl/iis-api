@@ -15,6 +15,7 @@ using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
+using Iis.Roles;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -165,7 +166,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.RelevanceId.HasValue) material.Relevance = GetMaterialSign(input.RelevanceId.Value);
             if (input.CompletenessId.HasValue) material.Completeness = GetMaterialSign(input.CompletenessId.Value);
             if (input.SourceReliabilityId.HasValue) material.SourceReliability = GetMaterialSign(input.SourceReliabilityId.Value);
-            if (input.ProcessedStatusId.HasValue) material.ProcessedStatus = GetMaterialSign(input.ProcessedStatusId.Value); 
+            if (input.ProcessedStatusId.HasValue) material.ProcessedStatus = GetMaterialSign(input.ProcessedStatusId.Value);
             if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
             if (input.States != null) material.LoadData.States = new List<string>(input.States);
@@ -182,6 +183,7 @@ namespace IIS.Core.Materials.EntityFramework
             result.Infos.AddRange(await MapInfos(material));
 
             result.Children.AddRange(await MapChildren(material));
+            result.Assignee = _mapper.Map<User>(material.Assignee);
 
             return result;
         }
@@ -312,6 +314,7 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.Children)
                     .Include(m => m.MaterialInfos)
                     .ThenInclude(m => m.MaterialFeatures)
+                    .Include(m => m.Assignee)
                     .AsNoTracking();
         }
 

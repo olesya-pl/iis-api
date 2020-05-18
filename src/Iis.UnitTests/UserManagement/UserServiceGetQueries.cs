@@ -8,6 +8,7 @@ using Xunit;
 using Iis.Roles;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.UnitTests.TestHelpers;
 
 namespace Iis.UnitTests.UserManagement
 {
@@ -83,13 +84,7 @@ namespace Iis.UnitTests.UserManagement
             var user = await service.GetUserAsync(userEntity.Id);
 
             //assert
-            Assert.Equal(userEntity.Id, user.Id);
-            Assert.Equal(userEntity.LastName, user.LastName);
-            Assert.Equal(userEntity.FirstName, user.FirstName);
-            Assert.Equal(userEntity.Patronymic, user.Patronymic);
-            Assert.Equal(userEntity.Username, user.UserName);
-            Assert.Equal(userEntity.PasswordHash, user.PasswordHash);
-            Assert.Equal(userEntity.IsBlocked, user.IsBlocked);
+            UserTestHelper.AssertUserEntityMappedToUserCorrectly(userEntity, user);
             Assert.Single(user.Roles);
             Assert.Equal(roleEntity.Id, user.Roles.FirstOrDefault().Id);
         }

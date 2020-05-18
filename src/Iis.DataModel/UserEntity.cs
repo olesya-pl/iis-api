@@ -1,5 +1,5 @@
+using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
-using System;
 using System.Collections.Generic;
 
 namespace Iis.DataModel
@@ -16,5 +16,6 @@ namespace Iis.DataModel
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public List<UserRoleEntity> UserRoles { get; set; }
+        public List<MaterialEntity> Materials { get; internal set; }
     }
 }

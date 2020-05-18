@@ -54,6 +54,11 @@ namespace Iis.DataModel.Materials
 
             builder.Property(e => e.ParentId).IsRequired(false);
             builder.Property(e => e.FileId).IsRequired(false);
+
+            builder
+                .HasOne(e => e.Assignee)
+                .WithMany(e => e.Materials)
+                .HasForeignKey(e => e.AssigneeId);
         }
     }
 }

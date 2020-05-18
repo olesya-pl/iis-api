@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.UnitTests.TestHelpers;
 using IIS.Core.Materials;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -43,6 +44,30 @@ namespace Iis.UnitTests.Materials
             Assert.Equal(data.Count(p => p.ParentId == null), count);
             Assert.DoesNotContain(items, p => p.ParentId != null);
             Assert.Contains(items, p => p.Id == parentGuid);
+        }
+
+        [Theory, RecursiveAutoData]
+        public async Task GetMaterialsAsync_RerurnsAssignee(MaterialEntity data, UserEntity assignee)
+        {
+            //arrange
+            data.Assignee = assignee;
+            data.AssigneeId = assignee.Id;
+            data.Parent = null;
+            data.ParentId = null;
+            data.Data = data.Metadata = data.LoadData = null;
+            data.MaterialInfos = new List<MaterialInfoEntity>();
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.Materials.AddRange(data);
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<IMaterialProvider>();
+            var (items, _, _) = await sut.GetMaterialsAsync(50, 0, null);
+
+            //assert
+            var material = items.First(p => p.Id == data.Id);
+            Assert.NotNull(material.Assignee);
+            UserTestHelper.AssertUserEntityMappedToUserCorrectly(assignee, material.Assignee);
         }
 
         [Theory, RecursiveAutoData]
