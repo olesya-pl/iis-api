@@ -250,6 +250,9 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("AssigneeId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("CompletenessSignId")
                         .HasColumnType("uuid");
 
@@ -299,6 +302,8 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssigneeId");
 
                     b.HasIndex("CompletenessSignId");
 
@@ -1028,6 +1033,10 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.Materials.MaterialEntity", b =>
                 {
+                    b.HasOne("Iis.DataModel.UserEntity", "Assignee")
+                        .WithMany("Materials")
+                        .HasForeignKey("AssigneeId");
+
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Completeness")
                         .WithMany()
                         .HasForeignKey("CompletenessSignId");

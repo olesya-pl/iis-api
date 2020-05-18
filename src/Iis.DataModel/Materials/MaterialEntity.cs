@@ -31,5 +31,7 @@ namespace Iis.DataModel.Materials
         public MaterialSignEntity ProcessedStatus { get; set; }
         public virtual ICollection<MaterialEntity> Children { get; set; }
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; }
+        public Guid? AssigneeId { get; set; }
+        public virtual UserEntity Assignee { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Iis.Roles;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain.Materials
@@ -32,5 +33,6 @@ namespace Iis.Domain.Materials
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
         public bool? IsImportantSession { get; set; }
+        public User Assignee { get; set; }
     }
 }

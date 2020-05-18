@@ -7,6 +7,7 @@ using HotChocolate.Types;
 using Iis.Interfaces.Materials;
 using IIS.Core.Files;
 using IIS.Core.GraphQL.Scalars;
+using IIS.Core.GraphQL.Users;
 using Newtonsoft.Json.Linq;
 using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 
@@ -42,6 +43,7 @@ namespace IIS.Core.GraphQL.Materials
         public JToken Highlight { get; set; }
         public IEnumerable<MaterialFeatureNode> Nodes => Infos.SelectMany(p => p.Features.Select(x => x.Node));
         public bool? IsImportantSession { get; set; }
+        public User Assignee { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
