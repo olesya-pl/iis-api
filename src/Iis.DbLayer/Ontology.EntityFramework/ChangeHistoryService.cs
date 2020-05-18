@@ -21,21 +21,26 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _schema = schema;
         }
 
-        public async Task SaveChange(Guid typeId, Guid rootTypeId, Guid targetId, string userName, string oldValue, string newValue)
+        public async Task SaveChange(string attributeDotName, Guid targetId, string userName, string oldValue, string newValue)
         {
-            var propertyName = _schema.GetAttributeTypeDotName(typeId, rootTypeId);
             var changeHistoryEntity = new ChangeHistoryEntity
             {
                 Id = Guid.NewGuid(),
                 TargetId = targetId,
                 UserName = userName, 
-                PropertyName = propertyName,
+                PropertyName = attributeDotName,
                 Date = DateTime.Now,
                 OldValue = oldValue,
                 NewValue = newValue
             };
             _context.Add(changeHistoryEntity);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveChange(Guid typeId, Guid rootTypeId, Guid targetId, string userName, string oldValue, string newValue)
+        {
+            var attributeDotName = _schema.GetAttributeTypeDotName(typeId, rootTypeId);
+            await SaveChange(attributeDotName, targetId, userName, oldValue, newValue);
         }
 
         public async Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistory(Guid targetId, string propertyName)
