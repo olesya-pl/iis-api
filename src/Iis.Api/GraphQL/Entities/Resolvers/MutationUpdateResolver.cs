@@ -210,7 +210,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 var oldValue = (string)(relation.Target as Attribute).Value;
                 if (oldValue != (string)value)
                 {
-                    //await _changeHistoryService.SaveChange(relation.Target.Type.Id, _rootEntityType.Id, _rootNodeId, GetCurrentUserName(), oldValue, (string)value);
+                    await _changeHistoryService.SaveChange(relation.Target.Type.Id, _rootEntityType.Id, _rootNodeId, GetCurrentUserName(), oldValue, (string)value);
                 }
             }
         }
