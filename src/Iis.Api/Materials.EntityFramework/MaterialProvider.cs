@@ -156,24 +156,6 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MaterialSign>(materialSignEntity);
         }
 
-        public async Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input)
-        {
-            var material = await GetMaterialAsync(input.Id);
-
-            if (string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
-            if (input.ImportanceId.HasValue) material.Importance = GetMaterialSign(input.ImportanceId.Value);
-            if (input.ReliabilityId.HasValue) material.Reliability = GetMaterialSign(input.ReliabilityId.Value);
-            if (input.RelevanceId.HasValue) material.Relevance = GetMaterialSign(input.RelevanceId.Value);
-            if (input.CompletenessId.HasValue) material.Completeness = GetMaterialSign(input.CompletenessId.Value);
-            if (input.SourceReliabilityId.HasValue) material.SourceReliability = GetMaterialSign(input.SourceReliabilityId.Value);
-            if (input.ProcessedStatusId.HasValue) material.ProcessedStatus = GetMaterialSign(input.ProcessedStatusId.Value);
-            if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
-            if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
-            if (input.States != null) material.LoadData.States = new List<string>(input.States);
-            if (input.IsImportantSession.HasValue) material.IsImportantSession = input.IsImportantSession.Value;
-            return _mapper.Map<MaterialEntity>(material);
-        }
-
         public async Task<Material> MapAsync(MaterialEntity material)
         {
             if (material == null) return null;
