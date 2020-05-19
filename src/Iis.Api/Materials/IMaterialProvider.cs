@@ -25,7 +25,6 @@ namespace IIS.Core.Materials
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(Guid id);
-        Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input);
         Task<Material> MapAsync(MaterialEntity material);
         Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId);
         Task<JObject> GetMaterialDocumentAsync(Guid materialId);
