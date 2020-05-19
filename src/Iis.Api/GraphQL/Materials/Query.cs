@@ -84,6 +84,11 @@ namespace IIS.Core.GraphQL.Materials
             return Task.FromResult(materialProvider.GetMaterialSigns("ProcessedStatus").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
 
+        public Task<IEnumerable<MaterialSignFull>> GetSessionPrioritySigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            return Task.FromResult(materialProvider.GetMaterialSigns("SessionPriority").Select(ms => mapper.Map<MaterialSignFull>(ms)));
+        }
+
         [GraphQLType(typeof(MaterialCollection))]
         public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByNodeId(
            [Service] IMaterialProvider materialProvider,

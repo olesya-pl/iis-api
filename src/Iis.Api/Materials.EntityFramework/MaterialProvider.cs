@@ -167,6 +167,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.CompletenessId.HasValue) material.Completeness = GetMaterialSign(input.CompletenessId.Value);
             if (input.SourceReliabilityId.HasValue) material.SourceReliability = GetMaterialSign(input.SourceReliabilityId.Value);
             if (input.ProcessedStatusId.HasValue) material.ProcessedStatus = GetMaterialSign(input.ProcessedStatusId.Value);
+            if (input.SessionPriorityId.HasValue) material.SessionPriority = GetMaterialSign(input.SessionPriorityId.Value);
             if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
             if (input.States != null) material.LoadData.States = new List<string>(input.States);

@@ -15,6 +15,7 @@ namespace IIS.Core.GraphQL.Materials
         public Guid? CompletenessId { get; set; }
         public Guid? SourceReliabilityId { get; set; }
         public Guid? ProcessedStatusId { get; set; }
+        public Guid? SessionPriorityId { get; set; }
         public IEnumerable<string> Objects { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public IEnumerable<string> States { get; set; }
