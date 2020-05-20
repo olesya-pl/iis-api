@@ -346,5 +346,15 @@ namespace IIS.Core.Materials.EntityFramework
                 })
                 .ToListAsync();
         }
+
+        public async Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId)
+        {
+            var materials = await
+                GetParentMaterialsQuery(GetMaterialQuery()).Where(p => p.AssigneeId == assigneeId)
+                .Select(p => _mapper.Map<Material>(p))
+                .ToListAsync();
+
+            return (materials, materials.Count());
+        }
     }
 }
