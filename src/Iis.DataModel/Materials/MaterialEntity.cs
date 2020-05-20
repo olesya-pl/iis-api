@@ -5,6 +5,15 @@ namespace Iis.DataModel.Materials
 {
     public class MaterialEntity : BaseEntity
     {
+        public static readonly Guid ProcessingStatusSignTypeId
+            = new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34");
+
+        public static readonly Guid ProcessingStatusProcessedSignId
+            = new Guid("c85a76f4-3c04-46f7-aed9-f865243b058e");
+
+        public static readonly Guid ProcessingStatusNotProcessedSignId
+            = new Guid("0a641312-abb7-4b40-a766-0781308eb077");
+
         public Guid? ParentId { get; set; }
         public virtual MaterialEntity Parent { get; set; }
         public Guid? FileId { get; set; }

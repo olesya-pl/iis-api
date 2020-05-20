@@ -1,4 +1,5 @@
 ﻿using System;
+using Iis.DataModel.Materials;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IIS.Core.Migrations
@@ -12,7 +13,7 @@ namespace IIS.Core.Migrations
                 columns: new[] { "Id", "Name", "Title" },
                 values: new object[,]
                 {
-                    { new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34"), "ProcessingStatus", "Обробка" },
+                    { MaterialEntity.ProcessingStatusSignTypeId, "ProcessingStatus", "Обробка" },
                 });
 
             migrationBuilder.InsertData(
@@ -20,8 +21,8 @@ namespace IIS.Core.Migrations
                 columns: new[] { "Id", "MaterialSignTypeId", "OrderNumber", "ShortTitle", "Title" },
                 values: new object[,]
                 {
-                    { new Guid("c85a76f4-3c04-46f7-aed9-f865243b058e"), new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34"), 1, "1", "Оброблено" },
-                    { new Guid("0a641312-abb7-4b40-a766-0781308eb077"), new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34"), 2, "2", "Не оброблено" },
+                    { MaterialEntity.ProcessingStatusProcessedSignId, MaterialEntity.ProcessingStatusSignTypeId, 1, "1", "Оброблено" },
+                    { MaterialEntity.ProcessingStatusNotProcessedSignId, MaterialEntity.ProcessingStatusSignTypeId, 2, "2", "Не оброблено" },
                 });
 
             migrationBuilder.DropColumn(
