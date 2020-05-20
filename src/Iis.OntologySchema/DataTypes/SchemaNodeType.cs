@@ -249,36 +249,6 @@ namespace Iis.OntologySchema.DataTypes
             return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
         }
 
-        private List<string> GetDotNameToRoot(Guid rootTypeId)
-        {
-            foreach (var relation in _incomingRelations)
-            {
-                if (relation._sourceType.Id == rootTypeId)
-                {
-                    return new List<string> { relation._nodeType.Name };
-                }
-                var list = relation._sourceType.GetDotNameToRoot(rootTypeId);
-                if (list.Count > 0)
-                {
-                    list.Add(relation._nodeType.Name);
-                    return list;
-                }
-            }
-            return new List<string>();
-        }
-
-        public string GetAttributeTypeDotName(Guid rootTypeId)
-        {
-            var list = GetDotNameToRoot(rootTypeId);
-            var sb = new StringBuilder();
-            foreach (var item in list)
-            {
-                sb.Append(item + ".");
-            }
-            sb.Remove(sb.Length-1, 1);
-            return sb.ToString();
-        }
-
         internal SchemaRelationType GetRelationByName(string relationName)
         {
             return _outgoingRelations

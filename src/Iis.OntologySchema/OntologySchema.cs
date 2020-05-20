@@ -165,13 +165,5 @@ namespace Iis.OntologySchema
             nodeType._relationType.TargetTypeId = targetTypeId;
             nodeType._relationType._targetType = _storage.NodeTypes[targetTypeId];
         }
-        
-        public string GetAttributeTypeDotName(Guid typeId, Guid rootTypeId)
-        {
-            var type = _storage.GetNodeTypeById(typeId);
-            if (type == null) return "Unknown";
-
-            return type.GetAttributeTypeDotName(rootTypeId);
-        }
     }
 }
