@@ -62,7 +62,7 @@ namespace AcceptanceTests.Steps
             return response.Data;
         }
 
-        private void ProcessGraphQlErrors(GraphQLError[] errors)
+        public void ProcessGraphQlErrors(GraphQLError[] errors)
         {
             var hasUnAuthenticatedCode = errors
                                             .Select(e => e.Extensions)
