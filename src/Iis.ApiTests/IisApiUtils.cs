@@ -1,6 +1,7 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
-using AcceptanceTests.Environment;
+//using AcceptanceTests.Environment;
 using GraphQL;
 using GraphQL.Client.Http;
 using IIS.Core.GraphQL.Users;
@@ -59,6 +60,14 @@ namespace AcceptanceTests.Steps
             graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
             var response = await graphQlClient.SendMutationAsync<MaterialResponse>(request);
             return response.Data;
+        }
+
+        private void ProcessGraphQlErrors(GraphQLError[] errors)
+        {
+            var hasUnAuthenticatedCode = errors
+                                            .Select(e => e.Extensions)
+                                            .SelectMany(ext => ext.Values)
+                                            .Any(value => value.ToString() == "UNAUTHENTICATED");
         }
 
     }

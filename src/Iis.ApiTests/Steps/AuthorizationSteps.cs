@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using AcceptanceTests.Environment;
+//using AcceptanceTests.Environment;
 using GraphQL;
 using GraphQL.Client.Http;
 using IIS.Core.GraphQL.Users;
@@ -62,5 +62,29 @@ namespace AcceptanceTests.Steps
             Assert.NotNull(response.Data.Token);
         }
 
+        [When(@"When I send incorrect login request")]
+        public void WhenWhenISendIncorrectLoginRequest()
+        {
+            var response = context.Get<GraphQLResponse<LoginResponse>>("authResponse");
+            if (response.Errors != null)
+            {
+                ProcessGraphQlErrors(response.Errors);
+            }
+        }
+
+
+        [Then(@"The result should not contain authorization token")]
+        public void ThenTheResultShouldNotContainAuthorizationToken()
+        {
+            var response = context.Get<GraphQLResponse<LoginResponse>>("authResponse");
+            Assert.Equal(response.Data.Token, "Authentication failed!");
+            //Assert.Equal(result.exceptionMessage, "Wrong username or password");
+        }
+
+
     }
 }
+
+
+
+
