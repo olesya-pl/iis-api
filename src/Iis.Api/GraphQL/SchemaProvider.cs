@@ -81,6 +81,7 @@ namespace IIS.Core.GraphQL
                 d.Include<ML.Mutation>();
                 d.Include<NodeMaterialRelation.Mutation>();
                 d.Include<ElasticConfig.Mutation>();
+                d.Include<Themes.Mutation>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
