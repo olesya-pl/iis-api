@@ -10,10 +10,12 @@ using Iis.Api.Ontology.Migration;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Users;
 using IIS.Core.GraphQL.Materials;
+using IIS.Core.GraphQL.Themes;
 using Iis.DataModel;
 using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
+using Iis.DataModel.Themes;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Roles;
 using Iis.Interfaces.Elastic;
@@ -196,7 +198,33 @@ namespace Iis.Api
             CreateMap<UserEntity, UserEntity>()
                 .ForMember(dest => dest.Username, opts => opts.Ignore())
                 .ForAllMembers(opts => opts.Condition((src, dest, sourceValue, targetValue) => sourceValue != null));
+            
             CreateMap<Iis.Domain.Materials.MaterialsCountByType, IIS.Core.GraphQL.Materials.MaterialsCountByType>();
+
+            //theme: graphQl input -> domain
+            CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, Iis.ThemeManagement.Models.Theme>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Query))
+                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Roles.User{ Id = src.UserId.Value }));
+
+            // theme: domain -> entity
+            CreateMap<Iis.ThemeManagement.Models.Theme, ThemeEntity>();
+
+            // theme: entity -> domain
+            CreateMap<ThemeEntity, Iis.ThemeManagement.Models.Theme>();
+
+            //theme: domain -> graphQl
+            CreateMap<Iis.ThemeManagement.Models.Theme, Theme>();
+
+            // themeType: domain -> entity
+            CreateMap<Iis.ThemeManagement.Models.ThemeType, ThemeTypeEntity>();
+
+            // themeType: entity -> domain
+            CreateMap<ThemeTypeEntity, Iis.ThemeManagement.Models.ThemeType>();
+
+            //theme: domain -> graphQl
+            CreateMap<Iis.ThemeManagement.Models.ThemeType, ThemeType>();
+
         }
         private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
         {

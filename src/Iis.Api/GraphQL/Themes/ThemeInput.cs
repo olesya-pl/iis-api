@@ -15,6 +15,6 @@ namespace IIS.Core.GraphQL.Themes
         public Guid? UserId {get;set;}
         [GraphQLNonNullType]
         [Required]
-        public Guid? ThemeTypeId {get;set;}
+        public string EntityTypeName {get;set;}
     }
 }

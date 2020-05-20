@@ -8,64 +8,40 @@ using HotChocolate.Types;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 using IIS.Core.GraphQL.Users;
+using ThemeMng = Iis.ThemeManagement;
 
 namespace IIS.Core.GraphQL.Themes
 {
     public class Mutation
     {
         public async Task<Theme> CreateTheme(
+            [Service] ThemeMng.ThemeService themeService,
+            [Service] IMapper mapper,
             [GraphQLNonNullType] ThemeInput themeInput)
         {
             Validator.ValidateObject(themeInput, new ValidationContext(themeInput), true);
 
-            var user = new User
-            {
-                Id = themeInput.UserId.Value,
-                UserName = "test user"
-            };
-            var materialType = new ThemeType
-            {
-                Id = new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"),
-                ShortTitle = "M",
-                Title = "Матеріал"
-            };
-            var theme = new Theme
-            {
-                Id = Guid.NewGuid(),
-                QueryResults = 122,
-                Title = themeInput.Query,
-                Query = themeInput.Query,
-                User = user,
-                Type = materialType
-            };
+            var theme = mapper.Map<ThemeMng.Models.Theme>(themeInput);
+            
+            var themeType = await themeService.GetThemeTypeByEntityTypeNameAsync(themeInput.EntityTypeName);
+            
+            theme.Type = themeType;
+            
+            var themeId = await themeService.CreateThemeAsync(theme);
 
-            return await Task.FromResult(theme);
+            theme = await themeService.GetThemeAsync(themeId);
+
+            return mapper.Map<Theme>(theme);
         }
 
         public async Task<Theme> DeleteTheme(
+            [Service] ThemeMng.ThemeService themeService,
+            [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                UserName = "test user"
-            };
-            var materialType = new ThemeType
-            {
-                Id = new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"),
-                ShortTitle = "M",
-                Title = "Матеріал"
-            };
-            var theme = new Theme
-            {
-                Id = Guid.NewGuid(),
-                QueryResults = 122,
-                Title = "телефон:1234567",
-                Query = "телефон:1234567",
-                User = user,
-                Type = materialType
-            };
-            return await Task.FromResult(theme);
+            var theme = await themeService.DeleteThemeAsync(id);
+
+            return mapper.Map<Theme>(theme);
         }
     } 
 }

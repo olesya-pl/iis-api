@@ -56,6 +56,7 @@ using Iis.Interfaces.Roles;
 using IIS.Core.NodeMaterialRelation;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DbLayer.Elastic;
+using Iis.ThemeManagement;
 
 namespace IIS.Core
 {
@@ -128,6 +129,7 @@ namespace IIS.Core
             services.AddScoped<ExportToJsonService>();
             services.AddTransient<RoleService>();
             services.AddTransient<UserService>();
+            services.AddTransient<ThemeService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
 
