@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AcceptanceTests.Environment;
 using GraphQL;
 using GraphQL.Client.Http;
+using IIS.Core.GraphQL.Users;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -58,7 +59,7 @@ namespace AcceptanceTests.Steps
         public void ThenTheResultShouldBeStatusCode()
         {
             var response = context.Get<GraphQLResponse<LoginResponse>>("authResponse");
-            Assert.NotNull(response.Data.Login.Token);
+            Assert.NotNull(response.Data.Token);
         }
 
     }

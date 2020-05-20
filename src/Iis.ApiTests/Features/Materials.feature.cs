@@ -114,7 +114,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("Authorized user with login olya and password hammer69", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 6
- testRunner.When("I want to request materials fro page 1 and get 10 materials per page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I want to request materials for page 1 and get 10 materials per page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 7
  testRunner.Then("the result should contain 10 items in the response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

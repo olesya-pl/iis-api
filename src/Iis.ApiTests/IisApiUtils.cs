@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AcceptanceTests.Environment;
 using GraphQL;
 using GraphQL.Client.Http;
+using IIS.Core.GraphQL.Users;
 
 namespace AcceptanceTests.Steps
 {
@@ -31,7 +32,7 @@ namespace AcceptanceTests.Steps
 
             var graphQlClient = new HttpClient().AsGraphQLClient(@"http://192.168.88.70:5000");
             var response = await graphQlClient.SendMutationAsync<LoginResponse>(request);
-            return response.Data.Login.Token;
+            return response.Data.Token;
         }
 
         public async Task<MaterialResponse> GetMaterials(int page, int pageSize, string authToken)

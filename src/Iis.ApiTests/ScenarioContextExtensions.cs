@@ -13,5 +13,15 @@ namespace AcceptanceTests.Steps
         {
             scenarioContext.Add("authToken", token);
         }
+
+        public static T GetResponse<T>(this ScenarioContext scenarioContext, string key)
+        {
+            return scenarioContext.Get<T>(key);
+        }
+
+        public static void SetResponse<T>(this ScenarioContext scenarioContext, string key, T value)
+        {
+            scenarioContext.Add(key, value);
+        }
     }
 }

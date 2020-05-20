@@ -26,16 +26,16 @@ namespace AcceptanceTests.Steps
             context.SetAuthToken(await IisApiUtils.Login(userName, password));
         }
 
-        [When(@"I want to request materials fro page (.*) and get (.*) materials per page")]
+        [When(@"I want to request materials for page (.*) and get (.*) materials per page")]
         public async Task WhenIWantToRequestMaterialsFroPageAndGetMaterialsPerPage(int page, int pageSize)
         {
-            context.Add(context.ScenarioInfo.Title, await IisApiUtils.GetMaterials(page, pageSize, context.GetAuthToken()));
+            context.SetResponse(context.ScenarioInfo.Title, await IisApiUtils.GetMaterials(page, pageSize, context.GetAuthToken()));
         }
 
         [Then(@"the result should contain (.*) items in the response")]
         public void ThenTheResultShouldContainItemsInTheResponse(int itemsCount)
         {
-            var materialResponse = context.Get<MaterialResponse>(context.ScenarioInfo.Title);
+            var materialResponse = context.GetResponse<MaterialResponse>(context.ScenarioInfo.Title);
             materialResponse.Materials.Value<int>("count").Should().BePositive();
             ((JContainer) materialResponse.Materials["items"]).Count.Should().Be(itemsCount);
         }
