@@ -25,11 +25,11 @@ namespace IIS.Core.Materials
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(Guid id);
-        Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input);
         Task<Material> MapAsync(MaterialEntity material);
         Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId);
         Task<JObject> GetMaterialDocumentAsync(Guid materialId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
+        Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
     }
 }

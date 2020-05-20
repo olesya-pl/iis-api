@@ -19,14 +19,15 @@ namespace Iis.DataModel.Materials
         public Guid? RelevanceSignId { get; set; }
         public Guid? CompletenessSignId { get; set; }
         public Guid? SourceReliabilitySignId { get; set; }
+        public Guid? SessionPriorityId { get; set; }
         public MaterialSignEntity Importance { get; set; }
         public MaterialSignEntity Reliability { get; set; }
         public MaterialSignEntity Relevance { get; set; }
         public MaterialSignEntity Completeness { get; set; }
         public MaterialSignEntity SourceReliability { get; set; }
+        public MaterialSignEntity SessionPriority { get; set; }
         public string Title { get; set; }
         public string LoadData { get; set; }
-        public bool IsImportantSession { get; set; }
         public Guid? ProcessedStatusSignId { get; set; }
         public MaterialSignEntity ProcessedStatus { get; set; }
         public virtual ICollection<MaterialEntity> Children { get; set; }

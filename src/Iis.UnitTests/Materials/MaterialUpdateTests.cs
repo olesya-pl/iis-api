@@ -24,7 +24,7 @@ namespace Iis.UnitTests.Materials
         public void Dispose()
         {
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            
+
             context.MaterialSigns.RemoveRange(context.MaterialSigns);
             context.MaterialSignTypes.RemoveRange(context.MaterialSignTypes);
 
@@ -67,10 +67,10 @@ namespace Iis.UnitTests.Materials
 
             materialEntity.Completeness = null;
             materialEntity.CompletenessSignId = null;
-            
+
             materialEntity.Importance = null;
             materialEntity.ImportanceSignId = null;
-            
+
             materialEntity.Relevance = null;
             materialEntity.RelevanceSignId = null;
 
@@ -99,7 +99,7 @@ namespace Iis.UnitTests.Materials
             //arrange:end
 
             var material = await materialProvider.GetMaterialAsync(materialEntity.Id);
-            
+
             var entity = mapper.Map<MaterialEntity>(material);
 
             //assert

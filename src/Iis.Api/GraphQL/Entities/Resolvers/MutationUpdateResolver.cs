@@ -93,10 +93,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                         foreach (var r in relations)
                         {
                             node.AddNode(r);
-                            foreach (var attribute in r.Target.GetChildAttributes())
+                            foreach (var child in r.GetChildAttributes())
                             { 
-                                await _changeHistoryService.SaveChange(attribute.Type.Id, _rootEntityType.Id, _rootNodeId,
-                                    GetCurrentUserName(), string.Empty, (string)attribute.Value);
+                                await _changeHistoryService.SaveChange(child.dotName, _rootNodeId,
+                                    GetCurrentUserName(), string.Empty, (string)child.attribute.Value);
                             }
                         }
                         break;
@@ -111,10 +111,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                             var id = InputExtensions.ParseGuid(dv);
                             var relation = node.GetRelation(embed, id);
                             node.RemoveNode(relation);
-                            foreach (var attribute in relation.Target.GetChildAttributes())
+                            foreach (var child in relation.Target.GetChildAttributes())
                             {
-                                await _changeHistoryService.SaveChange(attribute.Type.Id, _rootEntityType.Id, _rootNodeId,
-                                    GetCurrentUserName(), (string)attribute.Value, string.Empty);
+                                await _changeHistoryService.SaveChange(child.dotName, _rootNodeId,
+                                    GetCurrentUserName(), (string)child.attribute.Value, string.Empty);
                             }
                         }
 

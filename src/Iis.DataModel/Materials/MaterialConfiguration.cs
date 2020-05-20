@@ -48,6 +48,11 @@ namespace Iis.DataModel.Materials
                 .HasForeignKey(e => e.SourceReliabilitySignId);
 
             builder
+                .HasOne(e => e.SessionPriority)
+                .WithMany()
+                .HasForeignKey(e => e.SessionPriorityId);
+
+            builder
                 .HasOne(e => e.ProcessedStatus)
                 .WithMany()
                 .HasForeignKey(e => e.ProcessedStatusSignId);

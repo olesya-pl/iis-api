@@ -135,8 +135,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string)null : src.Metadata.ToString(Formatting.None)))
                 .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string)null : src.Data.ToString(Formatting.None)))
-                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null ? (string)null : src.LoadData.ToJson()))
-                .ForMember(dest => dest.IsImportantSession, opt => opt.MapFrom(src => src.IsImportantSession == null ? false : src.IsImportantSession));
+                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null ? (string)null : src.LoadData.ToJson()));
 
             CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => {
@@ -157,6 +156,8 @@ namespace Iis.Api
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SourceReliability)))
                 .ForMember(dest => dest.ProcessedStatus, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.ProcessedStatus)))
+                .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SessionPriority)))
                 .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => string.IsNullOrEmpty(src.LoadData) ? new Domain.Materials.MaterialLoadData() : MapLoadData(src.LoadData)));
 
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()

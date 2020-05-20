@@ -24,7 +24,7 @@ namespace Iis.Roles
         {
             var entityExists= await _context.Users
                                             .AnyAsync(u => u.Username == newUser.UserName);
-            if (entityExists) 
+            if (entityExists)
             {
                 throw new InvalidOperationException($"User with Username:'{newUser.UserName}' already exists");
             }
@@ -44,7 +44,7 @@ namespace Iis.Roles
                 _context.Add(userEntity);
 
                 _context.AddRange(userRolesEntitiesList);
-                
+
                  await _context.SaveChangesAsync();
 
                 return userEntity.Id;
@@ -54,18 +54,25 @@ namespace Iis.Roles
                 _context.Semaphore.Release();
             }
         }
+
+        public Task<List<User>> GetOperatorsAsync()
+        {
+            return _context.Users.AsNoTracking()
+                .Select(p => _mapper.Map<User>(p))
+                .ToListAsync();
+        }
+
         public async Task<Guid> UpdateUserAsync(User updatedUser)
         {
-            var userEntity = GetUsersQuery()
-                                        .FirstOrDefaultAsync(e => e.Id == updatedUser.Id)
-                                        .GetAwaiter().GetResult();
+            var userEntity = await GetUsersQuery()
+                                        .FirstOrDefaultAsync(e => e.Id == updatedUser.Id);
 
-            if (userEntity is null) 
+            if (userEntity is null)
             {
                 throw new InvalidOperationException($"Cannot find User with id:'{updatedUser.Id}'.");
             }
 
-            if (userEntity.PasswordHash == updatedUser.PasswordHash) 
+            if (userEntity.PasswordHash == updatedUser.PasswordHash)
             {
                 throw new InvalidOperationException($"New password must not match old.");
             }
@@ -119,7 +126,7 @@ namespace Iis.Roles
         {
             var userEntity = GetUsersQuery()
                                     .SingleOrDefault(x => x.Username == userName && x.PasswordHash == passwordHash);
-            
+
             return Map(userEntity);
         }
         public async Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(int offset, int pageSize)
@@ -129,7 +136,7 @@ namespace Iis.Roles
                                     .Take(pageSize)
                                     .AsNoTracking()
                                     .ToListAsync();
-            
+
             var userEntitiesCount = await _context.Users
                                         .CountAsync();
 
@@ -157,7 +164,7 @@ namespace Iis.Roles
             {
                 var accessGrantedList = roleEntity.RoleAccessEntities
                                             .Select(r => _mapper.Map<AccessGranted>(r));
-                
+
                 user.AccessGrantedItems.Merge(accessGrantedList);
             }
 
@@ -165,7 +172,7 @@ namespace Iis.Roles
 
             return user;
         }
-        private UserRoleEntity CreateUserRole(Guid userId, Guid roleId) 
+        private UserRoleEntity CreateUserRole(Guid userId, Guid roleId)
         {
             return new UserRoleEntity
             {
