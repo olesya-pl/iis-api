@@ -22,7 +22,7 @@ namespace Iis.UnitTests.Materials
         public void Dispose()
         {
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            
+
             context.MaterialSigns.RemoveRange(context.MaterialSigns);
             context.MaterialSignTypes.RemoveRange(context.MaterialSignTypes);
             context.Materials.RemoveRange(context.Materials);
@@ -166,7 +166,7 @@ namespace Iis.UnitTests.Materials
 
             var materialProvider = _serviceProvider.GetRequiredService<IMaterialProvider>();
             //arrange:end
-            
+
             //act
             var result = materialProvider.GetMaterialSigns("ProcessedStatus");
 
@@ -179,6 +179,52 @@ namespace Iis.UnitTests.Materials
 
             Assert.Equal(2, result.Count());
             Assert.Equal(expected,result.Select(item => (Id: item.Id, Name: item.Title)) );
+        }
+
+        [Theory, RecursiveAutoData]
+        public async Task GetMaterialsByAssigneeIdAsync_ReturnsMaterials_WithGivenAssignee(
+            List<MaterialEntity> materialsWithIncorrectAssignee,
+            List<MaterialEntity> materialsWithCorrectAssignee,
+            MaterialEntity materialWithCorrectAssigneeAndParent,
+            UserEntity assignee
+        )
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.AddRange(materialsWithIncorrectAssignee);
+            context.Add(assignee);
+
+            foreach (var material in materialsWithCorrectAssignee)
+            {
+                material.Parent = null;
+                material.ParentId = null;
+                material.Assignee = assignee;
+                material.AssigneeId = assignee.Id;
+                material.Data = material.Metadata = material.LoadData = null;
+                material.MaterialInfos = new List<MaterialInfoEntity>();
+            }
+            context.AddRange(materialsWithCorrectAssignee);
+
+            materialWithCorrectAssigneeAndParent.Assignee = assignee;
+            materialWithCorrectAssigneeAndParent.AssigneeId = assignee.Id;
+            materialWithCorrectAssigneeAndParent.Data
+                = materialWithCorrectAssigneeAndParent.Metadata
+                = materialWithCorrectAssigneeAndParent.LoadData = null;
+            materialWithCorrectAssigneeAndParent.MaterialInfos = new List<MaterialInfoEntity>();
+            context.Add(materialWithCorrectAssigneeAndParent);
+
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<IMaterialProvider>();
+            var result = await sut.GetMaterialsByAssigneeIdAsync(assignee.Id);
+
+            //assert
+            Assert.Equal(materialsWithCorrectAssignee.Count, result.Count);
+            foreach (var item in result.Materials)
+            {
+                UserTestHelper.AssertUserEntityMappedToUserCorrectly(assignee, item.Assignee);
+            }
         }
     }
 }

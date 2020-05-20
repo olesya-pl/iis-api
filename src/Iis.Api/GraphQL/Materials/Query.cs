@@ -84,6 +84,11 @@ namespace IIS.Core.GraphQL.Materials
             return Task.FromResult(materialProvider.GetMaterialSigns("ProcessedStatus").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
 
+        public Task<IEnumerable<MaterialSignFull>> GetSessionPrioritySigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            return Task.FromResult(materialProvider.GetMaterialSigns("SessionPriority").Select(ms => mapper.Map<MaterialSignFull>(ms)));
+        }
+
         [GraphQLType(typeof(MaterialCollection))]
         public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByNodeId(
            [Service] IMaterialProvider materialProvider,
@@ -103,6 +108,17 @@ namespace IIS.Core.GraphQL.Materials
         {
             var items = await materialProvider.CountMaterialsByTypeAndNodeAsync(nodeId);
             return mapper.Map<List<MaterialsCountByType>>(items);
+        }
+
+        public async Task<(IEnumerable<Material> materials, int totalCount)> GetMaterialsByAssigneeId(
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            Guid assigneeId)
+        {
+            var materialsResult = await materialProvider.GetMaterialsByAssigneeIdAsync(assigneeId);
+
+            var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+            return (materials, materialsResult.Count);
         }
     }
 }

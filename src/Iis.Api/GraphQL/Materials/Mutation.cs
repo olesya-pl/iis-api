@@ -20,21 +20,26 @@ namespace IIS.Core.GraphQL.Materials
             await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
 
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
-            
+
             return mapper.Map<Material>(material);
         }
 
         public async Task<Material> UpdateMaterial(
-            [Service] IMaterialProvider materialProvider,
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
-            var materialEntity = await materialProvider.UpdateMaterial(input);
-            await materialService.SaveAsync(materialEntity);
+            var material = await materialService.UpdateMaterial(input);
+            return mapper.Map<Material>(material);
+        }
 
-            var materialDomain = await materialProvider.MapAsync(materialEntity);
-            return mapper.Map<Material>(materialDomain);
+        public async Task<Material> AssignMaterialOperator(
+            [Service] IMaterialService materialService,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] AssignMaterialOperatorInput input)
+        {
+            var material = await materialService.AssignMaterialOperator(input.MaterialId, input.AssigneeId);
+            return mapper.Map<Material>(material);
         }
     }
 }
