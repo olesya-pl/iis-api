@@ -937,6 +937,84 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.Themes.ThemeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Query")
+                        .IsRequired()
+                        .HasColumnType("character varying(1024)")
+                        .HasMaxLength(1024);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("character varying(1024)")
+                        .HasMaxLength(1024);
+
+                    b.Property<Guid>("TypeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Themes");
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Themes.ThemeTypeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EntityTypeName")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("ShortTitle")
+                        .IsRequired()
+                        .HasColumnType("character varying(16)")
+                        .HasMaxLength(16);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ThemeTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"),
+                            EntityTypeName = "EntityMaterial",
+                            ShortTitle = "М",
+                            Title = "Матеріал"
+                        },
+                        new
+                        {
+                            Id = new Guid("043ae699-e070-4336-8513-e90c87555c58"),
+                            EntityTypeName = "EntityObject",
+                            ShortTitle = "О",
+                            Title = "Об'єкт"
+                        },
+                        new
+                        {
+                            Id = new Guid("42f61965-8baa-4026-ab33-0378be8a6c3e"),
+                            EntityTypeName = "EntityEvent",
+                            ShortTitle = "П",
+                            Title = "Подія"
+                        });
+                });
+
             modelBuilder.Entity("Iis.DataModel.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1200,6 +1278,21 @@ namespace Iis.DataModel.Migrations
 
                     b.HasOne("Iis.DataModel.UserEntity", "User")
                         .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Themes.ThemeEntity", b =>
+                {
+                    b.HasOne("Iis.DataModel.Themes.ThemeTypeEntity", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Iis.DataModel.UserEntity", "User")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

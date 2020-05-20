@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
-
 using HotChocolate;
 using HotChocolate.Types;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;

@@ -208,7 +208,9 @@ namespace Iis.Api
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Roles.User{ Id = src.UserId.Value }));
 
             // theme: domain -> entity
-            CreateMap<Iis.ThemeManagement.Models.Theme, ThemeEntity>();
+            CreateMap<Iis.ThemeManagement.Models.Theme, ThemeEntity>()
+                .ForMember(dest => dest.User, opts => opts.Ignore())
+                .ForMember(dest => dest.Type, opts => opts.Ignore());
 
             // theme: entity -> domain
             CreateMap<ThemeEntity, Iis.ThemeManagement.Models.Theme>();

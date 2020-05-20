@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 
 using Iis.DataModel;
@@ -25,68 +26,40 @@ namespace Iis.ThemeManagement
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
             
+            _context.Themes.Add(entity);
 
-            return await Task.FromResult(theme.Id);
+            await _context.SaveChangesAsync();
+
+            return entity.Id;
         }
 
         public async Task<Theme> DeleteThemeAsync(Guid themeId)
         {
-           var userEntity = new UserEntity
-           {
-               Id = Guid.NewGuid(),
-               Username = "testUser"
-           };
+            var entity = await GetThemes()
+                            .SingleOrDefaultAsync(e => e.Id == themeId);
+            
+            if(entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
-            var typeEntity = new ThemeTypeEntity
-            {
-                Id = new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"),
-                ShortTitle = "М",
-                Title = "Матеріал",
-                EntityTypeName = "material"
-            };
+            var theme = _mapper.Map<Theme>(entity);
 
-            var entity = new ThemeEntity
-            {
-                Id = themeId,
-                Query = "query field",
-                Title = "title field",
-                TypeId = typeEntity.Id,
-                Type = typeEntity,
-                UserId = userEntity.Id,
-                User = userEntity
-            };
+            entity.Type = null;
+            entity.User = null;
+            
+            _context.Themes.Remove(entity);
 
-            return await Task.FromResult(_mapper.Map<Theme>(entity));
+            await _context.SaveChangesAsync();
+
+            return theme;             
         }
         
         public async Task<Theme> GetThemeAsync(Guid themeId)
         {
-           var userEntity = new UserEntity
-           {
-               Id = Guid.NewGuid(),
-               Username = "testUser"
-           };
+            var entity = await GetThemes()
+                            .SingleOrDefaultAsync(e => e.Id == themeId);
 
-            var typeEntity = new ThemeTypeEntity
-            {
-                Id = new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"),
-                ShortTitle = "М",
-                Title = "Матеріал",
-                EntityTypeName = "material"
-            };
+            if(entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
-            var entity = new ThemeEntity
-            {
-                Id = themeId,
-                Query = "query field",
-                Title = "title field",
-                TypeId = typeEntity.Id,
-                Type = typeEntity,
-                UserId = userEntity.Id,
-                User = userEntity
-            };
-
-            return await Task.FromResult(_mapper.Map<Theme>(entity));
+            return _mapper.Map<Theme>(entity);
         }
 
         public async Task<IEnumerable<Theme>> GetThemesByUserIdAsync(Guid userId)
@@ -96,15 +69,28 @@ namespace Iis.ThemeManagement
 
         public async Task<ThemeType> GetThemeTypeByEntityTypeNameAsync(string entityTypeName)
         {
-            var entity = new ThemeTypeEntity
-            {
-                Id = new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"),
-                ShortTitle = "М",
-                Title = "Матеріал",
-                EntityTypeName = "material"
-            };
+            var entity = await _context.ThemeTypes
+                                    .SingleOrDefaultAsync(e => e.EntityTypeName == entityTypeName);
+            
+            if(entity is null) throw new ArgumentException($"ThemeType does not exist for EntityTypeName = {entityTypeName}");
 
-            return await Task.FromResult(_mapper.Map<ThemeType>(entity));
+            return _mapper.Map<ThemeType>(entity);
+        }
+
+        public async Task<IEnumerable<ThemeType>> GetThemeTypesAsync()
+        {
+            var entities = await _context.ThemeTypes
+                                    .ToListAsync();
+            
+            return _mapper.Map<IEnumerable<ThemeType>>(entities);
+        }
+
+        private IQueryable<ThemeEntity> GetThemes()
+        {
+            return _context.Themes
+                    .Include(e => e.Type)
+                    .Include(e => e.User)
+                    .AsNoTracking();
         }
     }
 }
