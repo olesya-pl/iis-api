@@ -8,14 +8,17 @@ using Newtonsoft.Json.Linq;
 using Iis.Api.GraphQL.Roles;
 using Iis.Api.Ontology.Migration;
 using IIS.Core.GraphQL.Roles;
+using IIS.Core.GraphQL.Users;
 using IIS.Core.GraphQL.Materials;
 using Iis.DataModel;
-using Iis.DataModel.Roles;
+using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
+using Iis.DataModel.Roles;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Roles;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-
+using Iis.Interfaces.Ontology;
 
 namespace Iis.Api
 {
@@ -57,6 +60,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Transcriptions, opts => opts.MapFrom(src => src.Infos.Select(info => info.Data)))
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Infos, opts => opts.MapFrom(src => src.Infos))
+                .ForMember(dest => dest.Highlight, opts => opts.Ignore())
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -103,9 +107,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
-            CreateMap<UserEntity, Roles.User>();
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
-            CreateMap<Roles.User, IIS.Core.GraphQL.Users.User>();
 
             CreateMap<Iis.Domain.MachineLearning.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
 
@@ -123,14 +125,93 @@ namespace Iis.Api
                 .ForMember(dest => dest.HandlerName, opts => opts.MapFrom(src => src.MLHandlerName));
 
             CreateMap<Iis.Domain.MachineLearning.MlResponse, IIS.Core.GraphQL.ML.MachineLearningResult>();
-            
+
             CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
 
+            CreateMap<IIisElasticField, ElasticFieldEntity>();
+            CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();
+            CreateMap<IIisElasticField, IIS.Core.GraphQL.ElasticConfig.ElasticField>();
             CreateMap<Iis.Domain.Materials.Material, Iis.DataModel.Materials.MaterialEntity>()
                 .ForMember(dest => dest.File, opt => opt.Ignore())
-                .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string) null: src.Metadata.ToString(Formatting.None)))
-                .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string) null : src.Data.ToString(Formatting.None)))
-                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null? (string) null : src.LoadData.ToJson()));
+                .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string)null : src.Metadata.ToString(Formatting.None)))
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string)null : src.Data.ToString(Formatting.None)))
+                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null ? (string)null : src.LoadData.ToJson()))
+                .ForMember(dest => dest.IsImportantSession, opt => opt.MapFrom(src => src.IsImportantSession == null ? false : src.IsImportantSession));
+
+            CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.File, opts => {
+                    opts.PreCondition(src => (src.FileId.HasValue));
+                    opts.MapFrom(src => new FileInfo(src.FileId.Value));
+                })
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.Parse(src.Data)))
+                .ForMember(dest => dest.Importance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Importance)))
+                .ForMember(dest => dest.Reliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Reliability)))
+                .ForMember(dest => dest.Relevance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Relevance)))
+                .ForMember(dest => dest.Completeness, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.Completeness)))
+                .ForMember(dest => dest.SourceReliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SourceReliability)))
+                .ForMember(dest => dest.ProcessedStatus, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.ProcessedStatus)))
+                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => string.IsNullOrEmpty(src.LoadData) ? new Domain.Materials.MaterialLoadData() : MapLoadData(src.LoadData)));
+
+            CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.Type, opts => opts.MapFrom(src => src.Metadata.Type))
+                .ForMember(dest => dest.Source, opts => opts.MapFrom(src => src.Metadata.Source))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
+                .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+
+            CreateMap<IChangeHistoryItem, Iis.DataModel.ChangeHistory.ChangeHistoryEntity>();
+            CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
+
+            //mapping: GraphQl.UserInput -> Roles.User
+            CreateMap<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Iis.Roles.Role{ Id = id})));
+            CreateMap<UserCreateInput, Iis.Roles.User>()
+                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+            CreateMap<UserUpdateInput, Iis.Roles.User>()
+                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, opts => opts.Ignore());
+
+            //mapping: Roles.User -> GraphQl.User
+            CreateMap<Iis.Roles.User, User>();
+            
+            //mappring: UserEntity -> Roles.User  
+            CreateMap<UserEntity, Roles.User>()
+                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
+
+            //mapping: Roles.User -> UserEntity
+            CreateMap<Roles.User, UserEntity>();
+
+            CreateMap<UserEntity, UserEntity>()
+                .ForMember(dest => dest.Username, opts => opts.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, sourceValue, targetValue) => sourceValue != null));
+            CreateMap<Iis.Domain.Materials.MaterialsCountByType, IIS.Core.GraphQL.Materials.MaterialsCountByType>();
+        }
+        private Domain.Materials.MaterialLoadData MapLoadData(string loadData)
+        {
+            var result = new Domain.Materials.MaterialLoadData();
+            var json = JObject.Parse(loadData);
+
+            if (json.ContainsKey("from")) result.From = (string)json["from"];
+            if (json.ContainsKey("code")) result.Code = (string)json["code"];
+            if (json.ContainsKey("coordinates")) result.Coordinates = (string)json["coordinates"];
+            if (json.ContainsKey("loadedBy")) result.LoadedBy = (string)json["loadedBy"];
+            if (json.ContainsKey("receivingDate")) result.ReceivingDate = (DateTime?)json["receivingDate"];
+            if (json.ContainsKey("objects")) result.Objects = json["objects"].Value<JArray>().ToObject<List<string>>();
+            if (json.ContainsKey("tags")) result.Tags = json["tags"].Value<JArray>().ToObject<List<string>>();
+            if (json.ContainsKey("states")) result.States = json["states"].Value<JArray>().ToObject<List<string>>();
+
+            return result;
         }
     }
 }

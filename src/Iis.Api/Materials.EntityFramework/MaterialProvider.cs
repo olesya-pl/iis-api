@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using AutoMapper;
 
-
 using Iis.Utility;
 using Iis.Domain;
 using Iis.Domain.Materials;
@@ -16,7 +15,7 @@ using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-using Microsoft.Extensions.DependencyInjection;
+using Iis.Roles;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -41,14 +40,17 @@ namespace IIS.Core.Materials.EntityFramework
             _mapper = mapper;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsAsync(int limit, int offset, string filterQuery,
+        public async Task<(
+            IEnumerable<Material> Materials,
+            int Count,
+            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(int limit, int offset, string filterQuery,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
         {
             await _context.Semaphore.WaitAsync();
 
             try
             {
-                IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery();
+                IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery(GetMaterialQuery());
                 IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
@@ -56,21 +58,22 @@ namespace IIS.Core.Materials.EntityFramework
                 {
                     if (!_elasticService.UseElastic)
                     {
-                        return (new List<Material>(), 0);
+                        return (new List<Material>(), 0, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
                     }
 
-                    var searchResult = await _elasticService.SearchByAllFieldsAsync(
+                    var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
                         _elasticService.MaterialIndexes,
                         new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
 
+                    var foundIds = searchResult.Items.Keys.ToList();
                     mappingTasks =  (await materialsQuery
-                                        .Where(e => searchResult.ids.Contains(e.Id))
+                                        .Where(e => foundIds.Contains(e.Id))
                                         .ToArrayAsync())
                                             .Select(async entity => await MapAsync(entity));
 
                     materials = await Task.WhenAll(mappingTasks);
 
-                    return (materials, searchResult.count);
+                    return (materials, searchResult.Count, searchResult.Items);
                 }
 
                 if (nodeIds == null)
@@ -99,7 +102,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 var materialsCount = await materialsCountQuery.CountAsync();
 
-                return (materials, materialsCount);
+                return (materials, materialsCount, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
             }
             finally
             {
@@ -156,15 +159,18 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<MaterialEntity> UpdateMaterial(IMaterialUpdateInput input)
         {
             var material = await GetMaterialAsync(input.Id);
-            if (input.Title != null) material.Title = input.Title;
-            if (input.ImportanceId != null) material.Importance = GetMaterialSign((Guid)input.ImportanceId);
-            if (input.ReliabilityId != null) material.Reliability = GetMaterialSign((Guid)input.ReliabilityId);
-            if (input.RelevanceId != null) material.Relevance = GetMaterialSign((Guid)input.RelevanceId);
-            if (input.CompletenessId != null) material.Completeness = GetMaterialSign((Guid)input.CompletenessId);
-            if (input.SourceReliabilityId != null) material.SourceReliability = GetMaterialSign((Guid)input.SourceReliabilityId);
+
+            if (string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
+            if (input.ImportanceId.HasValue) material.Importance = GetMaterialSign(input.ImportanceId.Value);
+            if (input.ReliabilityId.HasValue) material.Reliability = GetMaterialSign(input.ReliabilityId.Value);
+            if (input.RelevanceId.HasValue) material.Relevance = GetMaterialSign(input.RelevanceId.Value);
+            if (input.CompletenessId.HasValue) material.Completeness = GetMaterialSign(input.CompletenessId.Value);
+            if (input.SourceReliabilityId.HasValue) material.SourceReliability = GetMaterialSign(input.SourceReliabilityId.Value);
+            if (input.ProcessedStatusId.HasValue) material.ProcessedStatus = GetMaterialSign(input.ProcessedStatusId.Value);
             if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
             if (input.States != null) material.LoadData.States = new List<string>(input.States);
+            if (input.IsImportantSession.HasValue) material.IsImportantSession = input.IsImportantSession.Value;
             return _mapper.Map<MaterialEntity>(material);
         }
 
@@ -172,27 +178,13 @@ namespace IIS.Core.Materials.EntityFramework
         {
             if (material == null) return null;
 
-            var result = new Material(material.Id,
-                JObject.Parse(material.Metadata),
-                material.Data == null ? null : JArray.Parse(material.Data),
-                material.Type, material.Source);
-            result.Title = material.Title;
-            result.ParentId = material.ParentId;
-            if (material.FileId.HasValue)
-                result.File = new FileInfo(material.FileId.Value);
-
-            result.LoadData = string.IsNullOrEmpty(material.LoadData) ?
-                new MaterialLoadData() :
-                MapLoadData(material.LoadData);
-
-            result.Importance = MapSign(material.Importance);
-            result.Reliability = MapSign(material.Reliability);
-            result.Relevance = MapSign(material.Relevance);
-            result.Completeness = MapSign(material.Completeness);
-            result.SourceReliability = MapSign(material.SourceReliability);
+            var result = _mapper.Map<Material>(material);
 
             result.Infos.AddRange(await MapInfos(material));
+
             result.Children.AddRange(await MapChildren(material));
+            result.Assignee = _mapper.Map<User>(material.Assignee);
+
             return result;
         }
 
@@ -218,7 +210,7 @@ namespace IIS.Core.Materials.EntityFramework
             var materialTask = GetMaterialAsync(materialId);
 
             var mLResponsesTask = GetMlProcessingResultsAsync(materialId);
-            
+
             await Task.WhenAll(materialTask, mLResponsesTask);
 
             var material = await materialTask;
@@ -242,33 +234,37 @@ namespace IIS.Core.Materials.EntityFramework
 
             if (!(material.Data is null) && material.Data.HasValues)
             {
+                var materialData = new JObject();
                 material.Data
                     .Select(token => new JProperty(token.Value<string>("Type"), token.Value<string>("Text")))
                     .Select(property =>
                     {
-                        jDocument.Add(property);
+                        materialData.Add(property);
                         return property;
                     })
                     .ToList();
+                jDocument.Add(new JProperty(nameof(Material.Data), materialData));
             }
 
             if (!(material.LoadData is null))
             {
-                jDocument.Merge(JObject.Parse(material.LoadData.ToJson()));
+                jDocument.Add(new JProperty(nameof(Material.LoadData), JObject.Parse(material.LoadData.ToJson())));
             }
 
             if(mLResponses.Any())
             {
+                var mlResponses = new JObject();
+                jDocument.Add(new JProperty(nameof(mlResponses), mlResponses));
                 foreach (var response in mLResponses)
                 {
                     var handlerName = response.MlHandlerName.ToLowerCamelCase().RemoveWhiteSpace();
 
                     var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
 
-                    jDocument.Add(new JProperty(propertyName, response.ResponseText));
+                    mlResponses.Add(new JProperty(propertyName, response.ResponseText));
                 }
             }
-            
+
 
             return jDocument;
         }
@@ -277,24 +273,31 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Task<Material>> mappingTasks;
             IEnumerable<Material> materials;
 
-            var q = _context.Materials
-                .Join(_context.MaterialInfos, u => u.Id, uir => uir.MaterialId, (u, uir) => new { u, uir })
-                .Join(_context.MaterialFeatures, r => r.uir.Id, ro => ro.MaterialInfoId, (r, ro) => new { r, ro })
-                .Where(m => m.ro.NodeId == nodeId)
-                .Select(m => m.r.u);
+            IQueryable<MaterialEntity> materialsByNode = GetMaterialByNodeIdQuery(nodeId);
 
-            mappingTasks = (await q
-                                   .ToArrayAsync())
-                                        .Select(async entity => await MapAsync(entity));
+            mappingTasks = (await materialsByNode
+                                 .ToArrayAsync())
+                                 .Select(async e => await MapAsync(await GetMaterialEntityAsync(e.Id)));
 
             materials = await Task.WhenAll(mappingTasks);
 
             return (materials, materials.Count());
         }
 
-        private IQueryable<MaterialEntity> GetParentMaterialsQuery()
+        private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
         {
-            return GetMaterialQuery()
+            return _context.Materials
+                            .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                                (Material, MaterialInfo) => new { Material, MaterialInfo })
+                            .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                                (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                            .Where(m => m.MaterialFeature.NodeId == nodeId)
+                            .Select(m => m.MaterialInfoJoined.Material);
+        }
+
+        private IQueryable<MaterialEntity> GetParentMaterialsQuery(IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery
                     .Where(p => p.ParentId == null);
         }
 
@@ -307,12 +310,14 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.Relevance)
                     .Include(m => m.Completeness)
                     .Include(m => m.SourceReliability)
+                    .Include(m => m.ProcessedStatus)
                     .Include(m => m.Children)
                     .Include(m => m.MaterialInfos)
                     .ThenInclude(m => m.MaterialFeatures)
+                    .Include(m => m.Assignee)
                     .AsNoTracking();
         }
-        
+
         private async Task<Material[]> MapChildren(MaterialEntity material)
         {
             var mapChildrenTasks = new List<Task<Material>>();
@@ -333,28 +338,6 @@ namespace IIS.Core.Materials.EntityFramework
             return await Task.WhenAll(mapInfoTasks);
         }
 
-        private MaterialSign MapSign(MaterialSignEntity sign)
-        {
-            return _mapper.Map<MaterialSign>(sign);
-        }
-
-        private MaterialLoadData MapLoadData(string loadData)
-        {
-            var result = new MaterialLoadData();
-            var json = JObject.Parse(loadData);
-
-            if (json.ContainsKey("from")) result.From = (string)json["from"];
-            if (json.ContainsKey("code")) result.Code = (string)json["code"];
-            if (json.ContainsKey("coordinates")) result.Coordinates = (string)json["coordinates"];
-            if (json.ContainsKey("loadedBy")) result.LoadedBy = (string)json["loadedBy"];
-            if (json.ContainsKey("receivingDate")) result.ReceivingDate = (DateTime?)json["receivingDate"];
-            if (json.ContainsKey("objects")) result.Objects = json["objects"].Value<JArray>().ToObject<List<string>>();
-            if (json.ContainsKey("tags")) result.Tags = json["tags"].Value<JArray>().ToObject<List<string>>();
-            if (json.ContainsKey("states")) result.States = json["states"].Value<JArray>().ToObject<List<string>>();
-
-            return result;
-        }
-
         private async Task<MaterialInfo> MapAsync(MaterialInfoEntity info)
         {
             var result = new MaterialInfo(info.Id, JObject.Parse(info.Data), info.Source, info.SourceType, info.SourceVersion);
@@ -368,6 +351,18 @@ namespace IIS.Core.Materials.EntityFramework
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
             result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
             return result;
+        }
+
+        public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
+        {
+            return GetParentMaterialsQuery(GetMaterialByNodeIdQuery(nodeId))
+                .GroupBy(p => p.Type)
+                .Select(group => new MaterialsCountByType
+                {
+                    Count = group.Count(),
+                    Type = group.Key
+                })
+                .ToListAsync();
         }
     }
 }

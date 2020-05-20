@@ -7,6 +7,7 @@ using HotChocolate.Types;
 using Iis.Interfaces.Materials;
 using IIS.Core.Files;
 using IIS.Core.GraphQL.Scalars;
+using IIS.Core.GraphQL.Users;
 using Newtonsoft.Json.Linq;
 using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 
@@ -23,6 +24,7 @@ namespace IIS.Core.GraphQL.Materials
         public MaterialSign Relevance { get; set; }
         public MaterialSign Completeness { get; set; }
         public MaterialSign SourceReliability { get; set; }
+        public MaterialSign ProcessedStatus {get;set;}
         public IEnumerable<Data > Data { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Transcriptions { get; set; }
@@ -37,7 +39,11 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> States { get; set; } = new List<string>();
         public IEnumerable<Material> Children { get; set; } = new List<Material>();
         public IEnumerable<MaterialInfo> Infos { get; set; } = new List<MaterialInfo>();
+        [GraphQLType(typeof(JsonScalarType))]
+        public JToken Highlight { get; set; }
         public IEnumerable<MaterialFeatureNode> Nodes => Infos.SelectMany(p => p.Features.Select(x => x.Node));
+        public bool? IsImportantSession { get; set; }
+        public User Assignee { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

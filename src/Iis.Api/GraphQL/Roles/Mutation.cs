@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
-using Iis.Api.GraphQL.Roles;
-using Iis.Roles;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+
+using Iis.Roles;
+using Iis.Api.GraphQL.Roles;
+
 
 namespace IIS.Core.GraphQL.Roles
 {

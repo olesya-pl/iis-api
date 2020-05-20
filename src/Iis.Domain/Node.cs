@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Iis.Domain
 {
@@ -64,6 +65,38 @@ namespace Iis.Domain
         public override string ToString()
         {
             return $"Instance of type {Type.Name} with ID: {Id}.";
+        }
+
+        public List<(Attribute attribute, string dotName)> GetChildAttributes()
+        {
+            var result = new List<(Attribute, string)>();
+            if (this is Attribute)
+            {
+                result.Add((this as Attribute, null));
+            }
+            foreach (var relation in Nodes)
+            {
+                var children = relation.GetChildAttributes();
+                foreach (var child in children)
+                {
+                    var sb = new StringBuilder();
+                    if (this.Type is RelationType)
+                    {
+                        sb.Append(this.Type.Name);
+                    }
+
+                    if (child.dotName != null)
+                    {
+                        if (sb.Length > 0)
+                        {
+                            sb.Append(".");
+                        }
+                        sb.Append(child.dotName);
+                    }
+                    result.Add((child.attribute, sb.ToString()));
+                }
+            }
+            return result;
         }
     }
 }

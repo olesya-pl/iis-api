@@ -135,24 +135,62 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("AttributeTypes");
                 });
 
-            modelBuilder.Entity("Iis.DataModel.MLResponseEntity", b =>
+            modelBuilder.Entity("Iis.DataModel.ChangeHistory.ChangeHistoryEntity", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("MLHandlerName")
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("NewValue")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("MaterialId")
+                    b.Property<string>("OldValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PropertyName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TargetId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("OriginalResponse")
+                    b.Property<string>("UserName")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MLResponses");
+                    b.HasIndex("TargetId");
+
+                    b.ToTable("ChangeHistory");
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Elastic.ElasticFieldEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Boost")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Fuzziness")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsExcluded")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ObjectType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TypeName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ElasticFields");
                 });
 
             modelBuilder.Entity("Iis.DataModel.Materials.FileEntity", b =>
@@ -186,10 +224,33 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("Files");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.Materials.MLResponseEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MLHandlerName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OriginalResponse")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MLResponses");
+                });
+
             modelBuilder.Entity("Iis.DataModel.Materials.MaterialEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AssigneeId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("CompletenessSignId")
@@ -207,6 +268,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid?>("ImportanceSignId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsImportantSession")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LoadData")
                         .HasColumnType("text");
 
@@ -214,6 +278,9 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("text");
 
                     b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ProcessedStatusSignId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("RelevanceSignId")
@@ -236,6 +303,8 @@ namespace Iis.DataModel.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssigneeId");
+
                     b.HasIndex("CompletenessSignId");
 
                     b.HasIndex("FileId");
@@ -243,6 +312,8 @@ namespace Iis.DataModel.Migrations
                     b.HasIndex("ImportanceSignId");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("ProcessedStatusSignId");
 
                     b.HasIndex("RelevanceSignId");
 
@@ -870,8 +941,17 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -879,13 +959,19 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("Patronymic")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserNameActiveDirectory")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Username");
+                    b.HasAlternateKey("UserName");
 
                     b.ToTable("Users");
                 });
@@ -947,6 +1033,10 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.Materials.MaterialEntity", b =>
                 {
+                    b.HasOne("Iis.DataModel.UserEntity", "Assignee")
+                        .WithMany("Materials")
+                        .HasForeignKey("AssigneeId");
+
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Completeness")
                         .WithMany()
                         .HasForeignKey("CompletenessSignId");
@@ -962,6 +1052,10 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.Materials.MaterialEntity", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
+
+                    b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "ProcessedStatus")
+                        .WithMany()
+                        .HasForeignKey("ProcessedStatusSignId");
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Relevance")
                         .WithMany()

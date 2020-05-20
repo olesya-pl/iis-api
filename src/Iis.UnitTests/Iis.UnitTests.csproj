@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Api\Iis.Api.csproj" />
+    <ProjectReference Include="..\Iis.Roles\Iis.Roles.csproj" />
   </ItemGroup>
 
 </Project>

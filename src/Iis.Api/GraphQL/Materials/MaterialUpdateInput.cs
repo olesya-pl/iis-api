@@ -1,8 +1,7 @@
-﻿using Iis.Interfaces.Materials;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using Iis.Interfaces.Materials;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -15,8 +14,10 @@ namespace IIS.Core.GraphQL.Materials
         public Guid? RelevanceId { get; set; }
         public Guid? CompletenessId { get; set; }
         public Guid? SourceReliabilityId { get; set; }
+        public Guid? ProcessedStatusId { get; set; }
         public IEnumerable<string> Objects { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public IEnumerable<string> States { get; set; }
+        public bool? IsImportantSession { get; set; }
     }
 }

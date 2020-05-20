@@ -16,13 +16,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class OntologyProvider : BaseOntologyProvider, IOntologyProvider
     {
-        private readonly ContextFactory _contextFactory;
+        private readonly OntologyContext _context;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private OntologyModel _ontology;
 
-        public OntologyProvider(ContextFactory contextFactory)
+        public OntologyProvider(OntologyContext contextFactory)
         {
-            _contextFactory = contextFactory;
+            _context = contextFactory;
         }
 
         public async Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
@@ -49,21 +49,18 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     if (_ontology != null) return _ontology;
 
                     // Query primary source and update the cache
-                    using (var context = _contextFactory.CreateContext())
-                    {
-                        var types = context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                            .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
-                            .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
-                            .Include(e => e.AttributeType)
-                            .ToArray();
-                        var result = types.Select(e => MapType(e)).ToList();
-                        var relationTypes = _types.Values.Where(e => e is RelationType);
-                        // todo: refactor
-                        result.AddRange(relationTypes);
+                    var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
+                        .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
+                        .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
+                        .Include(e => e.AttributeType)
+                        .ToArray();
+                    var result = types.Select(e => MapType(e)).ToList();
+                    var relationTypes = _types.Values.Where(e => e is RelationType);
+                    // todo: refactor
+                    result.AddRange(relationTypes);
 
-                        _ontology = new OntologyModel(result);
-                        _types.Clear();
-                    }
+                    _ontology = new OntologyModel(result);
+                    _types.Clear();
 
                     return _ontology;
                 }

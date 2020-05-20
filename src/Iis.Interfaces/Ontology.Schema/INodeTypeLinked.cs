@@ -31,5 +31,7 @@ namespace Iis.Interfaces.Ontology.Schema
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
+        List<string> GetAttributeDotNamesRecursive(string parentName = null);
+        List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0);
     }
 }

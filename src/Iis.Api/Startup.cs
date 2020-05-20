@@ -54,6 +54,8 @@ using Iis.Roles;
 using Iis.Api.GraphQL.Access;
 using Iis.Interfaces.Roles;
 using IIS.Core.NodeMaterialRelation;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.DbLayer.Elastic;
 
 namespace IIS.Core
 {
@@ -88,11 +90,25 @@ namespace IIS.Core
             {
                 services.AddDbContext<OntologyContext>(
                     options => options.UseNpgsql(dbConnectionString),
-                    ServiceLifetime.Transient);
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Singleton);
                 using var context = OntologyContext.GetContext(dbConnectionString);
                 context.Database.Migrate();
                 (new FillDataForRoles(context)).Execute();
-                services.AddSingleton<IOntologyCache>(new OntologyCache(context));
+                var ontologyCache = new OntologyCache(context);
+                services.AddSingleton<IOntologyCache>(ontologyCache);
+
+                var schemaSource = new OntologySchemaSource
+                {
+                    Title = "DB",
+                    SourceKind = SchemaSourceKind.Database,
+                    Data = dbConnectionString
+                };
+                var ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                services.AddSingleton(ontologySchema);
+                var iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
+                iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
+                services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
             }
 
             services.AddHttpContextAccessor();
@@ -111,6 +127,7 @@ namespace IIS.Core
             services.AddScoped<ExportService>();
             services.AddScoped<ExportToJsonService>();
             services.AddTransient<RoleService>();
+            services.AddTransient<UserService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
 
@@ -119,10 +136,10 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
             services.AddTransient<Ontology.Seeding.Seeder>();
-            services.AddTransient(e => new ContextFactory(dbConnectionString));
             services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
+            services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
@@ -189,7 +206,9 @@ namespace IIS.Core
 
             services.AddSingleton<IElasticManager, ElasticManager>();
             services.AddSingleton<IElasticSerializer, ElasticSerializer>();
+            services.AddTransient<SearchResultExtractor>();
             services.AddSingleton(elasticConfiguration);
+            services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
@@ -216,17 +235,18 @@ namespace IIS.Core
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var roleLoader = context.Services.GetService<RoleService>();
+                var userService = context.Services.GetService<UserService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
 
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);
-                var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
+
+                var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
 
                 if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
-                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
+                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.UserName}");
                     }
                 }
 
@@ -241,6 +261,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
+            PopulateEntityFieldsCache(app);
 
             app.UseCors(builder =>
                 builder
@@ -260,6 +281,30 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void PopulateEntityFieldsCache(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                var serviceProvider = serviceScope.ServiceProvider;
+                var ontologyProvider = serviceProvider.GetRequiredService<IOntologyProvider>();
+                var ontology = ontologyProvider.GetOntologyAsync().GetAwaiter().GetResult();
+                var types = ontology.EntityTypes.Where(p => p.Name == "ObjectOfStudy");
+                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                    .Concat(types).Distinct().ToArray();
+
+                var ontologySchema = serviceProvider.GetRequiredService<IOntologySchema>();
+                var cache = serviceProvider.GetRequiredService<IOntologyCache>();
+
+                foreach (var type in derivedTypes)
+                {
+                    var nodeType = ontologySchema.GetEntityTypeByName(type.Name);
+                    cache.PutFieldNamesByNodeType(type.Name, nodeType.GetAttributeDotNamesRecursiveWithLimit());
+                }
+            }
         }
 
         private void UpdateDatabase(IApplicationBuilder app)

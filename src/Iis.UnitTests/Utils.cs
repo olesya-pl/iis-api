@@ -1,14 +1,19 @@
 ﻿using System.Linq;
+using AutoMapper;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
-using Iis.DataModel;
-using Iis.DataModel.Cache;
-using IIS.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using IIS.Core;
+using Iis.DataModel;
+using Iis.DataModel.Cache;
+using Iis.Interfaces.Elastic;
+using System;
+using IIS.Core.Materials;
+using IIS.Core.Files;
 
 namespace Iis.UnitTests
 {
@@ -47,11 +52,15 @@ namespace Iis.UnitTests
                             .Build());
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddDbContext<OntologyContext>(
-                options => options.UseInMemoryDatabase("db"),
+                options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()),
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
-            serviceCollection.AddSingleton<IOntologyCache>(new Mock<IOntologyCache>().Object);
-
+            serviceCollection.AddSingleton<IOntologyCache, OntologyCache>();
+            serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
+            serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
+            serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
+            serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
+            
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;
         }

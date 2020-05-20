@@ -8,5 +8,7 @@ namespace Iis.DataModel.Cache
     {
         IReadOnlyCollection<MaterialSignEntity> MaterialSigns { get; }
         MaterialSignEntity GetMaterialSign(Guid id);
+        void PutFieldNamesByNodeType(string typeName, IReadOnlyCollection<string> fieldNames);
+        IReadOnlyCollection<string> GetFieldNamesByNodeType(string typeName);
     }
 }

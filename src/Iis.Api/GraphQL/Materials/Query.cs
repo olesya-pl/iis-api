@@ -7,6 +7,7 @@ using HotChocolate;
 using IIS.Core.Materials;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -27,8 +28,20 @@ namespace IIS.Core.GraphQL.Materials
             var materialsResult = await materialProvider.GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+            MapHighlights(materials, materialsResult.Highlights);
 
             return (materials, materialsResult.Count);
+        }
+
+        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchByConfiguredFieldsResultItem> materialsResult)
+        {
+            foreach (var material in materials)
+            {
+                if (materialsResult.ContainsKey(material.Id))
+                {
+                    material.Highlight = materialsResult[material.Id].Highlight;
+                }
+            }
         }
 
         public async Task<Material> GetMaterial(
@@ -66,6 +79,11 @@ namespace IIS.Core.GraphQL.Materials
             return Task.FromResult(materialProvider.GetMaterialSigns("SourceReliability").Select(ms => mapper.Map<MaterialSignFull>(ms)));
         }
 
+        public Task<IEnumerable<MaterialSignFull>> GetProcessedStatusSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
+        {
+            return Task.FromResult(materialProvider.GetMaterialSigns("ProcessedStatus").Select(ms => mapper.Map<MaterialSignFull>(ms)));
+        }
+
         [GraphQLType(typeof(MaterialCollection))]
         public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByNodeId(
            [Service] IMaterialProvider materialProvider,
@@ -76,6 +94,15 @@ namespace IIS.Core.GraphQL.Materials
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             return (materials, materialsResult.Count);
+        }
+
+        public async Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            Guid nodeId)
+        {
+            var items = await materialProvider.CountMaterialsByTypeAndNodeAsync(nodeId);
+            return mapper.Map<List<MaterialsCountByType>>(items);
         }
     }
 }
