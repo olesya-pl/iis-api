@@ -9,12 +9,15 @@ namespace IIS.Core.GraphQL.Themes
     {
         [GraphQLNonNullType]
         [Required]
-        public string Query {get;set;}
+        public string Title { get; set; }
         [GraphQLNonNullType]
         [Required]
-        public Guid? UserId {get;set;}
+        public string Query { get; set; }
         [GraphQLNonNullType]
         [Required]
-        public string EntityTypeName {get;set;}
+        public Guid? UserId { get; set; }
+        [GraphQLNonNullType]
+        [Required]
+        public string EntityTypeName { get; set; }
     }
 }

@@ -204,7 +204,6 @@ namespace Iis.Api
             //theme: graphQl input -> domain
             CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, Iis.ThemeManagement.Models.Theme>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Query))
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Roles.User{ Id = src.UserId.Value }));
 
             // theme: domain -> entity

@@ -64,7 +64,11 @@ namespace Iis.ThemeManagement
 
         public async Task<IEnumerable<Theme>> GetThemesByUserIdAsync(Guid userId)
         {
-            return await Task.FromResult<IEnumerable<Theme>>(null);
+            var entities = await GetThemes()
+                                    .Where(e => e.UserId == userId)
+                                    .ToListAsync();
+
+            return _mapper.Map<IEnumerable<Theme>>(entities);
         }
 
         public async Task<ThemeType> GetThemeTypeByEntityTypeNameAsync(string entityTypeName)
@@ -80,7 +84,7 @@ namespace Iis.ThemeManagement
         public async Task<IEnumerable<ThemeType>> GetThemeTypesAsync()
         {
             var entities = await _context.ThemeTypes
-                                    .ToListAsync();
+                                            .ToListAsync();
             
             return _mapper.Map<IEnumerable<ThemeType>>(entities);
         }

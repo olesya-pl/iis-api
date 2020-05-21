@@ -6,7 +6,6 @@ using HotChocolate;
 using HotChocolate.Types;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
-using IIS.Core.GraphQL.Users;
 using ThemeMng = Iis.ThemeManagement;
 
 namespace IIS.Core.GraphQL.Themes
