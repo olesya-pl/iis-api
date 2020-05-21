@@ -31,7 +31,6 @@ namespace IIS.Core.GraphQL.Materials
         public DateTime? CreationDate { get; set; }
         public IEnumerable<DateTime> ModificationDates { get; set; }
         public string Coordinates { get; set; }
-        public bool? IsImportantSession { get; set; }
 
     }
 

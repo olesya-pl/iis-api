@@ -37,12 +37,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await _context.SaveChangesAsync();
         }
 
-        public async Task SaveChange(Guid typeId, Guid rootTypeId, Guid targetId, string userName, string oldValue, string newValue)
-        {
-            var attributeDotName = _schema.GetAttributeTypeDotName(typeId, rootTypeId);
-            await SaveChange(attributeDotName, targetId, userName, oldValue, newValue);
-        }
-
         public async Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistory(Guid targetId, string propertyName)
         {
             var query = _context.ChangeHistory.Where(ch => ch.TargetId == targetId);

@@ -7,6 +7,7 @@ using AutoMapper;
 
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.DataModel.Materials;
 
 namespace Iis.Roles
 {
@@ -55,10 +56,33 @@ namespace Iis.Roles
             }
         }
 
+        private IQueryable<UserEntity> GetOperatorsQuery()
+        {
+            return _context.Users.AsNoTracking();
+        }
+
         public Task<List<User>> GetOperatorsAsync()
         {
-            return _context.Users.AsNoTracking()
+            return GetOperatorsQuery()
                 .Select(p => _mapper.Map<User>(p))
+                .ToListAsync();
+        }
+
+        public Task<List<Guid>> GetAvailableOperatorIdsAsync()
+        {
+            const int MaxMaterialsCount = 10;
+
+            var unavailableOperators = _context.Materials
+                .AsNoTracking()
+                .Where(p => p.ProcessedStatusSignId == null
+                    || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                .GroupBy(p => p.AssigneeId)
+                .Where(group => group.Count() >= MaxMaterialsCount)
+                .Select(group => group.Key);
+
+            return GetOperatorsQuery()
+                .Select(p => p.Id)
+                .Where(p => !unavailableOperators.Contains(p))
                 .ToListAsync();
         }
 

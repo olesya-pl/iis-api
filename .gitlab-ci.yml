@@ -71,6 +71,14 @@ unit_test:
     name: dev_contour
     url: http://contour-dev-01.contour.net
 
+.deploy_contour_dev2:
+  extends: .deploy
+  variables:
+    DEPLOYMENT_FILE: dev2_con.yml
+  environment:
+    name: dev2_contour
+    url: http://dev2.contour.net
+
 .deploy_od_dev:
   extends: .deploy
   variables:
@@ -94,6 +102,10 @@ deploy_od_dev:
 
 deploy_contour_dev_manual:
   extends: .deploy_contour_dev
+  when: manual
+
+deploy_contour_dev2_manual:
+  extends: .deploy_contour_dev2
   when: manual
 
 deploy_od_dev_manual:

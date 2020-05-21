@@ -10,6 +10,7 @@ using Iis.Domain.Materials;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using IIS.Core.Materials;
+using IIS.Core.GraphQL.Materials;
 
 namespace Iis.UnitTests.Materials
 {
@@ -32,7 +33,44 @@ namespace Iis.UnitTests.Materials
 
             _serviceProvider.Dispose();
         }
-         [Theory(DisplayName = "Set status as Оброблено"), RecursiveAutoData]
+
+        [Theory, RecursiveAutoData]
+        public async Task UpdateAssigneeId(
+            MaterialEntity material,
+            UserEntity assignee)
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.Add(assignee);
+            context.Add(material);
+            material.Data = material.Metadata = material.LoadData = null;
+            material.MaterialInfos = new List<MaterialInfoEntity>();
+            context.SaveChanges();
+
+            material.AssigneeId = assignee.Id;
+            material.Assignee = null;
+            material.File = null;
+            //act
+            var sut = _serviceProvider.GetRequiredService<IMaterialService>();
+            await sut.UpdateMaterial(new MaterialUpdateInput
+            {
+                AssigneeId = material.AssigneeId,
+                CompletenessId = material.CompletenessSignId,
+                Id = material.Id,
+                ImportanceId = material.ImportanceSignId,
+                RelevanceId = material.RelevanceSignId,
+                ReliabilityId = material.ReliabilitySignId,
+                SessionPriorityId = material.SessionPriorityId,
+                SourceReliabilityId = material.SourceReliabilitySignId,
+                Title = material.Title
+            });
+
+            //assert
+            var res = context.Materials.First(p => p.Id == material.Id);
+            Assert.Equal(assignee.Id, res.AssigneeId);
+        }
+
+        [Theory(DisplayName = "Set status as Оброблено"), RecursiveAutoData]
         public async Task SetProcessStatusAsProcessed(MaterialSignTypeEntity typeEntity,
             MaterialSignEntity processed,
             MaterialSignEntity notProcessed,
@@ -95,20 +133,29 @@ namespace Iis.UnitTests.Materials
 
             var materialProvider = _serviceProvider.GetRequiredService<IMaterialProvider>();
             var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
-            var mapper = _serviceProvider.GetRequiredService<IMapper>();
             //arrange:end
 
             var material = await materialProvider.GetMaterialAsync(materialEntity.Id);
 
-            var entity = mapper.Map<MaterialEntity>(material);
-
             //assert
             Assert.Equal(notProcessed.Id, material.ProcessedStatusSignId.Value);
 
-            entity.ProcessedStatus = null;
-            entity.ProcessedStatusSignId = processed.Id;
-
-            await materialService.SaveAsync(entity);
+            await materialService.UpdateMaterial(new MaterialUpdateInput
+            {
+                AssigneeId = material.AssigneeId,
+                CompletenessId = material.CompletenessSignId,
+                Id = material.Id,
+                ImportanceId = material.ImportanceSignId,
+                Objects = material.LoadData.Objects,
+                ProcessedStatusId = processed.Id,
+                RelevanceId = material.RelevanceSignId,
+                ReliabilityId = material.ReliabilitySignId,
+                SessionPriorityId = material.SessionPriorityId,
+                SourceReliabilityId = material.SourceReliabilitySignId,
+                States = material.LoadData.States,
+                Tags = material.LoadData.Tags,
+                Title = material.Title
+            });
 
             material = await materialProvider.GetMaterialAsync(materialEntity.Id);
 
