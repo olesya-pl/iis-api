@@ -112,24 +112,26 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<Material> UpdateMaterial(IMaterialUpdateInput input)
         {
-            var material = await _materialProvider.GetMaterialAsync(input.Id);
+            var material = _context.Materials.FirstOrDefault(p => p.Id == input.Id);
 
             if (string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
-            if (input.ImportanceId.HasValue) material.Importance = _materialProvider.GetMaterialSign(input.ImportanceId.Value);
-            if (input.ReliabilityId.HasValue) material.Reliability = _materialProvider.GetMaterialSign(input.ReliabilityId.Value);
-            if (input.RelevanceId.HasValue) material.Relevance = _materialProvider.GetMaterialSign(input.RelevanceId.Value);
-            if (input.CompletenessId.HasValue) material.Completeness = _materialProvider.GetMaterialSign(input.CompletenessId.Value);
-            if (input.SourceReliabilityId.HasValue) material.SourceReliability = _materialProvider.GetMaterialSign(input.SourceReliabilityId.Value);
-            if (input.ProcessedStatusId.HasValue) material.ProcessedStatus = _materialProvider.GetMaterialSign(input.ProcessedStatusId.Value);
-            if (input.SessionPriorityId.HasValue) material.SessionPriority = _materialProvider.GetMaterialSign(input.SessionPriorityId.Value);
-            if (input.Objects != null) material.LoadData.Objects = new List<string>(input.Objects);
-            if (input.Tags != null) material.LoadData.Tags = new List<string>(input.Tags);
-            if (input.States != null) material.LoadData.States = new List<string>(input.States);
-            if (input.IsImportantSession.HasValue) material.IsImportantSession = input.IsImportantSession.Value;
+            if (input.ImportanceId.HasValue) material.ImportanceSignId = input.ImportanceId.Value;
+            if (input.ReliabilityId.HasValue) material.ReliabilitySignId = input.ReliabilityId.Value;
+            if (input.RelevanceId.HasValue) material.RelevanceSignId = input.RelevanceId.Value;
+            if (input.CompletenessId.HasValue) material.CompletenessSignId = input.CompletenessId.Value;
+            if (input.SourceReliabilityId.HasValue) material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
+            if (input.ProcessedStatusId.HasValue) material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
+            if (input.SessionPriorityId.HasValue) material.SessionPriorityId = input.SessionPriorityId.Value;
+            var loadData = new MaterialLoadData();
+            if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
+            if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
+            if (input.States != null) loadData.States = new List<string>(input.States);
+            material.LoadData = loadData.ToJson();
+            material.AssigneeId = input.AssigneeId;
 
-            await SaveAsync(material);
+            await UpdateAsync(material);
 
-            return material;
+            return await _materialProvider.GetMaterialAsync(input.Id);
         }
 
         private async Task<bool> PutMaterialToElasticSearch(Guid materialId)
@@ -193,7 +195,7 @@ namespace IIS.Core.Materials.EntityFramework
             return await _materialProvider.GetMaterialAsync(materialId);
         }
 
-        public async Task SaveAsync(MaterialEntity material)
+        public async Task UpdateAsync(MaterialEntity material)
         {
             await _context.Semaphore.WaitAsync();
             try

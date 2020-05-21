@@ -34,7 +34,7 @@ namespace Iis.Domain.Materials
         public DateTime CreatedDate { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
-        public bool? IsImportantSession { get; set; }
         public User Assignee { get; set; }
+        public Guid? AssigneeId { get; set; }
     }
 }
