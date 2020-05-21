@@ -236,7 +236,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var child in children)
             {
                 await _changeHistoryService.SaveChange(child.dotName, _rootNodeId,
-                    GetCurrentUserName(), string.Empty, (string)child.attribute.Value);
+                    GetCurrentUserName(), string.Empty, child.attribute.Value?.ToString());
             }
         }
 
