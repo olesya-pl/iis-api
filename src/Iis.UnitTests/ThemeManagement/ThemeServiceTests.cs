@@ -1,0 +1,100 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+using Iis.DataModel;
+using Iis.DataModel.Themes;
+
+using Iis.ThemeManagement;
+using Iis.ThemeManagement.Models;
+
+namespace Iis.UnitTests.ThemeManagement
+{
+    public class ThemeServiceTests : IDisposable
+    {
+        private readonly ServiceProvider _serviceProvider;
+
+        public ThemeServiceTests()
+        {
+            _serviceProvider = Utils.SetupInMemoryDb();
+        }
+        public void Dispose()
+        {
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            
+            context.ThemeTypes.RemoveRange(context.ThemeTypes);
+            context.Themes.RemoveRange(context.Themes);
+            context.SaveChanges();
+
+            _serviceProvider.Dispose();
+        }
+
+        [Theory(DisplayName = "Get ThemeType list"), RecursiveAutoData]
+        public async Task GetThemeTypes(
+            ThemeTypeEntity themeType1,
+            ThemeTypeEntity themeType2,
+            ThemeTypeEntity themeType3)
+        {
+            //arrange: begin
+            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+
+            context.ThemeTypes.Add(themeType1);
+            context.ThemeTypes.Add(themeType2);
+            context.ThemeTypes.Add(themeType3);
+
+            context.SaveChanges();
+            var themeTypeIds = new List<Guid>
+            {
+                themeType1.Id,
+                themeType2.Id,
+                themeType3.Id,
+            };
+            //arrange: end
+
+            var themeTypesList = await service.GetThemeTypesAsync();
+
+            Assert.Equal(3, themeTypesList.Count());
+            Assert.Equal(themeTypeIds, themeTypesList.Select(e => e.Id));
+        }
+
+        [Theory(DisplayName = "Create Theme"), RecursiveAutoData]
+        public async Task CreateTheme(
+            Theme theme)
+        {
+            //arrange: begin
+            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            //arrange: end
+
+            var themeId = await service.CreateThemeAsync(theme);
+
+            Assert.Equal(theme.Id, themeId);
+        }
+
+        [Theory(DisplayName = "Delete Theme"), RecursiveAutoData]
+        public async Task DeleteTheme(
+            ThemeEntity themeEntity)
+        {
+            //arrange: begin
+            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            
+            context.Themes.Add(themeEntity);
+            context.SaveChanges();
+            
+            //arrange: end
+            var theme = await service.DeleteThemeAsync(themeEntity.Id);
+
+            Assert.Equal(themeEntity.Id, theme.Id);
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.GetThemeAsync(themeEntity.Id));
+
+            Assert.Equal($"Theme does not exist for id = {themeEntity.Id}", exception.Message);
+        }
+    }
+}
