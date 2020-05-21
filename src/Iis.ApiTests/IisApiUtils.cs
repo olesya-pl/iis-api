@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 //using AcceptanceTests.Environment;
 using GraphQL;
 using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 using IIS.Core.GraphQL.Users;
 
 namespace AcceptanceTests.Steps
@@ -31,9 +32,9 @@ namespace AcceptanceTests.Steps
                 }
             };
 
-            var graphQlClient = new HttpClient().AsGraphQLClient(@"http://192.168.88.70:5000");
-            var response = await graphQlClient.SendMutationAsync<LoginResponse>(request);
-            return response.Data.Token;
+            var graphQlClient = GraphQLHttpClientFactory.CreateGraphQLHttpClient();
+            var response = await graphQlClient.SendMutationAsync<GraphQlResponseWrapper<LoginResponse>>(request);
+            return response.Data.Login.Token;
         }
 
         public async Task<MaterialResponse> GetMaterials(int page, int pageSize, string authToken)
@@ -56,7 +57,7 @@ namespace AcceptanceTests.Steps
                 }"
             };
 
-            var graphQlClient = new HttpClient().AsGraphQLClient(@"http://192.168.88.70:5000");
+            var graphQlClient = GraphQLHttpClientFactory.CreateGraphQLHttpClient();
             graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
             var response = await graphQlClient.SendMutationAsync<MaterialResponse>(request);
             return response.Data;
