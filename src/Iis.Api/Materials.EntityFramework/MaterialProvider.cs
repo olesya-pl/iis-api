@@ -16,6 +16,7 @@ using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using Iis.Roles;
+using Newtonsoft.Json;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -206,6 +207,7 @@ namespace IIS.Core.Materials.EntityFramework
                 new JProperty(nameof(Material.Relevance).ToLower(), material.Relevance?.Title),
                 new JProperty(nameof(Material.Completeness).ToLower(), material.Completeness?.Title),
                 new JProperty(nameof(Material.SourceReliability).ToLower(), material.SourceReliability?.Title),
+                new JProperty(nameof(Material.ProcessedStatus).ToLower(), material.ProcessedStatus?.Title),
                 new JProperty(nameof(Material.Id).ToLower(), material.Id.ToString("N"))
             );
 
@@ -233,7 +235,7 @@ namespace IIS.Core.Materials.EntityFramework
                 jDocument.Add(new JProperty(nameof(Material.LoadData), JObject.Parse(material.LoadData.ToJson())));
             }
 
-            if(mLResponses.Any())
+            if (mLResponses.Any())
             {
                 var mlResponses = new JObject();
                 jDocument.Add(new JProperty(nameof(mlResponses), mlResponses));
@@ -245,6 +247,13 @@ namespace IIS.Core.Materials.EntityFramework
 
                     mlResponses.Add(new JProperty(propertyName, response.ResponseText));
                 }
+            }
+
+            if (material.Assignee != null)
+            {
+                jDocument.Add(
+                    new JProperty(nameof(Material.Assignee),
+                    JObject.Parse(JsonConvert.SerializeObject(material.Assignee))));
             }
 
 
