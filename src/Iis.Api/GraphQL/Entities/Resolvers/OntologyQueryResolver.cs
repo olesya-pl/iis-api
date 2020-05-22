@@ -53,7 +53,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             IEnumerable<Guid> ids = new List<Guid>();
 
-            if (filter != null && filter.MatchList.Any())
+            if (filter != null && filter.MatchList?.Any() == true)
             {
                 ids = filter.MatchList;
             }
