@@ -128,7 +128,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
             if (input.States != null) loadData.States = new List<string>(input.States);
             material.LoadData = loadData.ToJson();
-            material.AssigneeId = input.AssigneeId;
+            if (input.AssigneeId != null) material.AssigneeId = input.AssigneeId;
 
             await UpdateAsync(material);
 
