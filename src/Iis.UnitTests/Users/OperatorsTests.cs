@@ -102,5 +102,32 @@ namespace Iis.UnitTests.Users
             Assert.DoesNotContain(operator2.Id, result);
             Assert.Contains(operator1.Id, result);
         }
+
+        [Theory, RecursiveAutoData]
+        public async Task GetAvailableOperators_NoMaterialsAssigned_ReturnsAllUsers(
+            List<UserEntity> operators,
+            List<MaterialEntity> materials)
+        {
+            //arrange
+            foreach (var material in materials)
+            {
+                material.Assignee = null;
+                material.AssigneeId = null;
+                material.ProcessedStatusSignId = null;
+                material.ProcessedStatus = null;
+            }
+
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.AddRange(operators);
+            context.AddRange(materials);
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<UserService>();
+            var result = await sut.GetAvailableOperatorIdsAsync();
+
+            //assert
+            Assert.Equal(operators.Count, result.Count);
+        }
     }
 }

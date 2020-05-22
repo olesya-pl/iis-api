@@ -12,6 +12,6 @@ namespace IIS.Core.Materials
         Task SaveAsync(Material material, IEnumerable<GraphQL.Materials.Node> nodes);
         Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response);
         Task<Material> UpdateMaterial(IMaterialUpdateInput input);
-        Task<Material> AssignMaterialOperator(Guid materialId, Guid assigneeId);
+        Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
     }
 }

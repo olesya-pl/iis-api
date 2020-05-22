@@ -8,17 +8,23 @@ using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Materials;
+using Microsoft.Extensions.Configuration;
 
 namespace Iis.Roles
 {
     public class UserService
     {
-        private OntologyContext _context;
-        private IMapper _mapper;
+        private readonly OntologyContext _context;
+        private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
+        private readonly IMapper _mapper;
 
-        public UserService(OntologyContext context, IMapper mapper)
+        public UserService(
+            OntologyContext context,
+            MaxMaterialsPerOperatorConfig maxMaterialsConfig,
+            IMapper mapper)
         {
             _context = context;
+            _maxMaterialsConfig = maxMaterialsConfig;
             _mapper = mapper;
         }
         public async Task<Guid> CreateUserAsync(User newUser)
@@ -70,14 +76,15 @@ namespace Iis.Roles
 
         public Task<List<Guid>> GetAvailableOperatorIdsAsync()
         {
-            const int MaxMaterialsCount = 10;
+            var maxMaterialsCount = _maxMaterialsConfig.Value;
 
             var unavailableOperators = _context.Materials
                 .AsNoTracking()
-                .Where(p => p.ProcessedStatusSignId == null
+                .Where(p => (p.ProcessedStatusSignId == null
                     || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                    && p.AssigneeId != null)
                 .GroupBy(p => p.AssigneeId)
-                .Where(group => group.Count() >= MaxMaterialsCount)
+                .Where(group => group.Count() >= maxMaterialsCount)
                 .Select(group => group.Key);
 
             return GetOperatorsQuery()
