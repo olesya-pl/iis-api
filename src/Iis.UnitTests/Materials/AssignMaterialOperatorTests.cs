@@ -43,7 +43,7 @@ namespace Iis.UnitTests
 
             //act
             var sut = _serviceProvider.GetRequiredService<IMaterialService>();
-            var res = await sut.AssignMaterialOperator(material.Id, assignee.Id);
+            var res = await sut.AssignMaterialOperatorAsync(material.Id, assignee.Id);
 
             //assert
             UserTestHelper.AssertUserEntityMappedToUserCorrectly(assignee, res.Assignee);

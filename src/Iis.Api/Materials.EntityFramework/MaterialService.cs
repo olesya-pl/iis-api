@@ -80,6 +80,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             await PutMaterialToElasticSearch(materialEntity.Id);
 
+            _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
             _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
             // todo: put message to rabbit instead of calling another service directly
 
@@ -183,7 +184,7 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        public async Task<Material> AssignMaterialOperator(Guid materialId, Guid assigneeId)
+        public async Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
             if (material == null)
