@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace AcceptanceTests.Steps
+namespace AcceptanceTests.DTO
 {
     public class MaterialResponse
     {

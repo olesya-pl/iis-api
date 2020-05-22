@@ -1,10 +1,9 @@
 ﻿using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using AcceptanceTests.DTO;
 //using AcceptanceTests.Environment;
 using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
+using Newtonsoft.Json.Linq;
 using IIS.Core.GraphQL.Users;
 
 namespace AcceptanceTests.Steps
@@ -61,6 +60,33 @@ namespace AcceptanceTests.Steps
             graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
             var response = await graphQlClient.SendMutationAsync<MaterialResponse>(request);
             return response.Data;
+        }
+
+        public async Task<GraphQLResponse<JObject>> UpdateMaterialImportance(string id, string importance, string authToken)
+        {
+            var request = new GraphQLRequest
+            {
+                Query =
+                    @"mutation updateMaterial($input: MaterialUpdateInput!)
+                    {
+                        updateMaterial(input: $input)
+                        {
+                            id
+                        }
+                    }",
+                Variables = new
+                {
+                    input = new
+                    {
+                        id = id,
+                        importanceId = importance
+                    }
+                }
+            };
+            var graphQlClient = GraphQLHttpClientFactory.CreateGraphQLHttpClient();
+            graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
+            var response = await graphQlClient.SendMutationAsync<JObject>(request);
+            return response;
         }
 
         public void ProcessGraphQlErrors(GraphQLError[] errors)
