@@ -1,10 +1,15 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 
+using Newtonsoft.Json.Linq;
+
+using IIS.Domain;
+using Iis.Domain;
 using Iis.DataModel;
 using Iis.DataModel.Themes;
 using Iis.ThemeManagement.Models;
@@ -13,13 +18,17 @@ namespace Iis.ThemeManagement
 {
     public class ThemeService
     {
-        private OntologyContext _context;
-        private IMapper _mapper;
+        private readonly OntologyContext _context;
+        private readonly IMapper _mapper;
+        private readonly IOntologyProvider _ontologyProvider;
 
-        public ThemeService(OntologyContext context, IMapper mapper)
+        private IOntologyService _ontologyService;
+
+        public ThemeService(OntologyContext context, IMapper mapper,IOntologyProvider ontologyProvider)
         {
             _context = context;
             _mapper = mapper;
+            _ontologyProvider = ontologyProvider;
         }
 
         public async Task<Guid> CreateThemeAsync(Theme theme)
@@ -68,7 +77,36 @@ namespace Iis.ThemeManagement
                                     .Where(e => e.UserId == userId)
                                     .ToListAsync();
 
-            return _mapper.Map<IEnumerable<Theme>>(entities);
+            var searchTasks = entities.Select(async e => {
+
+                                    var filter = new ElasticFilter
+                                    {
+                                        Limit = 1000,
+                                        Offset = 0,
+                                        Suggestion = e.Query
+                                    };
+
+                                    var searchFunc = GetSearchFunction(e.Type.ShortTitle);
+
+                                    if(searchFunc is null) return (id:e.Id, count: 0);
+
+                                    var searchResult = await searchFunc(filter, default(CancellationToken));
+
+                                    return (id: e.Id, count: searchResult.count);
+                                });
+            var searchResults = await Task.WhenAll(searchTasks);
+            
+            var themes = _mapper.Map<IEnumerable<Theme>>(entities);
+
+            themes = themes.Join(searchResults,
+                                e => e.Id,
+                                r => r.id,
+                                (e, r) => {
+                                    e.QueryResults = r.count;
+                                    return e;
+                                }).ToList();
+            
+            return themes;
         }
 
         public async Task<ThemeType> GetThemeTypeByEntityTypeNameAsync(string entityTypeName)
@@ -95,6 +133,17 @@ namespace Iis.ThemeManagement
                     .Include(e => e.Type)
                     .Include(e => e.User)
                     .AsNoTracking();
+        }
+
+        private Func<ElasticFilter, CancellationToken, Task<(IEnumerable<JObject> nodes, int count)>> GetSearchFunction(string key)
+        {
+            return key switch 
+            {
+                "М" => _ontologyService.FilterEventsAsync,
+                "О" => _ontologyService.FilterObjectsOfStudyAsync,
+                "П" => _ontologyService.FilterEventsAsync,
+                _ => null
+            };
         }
     }
 }

@@ -6,11 +6,13 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Roles\Iis.Roles.csproj" />
+    <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
+    <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
   </ItemGroup>
 
 </Project>

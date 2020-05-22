@@ -11,6 +11,7 @@ namespace Iis.Interfaces.Elastic
     {
         IEnumerable<string> MaterialIndexes { get; }
         IEnumerable<string> OntologyIndexes { get; }
+        IEnumerable<string> EventIndexes { get; }
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default);
         Task<bool> PutMaterialAsync(Guid materialId, JObject materialDocument, CancellationToken cancellation = default);

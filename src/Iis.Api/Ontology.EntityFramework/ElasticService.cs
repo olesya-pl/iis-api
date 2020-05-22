@@ -28,6 +28,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public IEnumerable<string> MaterialIndexes { get; }
         public IEnumerable<string> OntologyIndexes { get; }
+        public IEnumerable<string> EventIndexes { get; }
         public bool UseElastic { get; private set; }
 
         public ElasticService(
@@ -45,7 +46,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _elasticConfiguration = elasticConfiguration;
             _context = context;
 
-            OntologyIndexes = new [] {
+            OntologyIndexes = new[] {
                 "Organization",
                 "Person",
                 "ObjectOfStudy",
@@ -60,6 +61,10 @@ namespace IIS.Core.Ontology.EntityFramework
                 "EducationalInstitution",
                 "MilitaryOrganization",
                 "TerrorOrganization"
+            };
+            
+            EventIndexes = new[]{
+                "Event"
             };
 
             UseElastic = _context.NodeTypes.Any(nt => nt.Name == "ObjectOfStudy");
@@ -140,7 +145,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             if (!_runTimeSettings.PutSavedToElastic) return false;
 
-            if(materialDocument is null) return false;
+            if (materialDocument is null) return false;
 
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), materialId.ToString("N"), materialDocument.ToString(Formatting.None));
         }
@@ -152,7 +157,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private bool OntologyIndexIsSupported(string indexName)
         {
-            return OntologyIndexes.Any(index => index.Equals(indexName));
+            return OntologyIndexes.Any(index => index.Equals(indexName)) || EventIndexes.Any(index => indexName.Equals(indexName));
         }
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)

@@ -289,31 +289,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public async Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
+        public Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            await _context.Semaphore.WaitAsync(cancellationToken);
-            try
-            {
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-                var types = ontology.EntityTypes.Where(p => p.Name == "ObjectOfStudy");
-                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
-                    .Concat(types).Distinct().ToArray();
-
-                var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
-                if (isElasticSearch)
-                {
-                    var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                    return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
-                }
-                else
-                {
-                    return (new List<JObject>(), 0);
-                }
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            return FilterNodeAsync("ObjectOfStudy", filter, cancellationToken);
+        }
+        
+        public Task<(IEnumerable<JObject> nodes, int count)> FilterEventsAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
+        {
+            return FilterNodeAsync("Event", filter, cancellationToken);
         }
 
         public async Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
@@ -346,6 +329,33 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
+        private async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(string typeName, ElasticFilter filter, CancellationToken cancellationToken = default)
+        {
+            await _context.Semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
+                var types = ontology.EntityTypes.Where(p => p.Name == typeName);
+                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                    .Concat(types).Distinct().ToArray();
+
+                var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+                if (isElasticSearch)
+                {
+                    var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                    return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
+                }
+                else
+                {
+                    return (new List<JObject>(), 0);
+                }
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+        
         private IQueryable<NodeEntity> GetNodesInternal(IEnumerable<Guid> derived)
         {
             return _context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived);
@@ -480,8 +490,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             foreach (var relation in relations)
                 nodesDict[relation.SourceNodeId].OutgoingRelations.Add(relation);
         }
-
-
         private Node MapNode(NodeEntity ctxNode, OntologyModel ontology)
         {
             return MapNode(ctxNode, ontology, new List<Node>());
@@ -526,7 +534,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return node;
         }
-
         public async Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default)
         {
             var ctxNode = _context.Nodes.Local.Single(n => n.Id == node.Id);
