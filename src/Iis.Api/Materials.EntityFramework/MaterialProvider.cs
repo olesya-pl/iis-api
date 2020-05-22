@@ -41,12 +41,6 @@ namespace IIS.Core.Materials.EntityFramework
             _cache = cache;
             _mapper = mapper;
         }
-        public async Task<(IEnumerable<JObject> nodes, int count)> FilterMaterialsAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(_elasticService.MaterialIndexes,filter);
-
-            return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
-        }
         public async Task<(
             IEnumerable<Material> Materials,
             int Count,

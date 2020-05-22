@@ -8,10 +8,11 @@ using AutoMapper;
 
 using Newtonsoft.Json.Linq;
 
-using IIS.Domain;
 using Iis.Domain;
+using IIS.Domain;
 using Iis.DataModel;
 using Iis.DataModel.Themes;
+using Iis.Interfaces.Elastic;
 using Iis.ThemeManagement.Models;
 
 namespace Iis.ThemeManagement
@@ -21,14 +22,14 @@ namespace Iis.ThemeManagement
         private readonly OntologyContext _context;
         private readonly IMapper _mapper;
         private readonly IOntologyProvider _ontologyProvider;
+        private readonly IElasticService _elasticService;
 
-        private IOntologyService _ontologyService;
-
-        public ThemeService(OntologyContext context, IMapper mapper,IOntologyProvider ontologyProvider)
+        public ThemeService(OntologyContext context, IMapper mapper,IOntologyProvider ontologyProvider, IElasticService elasticService)
         {
             _context = context;
             _mapper = mapper;
             _ontologyProvider = ontologyProvider;
+            _elasticService = elasticService;
         }
 
         public async Task<Guid> CreateThemeAsync(Theme theme)
@@ -77,32 +78,21 @@ namespace Iis.ThemeManagement
                                     .Where(e => e.UserId == userId)
                                     .ToListAsync();
 
-            var searchTasks = entities.Select(async e => {
+            var ontology = await _ontologyProvider.GetOntologyAsync(default(CancellationToken));
 
-                                    var filter = new ElasticFilter
-                                    {
-                                        Limit = 1000,
-                                        Offset = 0,
-                                        Suggestion = e.Query
-                                    };
-
-                                    var searchFunc = GetSearchFunction(e.Type.ShortTitle);
-
-                                    if(searchFunc is null) return (id:e.Id, count: 0);
-
-                                    var searchResult = await searchFunc(filter, default(CancellationToken));
-
-                                    return (id: e.Id, count: searchResult.count);
-                                });
+            var searchTasks = entities.Select(e => {
+                return ExecuteThemeQuery(e.Id, e.Type.ShortTitle, e.Query, ontology);
+            });
+            
             var searchResults = await Task.WhenAll(searchTasks);
             
             var themes = _mapper.Map<IEnumerable<Theme>>(entities);
 
             themes = themes.Join(searchResults,
                                 e => e.Id,
-                                r => r.id,
+                                r => r.Id,
                                 (e, r) => {
-                                    e.QueryResults = r.count;
+                                    e.QueryResults = r.Count;
                                     return e;
                                 }).ToList();
             
@@ -135,15 +125,38 @@ namespace Iis.ThemeManagement
                     .AsNoTracking();
         }
 
-        private Func<ElasticFilter, CancellationToken, Task<(IEnumerable<JObject> nodes, int count)>> GetSearchFunction(string key)
+        private async Task<(Guid Id, int Count)> ExecuteThemeQuery(Guid id, string typeKey, string query, OntologyModel ontology)
         {
-            return key switch 
+            var filter = new ElasticFilter
             {
-                "М" => _ontologyService.FilterEventsAsync,
-                "О" => _ontologyService.FilterObjectsOfStudyAsync,
-                "П" => _ontologyService.FilterEventsAsync,
-                _ => null
+                Limit = 1000,
+                Offset = 0,
+                Suggestion = query
             };
+
+            var indexes = typeKey switch
+            {
+                "М" => _elasticService.MaterialIndexes,
+                "О" => GetOntologyIndexes(ontology, "ObjectOfStudy"),
+                "П" => GetOntologyIndexes(ontology, "Event"),
+                _   => (IEnumerable<string>) null
+            };
+
+            if(indexes is null) return (Id: id, Count: 0);
+            
+            var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes,filter);
+
+            return (Id: id, Count: searchResult.Count);
+        }
+        private string[] GetOntologyIndexes(OntologyModel ontology, string typeName)
+        {
+            var types = ontology.EntityTypes.Where(p => p.Name == typeName);
+
+            return types.SelectMany(e => ontology.GetChildTypes(e))
+                                        .Concat(types)
+                                        .Distinct()
+                                        .Select(nt => nt.Name)
+                                        .ToArray();
         }
     }
 }
