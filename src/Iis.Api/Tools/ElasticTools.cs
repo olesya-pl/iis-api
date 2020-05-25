@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using IIS.Core.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
-
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Tools
 {
@@ -15,17 +15,25 @@ namespace IIS.Core.Tools
         IElasticManager _elasticManager;
         IElasticService _elasticService;
         IMaterialProvider _materialProvider;
+        IOntologySchema _ontologySchema;
 
-        public ElasticTools(IExtNodeService extNodeService, IMaterialProvider materialProvider, IElasticService elasticService, IElasticManager elasticManager)
+        public ElasticTools(IExtNodeService extNodeService, IMaterialProvider materialProvider, IElasticService elasticService, IElasticManager elasticManager,
+            IOntologySchema ontologySchema)
         {
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
             _elasticService = elasticService;
             _materialProvider = materialProvider;
+            _ontologySchema = ontologySchema;
         }
 
         public async Task RecreateElasticAsync(CancellationToken cancellationToken = default)
         {
+            var type = _ontologySchema.GetEntityTypeByName("TerrorOrganization");
+            var attributesInfo = type.GetAttributesInfo();
+
+            return;
+
             var ontologyIndexes = _elasticService.OntologyIndexes;
 
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);

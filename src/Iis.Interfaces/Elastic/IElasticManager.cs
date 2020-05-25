@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Interfaces.Elastic
 {
@@ -16,5 +17,6 @@ namespace Iis.Interfaces.Elastic
         Task CreateIndexesAsync(IEnumerable<string> indexNames, CancellationToken token);
         Task<bool> DeleteIndexAsync(string indexName, CancellationToken cancellationToken = default);
         Task<bool> DeleteIndexesAsync(IEnumerable<string> indexNames, CancellationToken cancellationToken = default);
+        Task<bool> CreateMapping(IAttributeInfoList attributeInfoList);
     }
 }
