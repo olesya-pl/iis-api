@@ -88,13 +88,12 @@ namespace Iis.ThemeManagement
             
             var themes = _mapper.Map<IEnumerable<Theme>>(entities);
 
-            themes = themes.Join(searchResults,
-                                e => e.Id,
-                                r => r.Id,
-                                (e, r) => {
-                                    e.QueryResults = r.Count;
-                                    return e;
-                                }).ToList();
+            foreach (var theme in themes)
+            {
+                var result = searchResults.FirstOrDefault(r => r.Id == theme.Id);
+
+                theme.QueryResults = result.Count;
+            }
             
             return themes;
         }
@@ -147,6 +146,7 @@ namespace Iis.ThemeManagement
             };
 
             if(indexes is null) return (Id: id, Count: 0);
+
             if(typeKey == Event)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(indexes,filter);
