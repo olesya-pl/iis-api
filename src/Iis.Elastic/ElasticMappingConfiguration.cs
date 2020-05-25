@@ -24,7 +24,16 @@ namespace Iis.Elastic
 
         public JObject ConvertToJObject()
         {
-            return null;
+            var jProperties = new JObject();
+            foreach (var property in Properties)
+            {
+                jProperties[property.Name] = property.ConvertToJObject();
+            }
+            var inner = new JObject();
+            inner["properties"] = jProperties;
+            var result = new JObject();
+            result["mappings"] = inner;
+            return result;
         }
 
         public ElasticMappingPropertyType ToMappingType(ScalarType scalarType)
@@ -57,7 +66,7 @@ namespace Iis.Elastic
                     mappingProperty.Type = ElasticMappingPropertyType.Nested;
                     AddProperty(mappingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
                 }
-                Properties.Add(mappingProperty);
+                properties.Add(mappingProperty);
             }
             else
             {

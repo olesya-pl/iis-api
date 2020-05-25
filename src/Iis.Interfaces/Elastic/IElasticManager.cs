@@ -17,6 +17,6 @@ namespace Iis.Interfaces.Elastic
         Task CreateIndexesAsync(IEnumerable<string> indexNames, CancellationToken token);
         Task<bool> DeleteIndexAsync(string indexName, CancellationToken cancellationToken = default);
         Task<bool> DeleteIndexesAsync(IEnumerable<string> indexNames, CancellationToken cancellationToken = default);
-        Task<bool> CreateMapping(IAttributeInfoList attributeInfoList);
+        Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default);
     }
 }

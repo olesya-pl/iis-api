@@ -135,9 +135,13 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<bool> CreateMapping(IAttributeInfoList attributeInfoList)
+        public async Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default)
         {
-            return true;
+            var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
+            var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
+            var jObject = mappingConfiguration.ConvertToJObject();
+            var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
+            return response.Success;
         }
         
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)

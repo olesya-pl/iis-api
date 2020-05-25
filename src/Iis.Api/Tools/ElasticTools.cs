@@ -29,25 +29,25 @@ namespace IIS.Core.Tools
 
         public async Task RecreateElasticAsync(CancellationToken cancellationToken = default)
         {
-            var type = _ontologySchema.GetEntityTypeByName("TerrorOrganization");
-            var attributesInfo = type.GetAttributesInfo();
-
-            return;
-
             var ontologyIndexes = _elasticService.OntologyIndexes;
+            
+             await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
+
+            foreach (var ontologyIndex in ontologyIndexes)
+            {
+                var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
+                var attributesInfo = type.GetAttributesInfo();
+                await _elasticManager.CreateMapping(attributesInfo);
+            }
 
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
-            
-            await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
-            
             foreach (var extNode in extNodes)
             {
                 await _elasticService.PutNodeAsync(extNode, cancellationToken);
             }
 
             await _elasticManager.CreateIndexesAsync(ontologyIndexes, cancellationToken);
-
-
+            
             var materialEntities = await _materialProvider.GetMaterialEntitiesAsync();
 
             var materialIndex = _elasticService.MaterialIndexes.First();

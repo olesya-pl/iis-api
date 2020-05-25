@@ -27,6 +27,26 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         }
 
         [Fact]
+        public void ConstructorFromAttributeInfo_Deep2()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("parent.child", ScalarType.String),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Single(result.Properties);
+            var parent = result.Properties[0];
+            Assert.Equal("parent", parent.Name);
+            Assert.Equal(ElasticMappingPropertyType.Nested, parent.Type);
+
+            Assert.Single(parent.Properties);
+            var child = parent.Properties[0];
+            Assert.Equal("child", child.Name);
+            Assert.Equal(ElasticMappingPropertyType.Text, child.Type);
+        }
+
+        [Fact]
         public void ToMappingType_Test()
         {
             var mapping = new ElasticMappingConfiguration();
