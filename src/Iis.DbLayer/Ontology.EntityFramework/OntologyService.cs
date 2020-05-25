@@ -294,11 +294,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return FilterNodeAsync("ObjectOfStudy", filter, cancellationToken);
         }
         
-        public Task<(IEnumerable<JObject> nodes, int count)> FilterEventsAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            return FilterNodeAsync("Event", filter, cancellationToken);
-        }
-
         public async Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);

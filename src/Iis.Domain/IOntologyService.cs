@@ -11,7 +11,6 @@ namespace Iis.Domain
         Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default);
-        Task<(IEnumerable<JObject> nodes, int count)> FilterEventsAsync(ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
         Task SaveNodesAsync(IEnumerable<Node> node, CancellationToken cancellationToken = default);
