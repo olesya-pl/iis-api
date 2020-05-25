@@ -127,6 +127,10 @@ namespace Iis.ThemeManagement
 
         private async Task<(Guid Id, int Count)> ExecuteThemeQuery(Guid id, string typeKey, string query, OntologyModel ontology)
         {
+            const string Object = "О";
+            const string Material = "М";
+            const string Event = "П";
+
             var filter = new ElasticFilter
             {
                 Limit = 1000,
@@ -136,17 +140,25 @@ namespace Iis.ThemeManagement
 
             var indexes = typeKey switch
             {
-                "М" => _elasticService.MaterialIndexes,
-                "О" => GetOntologyIndexes(ontology, "ObjectOfStudy"),
-                "П" => GetOntologyIndexes(ontology, "Event"),
+                Material => _elasticService.MaterialIndexes,
+                Object => GetOntologyIndexes(ontology, "ObjectOfStudy"),
+                Event => GetOntologyIndexes(ontology, "Event"),
                 _   => (IEnumerable<string>) null
             };
 
             if(indexes is null) return (Id: id, Count: 0);
-            
-            var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes,filter);
+            if(typeKey == Event)
+            {
+                var searchResult = await _elasticService.SearchByAllFieldsAsync(indexes,filter);
 
-            return (Id: id, Count: searchResult.Count);
+                return (Id: id, Count: searchResult.count);
+
+            } else
+            {
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes,filter);
+
+                return (Id: id, Count: searchResult.Count);
+            }
         }
         private string[] GetOntologyIndexes(OntologyModel ontology, string typeName)
         {
