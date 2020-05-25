@@ -208,6 +208,7 @@ namespace IIS.Core.Materials.EntityFramework
                 new JProperty(nameof(Material.Completeness).ToLower(), material.Completeness?.Title),
                 new JProperty(nameof(Material.SourceReliability).ToLower(), material.SourceReliability?.Title),
                 new JProperty(nameof(Material.ProcessedStatus).ToLower(), material.ProcessedStatus?.Title),
+                new JProperty(nameof(Material.SessionPriority).ToLower(), material.SessionPriority?.Title),
                 new JProperty(nameof(Material.Id).ToLower(), material.Id.ToString("N"))
             );
 
@@ -253,12 +254,24 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 jDocument.Add(
                     new JProperty(nameof(Material.Assignee),
-                    JObject.Parse(JsonConvert.SerializeObject(material.Assignee))));
+                    SerializeAssignee(material.Assignee)));
             }
 
 
             return jDocument;
         }
+
+        private JObject SerializeAssignee(User assignee)
+        {
+            var res = new JObject();
+            res[nameof(User.Id)] = assignee.Id.ToString("N");
+            res[nameof(User.UserName)] = assignee.UserName;
+            res[nameof(User.FirstName)] = assignee.FirstName;
+            res[nameof(User.LastName)] = assignee.LastName;
+            res[nameof(User.Patronymic)] = assignee.Patronymic;
+            return res;
+        }
+
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
         {
             IEnumerable<Task<Material>> mappingTasks;

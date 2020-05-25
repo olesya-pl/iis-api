@@ -77,6 +77,7 @@ namespace Iis.DbLayer.Elastic
                 nameof(Material.Id).ToLower(),
                 nameof(Material.Title).ToLower(),
                 nameof(Material.ProcessedStatus).ToLower(),
+                nameof(Material.SessionPriority).ToLower(),
                 "mlResponses.*",
                 $"{nameof(Material.Data)}.*",
                 $"{nameof(Material.LoadData)}.*",
