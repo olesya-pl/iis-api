@@ -157,6 +157,18 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MaterialSign>(materialSignEntity);
         }
 
+        public MaterialSign GetMaterialSign(string signValue)
+        {
+            if(string.IsNullOrWhiteSpace(signValue)) return null;
+
+            var entity = _cache.MaterialSigns
+                            .FirstOrDefault(ms => ms.Title == signValue);
+
+            if(entity is null) return null;
+
+            return _mapper.Map<MaterialSign>(entity);
+        }
+
         public async Task<Material> MapAsync(MaterialEntity material)
         {
             if (material == null) return null;

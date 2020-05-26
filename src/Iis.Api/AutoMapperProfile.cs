@@ -171,6 +171,18 @@ namespace Iis.Api
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
 
+            CreateMap<MaterialInput, Iis.Domain.Materials.MaterialLoadData>()
+                .ForMember(dest => dest.From, opts => opts.MapFrom(src => src.From))
+                .ForMember(dest => dest.LoadedBy, opts => opts.MapFrom(src => src.LoadedBy))
+                .ForMember(dest => dest.Coordinates, opts => opts.MapFrom(src => src.Coordinates))
+                .ForMember(dest => dest.Code, opts => opts.MapFrom(src => src.Code))
+                .ForMember(dest => dest.ReceivingDate, opts => opts.MapFrom(src => src.CreationDate))
+                .ForMember(dest => dest.Objects, opts => opts.MapFrom(src => src.Objects))
+                .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags))
+                .ForMember(dest => dest.States, opts => opts.MapFrom(src => src.States));
+                
+
+
             CreateMap<IChangeHistoryItem, Iis.DataModel.ChangeHistory.ChangeHistoryEntity>();
             CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
 

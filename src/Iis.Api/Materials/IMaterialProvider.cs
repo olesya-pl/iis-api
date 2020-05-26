@@ -26,6 +26,7 @@ namespace IIS.Core.Materials
             IEnumerable<string> types = null);
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
+        MaterialSign GetMaterialSign(string signValue);
         MaterialSign GetMaterialSign(Guid id);
         Task<Material> MapAsync(MaterialEntity material);
         Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId);
