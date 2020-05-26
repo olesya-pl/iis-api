@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-
-using Iis.Domain;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Materials;
 
 namespace IIS.Core.Materials
 {
@@ -23,7 +19,9 @@ namespace IIS.Core.Materials
             int offset,
             string filterQuery,
             IEnumerable<Guid> nodeIds = null,
-            IEnumerable<string> types = null);
+            IEnumerable<string> types = null,
+            string sortColumnName = null,
+            string order = null);
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(Guid id);

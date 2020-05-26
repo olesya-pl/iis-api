@@ -82,6 +82,37 @@ namespace Iis.UnitTests.Materials
         }
 
         [Theory, RecursiveAutoData]
+        public async Task GetMaterialsAsync_OrdersByNodesCount(List<MaterialEntity> data)
+        {
+            //arrange
+            data.First().MaterialInfos = new List<MaterialInfoEntity>();
+            foreach (var item in data)
+            {
+                item.Parent = null;
+                item.ParentId = null;
+                item.Data = item.Metadata = item.LoadData = null;
+                foreach (var info in item.MaterialInfos)
+                {
+                    info.Data = "{}";
+                    foreach (var feature in info.MaterialFeatures)
+                    {
+                        feature.Node.NodeType.Meta = null;
+                    }
+                }
+            }
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.Materials.AddRange(data);
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<IMaterialProvider>();
+            var (items, _, _) = await sut.GetMaterialsAsync(50, 0, null, null, null, "nodes", "desc");
+
+            //assert
+            MaterialTestHelper.AssertMaterialsOrderedByNodesCountDescending(items.ToList());
+        }
+
+        [Theory, RecursiveAutoData]
         public async Task CountMaterialsByType_CountOnlyParentMaterials(List<MaterialEntity> data,
             MaterialEntity image1,
             MaterialEntity image2,

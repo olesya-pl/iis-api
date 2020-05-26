@@ -14,6 +14,8 @@ using Iis.Interfaces.Elastic;
 using System;
 using IIS.Core.Materials;
 using IIS.Core.Files;
+using IIS.Domain;
+using Iis.Domain;
 
 namespace Iis.UnitTests
 {
@@ -60,7 +62,9 @@ namespace Iis.UnitTests
             serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
             serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
             serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
-            
+            serviceCollection.AddTransient<IOntologyProvider>(factory => new Mock<IOntologyProvider>().Object);
+            serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
+
             var serviceProvider = serviceCollection.BuildServiceProvider();
             return serviceProvider;
         }
