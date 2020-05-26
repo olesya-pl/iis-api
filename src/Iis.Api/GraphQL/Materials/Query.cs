@@ -8,6 +8,7 @@ using IIS.Core.Materials;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Interfaces.Elastic;
+using Iis.Api.GraphQL.Common;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -20,12 +21,14 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
             FilterInput filter,
+            SortingInput sorting,
             IEnumerable<Guid> nodeIds = null,
             IEnumerable<string> types = null)
         {
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
 
-            var materialsResult = await materialProvider.GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types);
+            var materialsResult = await materialProvider
+                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);

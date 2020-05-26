@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -15,9 +14,7 @@ using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Materials;
 using Iis.Roles;
-using Newtonsoft.Json;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -44,14 +41,19 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<(
             IEnumerable<Material> Materials,
             int Count,
-            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(int limit, int offset, string filterQuery,
-            IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
+            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(
+            int limit, int offset, string filterQuery,
+            IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null,
+            string sortColumnName = null, string sortOrder = null)
         {
             await _context.Semaphore.WaitAsync();
 
             try
             {
-                IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery(GetMaterialQuery());
+                IQueryable<MaterialEntity> materialsQuery
+                    = GetMaterialQuery()
+                    .GetParentMaterialsQuery()
+                    .ApplySorting(sortColumnName, sortOrder);
                 IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
@@ -220,6 +222,7 @@ namespace IIS.Core.Materials.EntityFramework
                 new JProperty(nameof(Material.Completeness).ToLower(), material.Completeness?.Title),
                 new JProperty(nameof(Material.SourceReliability).ToLower(), material.SourceReliability?.Title),
                 new JProperty(nameof(Material.ProcessedStatus).ToLower(), material.ProcessedStatus?.Title),
+                new JProperty(nameof(Material.SessionPriority).ToLower(), material.SessionPriority?.Title),
                 new JProperty(nameof(Material.Id).ToLower(), material.Id.ToString("N"))
             );
 
@@ -265,12 +268,24 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 jDocument.Add(
                     new JProperty(nameof(Material.Assignee),
-                    JObject.Parse(JsonConvert.SerializeObject(material.Assignee))));
+                    SerializeAssignee(material.Assignee)));
             }
 
 
             return jDocument;
         }
+
+        private JObject SerializeAssignee(User assignee)
+        {
+            var res = new JObject();
+            res[nameof(User.Id)] = assignee.Id.ToString("N");
+            res[nameof(User.UserName)] = assignee.UserName;
+            res[nameof(User.FirstName)] = assignee.FirstName;
+            res[nameof(User.LastName)] = assignee.LastName;
+            res[nameof(User.Patronymic)] = assignee.Patronymic;
+            return res;
+        }
+
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
         {
             IEnumerable<Task<Material>> mappingTasks;
@@ -296,12 +311,6 @@ namespace IIS.Core.Materials.EntityFramework
                                 (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
                             .Where(m => m.MaterialFeature.NodeId == nodeId)
                             .Select(m => m.MaterialInfoJoined.Material);
-        }
-
-        private IQueryable<MaterialEntity> GetParentMaterialsQuery(IQueryable<MaterialEntity> materialQuery)
-        {
-            return materialQuery
-                    .Where(p => p.ParentId == null);
         }
 
         private IQueryable<MaterialEntity> GetMaterialQuery()
@@ -358,7 +367,8 @@ namespace IIS.Core.Materials.EntityFramework
 
         public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
         {
-            return GetParentMaterialsQuery(GetMaterialByNodeIdQuery(nodeId))
+            return GetMaterialByNodeIdQuery(nodeId)
+                .GetParentMaterialsQuery()
                 .GroupBy(p => p.Type)
                 .Select(group => new MaterialsCountByType
                 {
@@ -371,7 +381,9 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId)
         {
             var materials = await
-                GetParentMaterialsQuery(GetMaterialQuery()).Where(p => p.AssigneeId == assigneeId)
+                GetMaterialQuery()
+                .GetParentMaterialsQuery()
+                .Where(p => p.AssigneeId == assigneeId)
                 .Select(p => _mapper.Map<Material>(p))
                 .ToListAsync();
 
