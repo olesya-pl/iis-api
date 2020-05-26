@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq;
 using Iis.DataModel.Materials;
 
 namespace IIS.Core.Materials.EntityFramework
@@ -12,20 +10,26 @@ namespace IIS.Core.Materials.EntityFramework
             string sortColumnName,
             string sortOrder)
         {
-            Expression<Func<MaterialEntity, IComparable>> compareExpression = null;
-
-            compareExpression = sortColumnName switch
+            return (sortColumnName, sortOrder)
+            switch
             {
-                "type" => p => p.Type,
-                "source" => p => p.Source,
-                "title" => p => p.Title,
-                "importance" => p => p.ImportanceSignId,
-                "nodes" => p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count(),
-                _ => p => p.CreatedDate,
+                ("type", "asc") => materialsQuery.OrderBy(p => p.Type),
+                ("type", "desc") => materialsQuery.OrderByDescending(p => p.Type),
+                ("source", "asc") => materialsQuery.OrderBy(p => p.Source),
+                ("source", "desc") => materialsQuery.OrderByDescending(p => p.Source),
+                ("title", "asc") => materialsQuery.OrderBy(p => p.Title),
+                ("title", "desc") => materialsQuery.OrderByDescending(p => p.Title),
+                ("importance", "asc") => materialsQuery.OrderBy(p => p.Importance),
+                ("importance", "desc") => materialsQuery.OrderByDescending(p => p.Importance),
+
+                ("nodes", "asc") => materialsQuery
+                    .OrderBy(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
+                ("nodes", "desc") => materialsQuery
+                    .OrderByDescending(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
+
+                ("createdDate", "asc") => materialsQuery.OrderBy(p => p.CreatedDate),
+                _ => materialsQuery.OrderByDescending(p => p.CreatedDate),
             };
-            return string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase)
-                ? materialsQuery.OrderBy(compareExpression)
-                : materialsQuery.OrderByDescending(compareExpression);
         }
 
         public static IQueryable<MaterialEntity> GetParentMaterialsQuery(
