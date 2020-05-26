@@ -250,7 +250,7 @@ namespace Iis.OntologySchema.DataTypes
                 result.Add(new AttributeInfoItem (dotName, _attributeType.ScalarType ));
             }
 
-            if (Kind == Kind.Entity && Name == "FuzzyDate")
+            if (Kind == Kind.Entity && Name == EntityTypeNames.FuzzyDate.ToString())
             {
                 result.Add(new AttributeInfoItem (parentName, ScalarType.Date));
             }

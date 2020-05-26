@@ -49,7 +49,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _elasticConfiguration = elasticConfiguration;
             _context = context;
 
-            var objectOfStudyType = _ontologySchema.GetEntityTypeByName("ObjectOfStudy");
+            var objectOfStudyType = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
             if (objectOfStudyType != null)
             {
                 OntologyIndexes = objectOfStudyType.GetAllDescendants()
@@ -58,7 +58,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     .ToList();
             }
 
-            UseElastic = _context.NodeTypes.Any(nt => nt.Name == "ObjectOfStudy");
+            UseElastic = _context.NodeTypes.Any(nt => nt.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
             MaterialIndexes = new[] { "Materials" };
         }
