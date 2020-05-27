@@ -19,8 +19,8 @@ namespace IIS.Core.Materials.EntityFramework
                 ("source", "desc") => materialsQuery.OrderByDescending(p => p.Source),
                 ("title", "asc") => materialsQuery.OrderBy(p => p.Title),
                 ("title", "desc") => materialsQuery.OrderByDescending(p => p.Title),
-                ("importance", "asc") => materialsQuery.OrderBy(p => p.Importance),
-                ("importance", "desc") => materialsQuery.OrderByDescending(p => p.Importance),
+                ("importance", "asc") => materialsQuery.OrderBy(p => p.ImportanceSignId),
+                ("importance", "desc") => materialsQuery.OrderByDescending(p => p.ImportanceSignId),
 
                 ("nodes", "asc") => materialsQuery
                     .OrderBy(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
