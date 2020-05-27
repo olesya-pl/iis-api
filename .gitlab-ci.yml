@@ -62,6 +62,9 @@ unit_test:
     - /^sprint\..+$/
     - /^Release_*/
     - master
+    - develop
+    - /^rc-*/
+    - /^release-*/
 
 .deploy_contour_dev:
   extends: .deploy
