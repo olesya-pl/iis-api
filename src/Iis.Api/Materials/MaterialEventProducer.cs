@@ -15,6 +15,7 @@ namespace IIS.Core.Materials
     {
         void SendMaterialAddedEventAsync(MaterialAddedEvent eventData);
         void SendMaterialEvent(MaterialEventMessage eventMessage);
+        void SendAvailableForOperatorEvent(Guid materialId);
     }
 
     public class MaterialEventProducer : IMaterialEventProducer
@@ -23,18 +24,20 @@ namespace IIS.Core.Materials
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
-        private readonly IModel _materialEventChannel;   
-        private readonly MaterialEventConfiguration _eventConfiguration;  
+        private readonly IModel _materialEventChannel;
+        private readonly MaterialEventConfiguration _eventConfiguration;
+        private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
 
         public MaterialEventProducer(IConnectionFactory connectionFactory,
             ILoggerFactory loggerFactory,
-            MaterialEventConfiguration eventConfiguration)
+            MaterialEventConfiguration eventConfiguration,
+            MaterialOperatorAssignerConfiguration assignerConfiguration)
         {
             _logger = loggerFactory.CreateLogger<MaterialEventProducer>();
-            
+
             _connectionFactory = connectionFactory;
             _eventConfiguration = eventConfiguration;
-
+            _assignerConfiguration = assignerConfiguration;
 
             while (true)
             {
@@ -77,7 +80,7 @@ namespace IIS.Core.Materials
             var properties = _materialEventChannel.CreateBasicProperties();
 
             properties.Persistent = true;
-            
+
             _materialEventChannel.BasicPublish(exchange: _eventConfiguration.TargetChannel.ExchangeName,
                                 routingKey: routingKey,
                                 basicProperties: null,
@@ -96,9 +99,20 @@ namespace IIS.Core.Materials
         public void Dispose()
         {
             _channel.Dispose();
-
+            _materialEventChannel.Dispose();
             _connection.Dispose();
         }
 
+        public void SendAvailableForOperatorEvent(Guid materialId)
+        {
+            _channel.QueueDeclare(_assignerConfiguration.QueueName, true, false);
+
+            var body = Encoding.UTF8.GetBytes(materialId.ToString());
+
+            _channel.BasicPublish(exchange: "",
+                                routingKey: _assignerConfiguration.QueueName,
+                                basicProperties: null,
+                                body: body);
+        }
     }
 }

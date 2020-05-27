@@ -15,7 +15,14 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialInput input)
         {
+            
             Iis.Domain.Materials.Material inputMaterial = mapper.Map<Iis.Domain.Materials.Material>(input);
+
+            inputMaterial.Reliability = materialProvider.GetMaterialSign(input.ReliabilityText);
+
+            inputMaterial.SourceReliability = materialProvider.GetMaterialSign(input.SourceReliabilityText);
+
+            inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
 
             await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
 
@@ -38,7 +45,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] AssignMaterialOperatorInput input)
         {
-            var material = await materialService.AssignMaterialOperator(input.MaterialId, input.AssigneeId);
+            var material = await materialService.AssignMaterialOperatorAsync(input.MaterialId, input.AssigneeId);
             return mapper.Map<Material>(material);
         }
     }

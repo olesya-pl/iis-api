@@ -169,7 +169,21 @@ namespace Iis.Api
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
-                .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId));
+                .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))
+                .ForMember(dest => dest.CreatedDate,
+                    opts => opts.MapFrom(src => src.CreationDate >= new DateTime(1970, 1, 1) ? src.CreationDate : new DateTime(1970, 1, 1)));
+
+            CreateMap<MaterialInput, Iis.Domain.Materials.MaterialLoadData>()
+                .ForMember(dest => dest.From, opts => opts.MapFrom(src => src.From))
+                .ForMember(dest => dest.LoadedBy, opts => opts.MapFrom(src => src.LoadedBy))
+                .ForMember(dest => dest.Coordinates, opts => opts.MapFrom(src => src.Coordinates))
+                .ForMember(dest => dest.Code, opts => opts.MapFrom(src => src.Code))
+                .ForMember(dest => dest.ReceivingDate, opts => opts.MapFrom(src => src.CreationDate))
+                .ForMember(dest => dest.Objects, opts => opts.MapFrom(src => src.Objects))
+                .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags))
+                .ForMember(dest => dest.States, opts => opts.MapFrom(src => src.States));
+                
+
 
             CreateMap<IChangeHistoryItem, Iis.DataModel.ChangeHistory.ChangeHistoryEntity>();
             CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
@@ -187,8 +201,8 @@ namespace Iis.Api
 
             //mapping: Roles.User -> GraphQl.User
             CreateMap<Iis.Roles.User, User>();
-            
-            //mappring: UserEntity -> Roles.User  
+
+            //mappring: UserEntity -> Roles.User
             CreateMap<UserEntity, Roles.User>()
                 .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
 
@@ -198,7 +212,7 @@ namespace Iis.Api
             CreateMap<UserEntity, UserEntity>()
                 .ForMember(dest => dest.Username, opts => opts.Ignore())
                 .ForAllMembers(opts => opts.Condition((src, dest, sourceValue, targetValue) => sourceValue != null));
-            
+
             CreateMap<Iis.Domain.Materials.MaterialsCountByType, IIS.Core.GraphQL.Materials.MaterialsCountByType>();
 
             //theme: graphQl input -> domain

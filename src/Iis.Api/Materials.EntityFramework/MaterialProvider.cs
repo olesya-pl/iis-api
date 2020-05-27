@@ -14,7 +14,6 @@ using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Materials;
 using Iis.Roles;
 
 namespace IIS.Core.Materials.EntityFramework
@@ -39,18 +38,22 @@ namespace IIS.Core.Materials.EntityFramework
             _cache = cache;
             _mapper = mapper;
         }
-
         public async Task<(
             IEnumerable<Material> Materials,
             int Count,
-            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(int limit, int offset, string filterQuery,
-            IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null)
+            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(
+            int limit, int offset, string filterQuery,
+            IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null,
+            string sortColumnName = null, string sortOrder = null)
         {
             await _context.Semaphore.WaitAsync();
 
             try
             {
-                IQueryable<MaterialEntity> materialsQuery = GetParentMaterialsQuery(GetMaterialQuery());
+                IQueryable<MaterialEntity> materialsQuery
+                    = GetMaterialQuery()
+                    .GetParentMaterialsQuery()
+                    .ApplySorting(sortColumnName, sortOrder);
                 IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
@@ -61,19 +64,28 @@ namespace IIS.Core.Materials.EntityFramework
                         return (new List<Material>(), 0, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
                     }
 
+                    const int MaxResultWindow = 10000;
+
                     var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
                         _elasticService.MaterialIndexes,
-                        new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
+                        new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery});
 
                     var foundIds = searchResult.Items.Keys.ToList();
-                    mappingTasks =  (await materialsQuery
-                                        .Where(e => foundIds.Contains(e.Id))
+
+                    materialsCountQuery = materialsQuery = materialsQuery
+                                        .Where(e => foundIds.Contains(e.Id));
+
+                    mappingTasks = (await materialsQuery
+                                        .Skip(offset)
+                                        .Take(limit)
                                         .ToArrayAsync())
                                             .Select(async entity => await MapAsync(entity));
 
                     materials = await Task.WhenAll(mappingTasks);
 
-                    return (materials, searchResult.Count, searchResult.Items);
+                    var count = await materialsCountQuery.CountAsync();
+
+                    return (materials, count, searchResult.Items);
                 }
 
                 if (nodeIds == null)
@@ -156,6 +168,18 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MaterialSign>(materialSignEntity);
         }
 
+        public MaterialSign GetMaterialSign(string signValue)
+        {
+            if(string.IsNullOrWhiteSpace(signValue)) return null;
+
+            var entity = _cache.MaterialSigns
+                            .FirstOrDefault(ms => ms.Title == signValue);
+
+            if(entity is null) return null;
+
+            return _mapper.Map<MaterialSign>(entity);
+        }
+
         public async Task<Material> MapAsync(MaterialEntity material)
         {
             if (material == null) return null;
@@ -206,6 +230,8 @@ namespace IIS.Core.Materials.EntityFramework
                 new JProperty(nameof(Material.Relevance).ToLower(), material.Relevance?.Title),
                 new JProperty(nameof(Material.Completeness).ToLower(), material.Completeness?.Title),
                 new JProperty(nameof(Material.SourceReliability).ToLower(), material.SourceReliability?.Title),
+                new JProperty(nameof(Material.ProcessedStatus).ToLower(), material.ProcessedStatus?.Title),
+                new JProperty(nameof(Material.SessionPriority).ToLower(), material.SessionPriority?.Title),
                 new JProperty(nameof(Material.Id).ToLower(), material.Id.ToString("N"))
             );
 
@@ -233,7 +259,7 @@ namespace IIS.Core.Materials.EntityFramework
                 jDocument.Add(new JProperty(nameof(Material.LoadData), JObject.Parse(material.LoadData.ToJson())));
             }
 
-            if(mLResponses.Any())
+            if (mLResponses.Any())
             {
                 var mlResponses = new JObject();
                 jDocument.Add(new JProperty(nameof(mlResponses), mlResponses));
@@ -247,9 +273,28 @@ namespace IIS.Core.Materials.EntityFramework
                 }
             }
 
+            if (material.Assignee != null)
+            {
+                jDocument.Add(
+                    new JProperty(nameof(Material.Assignee),
+                    SerializeAssignee(material.Assignee)));
+            }
+
 
             return jDocument;
         }
+
+        private JObject SerializeAssignee(User assignee)
+        {
+            var res = new JObject();
+            res[nameof(User.Id)] = assignee.Id.ToString("N");
+            res[nameof(User.UserName)] = assignee.UserName;
+            res[nameof(User.FirstName)] = assignee.FirstName;
+            res[nameof(User.LastName)] = assignee.LastName;
+            res[nameof(User.Patronymic)] = assignee.Patronymic;
+            return res;
+        }
+
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
         {
             IEnumerable<Task<Material>> mappingTasks;
@@ -275,12 +320,6 @@ namespace IIS.Core.Materials.EntityFramework
                                 (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
                             .Where(m => m.MaterialFeature.NodeId == nodeId)
                             .Select(m => m.MaterialInfoJoined.Material);
-        }
-
-        private IQueryable<MaterialEntity> GetParentMaterialsQuery(IQueryable<MaterialEntity> materialQuery)
-        {
-            return materialQuery
-                    .Where(p => p.ParentId == null);
         }
 
         private IQueryable<MaterialEntity> GetMaterialQuery()
@@ -337,7 +376,8 @@ namespace IIS.Core.Materials.EntityFramework
 
         public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
         {
-            return GetParentMaterialsQuery(GetMaterialByNodeIdQuery(nodeId))
+            return GetMaterialByNodeIdQuery(nodeId)
+                .GetParentMaterialsQuery()
                 .GroupBy(p => p.Type)
                 .Select(group => new MaterialsCountByType
                 {
@@ -350,7 +390,9 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId)
         {
             var materials = await
-                GetParentMaterialsQuery(GetMaterialQuery()).Where(p => p.AssigneeId == assigneeId)
+                GetMaterialQuery()
+                .GetParentMaterialsQuery()
+                .Where(p => p.AssigneeId == assigneeId)
                 .Select(p => _mapper.Map<Material>(p))
                 .ToListAsync();
 
