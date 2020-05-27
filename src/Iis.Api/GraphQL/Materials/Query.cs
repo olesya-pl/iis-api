@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL.Materials
 
             var materialsResult = await materialProvider
                 .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types,
-                    sorting.ColumnName, sorting.Order);
+                    sorting?.ColumnName, sorting?.Order);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
