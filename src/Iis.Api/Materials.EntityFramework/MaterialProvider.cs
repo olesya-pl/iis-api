@@ -64,19 +64,28 @@ namespace IIS.Core.Materials.EntityFramework
                         return (new List<Material>(), 0, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
                     }
 
+                    const int MaxResultWindow = 10000;
+
                     var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
                         _elasticService.MaterialIndexes,
-                        new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery});
+                        new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery});
 
                     var foundIds = searchResult.Items.Keys.ToList();
-                    mappingTasks =  (await materialsQuery
-                                        .Where(e => foundIds.Contains(e.Id))
+
+                    materialsCountQuery = materialsQuery = materialsQuery
+                                        .Where(e => foundIds.Contains(e.Id));
+
+                    mappingTasks = (await materialsQuery
+                                        .Skip(offset)
+                                        .Take(limit)
                                         .ToArrayAsync())
                                             .Select(async entity => await MapAsync(entity));
 
                     materials = await Task.WhenAll(mappingTasks);
 
-                    return (materials, searchResult.Count, searchResult.Items);
+                    var count = await materialsCountQuery.CountAsync();
+
+                    return (materials, count, searchResult.Items);
                 }
 
                 if (nodeIds == null)

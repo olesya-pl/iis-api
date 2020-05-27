@@ -28,7 +28,8 @@ namespace IIS.Core.GraphQL.Materials
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
 
             var materialsResult = await materialProvider
-                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types);
+                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types,
+                    sorting.ColumnName, sorting.Order);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
