@@ -123,12 +123,15 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.SourceReliabilityId.HasValue) material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
             if (input.ProcessedStatusId.HasValue) material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
             if (input.SessionPriorityId.HasValue) material.SessionPriorityId = input.SessionPriorityId.Value;
-            var loadData = new MaterialLoadData();
+            if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
+            
+            var loadData = MaterialLoadData.MapLoadData(material.LoadData);
+            
             if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
             if (input.States != null) loadData.States = new List<string>(input.States);
+            
             material.LoadData = loadData.ToJson();
-            if (input.AssigneeId != null) material.AssigneeId = input.AssigneeId;
 
             await UpdateAsync(material);
 
