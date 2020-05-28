@@ -113,7 +113,7 @@ namespace Iis.OntologySchema.DataTypes
             return ancestors.Any(nt => nt.Name == nodeTypeName);
         }
 
-        public bool IsObjectOfStudy => IsInheritedFrom("ObjectOfStudy");
+        public bool IsObjectOfStudy => IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
 
         public string GetStringCode()
         {

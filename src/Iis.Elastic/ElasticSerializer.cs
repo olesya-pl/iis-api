@@ -52,11 +52,15 @@ namespace Iis.Elastic
             return json;
         }
 
-        private JToken GetFuzzyDateJObject(IExtNode extNode)
+        private JToken GetFuzzyDateJToken(IExtNode extNode)
         {
             int? year = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "year")?.AttributeValue;
-            int? month = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "month")?.AttributeValue;
-            int? day = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "day")?.AttributeValue;
+            if (year == null)
+            {
+                return null;
+            }
+            int month = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "month")?.AttributeValue ?? 1;
+            int day = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "day")?.AttributeValue ?? 1;
 
             var date = new DateTime((int)year, (int)month, (int)day);
             return JToken.FromObject(date);
@@ -66,7 +70,7 @@ namespace Iis.Elastic
         {
             if (extNode.EntityTypeName == EntityTypeNames.FuzzyDate.ToString())
             {
-                return GetFuzzyDateJObject(extNode);
+                return GetFuzzyDateJToken(extNode);
             }
 
             if (extNode.IsAttribute && extNode.AttributeValue != null)
