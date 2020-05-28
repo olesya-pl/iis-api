@@ -32,6 +32,9 @@ namespace Iis.Domain.Materials
         public static MaterialLoadData MapLoadData(string loadData)
         {
             var result = new Domain.Materials.MaterialLoadData();
+            
+            if(string.IsNullOrWhiteSpace(loadData)) return result;
+
             var json = JObject.Parse(loadData);
 
             if (json.ContainsKey("from")) result.From = (string)json["from"];

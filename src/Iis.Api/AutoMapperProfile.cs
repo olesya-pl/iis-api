@@ -166,7 +166,7 @@ namespace Iis.Api
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.ProcessedStatus)))
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SessionPriority)))
-                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => string.IsNullOrEmpty(src.LoadData) ? new Domain.Materials.MaterialLoadData() : Domain.Materials.MaterialLoadData.MapLoadData(src.LoadData)));
+                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => Domain.Materials.MaterialLoadData.MapLoadData(src.LoadData)));
 
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
