@@ -62,8 +62,15 @@ namespace Iis.Elastic
             int month = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "month")?.AttributeValue ?? 1;
             int day = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "day")?.AttributeValue ?? 1;
 
-            var date = new DateTime((int)year, (int)month, (int)day);
-            return JToken.FromObject(date);
+            try
+            {
+                var date = new DateTime((int)year, (int)month, (int)day);
+                return JToken.FromObject(date);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private JToken GetExtNodeValue(IExtNode extNode)
