@@ -32,7 +32,6 @@ namespace Iis.Elastic
                 inner["properties"] = jProperties;
             }
             return inner;
-        //result[Name] = 
         }
     }
 

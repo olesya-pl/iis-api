@@ -52,6 +52,7 @@ namespace IIS.Core.Materials
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            return;
             while (!stoppingToken.IsCancellationRequested)
             {
                 try

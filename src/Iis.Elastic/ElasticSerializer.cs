@@ -3,6 +3,8 @@ using System.Linq;
 
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
+using System;
 
 namespace Iis.Elastic
 {
@@ -50,16 +52,29 @@ namespace Iis.Elastic
             return json;
         }
 
+        private JToken GetFuzzyDateJObject(IExtNode extNode)
+        {
+            int? year = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "year")?.AttributeValue;
+            int? month = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "month")?.AttributeValue;
+            int? day = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "day")?.AttributeValue;
+
+            var date = new DateTime((int)year, (int)month, (int)day);
+            return JToken.FromObject(date);
+        }
+
         private JToken GetExtNodeValue(IExtNode extNode)
         {
-            if (extNode.IsAttribute)
+            if (extNode.EntityTypeName == EntityTypeNames.FuzzyDate.ToString())
             {
-                return extNode.AttributeValue;
+                return GetFuzzyDateJObject(extNode);
             }
-            else
+
+            if (extNode.IsAttribute && extNode.AttributeValue != null)
             {
-                return GetJsonObjectByExtNode(extNode, false);
+                return JToken.FromObject(extNode.AttributeValue);
             }
+            
+            return GetJsonObjectByExtNode(extNode, false);
         }
     }
 }

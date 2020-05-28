@@ -57,14 +57,15 @@ namespace Iis.Elastic
             if (existingProperty == null)
             {
                 var mappingProperty = new ElasticMappingProperty { Name = name };
-                if (nameParts.Length == 1)
-                {
-                    mappingProperty.Type = propertyType;
-                }
-                else
+                var isNestedProperty = nameParts.Length > 1;
+                if (isNestedProperty)
                 {
                     mappingProperty.Type = ElasticMappingPropertyType.Nested;
                     AddProperty(mappingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
+                }
+                else
+                {
+                    mappingProperty.Type = propertyType;
                 }
                 properties.Add(mappingProperty);
             }
