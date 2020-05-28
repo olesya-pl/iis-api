@@ -31,28 +31,27 @@ namespace IIS.Core.Tools
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
             
             await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
-            
+
+            await _elasticManager.CreateIndexesAsync(ontologyIndexes, cancellationToken);
             foreach (var extNode in extNodes)
             {
                 await _elasticService.PutNodeAsync(extNode, cancellationToken);
             }
 
-            await _elasticManager.CreateIndexesAsync(ontologyIndexes, cancellationToken);
 
+            //var materialEntities = await _materialProvider.GetMaterialEntitiesAsync();
 
-            var materialEntities = await _materialProvider.GetMaterialEntitiesAsync();
+            //var materialIndex = _elasticService.MaterialIndexes.First();
 
-            var materialIndex = _elasticService.MaterialIndexes.First();
+            //await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
-            await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
+            //var entityTasks = materialEntities
+            //                    .Select(async entity => {
+            //                        var document = await _materialProvider.GetMaterialDocumentAsync(entity.Id);
+            //                        return _elasticService.PutMaterialAsync(entity.Id, document, cancellationToken);
+            //                    });
 
-            var entityTasks = materialEntities
-                                .Select(async entity => {
-                                    var document = await _materialProvider.GetMaterialDocumentAsync(entity.Id);
-                                    return _elasticService.PutMaterialAsync(entity.Id, document, cancellationToken);
-                                });
-
-            await Task.WhenAll(entityTasks);
+            //await Task.WhenAll(entityTasks);
         }
     }
 }
