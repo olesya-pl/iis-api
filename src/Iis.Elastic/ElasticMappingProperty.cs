@@ -21,7 +21,11 @@ namespace Iis.Elastic
         public JObject ConvertToJObject()
         {
             var inner = new JObject();
-            inner["type"] = this.Type.ToString().ToLower();
+            if (this.Type != ElasticMappingPropertyType.Nested)
+            {
+                inner["type"] = this.Type.ToString().ToLower();
+            }
+
             if (Properties.Count > 0)
             {
                 var jProperties = new JObject();
