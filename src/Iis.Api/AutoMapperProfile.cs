@@ -137,7 +137,13 @@ namespace Iis.Api
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string)null : src.Metadata.ToString(Formatting.None)))
                 .ForMember(dest => dest.Data, opt => opt.MapFrom(src => src.Data == null ? (string)null : src.Data.ToString(Formatting.None)))
-                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null ? (string)null : src.LoadData.ToJson()));
+                .ForMember(dest => dest.LoadData, opt => opt.MapFrom(src => src.LoadData == null ? (string)null : src.LoadData.ToJson()))
+                .ForMember(dest => dest.Importance, opt => opt.Ignore())
+                .ForMember(dest => dest.Reliability, opt => opt.Ignore())
+                .ForMember(dest => dest.Relevance, opt => opt.Ignore())
+                .ForMember(dest => dest.Completeness, opt => opt.Ignore())
+                .ForMember(dest => dest.SourceReliability, opt => opt.Ignore())
+                .ForMember(dest => dest.SessionPriority, opt => opt.Ignore());
 
             CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => {
@@ -168,7 +174,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Source, opts => opts.MapFrom(src => src.Metadata.Source))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => new FileInfo((Guid)src.FileId)))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileInfo((Guid)src.FileId): null ))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))
                 .ForMember(dest => dest.CreatedDate,
                     opts => opts.MapFrom(src => src.CreationDate >= new DateTime(1970, 1, 1) ? src.CreationDate : new DateTime(1970, 1, 1)));
