@@ -19,6 +19,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLIgnore] public Guid? FileId { get; set; }
         [GraphQLNonNullType] public Metadata Metadata { get; set; }
         public string CreatedDate { get; set; }
+        public string Content { get; set; }
         public MaterialSign Importance { get; set; }
         public MaterialSign Reliability { get; set; }
         public MaterialSign Relevance { get; set; }
@@ -26,7 +27,7 @@ namespace IIS.Core.GraphQL.Materials
         public MaterialSign SourceReliability { get; set; }
         public MaterialSign ProcessedStatus { get; set; }
         public MaterialSign SessionPriority { get; set; }
-        public IEnumerable<Data > Data { get; set; }
+        public IEnumerable<Data> Data { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Transcriptions { get; set; }
         public string Title { get; set; }

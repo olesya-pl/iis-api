@@ -115,7 +115,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == input.Id);
 
-            if (string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
+            if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
             if (input.ImportanceId.HasValue) material.ImportanceSignId = input.ImportanceId.Value;
             if (input.ReliabilityId.HasValue) material.ReliabilitySignId = input.ReliabilityId.Value;
             if (input.RelevanceId.HasValue) material.RelevanceSignId = input.RelevanceId.Value;
@@ -124,7 +124,8 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.ProcessedStatusId.HasValue) material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
             if (input.SessionPriorityId.HasValue) material.SessionPriorityId = input.SessionPriorityId.Value;
             if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
-            
+            if (!string.IsNullOrWhiteSpace(input.Content)) material.Content = input.Content;
+
             var loadData = MaterialLoadData.MapLoadData(material.LoadData);
             
             if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
