@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL.Materials
 
             inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
 
-            await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
+            await materialService.SaveAsync(inputMaterial);
 
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
 

@@ -40,12 +40,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProcessors = materialProcessors;
         }
 
-        private async Task SaveAsync(Material material)
-        {
-            await SaveAsync(material, null);
-        }
-
-        public async Task SaveAsync(Material material, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes)
+        public async Task SaveAsync(Material material)
         {
             if (material.File != null) // if material has attached file
             {
@@ -94,8 +89,6 @@ namespace IIS.Core.Materials.EntityFramework
             if (material.File != null && material.Type == "cell.voice")
                 _eventProducer.SendMaterialAddedEventAsync(
                     new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id});
-
-            SendIcaoEvent(nodes);
         }
 
         public async Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)

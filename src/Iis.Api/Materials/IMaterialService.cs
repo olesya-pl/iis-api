@@ -9,7 +9,7 @@ namespace IIS.Core.Materials
 {
     public interface IMaterialService
     {
-        Task SaveAsync(Material material, IEnumerable<GraphQL.Materials.Node> nodes);
+        Task SaveAsync(Material material);
         Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response);
         Task<Material> UpdateMaterial(IMaterialUpdateInput input);
         Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
