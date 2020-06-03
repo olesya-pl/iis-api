@@ -9,6 +9,7 @@ namespace IIS.Core.GraphQL.Materials
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
+        public string Content {get;set;}
         public Guid? ImportanceId { get; set; }
         public Guid? ReliabilityId { get; set; }
         public Guid? RelevanceId { get; set; }

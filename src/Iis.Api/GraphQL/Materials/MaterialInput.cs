@@ -16,6 +16,7 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<Data> Data { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
+        public string Content { get; set; }
         public string ImportanceText { get; set; }
         public string ReliabilityText { get; set; }
         public string SourceReliabilityText { get; set; }

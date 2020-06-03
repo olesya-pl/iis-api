@@ -256,6 +256,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid?>("CompletenessSignId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
 
