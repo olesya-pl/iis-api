@@ -6,7 +6,7 @@ namespace Iis.Interfaces.Ontology.Schema
 {
     public interface IAttributeInfoItem
     {
-        public string DotName { get; }
-        public ScalarType ScalarType { get; }
+        string DotName { get; }
+        ScalarType ScalarType { get; }
     }
 }

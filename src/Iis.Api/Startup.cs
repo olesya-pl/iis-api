@@ -41,6 +41,7 @@ using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
 using AutoMapper;
+using Iis.Api.Bootstrap;
 using Iis.Api.Export;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
@@ -274,7 +275,8 @@ namespace IIS.Core
                     .AllowAnyMethod()
             );
 
-            app.UseSerilogRequestLogging();
+            app.UseMiddleware<LogHeaderMiddleware>();
+            app.UseMiddleware<LoggingMiddleware>();
 
             app.UseGraphQL();
             app.UsePlayground();
