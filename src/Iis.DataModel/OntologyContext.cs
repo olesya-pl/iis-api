@@ -1,9 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel.Analytics;
+using Iis.DataModel.ChangeHistory;
+using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
 using Iis.DataModel.Roles;
+using Iis.DataModel.Themes;
 using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DataModel
@@ -43,6 +46,13 @@ namespace Iis.DataModel
         public DbSet<AccessObjectEntity> AccessObjects { get; set; }
         public DbSet<UserRoleEntity> UserRoles { get; set; }
 
+        public DbSet<MLResponseEntity> MLResponses { get; set; }
+        public DbSet<ElasticFieldEntity> ElasticFields { get; set; }
+        public DbSet<ChangeHistoryEntity> ChangeHistory { get; set; }
+
+        public DbSet<ThemeEntity> Themes { get; set; }
+        public DbSet<ThemeTypeEntity> ThemeTypes { get; set; }
+
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
         {
@@ -75,7 +85,12 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new OntologyMigrationsConfiguration());
 
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+
+            modelBuilder.ApplyConfiguration(new MLResponseConfiguration());
+            modelBuilder.ApplyConfiguration(new ElasticFieldConfiguration());
+            modelBuilder.ApplyConfiguration(new ChangeHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ThemeConfiguration());
+            modelBuilder.ApplyConfiguration(new ThemeTypeConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

@@ -7,27 +7,24 @@ using Iis.DataModel;
 using Iis.DataModel.Analytics;
 using Newtonsoft.Json;
 using IIS.Domain;
-using Iis.DbLayer.Ontology.EntityFramework;
 
 namespace IIS.Core.Analytics.EntityFramework
 {
     public class AnalyticsRepository : IAnalyticsRepository
     {
-        private OntologyContext _dbCtx;
-        private ContextFactory _ctxFactory;
+        private OntologyContext _context;
         private IOntologyProvider _ontologyProvider;
 
-        public AnalyticsRepository(OntologyContext ctx, ContextFactory contextFactory, IOntologyProvider ontologyProvider)
+        public AnalyticsRepository(OntologyContext ctx, IOntologyProvider ontologyProvider)
         {
-            _dbCtx = ctx;
-            _ctxFactory = contextFactory;
+            _context = ctx;
             _ontologyProvider = ontologyProvider;
         }
 
         public async Task<IEnumerable<AnalyticIndicatorEntity>> GetAllChildrenAsync(Guid parentId)
         {
             // TODO: better to use QueryBuilder because escaping is Postgres specific
-            return await _dbCtx.AnalyticIndicators
+            return await _context.AnalyticIndicators
                 .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *
@@ -47,7 +44,7 @@ namespace IIS.Core.Analytics.EntityFramework
         public async Task<AnalyticIndicatorEntity> getRootAsync(Guid childId)
         {
             // TODO: better to use QueryBuilder because escaping is Postgres specific
-            return await _dbCtx.AnalyticIndicators
+            return await _context.AnalyticIndicators
                 .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *, 0 as level
@@ -61,7 +58,6 @@ namespace IIS.Core.Analytics.EntityFramework
                     )
                     SELECT * FROM children
                     ORDER BY level DESC
-                    LIMIT 1
                 ", childId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
@@ -69,33 +65,30 @@ namespace IIS.Core.Analytics.EntityFramework
 
         public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsQueryBuilder query)
         {
-            using (var ctx = _ctxFactory.CreateContext())
+            var (sql, sqlParams) = query.ToSQL();
+            List<AnalyticsQueryIndicatorResult> results;
+
+            using (var command = _context.Database.GetDbConnection().CreateCommand())
             {
-                var (sql, sqlParams) = query.ToSQL();
-                List<AnalyticsQueryIndicatorResult> results;
-
-                using (var command = ctx.Database.GetDbConnection().CreateCommand())
+                command.CommandText = sql;
+                foreach (var param in sqlParams)
                 {
-                    command.CommandText = sql;
-                    foreach (var param in sqlParams)
-                    {
-                        var parameter = command.CreateParameter();
-                        parameter.Value = param.Value;
-                        parameter.ParameterName = param.Key;
-                        command.Parameters.Add(parameter);
-                    }
-
-                    ctx.Database.OpenConnection();
-                    using (var reader = await command.ExecuteReaderAsync())
-                    {
-                        results = new List<AnalyticsQueryIndicatorResult>();
-                        while (reader.Read())
-                            results.Add(new AnalyticsQueryIndicatorResult(reader.GetGuid(0), reader[1]));
-                    }
+                    var parameter = command.CreateParameter();
+                    parameter.Value = param.Value;
+                    parameter.ParameterName = param.Key;
+                    command.Parameters.Add(parameter);
                 }
 
-                return results;
+                _context.Database.OpenConnection();
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    results = new List<AnalyticsQueryIndicatorResult>();
+                    while (reader.Read())
+                        results.Add(new AnalyticsQueryIndicatorResult(reader.GetGuid(0), reader[1]));
+                }
             }
+
+            return results;
         }
 
         public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticIndicatorEntity indicator, DateTime? fromDate, DateTime? toDate)

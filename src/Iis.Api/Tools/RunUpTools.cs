@@ -67,7 +67,6 @@ namespace IIS.Core.Tools
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
             ActionTools tools = scope.ServiceProvider.GetRequiredService<ActionTools>();
-            ElasticTools elasticTools = scope.ServiceProvider.GetRequiredService<ElasticTools>();
 
             switch (actionName)
             {
@@ -100,9 +99,6 @@ namespace IIS.Core.Tools
                     break;
                 case "dump-odysseus-ontology":
                     await tools.DumpOdysseusOntologyAsync();
-                    break;
-                case "recreate-elastic":
-                    await elasticTools.RecreateElasticAsync();
                     break;
                 case "migrate-ontology":
                     await tools.MigrateOntologyAsync();

@@ -47,8 +47,23 @@ namespace Iis.DataModel.Materials
                 .WithMany()
                 .HasForeignKey(e => e.SourceReliabilitySignId);
 
+            builder
+                .HasOne(e => e.SessionPriority)
+                .WithMany()
+                .HasForeignKey(e => e.SessionPriorityId);
+
+            builder
+                .HasOne(e => e.ProcessedStatus)
+                .WithMany()
+                .HasForeignKey(e => e.ProcessedStatusSignId);
+
             builder.Property(e => e.ParentId).IsRequired(false);
             builder.Property(e => e.FileId).IsRequired(false);
+
+            builder
+                .HasOne(e => e.Assignee)
+                .WithMany(e => e.Materials)
+                .HasForeignKey(e => e.AssigneeId);
         }
     }
 }

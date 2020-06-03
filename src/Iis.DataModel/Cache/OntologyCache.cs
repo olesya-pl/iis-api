@@ -10,6 +10,7 @@ namespace Iis.DataModel.Cache
     {
         OntologyContext _context;
         Dictionary<Guid, MaterialSignEntity> _materialSignsDict;
+        Dictionary<string, IReadOnlyCollection<string>> _fieldNamesByType = new Dictionary<string, IReadOnlyCollection<string>>();
         public IReadOnlyCollection<MaterialSignEntity> MaterialSigns => _materialSignsDict.Values;
         public OntologyCache(OntologyContext context)
         {
@@ -23,6 +24,17 @@ namespace Iis.DataModel.Cache
         public MaterialSignEntity GetMaterialSign(Guid id)
         {
             return _materialSignsDict[id];
+        }
+
+        public void PutFieldNamesByNodeType(string typeName, IReadOnlyCollection<string> fieldNames)
+        {
+            _fieldNamesByType["typeName"] = fieldNames;
+        }
+
+        public IReadOnlyCollection<string> GetFieldNamesByNodeType(string typeName)
+        {
+            _fieldNamesByType.TryGetValue(typeName, out var result);
+            return result;
         }
     }
 }

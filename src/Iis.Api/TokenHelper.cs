@@ -1,13 +1,13 @@
+using System;
+using System.Text;
 using System.Security.Claims;
 using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Security.Authentication;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
+
 using Iis.Roles;
-using System.Threading.Tasks;
 
 namespace IIS.Core
 {
@@ -45,7 +45,7 @@ namespace IIS.Core
             );
         }
 
-        public static TokenPayload ValidateToken(string token, IConfiguration config, RoleLoader roleLoader)
+        public static TokenPayload ValidateToken(string token, IConfiguration config, UserService userService)
         {
             if (!_securityTokenHandler.CanReadToken(token))
                 throw new AuthenticationException("Unable to read token");
@@ -57,11 +57,19 @@ namespace IIS.Core
                     ValidAudience = config.GetValue<string>("jwt:audience"),
                     IssuerSigningKey = GetSymmetricSecurityKey(config.GetValue<string>("jwt:signingKey")),
                     ValidateIssuerSigningKey = true,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
                 };
 
                 _securityTokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-                return TokenPayload.From(validatedToken as JwtSecurityToken, roleLoader);
+
+                var userId = TokenPayload.GetUserId(validatedToken as JwtSecurityToken);
+
+                var user = userService.GetUser(userId);
+
+                if (user is null) throw new SecurityTokenException();
+
+                return TokenPayload.From(validatedToken as JwtSecurityToken, user);
             }
             catch (SecurityTokenException)
             {
@@ -77,13 +85,17 @@ namespace IIS.Core
         public readonly Guid UserId;
         public User User;
 
-        static public TokenPayload From(JwtSecurityToken token, RoleLoader roleLoader)
+        public static TokenPayload From(JwtSecurityToken token, User user)
         {
-            var userId = Guid.Parse(token.Payload[TokenHelper.CLAIM_TYPE_UID] as string);
-            var user = roleLoader.GetUser(userId);
-            return new TokenPayload(userId, user);
+            return new TokenPayload(user.Id, user);
         }
 
+        public static Guid GetUserId(JwtSecurityToken token) 
+        {
+            var userId = Guid.Parse(token.Payload[TokenHelper.CLAIM_TYPE_UID] as string);
+
+            return userId;
+        }
         public TokenPayload(Guid userId, User user)
         {
             UserId = userId;

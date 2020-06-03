@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
-
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Elastic
 {
@@ -18,16 +17,19 @@ namespace Iis.Elastic
         private const string RemoveSymbolsPattern = "№";
         ElasticLowLevelClient _lowLevelClient;
         ElasticConfiguration _configuration;
+        SearchResultExtractor _resultExtractor;
 
-        public ElasticManager(ElasticConfiguration configuration)
+        public ElasticManager(ElasticConfiguration configuration,
+            SearchResultExtractor resultExtractor)
         {
             _configuration = configuration;
 
             var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
 
             var config = new ConnectionConfiguration(connectionPool);
-            
+
             _lowLevelClient = new ElasticLowLevelClient(config);
+            _resultExtractor = resultExtractor;
         }
 
         public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
@@ -46,7 +48,7 @@ namespace Iis.Elastic
         public async Task<bool> DeleteDocumentAsync(string indexName, string documentId)
         {
             var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId);
-            
+
             return searchResponse.Success;
         }
 
@@ -54,17 +56,17 @@ namespace Iis.Elastic
         {
             var jsonString = GetSearchJson(searchParams);
             var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_search" : 
+                "_search" :
                 $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
             var response = await GetAsync(path, jsonString, cancellationToken);
-            return GetSearchResultFromResponse(response);
+            return _resultExtractor.GetFromResponse(response);
         }
 
-        public async Task<IEnumerable<string>> GetDocumentIdListFromIndexAsync(string indexName)
+        public async Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName)
         {
             if (indexName == null) throw new ArgumentNullException(nameof(indexName));
-            
+
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
             {
                 query = new
@@ -76,10 +78,10 @@ namespace Iis.Elastic
 
             if (!searchResponse.Success)
             {
-                return new List<string>();
+                return new ElasticSearchResult();
             }
-            
-            return GetSearchResultFromResponse(searchResponse).Identifiers;
+
+            return _resultExtractor.GetFromResponse(searchResponse);
         }
 
         public async Task<string> GetDocumentByIdAsync(string indexName, string documentId, string[] documentFields)
@@ -120,7 +122,7 @@ namespace Iis.Elastic
             var path = $"{GetRealIndexNames(indexNames)}";
 
             var response = await DoRequestAsync(HttpMethod.DELETE, path, string.Empty, cancellationToken);
-            
+
             return response.Success;
         }
 
@@ -129,9 +131,19 @@ namespace Iis.Elastic
             var indexUrl = $"{GetRealIndexName(indexName)}";
 
             var response = await DoRequestAsync(HttpMethod.DELETE, indexUrl, string.Empty, cancellationToken);
-            
+
             return response.Success;
         }
+
+        public async Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default)
+        {
+            var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
+            var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
+            var jObject = mappingConfiguration.ConvertToJObject();
+            var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
+            return response.Success;
+        }
+        
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
@@ -154,29 +166,6 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        private IElasticSearchResult GetSearchResultFromResponse(StringResponse response)
-        {
-            var json = JObject.Parse(response.Body);
-            var ids = new List<string>();
-
-            var hits = json["hits"]["hits"];
-            if (hits != null)
-            {
-                foreach (var hit in hits)
-                {
-                    var hitObj = JObject.Parse(hit.ToString());
-                    ids.Add(hit["_id"].ToString());
-
-                }
-            }
-            var total = json["hits"]["total"]["value"];
-            return new ElasticSearchResult
-            {
-                Count = (int)total, 
-                Identifiers = ids
-            };
-        }
-
         private string GetSearchJson(IIisElasticSearchParams searchParams)
         {
             var json = new JObject();
@@ -184,15 +173,78 @@ namespace Iis.Elastic
             json["from"] = searchParams.From;
             json["size"] = searchParams.Size;
             json["query"] = new JObject();
+
+            PrepareHighlights(json);
+
+            if (IsExactQuery(searchParams.Query))
+            {
+                PopulateExactQuery(searchParams, json);
+            }
+            else if (searchParams.SearchFields?.Any() == true)
+            {
+                PopulateFieldsIntoQuery(searchParams, json);
+            }
+            else
+            {
+                PrepareFallbackQuery(searchParams, json);
+            }
+
+            return json.ToString();
+        }
+
+        private bool IsExactQuery(string query)
+        {
+            return query.Contains(":")
+                || query.Contains(" AND ")
+                || query.Contains(" OR ");
+        }
+
+        private void PopulateExactQuery(IIisElasticSearchParams searchParams, JObject json)
+        {
             var queryString = new JObject();
-
-            queryString["query"] = EscapeElasticSpecificSymbols(RemoveSymbols(searchParams.Query, RemoveSymbolsPattern), EscapeSymbolsPattern);
-            queryString["fields"] = new JArray(searchParams.SearchFields);
+            queryString["query"] = searchParams.Query;
             queryString["lenient"] = searchParams.IsLenient;
-
             json["query"]["query_string"] = queryString;
+        }
 
-            return json.ToString(); ;
+        private void PopulateFieldsIntoQuery(IIisElasticSearchParams searchParams, JObject json)
+        {
+            json["query"]["bool"] = new JObject();
+            var columns = new JArray();
+
+            json["query"]["bool"]["should"] = columns;
+            foreach (var searchFieldGroup in searchParams.SearchFields.GroupBy(p => new { p.Fuzziness, p.Boost }))
+            {
+                var query = new JObject();
+                var queryString = new JObject();
+                queryString["query"] = ApplyFuzzinessOperator(
+                    EscapeElasticSpecificSymbols(
+                        RemoveSymbols(searchParams.Query, RemoveSymbolsPattern),
+                    EscapeSymbolsPattern));
+                queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
+                queryString["boost"] = searchFieldGroup.Key.Boost;
+                queryString["lenient"] = searchParams.IsLenient;
+                queryString["fields"] = new JArray(searchFieldGroup.Select(p => p.Name));
+                query["query_string"] = queryString;
+                columns.Add(query);
+            }
+        }
+
+        private void PrepareFallbackQuery(IIisElasticSearchParams searchParams, JObject json)
+        {
+            var queryString = new JObject();
+            queryString["query"] = EscapeElasticSpecificSymbols(
+                RemoveSymbols(searchParams.Query, RemoveSymbolsPattern), EscapeSymbolsPattern);
+            queryString["fields"] = new JArray("*");
+            queryString["lenient"] = searchParams.IsLenient;
+            json["query"]["query_string"] = queryString;
+        }
+
+        private static void PrepareHighlights(JObject json)
+        {
+            json["highlight"] = new JObject();
+            json["highlight"]["fields"] = new JObject();
+            json["highlight"]["fields"]["*"] = JObject.Parse("{\"type\" : \"plain\"}");
         }
 
         private string GetRealIndexName(string baseIndexName)
@@ -203,6 +255,11 @@ namespace Iis.Elastic
         private string GetRealIndexNames(IEnumerable<string> baseIndexNames)
         {
             return string.Join(',', baseIndexNames.Select(name => GetRealIndexName(name)));
+        }
+
+        private string ApplyFuzzinessOperator(string input)
+        {
+            return $"{input}~";
         }
 
         private string EscapeElasticSpecificSymbols(string input, string escapePattern)

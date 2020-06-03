@@ -3,7 +3,6 @@ using Iis.Domain.ExtendedData;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,47 +30,83 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private List<Guid> GetObjectOfStudyTypes()
         {
-            //TODO: 
+            //TODO:
             var objectOfStudyType = _context.NodeTypes
                 .Include(nt => nt.IncomingRelations)
                 .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
                 .SingleOrDefault();
-            return objectOfStudyType.IncomingRelations
-                .Where(r => r.Kind == RelationKind.Inheritance)
-                .Select(r => r.SourceTypeId)
-                .ToList();
+
+            if(objectOfStudyType != null)
+            {
+                return objectOfStudyType.IncomingRelations
+                    .Where(r => r.Kind == RelationKind.Inheritance)
+                    .Select(r => r.SourceTypeId)
+                    .ToList();
+            }
+            else
+            //TODO: we need some staff to do a check Contour or Odyssey
+            {
+                var types = _context.NodeTypes
+                                .Include(nt => nt.IncomingRelations)
+                                .Where(nt => nt.Kind == Kind.Entity && (nt.Name == "Organization" || nt.Name == "Person"))
+                                .ToList();
+
+                return types.SelectMany(t => t.IncomingRelations)
+                            .Select(r => r.SourceTypeId)
+                            .ToList();
+            }
         }
 
-        public async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
+        private object GetAttributeValue(NodeEntity nodeEntity)
         {
-            //Console.WriteLine($"=> {nodeEntity.Id}; {nodeEntity.NodeType.Name}");
+            if (nodeEntity.Attribute == null) return null;
+
+            var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
+            var value = nodeEntity.Attribute.Value;
+            switch (scalarType)
+            {
+                case ScalarType.Int:
+                    return Convert.ToInt32(value);
+                case ScalarType.Date:
+                    return Convert.ToDateTime(value);
+                default:
+                    return value.ToString();
+            }
+        }
+
+        private async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
+        {
             var extNode = new ExtNode
             {
                 Id = nodeEntity.Id.ToString("N"),
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
                 NodeTypeName = nodeTypeName,
                 NodeTypeTitle = nodeTypeTitle,
-                AttributeValue = nodeEntity.Attribute?.Value,
+                EntityTypeName = nodeEntity.NodeType.Name,
+                AttributeValue = GetAttributeValue(nodeEntity),
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
                 Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, cancellationToken)
             };
             return await Task.FromResult(extNode);
         }
-        
+
         public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var nodeEntity = await GetNodeQuery()
                 .Where(n => n.Id == id)
                 .SingleOrDefaultAsync();
+            
+            if (nodeEntity == null) return null;
+
             var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
             return extNode;
         }
 
-        public async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
+        private async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
         {
             var result = new List<IExtNode>();
-            foreach (var relation in relations)
+            foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.TargetNode.IsArchived))
             {
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
                 if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
@@ -109,11 +144,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return _context.Nodes
                 .Include(n => n.Attribute)
                 .Include(n => n.NodeType)
+                .ThenInclude(nt => nt.AttributeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
-                .ThenInclude(r => r.TargetNode);
+                .ThenInclude(r => r.TargetNode)
+                .Where(n => !n.IsArchived);
         }
     }
 }

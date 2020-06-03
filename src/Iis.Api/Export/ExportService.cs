@@ -46,10 +46,11 @@ namespace Iis.Api.Export
                         Body = new Body()
                     };
                     var body = mainPart.Document.Body;
-                    var container = body.AppendChild(new Run());
 
                     AppendNodeType(node, body);
                     AppendNodes(node.Children, body);
+
+                    doc.Close();
                 }
 
                 return memoryStream.ToArray();
@@ -109,7 +110,7 @@ namespace Iis.Api.Export
             headerParagraph.Append(headerRun);
             headerRun.AppendChild(new Text($"{childNode.NodeTypeTitle}"));
 
-            if (childNode.IsAttribute && !string.IsNullOrEmpty(childNode.AttributeValue))
+            if (childNode.IsAttribute && childNode.AttributeValue != null)
             {
                 var valueParagraph = container.AppendChild(new Paragraph());
                 var valueRun = new Run()
@@ -117,7 +118,7 @@ namespace Iis.Api.Export
                     RunProperties = GetValueStyles()
                 };
                 valueParagraph.Append(valueRun);
-                valueRun.AppendChild(new Text(FormatAttributeValue(childNode.AttributeValue)));
+                valueRun.AppendChild(new Text(FormatAttributeValue(childNode.AttributeValue.ToString())));
             }
 
             if (childNode.Children.Any())

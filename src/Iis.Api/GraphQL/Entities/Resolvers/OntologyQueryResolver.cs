@@ -2,29 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Flee.PublicTypes;
-using HotChocolate.Resolvers;
+using Microsoft.EntityFrameworkCore;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.Common;
+using HotChocolate.Resolvers;
 using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
-using IIS.Core.Ontology;
 using IIS.Core.Ontology.ComputedProperties;
+using IIS.Domain;
 using Iis.Domain;
 using Iis.Domain.Meta;
-using Microsoft.EntityFrameworkCore;
 using Attribute = Iis.Domain.Attribute;
 using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
-using IIS.Domain;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
     public class OntologyQueryResolver : IOntologyQueryResolver
     {
         private const string LastRelation = "LastRelation";
+
 
         public ObjectType ResolveAbstractType(IResolverContext context, object resolverResult)
         {
@@ -47,10 +45,20 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node as Entity; // return null if node was not entity
         }
 
-        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter>> ResolveEntityList(IResolverContext ctx, EntityType type)
+        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, EntityType type)
         {
             var nf = ctx.CreateNodeFilter(type);
-            return Tuple.Create((IEnumerable<EntityType>) new[] {type}, nf);
+
+            var filter = ctx.Argument<FilterInput>("filter");
+
+            IEnumerable<Guid> ids = new List<Guid>();
+
+            if (filter != null && filter.MatchList?.Any() == true)
+            {
+                ids = filter.MatchList;
+            }
+
+            return Tuple.Create((IEnumerable<EntityType>) new[] {type}, nf, ids);
         }
 
         // ----- Relations to attributes ----- //
@@ -148,7 +156,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ------ All entities ----- //
 
-        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter>> GetAllEntities(IResolverContext ctx)
+        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
             var ontologyService = ctx.Service<IOntologyService>();
@@ -159,7 +167,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (filter?.Types != null)
                 types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
 
-            return Tuple.Create(types, ctx.CreateNodeFilter());
+            IEnumerable<Guid> ids = new List<Guid>();
+
+            if (filter != null && filter.MatchList?.Any() == true)
+            {
+                ids = filter.MatchList;
+            }
+
+            return Tuple.Create(types, ctx.CreateNodeFilter(), ids);
         }
     }
 }

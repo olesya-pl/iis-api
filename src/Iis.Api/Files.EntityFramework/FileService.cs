@@ -46,15 +46,38 @@ namespace IIS.Core.Files.EntityFramework
                     f.Id,
                     f.Contents
                 };
+
             var files = await query.ToArrayAsync(token);
+
             foreach (var fileData in files)
             {
-                if (fileData.Contents.Length != contents.Length)
+                var storedFileBody = Array.Empty<byte>();
+
+                //since we have at least 2 types of storage: Database and Folder 
+                //let's do checks in both of them  
+                if (fileData.Contents != null)
+                {
+                    storedFileBody = fileData.Contents;
+                }
+                else
+                if(_configuration.Storage == Storage.Folder)
+                {
+                    var storedFilePath = Path.Combine(_configuration.Path, fileData.Id.ToString("D"));
+
+                    var storedFileInfo = new System.IO.FileInfo(storedFilePath);
+
+                    if(storedFileInfo.Exists)
+                    {
+                        storedFileBody = await File.ReadAllBytesAsync(storedFileInfo.FullName);
+                    }
+                }
+                
+                if (storedFileBody.Length != contents.Length)
                 {
                     continue;
                 }
 
-                if (contents.SequenceEqual(fileData.Contents))
+                if (contents.SequenceEqual(storedFileBody))
                 {
                     // Duplicate found.
                     return new FileId
@@ -80,6 +103,7 @@ namespace IIS.Core.Files.EntityFramework
             }
 
             _context.Add(file);
+            
             await _context.SaveChangesAsync();
 
             if (_configuration.Storage == Storage.Folder && !string.IsNullOrEmpty(_configuration.Path))
@@ -138,6 +162,8 @@ namespace IIS.Core.Files.EntityFramework
             {
                 contents = file.Contents;
             }
+
+            if (contents == null) return null;
 
             var ms = new MemoryStream(contents);
             return new FileInfo(id, file.Name, file.ContentType, ms, file.IsTemporary);

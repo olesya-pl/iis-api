@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - deploy
 
 build_job:
@@ -14,14 +15,34 @@ build_job:
     paths:
       - publish
     expire_in: 1 month
-
   tags:
     - ci
-  only:
-    - master
-    - /^v.+$/
-    - /^sprint\..+$/
-    - /^Release_*/
+  # only:
+  #   - master
+  #   - /^v.+$/
+  #   - /^sprint\..+$/
+  #   - /^Release_*/
+
+unit_test:
+  stage: test
+  script:
+    - dotnet test --test-adapter-path:. --logger:"junit;LogFilePath=../../{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose" src/Iis.UnitTests/Iis.UnitTests.csproj
+  artifacts:
+    when: always
+    paths:
+      - ./*test-result.xml
+    reports:
+      junit:
+        - ./*test-result.xml
+  allow_failure: true
+  tags:
+    - ci
+  # only:
+  #   - master
+  #   - /^v.+$/
+  #   - /^sprint\..+$/
+  #   - /^Release_*/
+
 
 .deploy:
   stage: deploy
@@ -41,6 +62,9 @@ build_job:
     - /^sprint\..+$/
     - /^Release_*/
     - master
+    - develop
+    - /^rc-*/
+    - /^release-*/
 
 .deploy_contour_dev:
   extends: .deploy
@@ -49,6 +73,14 @@ build_job:
   environment:
     name: dev_contour
     url: http://contour-dev-01.contour.net
+
+.deploy_contour_dev2:
+  extends: .deploy
+  variables:
+    DEPLOYMENT_FILE: dev2_con.yml
+  environment:
+    name: dev2_contour
+    url: http://dev2.contour.net
 
 .deploy_od_dev:
   extends: .deploy
@@ -64,15 +96,21 @@ deploy_contour_dev_auto:
   only:
     - /^Release_*/
     - master
+    - develop
 
 deploy_od_dev:
   extends: .deploy_od_dev
   only:
     - /^Release_*/
     - master
+    - develop
 
 deploy_contour_dev_manual:
   extends: .deploy_contour_dev
+  when: manual
+
+deploy_contour_dev2_manual:
+  extends: .deploy_contour_dev2
   when: manual
 
 deploy_od_dev_manual:

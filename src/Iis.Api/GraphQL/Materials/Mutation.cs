@@ -15,23 +15,38 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialInput input)
         {
-            Iis.Domain.Materials.Material inputMaterial = input.ToDomain();
+            
+            Iis.Domain.Materials.Material inputMaterial = mapper.Map<Iis.Domain.Materials.Material>(input);
+
+            inputMaterial.Reliability = materialProvider.GetMaterialSign(input.ReliabilityText);
+
+            inputMaterial.SourceReliability = materialProvider.GetMaterialSign(input.SourceReliabilityText);
+
+            inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
+
             await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
+
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
+
             return mapper.Map<Material>(material);
         }
 
         public async Task<Material> UpdateMaterial(
-            [Service] IMaterialProvider materialProvider,
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
-            var materialEntity = await materialProvider.UpdateMaterial(input);
-            await materialService.SaveAsync(materialEntity);
+            var material = await materialService.UpdateMaterial(input);
+            return mapper.Map<Material>(material);
+        }
 
-            var materialDomain = await materialProvider.MapAsync(materialEntity);
-            return mapper.Map<Material>(materialDomain);
+        public async Task<Material> AssignMaterialOperator(
+            [Service] IMaterialService materialService,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] AssignMaterialOperatorInput input)
+        {
+            var material = await materialService.AssignMaterialOperatorAsync(input.MaterialId, input.AssigneeId);
+            return mapper.Map<Material>(material);
         }
     }
 }

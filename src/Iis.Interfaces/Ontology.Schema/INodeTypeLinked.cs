@@ -25,11 +25,16 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<INodeTypeLinked> GetDirectAncestors();
         IReadOnlyList<INodeTypeLinked> GetAllAncestors();
         IReadOnlyList<INodeTypeLinked> GetDirectDescendants();
+        IReadOnlyList<INodeTypeLinked> GetAllDescendants();
         IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded();
-
         bool IsIdentical(INodeTypeLinked nodeType);
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
+        List<string> GetAttributeDotNamesRecursive(string parentName = null);
+        List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0);
+        IAttributeInfoList GetAttributesInfo();
+        bool IsInheritedFrom(string nodeTypeName);
+        bool IsObjectOfStudy { get; }
     }
 }

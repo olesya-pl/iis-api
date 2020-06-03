@@ -135,6 +135,64 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("AttributeTypes");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.ChangeHistory.ChangeHistoryEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OldValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PropertyName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TargetId");
+
+                    b.ToTable("ChangeHistory");
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Elastic.ElasticFieldEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Boost")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Fuzziness")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsExcluded")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ObjectType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TypeName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ElasticFields");
+                });
+
             modelBuilder.Entity("Iis.DataModel.Materials.FileEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -166,14 +224,40 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("Files");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.Materials.MLResponseEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MLHandlerName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OriginalResponse")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MLResponses");
+                });
+
             modelBuilder.Entity("Iis.DataModel.Materials.MaterialEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("AssigneeId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("CompletenessSignId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
@@ -196,10 +280,16 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ProcessedStatusSignId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("RelevanceSignId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ReliabilitySignId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SessionPriorityId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Source")
@@ -216,6 +306,8 @@ namespace Iis.DataModel.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssigneeId");
+
                     b.HasIndex("CompletenessSignId");
 
                     b.HasIndex("FileId");
@@ -224,9 +316,13 @@ namespace Iis.DataModel.Migrations
 
                     b.HasIndex("ParentId");
 
+                    b.HasIndex("ProcessedStatusSignId");
+
                     b.HasIndex("RelevanceSignId");
 
                     b.HasIndex("ReliabilitySignId");
+
+                    b.HasIndex("SessionPriorityId");
 
                     b.HasIndex("SourceReliabilitySignId");
 
@@ -267,7 +363,10 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Data")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("{}");
 
                     b.Property<Guid>("MaterialId")
                         .HasColumnType("uuid");
@@ -798,6 +897,10 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AdGroup")
+                        .HasColumnType("character varying(1024)")
+                        .HasMaxLength(1024);
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -837,19 +940,112 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.Themes.ThemeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Query")
+                        .IsRequired()
+                        .HasColumnType("character varying(1024)")
+                        .HasMaxLength(1024);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("character varying(1024)")
+                        .HasMaxLength(1024);
+
+                    b.Property<Guid>("TypeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Themes");
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Themes.ThemeTypeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EntityTypeName")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("ShortTitle")
+                        .IsRequired()
+                        .HasColumnType("character varying(16)")
+                        .HasMaxLength(16);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ThemeTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"),
+                            EntityTypeName = "EntityMaterial",
+                            ShortTitle = "М",
+                            Title = "Матеріал"
+                        },
+                        new
+                        {
+                            Id = new Guid("043ae699-e070-4336-8513-e90c87555c58"),
+                            EntityTypeName = "EntityObject",
+                            ShortTitle = "О",
+                            Title = "Об'єкт"
+                        },
+                        new
+                        {
+                            Id = new Guid("42f61965-8baa-4026-ab33-0378be8a6c3e"),
+                            EntityTypeName = "EntityEvent",
+                            ShortTitle = "П",
+                            Title = "Подія"
+                        });
+                });
+
             modelBuilder.Entity("Iis.DataModel.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Patronymic")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserNameActiveDirectory")
                         .HasColumnType("text");
 
                     b.Property<string>("Username")
@@ -920,6 +1116,10 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.Materials.MaterialEntity", b =>
                 {
+                    b.HasOne("Iis.DataModel.UserEntity", "Assignee")
+                        .WithMany("Materials")
+                        .HasForeignKey("AssigneeId");
+
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Completeness")
                         .WithMany()
                         .HasForeignKey("CompletenessSignId");
@@ -936,6 +1136,10 @@ namespace Iis.DataModel.Migrations
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
 
+                    b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "ProcessedStatus")
+                        .WithMany()
+                        .HasForeignKey("ProcessedStatusSignId");
+
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Relevance")
                         .WithMany()
                         .HasForeignKey("RelevanceSignId");
@@ -943,6 +1147,10 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Reliability")
                         .WithMany()
                         .HasForeignKey("ReliabilitySignId");
+
+                    b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "SessionPriority")
+                        .WithMany()
+                        .HasForeignKey("SessionPriorityId");
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "SourceReliability")
                         .WithMany()
@@ -1073,6 +1281,21 @@ namespace Iis.DataModel.Migrations
 
                     b.HasOne("Iis.DataModel.UserEntity", "User")
                         .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Themes.ThemeEntity", b =>
+                {
+                    b.HasOne("Iis.DataModel.Themes.ThemeTypeEntity", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Iis.DataModel.UserEntity", "User")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

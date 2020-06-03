@@ -1,5 +1,5 @@
+using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
-using System;
 using System.Collections.Generic;
 
 namespace Iis.DataModel
@@ -8,8 +8,14 @@ namespace Iis.DataModel
     {
         public string Username { get; set; }
         public string Name { get; set; }
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public string Patronymic { get; set; }
+        public string Comment { get; set; }
         public string PasswordHash { get; set; }
+        public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public List<UserRoleEntity> UserRoles { get; set; }
+        public List<MaterialEntity> Materials { get; internal set; }
     }
 }

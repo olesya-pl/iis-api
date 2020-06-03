@@ -1,67 +1,63 @@
+using System;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
+using AutoMapper;
+using Iis.Roles;
 using HotChocolate;
 using HotChocolate.Types;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+
+using Iis.Roles;
 using Iis.DataModel;
-using AutoMapper;
+using DomainRoles = Iis.Roles;
 
 namespace IIS.Core.GraphQL.Users
 {
     public class Mutation
     {
         private IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public Mutation(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public Mutation(IConfiguration configuration)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<User> CreateUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLNonNullType] UserInput data)
+        public async Task<User> CreateUser(
+            [Service] UserService userService,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] UserCreateInput user)
         {
-            Validator.ValidateObject(data, new System.ComponentModel.DataAnnotations.ValidationContext(data), true);
-            if (context.Users.Any(u => u.Username == data.Username))
-                throw new InvalidOperationException($"User {data.Username} already exists");
+            Validator.ValidateObject(user, new ValidationContext(user), true);
 
-            var user = new Iis.DataModel.UserEntity
-            {
-                Id           = Guid.NewGuid(),
-                IsBlocked    = data.IsBlocked.GetValueOrDefault(),
-                Name         = data.Name,
-                Username     = data.Username,
-                PasswordHash = _configuration.GetPasswordHashAsBase64String(data.Password)
-            };
+            var domainUser = mapper.Map<DomainRoles.User>(user);
 
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
-            return mapper.Map<User>(user);
+            domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+
+            var userId = await userService.CreateUserAsync(domainUser);
+            
+            domainUser = await userService.GetUserAsync(userId);
+
+            return mapper.Map<User>(domainUser);
         }
-
         public async Task<User> UpdateUser(
-            [Service] OntologyContext context, 
-            [Service] IMapper mapper, 
-            [GraphQLType(typeof(NonNullType<IdType>))] string id, 
-            [GraphQLNonNullType] UserInput data)
+            [Service] UserService userService,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] UserUpdateInput user)
         {
-            //TODO: should not be able to block yourself
-            Validator.ValidateObject(data, new System.ComponentModel.DataAnnotations.ValidationContext(data), true);
-            var user = await context.Users.FindAsync(Guid.Parse(id));
-            if (user == null)
-                throw new InvalidOperationException($"Cannot find user with id = {id}");
+            Validator.ValidateObject(user, new ValidationContext(user), true);
 
-            user.IsBlocked    = data.IsBlocked.GetValueOrDefault();
-            user.Name         = data.Name;
-            user.PasswordHash = _configuration.GetPasswordHashAsBase64String(data.Password);
+            var domainUser = mapper.Map<DomainRoles.User>(user);
 
-            await context.SaveChangesAsync();
+            if (!string.IsNullOrWhiteSpace(user.Password)) 
+            {
+                domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+            }
 
-            return mapper.Map<User>(user);
+            var userId = await userService.UpdateUserAsync(domainUser);
+
+            domainUser = await userService.GetUserAsync(userId);
+
+            return mapper.Map<User>(domainUser);
         }
 
         public async Task<User> DeleteUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
@@ -74,6 +70,23 @@ namespace IIS.Core.GraphQL.Users
             await context.SaveChangesAsync();
 
             return mapper.Map<User>(dbUser);
+        }
+
+        public async Task<User> AssignRole([Service] UserService userService,
+            [Service] IMapper mapper,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)
+        {
+            var user = await userService.AssignRole(userId, roleId);
+            return mapper.Map<User>(user);
+        }
+        public async Task<User> RejectRole([Service] UserService userService,
+            [Service] IMapper mapper,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)
+        {
+            var user = await userService.RejectRole(userId, roleId);
+            return mapper.Map<User>(user);
         }
     }
 }

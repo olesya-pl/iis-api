@@ -443,6 +443,7 @@ namespace Iis.OntologyManager
         }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
+            var a = nodeType.GetAttributeDotNamesRecursive();
             if (addToHistory && _currentNodeType != null)
             {
                 _history.Add(_currentNodeType);

@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologySchema.Saver", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Roles", "Iis.Roles\Iis.Roles.csproj", "{205868E4-13F8-4420-8433-AC6B7CDC3F7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.ThemeManagement", "Iis.ThemeManagement\Iis.ThemeManagement.csproj", "{588BDD66-7785-42A3-8718-92ADE68E9426}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{205868E4-13F8-4420-8433-AC6B7CDC3F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{205868E4-13F8-4420-8433-AC6B7CDC3F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{205868E4-13F8-4420-8433-AC6B7CDC3F7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{588BDD66-7785-42A3-8718-92ADE68E9426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{588BDD66-7785-42A3-8718-92ADE68E9426}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{588BDD66-7785-42A3-8718-92ADE68E9426}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{588BDD66-7785-42A3-8718-92ADE68E9426}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

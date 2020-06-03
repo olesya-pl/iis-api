@@ -12,8 +12,12 @@ namespace Iis.Interfaces.Materials
         Guid? RelevanceId { get; set; }
         Guid? ReliabilityId { get; set; }
         Guid? SourceReliabilityId { get; set; }
+        Guid? ProcessedStatusId { get; set; }
+        Guid? SessionPriorityId { get; set; }
+        Guid? AssigneeId { get; set; }
         IEnumerable<string> States { get; set; }
         IEnumerable<string> Tags { get; set; }
         string Title { get; set; }
+        string Content { get; set; }
     }
 }

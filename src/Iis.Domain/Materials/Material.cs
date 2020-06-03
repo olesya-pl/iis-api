@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
+using Iis.Roles;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain.Materials
 {
     public class Material
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
-        public JArray Data { get; }
-        public JObject Metadata { get; }
-        public string Type { get; }
-        public string Source { get; }
+        public JArray Data { get; set; }
+        public JObject Metadata { get; set; }
+        public string Type { get; set; }
+        public string Source { get; set; }
+        public string Content { get; set; }
         public MaterialSign Importance { get; set; }
         public Guid? ImportanceSignId => Importance?.Id;
         public MaterialSign Reliability { get; set; }
@@ -22,22 +24,18 @@ namespace Iis.Domain.Materials
         public Guid? CompletenessSignId => Completeness?.Id;
         public MaterialSign SourceReliability { get; set; }
         public Guid? SourceReliabilitySignId => SourceReliability?.Id;
-        public ICollection<Material> Children { get; } = new List<Material>();
+        public MaterialSign ProcessedStatus { get; set; }
+        public Guid? ProcessedStatusSignId => ProcessedStatus?.Id;
+        public MaterialSign SessionPriority { get; set; }
+        public Guid? SessionPriorityId => SessionPriority?.Id;
+        public List<Material> Children { get; } = new List<Material>();
         public FileInfo File { get; set; }
         public Guid? FileId => File?.Id;
-        public ICollection<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
+        public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
         public DateTime CreatedDate { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
-
-        public Material(Guid id, JObject metadata, JArray data, string type, string source)
-        {
-            Id = id;
-            Metadata = metadata;
-            Data = data;
-            Type = type;
-            Source = source;
-            CreatedDate = DateTime.Now;
-        }
+        public User Assignee { get; set; }
+        public Guid? AssigneeId { get; set; }
     }
 }

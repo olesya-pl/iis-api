@@ -5,8 +5,14 @@ using System.Text;
 
 namespace Iis.Roles
 {
-    public class AccessGranted : IAccessGranted
+    public class AccessGranted
     {
+        public const string CreateAccessName = "create";
+        public const string ReadAccessName = "read";
+        public const string UpdateAccessName = "update";
+        public const string DeleteAccessName = "delete";
+
+        public Guid Id { get; set; }
         public AccessKind Kind { get; set; }
         public AccessCategory Category { get; set; }
         public string Title { get; set; }
@@ -19,15 +25,15 @@ namespace Iis.Roles
             get
             {
                 var list = new List<string>();
-                if (CreateGranted) list.Add("create");
-                if (ReadGranted) list.Add("read");
-                if (UpdateGranted) list.Add("update");
-                if (DeleteGranted) list.Add("delete");
+                if (CreateGranted) list.Add(CreateAccessName);
+                if (ReadGranted) list.Add(ReadAccessName);
+                if (UpdateGranted) list.Add(UpdateAccessName);
+                if (DeleteGranted) list.Add(DeleteAccessName);
                 return list;
             }
         }
 
-        public AccessGranted Add(IAccessGranted other)
+        public AccessGranted Add(AccessGranted other)
         {
             CreateGranted |= other.CreateGranted;
             ReadGranted |= other.ReadGranted;

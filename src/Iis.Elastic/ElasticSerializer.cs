@@ -1,7 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Linq;
 
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
+using System;
+
 namespace Iis.Elastic
 {
     public class ElasticSerializer : IElasticSerializer
@@ -26,40 +30,62 @@ namespace Iis.Elastic
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
             }
 
-            foreach (var child in extNode.Children)
+            foreach (var childGroup in extNode.Children.GroupBy(p => p.NodeTypeName))
             {
-                var key = GetUniqueKey(json, child.NodeTypeName);
-                if (child.IsAttribute)
+                var key = childGroup.Key;
+                if (childGroup.Count() == 1)
                 {
-                    json[key] = child.AttributeValue;
+                    var child = childGroup.First();
+                    json[key] = GetExtNodeValue(child);
                 }
                 else
                 {
-                    if (child.Children.Count == 1 && child.Children[0].NodeTypeName == "value")
+                    var items = new JArray();
+                    json[key] = items;
+                    foreach (var child in childGroup)
                     {
-                        json[key] = child.Children[0].AttributeValue;
-                    }
-                    else
-                    {
-                        json[key] = GetJsonObjectByExtNode(child, false);
+                        items.Add(GetExtNodeValue(child));
                     }
                 }
             }
 
             return json;
         }
-        private string GetUniqueKey(JObject json, string baseKey)
+
+        private JToken GetFuzzyDateJToken(IExtNode extNode)
         {
-            if (!json.ContainsKey(baseKey)) return baseKey;
-            var n = 1;
-            string key;
-            do
+            int? year = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "year")?.AttributeValue;
+            if (year == null)
             {
-                key = $"{baseKey}{n++}";
+                return null;
             }
-            while (json.ContainsKey(key));
-            return key;
+            int month = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "month")?.AttributeValue ?? 1;
+            int day = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "day")?.AttributeValue ?? 1;
+
+            try
+            {
+                var date = new DateTime((int)year, (int)month, (int)day);
+                return JToken.FromObject(date);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
+        private JToken GetExtNodeValue(IExtNode extNode)
+        {
+            if (extNode.EntityTypeName == EntityTypeNames.FuzzyDate.ToString())
+            {
+                return GetFuzzyDateJToken(extNode);
+            }
+
+            if (extNode.IsAttribute && extNode.AttributeValue != null)
+            {
+                return JToken.FromObject(extNode.AttributeValue);
+            }
+            
+            return GetJsonObjectByExtNode(extNode, false);
+        }
     }
 }

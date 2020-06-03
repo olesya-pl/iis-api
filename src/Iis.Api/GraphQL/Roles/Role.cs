@@ -1,16 +1,14 @@
-﻿using HotChocolate;
-using HotChocolate.Types;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.Roles
 {
     public class Role
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [GraphQLNonNullType]
         public string Name { get; set; }
@@ -18,6 +16,7 @@ namespace IIS.Core.GraphQL.Roles
 
         [GraphQLNonNullType]
         public bool IsAdmin { get; set; }
+        public string AdGroup { get; set; }
         public IEnumerable<AccessEntity> Entities { get; set; }
         public IEnumerable<AccessTab> Tabs { get; set; }
     }

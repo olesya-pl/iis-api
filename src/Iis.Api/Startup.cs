@@ -34,9 +34,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Serilog;
-using Iis.Domain.Elastic;
 using Iis.Elastic;
 using Iis.Api;
+using Iis.Api.Modules;
 using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
@@ -53,6 +53,10 @@ using Iis.DataModel.Roles;
 using Iis.Roles;
 using Iis.Api.GraphQL.Access;
 using Iis.Interfaces.Roles;
+using IIS.Core.NodeMaterialRelation;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.DbLayer.Elastic;
+using Iis.ThemeManagement;
 
 namespace IIS.Core
 {
@@ -69,6 +73,11 @@ namespace IIS.Core
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            RegisterServices(services, true);
+        }
+
+        public void RegisterServices(IServiceCollection services, bool enableContext)
+        {
             services
                 .RegisterRunUpTools()
                 .RegisterSeederTools()
@@ -77,16 +86,33 @@ namespace IIS.Core
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
-            services.AddDbContext<OntologyContext>(
-                options => options.UseNpgsql(dbConnectionString),
-                ServiceLifetime.Transient);
 
-            
+            if (enableContext)
+            {
+                services.AddDbContext<OntologyContext>(
+                    options => options.UseNpgsql(dbConnectionString),
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Singleton);
+                using var context = OntologyContext.GetContext(dbConnectionString);
+                context.Database.Migrate();
+                (new FillDataForRoles(context)).Execute();
+                var ontologyCache = new OntologyCache(context);
+                services.AddSingleton<IOntologyCache>(ontologyCache);
+
+                var schemaSource = new OntologySchemaSource
+                {
+                    Title = "DB",
+                    SourceKind = SchemaSourceKind.Database,
+                    Data = dbConnectionString
+                };
+                var ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                services.AddSingleton(ontologySchema);
+                var iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
+                iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
+                services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
+            }
+
             services.AddHttpContextAccessor();
-            using var context = OntologyContext.GetContext(dbConnectionString);
-            context.Database.Migrate();
-            (new FillDataForRoles(context)).Execute();
-            services.AddSingleton<IOntologyCache>(new OntologyCache(context));
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
@@ -100,17 +126,22 @@ namespace IIS.Core
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
-            services.AddTransient<RoleLoader>();
+            services.AddScoped<ExportToJsonService>();
+            services.AddTransient<RoleService>();
+            services.AddTransient<UserService>();
+            services.AddTransient<ThemeService>();
+            services.AddTransient<AccessObjectService>();
+            services.AddTransient<NodeMaterialRelationService>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
             services.AddTransient<Ontology.Seeding.Seeder>();
-            services.AddTransient(e => new ContextFactory(dbConnectionString));
             services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
+            services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
@@ -132,7 +163,7 @@ namespace IIS.Core
                     }
                     catch (Exception e)
                     {
-                        if (!(e is AuthenticationException) && !(e is InvalidOperationException))
+                        if (!(e is AuthenticationException) && !(e is InvalidOperationException) && !(e is AccessViolationException))
                             throw e;
 
                         var errorHandler = context.Services.GetService<IErrorHandler>();
@@ -162,46 +193,32 @@ namespace IIS.Core
             // end of graphql engine registration
             services.AddDataLoaderRegistry();
 
-            var mq = Configuration.GetSection("mq").Get<MqConfiguration>();
-            if (mq == null) throw new Exception("mq config not found");
-            var factory = new ConnectionFactory
-            {
-                HostName = mq.Host,
-                RequestedConnectionTimeout = 3 * 60 * 1000, // why this shit doesn't work
-            };
-            if (mq.Username != null)
-            {
-                factory.UserName = mq.Username;
-            }
-            if (mq.Password != null)
-            {
-                factory.Password = mq.Password;
-            }
+            /* message queue registration*/
+            services.RegisterMqFactory(Configuration, out string mqConnectionString)
+                    .RegisterMaterialEventServices(Configuration);
 
-            services.AddTransient<IConnectionFactory>(s => factory);
 
-            string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}";
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
+            var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
+            services.AddSingleton(maxOperatorsConfig);
 
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
-                .AddRabbitMQ(mqString, (SslOption)null)
+                .AddRabbitMQ(mqConnectionString, (SslOption)null)
                 .AddElasticsearch(elasticConfiguration.Uri);
 
-            var gsmWorkerUrl = Configuration.GetValue<string>("gsmWorkerUrl");
-            services.AddSingleton<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl));
-            services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
 
             services.AddSingleton<IElasticManager, ElasticManager>();
             services.AddSingleton<IElasticSerializer, ElasticSerializer>();
+            services.AddTransient<SearchResultExtractor>();
             services.AddSingleton(elasticConfiguration);
-
-            services.AddHostedService<MaterialEventConsumer>();
+            services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<GraphQLAccessList>();
         }
+
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {
@@ -222,17 +239,18 @@ namespace IIS.Core
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var roleLoader = context.Services.GetService<RoleLoader>();
+                var userService = context.Services.GetService<UserService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
-                
+
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);
-                var validatedToken = TokenHelper.ValidateToken(token, Configuration, roleLoader);
+
+                var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
 
                 if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
-                        throw new AuthenticationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.Username}");
+                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.UserName}");
                     }
                 }
 
@@ -247,6 +265,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
+            PopulateEntityFieldsCache(app);
 
             app.UseCors(builder =>
                 builder
@@ -266,6 +285,30 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void PopulateEntityFieldsCache(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                var serviceProvider = serviceScope.ServiceProvider;
+                var ontologyProvider = serviceProvider.GetRequiredService<IOntologyProvider>();
+                var ontology = ontologyProvider.GetOntologyAsync().GetAwaiter().GetResult();
+                var types = ontology.EntityTypes.Where(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
+                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                    .Concat(types).Distinct().ToArray();
+
+                var ontologySchema = serviceProvider.GetRequiredService<IOntologySchema>();
+                var cache = serviceProvider.GetRequiredService<IOntologyCache>();
+
+                foreach (var type in derivedTypes)
+                {
+                    var nodeType = ontologySchema.GetEntityTypeByName(type.Name);
+                    cache.PutFieldNamesByNodeType(type.Name, nodeType.GetAttributeDotNamesRecursiveWithLimit());
+                }
+            }
         }
 
         private void UpdateDatabase(IApplicationBuilder app)
@@ -308,13 +351,6 @@ namespace IIS.Core
         }
     }
 
-    public class MqConfiguration
-    {
-        public string Host { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
     class AppErrorFilter : IErrorFilter
     {
         public IError OnError(IError error)
@@ -329,6 +365,11 @@ namespace IIS.Core
             if (error.Exception is AuthenticationException)
             {
                 return error.WithCode("UNAUTHENTICATED");
+            }
+
+            if (error.Exception is AccessViolationException)
+            {
+                return error.WithCode("ACCESS_DENIED");
             }
 
             return error;
