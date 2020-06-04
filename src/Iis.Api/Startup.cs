@@ -41,6 +41,7 @@ using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
 using AutoMapper;
+using Iis.Api.bo;
 using Iis.Api.Bootstrap;
 using Iis.Api.Export;
 using Iis.Interfaces.Elastic;
@@ -350,31 +351,6 @@ namespace IIS.Core
             }
 
             await c.Response.WriteAsync(result);
-        }
-    }
-
-    class AppErrorFilter : IErrorFilter
-    {
-        public IError OnError(IError error)
-        {
-            if (error.Exception is InvalidOperationException || error.Exception is InvalidCredentialException)
-            {
-
-                return error.WithCode("BAD_REQUEST")
-                    .WithMessage(error.Exception.Message);
-            }
-
-            if (error.Exception is AuthenticationException)
-            {
-                return error.WithCode("UNAUTHENTICATED");
-            }
-
-            if (error.Exception is AccessViolationException)
-            {
-                return error.WithCode("ACCESS_DENIED");
-            }
-
-            return error;
         }
     }
 }

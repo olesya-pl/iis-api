@@ -19,7 +19,7 @@ namespace Iis.Api.Bootstrap
         {
             var logger = context.RequestServices.GetRequiredService<ILogger<LogHeaderMiddleware>>();
 
-            var header = context.Request.Headers["CorrelationId"];
+            var header = context.Request.Headers["X-CorrelationId"];
             var correlationId = header.Count > 0 ? header[0] : Guid.NewGuid().GetHashCode().ToString();
             using (logger.BeginScope("{@CorrelationId}", correlationId))
             {
