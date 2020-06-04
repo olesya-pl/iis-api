@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Iis.Api.Bootstrap
 {
     public class LoggingMiddleware
     {
         readonly RequestDelegate _next;
-        private static ILogger<LoggingMiddleware> logger;
+        private static ILogger<LogHeaderMiddleware> logger;
 
         public LoggingMiddleware(RequestDelegate next)
         {
@@ -21,14 +21,14 @@ namespace Iis.Api.Bootstrap
 
         public async Task Invoke(HttpContext context)
         {
-            logger = context.RequestServices.GetRequiredService<ILogger<LoggingMiddleware>>();
+            logger = context.RequestServices.GetRequiredService<ILogger<LogHeaderMiddleware>>();
 
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             var sw = Stopwatch.StartNew();
             try
             {
-                var request = FormatRequest(context.Request);
+                var request = await FormatRequest(context.Request);
                 logger.LogInformation(request);
                 var originalBodyStream = context.Response.Body;
 
@@ -45,9 +45,21 @@ namespace Iis.Api.Bootstrap
             catch (Exception ex) when (LogException(sw, ex)) { }
         }
 
-        private string FormatRequest(HttpRequest request)
+        private async Task<string> FormatRequest(HttpRequest request)
         {
-            return $"{request.Scheme} {request.Host}{request.Path} {request.QueryString}";
+            var body = request.Body;
+
+            request.EnableBuffering();
+
+            var buffer = new byte[Convert.ToInt32(request.ContentLength)];
+
+            await request.Body.ReadAsync(buffer, 0, buffer.Length);
+
+            var bodyAsText = Encoding.UTF8.GetString(buffer);
+
+            request.Body = body;
+
+            return $"{request.Scheme} {request.Host}{request.Path} {request.QueryString} {bodyAsText}";
         }
 
         private async Task<string> FormatResponse(HttpResponse response, Stopwatch sw)
