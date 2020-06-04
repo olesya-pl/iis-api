@@ -278,6 +278,7 @@ namespace IIS.Core
 
             app.UseMiddleware<LogHeaderMiddleware>();
 
+            app.UseMiddleware<LoggingMiddleware>();
             app.UseGraphQL();
             app.UsePlayground();
             app.UseMiddleware<LoggingMiddleware>();
