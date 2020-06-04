@@ -16,7 +16,8 @@ using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
-using IIS.Core.Ontology;
+using IIS.Core.Materials.FeatureProcessors;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
 using Microsoft.AspNetCore.Builder;
@@ -132,6 +133,7 @@ namespace IIS.Core
             services.AddTransient<ThemeService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
+            services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
