@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IO;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -13,10 +14,12 @@ namespace Iis.Api.Bootstrap
     {
         readonly RequestDelegate _next;
         private static ILogger<LogHeaderMiddleware> logger;
+        private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
 
         public LoggingMiddleware(RequestDelegate next)
         {
             _next = next;
+            _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
         }
 
         public async Task Invoke(HttpContext context)
@@ -30,11 +33,10 @@ namespace Iis.Api.Bootstrap
             {
                 var request = await FormatRequest(context.Request);
                 logger.LogInformation(request);
+
                 var originalBodyStream = context.Response.Body;
-
-                await using var responseBody = new MemoryStream();
+                await using var responseBody = _recyclableMemoryStreamManager.GetStream();
                 context.Response.Body = responseBody;
-
                 await _next(context);
 
                 var response = await FormatResponse(context.Response, sw);
@@ -45,31 +47,33 @@ namespace Iis.Api.Bootstrap
             catch (Exception ex) when (LogException(sw, ex)) { }
         }
 
+        private static string ReadStreamInChunks(Stream requestStream)
+        {
+            string requestBody;
+            requestStream.Position = 0;
+            using (StreamReader streamReader = new StreamReader(requestStream))
+            {
+                requestBody = streamReader.ReadToEnd();
+            }
+            return requestBody;
+        }
+
         private async Task<string> FormatRequest(HttpRequest request)
         {
-            var body = request.Body;
-
             request.EnableBuffering();
+            await using var requestStream = _recyclableMemoryStreamManager.GetStream();
+            await request.Body.CopyToAsync(requestStream);
 
-            var buffer = new byte[Convert.ToInt32(request.ContentLength)];
-
-            await request.Body.ReadAsync(buffer, 0, buffer.Length);
-
-            var bodyAsText = Encoding.UTF8.GetString(buffer);
-
-            request.Body = body;
-
-            return $"{request.Scheme} {request.Host}{request.Path} {request.QueryString} {bodyAsText}";
+            var dump = $"{request.Scheme} {request.Host}{request.Path} {request.QueryString} {ReadStreamInChunks(requestStream)}";
+            request.Body.Position = 0;
+            return dump;
         }
 
         private async Task<string> FormatResponse(HttpResponse response, Stopwatch sw)
         {
             response.Body.Seek(0, SeekOrigin.Begin);
-
-            string text = await new StreamReader(response.Body).ReadToEndAsync();
-
+            var text = await new StreamReader(response.Body).ReadToEndAsync();
             response.Body.Seek(0, SeekOrigin.Begin);
-            sw.Stop();
             return $"{response.StatusCode}: {text} Elapsed(ms): {sw.ElapsedMilliseconds}";
         }
 
@@ -78,7 +82,7 @@ namespace Iis.Api.Bootstrap
             sw.Stop();
             //TODO. add additional exception logging
             //logger.LogError(ex,);
-            
+
             return false;
         }
     }
