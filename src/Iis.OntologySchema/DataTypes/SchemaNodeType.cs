@@ -18,6 +18,7 @@ namespace Iis.OntologySchema.DataTypes
         public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
+        public IEnumerable<string> AliasesList => string.IsNullOrEmpty(Aliases) ? null : Aliases.Split(',');
         internal void AddIncomingRelation(SchemaRelationType relationType)
         {
             _incomingRelations.Add(relationType);
@@ -169,6 +170,7 @@ namespace Iis.OntologySchema.DataTypes
             return Name == nodeType.Name
                 && Title == nodeType.Title
                 && Meta == nodeType.Meta
+                && Aliases == nodeType.Aliases
                 && IsArchived == nodeType.IsArchived
                 && Kind == nodeType.Kind
                 && IsAbstract == nodeType.IsAbstract
@@ -181,6 +183,7 @@ namespace Iis.OntologySchema.DataTypes
             dict[nameof(Name)] = Name;
             dict[nameof(Title)] = Title;
             dict[nameof(Meta)] = Meta;
+            dict[nameof(Aliases)] = Aliases;
             dict[nameof(IsArchived)] = IsArchived.ToString();
             dict[nameof(Kind)] = Kind.ToString();
             dict[nameof(IsAbstract)] = IsAbstract.ToString();
@@ -247,12 +250,12 @@ namespace Iis.OntologySchema.DataTypes
             if (Kind == Kind.Attribute)
             {
                 var dotName = parentName ?? Name;
-                result.Add(new AttributeInfoItem (dotName, _attributeType.ScalarType ));
+                result.Add(new AttributeInfoItem (dotName, _attributeType.ScalarType, AliasesList));
             }
 
             if (Kind == Kind.Entity && Name == EntityTypeNames.FuzzyDate.ToString())
             {
-                result.Add(new AttributeInfoItem (parentName, ScalarType.Date));
+                result.Add(new AttributeInfoItem (parentName, ScalarType.Date, AliasesList));
             }
             else
             {

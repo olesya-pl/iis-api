@@ -16,6 +16,7 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsArchived { get; }
         Kind Kind { get; }
         bool IsAbstract { get; }
+        string Aliases { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
         IAttributeType AttributeType { get; }

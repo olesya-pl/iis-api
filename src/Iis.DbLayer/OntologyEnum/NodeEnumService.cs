@@ -28,10 +28,10 @@ namespace Iis.DbLayer.OntologyEnum
         private INodeEnumValue MapToEnumValue(IExtNode extNode)
         {
             var enumValue = new NodeEnumValue();
-            foreach (var child in extNode.Children)
-            {
-                enumValue.AddProperty(child.NodeTypeName, child.AttributeValue);
-            }
+            //foreach (var child in extNode.Children)
+            //{
+            //    enumValue.AddProperty(child.NodeTypeName, child.AttributeValue);
+            //}
             return enumValue;
         }
     }

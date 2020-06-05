@@ -10,12 +10,14 @@ namespace Iis.Elastic
         Text,
         Integer,
         Date,
-        Nested
+        Nested,
+        Alias
     }
     public class ElasticMappingProperty
     {
         public string Name { get; set; }
         public ElasticMappingPropertyType Type { get; set; }
+        public string Path { get; set; }
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
 
         public JObject ConvertToJObject()

@@ -9,10 +9,12 @@ namespace Iis.OntologySchema.DataTypes
     {
         public string DotName { get; set; }
         public ScalarType ScalarType { get; set; }
-        public AttributeInfoItem(string dotName, ScalarType scalarType)
+        public IEnumerable<string> AliasesList { get; set; }
+        public AttributeInfoItem(string dotName, ScalarType scalarType, IEnumerable<string> aliasesList)
         {
             DotName = dotName;
             ScalarType = scalarType;
+            AliasesList = aliasesList ?? new List<string>();
         }
     }
 }

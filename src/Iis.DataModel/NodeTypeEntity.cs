@@ -15,6 +15,7 @@ namespace Iis.DataModel
         public bool IsArchived { get; set; }
         public Kind Kind { get; set; }
         public bool IsAbstract { get; set; }
+        public string Aliases { get; set; }
 
         public virtual List<RelationTypeEntity> IncomingRelations { get; set; } = new List<RelationTypeEntity>();
         public virtual List<RelationTypeEntity> OutgoingRelations { get; set; } = new List<RelationTypeEntity>();

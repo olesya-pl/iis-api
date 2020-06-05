@@ -150,6 +150,8 @@ namespace Iis.OntologySchema
             {
                 nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
             }
+
+            nodeType.Aliases = updateParameter.Aliases;
         }
         private void UpdateRelationNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
         {

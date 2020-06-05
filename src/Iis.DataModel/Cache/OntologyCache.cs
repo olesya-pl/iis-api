@@ -14,6 +14,7 @@ namespace Iis.DataModel.Cache
         public IReadOnlyCollection<MaterialSignEntity> MaterialSigns => _materialSignsDict.Values;
         public OntologyCache(OntologyContext context)
         {
+            if (context == null) return;
             _context = context;
             _materialSignsDict = _context.MaterialSigns
                 .Include(ms => ms.MaterialSignType)

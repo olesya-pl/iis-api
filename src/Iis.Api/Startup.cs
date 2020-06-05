@@ -94,21 +94,37 @@ namespace IIS.Core
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Singleton);
                 using var context = OntologyContext.GetContext(dbConnectionString);
-                context.Database.Migrate();
-                (new FillDataForRoles(context)).Execute();
-                var ontologyCache = new OntologyCache(context);
-                services.AddSingleton<IOntologyCache>(ontologyCache);
+                
+                IOntologySchema ontologySchema;
+                IOntologyCache ontologyCache;
+                IisElasticConfiguration iisElasticConfiguration;
 
-                var schemaSource = new OntologySchemaSource
+                if (Program.IsStartedFromMain)
                 {
-                    Title = "DB",
-                    SourceKind = SchemaSourceKind.Database,
-                    Data = dbConnectionString
-                };
-                var ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                    context.Database.Migrate();
+                    (new FillDataForRoles(context)).Execute();
+                    ontologyCache = new OntologyCache(context);
+
+                    var schemaSource = new OntologySchemaSource
+                    {
+                        Title = "DB",
+                        SourceKind = SchemaSourceKind.Database,
+                        Data = dbConnectionString
+                    };
+                    ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                    
+                    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
+                    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
+                }
+                else
+                {
+                    ontologyCache = new OntologyCache(null);
+                    ontologySchema = (new OntologySchemaService()).GetOntologySchema(null);
+                    iisElasticConfiguration = new IisElasticConfiguration(null, null);
+                }
+
+                services.AddSingleton<IOntologyCache>(ontologyCache);
                 services.AddSingleton(ontologySchema);
-                var iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
-                iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
                 services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
             }
 

@@ -15,7 +15,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.String),
+                new AttributeInfoItem("name1", ScalarType.String, null),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -31,7 +31,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("parent.child", ScalarType.String),
+                new AttributeInfoItem("parent.child", ScalarType.String, null),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -44,6 +44,36 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var child = parent.Properties[0];
             Assert.Equal("child", child.Name);
             Assert.Equal(ElasticMappingPropertyType.Text, child.Type);
+        }
+
+        [Fact]
+        public void ConstructorFromAttributeInfo_Aliases()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("parent.child", ScalarType.String, new List<string> { "alias1", "alias2" }),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Equal(3, result.Properties.Count);
+            var parent = result.Properties[0];
+            Assert.Equal("parent", parent.Name);
+            Assert.Equal(ElasticMappingPropertyType.Nested, parent.Type);
+
+            Assert.Single(parent.Properties);
+            var child = parent.Properties[0];
+            Assert.Equal("child", child.Name);
+            Assert.Equal(ElasticMappingPropertyType.Text, child.Type);
+
+            var alias1 = result.Properties[1];
+            Assert.Equal("alias1", alias1.Name);
+            Assert.Equal(ElasticMappingPropertyType.Alias, alias1.Type);
+            Assert.Equal("parent.child", alias1.Path);
+
+            var alias2 = result.Properties[2];
+            Assert.Equal("alias2", alias2.Name);
+            Assert.Equal(ElasticMappingPropertyType.Alias, alias2.Type);
+            Assert.Equal("parent.child", alias2.Path);
         }
 
         [Fact]

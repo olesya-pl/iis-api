@@ -3,6 +3,7 @@ using Iis.OntologyManager.Style;
 using Iis.OntologySchema.ChangeParameters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -13,6 +14,7 @@ namespace Iis.OntologyManager.UiControls
         private TextBox txtName;
         private TextBox txtTitle;
         private RichTextBox txtMeta;
+        private RichTextBox txtAliases;
         private ComboBox cmbEmbedding;
         private ComboBox cmbTargetType;
         private Button btnSave;
@@ -44,6 +46,8 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(btnSave);
             _container.GoToNewColumn();
             _container.Add(txtMeta = new RichTextBox(), "Meta", true);
+            _container.GoToNewColumn();
+            _container.Add(txtAliases = new RichTextBox(), "Aliases", true);
         }
         public void SetUiValues(INodeTypeLinked nodeType)
         {
@@ -51,6 +55,7 @@ namespace Iis.OntologyManager.UiControls
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
             txtMeta.Text = nodeType.Meta;
+            txtAliases.Lines = nodeType.Aliases?.Split(',');
             _uiControlsCreator.SetSelectedValue(cmbEmbedding, nodeType.RelationType.EmbeddingOptions.ToString());
             cmbTargetType.DataSource = _getAllEntities();
             _uiControlsCreator.SetSelectedValue(cmbTargetType, nodeType.RelationType.TargetType.Name);
@@ -61,6 +66,7 @@ namespace Iis.OntologyManager.UiControls
             txtName.Clear();
             txtTitle.Clear();
             txtMeta.Clear();
+            txtAliases.Clear();
             cmbEmbedding.SelectedIndex = 0;
             cmbTargetType.DataSource = _getAllEntities();
             cmbTargetType.SelectedIndex = -1;
@@ -68,12 +74,17 @@ namespace Iis.OntologyManager.UiControls
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
             var isNew = string.IsNullOrEmpty(txtId.Text);
+            var aliases = string.IsNullOrWhiteSpace(txtAliases.Text) ?
+                null :
+                string.Join(',', txtAliases.Lines.Where(l => !string.IsNullOrWhiteSpace(l)));
+
             return new NodeTypeUpdateParameter
             {
                 Id = isNew ? (Guid?)null : new Guid(txtId.Text),
                 Name = isNew ? txtName.Text : null,
                 Title = txtTitle.Text,
                 Meta = txtMeta.Text,
+                Aliases = aliases,
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
                 TargetTypeId = (Guid)cmbTargetType.SelectedValue,
                 ParentTypeId = _parentTypeId
