@@ -227,20 +227,8 @@ namespace Iis.OntologySchema.DataTypes
 
         public List<string> GetAttributeDotNamesRecursive(string parentName = null)
         {
-            var result = new List<string>();
-
-            if (Kind == Kind.Attribute)
-            {
-                result.Add(Name);
-            }
-
-            foreach (var relation in OutgoingRelations)
-            {
-                string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity ? relation.NodeType.Name : null;
-                result.AddRange(relation.TargetType.GetAttributeDotNamesRecursive(relationName));
-            }
-
-            return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
+            var attributeInfos = GetAttributesInfoRecursive();
+            return attributeInfos.Select(ai => ai.DotName).ToList();
         }
 
         private List<AttributeInfoItem> GetAttributesInfoRecursive(string parentName = null)

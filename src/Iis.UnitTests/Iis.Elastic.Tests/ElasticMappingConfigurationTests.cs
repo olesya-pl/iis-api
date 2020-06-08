@@ -3,6 +3,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -88,6 +89,42 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.Geo));
             Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.File));
             Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.Json));
+        }
+
+        [Fact]
+        public void ConvertToJson_Test()
+        {
+            const string MAPPING = "mappings";
+            const string PROPERTIES = "properties";
+            const string TYPE = "type";
+            const string PATH = "path";
+
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("part1.part2", ScalarType.String, new List<string> { "alias1", "alias2" }),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var configuration = new ElasticMappingConfiguration(attributeInfo);
+            var jConfig = configuration.ConvertToJObject();
+            var jProperties = jConfig[MAPPING];
+            var jChildren = jProperties[PROPERTIES];
+            Assert.Equal(3, jChildren.Children().Count());
+            var jPart1 = jChildren["part1"];
+            var jPart1Properties = jPart1[PROPERTIES];
+            Assert.Single(jPart1Properties.Children());
+            var jPart2 = jPart1Properties["part2"];
+            Assert.Single(jPart2.Children());
+            Assert.Equal("text", jPart2[TYPE]);
+
+            var jAlias1 = jChildren["alias1"];
+            Assert.Equal(2, jAlias1.Children().Count());
+            Assert.Equal("alias", jAlias1[TYPE]);
+            Assert.Equal("part1.part2", jAlias1[PATH]);
+
+            var jAlias2 = jChildren["alias2"];
+            Assert.Equal(2, jAlias2.Children().Count());
+            Assert.Equal("alias", jAlias2[TYPE]);
+            Assert.Equal("part1.part2", jAlias2[PATH]);
         }
     }
 }

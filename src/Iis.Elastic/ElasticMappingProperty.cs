@@ -22,10 +22,15 @@ namespace Iis.Elastic
 
         public JObject ConvertToJObject()
         {
-            var inner = new JObject();
+            var result = new JObject();
             if (this.Type != ElasticMappingPropertyType.Nested)
             {
-                inner["type"] = this.Type.ToString().ToLower();
+                result["type"] = this.Type.ToString().ToLower();
+            }
+
+            if (this.Type == ElasticMappingPropertyType.Alias)
+            {
+                result["path"] = this.Path;
             }
 
             if (Properties.Count > 0)
@@ -35,9 +40,9 @@ namespace Iis.Elastic
                 {
                     jProperties[property.Name] = property.ConvertToJObject();
                 }
-                inner["properties"] = jProperties;
+                result["properties"] = jProperties;
             }
-            return inner;
+            return result;
         }
     }
 
