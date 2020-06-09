@@ -41,6 +41,8 @@ using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
 using Iis.Api.Ontology.Migration;
 using AutoMapper;
+using Iis.Api.bo;
+using Iis.Api.Bootstrap;
 using Iis.Api.Export;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
@@ -290,8 +292,9 @@ namespace IIS.Core
                     .AllowAnyMethod()
             );
 
-            app.UseSerilogRequestLogging();
+            app.UseMiddleware<LogHeaderMiddleware>();
 
+            app.UseMiddleware<LoggingMiddleware>();
             app.UseGraphQL();
             app.UsePlayground();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
@@ -364,31 +367,6 @@ namespace IIS.Core
             }
 
             await c.Response.WriteAsync(result);
-        }
-    }
-
-    class AppErrorFilter : IErrorFilter
-    {
-        public IError OnError(IError error)
-        {
-            if (error.Exception is InvalidOperationException || error.Exception is InvalidCredentialException)
-            {
-
-                return error.WithCode("BAD_REQUEST")
-                    .WithMessage(error.Exception.Message);
-            }
-
-            if (error.Exception is AuthenticationException)
-            {
-                return error.WithCode("UNAUTHENTICATED");
-            }
-
-            if (error.Exception is AccessViolationException)
-            {
-                return error.WithCode("ACCESS_DENIED");
-            }
-
-            return error;
         }
     }
 }
