@@ -277,6 +277,11 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Metadata")
                         .HasColumnType("text");
 
+                    b.Property<int>("MlHadnlersCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid");
 
