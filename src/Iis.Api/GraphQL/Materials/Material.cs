@@ -45,6 +45,8 @@ namespace IIS.Core.GraphQL.Materials
         public JToken Highlight { get; set; }
         public IEnumerable<MaterialFeatureNode> Nodes => Infos.SelectMany(p => p.Features.Select(x => x.Node));
         public User Assignee { get; set; }
+        public int MlHadnlersCount { get; set; }
+        public int ProcessedMlHandlersCount { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

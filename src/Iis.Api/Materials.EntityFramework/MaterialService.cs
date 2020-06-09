@@ -10,6 +10,7 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.Interfaces.Materials;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -219,6 +220,19 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 _context.Semaphore.Release();
             }
+        }
+
+        public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
+        {
+            var material = await _context.Materials.FirstOrDefaultAsync(p => p.Id == materialId);
+
+            if (material == null)
+            {
+                throw new ArgumentNullException($"Material with given id not found");
+            }
+
+            material.MlHadnlersCount = handlersCount;
+            await _context.SaveChangesAsync();
         }
     }
 }

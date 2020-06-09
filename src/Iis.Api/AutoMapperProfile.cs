@@ -247,6 +247,7 @@ namespace Iis.Api
             //theme: domain -> graphQl
             CreateMap<Iis.ThemeManagement.Models.ThemeType, ThemeType>();
 
+            CreateMap<IIS.Core.GraphQL.ML.MachineLearningHadnlersCountInput, IIS.Core.GraphQL.ML.MachineLearningHadnlersCountResult>();
         }
     }
 }
