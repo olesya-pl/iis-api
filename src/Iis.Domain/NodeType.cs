@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain
@@ -39,6 +40,9 @@ namespace Iis.Domain
             AllParents.SelectMany(p => p.DirectProperties)
                 .Where(pp => DirectProperties.All(dp => dp.Name != pp.Name)) // Ignore parent properties with same name (overriden)
                 .Union(DirectProperties);
+
+        public bool IsObjectOfStudy => 
+            AllParents.Any(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
         protected NodeType(Guid id, string name)
         {

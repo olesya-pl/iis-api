@@ -50,8 +50,8 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType] string Title { get; }
 
         [GraphQLNonNullType] string Code { get; }
-
         [GraphQLNonNullType] bool Editable { get; }
+        [GraphQLNonNullType] bool IsLinkToObjectOfStudy { get; }
 
         bool Multiple { get; }
         string Format { get; }
@@ -90,6 +90,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
         public string Format => (MetaObject as AttributeRelationMeta)?.Format;
+        [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.TargetType.IsObjectOfStudy;
 
         [GraphQLType(typeof(AnyType))]
         public FormField FormField => MetaObject?.FormField;
