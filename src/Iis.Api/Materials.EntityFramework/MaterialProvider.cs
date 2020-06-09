@@ -111,6 +111,7 @@ namespace IIS.Core.Materials.EntityFramework
                                     .Select(async entity => await MapAsync(entity));
 
                 materials = await Task.WhenAll(mappingTasks);
+                PopulateProcessedMlHandlersCount(materials);
 
                 var materialsCount = await materialsCountQuery.CountAsync();
 
@@ -119,6 +120,23 @@ namespace IIS.Core.Materials.EntityFramework
             finally
             {
                 _context.Semaphore.Release();
+            }
+        }
+
+        private void PopulateProcessedMlHandlersCount(IEnumerable<Material> materials)
+        {
+            var materialIds = materials.Select(p => p.Id).ToArray();
+
+            foreach (var item in _context.MLResponses.Where(p => materialIds.Contains(p.MaterialId))
+                 .GroupBy(p => p.MaterialId)
+                 .Select(p => new { id = p.Key, count = p.Count() }))
+            {
+                var material = materials.FirstOrDefault(p => p.Id == item.id);
+                if (material == null)
+                {
+                    continue;
+                }
+                material.ProcessedMlHandlersCount = item.count;
             }
         }
 
