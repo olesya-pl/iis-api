@@ -277,7 +277,7 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Metadata")
                         .HasColumnType("text");
 
-                    b.Property<int>("MlHadnlersCount")
+                    b.Property<int>("MlHandlersCount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0);

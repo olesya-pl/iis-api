@@ -44,6 +44,6 @@ namespace Iis.DataModel.Materials
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; }
         public Guid? AssigneeId { get; set; }
         public virtual UserEntity Assignee { get; set; }
-        public int MlHadnlersCount { get; set; }
+        public int MlHandlersCount { get; set; }
     }
 }

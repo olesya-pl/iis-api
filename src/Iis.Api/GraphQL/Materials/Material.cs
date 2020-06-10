@@ -48,7 +48,7 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<MaterialFeatureNode> Events { get; set; }
 
         public User Assignee { get; set; }
-        public int MlHadnlersCount { get; set; }
+        public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
