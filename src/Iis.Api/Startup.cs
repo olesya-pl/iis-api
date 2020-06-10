@@ -127,6 +127,7 @@ namespace IIS.Core
 
                 services.AddSingleton<IOntologyCache>(ontologyCache);
                 services.AddSingleton(ontologySchema);
+                services.AddSingleton<IFieldToAliasMapper>(ontologySchema);
                 services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
             }
 

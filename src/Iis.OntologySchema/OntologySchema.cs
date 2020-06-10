@@ -12,6 +12,7 @@ namespace Iis.OntologySchema
     {
         IMapper _mapper;
         SchemaStorage _storage;
+        Dictionary<string, string> _aliases;
         public IOntologySchemaSource SchemaSource { get; private set; }
         public OntologySchema(IOntologySchemaSource schemaSource)
         {
@@ -45,6 +46,7 @@ namespace Iis.OntologySchema
         {
             _storage = new SchemaStorage(_mapper);
             _storage.Initialize(ontologyRawData);
+            _aliases = GetAliases();
         }
 
         public IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter)
@@ -302,6 +304,25 @@ namespace Iis.OntologySchema
                 };
                 _storage.AddRelationType(relationType);
             }
+        }
+        public string GetAlias(string fieldDotName)
+        {
+            return _aliases.ContainsKey(fieldDotName) ? _aliases[fieldDotName] : null;
+        }
+        private Dictionary<string, string> GetAliases()
+        {
+            var result = new Dictionary<string, string>();
+            foreach (var entityType in _storage.NodeTypes.Values
+                .Where(nt => nt.Kind == Kind.Entity && !nt.IsAbstract))
+            {
+                var attributesInfo = entityType.GetAttributesInfo();
+                foreach (var item in attributesInfo.Items.Where(i => i.AliasesList.Any()))
+                {
+                    var fullDotName = $"{entityType.Name}.{item.DotName}";
+                    result[fullDotName] = item.AliasesList.First();
+                }
+            }
+            return result;
         }
     }
 }

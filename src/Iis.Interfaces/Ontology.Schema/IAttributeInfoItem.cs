@@ -8,6 +8,6 @@ namespace Iis.Interfaces.Ontology.Schema
     {
         string DotName { get; }
         ScalarType ScalarType { get; }
-        IEnumerable<string> AliasesList { get; set; }
+        IEnumerable<string> AliasesList { get; }
     }
 }

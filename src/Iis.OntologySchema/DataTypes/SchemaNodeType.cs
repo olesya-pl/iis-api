@@ -249,7 +249,7 @@ namespace Iis.OntologySchema.DataTypes
             {
                 foreach (var relationType in _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding))
                 {
-                    if (relationType.TargetType.IsObjectOfStudy) continue;
+                    if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
 
                     var relationTypeName = parentName == null ? relationType.NodeType.Name : $"{parentName}.{relationType.NodeType.Name}";
                     var relationAttributes = relationType._targetType.GetAttributesInfoRecursive(relationTypeName);
@@ -301,6 +301,19 @@ namespace Iis.OntologySchema.DataTypes
             return _outgoingRelations
                 .Where(r => r.NodeType.Name == relationName)
                 .SingleOrDefault();
+        }
+
+        public INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts)
+        {
+            var nodeType = OutgoingRelations
+                .Where(r => r.Kind == RelationKind.Embedding
+                    && r.NodeType.Name == dotNameParts[0])
+                .Select(r => r.TargetType)
+                .Single();
+
+            return dotNameParts.Length == 1 ? 
+                nodeType : 
+                nodeType.GetNodeTypeByDotNameParts(dotNameParts.Skip(1).ToArray());
         }
 
         public override string ToString() => Name;

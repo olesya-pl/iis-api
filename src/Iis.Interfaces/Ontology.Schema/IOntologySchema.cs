@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
-    public interface IOntologySchema: ISchemaEntityTypeFinder
+    public interface IOntologySchema: ISchemaEntityTypeFinder, IFieldToAliasMapper
     {
         IOntologySchemaSource SchemaSource { get; }
         void Initialize(IOntologyRawData ontologyRawData);
