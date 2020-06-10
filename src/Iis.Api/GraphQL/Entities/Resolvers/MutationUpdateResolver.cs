@@ -22,6 +22,18 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private EntityType _rootEntityType;
         private Guid _rootNodeId;
 
+        public MutationUpdateResolver(IOntologyProvider ontologyProvider
+        , IOntologyService ontologyService
+        , IChangeHistoryService changeHistoryService
+        , MutationCreateResolver mutationCreateResolver
+        , MutationDeleteResolver mutationDeleteResolver)
+        {
+            _mutationCreateResolver = mutationCreateResolver;
+            _mutationDeleteResolver = mutationDeleteResolver;
+            _ontologyProvider = ontologyProvider;
+            _ontologyService = ontologyService;
+            _changeHistoryService = changeHistoryService;
+        }
         public MutationUpdateResolver(IResolverContext ctx)
         {
             _mutationCreateResolver = new MutationCreateResolver(ctx);
@@ -226,6 +238,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private string GetCurrentUserName()
         {
+            if(_resolverContext is null) return "system";
+
             var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
             return tokenPayload?.User?.UserName;
         }

@@ -31,6 +31,8 @@ namespace IIS.Core.Ontology.EntityFramework
         public IEnumerable<string> MaterialIndexes { get; }
         public IEnumerable<string> OntologyIndexes { get; }
         public IEnumerable<string> EventIndexes { get; }
+        public IEnumerable<string> FeatureIndexes { get; }
+
         public bool UseElastic { get; private set; }
 
         public ElasticService(
@@ -66,6 +68,8 @@ namespace IIS.Core.Ontology.EntityFramework
             UseElastic = _context.NodeTypes.Any(nt => nt.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
             MaterialIndexes = new[] { "Materials" };
+
+            FeatureIndexes = new[] {"Features"};
         }
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
@@ -146,6 +150,16 @@ namespace IIS.Core.Ontology.EntityFramework
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), materialId.ToString("N"), materialDocument.ToString(Formatting.None));
         }
 
+        public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
+        {
+            if (!UseElastic) return true;
+
+            if (!_runTimeSettings.PutSavedToElastic) return false;
+
+            if (featureDocument is null) return false;
+
+            return await _elasticManager.PutDocumentAsync(FeatureIndexes.FirstOrDefault(), featureId.ToString("N"), featureDocument.ToString(Formatting.None));
+        }
         public bool TypesAreSupported(IEnumerable<string> typeNames)
         {
             return OntologyIndexesAreSupported(typeNames);

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Materials.FeatureProcessors
@@ -7,6 +8,6 @@ namespace IIS.Core.Materials.FeatureProcessors
     /// </summary>
     public interface IFeatureProcessor
     {
-        JObject ProcessMetadata(JObject metadata);
+        Task<JObject> ProcessMetadata(JObject metadata);
     }
 }

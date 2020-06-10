@@ -20,6 +20,7 @@ using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
+using IIS.Core.GraphQL.Entities.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -116,6 +117,9 @@ namespace IIS.Core
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
+            services.AddSingleton<MutationCreateResolver>();
+            services.AddSingleton<MutationUpdateResolver>();
+            services.AddSingleton<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();

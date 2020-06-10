@@ -30,6 +30,8 @@ namespace IIS.Core.GraphQL.Materials
             
             var res = featureProcessor.ProcessMetadata(inputMaterial.Metadata);
             
+            throw new System.Exception("FUCK");
+            
             await materialService.SaveAsync(inputMaterial);
 
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
