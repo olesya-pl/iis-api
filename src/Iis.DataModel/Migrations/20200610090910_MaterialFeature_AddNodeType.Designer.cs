@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    [Migration("20200610073851_MaterialFeature_AddNodeType")]
+    [Migration("20200610090910_MaterialFeature_AddNodeType")]
     partial class MaterialFeature_AddNodeType
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

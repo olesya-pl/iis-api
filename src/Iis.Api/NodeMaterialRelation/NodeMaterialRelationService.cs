@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -19,42 +20,20 @@ namespace IIS.Core.NodeMaterialRelation
             _context = context;
         }
 
-        public async Task Create(NodeMaterialRelation relation)
+        public async Task Create(NodeMaterialRelation relation, EntityTypeNames entityType)
         {
             ValidateUniquness(relation);
-
-            var nodeType = await GetNodeType(relation.NodeId);
 
             _context.MaterialFeatures.Add(new MaterialFeatureEntity
             {
                 NodeId = relation.NodeId,
-                NodeType = nodeType,
+                NodeType = entityType,
                 MaterialInfo = new MaterialInfoEntity
                 {
                     MaterialId = relation.MaterialId
                 }
             });
             await _context.SaveChangesAsync();
-        }
-
-        private async Task<NodeEntityType> GetNodeType(Guid nodeId)
-        {
-            var node = await _context.Nodes
-                .Include(p => p.NodeType)
-                .FirstOrDefaultAsync(p => p.Id == nodeId);
-
-            if (node == null)
-            {
-                throw new ArgumentNullException($"Could not find node by id {nodeId} while creating node-material relation");
-            }
-
-            return node.NodeType.Name switch
-            {
-                "Event" => NodeEntityType.Event,
-                "ObjectSign" => NodeEntityType.Feature,
-                _ => NodeEntityType.Entity
-            };
-
         }
 
         private void ValidateUniquness(NodeMaterialRelation relation)

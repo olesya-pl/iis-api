@@ -1,4 +1,5 @@
 using System;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Domain.Materials
 {
@@ -8,7 +9,7 @@ namespace Iis.Domain.Materials
         public string Relation { get; }
         public string Value { get; }
         public Node Node { get; set; }
-        public NodeEntityType NodeType { get; set; }
+        public EntityTypeNames NodeType { get; set; }
 
         public MaterialFeature(Guid id, string relation, string value)
         {
@@ -16,12 +17,5 @@ namespace Iis.Domain.Materials
             Relation = relation;
             Value = value;
         }
-    }
-
-    public enum NodeEntityType
-    {
-        Entity = 0,
-        Event = 1,
-        Feature = 2
     }
 }

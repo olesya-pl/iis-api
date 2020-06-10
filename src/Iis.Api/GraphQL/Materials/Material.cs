@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-using Iis.Domain.Materials;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.Files;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.GraphQL.Users;
@@ -45,7 +45,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(JsonScalarType))]
         public JToken Highlight { get; set; }
         public IEnumerable<MaterialFeatureNode> Nodes =>
-            Infos.SelectMany(p => p.Features.Where(p => p.NodeType == NodeEntityType.Entity).Select(x => x.Node));
+            Infos.SelectMany(p => p.Features.Where(p => p.NodeType == EntityTypeNames.ObjectOfStudy).Select(x => x.Node));
         public User Assignee { get; set; }
         public int MlHadnlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }

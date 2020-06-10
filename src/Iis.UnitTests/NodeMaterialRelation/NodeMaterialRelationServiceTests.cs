@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.NodeMaterialRelation;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -33,7 +34,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
             {
                 NodeId = node.Id,
                 MaterialId = material.Id
-            });
+            }, EntityTypeNames.ObjectOfStudy);
 
             //assert
             Assert.True(context.MaterialFeatures.Any(p => p.NodeId == node.Id
@@ -63,7 +64,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
             {
                 NodeId = node.Id,
                 MaterialId = material.Id
-            }));
+            }, EntityTypeNames.ObjectOfStudy));
 
             //assert
             Assert.Equal(1, context.MaterialFeatures.Count(p => p.NodeId == node.Id

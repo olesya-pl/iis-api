@@ -1,3 +1,4 @@
+using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,7 +16,7 @@ namespace Iis.DataModel.Materials
             builder
                 .Property(p => p.NodeType)
                 .IsRequired()
-                .HasDefaultValue(NodeEntityType.Entity);
+                .HasDefaultValue(EntityTypeNames.ObjectOfStudy);
         }
     }
 }

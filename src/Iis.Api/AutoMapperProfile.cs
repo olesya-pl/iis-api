@@ -66,8 +66,6 @@ namespace Iis.Api
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
-            CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>()
-                .ForMember(dest => dest.NodeType, opts => opts.MapFrom(src => src.NodeType));
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
             CreateMap<Iis.Domain.Materials.MaterialInfo, MaterialInfoEntity>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToString()))

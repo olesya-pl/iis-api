@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
 using IIS.Core.NodeMaterialRelation;
@@ -15,7 +17,12 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
-            await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input));
+            var parsed = Enum.TryParse<EntityTypeNames>(input.NodeType, true, out var nodeType);
+            if (!parsed)
+            {
+                nodeType = EntityTypeNames.ObjectOfStudy;
+            }
+            await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), nodeType);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId);
             return mapper.Map<Material>(material);
         }
