@@ -11,6 +11,11 @@ namespace Iis.DataModel.Materials
                 .HasOne(e => e.Node)
                 .WithMany(e => e.MaterialFeatures)
                 .HasForeignKey(e => e.NodeId);
+
+            builder
+                .Property(p => p.NodeType)
+                .IsRequired()
+                .HasDefaultValue(NodeEntityType.Entity);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Microsoft.EntityFrameworkCore;
@@ -22,15 +23,34 @@ namespace IIS.Core.NodeMaterialRelation
         {
             ValidateUniquness(relation);
 
+            var nodeType = await GetNodeType(relation.NodeId);
+
             _context.MaterialFeatures.Add(new MaterialFeatureEntity
             {
                 NodeId = relation.NodeId,
+                NodeType = nodeType,
                 MaterialInfo = new MaterialInfoEntity
                 {
                     MaterialId = relation.MaterialId
                 }
             });
             await _context.SaveChangesAsync();
+        }
+
+        private async Task<NodeEntityType> GetNodeType(Guid nodeId)
+        {
+            var node = await _context.Nodes
+                .Include(p => p.NodeType)
+                .FirstOrDefaultAsync(p => p.Id == nodeId);
+
+            if (node == null)
+            {
+                throw new ArgumentNullException($"Could not find node by id {nodeId} while creating node-material relation");
+            }
+
+            return node.NodeType.Name == "Event"
+                ? NodeEntityType.Event
+                : NodeEntityType.Entity;
         }
 
         private void ValidateUniquness(NodeMaterialRelation relation)

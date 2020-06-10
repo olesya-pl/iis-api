@@ -9,8 +9,16 @@ namespace Iis.DataModel.Materials
 
         public Guid NodeId { get; set; }
         public virtual NodeEntity Node { get; set; }
+        public NodeEntityType NodeType { get; set; }
 
         public string Relation { get; set; }
         public string Value { get; set; }
+    }
+
+    public enum NodeEntityType
+    {
+        Entity = 0,
+        Event = 1,
+        Feature = 2
     }
 }

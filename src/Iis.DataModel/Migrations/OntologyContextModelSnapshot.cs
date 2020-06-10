@@ -346,6 +346,11 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("NodeId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("NodeType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("Relation")
                         .HasColumnType("text");
 

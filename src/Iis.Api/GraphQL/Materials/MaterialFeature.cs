@@ -1,6 +1,7 @@
 ﻿using System;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Domain.Materials;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -11,6 +12,7 @@ namespace IIS.Core.GraphQL.Materials
         public string Relation { get; set; }
         public string Value { get; set; }
         public MaterialFeatureNode Node { get; set; }
+        public NodeEntityType NodeType { get; set; }
     }
 
     public class MaterialFeatureNode
