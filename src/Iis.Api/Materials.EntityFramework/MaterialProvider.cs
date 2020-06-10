@@ -214,7 +214,14 @@ namespace IIS.Core.Materials.EntityFramework
             result.Assignee = _mapper.Map<User>(material.Assignee);
 
             result.Nodes = result.Infos.SelectMany(p => p.Features.Select(x => x.Node).Where(x => IsObjectOfStudy(x)));
+            result.Events = result.Infos.SelectMany(p => p.Features.Select(x => x.Node).Where(x => IsEvent(x)));
             return result;
+        }
+
+        private bool IsEvent(Node node)
+        {
+            var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
+            return nodeType.IsEvent;
         }
 
         private bool IsObjectOfStudy(Node node)

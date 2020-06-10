@@ -45,6 +45,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(JsonScalarType))]
         public JToken Highlight { get; set; }
         public IEnumerable<MaterialFeatureNode> Nodes { get; set; }
+        public IEnumerable<MaterialFeatureNode> Events { get; set; }
 
         public User Assignee { get; set; }
         public int MlHadnlersCount { get; set; }

@@ -41,5 +41,6 @@ namespace Iis.Domain.Materials
         public int ProcessedMlHandlersCount { get; set; }
 
         public IEnumerable<Node> Nodes { get; set; }
+        public IEnumerable<Node> Events { get; set; }
     }
 }
