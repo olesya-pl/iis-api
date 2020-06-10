@@ -298,6 +298,7 @@ namespace IIS.Core
             app.UseMiddleware<LoggingMiddleware>();
             app.UseGraphQL();
             app.UsePlayground();
+            app.UseMiddleware<LoggingMiddleware>();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();

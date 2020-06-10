@@ -84,7 +84,7 @@ namespace Iis.OntologySchema.DataTypes
 
             return result;
         }
-        
+
         public IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded()
         {
             return IncomingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(r => r.SourceType).ToList();
@@ -115,6 +115,8 @@ namespace Iis.OntologySchema.DataTypes
         }
 
         public bool IsObjectOfStudy => IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
+
+        public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
 
         public string GetStringCode()
         {

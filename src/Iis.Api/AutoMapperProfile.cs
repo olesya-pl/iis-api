@@ -63,6 +63,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Infos, opts => opts.MapFrom(src => src.Infos))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
+                .ForMember(dest => dest.Nodes, opts => opts.MapFrom(src => src.Nodes))
+                .ForMember(dest => dest.Events, opts => opts.MapFrom(src => src.Events))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 

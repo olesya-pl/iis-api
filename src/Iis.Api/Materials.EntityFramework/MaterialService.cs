@@ -231,7 +231,7 @@ namespace IIS.Core.Materials.EntityFramework
                 throw new ArgumentNullException($"Material with given id not found");
             }
 
-            material.MlHadnlersCount = handlersCount;
+            material.MlHandlersCount = handlersCount;
             await _context.SaveChangesAsync();
         }
     }

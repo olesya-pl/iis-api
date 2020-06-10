@@ -65,7 +65,7 @@ namespace Iis.DataModel.Materials
                 .WithMany(e => e.Materials)
                 .HasForeignKey(e => e.AssigneeId);
 
-            builder.Property(e => e.MlHadnlersCount)
+            builder.Property(e => e.MlHandlersCount)
                 .IsRequired(true)
                 .HasDefaultValue(0);
         }

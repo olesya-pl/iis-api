@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.Files;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.GraphQL.Users;
@@ -43,9 +44,11 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<MaterialInfo> Infos { get; set; } = new List<MaterialInfo>();
         [GraphQLType(typeof(JsonScalarType))]
         public JToken Highlight { get; set; }
-        public IEnumerable<MaterialFeatureNode> Nodes => Infos.SelectMany(p => p.Features.Select(x => x.Node));
+        public IEnumerable<MaterialFeatureNode> Nodes { get; set; }
+        public IEnumerable<MaterialFeatureNode> Events { get; set; }
+
         public User Assignee { get; set; }
-        public int MlHadnlersCount { get; set; }
+        public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
