@@ -16,6 +16,7 @@ using IIS.Core.Materials;
 using IIS.Core.Files;
 using IIS.Domain;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.UnitTests
 {
@@ -58,6 +59,7 @@ namespace Iis.UnitTests
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
             serviceCollection.AddSingleton<IOntologyCache, OntologyCache>();
+            serviceCollection.AddSingleton(new Mock<IOntologySchema>().Object);
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
             serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
             serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
