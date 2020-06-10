@@ -48,9 +48,13 @@ namespace IIS.Core.NodeMaterialRelation
                 throw new ArgumentNullException($"Could not find node by id {nodeId} while creating node-material relation");
             }
 
-            return node.NodeType.Name == "Event"
-                ? NodeEntityType.Event
-                : NodeEntityType.Entity;
+            return node.NodeType.Name switch
+            {
+                "Event" => NodeEntityType.Event,
+                "ObjectSign" => NodeEntityType.Feature,
+                _ => NodeEntityType.Entity
+            };
+
         }
 
         private void ValidateUniquness(NodeMaterialRelation relation)
