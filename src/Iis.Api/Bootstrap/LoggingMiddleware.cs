@@ -5,6 +5,7 @@ using Microsoft.IO;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -61,11 +62,16 @@ namespace Iis.Api.Bootstrap
         private async Task<string> FormatRequest(HttpRequest request)
         {
             request.EnableBuffering();
-            await using var requestStream = _recyclableMemoryStreamManager.GetStream();
-            await request.Body.CopyToAsync(requestStream);
-
-            var dump = $"{request.Scheme} {request.Host}{request.Path} {request.QueryString} {ReadStreamInChunks(requestStream)}";
-            request.Body.Position = 0;
+            var isFileRequest = request.Path.Value.ToLower().Contains("files");
+            var requestBodyString = string.Empty;
+            if (!isFileRequest)
+            {
+                await using var requestStream = _recyclableMemoryStreamManager.GetStream();
+                await request.Body.CopyToAsync(requestStream);
+                requestBodyString = ReadStreamInChunks(requestStream);
+                request.Body.Position = 0;
+            }
+            var dump = $"{request.Scheme} {request.Host}{request.Path} {request.QueryString} {requestBodyString}";
             return dump;
         }
 
