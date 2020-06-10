@@ -26,12 +26,12 @@ namespace Iis.Elastic
             }
         }
 
-        public JObject ConvertToJObject()
+        public JObject ToJObject()
         {
             var jProperties = new JObject();
             foreach (var property in Properties)
             {
-                jProperties[property.Name] = property.ConvertToJObject();
+                jProperties[property.Name] = property.ToJObject();
             }
             var inner = new JObject();
             inner["properties"] = jProperties;

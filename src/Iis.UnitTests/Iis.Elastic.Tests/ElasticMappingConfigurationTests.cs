@@ -105,7 +105,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var configuration = new ElasticMappingConfiguration(attributeInfo);
-            var jConfig = configuration.ConvertToJObject();
+            var jConfig = configuration.ToJObject();
             var jProperties = jConfig[MAPPING];
             var jChildren = jProperties[PROPERTIES];
             Assert.Equal(3, jChildren.Children().Count());

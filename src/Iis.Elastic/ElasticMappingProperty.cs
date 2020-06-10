@@ -20,7 +20,7 @@ namespace Iis.Elastic
         public string Path { get; set; }
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
 
-        public JObject ConvertToJObject()
+        public JObject ToJObject()
         {
             var result = new JObject();
             if (this.Type != ElasticMappingPropertyType.Nested)
@@ -38,7 +38,7 @@ namespace Iis.Elastic
                 var jProperties = new JObject();
                 foreach (var property in Properties)
                 {
-                    jProperties[property.Name] = property.ConvertToJObject();
+                    jProperties[property.Name] = property.ToJObject();
                 }
                 result["properties"] = jProperties;
             }

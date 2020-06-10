@@ -139,7 +139,7 @@ namespace Iis.Elastic
         {
             var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
-            var jObject = mappingConfiguration.ConvertToJObject();
+            var jObject = mappingConfiguration.ToJObject();
             var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
             return response.Success;
         }
