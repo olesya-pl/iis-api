@@ -14,6 +14,11 @@ namespace Iis.Elastic
             _fieldToAliasMapper = fieldToAliasMapper;
         }
 
+        public SearchResultExtractor()
+        {
+
+        }
+
         public IElasticSearchResult GetFromResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);
@@ -32,7 +37,7 @@ namespace Iis.Elastic
                         Higlight = hit[HIGHLIGHT],
                         SearchResult = hit["_source"] as JObject
                     };
-                    var nodeTypeName = resultItem.SearchResult[NODE_TYPE_NAME].ToString();
+                    var nodeTypeName = resultItem.SearchResult[NODE_TYPE_NAME]?.ToString();
                     resultItem.SearchResult[HIGHLIGHT] = RemoveFieldsDuplicatedByAlias(resultItem.Higlight, nodeTypeName);
                     if (resultItem.SearchResult[NODE_TYPE_NAME] != null)
                     {
@@ -58,7 +63,7 @@ namespace Iis.Elastic
             foreach (JProperty child in highlight.Children())
             {
                 var fullName = $"{nodeTypeName}.{child.Name}";
-                var alias = _fieldToAliasMapper.GetAlias(fullName);
+                var alias = _fieldToAliasMapper?.GetAlias(fullName);
                 if (alias == null)
                 {
                     result[child.Name] = child.Value;
