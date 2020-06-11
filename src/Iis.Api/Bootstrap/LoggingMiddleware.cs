@@ -71,7 +71,7 @@ namespace Iis.Api.Bootstrap
                 requestBodyString = ReadStreamInChunks(requestStream);
                 request.Body.Position = 0;
             }
-            var dump = $"{request.Scheme} {request.Host}{request.Path} {request.QueryString} {requestBodyString}";
+            var dump = $"Request: {request.Scheme} {request.Host}{request.Path} {request.QueryString} {requestBodyString}";
             return dump;
         }
 
@@ -80,7 +80,7 @@ namespace Iis.Api.Bootstrap
             response.Body.Seek(0, SeekOrigin.Begin);
             var text = await new StreamReader(response.Body).ReadToEndAsync();
             response.Body.Seek(0, SeekOrigin.Begin);
-            return $"{response.StatusCode}: {text} Elapsed(ms): {sw.ElapsedMilliseconds}";
+            return $"Response: {response.StatusCode}: {text} Elapsed(ms): {sw.ElapsedMilliseconds}";
         }
 
         static bool LogException(Stopwatch sw, Exception ex)
