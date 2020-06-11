@@ -3,11 +3,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
     internal static class FeatureFields
     {
         public const string FeaturesSectionName = "Features";
-        public const string IMSIField = "IMSI";
-        public const string PhoneNumberField = "PhoneNumber";
-        public const string DBObjectField = "ObjectOfStudy";
-        public const string TMSIField = "TMSI";
-        public const string IMEIField = "IMEI";
+        public const string IMSI = "IMSI";
+        public const string PhoneNumber = "PhoneNumber";
+        public const string DBObject = "DBObject";
+        public const string TMSI = "TMSI";
+        public const string IMEI = "IMEI";
         public const string FeatureId = "featureId";
     }
 }

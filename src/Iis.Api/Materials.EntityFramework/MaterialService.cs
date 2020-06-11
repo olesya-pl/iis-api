@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
+using Newtonsoft.Json.Linq;
 using IIS.Core.Files;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
@@ -71,14 +72,16 @@ namespace IIS.Core.Materials.EntityFramework
             foreach (var info in material.Infos)
                 _context.Add(Map(info, material.Id));
 
+            
+
             await _context.SaveChangesAsync();
 
-            await PutMaterialToElasticSearch(materialEntity.Id);
+            //await PutMaterialToElasticSearch(materialEntity.Id);
 
-            _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
+            //_eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
+            //_eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
+
             // todo: put message to rabbit instead of calling another service directly
-
             if (material.Metadata.SelectToken("Features.Nodes") != null)
             {
                 foreach (var processor in _materialProcessors)
@@ -104,7 +107,7 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MlResponse>(responseEntity);
         }
 
-        public async Task<Material> UpdateMaterial(IMaterialUpdateInput input)
+        public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == input.Id);
 
@@ -139,6 +142,11 @@ namespace IIS.Core.Materials.EntityFramework
             return await _elasticService.PutMaterialAsync(materialId, materialDocument);
         }
 
+        private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
+        {
+            //metadata.SelectToken("Features").Select(e => (e as JObject).GetValue("featureId").Value<string>())
+            return null;
+        }
         private Guid GetIcaoNode(string icaoValue)
         {
             var q = from n in _context.Nodes

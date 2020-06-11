@@ -26,11 +26,7 @@ namespace IIS.Core.GraphQL.Materials
 
             inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
 
-            var featureProcessor = featureProcessorFactory.GetInstance(inputMaterial.Source);
-            
-            var res = featureProcessor.ProcessMetadata(inputMaterial.Metadata);
-            
-            throw new System.Exception("FUCK");
+            inputMaterial.Metadata = await featureProcessorFactory.GetInstance(inputMaterial.Source).ProcessMetadata(inputMaterial.Metadata);
             
             await materialService.SaveAsync(inputMaterial);
 
@@ -44,7 +40,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
-            var material = await materialService.UpdateMaterial(input);
+            var material = await materialService.UpdateMaterialAsync(input);
             return mapper.Map<Material>(material);
         }
 

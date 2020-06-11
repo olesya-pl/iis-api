@@ -27,16 +27,24 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         private static readonly List<string> prioritizedField = new List<string>
         {
-            FeatureFields.IMSIField,
-            FeatureFields.PhoneNumberField,
-            FeatureFields.IMEIField,
+            FeatureFields.IMSI,
+            FeatureFields.PhoneNumber,
+            FeatureFields.IMEI,
+        };
+        private static readonly Dictionary<string, string> signTypeFields = new Dictionary<string, string>
+        {
+            { PhoneSignFields.PhoneNumber, FeatureFields.PhoneNumber },
+            { PhoneSignFields.DBObject, FeatureFields.DBObject },
+            { PhoneSignFields.IMEI, FeatureFields.IMEI },
+            { PhoneSignFields.IMSI, FeatureFields.IMSI },
+            { PhoneSignFields.TMSI, FeatureFields.TMSI }
         };
         private static readonly JsonMergeSettings mergeSettings = new JsonMergeSettings
-		{
-			MergeArrayHandling = MergeArrayHandling.Union,
-			PropertyNameComparison = StringComparison.InvariantCultureIgnoreCase,
-			MergeNullValueHandling = MergeNullValueHandling.Ignore
-		};
+        {
+            MergeArrayHandling = MergeArrayHandling.Union,
+            PropertyNameComparison = StringComparison.InvariantCultureIgnoreCase,
+            MergeNullValueHandling = MergeNullValueHandling.Ignore
+        };
 
         public GSMFeatureProcessor(IElasticService elasticService
         , IOntologyProvider ontologyProvider
@@ -65,22 +73,28 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                 var searchResult = await SearchExistingFeature(feature);
 
-                if(searchResult.isExist)
+                if (searchResult.isExist)
                 {
                     feature[FeatureFields.FeatureId] = searchResult.featureId.Value.ToString();
-                    
+
                     var updatedFeature = MergeFeatures(feature, searchResult.feature);
-                    
+
                     await PutFeature(updatedFeature);
 
-                    //update existing node in ontology
-                } 
+                    var properties = GetPropertiesForEntity(updatedFeature);
+
+                    var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
+                    
+                }
                 else
                 {
-                    //put new node to onlology
-                    var entity = await SaveFeature(signType, feature);
+                    var properties = GetPropertiesForEntity(feature);
 
-                    //await PutFeature(feature);
+                    var entity = await _createResolver.CreateEntity(signType, properties);
+
+                    feature[FeatureFields.FeatureId] = entity.Id.ToString();
+
+                    await PutFeature(feature);
                 }
             }
 
@@ -104,13 +118,13 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             {
                 var fieldValue = feature.GetValue(fieldName, StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
 
-                if(string.IsNullOrWhiteSpace(fieldValue)) continue;
+                if (string.IsNullOrWhiteSpace(fieldValue)) continue;
 
                 var searchResult = await SearchFeature(fieldName, fieldValue);
 
                 if (searchResult.isExist) return (searchResult.isExist, fieldName, searchResult.featureId, searchResult.feature);
             }
-            return (false, null, null, null);    
+            return (false, null, null, null);
         }
         private async Task<(bool isExist, Guid? featureId, JObject feature)> SearchFeature(string fieldName, string fieldValue)
         {
@@ -118,9 +132,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
                         _elasticService.FeatureIndexes,
-                        new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:{fieldValue})"});
-            
-            if(searchResult.Count == 0) return (false, null, null);
+                        new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:{fieldValue})" });
+
+            if (searchResult.Count == 0) return (false, null, null);
 
             var featurePair = searchResult.Items.FirstOrDefault();
 
@@ -134,28 +148,31 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             var featureDocument = new JObject();
 
-            foreach(var property in feature.Properties())
+            foreach (var property in feature.Properties())
             {
-                var propertyName = property.Name.ToLowerCamelcase();
+                var propertyName = property.Name.ToLowerInvariant();
 
-                if(propertyName == FeatureFields.FeatureId.ToLowerCamelcase()) continue;
+                if (propertyName == FeatureFields.FeatureId.ToLowerInvariant()) continue;
 
                 featureDocument.Add(new JProperty(propertyName, property.Value.Value<string>()));
             }
 
             return await _elasticService.PutFeatureAsync(featureId, featureDocument);
         }
-        private async Task<Entity> SaveFeature(EntityType signType, JObject feature)
+        private Dictionary<string, object> GetPropertiesForEntity(JObject feature)
         {
             var properties = new Dictionary<string, object>();
 
-            var phoneNumber = feature.GetValue(FeatureFields.PhoneNumberField, StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
+            foreach (var (signFieldName, featureFieldName) in signTypeFields)
+            {
+                var fieldValue = feature.GetValue(featureFieldName, StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
 
-            properties.Add("value", phoneNumber);
+                if(string.IsNullOrWhiteSpace(fieldValue)) continue;
 
-            var entity = await _createResolver.CreateEntity(signType, properties);
+                properties.Add(signFieldName, fieldValue);
+            }            
 
-            return await Task.FromResult(entity);
+            return properties;
         }
         private JObject MergeFeatures(JObject newFeature, JObject existingFeature)
         {
@@ -170,9 +187,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             foreach (var property in feature.Properties())
             {
                 var propertyName = property.Name;
-                var propertyValue =  property.Value.Value<string>();
+                var propertyValue = property.Value.Value<string>();
 
-                if(string.IsNullOrWhiteSpace(propertyValue))
+                if (string.IsNullOrWhiteSpace(propertyValue))
                 {
                     emptyPropsList.Add(propertyName);
                 }
@@ -180,9 +197,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             foreach (var propertyName in emptyPropsList)
             {
-                feature.Remove(propertyName);           
+                feature.Remove(propertyName);
             }
-            
+
             return feature;
         }
     }

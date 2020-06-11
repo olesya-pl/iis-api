@@ -11,7 +11,7 @@ namespace IIS.Core.Materials
     {
         Task SaveAsync(Material material);
         Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response);
-        Task<Material> UpdateMaterial(IMaterialUpdateInput input);
+        Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input);
         Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
     }
 }
