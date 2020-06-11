@@ -225,6 +225,7 @@ namespace IIS.Core.Materials.EntityFramework
             var jDocument = new JObject(
                 new JProperty(nameof(Material.Source).ToLower(), material.Source),
                 new JProperty(nameof(Material.Type).ToLower(), material.Type),
+                new JProperty(nameof(Material.Content).ToLower(), material.Content),
                 new JProperty(nameof(Material.Importance).ToLower(), material.Importance?.Title),
                 new JProperty(nameof(Material.Reliability).ToLower(), material.Reliability?.Title),
                 new JProperty(nameof(Material.Relevance).ToLower(), material.Relevance?.Title),
@@ -332,6 +333,7 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.Completeness)
                     .Include(m => m.SourceReliability)
                     .Include(m => m.ProcessedStatus)
+                    .Include(m => m.SessionPriority)
                     .Include(m => m.Children)
                     .Include(m => m.MaterialInfos)
                     .ThenInclude(m => m.MaterialFeatures)

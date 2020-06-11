@@ -78,7 +78,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             await _context.SaveChangesAsync();
 
-            await PutMaterialToElasticSearch(materialEntity.Id);
+            await PutMaterialToElasticSearchAsync(materialEntity.Id);
 
             _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
             _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
@@ -106,7 +106,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             _context.SaveChanges();
 
-            await PutMaterialToElasticSearch(responseEntity.MaterialId);
+            await PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
             return _mapper.Map<MlResponse>(responseEntity);
         }
@@ -115,7 +115,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == input.Id);
 
-            if (string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
+            if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
             if (input.ImportanceId.HasValue) material.ImportanceSignId = input.ImportanceId.Value;
             if (input.ReliabilityId.HasValue) material.ReliabilitySignId = input.ReliabilityId.Value;
             if (input.RelevanceId.HasValue) material.RelevanceSignId = input.RelevanceId.Value;
@@ -123,19 +123,23 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.SourceReliabilityId.HasValue) material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
             if (input.ProcessedStatusId.HasValue) material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
             if (input.SessionPriorityId.HasValue) material.SessionPriorityId = input.SessionPriorityId.Value;
-            var loadData = new MaterialLoadData();
+            if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
+            if (!string.IsNullOrWhiteSpace(input.Content)) material.Content = input.Content;
+
+            var loadData = MaterialLoadData.MapLoadData(material.LoadData);
+
             if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
             if (input.States != null) loadData.States = new List<string>(input.States);
+
             material.LoadData = loadData.ToJson();
-            if (input.AssigneeId != null) material.AssigneeId = input.AssigneeId;
 
             await UpdateAsync(material);
 
             return await _materialProvider.GetMaterialAsync(input.Id);
         }
 
-        private async Task<bool> PutMaterialToElasticSearch(Guid materialId)
+        private async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId)
         {
             var materialDocument = await _materialProvider.GetMaterialDocumentAsync(materialId);
 
@@ -193,6 +197,7 @@ namespace IIS.Core.Materials.EntityFramework
             }
             material.AssigneeId = assigneeId;
             await _context.SaveChangesAsync();
+            await PutMaterialToElasticSearchAsync(materialId);
             return await _materialProvider.GetMaterialAsync(materialId);
         }
 
@@ -205,7 +210,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 await _context.SaveChangesAsync();
 
-                await PutMaterialToElasticSearch(material.Id);
+                await PutMaterialToElasticSearchAsync(material.Id);
 
                 _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
 

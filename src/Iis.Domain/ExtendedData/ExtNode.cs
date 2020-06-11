@@ -12,7 +12,8 @@ namespace Iis.Domain.ExtendedData
         public string NodeTypeId { get; set; }
         public string NodeTypeName { get; set; }
         public string NodeTypeTitle { get; set; }
-        public string AttributeValue { get; set; }
+        public string EntityTypeName { get; set; }
+        public object AttributeValue { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public IReadOnlyList<IExtNode> Children { get; set; } = new List<ExtNode>();
