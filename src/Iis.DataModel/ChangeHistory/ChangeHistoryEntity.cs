@@ -1,7 +1,5 @@
 ﻿using Iis.Interfaces.Ontology;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DataModel.ChangeHistory
 {
@@ -13,5 +11,6 @@ namespace Iis.DataModel.ChangeHistory
         public DateTime Date { get; set; }
         public string OldValue { get; set; }
         public string NewValue { get; set; }
+        public Guid RequestId { get; set; }
     }
 }

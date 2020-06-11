@@ -152,6 +152,11 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("PropertyName")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13) placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)");
+
                     b.Property<Guid>("TargetId")
                         .HasColumnType("uuid");
 
@@ -687,7 +692,7 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Aliens")
+                    b.Property<string>("Aliases")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
