@@ -10,7 +10,6 @@ using Iis.Domain.Materials;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
-using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 using Material = Iis.Domain.Materials.Material;
 using Node = Iis.Domain.Node;
 using IIS.Domain;

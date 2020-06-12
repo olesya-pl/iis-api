@@ -2,6 +2,7 @@
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -27,7 +28,7 @@ namespace IIS.Core.Ontology
 
     public interface IAttributeBuilder : ITypeBuilder
     {
-        IAttributeBuilder HasValueOf(Iis.Domain.ScalarType name);
+        IAttributeBuilder HasValueOf(ScalarType name);
     }
 
     public interface IRelationBuilder

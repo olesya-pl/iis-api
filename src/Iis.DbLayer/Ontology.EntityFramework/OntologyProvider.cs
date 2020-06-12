@@ -10,7 +10,6 @@ using Iis.Interfaces.Ontology.Schema;
 using IIS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -98,7 +97,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (type.Kind == Kind.Attribute)
                 {
                     var attributeType = type.AttributeType;
-                    var attr = new AttributeType(type.Id, type.Name, MapScalarType(attributeType.ScalarType));
+                    var attr = new AttributeType(type.Id, type.Name, attributeType.ScalarType);
                     _types.Add(type.Id, attr);
                     FillProperties(type, attr);
                     attr.Meta = attr.CreateMeta(); // todo: refactor meta creation
@@ -168,21 +167,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;
-        }
-
-        private static Domain.ScalarType MapScalarType(Interfaces.Ontology.Schema.ScalarType scalarType)
-        {
-            switch (scalarType)
-            {
-                case Interfaces.Ontology.Schema.ScalarType.Boolean: return Domain.ScalarType.Boolean;
-                case Interfaces.Ontology.Schema.ScalarType.Date: return Domain.ScalarType.DateTime;
-                case Interfaces.Ontology.Schema.ScalarType.Decimal: return Domain.ScalarType.Decimal;
-                case Interfaces.Ontology.Schema.ScalarType.File: return Domain.ScalarType.File;
-                case Interfaces.Ontology.Schema.ScalarType.Geo: return Domain.ScalarType.Geo;
-                case Interfaces.Ontology.Schema.ScalarType.Int: return Domain.ScalarType.Integer;
-                case Interfaces.Ontology.Schema.ScalarType.String: return Domain.ScalarType.String;
-                default: throw new NotImplementedException();
-            }
         }
 
         private static EmbeddingOptions Map(Interfaces.Ontology.Schema.EmbeddingOptions embeddingOptions)

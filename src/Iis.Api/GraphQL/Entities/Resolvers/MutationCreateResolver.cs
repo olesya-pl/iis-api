@@ -8,6 +8,7 @@ using Iis.Domain;
 using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -106,9 +107,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (embed.IsAttributeType)
             {
-                if (embed.AttributeType.ScalarTypeEnum == Iis.Domain.ScalarType.File)
+                if (embed.AttributeType.ScalarTypeEnum == ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.AttributeType.ScalarTypeEnum == Iis.Domain.ScalarType.Geo)
+                else if (embed.AttributeType.ScalarTypeEnum == ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.

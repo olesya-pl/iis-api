@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,7 @@ namespace Iis.Domain.ExtendedData
         public string NodeTypeTitle { get; set; }
         public string EntityTypeName { get; set; }
         public object AttributeValue { get; set; }
+        public ScalarType? ScalarType { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public IReadOnlyList<IExtNode> Children { get; set; } = new List<ExtNode>();

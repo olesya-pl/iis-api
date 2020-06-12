@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Ontology
 {

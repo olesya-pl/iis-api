@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Ontology {
     public class AnalyticsQueryBuilder
@@ -175,11 +176,11 @@ namespace IIS.Core.Ontology {
             private Dictionary<string, object> _sqlParams = new Dictionary<string, object>();
             private ConditionExpr[] _conditions;
 
-            private Dictionary<Iis.Domain.ScalarType, string> _dataTypesToSqlTypes = new Dictionary<Iis.Domain.ScalarType, string>() {
-                { Iis.Domain.ScalarType.Integer, "integer" },
-                { Iis.Domain.ScalarType.Decimal, "double" },
-                { Iis.Domain.ScalarType.Boolean, "boolean" },
-                { Iis.Domain.ScalarType.DateTime, "timestamp" }
+            private Dictionary<ScalarType, string> _dataTypesToSqlTypes = new Dictionary<ScalarType, string>() {
+                { ScalarType.Int, "integer" },
+                { ScalarType.Decimal, "double" },
+                { ScalarType.Boolean, "boolean" },
+                { ScalarType.Date, "timestamp" }
             };
 
             public SQLGenerator(AnalyticsQueryParser.Ast ast, List<Expr> groups, Expr agg, Expr[] select, ConditionExpr[] conditions)

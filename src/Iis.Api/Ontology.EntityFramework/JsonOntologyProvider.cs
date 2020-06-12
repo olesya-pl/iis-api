@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using IIS.Domain;
 using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -68,7 +69,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     type = RelationType.Build(dataType.Id, dataType.Name, _metaToEmbeddingOptions(dataType.Meta));
                     break;
                 case "attributes":
-                    Iis.Domain.ScalarType attrDataType;
+                    ScalarType attrDataType;
                     Enum.TryParse(dataType.Type, out attrDataType);
                     type = new AttributeType(dataType.Id, dataType.Name, attrDataType);
                     break;
