@@ -2,7 +2,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
     internal static class FeatureFields
     {
-        public const string FeaturesSectionName = "Features";
+        public const string FeaturesSection = "Features";
         public const string IMSI = "IMSI";
         public const string PhoneNumber = "PhoneNumber";
         public const string DBObject = "DBObject";

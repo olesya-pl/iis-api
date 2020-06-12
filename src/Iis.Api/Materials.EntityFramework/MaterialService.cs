@@ -11,6 +11,7 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.Interfaces.Materials;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -72,14 +73,25 @@ namespace IIS.Core.Materials.EntityFramework
             foreach (var info in material.Infos)
                 _context.Add(Map(info, material.Id));
 
-            
+            foreach (var featureId in GetNodeIdentitiesFromFeatures(material.Metadata))
+            {
+                _context.MaterialFeatures.Add(new MaterialFeatureEntity
+                {
+                    NodeId = featureId,
+                    MaterialInfo = new MaterialInfoEntity
+                    {
+                        MaterialId = material.Id
+                    }
+                });
+            }
 
             await _context.SaveChangesAsync();
 
-            //await PutMaterialToElasticSearch(materialEntity.Id);
+            await PutMaterialToElasticSearch(materialEntity.Id);
 
-            //_eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
-            //_eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
+            _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
+            
+            _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
 
             // todo: put message to rabbit instead of calling another service directly
             if (material.Metadata.SelectToken("Features.Nodes") != null)
@@ -106,6 +118,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             return _mapper.Map<MlResponse>(responseEntity);
         }
+
 
         public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)
         {
@@ -144,8 +157,24 @@ namespace IIS.Core.Materials.EntityFramework
 
         private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
         {
-            //metadata.SelectToken("Features").Select(e => (e as JObject).GetValue("featureId").Value<string>())
-            return null;
+            var result = new List<Guid>();
+
+            var features = metadata.SelectToken(FeatureFields.FeaturesSection);
+
+            if(features is null) return result;
+
+            foreach (JObject feature in features)
+            {
+                var featureId = feature.GetValue(FeatureFields.FeatureId)?.Value<string>();
+
+                if(string.IsNullOrWhiteSpace(featureId)) continue;
+
+                if(!Guid.TryParse(featureId, out Guid featureGuid)) continue;
+                
+                result.Add(featureGuid);
+            }
+            
+            return result;
         }
         private Guid GetIcaoNode(string icaoValue)
         {

@@ -65,8 +65,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             var signType = ontology.GetEntityType(SignTypeName);
 
-            var features = metadata.SelectToken(FeatureFields.FeaturesSectionName);
-
+            var features = metadata.SelectToken(FeatureFields.FeaturesSection);
+            
             foreach (JObject feature in features)
             {
                 RemoveEmptyValues(feature);
@@ -77,6 +77,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                 {
                     feature[FeatureFields.FeatureId] = searchResult.featureId.Value.ToString();
 
+                    var isEqual = JToken.DeepEquals(searchResult.feature, feature);
+                    
                     var updatedFeature = MergeFeatures(feature, searchResult.feature);
 
                     await PutFeature(updatedFeature);
@@ -104,11 +106,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         private bool FeaturesSectionIsValidNotEmpty(JObject metadata)
         {
-            if (!metadata.ContainsKey(FeatureFields.FeaturesSectionName)) return false;
+            if (!metadata.ContainsKey(FeatureFields.FeaturesSection)) return false;
 
-            if (!(metadata.SelectToken(FeatureFields.FeaturesSectionName) is JArray)) return false;
+            if (!(metadata.SelectToken(FeatureFields.FeaturesSection) is JArray)) return false;
 
-            if (!metadata.SelectToken(FeatureFields.FeaturesSectionName).HasValues) return false;
+            if (!metadata.SelectToken(FeatureFields.FeaturesSection).HasValues) return false;
 
             return true;
         }
