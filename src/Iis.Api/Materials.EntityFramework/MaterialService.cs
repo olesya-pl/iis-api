@@ -119,7 +119,6 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MlResponse>(responseEntity);
         }
 
-
         public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == input.Id);
@@ -143,9 +142,41 @@ namespace IIS.Core.Materials.EntityFramework
             
             material.LoadData = loadData.ToJson();
 
-            await UpdateAsync(material);
+            await UpdateMaterialAsync(material);
 
             return await _materialProvider.GetMaterialAsync(input.Id);
+        }
+
+        public async Task UpdateMaterialAsync(MaterialEntity material)
+        {
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                _context.Update(material);
+
+                await _context.SaveChangesAsync();
+
+                await PutMaterialToElasticSearch(material.Id);
+
+                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+        
+        public async Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
+        {
+            var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
+            if (material == null)
+            {
+                throw new ArgumentNullException("No material found by given id");
+            }
+            material.AssigneeId = assigneeId;
+            await _context.SaveChangesAsync();
+            return await _materialProvider.GetMaterialAsync(materialId);
         }
 
         private async Task<bool> PutMaterialToElasticSearch(Guid materialId)
@@ -176,6 +207,7 @@ namespace IIS.Core.Materials.EntityFramework
             
             return result;
         }
+
         private Guid GetIcaoNode(string icaoValue)
         {
             var q = from n in _context.Nodes
@@ -216,38 +248,6 @@ namespace IIS.Core.Materials.EntityFramework
                 SourceType = info.SourceType,
                 SourceVersion = info.SourceVersion,
             };
-        }
-
-        public async Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
-        {
-            var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
-            if (material == null)
-            {
-                throw new ArgumentNullException("No material found by given id");
-            }
-            material.AssigneeId = assigneeId;
-            await _context.SaveChangesAsync();
-            return await _materialProvider.GetMaterialAsync(materialId);
-        }
-
-        public async Task UpdateAsync(MaterialEntity material)
-        {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                _context.Update(material);
-
-                await _context.SaveChangesAsync();
-
-                await PutMaterialToElasticSearch(material.Id);
-
-                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
-
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
         }
     }
 }
