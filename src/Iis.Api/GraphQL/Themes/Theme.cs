@@ -15,5 +15,6 @@ namespace IIS.Core.GraphQL.Themes
         public string Query {get;set;}
         public User User {get;set;}
         public ThemeType Type {get;set;}
+        public string Comment { get; set; }
     }
 }

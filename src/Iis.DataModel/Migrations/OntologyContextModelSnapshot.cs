@@ -958,6 +958,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
                     b.Property<string>("Query")
                         .IsRequired()
                         .HasColumnType("character varying(1024)")
