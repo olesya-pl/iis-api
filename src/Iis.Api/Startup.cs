@@ -295,7 +295,9 @@ namespace IIS.Core
 
             app.UseMiddleware<LogHeaderMiddleware>();
 
+#if !DEBUG
             app.UseMiddleware<LoggingMiddleware>();
+#endif
             app.UseGraphQL();
             app.UsePlayground();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
