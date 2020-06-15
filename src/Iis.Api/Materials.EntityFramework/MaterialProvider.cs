@@ -15,6 +15,7 @@ using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Roles;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -22,18 +23,21 @@ namespace IIS.Core.Materials.EntityFramework
     {
         private readonly OntologyContext _context;
         private readonly IOntologyService _ontologyService;
+        private readonly IOntologySchema _ontologySchema;
         private readonly IOntologyCache _cache;
         private readonly IMapper _mapper;
         private readonly IElasticService _elasticService;
 
         public MaterialProvider(OntologyContext context,
             IOntologyService ontologyService,
+            IOntologySchema ontologySchema,
             IElasticService elasticService,
             IOntologyCache cache,
             IMapper mapper)
         {
             _context = context;
             _ontologyService = ontologyService;
+            _ontologySchema = ontologySchema;
             _elasticService = elasticService;
             _cache = cache;
             _mapper = mapper;
@@ -111,6 +115,7 @@ namespace IIS.Core.Materials.EntityFramework
                                     .Select(async entity => await MapAsync(entity));
 
                 materials = await Task.WhenAll(mappingTasks);
+                PopulateProcessedMlHandlersCount(materials);
 
                 var materialsCount = await materialsCountQuery.CountAsync();
 
@@ -119,6 +124,23 @@ namespace IIS.Core.Materials.EntityFramework
             finally
             {
                 _context.Semaphore.Release();
+            }
+        }
+
+        private void PopulateProcessedMlHandlersCount(IEnumerable<Material> materials)
+        {
+            var materialIds = materials.Select(p => p.Id).ToArray();
+
+            foreach (var item in _context.MLResponses.Where(p => materialIds.Contains(p.MaterialId))
+                 .GroupBy(p => p.MaterialId)
+                 .Select(p => new { id = p.Key, count = p.Count() }))
+            {
+                var material = materials.FirstOrDefault(p => p.Id == item.id);
+                if (material == null)
+                {
+                    continue;
+                }
+                material.ProcessedMlHandlersCount = item.count;
             }
         }
 
@@ -191,7 +213,21 @@ namespace IIS.Core.Materials.EntityFramework
             result.Children.AddRange(await MapChildren(material));
             result.Assignee = _mapper.Map<User>(material.Assignee);
 
+            result.Nodes = result.Infos.SelectMany(p => p.Features.Select(x => x.Node).Where(x => IsObjectOfStudy(x)));
+            result.Events = result.Infos.SelectMany(p => p.Features.Select(x => x.Node).Where(x => IsEvent(x)));
             return result;
+        }
+
+        private bool IsEvent(Node node)
+        {
+            var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
+            return nodeType.IsEvent;
+        }
+
+        private bool IsObjectOfStudy(Node node)
+        {
+            var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
+            return nodeType.IsObjectOfStudy;
         }
 
         public async Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId)

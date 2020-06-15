@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Iis.ThemeManagement\Iis.ThemeManagement.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Iis.Ontology.OntologyEnum\" />
+  </ItemGroup>
+
 </Project>

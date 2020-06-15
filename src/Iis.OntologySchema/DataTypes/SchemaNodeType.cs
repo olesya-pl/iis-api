@@ -18,6 +18,7 @@ namespace Iis.OntologySchema.DataTypes
         public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
+        public IEnumerable<string> AliasesList => string.IsNullOrEmpty(Aliases) ? null : Aliases.Split(',');
         internal void AddIncomingRelation(SchemaRelationType relationType)
         {
             _incomingRelations.Add(relationType);
@@ -83,7 +84,7 @@ namespace Iis.OntologySchema.DataTypes
 
             return result;
         }
-        
+
         public IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded()
         {
             return IncomingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(r => r.SourceType).ToList();
@@ -114,6 +115,8 @@ namespace Iis.OntologySchema.DataTypes
         }
 
         public bool IsObjectOfStudy => IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
+
+        public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
 
         public string GetStringCode()
         {
@@ -169,6 +172,7 @@ namespace Iis.OntologySchema.DataTypes
             return Name == nodeType.Name
                 && Title == nodeType.Title
                 && Meta == nodeType.Meta
+                && Aliases == nodeType.Aliases
                 && IsArchived == nodeType.IsArchived
                 && Kind == nodeType.Kind
                 && IsAbstract == nodeType.IsAbstract
@@ -181,6 +185,7 @@ namespace Iis.OntologySchema.DataTypes
             dict[nameof(Name)] = Name;
             dict[nameof(Title)] = Title;
             dict[nameof(Meta)] = Meta;
+            dict[nameof(Aliases)] = Aliases;
             dict[nameof(IsArchived)] = IsArchived.ToString();
             dict[nameof(Kind)] = Kind.ToString();
             dict[nameof(IsAbstract)] = IsAbstract.ToString();
@@ -224,20 +229,8 @@ namespace Iis.OntologySchema.DataTypes
 
         public List<string> GetAttributeDotNamesRecursive(string parentName = null)
         {
-            var result = new List<string>();
-
-            if (Kind == Kind.Attribute)
-            {
-                result.Add(Name);
-            }
-
-            foreach (var relation in OutgoingRelations)
-            {
-                string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity ? relation.NodeType.Name : null;
-                result.AddRange(relation.TargetType.GetAttributeDotNamesRecursive(relationName));
-            }
-
-            return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
+            var attributeInfos = GetAttributesInfoRecursive();
+            return attributeInfos.Select(ai => ai.DotName).ToList();
         }
 
         private List<AttributeInfoItem> GetAttributesInfoRecursive(string parentName = null)
@@ -247,18 +240,18 @@ namespace Iis.OntologySchema.DataTypes
             if (Kind == Kind.Attribute)
             {
                 var dotName = parentName ?? Name;
-                result.Add(new AttributeInfoItem (dotName, _attributeType.ScalarType ));
+                result.Add(new AttributeInfoItem (dotName, _attributeType.ScalarType, AliasesList));
             }
 
             if (Kind == Kind.Entity && Name == EntityTypeNames.FuzzyDate.ToString())
             {
-                result.Add(new AttributeInfoItem (parentName, ScalarType.Date));
+                result.Add(new AttributeInfoItem (parentName, ScalarType.Date, AliasesList));
             }
             else
             {
                 foreach (var relationType in _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding))
                 {
-                    if (relationType.TargetType.IsObjectOfStudy) continue;
+                    if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
 
                     var relationTypeName = parentName == null ? relationType.NodeType.Name : $"{parentName}.{relationType.NodeType.Name}";
                     var relationAttributes = relationType._targetType.GetAttributesInfoRecursive(relationTypeName);
@@ -310,6 +303,19 @@ namespace Iis.OntologySchema.DataTypes
             return _outgoingRelations
                 .Where(r => r.NodeType.Name == relationName)
                 .SingleOrDefault();
+        }
+
+        public INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts)
+        {
+            var nodeType = OutgoingRelations
+                .Where(r => r.Kind == RelationKind.Embedding
+                    && r.NodeType.Name == dotNameParts[0])
+                .Select(r => r.TargetType)
+                .Single();
+
+            return dotNameParts.Length == 1 ? 
+                nodeType : 
+                nodeType.GetNodeTypeByDotNameParts(dotNameParts.Skip(1).ToArray());
         }
 
         public override string ToString() => Name;

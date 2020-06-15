@@ -10,6 +10,7 @@ namespace Iis.Interfaces.Ontology.Schema
         string Name { get; }
         string Title { get; }
         string Meta { get; }
+        string Aliases { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }
         bool IsArchived { get; }

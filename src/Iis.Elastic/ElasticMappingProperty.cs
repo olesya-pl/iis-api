@@ -10,20 +10,27 @@ namespace Iis.Elastic
         Text,
         Integer,
         Date,
-        Nested
+        Nested,
+        Alias
     }
     public class ElasticMappingProperty
     {
         public string Name { get; set; }
         public ElasticMappingPropertyType Type { get; set; }
+        public string Path { get; set; }
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
 
-        public JObject ConvertToJObject()
+        public JObject ToJObject()
         {
-            var inner = new JObject();
+            var result = new JObject();
             if (this.Type != ElasticMappingPropertyType.Nested)
             {
-                inner["type"] = this.Type.ToString().ToLower();
+                result["type"] = this.Type.ToString().ToLower();
+            }
+
+            if (this.Type == ElasticMappingPropertyType.Alias)
+            {
+                result["path"] = this.Path;
             }
 
             if (Properties.Count > 0)
@@ -31,11 +38,11 @@ namespace Iis.Elastic
                 var jProperties = new JObject();
                 foreach (var property in Properties)
                 {
-                    jProperties[property.Name] = property.ConvertToJObject();
+                    jProperties[property.Name] = property.ToJObject();
                 }
-                inner["properties"] = jProperties;
+                result["properties"] = jProperties;
             }
-            return inner;
+            return result;
         }
     }
 

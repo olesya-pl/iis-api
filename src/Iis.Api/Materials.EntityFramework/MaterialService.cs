@@ -12,6 +12,7 @@ using Iis.DataModel.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.Interfaces.Materials;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -87,10 +88,12 @@ namespace IIS.Core.Materials.EntityFramework
 
             await _context.SaveChangesAsync();
 
-            await PutMaterialToElasticSearch(materialEntity.Id);
+            await PutMaterialToElasticSearchAsync(materialEntity.Id);
 
-            _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
-            
+            if (material.ParentId == null)
+            {
+                _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
+            }
             _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
 
             // todo: put message to rabbit instead of calling another service directly
@@ -114,7 +117,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             _context.SaveChanges();
 
-            await PutMaterialToElasticSearch(responseEntity.MaterialId);
+            await PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
             return _mapper.Map<MlResponse>(responseEntity);
         }
@@ -135,11 +138,11 @@ namespace IIS.Core.Materials.EntityFramework
             if (!string.IsNullOrWhiteSpace(input.Content)) material.Content = input.Content;
 
             var loadData = MaterialLoadData.MapLoadData(material.LoadData);
-            
+
             if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
             if (input.States != null) loadData.States = new List<string>(input.States);
-            
+
             material.LoadData = loadData.ToJson();
 
             await UpdateMaterialAsync(material);
@@ -156,7 +159,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 await _context.SaveChangesAsync();
 
-                await PutMaterialToElasticSearch(material.Id);
+                await PutMaterialToElasticSearchAsync(material.Id);
 
                 _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
 
@@ -179,7 +182,7 @@ namespace IIS.Core.Materials.EntityFramework
             return await _materialProvider.GetMaterialAsync(materialId);
         }
 
-        private async Task<bool> PutMaterialToElasticSearch(Guid materialId)
+        private async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId)
         {
             var materialDocument = await _materialProvider.GetMaterialDocumentAsync(materialId);
 
@@ -248,6 +251,19 @@ namespace IIS.Core.Materials.EntityFramework
                 SourceType = info.SourceType,
                 SourceVersion = info.SourceVersion,
             };
+        }
+
+        public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
+        {
+            var material = await _context.Materials.FirstOrDefaultAsync(p => p.Id == materialId);
+
+            if (material == null)
+            {
+                throw new ArgumentNullException($"Material with given id not found");
+            }
+
+            material.MlHandlersCount = handlersCount;
+            await _context.SaveChangesAsync();
         }
     }
 }

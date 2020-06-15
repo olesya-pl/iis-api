@@ -10,5 +10,6 @@ namespace Iis.Interfaces.Ontology
         string PropertyName { get; set; }
         Guid TargetId { get; set; }
         string UserName { get; set; }
+        Guid RequestId { get; set; }
     }
 }

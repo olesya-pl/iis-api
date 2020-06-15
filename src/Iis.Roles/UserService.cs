@@ -82,6 +82,7 @@ namespace Iis.Roles
                 .AsNoTracking()
                 .Where(p => (p.ProcessedStatusSignId == null
                     || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                    && p.ParentId == null
                     && p.AssigneeId != null)
                 .GroupBy(p => p.AssigneeId)
                 .Where(group => group.Count() >= maxMaterialsCount)

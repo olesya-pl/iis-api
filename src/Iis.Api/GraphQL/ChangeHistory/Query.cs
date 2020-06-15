@@ -12,7 +12,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
 {
     public class Query
     {
-        public async Task<GraphQLCollection<ChangeHistoryItem>> GetChangeHistory([Service] IChangeHistoryService service, [Service] IMapper mapper, 
+        public async Task<GraphQLCollection<ChangeHistoryItem>> GetChangeHistory([Service] IChangeHistoryService service, [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid targetId,
             string propertyName = "")
         {

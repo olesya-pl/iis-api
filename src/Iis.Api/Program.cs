@@ -9,8 +9,10 @@ namespace IIS.Core
 {
     public class Program
     {
+        public static bool IsStartedFromMain { get; set; }
         public static async Task Main(string[] args)
         {
+            IsStartedFromMain = true;
             IHost host = CreateWebHostBuilder(args).Build();
             if (await host.RunUpAsync())
             {

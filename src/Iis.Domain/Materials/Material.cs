@@ -37,5 +37,10 @@ namespace Iis.Domain.Materials
         public MaterialLoadData LoadData { get; set; }
         public User Assignee { get; set; }
         public Guid? AssigneeId { get; set; }
+        public int MlHandlersCount { get; set; }
+        public int ProcessedMlHandlersCount { get; set; }
+
+        public IEnumerable<Node> Nodes { get; set; }
+        public IEnumerable<Node> Events { get; set; }
     }
 }

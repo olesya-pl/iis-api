@@ -20,14 +20,18 @@ namespace Iis.Elastic
                 var mappingType = ToMappingType(item.ScalarType);
                 AddProperty(Properties, nameParts, mappingType);
             }
+            foreach (var item in attributeInfo.Items)
+            {
+                AddAlias(Properties, item);
+            }
         }
 
-        public JObject ConvertToJObject()
+        public JObject ToJObject()
         {
             var jProperties = new JObject();
             foreach (var property in Properties)
             {
-                jProperties[property.Name] = property.ConvertToJObject();
+                jProperties[property.Name] = property.ToJObject();
             }
             var inner = new JObject();
             inner["properties"] = jProperties;
@@ -72,6 +76,22 @@ namespace Iis.Elastic
             else
             {
                 AddProperty(existingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
+            }
+        }
+
+        private void AddAlias(List<ElasticMappingProperty> properties, IAttributeInfoItem attributeInfoItem)
+        {
+            if (attributeInfoItem.AliasesList == null) return;
+
+            foreach (var aliasName in attributeInfoItem.AliasesList)
+            {
+                var mappingProperty = new ElasticMappingProperty
+                {
+                    Name = aliasName,
+                    Type = ElasticMappingPropertyType.Alias,
+                    Path = attributeInfoItem.DotName
+                };
+                properties.Add(mappingProperty);
             }
         }
     }

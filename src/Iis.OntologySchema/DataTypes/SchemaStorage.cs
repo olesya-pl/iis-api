@@ -67,5 +67,42 @@ namespace Iis.OntologySchema.DataTypes
         {
             return NodeTypes.Values.SingleOrDefault(nt => nt.Id == id);
         }
+        public void AddNodeType(SchemaNodeType nodeType)
+        {
+            NodeTypes[nodeType.Id] = nodeType;
+        }
+        public void AddRelationType(SchemaRelationType relationType)
+        {
+            RelationTypes[relationType.Id] = relationType;
+            var nodeType = NodeTypes[relationType.Id];
+            if (nodeType != null)
+            {
+                nodeType._relationType = relationType;
+                relationType._nodeType = nodeType;
+            }
+
+            var sourceNodeType = NodeTypes[relationType.SourceTypeId];
+            if (sourceNodeType != null)
+            {
+                sourceNodeType.AddOutgoingRelation(relationType);
+                relationType._sourceType = sourceNodeType;
+            }
+
+            var targetNodeType = NodeTypes[relationType.TargetTypeId];
+            if (targetNodeType != null)
+            {
+                targetNodeType.AddIncomingRelation(relationType);
+                relationType._targetType = targetNodeType;
+            }
+        }
+        public void AddAttributeType(SchemaAttributeType attributeType)
+        {
+            AttributeTypes[attributeType.Id] = attributeType;
+            var nodeType = NodeTypes[attributeType.Id];
+            if (nodeType != null)
+            {
+                nodeType._attributeType = attributeType;
+            }
+        }
     }
 }

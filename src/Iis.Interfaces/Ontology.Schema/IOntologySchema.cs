@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
-    public interface IOntologySchema: ISchemaEntityTypeFinder
+    public interface IOntologySchema: ISchemaEntityTypeFinder, IFieldToAliasMapper
     {
         IOntologySchemaSource SchemaSource { get; }
         void Initialize(IOntologyRawData ontologyRawData);
@@ -17,5 +17,6 @@ namespace Iis.Interfaces.Ontology.Schema
         Dictionary<string, INodeTypeLinked> GetStringCodes();
         void UpdateNodeType(INodeTypeUpdateParameter updateParameter);
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
+        void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
     }
 }

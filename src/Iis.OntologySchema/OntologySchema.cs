@@ -12,6 +12,7 @@ namespace Iis.OntologySchema
     {
         IMapper _mapper;
         SchemaStorage _storage;
+        Dictionary<string, string> _aliases;
         public IOntologySchemaSource SchemaSource { get; private set; }
         public OntologySchema(IOntologySchemaSource schemaSource)
         {
@@ -45,6 +46,7 @@ namespace Iis.OntologySchema
         {
             _storage = new SchemaStorage(_mapper);
             _storage.Initialize(ontologyRawData);
+            _aliases = GetAliases();
         }
 
         public IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter)
@@ -133,29 +135,144 @@ namespace Iis.OntologySchema
             result.SchemaSource = schema.SchemaSource;
             return result;
         }
-
-        public void UpdateNodeType(INodeTypeUpdateParameter updateParameter)
+        
+        private void UpdateNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
         {
-            var nodeType = _storage.GetNodeTypeById(updateParameter.Id);
-
             if (!string.IsNullOrEmpty(updateParameter.Title))
             {
                 nodeType.Title = updateParameter.Title;
             }
 
-            if (!string.IsNullOrEmpty(updateParameter.Meta))
+            if (nodeType.Kind == Kind.Relation && !string.IsNullOrEmpty(updateParameter.Meta))
             {
                 nodeType.Meta = updateParameter.Meta;
-            }
-
-            if (updateParameter.EmbeddingOptions != null && nodeType._relationType != null)
-            {
-                nodeType._relationType.EmbeddingOptions = (EmbeddingOptions)updateParameter.EmbeddingOptions;
             }
 
             if (updateParameter.ScalarType != null && nodeType._attributeType != null)
             {
                 nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
+            }
+
+            nodeType.Aliases = updateParameter.Aliases;
+        }
+        private void UpdateRelationNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
+        {
+            UpdateNodeType(nodeType, updateParameter);
+
+            if (updateParameter.EmbeddingOptions != null)
+            {
+                nodeType._relationType.EmbeddingOptions = (EmbeddingOptions)updateParameter.EmbeddingOptions;
+            }
+
+            if (updateParameter.TargetTypeId != null && nodeType.RelationType.TargetType.Kind == Kind.Entity)
+            {
+                nodeType._relationType.TargetTypeId = (Guid)updateParameter.TargetTypeId;
+                nodeType._relationType._targetType = _storage.NodeTypes[(Guid)updateParameter.TargetTypeId];
+            }
+
+            UpdateNodeType(nodeType._relationType._targetType, updateParameter);
+        }
+        private void CreateEntityNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            var nodeType = new SchemaNodeType
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Entity,
+                IsArchived = false,
+                IsAbstract = false
+            };
+            _storage.AddNodeType(nodeType);
+            UpdateNodeType(nodeType, updateParameter);
+        }
+        private void CreateAttributeNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            var attributeNodeType = new SchemaNodeType
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Attribute,
+            };
+            _storage.AddNodeType(attributeNodeType);
+            var attribute = new SchemaAttributeType 
+            { 
+                Id = attributeNodeType.Id, 
+                ScalarType = (ScalarType)updateParameter.ScalarType 
+            };
+            _storage.AddAttributeType(attribute);
+            var relationNodeType = new SchemaNodeType()
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Relation,
+            };
+            _storage.AddNodeType(relationNodeType);
+            var relationType = new SchemaRelationType
+            {
+                Id = relationNodeType.Id,
+                SourceTypeId = (Guid)updateParameter.ParentTypeId,
+                TargetTypeId = attributeNodeType.Id
+            };
+            _storage.AddRelationType(relationType);
+            UpdateRelationNodeType(relationNodeType, updateParameter);
+        }
+        private void CreateRelationToEntity(INodeTypeUpdateParameter updateParameter)
+        {
+            var relationNodeType = new SchemaNodeType()
+            {
+                Id = Guid.NewGuid(),
+                Name = updateParameter.Name,
+                Kind = Kind.Relation,
+            };
+            _storage.AddNodeType(relationNodeType);
+            var relationType = new SchemaRelationType
+            {
+                Id = relationNodeType.Id,
+                SourceTypeId = (Guid)updateParameter.ParentTypeId,
+                TargetTypeId = (Guid)updateParameter.TargetTypeId,
+            };
+            _storage.AddRelationType(relationType);
+            UpdateRelationNodeType(relationNodeType, updateParameter);
+        }
+        private void CreateNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            if (updateParameter.EmbeddingOptions == null)
+            {
+                CreateEntityNodeType(updateParameter);
+            }
+            else if (updateParameter.ScalarType != null)
+            {
+                CreateAttributeNodeType(updateParameter);
+            }
+            else if (updateParameter.TargetTypeId != null)
+            {
+                CreateRelationToEntity(updateParameter);
+            }
+            else
+            {
+                throw new ArgumentException("Bad updateParameter");
+            }
+        }
+        public void UpdateNodeType(INodeTypeUpdateParameter updateParameter)
+        {
+            if (updateParameter.Id == null)
+            {
+                CreateNodeType(updateParameter);
+                return;
+            }
+            var nodeType = _storage.GetNodeTypeById((Guid)updateParameter.Id);
+            
+            switch (nodeType.Kind)
+            {
+                case Kind.Entity:
+                    UpdateNodeType(nodeType, updateParameter);
+                    break;
+                case Kind.Relation:
+                    UpdateRelationNodeType(nodeType, updateParameter);
+                    break;
+                case Kind.Attribute:
+                    UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
+                    break;
             }
         }
 
@@ -164,6 +281,48 @@ namespace Iis.OntologySchema
             var nodeType = _storage.GetNodeTypeById(relationTypeId);
             nodeType._relationType.TargetTypeId = targetTypeId;
             nodeType._relationType._targetType = _storage.NodeTypes[targetTypeId];
+        }
+        public void SetInheritance(Guid sourceTypeId, Guid targetTypeId)
+        {
+            var sourceNodeType = _storage.GetNodeTypeById(sourceTypeId);
+            if (!sourceNodeType.OutgoingRelations.Any(r => r.TargetTypeId == targetTypeId && r.Kind == RelationKind.Inheritance))
+            {
+                var relationNodeType = new SchemaNodeType()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Is",
+                    Kind = Kind.Relation,
+                };
+                _storage.AddNodeType(relationNodeType);
+                var relationType = new SchemaRelationType
+                {
+                    Id = relationNodeType.Id,
+                    SourceTypeId = sourceTypeId,
+                    TargetTypeId = targetTypeId,
+                    Kind = RelationKind.Inheritance,
+                    EmbeddingOptions = EmbeddingOptions.None
+                };
+                _storage.AddRelationType(relationType);
+            }
+        }
+        public string GetAlias(string fieldDotName)
+        {
+            return _aliases.ContainsKey(fieldDotName) ? _aliases[fieldDotName] : null;
+        }
+        private Dictionary<string, string> GetAliases()
+        {
+            var result = new Dictionary<string, string>();
+            foreach (var entityType in _storage.NodeTypes.Values
+                .Where(nt => nt.Kind == Kind.Entity && !nt.IsAbstract))
+            {
+                var attributesInfo = entityType.GetAttributesInfo();
+                foreach (var item in attributesInfo.Items.Where(i => i.AliasesList.Any()))
+                {
+                    var fullDotName = $"{entityType.Name}.{item.DotName}";
+                    result[fullDotName] = item.AliasesList.First();
+                }
+            }
+            return result;
         }
     }
 }

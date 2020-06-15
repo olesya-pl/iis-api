@@ -42,6 +42,10 @@ namespace Iis.DbLayer.OntologySchema
 
         public IOntologySchema GetOntologySchema(IOntologySchemaSource schemaSource)
         {
+            if (schemaSource == null)
+            {
+                return new Iis.OntologySchema.OntologySchema(null);
+            }
             switch (schemaSource.SourceKind)
             {
                 case SchemaSourceKind.File:
