@@ -14,7 +14,7 @@ using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 
 namespace IIS.Core.GraphQL.Materials
 {
-    public class Material: IMaterialLoadData
+    public class Material : IMaterialLoadData
     {
         [GraphQLType(typeof(NonNullType<IdType>))] public Guid Id { get; set; }
         [GraphQLIgnore] public Guid? FileId { get; set; }
@@ -46,6 +46,9 @@ namespace IIS.Core.GraphQL.Materials
         public JToken Highlight { get; set; }
         public IEnumerable<MaterialFeatureNode> Nodes { get; set; }
         public IEnumerable<MaterialFeatureNode> Events { get; set; }
+
+        [GraphQLType(typeof(ListType<JsonScalarType>))]
+        public IEnumerable<JObject> Features { get; set; }
 
         public User Assignee { get; set; }
         public int MlHandlersCount { get; set; }

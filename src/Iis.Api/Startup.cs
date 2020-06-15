@@ -301,7 +301,7 @@ namespace IIS.Core
 
             app.UseMiddleware<LogHeaderMiddleware>();
 
-            app.UseMiddleware<LoggingMiddleware>();
+            //app.UseMiddleware<LoggingMiddleware>();
             app.UseGraphQL();
             app.UsePlayground();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });

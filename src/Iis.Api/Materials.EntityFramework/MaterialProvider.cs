@@ -42,6 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
             _cache = cache;
             _mapper = mapper;
         }
+        
         public async Task<(
             IEnumerable<Material> Materials,
             int Count,
@@ -211,10 +212,18 @@ namespace IIS.Core.Materials.EntityFramework
             result.Infos.AddRange(await MapInfos(material));
 
             result.Children.AddRange(await MapChildren(material));
+
             result.Assignee = _mapper.Map<User>(material.Assignee);
 
-            result.Nodes = result.Infos.SelectMany(p => p.Features.Select(x => x.Node).Where(x => IsObjectOfStudy(x)));
-            result.Events = result.Infos.SelectMany(p => p.Features.Select(x => x.Node).Where(x => IsEvent(x)));
+            var nodes = result.Infos
+                                .SelectMany(p => p.Features.Select(x => x.Node))
+                                .ToList();
+
+            result.Nodes = nodes.Where(x => IsObjectOfStudy(x));
+            result.Events = nodes.Where(x => IsEvent(x));
+
+            result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
+
             return result;
         }
 
@@ -230,6 +239,23 @@ namespace IIS.Core.Materials.EntityFramework
             return nodeType.IsObjectOfStudy;
         }
 
+        private bool IsObjectSign(Node node)
+        {
+            var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
+
+            return nodeType.IsObjectSign;
+        }
+        private JObject NodeToJObject(Node node)
+        {
+            var result = new JObject();
+
+            foreach (var attribute in node.GetChildAttributes())
+            {
+                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
+            }
+
+            return result;
+        }
         public async Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId)
         {
             await _context.Semaphore.WaitAsync();
