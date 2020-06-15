@@ -20,15 +20,35 @@ namespace IIS.Core.GraphQL.Themes
             Validator.ValidateObject(themeInput, new ValidationContext(themeInput), true);
 
             var theme = mapper.Map<ThemeMng.Models.Theme>(themeInput);
-            
+
             var themeType = await themeService.GetThemeTypeByEntityTypeNameAsync(themeInput.EntityTypeName);
-            
+
             theme.Type = themeType;
-            
+
             var themeId = await themeService.CreateThemeAsync(theme);
 
             theme = await themeService.GetThemeAsync(themeId);
 
+            return mapper.Map<Theme>(theme);
+        }
+
+        public async Task<Theme> UpdateTheme(
+            [Service] ThemeMng.ThemeService themeService,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] UpdateThemeInput themeInput)
+        {
+            Validator.ValidateObject(themeInput, new ValidationContext(themeInput), true);
+
+            var theme = mapper.Map<ThemeMng.Models.Theme>(themeInput);
+            if (!string.IsNullOrEmpty(themeInput.EntityTypeName))
+            {
+                var themeType = await themeService.GetThemeTypeByEntityTypeNameAsync(themeInput.EntityTypeName);
+                theme.Type = themeType;
+            }
+
+            var themeId = await themeService.UpdateThemeAsync(theme);
+
+            theme = await themeService.GetThemeAsync(themeId);
             return mapper.Map<Theme>(theme);
         }
 
@@ -41,5 +61,5 @@ namespace IIS.Core.GraphQL.Themes
 
             return mapper.Map<Theme>(theme);
         }
-    } 
+    }
 }

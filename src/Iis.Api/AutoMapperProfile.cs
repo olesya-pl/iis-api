@@ -229,6 +229,10 @@ namespace Iis.Api
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Roles.User{ Id = src.UserId.Value }));
 
+            CreateMap<IIS.Core.GraphQL.Themes.UpdateThemeInput, Iis.ThemeManagement.Models.Theme>()
+                .ForMember(dest => dest.User, opts => opts.MapFrom(src =>
+                    src.UserId.HasValue ? new Iis.Roles.User { Id = src.UserId.Value } : null));
+
             // theme: domain -> entity
             CreateMap<Iis.ThemeManagement.Models.Theme, ThemeEntity>()
                 .ForMember(dest => dest.User, opts => opts.Ignore())
