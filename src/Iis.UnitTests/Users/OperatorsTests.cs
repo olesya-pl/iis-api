@@ -66,6 +66,8 @@ namespace Iis.UnitTests.Users
                 dummyMaterial.AssigneeId = operator1.Id;
                 dummyMaterial.Assignee = operator1;
                 dummyMaterial.Id = new Guid();
+                dummyMaterial.ParentId = null;
+                dummyMaterial.Parent = null;
                 context.Add(dummyMaterial);
                 context.SaveChanges();
             }

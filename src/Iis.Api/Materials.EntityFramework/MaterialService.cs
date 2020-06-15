@@ -81,7 +81,10 @@ namespace IIS.Core.Materials.EntityFramework
 
             await PutMaterialToElasticSearchAsync(materialEntity.Id);
 
-            _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
+            if (material.ParentId == null)
+            {
+                _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
+            }
             _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
             // todo: put message to rabbit instead of calling another service directly
 
