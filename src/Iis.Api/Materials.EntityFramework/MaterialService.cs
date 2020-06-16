@@ -199,7 +199,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             foreach (JObject feature in features)
             {
-                var featureId = feature.GetValue(FeatureFields.FeatureId)?.Value<string>();
+                var featureId = feature.GetValue(FeatureFields.featureId)?.Value<string>();
 
                 if(string.IsNullOrWhiteSpace(featureId)) continue;
 

@@ -67,21 +67,27 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             var features = metadata.SelectToken(FeatureFields.FeaturesSection);
             
-            foreach (JObject feature in features)
+            foreach (JObject originalFeature in features)
             {
-                NormalizeObject(feature);
+                RemoveEmptyProperties(originalFeature);
+                
+                var feature = NormalizeObject(originalFeature);
 
                 var searchResult = await SearchExistingFeature(feature);
 
                 if (searchResult.isExist)
                 {
-                    feature[FeatureFields.FeatureId] = searchResult.featureId.Value.ToString();
+                    var featureId = searchResult.featureId.Value.ToString();
 
-                    var isEqual = JToken.DeepEquals(searchResult.feature, feature);
+                    feature[FeatureFields.featureid] = featureId;
+                    
+                    originalFeature[FeatureFields.featureId] = featureId;
+                    
+                    if(AreFeaturesEqual(feature, searchResult.feature)) continue;
                     
                     var updatedFeature = MergeFeatures(feature, searchResult.feature);
 
-                    await PutFeature(updatedFeature);
+                    await PutFeatureToElasticSearch(updatedFeature);
 
                     var properties = GetPropertiesForEntity(updatedFeature);
 
@@ -93,13 +99,16 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                     var properties = GetPropertiesForEntity(feature);
 
                     var entity = await _createResolver.CreateEntity(signType, properties);
+                    
+                    var featureId = entity.Id.ToString();
 
-                    feature[FeatureFields.FeatureId] = entity.Id.ToString();
+                    feature[FeatureFields.featureid] = featureId;
 
-                    await PutFeature(feature);
+                    originalFeature[FeatureFields.featureId] = featureId;
+
+                    await PutFeatureToElasticSearch(feature);
                 }
             }
-
 
             return metadata;
         }
@@ -114,24 +123,26 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             return true;
         }
+        
         private async Task<(bool isExist, string fieldName, Guid? featureId, JObject feature)> SearchExistingFeature(JObject feature)
         {
-            foreach (var fieldName in prioritizedField)
+            foreach (var field in prioritizedField)
             {
+                var fieldName = field.ToLowerInvariant();
+
                 var fieldValue = feature.GetValue(fieldName, StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
 
                 if (string.IsNullOrWhiteSpace(fieldValue)) continue;
 
-                var searchResult = await SearchFeature(fieldName, fieldValue);
+                var searchResult = await SearchFeatureInElasticSearch(fieldName, fieldValue);
 
                 if (searchResult.isExist) return (searchResult.isExist, fieldName, searchResult.featureId, searchResult.feature);
             }
             return (false, null, null, null);
         }
-        private async Task<(bool isExist, Guid? featureId, JObject feature)> SearchFeature(string fieldName, string fieldValue)
-        {
-            fieldName = fieldName.ToLowerInvariant();
 
+        private async Task<(bool isExist, Guid? featureId, JObject feature)> SearchFeatureInElasticSearch(string fieldName, string fieldValue)
+        {
             var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
                         _elasticService.FeatureIndexes,
                         new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:{fieldValue})" });
@@ -142,25 +153,29 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             featurePair.Value.SearchResult.Remove(HIGHLIGHT);
 
-            return (true, featurePair.Key, featurePair.Value.SearchResult);
+            var feature = featurePair.Value.SearchResult.Value<JObject>();
+            
+            return (true, featurePair.Key, feature);
         }
-        private async Task<bool> PutFeature(JObject feature)
+        
+        private async Task<bool> PutFeatureToElasticSearch(JObject feature)
         {
-            var featureId = new Guid(feature[FeatureFields.FeatureId].Value<string>());
+            var featureId = new Guid(feature[FeatureFields.featureid].Value<string>());
 
             var featureDocument = new JObject();
 
             foreach (var property in feature.Properties())
             {
-                var propertyName = property.Name.ToLowerInvariant();
+                var propertyName = property.Name;
 
-                if (propertyName == FeatureFields.FeatureId.ToLowerInvariant()) continue;
+                if (propertyName == FeatureFields.featureid) continue;
 
                 featureDocument.Add(new JProperty(propertyName, property.Value.Value<string>()));
             }
 
             return await _elasticService.PutFeatureAsync(featureId, featureDocument);
         }
+        
         private Dictionary<string, object> GetPropertiesForEntity(JObject feature)
         {
             var properties = new Dictionary<string, object>();
@@ -176,13 +191,41 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             return properties;
         }
+        
         private JObject MergeFeatures(JObject newFeature, JObject existingFeature)
         {
             existingFeature.Merge(newFeature, mergeSettings);
 
             return existingFeature;
         }
+        
+        private bool AreFeaturesEqual(JObject newFeature, JObject existingFeature)
+        {
+            var feature = newFeature.DeepClone() as JObject;
+
+            feature.Remove(FeatureFields.featureid);
+
+            return JToken.DeepEquals(feature, existingFeature);
+        } 
+
         private JObject NormalizeObject(JObject feature)
+        {
+            var result = new JObject();
+
+            foreach (var property in feature.Properties())
+            {
+                var propertyName = property.Name.ToLowerInvariant();
+
+                var propertyValue = property.Value.Value<string>();
+
+                if(string.IsNullOrWhiteSpace(propertyValue)) continue;
+
+                result.Add(propertyName, property.Value);    
+            }
+
+            return result;            
+        }
+        private JObject RemoveEmptyProperties(JObject feature)
         {
             var emptyPropsList = new List<string>();
 
@@ -205,6 +248,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             return feature;
         }
+ 
     }
 
 }

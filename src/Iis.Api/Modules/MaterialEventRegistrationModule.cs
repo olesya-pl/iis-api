@@ -23,8 +23,8 @@ namespace Iis.Api.Modules
                         .AddSingleton(assignerConfig)
                         .AddTransient<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl))
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
-                        .AddHostedService<MaterialEventConsumer>();
-                        //.AddHostedService<MaterialOperatorAssigner>();
+                        .AddHostedService<MaterialEventConsumer>()
+                        .AddHostedService<MaterialOperatorAssigner>();
         }
     }
 }
