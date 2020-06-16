@@ -10,7 +10,7 @@ using Xunit;
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    public sealed class AuthorizationSteps : IisApiUtils
+    public sealed class OdysseusAuthorizationSteps : IisApiUtils
     {
         // For additional details on SpecFlow step definitions see https://go.specflow.org/doc-stepdef
 
@@ -19,13 +19,13 @@ namespace AcceptanceTests.Steps
         private const string authResponce = "authResponse";
         private const string errResponce = "Wrong username or password";
 
-        public AuthorizationSteps(ScenarioContext injectedContext)
+        public OdysseusAuthorizationSteps(ScenarioContext injectedContext)
         {
             context = injectedContext;
-            graphQlClient = GraphQLHttpClientFactory.CreateGraphQLHttpClient();
+            graphQlClient = GraphQLHttpClientFactory.CreateOdysseusGraphQLHttpClient();
         }
 
-        [Given(@"I want to authenticate with the user (.*) and password (.*)")]
+        [Given(@"I want to authenticate with the user (.*) and password (.*) in the Odysseus")]
         public void GivenIWantToAuthenticateWithTheUserAndPassword(string userName, string password)
         {
             var request = new GraphQLRequest
@@ -49,7 +49,7 @@ namespace AcceptanceTests.Steps
             context.Add("authRequest", request);
         }
 
-        [When(@"I send login request")]
+        [When(@"I send login request to the Odysseus")]
         public async Task WhenWhenISendLoginRequest()
         {
             var authRequest = context.Get<GraphQLRequest>("authRequest");
@@ -58,14 +58,14 @@ namespace AcceptanceTests.Steps
             context.Add(authResponce, response);
         }
 
-        [Then(@"The result should contain authorization token")]
+        [Then(@"The result should contain authorization token from the Odysseus")]
         public void ThenTheResultShouldBeStatusCode()
         {
             var response = context.Get<GraphQLResponse<GraphQlResponseWrapper<LoginResponse>>>("authResponse");
             Assert.NotNull(response.Data.Login.Token);
         }
 
-        [Then(@"The result should not contain authorization token")]
+        [Then(@"The result should not contain authorization token from the Odysseus")]
         public void ThenTheResultShouldNotContainAuthorizationToken()
         {
             var response = context.Get<GraphQLResponse<GraphQlResponseWrapper<LoginResponse>>>("authResponse");

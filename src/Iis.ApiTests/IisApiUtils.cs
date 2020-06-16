@@ -31,7 +31,7 @@ namespace AcceptanceTests.Steps
                 }
             };
 
-            var graphQlClient = GraphQLHttpClientFactory.CreateGraphQLHttpClient();
+            var graphQlClient = GraphQLHttpClientFactory.CreateContourGraphQLHttpClient();
             var response = await graphQlClient.SendMutationAsync<GraphQlResponseWrapper<LoginResponse>>(request);
             return response.Data.Login.Token;
         }
@@ -56,7 +56,7 @@ namespace AcceptanceTests.Steps
                 }"
             };
 
-            var graphQlClient = GraphQLHttpClientFactory.CreateGraphQLHttpClient();
+            var graphQlClient = GraphQLHttpClientFactory.CreateContourGraphQLHttpClient();
             graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
             var response = await graphQlClient.SendMutationAsync<MaterialResponse>(request);
             return response.Data;
@@ -83,7 +83,7 @@ namespace AcceptanceTests.Steps
                     }
                 }
             };
-            var graphQlClient = GraphQLHttpClientFactory.CreateGraphQLHttpClient();
+            var graphQlClient = GraphQLHttpClientFactory.CreateContourGraphQLHttpClient();
             graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
             var response = await graphQlClient.SendMutationAsync<JObject>(request);
             return response;
