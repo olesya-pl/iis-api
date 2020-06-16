@@ -10,5 +10,6 @@ namespace Iis.DataModel.Themes
         public ThemeTypeEntity Type { get; set; }
         public Guid UserId { get; set; }
         public UserEntity User { get; set; }
+        public string Comment { get; set; }
     }
 }
