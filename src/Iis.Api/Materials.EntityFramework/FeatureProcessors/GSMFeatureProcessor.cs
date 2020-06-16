@@ -69,7 +69,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             
             foreach (JObject feature in features)
             {
-                RemoveEmptyValues(feature);
+                NormalizeObject(feature);
 
                 var searchResult = await SearchExistingFeature(feature);
 
@@ -182,13 +182,14 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             return existingFeature;
         }
-        private JObject RemoveEmptyValues(JObject feature)
+        private JObject NormalizeObject(JObject feature)
         {
             var emptyPropsList = new List<string>();
 
             foreach (var property in feature.Properties())
             {
                 var propertyName = property.Name;
+                
                 var propertyValue = property.Value.Value<string>();
 
                 if (string.IsNullOrWhiteSpace(propertyValue))
@@ -196,7 +197,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                     emptyPropsList.Add(propertyName);
                 }
             }
-
+            
             foreach (var propertyName in emptyPropsList)
             {
                 feature.Remove(propertyName);
