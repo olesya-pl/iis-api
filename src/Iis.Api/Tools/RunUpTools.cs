@@ -73,15 +73,6 @@ namespace IIS.Core.Tools
                 case "clear-types":
                     await tools.ClearTypesAsync();
                     break;
-                case "fill-odysseus-types":
-                    await tools.FillOdysseusTypesAsync();
-                    break;
-                case "fill-contour-types":
-                    await tools.FillContourTypesAsync();
-                    break;
-                case "fill-developer-types":
-                    await tools.FillDeveloperTypesAsync();
-                    break;
                 case "seed-contour-data":
                     await tools.SeedContourDataAsync();
                     break;
@@ -93,12 +84,6 @@ namespace IIS.Core.Tools
                     break;
                 case "apply-ef-migrations":
                     tools.ApplyEfMigrations();
-                    break;
-                case "dump-contour-ontology":
-                    await tools.DumpContourOntologyAsync();
-                    break;
-                case "dump-odysseus-ontology":
-                    await tools.DumpOdysseusOntologyAsync();
                     break;
                 case "migrate-ontology":
                     await tools.MigrateOntologyAsync();

@@ -128,7 +128,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var relation = default(RelationType);
                 if (relationType.Kind == RelationKind.Embedding)
                 {
-                    relation = new EmbeddingRelationType(type.Id, type.Name, Map(relationType.EmbeddingOptions));
+                    relation = new EmbeddingRelationType(type.Id, type.Name, relationType.EmbeddingOptions);
                     FillProperties(type, relation);
                     _types.Add(type.Id, relation);
                     var target = mapType(relationType.TargetType);
@@ -167,17 +167,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;
-        }
-
-        private static EmbeddingOptions Map(Interfaces.Ontology.Schema.EmbeddingOptions embeddingOptions)
-        {
-            switch (embeddingOptions)
-            {
-                case Interfaces.Ontology.Schema.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
-                case Interfaces.Ontology.Schema.EmbeddingOptions.Required: return EmbeddingOptions.Required;
-                case Interfaces.Ontology.Schema.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
-                default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
-            }
         }
     }
 }

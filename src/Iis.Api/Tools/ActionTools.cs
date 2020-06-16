@@ -66,29 +66,6 @@ namespace IIS.Core.Tools
             _logger.LogInformation("Types cleared.");
         }
 
-        public async Task FillOdysseusTypesAsync()
-        {
-            await SeedTypesAsync("odysseus");
-        }
-
-        public async Task FillContourTypesAsync()
-        {
-            await SeedTypesAsync("contour");
-        }
-        
-        public async Task FillDeveloperTypesAsync()
-        {
-            await SeedTypesAsync("develop");
-        }
-
-        private async Task SeedTypesAsync(string name)
-        {
-            JsonOntologyProvider provider = new JsonOntologyProvider(Path.Combine(Environment.CurrentDirectory, "data", name, "ontology"));
-            OntologyModel ontology = await provider.GetOntologyAsync();
-            _ontologyTypeSaver.SaveTypes(ontology.EntityTypes);
-            _logger.LogInformation("{name} types filled.", name);
-        }
-
         public async Task SeedContourDataAsync()
         {
             _runtimeSettings.PutSavedToElastic = false;
@@ -183,17 +160,7 @@ namespace IIS.Core.Tools
             _ontologyContext.Database.Migrate();
             _logger.LogInformation("Migration has been applied.");
         }
-
-        public async Task DumpOdysseusOntologyAsync()
-            {
-            await _dumpOntology("odysseus");
-        }
-
-        public async Task DumpContourOntologyAsync()
-        {
-            await _dumpOntology("contour");
-        }
-
+        
         public async Task ResetPasswordsAsync()
         {
             List<UserEntity> userEntities = await _ontologyContext.Users.ToListAsync();
@@ -223,7 +190,7 @@ namespace IIS.Core.Tools
             _migrationService.MakeSnapshotOld();
             
             await ClearTypesAsync();
-            await FillContourTypesAsync();
+            //await FillContourTypesAsync();
             
             var migrationResult = await _migrationService.MigrateAsync();
             ontologyMigration.StructureBefore = migrationResult.StructureBefore;
@@ -265,16 +232,6 @@ namespace IIS.Core.Tools
             ontologyMigration.IsSuccess = true;
             _ontologyContext.OntologyMigrations.Add(ontologyMigration);
             _ontologyContext.SaveChanges();
-        }
-
-        private async Task _dumpOntology(string name)
-        {
-            var ontology = await _ontologyProvider.GetOntologyAsync();
-            var basePath = Path.Combine(Environment.CurrentDirectory, "data", name, "ontology");
-            var serializer = new Serializer();
-
-            serializer.serialize(basePath, ontology);
-            Console.WriteLine($"Dumped ontology for {name} into {basePath}");
         }
 
         class AnalyticsIndicatorBuilder
