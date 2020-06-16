@@ -27,7 +27,7 @@ namespace IIS.Core.GraphQL.Materials
             inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
 
             inputMaterial.Metadata = await featureProcessorFactory.GetInstance(inputMaterial.Source).ProcessMetadata(inputMaterial.Metadata);
-            throw new System.Exception("FUCK");
+
             await materialService.SaveAsync(inputMaterial);
 
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
