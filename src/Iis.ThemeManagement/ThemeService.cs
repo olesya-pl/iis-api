@@ -184,16 +184,37 @@ namespace Iis.ThemeManagement
             if(typeKey == Event)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(indexes,filter);
-
                 return (Id: id, Count: searchResult.count);
 
-            } else
+            }
+            else if (typeKey == Material)
+            {
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes, filter);
+                int count = await GetCountOfParentMaterials(searchResult);
+                return (Id: id, Count: count);
+            }
+            else
             {
                 var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes,filter);
-
                 return (Id: id, Count: searchResult.Count);
             }
         }
+
+        private async Task<int> GetCountOfParentMaterials(SearchByConfiguredFieldsResult searchResult)
+        {
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                var foundMaterialIds = searchResult.Items.Keys.ToArray();
+                var count = await _context.Materials.CountAsync(p => p.ParentId == null && foundMaterialIds.Contains(p.Id));
+                return count;
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
         private string[] GetOntologyIndexes(OntologyModel ontology, string typeName)
         {
             var types = ontology.EntityTypes.Where(p => p.Name == typeName);
