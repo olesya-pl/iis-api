@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 
 namespace IIS.Core.Ontology
@@ -35,7 +36,7 @@ namespace IIS.Core.Ontology
         private List<Action<ITypeBuilder>> _parentBuilders = new List<Action<ITypeBuilder>>();
         private List<Relation> _childNodes = new List<Relation>();
         private Kind _kind;
-        private Iis.Domain.ScalarType _scalarType;
+        private ScalarType _scalarType;
 
         private readonly Dictionary<string, OntologyBuilder> Builders;
 
@@ -139,7 +140,7 @@ namespace IIS.Core.Ontology
         }
 
         // Attr
-        public IAttributeBuilder HasValueOf(Iis.Domain.ScalarType scalarType)
+        public IAttributeBuilder HasValueOf(ScalarType scalarType)
         {
             _scalarType = scalarType;
             return this;

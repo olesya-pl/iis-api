@@ -1,6 +1,7 @@
 using System;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 
 namespace Iis.DbLayer.Ontology.EntityFramework

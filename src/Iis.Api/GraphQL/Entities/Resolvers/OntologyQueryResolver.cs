@@ -13,9 +13,9 @@ using IIS.Domain;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Attribute = Iis.Domain.Attribute;
-using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

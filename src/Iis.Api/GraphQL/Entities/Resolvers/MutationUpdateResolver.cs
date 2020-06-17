@@ -7,6 +7,7 @@ using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

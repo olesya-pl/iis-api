@@ -12,8 +12,6 @@ namespace Iis.Utility
 
         public override string ToString() => _value;
 
-        public override bool Equals(object obj) => Equals(obj as ScalarType);
-
         public override int GetHashCode() => _value.GetHashCode();
 
         public static bool operator ==(ObjectEnum a, ObjectEnum b)

@@ -1,4 +1,5 @@
 using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -8,7 +9,7 @@ namespace Iis.Domain.Meta
     {
         protected readonly JsonSerializer js;
 
-        protected TypeMetaConverterBase(Iis.Domain.ScalarType? scalarType)
+        protected TypeMetaConverterBase(ScalarType? scalarType)
         {
             js = new JsonSerializer {MissingMemberHandling = MissingMemberHandling.Error};
             js.Converters.Add(new ValidationConverter(scalarType, js));
@@ -22,7 +23,7 @@ namespace Iis.Domain.Meta
 
     public class MetaConverter<TMeta> : TypeMetaConverterBase where TMeta : IMeta
     {
-        public MetaConverter(Iis.Domain.ScalarType? scalarType) : base(scalarType)
+        public MetaConverter(ScalarType? scalarType) : base(scalarType)
         {
         }
 
@@ -36,10 +37,10 @@ namespace Iis.Domain.Meta
 
     public class ValidationConverter : JsonConverter<IValidation>
     {
-        private readonly Iis.Domain.ScalarType? _scalarType;
+        private readonly ScalarType? _scalarType;
         private JsonSerializer js;
 
-        public ValidationConverter(Iis.Domain.ScalarType? scalarType, JsonSerializer js)
+        public ValidationConverter(ScalarType? scalarType, JsonSerializer js)
         {
             _scalarType = scalarType;
             this.js = js;
@@ -56,11 +57,11 @@ namespace Iis.Domain.Meta
             var jo = JObject.Load(reader);
             switch (_scalarType)
             {
-                case Iis.Domain.ScalarType.String:
+                case ScalarType.String:
                     return jo.ToObject<StringValidation>();
-                case Iis.Domain.ScalarType.Integer:
+                case ScalarType.Int:
                     return jo.ToObject<IntValidation>();
-                case Iis.Domain.ScalarType.DateTime:
+                case ScalarType.Date:
                     return jo.ToObject<DateValidation>();
                 default:
                     return jo.ToObject<Validation>();
