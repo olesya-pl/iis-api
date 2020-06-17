@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Iis.Api.GraphQL.Roles;
-using Iis.Api.Ontology.Migration;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Users;
 using IIS.Core.GraphQL.Materials;
@@ -28,12 +27,6 @@ namespace Iis.Api
     {
         public AutoMapperProfile()
         {
-            CreateMap<NodeEntity, SnapshotNode>().ReverseMap();
-            CreateMap<RelationEntity, SnapshotRelation>().ReverseMap();
-            CreateMap<AttributeEntity, SnapshotAttribute>().ReverseMap();
-            CreateMap<RelationTypeEntity, SnatshotRelationType>().ReverseMap();
-            CreateMap<NodeTypeEntity, SnapshotNodeType>().ReverseMap();
-            CreateMap<AttributeTypeEntity, SnapshotAttributeType>().ReverseMap();
             CreateMap<IMaterialSignType, MaterialSignTypeEntity>();
             CreateMap<IMaterialSign, MaterialSignEntity>();
             CreateMap<IMaterialSign, Iis.Domain.Materials.MaterialSign>();

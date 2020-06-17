@@ -85,9 +85,6 @@ namespace IIS.Core.Tools
                 case "apply-ef-migrations":
                     tools.ApplyEfMigrations();
                     break;
-                case "migrate-ontology":
-                    await tools.MigrateOntologyAsync();
-                    break;
                 case "reset-passwords":
                     await tools.ResetPasswordsAsync();
                     break;

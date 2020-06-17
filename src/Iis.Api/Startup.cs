@@ -39,7 +39,6 @@ using Iis.Api;
 using Iis.Api.Modules;
 using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
-using Iis.Api.Ontology.Migration;
 using AutoMapper;
 using Iis.Api.bo;
 using Iis.Api.Bootstrap;
@@ -141,7 +140,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
-            services.AddTransient<MigrationService>();
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
