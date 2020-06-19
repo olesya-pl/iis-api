@@ -8,7 +8,6 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         public const string DBObject = "DBObject";
         public const string TMSI = "TMSI";
         public const string IMEI = "IMEI";
-        public const string featureid = "featureid";
         public const string featureId = "featureId";
     }
 }
