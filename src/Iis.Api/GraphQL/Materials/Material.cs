@@ -18,7 +18,7 @@ namespace IIS.Core.GraphQL.Materials
     {
         [GraphQLType(typeof(NonNullType<IdType>))] public Guid Id { get; set; }
         [GraphQLIgnore] public Guid? FileId { get; set; }
-        [GraphQLType(typeof(JsonScalarType))] public JObject Metadata { get; set; }
+        [GraphQLNonNullType, GraphQLType(typeof(JsonScalarType))] public JObject Metadata { get; set; }
         public string CreatedDate { get; set; }
         public string Content { get; set; }
         public MaterialSign Importance { get; set; }
