@@ -14,12 +14,18 @@ namespace Iis.OntologySchema
 
         public IReadOnlyList<IAttributeType> AttributeTypes { get; private set; }
 
-        public OntologyRawData(IEnumerable<INodeType> nodeTypes, IEnumerable<IRelationType> relationTypes, IEnumerable<IAttributeType> attributeTypes)
+        public IReadOnlyList<IAlias> Aliases { get; private set; }
+
+        public OntologyRawData(
+            IEnumerable<INodeType> nodeTypes, 
+            IEnumerable<IRelationType> relationTypes, 
+            IEnumerable<IAttributeType> attributeTypes,
+            IEnumerable<IAlias> aliases)
         {
             NodeTypes = new List<INodeType>(nodeTypes);
             RelationTypes = new List<IRelationType>(relationTypes);
             AttributeTypes = new List<IAttributeType>(attributeTypes);
+            Aliases = new List<IAlias>(aliases);
         }
-
     }
 }

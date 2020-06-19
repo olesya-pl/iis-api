@@ -16,6 +16,5 @@ namespace Iis.OntologySchema.DataTypes
         public bool IsArchived { get; set; }
         public Kind Kind { get; set; }
         public bool IsAbstract { get; set; }
-        public string Aliases { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace Iis.OntologyManager.UiControls
     {
         private TextBox txtName;
         private TextBox txtTitle;
+        private RichTextBox txtAliases;
         private DataGridView gridInheritedFrom;
         private DataGridView gridInheritedBy;
         private DataGridView gridEmbeddence;
@@ -42,12 +43,12 @@ namespace Iis.OntologyManager.UiControls
         {
             _uiControlsCreator = uiControlsCreator;
         }
-        public void SetUiValues(INodeTypeLinked nodeType)
+        public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
         {
-            
             txtId.Text = nodeType.Id.ToString("N");
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
+            txtAliases.Lines = aliases.ToArray();
             var children = nodeType.GetAllChildren();
             gridChildren.DataSource = children;
             var ancestors = nodeType.GetAllAncestors();
@@ -82,6 +83,9 @@ namespace Iis.OntologyManager.UiControls
 
             gridEmbeddence = GetRelationsGrid(nameof(gridEmbeddence));
             _container.Add(gridEmbeddence, "Embedded By:", true);
+            _container.GoToNewColumn();
+
+            _container.Add(txtAliases = new RichTextBox(), "Aliases", true);
             _container.GoToNewColumn();
 
             btnSave = new Button { Text = "Save" };
@@ -124,7 +128,8 @@ namespace Iis.OntologyManager.UiControls
                 Id =  isNew ? (Guid?)null : new Guid(txtId.Text),
                 Name = isNew ? txtName.Text : null,
                 Title = txtTitle.Text,
-                ParentTypeId = null
+                ParentTypeId = null,
+                Aliases = txtAliases.Lines
             };
         }
         private DataGridView GetRelationsGrid(string name)

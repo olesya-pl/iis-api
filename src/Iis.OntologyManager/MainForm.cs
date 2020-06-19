@@ -443,14 +443,14 @@ namespace Iis.OntologyManager
         }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
-            var a = nodeType.GetAttributeDotNamesRecursive();
             if (addToHistory && _currentNodeType != null)
             {
                 _history.Add(_currentNodeType);
             }
             var nodeViewType = GetNodeViewType(nodeType);
             SetNodeTypeViewVisibility(nodeViewType);
-            _nodeTypeControls[nodeViewType].SetUiValues(nodeType);
+            var aliases = nodeType.Kind == Kind.Entity ? _schema.Aliases.GetStrings(nodeType.Name) : new List<string>();
+            _nodeTypeControls[nodeViewType].SetUiValues(nodeType, aliases);
 
             lblTypeHeaderName.Text = nodeType.Name;
             _currentNodeType = nodeType;

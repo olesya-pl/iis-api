@@ -17,12 +17,16 @@ namespace Iis.OntologySchema.DataTypes
         public Dictionary<Guid, SchemaNodeType> NodeTypes { get; private set; }
         public Dictionary<Guid, SchemaRelationType> RelationTypes { get; private set; }
         public Dictionary<Guid, SchemaAttributeType> AttributeTypes { get; private set; }
+        public SchemaAliases Aliases { get; private set; }
+        public Dictionary<string, SchemaNodeType> DotNameTypes { get; private set; } = new Dictionary<string, SchemaNodeType>();
+        public IEnumerable<SchemaNodeType> Entities => NodeTypes.Values.Where(nt => !nt.IsArchived && nt.Kind == Kind.Entity);
 
         public void Initialize(IOntologyRawData ontologyRawData)
         {
             NodeTypes = ontologyRawData.NodeTypes.ToDictionary(nt => nt.Id, nt => _mapper.Map<SchemaNodeType>(nt));
             RelationTypes = ontologyRawData.RelationTypes.ToDictionary(r => r.Id, r => _mapper.Map<SchemaRelationType>(r));
             AttributeTypes = ontologyRawData.AttributeTypes.ToDictionary(at => at.Id, at => _mapper.Map<SchemaAttributeType>(at));
+            Aliases = new SchemaAliases(ontologyRawData.Aliases);
             foreach (var relationType in RelationTypes.Values)
             {
                 var nodeType = NodeTypes[relationType.Id];
@@ -37,9 +41,20 @@ namespace Iis.OntologySchema.DataTypes
                 relationType.SetTargetType(targetType);
                 targetType.AddIncomingRelation(relationType);
             }
+
             foreach (var attributeType in AttributeTypes.Values)
             {
                 NodeTypes[attributeType.Id]._attributeType = attributeType;
+            }
+
+            foreach (var nodeType in Entities)
+            {
+                DotNameTypes[nodeType.Name] = nodeType;
+                var childInfos = nodeType.GetNodeTypesRecursive();
+                foreach (var childInfo in childInfos)
+                {
+                    DotNameTypes[childInfo.dotName] = childInfo.nodeType;
+                }
             }
         }
 
@@ -56,6 +71,11 @@ namespace Iis.OntologySchema.DataTypes
         public IEnumerable<SchemaAttributeTypeRaw> GetAttributeTypesRaw()
         {
             return AttributeTypes.Values.Select(at => _mapper.Map<SchemaAttributeTypeRaw>(at));
+        }
+
+        public IEnumerable<IAlias> GetAliases()
+        {
+            return Aliases.Items;
         }
 
         public Dictionary<string, INodeTypeLinked> GetStringCodes()

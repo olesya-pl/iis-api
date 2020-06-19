@@ -8,7 +8,7 @@ namespace Iis.OntologyManager
     {
         public AutoMapperProfile()
         {
-            
+            CreateMap<IAlias, SchemaAlias>();
         }
     }
 }
