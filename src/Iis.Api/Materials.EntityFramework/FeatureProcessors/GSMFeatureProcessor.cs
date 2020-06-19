@@ -25,7 +25,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private readonly MutationCreateResolver _createResolver;
         private readonly MutationUpdateResolver _updateResolver;
 
-        private static readonly List<string> prioritizedField = new List<string>
+        private static readonly List<string> prioritizedFields = new List<string>
         {
             FeatureFields.IMSI,
             FeatureFields.PhoneNumber,
@@ -42,7 +42,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private static readonly JsonMergeSettings mergeSettings = new JsonMergeSettings
         {
             MergeArrayHandling = MergeArrayHandling.Union,
-            PropertyNameComparison = StringComparison.InvariantCultureIgnoreCase,
+            PropertyNameComparison = StringComparison.OrdinalIgnoreCase,
             MergeNullValueHandling = MergeNullValueHandling.Ignore
         };
 
@@ -106,24 +106,18 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return metadata;
         }
 
-        private bool FeaturesSectionIsValidNotEmpty(JObject metadata)
-        {
-            if (!metadata.ContainsKey(FeatureFields.FeaturesSection)) return false;
+        private bool FeaturesSectionIsValidNotEmpty(JObject metadata) =>
+            metadata.ContainsKey(FeatureFields.FeaturesSection) &&
+            metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
+            metadata.SelectToken(FeatureFields.FeaturesSection).HasValues;
 
-            if (!(metadata.SelectToken(FeatureFields.FeaturesSection) is JArray)) return false;
-
-            if (!metadata.SelectToken(FeatureFields.FeaturesSection).HasValues) return false;
-
-            return true;
-        }
-        
         private async Task<(bool isExist, string fieldName, Guid? featureId, JObject feature)> SearchExistingFeature(JObject feature)
         {
-            foreach (var field in prioritizedField)
+            foreach (var field in prioritizedFields)
             {
                 var fieldName = field.ToLowerInvariant();
 
-                var fieldValue = feature.GetValue(fieldName, StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
+                var fieldValue = feature.GetValue(fieldName, StringComparison.OrdinalIgnoreCase)?.Value<string>();
 
                 if (string.IsNullOrWhiteSpace(fieldValue)) continue;
 
@@ -162,7 +156,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             foreach (var (signFieldName, featureFieldName) in signTypeFields)
             {
-                var fieldValue = feature.GetValue(featureFieldName, StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
+                var fieldValue = feature.GetValue(featureFieldName, StringComparison.OrdinalIgnoreCase)?.Value<string>();
 
                 if(string.IsNullOrWhiteSpace(fieldValue)) continue;
 
