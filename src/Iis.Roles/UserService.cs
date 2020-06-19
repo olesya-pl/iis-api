@@ -64,7 +64,10 @@ namespace Iis.Roles
 
         private IQueryable<UserEntity> GetOperatorsQuery()
         {
-            return _context.Users.AsNoTracking();
+            return _context.Users
+                .Include(p => p.UserRoles)
+                .Where(p => p.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
+                .AsNoTracking();
         }
 
         public Task<List<User>> GetOperatorsAsync()
