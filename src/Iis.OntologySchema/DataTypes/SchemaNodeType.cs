@@ -117,6 +117,8 @@ namespace Iis.OntologySchema.DataTypes
 
         public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
 
+        public bool IsObjectSign => IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
+
         public string GetStringCode()
         {
             switch (Kind)

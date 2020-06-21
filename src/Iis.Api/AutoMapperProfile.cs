@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Iis.Api.GraphQL.Roles;
-using Iis.Api.Ontology.Migration;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Users;
 using IIS.Core.GraphQL.Materials;
@@ -28,12 +27,6 @@ namespace Iis.Api
     {
         public AutoMapperProfile()
         {
-            CreateMap<NodeEntity, SnapshotNode>().ReverseMap();
-            CreateMap<RelationEntity, SnapshotRelation>().ReverseMap();
-            CreateMap<AttributeEntity, SnapshotAttribute>().ReverseMap();
-            CreateMap<RelationTypeEntity, SnatshotRelationType>().ReverseMap();
-            CreateMap<NodeTypeEntity, SnapshotNodeType>().ReverseMap();
-            CreateMap<AttributeTypeEntity, SnapshotAttributeType>().ReverseMap();
             CreateMap<IMaterialSignType, MaterialSignTypeEntity>();
             CreateMap<IMaterialSign, MaterialSignEntity>();
             CreateMap<IMaterialSign, Iis.Domain.Materials.MaterialSign>();
@@ -56,7 +49,6 @@ namespace Iis.Api
             CreateMap<Iis.Domain.Materials.MaterialInfo, IIS.Core.GraphQL.Materials.MaterialInfo>()
                 .ForMember(dest => dest.Features, opts => opts.MapFrom(src => src.Features));
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
-                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata.ToObject<IIS.Core.GraphQL.Materials.Metadata>()))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
                 .ForMember(dest => dest.Transcriptions, opts => opts.MapFrom(src => src.Infos.Select(info => info.Data)))
@@ -173,14 +165,18 @@ namespace Iis.Api
 
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.Type, opts => opts.MapFrom(src => src.Metadata.Type))
-                .ForMember(dest => dest.Source, opts => opts.MapFrom(src => src.Metadata.Source))
-                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.FromObject(src.Metadata)))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileInfo((Guid)src.FileId): null ))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))
                 .ForMember(dest => dest.CreatedDate,
-                    opts => opts.MapFrom(src => src.CreationDate >= new DateTime(1970, 1, 1) ? src.CreationDate : new DateTime(1970, 1, 1)));
+                    opts => opts.MapFrom(src => !src.CreationDate.HasValue ? DateTime.Now : src.CreationDate))
+                .AfterMap((src, dest) => {
+                    if (dest.Metadata is null) return;
+
+                    dest.Type = dest.Metadata.GetValue("type", StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
+                    dest.Source = dest.Metadata.GetValue("source", StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
+                });
 
             CreateMap<MaterialInput, Iis.Domain.Materials.MaterialLoadData>()
                 .ForMember(dest => dest.From, opts => opts.MapFrom(src => src.From))

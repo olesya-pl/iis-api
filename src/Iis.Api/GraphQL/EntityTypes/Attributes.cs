@@ -10,8 +10,9 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OScalarType = Iis.Domain.ScalarType;
+using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using IIS.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -20,11 +21,11 @@ namespace IIS.Core.GraphQL.EntityTypes
         protected override void Configure(IEnumTypeDescriptor descriptor)
         {
             descriptor.Name("EntityAttributeType");
-            descriptor.Item(OScalarType.Integer.ToString()).Name("int");
+            descriptor.Item(OScalarType.Int.ToString()).Name("int");
             descriptor.Item(OScalarType.Decimal.ToString()).Name("float");
             descriptor.Item(OScalarType.String.ToString()).Name("string");
             descriptor.Item(OScalarType.Boolean.ToString()).Name("boolean");
-            descriptor.Item(OScalarType.DateTime.ToString()).Name("date");
+            descriptor.Item(OScalarType.Date.ToString()).Name("date");
             descriptor.Item(OScalarType.Geo.ToString()).Name("geo");
             descriptor.Item(OScalarType.File.ToString()).Name("file");
             descriptor.Item("relation").Name("relation");

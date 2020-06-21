@@ -8,6 +8,7 @@ namespace Iis.Interfaces.Ontology.Schema
     {
         ObjectOfStudy,
         FuzzyDate,
+        ObjectSign,
         Event
     }
 }

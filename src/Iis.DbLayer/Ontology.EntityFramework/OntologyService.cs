@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 using IIS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
-using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {

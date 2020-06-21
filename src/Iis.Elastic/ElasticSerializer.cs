@@ -30,6 +30,20 @@ namespace Iis.Elastic
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
             }
 
+            var coordinates = extNode.GetCoordinates();
+            if (coordinates != null && coordinates.Count > 0)
+            {
+                var coords = new JArray();
+                foreach (var coord in coordinates)
+                {
+                    var item = new JObject();
+                    item["lat"] = coord.Latitude;
+                    item["lang"] = coord.Langitude;
+                    coords.Add(item);
+                }
+                json["__coordinates"] = coords;
+            }
+
             foreach (var childGroup in extNode.Children.GroupBy(p => p.NodeTypeName))
             {
                 var key = childGroup.Key;

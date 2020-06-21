@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using IIS.Core.Materials;
+using IIS.Core.Materials.FeatureProcessors;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -13,6 +14,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMaterialProvider materialProvider,
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
+            [Service] IFeatureProcessorFactory featureProcessorFactory,
             [GraphQLNonNullType] MaterialInput input)
         {
             
@@ -24,7 +26,9 @@ namespace IIS.Core.GraphQL.Materials
 
             inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
 
-            await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
+            inputMaterial.Metadata = await featureProcessorFactory.GetInstance(inputMaterial.Source).ProcessMetadata(inputMaterial.Metadata);
+
+            await materialService.SaveAsync(inputMaterial);
 
             Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
 
@@ -36,7 +40,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
-            var material = await materialService.UpdateMaterial(input);
+            var material = await materialService.UpdateMaterialAsync(input);
             return mapper.Map<Material>(material);
         }
 

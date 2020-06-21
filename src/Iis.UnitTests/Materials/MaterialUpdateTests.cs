@@ -52,7 +52,7 @@ namespace Iis.UnitTests.Materials
             material.File = null;
             //act
             var sut = _serviceProvider.GetRequiredService<IMaterialService>();
-            await sut.UpdateMaterial(new MaterialUpdateInput
+            await sut.UpdateMaterialAsync(new MaterialUpdateInput
             {
                 AssigneeId = material.AssigneeId,
                 CompletenessId = material.CompletenessSignId,
@@ -109,7 +109,7 @@ namespace Iis.UnitTests.Materials
 
             //act
             var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
-            var material = await materialService.UpdateMaterial(new MaterialUpdateInput {
+            var material = await materialService.UpdateMaterialAsync(new MaterialUpdateInput {
                 Id = materialEntity.Id,
                 SessionPriorityId = important.Id
             });
@@ -188,7 +188,7 @@ namespace Iis.UnitTests.Materials
             //assert
             Assert.Equal(notProcessed.Id, material.ProcessedStatusSignId.Value);
 
-            await materialService.UpdateMaterial(new MaterialUpdateInput
+            await materialService.UpdateMaterialAsync(new MaterialUpdateInput
             {
                 AssigneeId = material.AssigneeId,
                 CompletenessId = material.CompletenessSignId,

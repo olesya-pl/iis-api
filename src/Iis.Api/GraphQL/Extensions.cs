@@ -8,6 +8,7 @@ using IIS.Core.GraphQL.Entities;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL
 {

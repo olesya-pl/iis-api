@@ -35,6 +35,7 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsInheritedFrom(string nodeTypeName);
         bool IsObjectOfStudy { get; }
         bool IsEvent { get; }
+        bool IsObjectSign { get; }
         INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts);
     }
 }

@@ -84,6 +84,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 NodeTypeTitle = nodeTypeTitle,
                 EntityTypeName = nodeEntity.NodeType.Name,
                 AttributeValue = GetAttributeValue(nodeEntity),
+                ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
                 Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, cancellationToken)

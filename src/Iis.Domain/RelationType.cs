@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 
 namespace Iis.Domain
 {

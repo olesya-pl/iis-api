@@ -16,9 +16,11 @@ using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
-using IIS.Core.Ontology;
+using IIS.Core.Materials.FeatureProcessors;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
+using IIS.Core.GraphQL.Entities.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,7 +41,6 @@ using Iis.Api;
 using Iis.Api.Modules;
 using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
-using Iis.Api.Ontology.Migration;
 using AutoMapper;
 using Iis.Api.bo;
 using Iis.Api.Bootstrap;
@@ -134,6 +135,9 @@ namespace IIS.Core
             services.AddHttpContextAccessor();
             services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
+            services.AddSingleton<MutationCreateResolver>();
+            services.AddSingleton<MutationUpdateResolver>();
+            services.AddSingleton<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
@@ -141,7 +145,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
-            services.AddTransient<MigrationService>();
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
@@ -151,6 +154,7 @@ namespace IIS.Core
             services.AddTransient<ThemeService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
+            services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();

@@ -23,9 +23,9 @@ namespace Iis.Api.Controllers
         IOntologySchema _ontologySchema;
         IElasticSerializer _elasticSerializer;
         public AdminController(
-            IExtNodeService extNodeService, 
-            IMaterialProvider materialProvider, 
-            IElasticService elasticService, 
+            IExtNodeService extNodeService,
+            IMaterialProvider materialProvider,
+            IElasticService elasticService,
             IElasticManager elasticManager,
             IElasticSerializer elasticSerializer,
             IOntologySchema ontologySchema)
@@ -90,6 +90,7 @@ namespace Iis.Api.Controllers
             var materialIndex = _elasticService.MaterialIndexes.First();
 
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
+            await _elasticManager.CreateIndexesAsync(new[] { materialIndex }, cancellationToken);
 
             var entityTasks = materialEntities
                                 .Select(async entity =>

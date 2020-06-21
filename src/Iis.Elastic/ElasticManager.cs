@@ -140,10 +140,36 @@ namespace Iis.Elastic
             var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
+            ApplyRussianAnalyzerAsync(jObject);
             var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
             return response.Success;
         }
-        
+
+        public void ApplyRussianAnalyzerAsync(JObject createRequest)
+        {
+            var analyzerSettings = @"{
+            ""analysis"": {
+                ""filter"": {
+                    ""russian_stop"": {
+                        ""type"": ""stop"",
+                        ""stopwords"": ""_russian_""
+                    },
+                    ""russian_stemmer"": {
+                        ""type"": ""stemmer"",
+                        ""language"": ""russian""
+                    }
+                },
+            ""analyzer"": {
+                ""default"": {
+                    ""tokenizer"": ""standard"",
+                    ""filter"": [
+                        ""lowercase"",
+                        ""russian_stop"",
+                        ""russian_stemmer""
+                ]}}}}";
+            createRequest["settings"] = JObject.Parse(analyzerSettings);
+        }
+
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
@@ -162,7 +188,10 @@ namespace Iis.Elastic
 
         private async Task<bool> CreateIndexAsync(string indexName, CancellationToken token)
         {
-            StringResponse response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, GetRealIndexName(indexName), token);
+            var request = new JObject();
+            ApplyRussianAnalyzerAsync(request);
+            var response =
+                await DoRequestAsync(HttpMethod.PUT, GetRealIndexName(indexName), request.ToString(), token);
             return response.Success;
         }
 
