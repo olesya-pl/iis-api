@@ -25,7 +25,7 @@ namespace Iis.OntologySchema
             NodeTypes = new List<INodeType>(nodeTypes);
             RelationTypes = new List<IRelationType>(relationTypes);
             AttributeTypes = new List<IAttributeType>(attributeTypes);
-            Aliases = new List<IAlias>(aliases);
+            Aliases = aliases == null ? new List<IAlias>() : new List<IAlias>(aliases);
         }
     }
 }

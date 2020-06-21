@@ -21,5 +21,9 @@ namespace Iis.OntologySchema.DataTypes
             DotName = dotName;
             Value = value;
         }
+        public override string ToString()
+        {
+            return $"{DotName}:{Value}";
+        }
     }
 }

@@ -60,8 +60,8 @@ namespace Iis.OntologySchema.DataTypes
         public (IEnumerable<IAlias> itemsToAdd, IEnumerable<IAlias> itemsToUpdate, IEnumerable<IAlias> itemsToDelete) CompareTo(IAliases other)
         {
             return (
-                _dict.Keys.Where(key => other.Exists(key)).Select(key => _dict[key]),
-                _dict.Keys.Where(key => other.GetItem(key)?.Value != _dict[key].Value).Select(key => _dict[key]),
+                _dict.Keys.Where(key => !other.Exists(key)).Select(key => _dict[key]),
+                _dict.Keys.Where(key => other.Exists(key) && other.GetItem(key)?.Value != _dict[key].Value).Select(key => _dict[key]),
                 other.Items.Where(item => !Exists(item.DotName))
             );
         }

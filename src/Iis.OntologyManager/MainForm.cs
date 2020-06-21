@@ -358,15 +358,15 @@ namespace Iis.OntologyManager
             _compareResult = _schema.CompareTo(schema);
             txtComparison.Text = GetCompareText(_compareResult);
         }
-        private string GetCompareText(string title, IEnumerable<INodeTypeLinked> nodeTypes)
+        private string GetCompareText(string title, IEnumerable<string> lines)
         {
             var sb = new StringBuilder();
             sb.AppendLine("===============");
             sb.AppendLine(title);
             sb.AppendLine("===============");
-            foreach (var nodeType in nodeTypes)
+            foreach (var line in lines)
             {
-                sb.AppendLine(nodeType.GetStringCode());
+                sb.AppendLine(line);
             }
 
             return sb.ToString();
@@ -374,8 +374,8 @@ namespace Iis.OntologyManager
         private string GetCompareText(ISchemaCompareResult compareResult)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd));
-            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete));
+            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd.Select(item => item.GetStringCode())));
+            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete.Select(item => item.GetStringCode())));
             sb.AppendLine("===============");
             sb.AppendLine("NODES TO UPDATE");
             sb.AppendLine("===============");
@@ -389,6 +389,9 @@ namespace Iis.OntologyManager
                 }
                 sb.AppendLine();
             }
+            sb.AppendLine(GetCompareText("ALIASES TO ADD", compareResult.AliasesToAdd.Select(item => item.ToString())));
+            sb.AppendLine(GetCompareText("ALIASES TO DELETE", compareResult.AliasesToDelete.Select(item => item.ToString())));
+            sb.AppendLine(GetCompareText("ALIASES TO UPDATE", compareResult.AliasesToUpdate.Select(item => item.ToString())));
             return sb.ToString();
         }
         private void UpdateComparedDatabase()

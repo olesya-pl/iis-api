@@ -26,7 +26,7 @@ namespace Iis.OntologySchema.Saver
             DeleteNodes(compareResult.ItemsToDelete);
             UpdateNodes(compareResult.ItemsToUpdate, schemaTo);
             AddAliases(compareResult.AliasesToAdd);
-            UpdateAliases(compareResult.AliasesToAdd);
+            UpdateAliases(compareResult.AliasesToUpdate);
             DeleteAliases(compareResult.AliasesToDelete);
             _context.SaveChanges();
         }
