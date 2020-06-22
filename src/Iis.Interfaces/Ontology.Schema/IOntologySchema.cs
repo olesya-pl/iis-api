@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iis.OntologySchema.DataTypes;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,5 +19,7 @@ namespace Iis.Interfaces.Ontology.Schema
         void UpdateNodeType(INodeTypeUpdateParameter updateParameter);
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
+        IAttributeInfoList GetAttributesInfo(string entityName);
+        public IAliases Aliases { get; }
     }
 }

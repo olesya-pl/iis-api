@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
@@ -8,7 +9,7 @@ namespace Iis.Interfaces.Ontology.Schema
         string Name { get; }
         EmbeddingOptions? EmbeddingOptions { get; }
         string Meta { get; }
-        string Aliases { get; }
+        IEnumerable<string> Aliases { get; }
         ScalarType? ScalarType { get; }
         string Title { get; }
         Guid? TargetTypeId { get; }

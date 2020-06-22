@@ -4,11 +4,9 @@ using System.Text;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
-    public enum EntityTypeNames
+    public interface IAlias
     {
-        ObjectOfStudy,
-        FuzzyDate,
-        ObjectSign,
-        Event
+        string DotName { get; }
+        string Value { get; }
     }
 }

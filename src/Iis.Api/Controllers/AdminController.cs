@@ -68,7 +68,7 @@ namespace Iis.Api.Controllers
             foreach (var ontologyIndex in ontologyIndexes)
             {
                 var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
-                var attributesInfo = type.GetAttributesInfo();
+                var attributesInfo = _ontologySchema.GetAttributesInfo(ontologyIndex);
                 await _elasticManager.CreateMapping(attributesInfo);
             }
 

@@ -18,6 +18,7 @@ namespace Iis.DataModel
         public DbSet<NodeTypeEntity> NodeTypes { get; set; }
         public DbSet<RelationTypeEntity> RelationTypes { get; set; }
         public DbSet<AttributeTypeEntity> AttributeTypes { get; set; }
+        public DbSet<AliasEntity> Aliases { get; set; }
 
         public DbSet<NodeEntity> Nodes { get; set; }
         public DbSet<RelationEntity> Relations { get; set; }
@@ -52,7 +53,7 @@ namespace Iis.DataModel
 
         public DbSet<ThemeEntity> Themes { get; set; }
         public DbSet<ThemeTypeEntity> ThemeTypes { get; set; }
-
+        
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
         {
@@ -91,6 +92,7 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new ChangeHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new ThemeConfiguration());
             modelBuilder.ApplyConfiguration(new ThemeTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new AliasConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

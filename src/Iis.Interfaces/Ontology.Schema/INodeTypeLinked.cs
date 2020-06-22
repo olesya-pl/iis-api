@@ -16,7 +16,6 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsArchived { get; }
         Kind Kind { get; }
         bool IsAbstract { get; }
-        string Aliases { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
         IAttributeType AttributeType { get; }
@@ -32,12 +31,11 @@ namespace Iis.Interfaces.Ontology.Schema
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
-        List<string> GetAttributeDotNamesRecursive(string parentName = null);
         List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0);
-        IAttributeInfoList GetAttributesInfo();
         bool IsInheritedFrom(string nodeTypeName);
         bool IsObjectOfStudy { get; }
         bool IsEvent { get; }
+        bool IsObjectSign { get; }
         INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts);
     }
 }

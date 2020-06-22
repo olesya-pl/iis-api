@@ -17,7 +17,7 @@ namespace Iis.DbLayer.OntologySchema
         {
             var json = File.ReadAllText(schemaSource.Data);
             var rawData = JsonConvert.DeserializeObject<OntologyRawDataDeserializable>(json);
-            var ontologyRawData = new OntologyRawData(rawData.NodeTypes, rawData.RelationTypes, rawData.AttributeTypes);
+            var ontologyRawData = new OntologyRawData(rawData.NodeTypes, rawData.RelationTypes, rawData.AttributeTypes, rawData.Aliases);
             var ontologySchema = Iis.OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
             return ontologySchema;
         }
@@ -35,7 +35,8 @@ namespace Iis.DbLayer.OntologySchema
             var ontologyRawData = new OntologyRawData(
                 context.NodeTypes.AsNoTracking(),
                 context.RelationTypes.AsNoTracking(),
-                context.AttributeTypes.AsNoTracking());
+                context.AttributeTypes.AsNoTracking(),
+                context.Aliases.AsNoTracking());
             var ontologySchema = Iis.OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
             return ontologySchema;
         }

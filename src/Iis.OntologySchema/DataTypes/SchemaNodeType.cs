@@ -18,7 +18,6 @@ namespace Iis.OntologySchema.DataTypes
         public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
-        public IEnumerable<string> AliasesList => string.IsNullOrEmpty(Aliases) ? null : Aliases.Split(',');
         internal void AddIncomingRelation(SchemaRelationType relationType)
         {
             _incomingRelations.Add(relationType);
@@ -118,6 +117,8 @@ namespace Iis.OntologySchema.DataTypes
 
         public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
 
+        public bool IsObjectSign => IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
+
         public string GetStringCode()
         {
             switch (Kind)
@@ -172,7 +173,6 @@ namespace Iis.OntologySchema.DataTypes
             return Name == nodeType.Name
                 && Title == nodeType.Title
                 && Meta == nodeType.Meta
-                && Aliases == nodeType.Aliases
                 && IsArchived == nodeType.IsArchived
                 && Kind == nodeType.Kind
                 && IsAbstract == nodeType.IsAbstract
@@ -185,7 +185,6 @@ namespace Iis.OntologySchema.DataTypes
             dict[nameof(Name)] = Name;
             dict[nameof(Title)] = Title;
             dict[nameof(Meta)] = Meta;
-            dict[nameof(Aliases)] = Aliases;
             dict[nameof(IsArchived)] = IsArchived.ToString();
             dict[nameof(Kind)] = Kind.ToString();
             dict[nameof(IsAbstract)] = IsAbstract.ToString();
@@ -227,45 +226,22 @@ namespace Iis.OntologySchema.DataTypes
             IsAbstract = nodeType.IsAbstract;
         }
 
-        public List<string> GetAttributeDotNamesRecursive(string parentName = null)
+        internal List<(string dotName, SchemaNodeType nodeType)> GetNodeTypesRecursive(string parentName = null)
         {
-            var attributeInfos = GetAttributesInfoRecursive();
-            return attributeInfos.Select(ai => ai.DotName).ToList();
-        }
+            var result = new List<(string dotName, SchemaNodeType nodeType)>();
+            
+            var dotName = parentName ?? Name;
+            result.Add((dotName, this));
 
-        private List<AttributeInfoItem> GetAttributesInfoRecursive(string parentName = null)
-        {
-            var result = new List<AttributeInfoItem>();
-
-            if (Kind == Kind.Attribute)
+            foreach (var relationType in _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding))
             {
-                var dotName = parentName ?? Name;
-                result.Add(new AttributeInfoItem (dotName, _attributeType.ScalarType, AliasesList));
-            }
+                if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
 
-            if (Kind == Kind.Entity && Name == EntityTypeNames.FuzzyDate.ToString())
-            {
-                result.Add(new AttributeInfoItem (parentName, ScalarType.Date, AliasesList));
+                var relationTypeName = $"{dotName}.{relationType.NodeType.Name}";
+                var relationAttributes = relationType._targetType.GetNodeTypesRecursive(relationTypeName);
+                result.AddRange(relationAttributes);
             }
-            else
-            {
-                foreach (var relationType in _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding))
-                {
-                    if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
-
-                    var relationTypeName = parentName == null ? relationType.NodeType.Name : $"{parentName}.{relationType.NodeType.Name}";
-                    var relationAttributes = relationType._targetType.GetAttributesInfoRecursive(relationTypeName);
-                    result.AddRange(relationAttributes);
-                }
-            }
-
             return result;
-        }
-
-        public IAttributeInfoList GetAttributesInfo()
-        {
-            var items = GetAttributesInfoRecursive();
-            return new AttributeInfo(Name, items);
         }
 
         public List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)

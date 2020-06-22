@@ -11,5 +11,8 @@ namespace Iis.OntologySchema.Comparison
         public IReadOnlyList<INodeTypeLinked> ItemsToAdd { get; set; }
         public IReadOnlyList<INodeTypeLinked> ItemsToDelete { get; set; }
         public IReadOnlyList<ISchemaCompareDiffItem> ItemsToUpdate { get; set; }
+        public IReadOnlyList<IAlias> AliasesToAdd { get; set; }
+        public IReadOnlyList<IAlias> AliasesToDelete { get; set; }
+        public IReadOnlyList<IAlias> AliasesToUpdate { get; set; }
     }
 }

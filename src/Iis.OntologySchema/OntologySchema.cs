@@ -12,8 +12,8 @@ namespace Iis.OntologySchema
     {
         IMapper _mapper;
         SchemaStorage _storage;
-        Dictionary<string, string> _aliases;
         public IOntologySchemaSource SchemaSource { get; private set; }
+        public IAliases Aliases => _storage.Aliases;
         public OntologySchema(IOntologySchemaSource schemaSource)
         {
             SchemaSource = schemaSource;
@@ -46,7 +46,6 @@ namespace Iis.OntologySchema
         {
             _storage = new SchemaStorage(_mapper);
             _storage.Initialize(ontologyRawData);
-            _aliases = GetAliases();
         }
 
         public IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter)
@@ -65,7 +64,7 @@ namespace Iis.OntologySchema
 
         public IOntologyRawData GetRawData()
         {
-            return new OntologyRawData(_storage.GetNodeTypesRaw(), _storage.GetRelationTypesRaw(), _storage.GetAttributeTypesRaw());
+            return new OntologyRawData(_storage.GetNodeTypesRaw(), _storage.GetRelationTypesRaw(), _storage.GetAttributeTypesRaw(), _storage.GetAliases());
         }
 
         public void AddNodeType(INodeType nodeType)
@@ -133,6 +132,12 @@ namespace Iis.OntologySchema
                 .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = otherCodes[key] })
                 .ToList();
             result.SchemaSource = schema.SchemaSource;
+
+            var aliasesComparison = Aliases.CompareTo(schema.Aliases);
+            result.AliasesToAdd = aliasesComparison.itemsToAdd.ToList();
+            result.AliasesToDelete = aliasesComparison.itemsToDelete.ToList();
+            result.AliasesToUpdate = aliasesComparison.itemsToUpdate.ToList();
+
             return result;
         }
         
@@ -153,7 +158,7 @@ namespace Iis.OntologySchema
                 nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
             }
 
-            nodeType.Aliases = updateParameter.Aliases;
+            _storage.Aliases.Update(nodeType.Name, updateParameter.Aliases);
         }
         private void UpdateRelationNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
         {
@@ -307,22 +312,22 @@ namespace Iis.OntologySchema
         }
         public string GetAlias(string fieldDotName)
         {
-            return _aliases.ContainsKey(fieldDotName) ? _aliases[fieldDotName] : null;
+            return _storage.Aliases.GetItem(fieldDotName)?.Value;
         }
-        private Dictionary<string, string> GetAliases()
+
+        public IAttributeInfoList GetAttributesInfo(string entityName)
         {
-            var result = new Dictionary<string, string>();
-            foreach (var entityType in _storage.NodeTypes.Values
-                .Where(nt => nt.Kind == Kind.Entity && !nt.IsAbstract))
+            var items = new List<AttributeInfoItem>();
+            foreach (var key in _storage.DotNameTypes.Keys.Where(key => key.StartsWith(entityName)))
             {
-                var attributesInfo = entityType.GetAttributesInfo();
-                foreach (var item in attributesInfo.Items.Where(i => i.AliasesList.Any()))
-                {
-                    var fullDotName = $"{entityType.Name}.{item.DotName}";
-                    result[fullDotName] = item.AliasesList.First();
-                }
+                var nodeType = _storage.DotNameTypes[key];
+                if (nodeType.Kind != Kind.Attribute) continue;
+                var aliases = _storage.Aliases.GetItem(key)?.Value?.Split(',') ?? null;
+                var shortDotName = key.Substring(key.IndexOf('.') + 1);
+                var item = new AttributeInfoItem(shortDotName, nodeType.AttributeType.ScalarType, aliases);
+                items.Add(item);
             }
-            return result;
+            return new AttributeInfo(entityName, items);
         }
     }
 }

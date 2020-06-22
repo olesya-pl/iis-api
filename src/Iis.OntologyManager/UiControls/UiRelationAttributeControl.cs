@@ -14,7 +14,6 @@ namespace Iis.OntologyManager.UiControls
         private TextBox txtName;
         private TextBox txtTitle;
         private RichTextBox txtMeta;
-        private RichTextBox txtAliases;
         private ComboBox cmbEmbedding;
         private ComboBox cmbScalarType;
         private Button btnSave;
@@ -40,8 +39,6 @@ namespace Iis.OntologyManager.UiControls
 
             _container.GoToNewColumn();
             _container.Add(txtMeta = new RichTextBox(), "Meta", true);
-            _container.GoToNewColumn();
-            _container.Add(txtAliases = new RichTextBox(), "Aliases", true);
         }
         public void CreateNew()
         {
@@ -49,26 +46,21 @@ namespace Iis.OntologyManager.UiControls
             txtName.Clear();
             txtTitle.Clear();
             txtMeta.Clear();
-            txtAliases.Clear();
             cmbEmbedding.SelectedIndex = 0;
             cmbScalarType.SelectedIndex = 0;
         }
-        public void SetUiValues(INodeTypeLinked nodeType)
+        public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
         {
             txtId.Text = nodeType.Id.ToString("N");
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
             txtMeta.Text = nodeType.Meta;
-            txtAliases.Lines = nodeType.Aliases?.Split(',');
             _uiControlsCreator.SetSelectedValue(cmbEmbedding, nodeType.RelationType.EmbeddingOptions.ToString());
             _uiControlsCreator.SetSelectedValue(cmbScalarType, nodeType.RelationType.TargetType.AttributeType.ScalarType.ToString());
         }
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
             var isNew = string.IsNullOrEmpty(txtId.Text);
-            var aliases = string.IsNullOrWhiteSpace(txtAliases.Text) ?
-                null :
-                string.Join(',', txtAliases.Lines.Where(l => !string.IsNullOrWhiteSpace(l)));
 
             return new NodeTypeUpdateParameter
             {
@@ -76,7 +68,6 @@ namespace Iis.OntologyManager.UiControls
                 Name = isNew ? txtName.Text : null,
                 Title = txtTitle.Text,
                 Meta = txtMeta.Text,
-                Aliases = aliases,
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
                 ScalarType = (ScalarType)cmbScalarType.SelectedItem,
                 ParentTypeId = _parentTypeId

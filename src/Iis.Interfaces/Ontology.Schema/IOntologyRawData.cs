@@ -9,5 +9,6 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<INodeType> NodeTypes { get; }
         IReadOnlyList<IRelationType> RelationTypes { get; }
         IReadOnlyList<IAttributeType> AttributeTypes { get; }
+        IReadOnlyList<IAlias> Aliases { get; }
     }
 }

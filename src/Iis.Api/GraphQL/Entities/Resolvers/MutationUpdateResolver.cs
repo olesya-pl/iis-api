@@ -20,6 +20,17 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IResolverContext _resolverContext;
         private Guid _rootNodeId;
 
+        public MutationUpdateResolver(IOntologyProvider ontologyProvider
+        , IOntologyService ontologyService
+        , IChangeHistoryService changeHistoryService
+        , MutationCreateResolver mutationCreateResolver
+        , MutationDeleteResolver mutationDeleteResolver)
+        {
+            _mutationCreateResolver = mutationCreateResolver;
+            _ontologyProvider = ontologyProvider;
+            _ontologyService = ontologyService;
+            _changeHistoryService = changeHistoryService;
+        }
         public MutationUpdateResolver(IResolverContext ctx)
         {
             _mutationCreateResolver = new MutationCreateResolver(ctx);
@@ -40,7 +51,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
         }
+        public Task<Entity> UpdateEntity(EntityType type, Guid id, Dictionary<string, object> properties)
+        {
+            _rootNodeId = id;
+            var requestId = Guid.NewGuid();
 
+            return UpdateEntity(type, id, properties, string.Empty, requestId);
+        }
         private async Task<Entity> UpdateEntity(
             EntityType type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
@@ -232,6 +249,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private string GetCurrentUserName()
         {
+            if(_resolverContext is null) return "system";
+
             var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
             return tokenPayload?.User?.UserName;
         }
