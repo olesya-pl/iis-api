@@ -156,15 +156,18 @@ namespace IIS.Core.Materials.EntityFramework
                 _context.Semaphore.Release();
             }
         }
-
         public async Task<Material> GetMaterialAsync(Guid id)
         {
+            //await TestDossierToMaterial();
+
             var material = await GetMaterialEntityAsync(id);
+
             return await MapAsync(material);
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
         {
+            
             await _context.Semaphore.WaitAsync();
             try
             {
@@ -357,6 +360,24 @@ namespace IIS.Core.Materials.EntityFramework
                                 (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
                             .Where(m => m.MaterialFeature.NodeId == nodeId)
                             .Select(m => m.MaterialInfoJoined.Material);
+        }
+        private async Task TestDossierToMaterial()
+        {
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                var type = _ontologySchema.GetEntityTypeByName("CellphoneSign");
+                //get IDs of dossier cell phones
+                var result = _context.Nodes
+                                .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new {Node = node, Relation = relation})
+                                .Where(e => e.Node.NodeTypeId == type.Id && e.Relation.SourceNodeId == new Guid("fb93c51d-a6cc-4f08-abee-888f16caea5b"))
+                                .Select(e => e.Node.Id)
+                                .ToList();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
         private IQueryable<MaterialEntity> GetMaterialQuery()
