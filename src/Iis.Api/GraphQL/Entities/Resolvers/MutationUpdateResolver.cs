@@ -8,6 +8,7 @@ using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Newtonsoft.Json;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -235,7 +236,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 }
                 else if (oldRelation.Target is Attribute)
                 {
-                    var oldValue = (string)(oldRelation.Target as Attribute).Value;
+                    var oldValueObj = (oldRelation.Target as Attribute).Value;
+                    var oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);
+
                     if (oldValue != (string)value)
                     {
                         await _changeHistoryService
@@ -243,8 +246,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     }
                 }
             }
-
-
         }
 
         private string GetCurrentUserName()
