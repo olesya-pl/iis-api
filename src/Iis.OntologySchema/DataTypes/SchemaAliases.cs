@@ -74,6 +74,7 @@ namespace Iis.OntologySchema.DataTypes
         private Dictionary<string, string> GetDictionary(string nodeTypeName, IEnumerable<string> semiAliases)
         {
             var result = new Dictionary<string, string>();
+            if (semiAliases == null) return result;
             foreach (var semiAlias in semiAliases)
             {
                 var n = semiAlias.IndexOf(':');
