@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix Condition="'$(IIS_VERSION_SUFFIX)' != ''">$(IIS_VERSION_SUFFIX)</VersionSuffix>
     <SourceRevisionId Condition="'$(IIS_SOURCE_REVISION_ID)' != ''">$(IIS_SOURCE_REVISION_ID)</SourceRevisionId>
     <UserSecretsId>7fbdec57-37c4-4ac5-bbe0-b67a05e1794d</UserSecretsId>
