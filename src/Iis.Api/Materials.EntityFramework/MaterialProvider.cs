@@ -159,8 +159,6 @@ namespace IIS.Core.Materials.EntityFramework
         }
         public async Task<Material> GetMaterialAsync(Guid id)
         {
-            //await TestDossierToMaterial();
-
             var material = await GetMaterialEntityAsync(id);
 
             return await MapAsync(material);
@@ -222,10 +220,11 @@ namespace IIS.Core.Materials.EntityFramework
                                 .SelectMany(p => p.Features.Select(x => x.Node))
                                 .ToList();
 
-            result.Nodes = nodes.Where(x => IsObjectOfStudy(x));
             result.Events = nodes.Where(x => IsEvent(x));
 
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
+
+            result.ObjectsOfStudy = GetObjectOfStudyListForMaterial(nodes);
 
             return result;
         }
@@ -248,9 +247,10 @@ namespace IIS.Core.Materials.EntityFramework
 
             return nodeType.IsObjectSign;
         }
+
         private JObject NodeToJObject(Node node)
         {
-            var result = new JObject();
+            var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString()));
 
             foreach (var attribute in node.GetChildAttributes())
             {
@@ -379,31 +379,62 @@ namespace IIS.Core.Materials.EntityFramework
 
         private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
         {
-            return _context.Materials
-                            .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                                (Material, MaterialInfo) => new { Material, MaterialInfo })
-                            .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                                (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                            .Where(m => m.MaterialFeature.NodeId == nodeId)
-                            .Select(m => m.MaterialInfoJoined.Material);
+            var nodeList = GetNodeIdsForFilteringByNodeId(nodeId);
+            var nodeIdList = nodeList
+                                .Select(n => n.NodeId);
+
+            var materialResult =  _context.Materials
+                                    .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                                        (Material, MaterialInfo) => new { Material, MaterialInfo })
+                                    .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                                        (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                                    .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
+                                    .Select(m => new { Material = m.MaterialInfoJoined.Material, NodeId = m.MaterialFeature.NodeId});
+            
+            return materialResult.Select(m => m.Material);
         }
-        private async Task TestDossierToMaterial()
+        private IEnumerable<(Guid NodeId, EntityMaterialRelation RelationType)> GetNodeIdsForFilteringByNodeId(Guid nodeId)
         {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                var type = _ontologySchema.GetEntityTypeByName("CellphoneSign");
-                //get IDs of dossier cell phones
-                var result = _context.Nodes
+            var type = _ontologySchema.GetEntityTypeByName("CellphoneSign");
+
+            var queryResult = _context.Nodes
                                 .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new {Node = node, Relation = relation})
-                                .Where(e => e.Node.NodeTypeId == type.Id && e.Relation.SourceNodeId == new Guid("fb93c51d-a6cc-4f08-abee-888f16caea5b"))
+                                .Where(e => e.Node.NodeTypeId == type.Id && e.Relation.SourceNodeId == nodeId)
                                 .Select(e => e.Node.Id)
+                                .ToList()
+                                .Select(e => (NodeId: e, Relation: EntityMaterialRelation.Feature))
                                 .ToList();
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+
+            queryResult.Add((NodeId: nodeId, Relation: EntityMaterialRelation.Direct));
+
+            return queryResult;
+        }
+
+        private IEnumerable<MaterialRelation> GetObjectOfStudyListForMaterial(List<Node> nodeList)
+        {
+            var result = new List<MaterialRelation>();
+
+            if(!nodeList.Any()) return result;
+
+            var directList = nodeList
+                                .Where(x => IsObjectOfStudy(x))
+                                .Select(x => new MaterialRelation{ NodeId = x.Id, NodeRelation = EntityMaterialRelation.Direct});
+
+            var featureIdList = nodeList
+                                    .Where(x => IsObjectSign(x))
+                                    .Select(x => x.Id);
+
+            var featureList = _context.Relations
+                                        .Where(e => featureIdList.Contains(e.TargetNodeId))
+                                        .Select(e => e.SourceNodeId)
+                                        .ToList()
+                                        .Select(e => new MaterialRelation{NodeId = e, NodeRelation = EntityMaterialRelation.Feature});
+            
+            result.AddRange(directList);
+
+            result.AddRange(featureList);
+
+            return result;
         }
 
         private IQueryable<MaterialEntity> GetMaterialQuery()
