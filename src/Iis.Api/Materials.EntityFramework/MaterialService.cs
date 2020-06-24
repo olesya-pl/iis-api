@@ -67,8 +67,16 @@ namespace IIS.Core.Materials.EntityFramework
 
             foreach (var child in material.Children)
             {
-                child.ParentId = material.Id;
-                await SaveAsync(child);
+                await _context.Semaphore.WaitAsync();
+                try
+                {
+                    child.ParentId = material.Id;
+                    await SaveAsync(child);
+                }
+                finally
+                {
+                    _context.Semaphore.Release();
+                }
             }
 
             foreach (var info in material.Infos)
@@ -169,7 +177,7 @@ namespace IIS.Core.Materials.EntityFramework
                 _context.Semaphore.Release();
             }
         }
-        
+
         public async Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
@@ -204,10 +212,10 @@ namespace IIS.Core.Materials.EntityFramework
                 if(string.IsNullOrWhiteSpace(featureId)) continue;
 
                 if(!Guid.TryParse(featureId, out Guid featureGuid)) continue;
-                
+
                 result.Add(featureGuid);
             }
-            
+
             return result;
         }
 

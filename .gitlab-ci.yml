@@ -8,7 +8,7 @@ build_job:
   variables:
     IIS_VERSION_SUFFIX: $CI_PIPELINE_ID
   script:
-    - export IIS_SOURCE_REVISION_ID=`git describe --always --tags --dirty`
+    - export IIS_SOURCE_REVISION_ID=$PRODUCT_VERSION.$CI_PIPELINE_ID
     - dotnet publish src/Iis.Api/Iis.Api.csproj -c Release -o publish/core
     - env
   artifacts:
@@ -137,4 +137,13 @@ deploy_od_qa:
   environment:
     name: qa_odysseus
     url: http://qa-app.odysseus.lcl
+  when: manual
+
+deploy_contour_demo:
+  extends: .deploy
+  variables:
+    DEPLOYMENT_FILE: demo_con.yml
+  environment:
+    name: demo_contour
+    url: http://demo.contour.net
   when: manual

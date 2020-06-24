@@ -79,10 +79,10 @@ namespace IIS.Core.GraphQL.Entities
         {
             try
             {
-                var dict = (Dictionary<string, object>) value;
+                var dict = AttributeType.ValueToDict(value.ToString());
                 var jo = JObject.FromObject(dict);
                 JsonConvert.DeserializeObject<IGeometryObject>(jo.ToString(), new GeometryConverter());
-                return value;
+                return dict;
             }
             catch (Exception e)
             {

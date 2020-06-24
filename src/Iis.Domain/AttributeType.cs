@@ -61,8 +61,7 @@ namespace Iis.Domain
                 case ScalarType.Decimal: return decimal.Parse(value);
                 case ScalarType.Int: return int.Parse(value);
                 case ScalarType.String: return value;
-                //case ScalarType.Json: return JObject.Parse(value);
-                case ScalarType.Geo: return JsonConvert.DeserializeObject<Dictionary<string, object>>(value, new DictionaryConverter());
+                case ScalarType.Geo: return ValueToDict(value);
                 case ScalarType.File: return Guid.Parse(value);
                 default: throw new NotImplementedException();
             }
@@ -73,7 +72,7 @@ namespace Iis.Domain
             switch (scalarType)
             {
                 case ScalarType.Geo:
-                    return JsonConvert.SerializeObject((Dictionary<string, object>)value);
+                    return JsonConvert.SerializeObject(value);
                 case ScalarType.Date:
                     if (value == null)
                         return null;
@@ -83,5 +82,9 @@ namespace Iis.Domain
             }
         }
 
+        public static Dictionary<string, object> ValueToDict(string value)
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, object>>(value, new DictionaryConverter());
+        }
     }
 }

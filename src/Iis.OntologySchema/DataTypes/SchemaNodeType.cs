@@ -226,20 +226,30 @@ namespace Iis.OntologySchema.DataTypes
             IsAbstract = nodeType.IsAbstract;
         }
 
-        internal List<(string dotName, SchemaNodeType nodeType)> GetNodeTypesRecursive(string parentName = null)
+        public List<(string dotName, SchemaNodeType nodeType)> GetNodeTypesRecursive(string parentName = null)
         {
             var result = new List<(string dotName, SchemaNodeType nodeType)>();
-            
+
             var dotName = parentName ?? Name;
             result.Add((dotName, this));
 
-            foreach (var relationType in _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding))
+            foreach (var relationType in GetEmbeddingRelationsIncludeInherited())
             {
                 if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
 
                 var relationTypeName = $"{dotName}.{relationType.NodeType.Name}";
                 var relationAttributes = relationType._targetType.GetNodeTypesRecursive(relationTypeName);
                 result.AddRange(relationAttributes);
+            }
+            return result;
+        }
+
+        private IEnumerable<SchemaRelationType> GetEmbeddingRelationsIncludeInherited()
+        {
+            var result = _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding).ToList();
+            foreach (SchemaNodeType ancestor in GetAllAncestors())
+            {
+                result.AddRange(ancestor.GetEmbeddingRelationsIncludeInherited());
             }
             return result;
         }
