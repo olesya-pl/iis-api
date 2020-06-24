@@ -1,8 +1,8 @@
 namespace Iis.Domain
 {
-    public enum EntityMaterialRelation
+    public class EntityMaterialRelation
     {
-        Direct,
-        Feature
+        public const string Direct = "DIRECT";
+        public const string Feature = "FEATURE";
     }
 }

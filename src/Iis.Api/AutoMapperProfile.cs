@@ -45,10 +45,12 @@ namespace Iis.Api
                 .ForMember(dest => dest.NodeTypeId, opts => opts.MapFrom(src => src.Type.Id))
                 .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Type.Name))
                 .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Type.Title));
+
             CreateMap<Iis.Domain.Materials.MaterialFeature, IIS.Core.GraphQL.Materials.MaterialFeature>();
+
             CreateMap<Iis.Domain.Materials.MaterialInfo, IIS.Core.GraphQL.Materials.MaterialInfo>()
                 .ForMember(dest => dest.Features, opts => opts.MapFrom(src => src.Features));
-            CreateMap<Iis.Domain.Materials.MaterialRelation, IIS.Core.GraphQL.Materials.MaterialRelation>();
+
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
