@@ -401,7 +401,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             var queryResult = _context.Nodes
                                 .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                                .Where(e => e.Node.NodeTypeId == type.Id && e.Relation.SourceNodeId == nodeId)
+                                .Where(e => (type == null? true : e.Node.NodeTypeId == type.Id) && e.Relation.SourceNodeId == nodeId)
                                 .Select(e => e.Node.Id)
                                 .ToList()
                                 .Select(e => (NodeId: e, Relation: EntityMaterialRelation.Feature))
