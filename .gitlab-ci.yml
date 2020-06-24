@@ -138,3 +138,12 @@ deploy_od_qa:
     name: qa_odysseus
     url: http://qa-app.odysseus.lcl
   when: manual
+
+deploy_contour_demo:
+  extends: .deploy
+  variables:
+    DEPLOYMENT_FILE: demo_con.yml
+  environment:
+    name: demo_contour
+    url: http://demo.contour.net
+  when: manual
