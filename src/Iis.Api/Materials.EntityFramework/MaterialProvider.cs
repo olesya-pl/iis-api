@@ -381,33 +381,36 @@ namespace IIS.Core.Materials.EntityFramework
 
         private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
         {
-            var nodeList = GetNodeIdsForFilteringByNodeId(nodeId);
-            var nodeIdList = nodeList
-                                .Select(n => n.NodeId);
+            var nodeIdList = GetNodeIdsForFilteringByNodeId(nodeId);
 
-            var materialResult = _context.Materials
-                                    .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                                        (Material, MaterialInfo) => new { Material, MaterialInfo })
-                                    .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                                        (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                                    .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
-                                    .Select(m => new { Material = m.MaterialInfoJoined.Material, NodeId = m.MaterialFeature.NodeId });
-
-            return materialResult.Select(m => m.Material);
+            return _context.Materials
+                        .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                            (Material, MaterialInfo) => new { Material, MaterialInfo })
+                        .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                            (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                        .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
+                        .Select(m => m.MaterialInfoJoined.Material);
         }
-        private IEnumerable<(Guid NodeId, string RelationType)> GetNodeIdsForFilteringByNodeId(Guid nodeId)
+        private IEnumerable<Guid> GetNodeIdsForFilteringByNodeId(Guid nodeId)
         {
-            var type = _ontologySchema.GetEntityTypeByName("CellphoneSign");
+            var type = _ontologySchema.GetEntityTypeByName("ObjectSign");
 
+            var typeIdList = new List<Guid>();
+
+            if(type != null)
+            {
+                typeIdList = type.IncomingRelations
+                                    .Select(p => p.SourceTypeId)
+                                    .ToList();
+            } 
+            
             var queryResult = _context.Nodes
                                 .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                                .Where(e => (type == null? true : e.Node.NodeTypeId == type.Id) && e.Relation.SourceNodeId == nodeId)
+                                .Where(e => (!typeIdList.Any() ? true : typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
                                 .Select(e => e.Node.Id)
-                                .ToList()
-                                .Select(e => (NodeId: e, Relation: EntityMaterialRelation.Feature))
                                 .ToList();
 
-            queryResult.Add((NodeId: nodeId, Relation: EntityMaterialRelation.Direct));
+            queryResult.Add(nodeId);
 
             return queryResult;
         }
