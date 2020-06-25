@@ -106,13 +106,13 @@ namespace Iis.Elastic
             return searchResponse.Body;
         }
 
-        public async Task CreateIndexesAsync(IEnumerable<string> indexNames, CancellationToken token)
+        public async Task CreateIndexesAsync(IEnumerable<string> indexNames, JObject mappingConfiguration = null, CancellationToken token = default)
         {
             foreach (string indexName in indexNames)
             {
                 if (!await IndexExistsAsync(indexName, token))
                 {
-                    await CreateIndexAsync(indexName, token);
+                    await CreateIndexAsync(indexName, mappingConfiguration, token);
                 }
             }
         }
@@ -186,13 +186,23 @@ namespace Iis.Elastic
             return searchResponse.Success || searchResponse.HttpStatusCode != 404;
         }
 
-        private async Task<bool> CreateIndexAsync(string indexName, CancellationToken token)
+        private async Task<bool> CreateIndexAsync(string indexName, JObject mappingConfiguration = null, CancellationToken token = default)
         {
             var request = new JObject();
             ApplyRussianAnalyzerAsync(request);
+            ApplyMappingConfiguration(request, mappingConfiguration);
             var response =
                 await DoRequestAsync(HttpMethod.PUT, GetRealIndexName(indexName), request.ToString(), token);
             return response.Success;
+        }
+
+        private void ApplyMappingConfiguration(JObject request, JObject mappingConfiguration)
+        {
+            if (mappingConfiguration == null)
+            {
+                return;
+            }
+            request.Merge(mappingConfiguration);
         }
 
         private string GetSearchJson(IIisElasticSearchParams searchParams)

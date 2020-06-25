@@ -322,6 +322,11 @@ namespace IIS.Core.Materials.EntityFramework
                 jDocument.Add(new JProperty(nameof(Material.Data), materialData));
             }
 
+            if (!(material.Metadata is null))
+            {
+                jDocument.Add(new JProperty(nameof(Material.Metadata), material.Metadata));
+            }
+
             if (!(material.LoadData is null))
             {
                 jDocument.Add(new JProperty(nameof(Material.LoadData), JObject.Parse(material.LoadData.ToJson())));

@@ -82,6 +82,7 @@ namespace Iis.DbLayer.Elastic
                 "mlResponses.*",
                 $"{nameof(Material.Data)}.*",
                 $"{nameof(Material.LoadData)}.*",
+                $"{nameof(Material.Metadata)}.*",
                 $"{nameof(Material.Assignee)}.*"
             };
         }

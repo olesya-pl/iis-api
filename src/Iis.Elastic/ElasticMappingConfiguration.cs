@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Iis.Elastic
 {
@@ -11,7 +10,10 @@ namespace Iis.Elastic
     {
         public List<ElasticMappingProperty> Properties { get; } = new List<ElasticMappingProperty>();
 
-        public ElasticMappingConfiguration() { }
+        public ElasticMappingConfiguration(List<ElasticMappingProperty> properties)
+        {
+            Properties = properties;
+        }
         public ElasticMappingConfiguration(IAttributeInfoList attributeInfo)
         {
             foreach (var item in attributeInfo.Items)
@@ -40,7 +42,7 @@ namespace Iis.Elastic
             return result;
         }
 
-        public ElasticMappingPropertyType ToMappingType(ScalarType scalarType)
+        public static ElasticMappingPropertyType ToMappingType(ScalarType scalarType)
         {
             switch (scalarType)
             {
