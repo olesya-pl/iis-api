@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Elastic;
+﻿using Iis.Elastic;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.Materials;
@@ -90,7 +91,14 @@ namespace Iis.Api.Controllers
             var materialIndex = _elasticService.MaterialIndexes.First();
 
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
-            await _elasticManager.CreateIndexesAsync(new[] { materialIndex }, cancellationToken);
+
+            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+                new ElasticMappingProperty("Metadata.features.PhoneNumber", ElasticMappingPropertyType.Keyword)
+            });
+
+            await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
+                mappingConfiguration.ToJObject(),
+                cancellationToken);
 
             var entityTasks = materialEntities
                                 .Select(async entity =>

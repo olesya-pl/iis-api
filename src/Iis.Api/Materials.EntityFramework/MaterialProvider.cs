@@ -42,7 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
             _cache = cache;
             _mapper = mapper;
         }
-        
+
         public async Task<(
             IEnumerable<Material> Materials,
             int Count,
@@ -315,6 +315,11 @@ namespace IIS.Core.Materials.EntityFramework
                     })
                     .ToList();
                 jDocument.Add(new JProperty(nameof(Material.Data), materialData));
+            }
+
+            if (!(material.Metadata is null))
+            {
+                jDocument.Add(new JProperty(nameof(Material.Metadata), material.Metadata));
             }
 
             if (!(material.LoadData is null))

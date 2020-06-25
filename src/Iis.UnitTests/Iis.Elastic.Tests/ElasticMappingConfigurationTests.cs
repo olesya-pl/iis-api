@@ -80,15 +80,14 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void ToMappingType_Test()
         {
-            var mapping = new ElasticMappingConfiguration();
-            Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.String));
-            Assert.Equal(ElasticMappingPropertyType.Integer, mapping.ToMappingType(ScalarType.Int));
-            Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.Decimal));
-            Assert.Equal(ElasticMappingPropertyType.Date, mapping.ToMappingType(ScalarType.Date));
-            Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.Boolean));
-            Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.Geo));
-            Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.File));
-            Assert.Equal(ElasticMappingPropertyType.Text, mapping.ToMappingType(ScalarType.Json));
+            Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.String));
+            Assert.Equal(ElasticMappingPropertyType.Integer, ElasticMappingConfiguration.ToMappingType(ScalarType.Int));
+            Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.Decimal));
+            Assert.Equal(ElasticMappingPropertyType.Date, ElasticMappingConfiguration.ToMappingType(ScalarType.Date));
+            Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.Boolean));
+            Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.Geo));
+            Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.File));
+            Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.Json));
         }
 
         [Fact]
