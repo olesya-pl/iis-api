@@ -17,7 +17,6 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IFeatureProcessorFactory featureProcessorFactory,
             [GraphQLNonNullType] MaterialInput input)
         {
-            
             Iis.Domain.Materials.Material inputMaterial = mapper.Map<Iis.Domain.Materials.Material>(input);
 
             inputMaterial.Reliability = materialProvider.GetMaterialSign(input.ReliabilityText);
