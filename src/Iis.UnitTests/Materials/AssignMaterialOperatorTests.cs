@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
@@ -28,25 +29,6 @@ namespace Iis.UnitTests
             context.SaveChanges();
 
             _serviceProvider.Dispose();
-        }
-
-        [Theory, RecursiveAutoData]
-        public async Task AssignMaterialOperator_AssignsOperatorSuccessfully(MaterialEntity material, UserEntity assignee)
-        {
-            //arrange
-            material.Data = material.Metadata = material.LoadData = null;
-            material.MaterialInfos = new List<MaterialInfoEntity>();
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            context.Add(material);
-            context.Add(assignee);
-            context.SaveChanges();
-
-            //act
-            var sut = _serviceProvider.GetRequiredService<IMaterialService>();
-            var res = await sut.AssignMaterialOperatorAsync(material.Id, assignee.Id);
-
-            //assert
-            UserTestHelper.AssertUserEntityMappedToUserCorrectly(assignee, res.Assignee);
         }
     }
 }

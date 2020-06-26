@@ -43,14 +43,5 @@ namespace IIS.Core.GraphQL.Materials
             var material = await materialService.UpdateMaterialAsync(input);
             return mapper.Map<Material>(material);
         }
-
-        public async Task<Material> AssignMaterialOperator(
-            [Service] IMaterialService materialService,
-            [Service] IMapper mapper,
-            [GraphQLNonNullType] AssignMaterialOperatorInput input)
-        {
-            var material = await materialService.AssignMaterialOperatorAsync(input.MaterialId, input.AssigneeId);
-            return mapper.Map<Material>(material);
-        }
     }
 }

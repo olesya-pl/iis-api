@@ -178,16 +178,15 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        public async Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
+        public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
             if (material == null)
             {
-                throw new ArgumentNullException("No material found by given id");
+                return;
             }
             material.AssigneeId = assigneeId;
             await _context.SaveChangesAsync();
-            return await _materialProvider.GetMaterialAsync(materialId);
         }
 
         private async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId)
