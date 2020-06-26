@@ -111,8 +111,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 switch (key)
                 {
                     case "create":
-                        var relations = await _mutationCreateResolver.CreateMultipleProperties(embed, v);
-                        foreach (var relation in relations)
+                        var relations = _mutationCreateResolver.CreateMultipleProperties(embed, v);
+                        await foreach (var relation in relations)
                         {
                             node.AddNode(relation);
                             await SaveChangesForNewRelation(relation, requestId);

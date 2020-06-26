@@ -5,6 +5,7 @@ using HotChocolate.Resolvers;
 using IIS.Core.Files;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using Iis.Utility;
 using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
@@ -54,7 +55,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 var embed = node.Type.GetProperty(key) ??
                             throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
                 var relations = await CreateRelations(embed, value);
-                foreach (var relation in relations)
+                await foreach (var relation in relations)
                     node.AddNode(relation);
             }
 
@@ -62,37 +63,34 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node;
         }
 
-        public async Task<IEnumerable<Relation>> CreateRelations(EmbeddingRelationType embed, object value)
+        public async Task<IAsyncEnumerable<Relation>> CreateRelations(EmbeddingRelationType embed, object value)
         {
             switch (embed.EmbeddingOptions)
             {
                 case EmbeddingOptions.Optional:
                 case EmbeddingOptions.Required:
-                    return new[] {await CreateSingleProperty(embed, value)};
+                    return CreateSingleProperty(embed, value).ToAsyncEnumerable();
                 case EmbeddingOptions.Multiple:
-                    return await CreateMultipleProperties(embed, value);
+                    return CreateMultipleProperties(embed, value);
                 default:
                     throw new NotImplementedException();
             }
-        }
+        }        
 
-        public async Task<IEnumerable<Relation>> CreateMultipleProperties(EmbeddingRelationType embed, object value)
+        public async IAsyncEnumerable<Relation> CreateMultipleProperties(EmbeddingRelationType embed, object value)
         {
             var values = (IEnumerable<object>) value;
-            var result = new List<Relation>();
             foreach (var v in values)
                 if (embed.IsEntityType)
                 {
-                    result.Add(await CreateSingleProperty(embed, v));
+                    yield return await CreateSingleProperty(embed, v);
                 }
                 else
                 {
                     var dict = (Dictionary<string, object>) v;
                     var attrValue = dict["value"];
-                    result.Add(await CreateSingleProperty(embed, attrValue));
+                    yield return await CreateSingleProperty(embed, attrValue);
                 }
-
-            return result;
         }
 
         public async Task<Relation> CreateSingleProperty(EmbeddingRelationType embed, object value)
