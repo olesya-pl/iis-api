@@ -386,7 +386,9 @@ namespace IIS.Core.Materials.EntityFramework
 
         private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
         {
-            var nodeIdList = GetNodeIdsForFilteringByNodeId(nodeId);
+            var nodeIdList = GetFeatureIdListThatRealtesToObjectId(nodeId);
+
+            nodeIdList.Add(nodeId);
 
             return _context.Materials
                         .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
@@ -396,7 +398,7 @@ namespace IIS.Core.Materials.EntityFramework
                         .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
                         .Select(m => m.MaterialInfoJoined.Material);
         }
-        private IEnumerable<Guid> GetNodeIdsForFilteringByNodeId(Guid nodeId)
+        private IList<Guid> GetFeatureIdListThatRealtesToObjectId(Guid nodeId)
         {
             var type = _ontologySchema.GetEntityTypeByName("ObjectSign");
 
@@ -409,15 +411,11 @@ namespace IIS.Core.Materials.EntityFramework
                                     .ToList();
             } 
             
-            var queryResult = _context.Nodes
+            return _context.Nodes
                                 .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
                                 .Where(e => (!typeIdList.Any() ? true : typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
                                 .Select(e => e.Node.Id)
                                 .ToList();
-
-            queryResult.Add(nodeId);
-
-            return queryResult;
         }
 
         private JObject GetObjectOfStudyListForMaterial(List<Node> nodeList)
