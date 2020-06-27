@@ -16,7 +16,7 @@ namespace Iis.UnitTests.Roles
 
         public RolesServiceTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
 
         public void Dispose()

@@ -15,7 +15,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
 
         public NodeMaterialRelationServiceTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
 
         [Theory, RecursiveAutoData]

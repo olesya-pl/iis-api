@@ -21,7 +21,7 @@ namespace Iis.UnitTests.ThemeManagement
 
         public ThemeServiceTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
         public void Dispose()
         {
