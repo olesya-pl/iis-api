@@ -16,7 +16,7 @@ namespace Iis.UnitTests
 
         public AssignMaterialOperatorTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
         public void Dispose()
         {

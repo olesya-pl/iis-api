@@ -3,7 +3,8 @@
     public enum SchemaSourceKind
     {
         File,
-        Database
+        Database,
+        New
     }
     public interface IOntologySchemaSource
     {

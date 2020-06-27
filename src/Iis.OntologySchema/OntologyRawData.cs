@@ -16,6 +16,13 @@ namespace Iis.OntologySchema
 
         public IReadOnlyList<IAlias> Aliases { get; private set; }
 
+        public OntologyRawData()
+        {
+            NodeTypes = new List<INodeType>();
+            RelationTypes = new List<IRelationType>();
+            AttributeTypes = new List<IAttributeType>();
+            Aliases = new List<IAlias>();
+        }
         public OntologyRawData(
             IEnumerable<INodeType> nodeTypes, 
             IEnumerable<IRelationType> relationTypes, 
