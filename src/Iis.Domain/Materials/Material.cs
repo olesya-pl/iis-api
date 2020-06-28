@@ -39,8 +39,9 @@ namespace Iis.Domain.Materials
         public Guid? AssigneeId { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
-        public IEnumerable<Node> Nodes { get; set; }
+        public JObject ObjectsOfStudy { get; set; }
         public IEnumerable<Node> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
+        public JObject ObjectsOfStudy2 { get; set; }
     }
 }

@@ -17,7 +17,6 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IFeatureProcessorFactory featureProcessorFactory,
             [GraphQLNonNullType] MaterialInput input)
         {
-            
             Iis.Domain.Materials.Material inputMaterial = mapper.Map<Iis.Domain.Materials.Material>(input);
 
             inputMaterial.Reliability = materialProvider.GetMaterialSign(input.ReliabilityText);
@@ -41,15 +40,6 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
             var material = await materialService.UpdateMaterialAsync(input);
-            return mapper.Map<Material>(material);
-        }
-
-        public async Task<Material> AssignMaterialOperator(
-            [Service] IMaterialService materialService,
-            [Service] IMapper mapper,
-            [GraphQLNonNullType] AssignMaterialOperatorInput input)
-        {
-            var material = await materialService.AssignMaterialOperatorAsync(input.MaterialId, input.AssigneeId);
             return mapper.Map<Material>(material);
         }
     }

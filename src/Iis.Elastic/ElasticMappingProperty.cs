@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.Elastic
@@ -11,10 +12,30 @@ namespace Iis.Elastic
         Integer,
         Date,
         Nested,
-        Alias
+        Alias,
+        Keyword
     }
     public class ElasticMappingProperty
     {
+        public ElasticMappingProperty() { }
+        public ElasticMappingProperty(string dotName, ElasticMappingPropertyType type)
+        {
+            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            Name = splitted[0];
+            if (splitted.Length == 1)
+            {
+                Type = type;
+            }
+            else
+            {
+                Type = ElasticMappingPropertyType.Nested;
+                Properties = new List<ElasticMappingProperty>
+                {
+                    new ElasticMappingProperty(string.Join('.', splitted.Skip(1)), type)
+                };
+            }
+        }
+
         public string Name { get; set; }
         public ElasticMappingPropertyType Type { get; set; }
         public string Path { get; set; }
@@ -46,5 +67,5 @@ namespace Iis.Elastic
         }
     }
 
-    
+
 }

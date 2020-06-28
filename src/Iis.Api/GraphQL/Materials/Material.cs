@@ -19,6 +19,8 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(NonNullType<IdType>))] public Guid Id { get; set; }
         [GraphQLIgnore] public Guid? FileId { get; set; }
         [GraphQLNonNullType, GraphQLType(typeof(JsonScalarType))] public JObject Metadata { get; set; }
+        public string Type { get; set; }
+        public string Source { get; set; }
         public string CreatedDate { get; set; }
         public string Content { get; set; }
         public MaterialSign Importance { get; set; }
@@ -42,18 +44,19 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> States { get; set; } = new List<string>();
         public IEnumerable<Material> Children { get; set; } = new List<Material>();
         public IEnumerable<MaterialInfo> Infos { get; set; } = new List<MaterialInfo>();
+        
         [GraphQLType(typeof(JsonScalarType))]
         public JToken Highlight { get; set; }
-        public IEnumerable<MaterialFeatureNode> Nodes { get; set; }
+        
+        [GraphQLType(typeof(JsonScalarType))]
+        public JObject ObjectsOfStudy { get; set; }
         public IEnumerable<MaterialFeatureNode> Events { get; set; }
-
+        
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Features { get; set; }
-
         public User Assignee { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
-
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
             if (FileId == null) return null;

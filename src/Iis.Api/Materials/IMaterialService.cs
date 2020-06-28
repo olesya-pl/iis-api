@@ -12,7 +12,7 @@ namespace IIS.Core.Materials
         Task SaveAsync(Material material);
         Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response);
         Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input);
-        Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
+        Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);
     }
 }

@@ -10,7 +10,7 @@ namespace IIS.Core.Materials.EntityFramework
             string sortColumnName,
             string sortOrder)
         {
-            return (sortColumnName, sortOrder)
+            var orderedQueryable = (sortColumnName, sortOrder)
             switch
             {
                 ("type", "asc") => materialsQuery.OrderBy(p => p.Type),
@@ -30,6 +30,7 @@ namespace IIS.Core.Materials.EntityFramework
                 ("createdDate", "asc") => materialsQuery.OrderBy(p => p.CreatedDate),
                 _ => materialsQuery.OrderByDescending(p => p.CreatedDate),
             };
+            return orderedQueryable.ThenBy(p => p.Id);
         }
 
         public static IQueryable<MaterialEntity> GetParentMaterialsQuery(

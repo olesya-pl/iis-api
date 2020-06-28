@@ -102,7 +102,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
             }
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
+            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type });
 
             // todo: put message to rabbit instead of calling another service directly
             if (material.Metadata.SelectToken("Features.Nodes") != null)
@@ -114,7 +114,7 @@ namespace IIS.Core.Materials.EntityFramework
             // todo: multiple queues for different material types
             if (material.File != null && material.Type == "cell.voice")
                 _eventProducer.SendMaterialAddedEventAsync(
-                    new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id});
+                    new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
         }
 
         public async Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
@@ -178,16 +178,15 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        public async Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
+        public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
             if (material == null)
             {
-                throw new ArgumentNullException("No material found by given id");
+                return;
             }
             material.AssigneeId = assigneeId;
             await _context.SaveChangesAsync();
-            return await _materialProvider.GetMaterialAsync(materialId);
         }
 
         private async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId)
@@ -203,15 +202,15 @@ namespace IIS.Core.Materials.EntityFramework
 
             var features = metadata.SelectToken(FeatureFields.FeaturesSection);
 
-            if(features is null) return result;
+            if (features is null) return result;
 
             foreach (JObject feature in features)
             {
                 var featureId = feature.GetValue(FeatureFields.featureId)?.Value<string>();
 
-                if(string.IsNullOrWhiteSpace(featureId)) continue;
+                if (string.IsNullOrWhiteSpace(featureId)) continue;
 
-                if(!Guid.TryParse(featureId, out Guid featureGuid)) continue;
+                if (!Guid.TryParse(featureId, out Guid featureGuid)) continue;
 
                 result.Add(featureGuid);
             }

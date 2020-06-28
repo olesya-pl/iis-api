@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-using Iis.Utility;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Domain;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
@@ -30,6 +30,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             FeatureFields.IMSI,
             FeatureFields.PhoneNumber,
             FeatureFields.IMEI,
+            FeatureFields.DBObject
         };
         private static readonly Dictionary<string, string> signTypeFields = new Dictionary<string, string>
         {
@@ -59,7 +60,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         public async Task<JObject> ProcessMetadata(JObject metadata)
         {
-            if (FeaturesSectionIsInvalid(metadata)) return metadata;
+            if (!FeaturesSectionExists(metadata)) return metadata;
 
             var ontology = await _ontologyProvider.GetOntologyAsync();
 
@@ -72,6 +73,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                 RemoveEmptyProperties(originalFeature);
 
                 var feature = NormalizeObject(originalFeature);
+
+                if(!feature.HasValues) continue;
 
                 var searchResult = await SearchExistingFeature(feature);
 
@@ -106,34 +109,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return metadata;
         }
 
-        private bool FeaturesSectionIsInvalid(JObject metadata)
-        {
-            if (metadata.ContainsKey(FeatureFields.FeaturesSection) &&
-                metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
-                metadata.SelectToken(FeatureFields.FeaturesSection).HasValues)
-            {
-                foreach (var feature in metadata.SelectToken(FeatureFields.FeaturesSection))
-                {
-                    var metadataItem = feature as JObject;
-                    if (metadataItem == null)
-                        return true;
-                    var prioritizedFieldExists = false;
-                    foreach (var prioritizedField in prioritizedFields)
-                    {
-                        if (metadataItem.ContainsKey(prioritizedField))
-                        {
-                            prioritizedFieldExists = true;
-                            break;
-                        }
-                    }
-                    if (!prioritizedFieldExists)
-                        return true;
-                }
-                return false;
-            }
-            return true;
-        }
-
+        private bool FeaturesSectionExists(JObject metadata) =>
+            metadata.ContainsKey(FeatureFields.FeaturesSection) &&
+            metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
+            metadata.SelectToken(FeatureFields.FeaturesSection).HasValues;
+        
         private async Task<(bool isExist, string fieldName, Guid? featureId, JObject feature)> SearchExistingFeature(JObject feature)
         {
             foreach (var field in prioritizedFields)
