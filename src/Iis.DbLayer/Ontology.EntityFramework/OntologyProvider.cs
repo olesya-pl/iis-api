@@ -167,6 +167,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;
+            ontologyType.UniqueValueFieldName = type.UniqueValueFieldName;
         }
     }
 }

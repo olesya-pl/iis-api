@@ -16,5 +16,6 @@ namespace Iis.OntologySchema.ChangeParameters
         public ScalarType? ScalarType { get; set; }
         public Guid? TargetTypeId { get; set; }
         public Guid? ParentTypeId { get; set; }
+        public string UniqueValueFieldName { get; set; }
     }
 }
