@@ -24,50 +24,50 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _context = contextFactory;
         }
 
-        public async Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
+        public Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
         {
-            // ReaderWriterLockSlim is used to allow multiple concurrent reads and only one exclusive write.
-            // Class member can be replaced with some distributed cache
-            return await Task.Run(() =>
+            return Task.FromResult(GetOntology());
+        }
+
+        public OntologyModel GetOntology()
+        {
+            _locker.EnterReadLock();
+            try
             {
-                _locker.EnterReadLock();
-                try
-                {
-                    // Try to hit in cache
-                    if (_ontology != null) return _ontology;
-                }
-                finally
-                {
-                    _locker.ExitReadLock();
-                }
+                // Try to hit in cache
+                if (_ontology != null) return _ontology;
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
 
-                _locker.EnterWriteLock();
-                try
-                {
-                    // Double check
-                    if (_ontology != null) return _ontology;
+            _locker.EnterWriteLock();
+            try
+            {
+                // Double check
+                if (_ontology != null) return _ontology;
 
-                    // Query primary source and update the cache
-                    var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                        .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
-                        .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
-                        .Include(e => e.AttributeType)
-                        .ToArray();
-                    var result = types.Select(e => MapType(e)).ToList();
-                    var relationTypes = _types.Values.Where(e => e is RelationType);
-                    // todo: refactor
-                    result.AddRange(relationTypes);
+                // Query primary source and update the cache
+                var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
+                    .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.AttributeType)
+                    .ToArray();
+                var result = types.Select(e => MapType(e)).ToList();
+                var relationTypes = _types.Values.Where(e => e is RelationType);
+                // todo: refactor
+                result.AddRange(relationTypes);
 
-                    _ontology = new OntologyModel(result);
-                    _types.Clear();
+                _ontology = new OntologyModel(result);
+                _types.Clear();
 
-                    return _ontology;
-                }
-                finally
-                {
-                    _locker.ExitWriteLock();
-                }
-            }, cancellationToken);
+                return _ontology;
+            }
+            finally
+            {
+                _locker.ExitWriteLock();
+            }
         }
 
         public void Invalidate()

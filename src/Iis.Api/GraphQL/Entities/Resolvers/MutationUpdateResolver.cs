@@ -69,15 +69,26 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!type.IsAssignableFrom(node.Type)) // no direct checking of types - we can update child as its base type
                 throw new ArgumentException($"Type {node.Type.Name} can not be updated as {type.Name}");
 
-            foreach (var (key, value) in properties)
+            if (type.HasUniqueValues)
             {
-                var embed = node.Type.GetProperty(key) ??
-                            throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
-                await UpdateRelations(node, embed, value,
-                    string.IsNullOrEmpty(dotName) ? key : dotName + "." + key, requestId);
+                var newNode = await _mutationCreateResolver.CreateEntity(type, properties);
+                if (newNode.Id != node.Id)
+                {
+                    node = (Entity)await _ontologyService.LoadNodesAsync(newNode.Id, null);
+                }
             }
-
-            await _ontologyService.SaveNodeAsync(node);
+            else
+            {
+                foreach (var (key, value) in properties)
+                {
+                    var embed = node.Type.GetProperty(key) ??
+                                throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
+                    await UpdateRelations(node, embed, value,
+                        string.IsNullOrEmpty(dotName) ? key : dotName + "." + key, requestId);
+                    await _ontologyService.SaveNodeAsync(node);
+                }
+            }
+            
             return node;
         }
 
@@ -160,7 +171,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
                     var ontology = await _ontologyProvider.GetOntologyAsync();
                     var type = ontology.GetEntityType(typeName);
-                    await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
+                    var updatedNode = await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
+                    if (relation.Target.Id != updatedNode.Id)
+                    {
+                        node.RemoveNode(relation);
+                        var newRelation = new Relation(Guid.NewGuid(), embed);
+                        var target = (Entity)await _ontologyService.LoadNodesAsync(updatedNode.Id, null);
+                        newRelation.AddNode(target);
+                        node.AddNode(newRelation);
+                    }
                 }
                 else // targetId only
                 {

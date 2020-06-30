@@ -23,7 +23,8 @@ namespace Iis.Domain
         public JObject MetaSource { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public bool HasUniqueValues => Name == "CellPhoneSign";
+        public bool HasUniqueValues => Name == "CellphoneSign";
+        public string UniqueValueFieldName = "value";
 
         // todo: move to extensions?
 

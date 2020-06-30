@@ -7,6 +7,7 @@ namespace IIS.Domain
     public interface IOntologyProvider
     {
         Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default);
+        OntologyModel GetOntology();
         void Invalidate();
     }
 }
