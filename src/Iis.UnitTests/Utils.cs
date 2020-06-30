@@ -17,6 +17,7 @@ using IIS.Core.Files;
 using IIS.Domain;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.DbLayer.OntologySchema;
 
 namespace Iis.UnitTests
 {
@@ -46,9 +47,25 @@ namespace Iis.UnitTests
         { }
     }
 
-    public static class Utils
+    public class Utils
     {
-        public static ServiceProvider SetupInMemoryDb()
+        private static Utils _instance;
+        private static Utils Instance => _instance ?? (_instance = CreateInstance());
+        public Startup Startup { get; private set; }
+        public ServiceCollection ServiceCollection { get; private set; }
+        public ServiceProvider ServiceProvider => ServiceCollection.BuildServiceProvider();
+
+        public static ServiceProvider GetServiceProvider()
+        {
+            return Instance.ServiceProvider;
+        }
+
+        public static string GetConnectionString()
+        {
+            return Instance.Startup.Configuration.GetConnectionString("DB");
+        }
+
+        private static Utils CreateInstance()
         {
             var startup = new Startup(new ConfigurationBuilder()
                             .AddJsonFile("appsettings.json", optional: true)
@@ -67,8 +84,32 @@ namespace Iis.UnitTests
             serviceCollection.AddTransient<IOntologyProvider>(factory => new Mock<IOntologyProvider>().Object);
             serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
 
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            return serviceProvider;
+            return new Utils
+            {
+                Startup = startup,
+                ServiceCollection = serviceCollection
+            };
+        }
+
+        public static IOntologySchema GetOntologySchemaFromDb()
+        {
+            var schemaSource = new OntologySchemaSource
+            {
+                Title = "DB",
+                SourceKind = SchemaSourceKind.Database,
+                Data = Utils.GetConnectionString()
+            };
+            return (new OntologySchemaService()).GetOntologySchema(schemaSource);
+        }
+        public static IOntologySchema GetEmptyOntologySchema()
+        {
+            var schemaSource = new OntologySchemaSource
+            {
+                Title = "NEW",
+                SourceKind = SchemaSourceKind.New,
+                Data = string.Empty
+            };
+            return (new OntologySchemaService()).GetOntologySchema(schemaSource);
         }
     }
 }

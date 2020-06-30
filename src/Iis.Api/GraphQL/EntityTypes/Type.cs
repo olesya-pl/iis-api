@@ -66,7 +66,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType]
         [GraphQLDescription("Entity contains unique values and needs dropdown tip on UI")]
-        public bool HasUniqueValues => Code == "CellphoneSign";
+        public bool HasUniqueValues => Source.HasUniqueValues;
 
         protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType)
         {
