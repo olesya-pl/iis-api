@@ -212,7 +212,6 @@ namespace IIS.Core.Materials.EntityFramework
 
             var result = _mapper.Map<Material>(material);
 
-            System.Console.WriteLine("Started - "+material.Id.ToString());
             result.Infos.AddRange(await MapInfos(material));
 
             result.Children.AddRange(await MapChildren(material));
@@ -225,16 +224,10 @@ namespace IIS.Core.Materials.EntityFramework
 
             result.Events = nodes.Where(x => IsEvent(x));
 
-            //var events = result.Events.Select(n => NodeToJObject(n)).ToList();
-
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
 
-            System.Console.WriteLine("Objects - "+material.Id.ToString());
-
             result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
-
-            System.Console.WriteLine("Finished - "+material.Id.ToString());
-
+            
             return result;
         }
 
