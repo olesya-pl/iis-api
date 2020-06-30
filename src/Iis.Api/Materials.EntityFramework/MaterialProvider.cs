@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace IIS.Core.Materials.EntityFramework
 {
     public class MaterialProvider : IMaterialProvider
     {
+        private readonly SemaphoreSlim localObjectSemaphore = new SemaphoreSlim(1, int.MaxValue);
         private readonly OntologyContext _context;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
@@ -210,6 +212,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             var result = _mapper.Map<Material>(material);
 
+            System.Console.WriteLine("Started - "+material.Id.ToString());
             result.Infos.AddRange(await MapInfos(material));
 
             result.Children.AddRange(await MapChildren(material));
@@ -222,9 +225,15 @@ namespace IIS.Core.Materials.EntityFramework
 
             result.Events = nodes.Where(x => IsEvent(x));
 
+            //var events = result.Events.Select(n => NodeToJObject(n)).ToList();
+
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
 
-            result.ObjectsOfStudy = GetObjectOfStudyListForMaterial(nodes);
+            System.Console.WriteLine("Objects - "+material.Id.ToString());
+
+            result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
+
+            System.Console.WriteLine("Finished - "+material.Id.ToString());
 
             return result;
         }
@@ -414,11 +423,12 @@ namespace IIS.Core.Materials.EntityFramework
             return _context.Nodes
                                 .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
                                 .Where(e => (!typeIdList.Any() ? true : typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
+                                .AsNoTracking()
                                 .Select(e => e.Node.Id)
                                 .ToList();
         }
 
-        private JObject GetObjectOfStudyListForMaterial(List<Node> nodeList)
+        private async Task<JObject> GetObjectOfStudyListForMaterial(List<Node> nodeList)
         {
             var result = new JObject();
 
@@ -426,21 +436,36 @@ namespace IIS.Core.Materials.EntityFramework
 
             var directIdList = nodeList
                                 .Where(x => IsObjectOfStudy(x))
-                                .Select(x => x.Id);
+                                .Select(x => x.Id)
+                                .ToList();
 
             var featureIdList = nodeList
                                     .Where(x => IsObjectSign(x))
-                                    .Select(x => x.Id);
+                                    .Select(x => x.Id)
+                                    .ToList();
+            
+            var featureList = new List<Guid>();
 
-            var featureList = _context.Relations
-                                        .Where(e => featureIdList.Contains(e.TargetNodeId))
-                                        .Select(e => e.SourceNodeId)
-                                        .ToList()
-                                        .Except(directIdList);
+            await localObjectSemaphore.WaitAsync();
 
-            result.Add(directIdList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Direct)));
+            try
+            {
+                featureList = await _context.Relations
+                                            .Where(e => featureIdList.Contains(e.TargetNodeId))
+                                            .AsNoTracking()
+                                            .Select(e => e.SourceNodeId)
+                                            .ToListAsync();
 
+            }
+            finally
+            {
+                localObjectSemaphore.Release();
+            }
+
+            featureList = featureList.Except(directIdList).ToList();
+    
             result.Add(featureList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Feature)));
+            result.Add(directIdList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Direct)));
 
             return result;
         }
