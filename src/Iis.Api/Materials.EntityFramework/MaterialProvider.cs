@@ -224,6 +224,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             result.Events = nodes.Where(x => IsEvent(x));
 
+            result.Events2 = nodes.Where(x => IsEvent(x)).Select(x => NodeToJObject(x));
+
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
 
             result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
@@ -448,7 +450,6 @@ namespace IIS.Core.Materials.EntityFramework
                                             .AsNoTracking()
                                             .Select(e => e.SourceNodeId)
                                             .ToListAsync();
-
             }
             finally
             {
