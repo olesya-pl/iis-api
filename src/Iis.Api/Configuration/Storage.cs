@@ -1,9 +1,8 @@
 ﻿namespace Iis.Api.Configuration
 {
-    public enum Storage
+    public enum Storage : byte
     {
         Database,
-
         Folder
     }
 }

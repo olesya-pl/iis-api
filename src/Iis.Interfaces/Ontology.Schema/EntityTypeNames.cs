@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Iis.Interfaces.Ontology.Schema
+﻿namespace Iis.Interfaces.Ontology.Schema
 {
-    public enum EntityTypeNames
+    public enum EntityTypeNames: byte
     {
         ObjectOfStudy,
         FuzzyDate,

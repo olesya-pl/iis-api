@@ -35,7 +35,7 @@ namespace Iis.Domain.Meta
         public bool Editable { get; set; }
     }
 
-    public enum EntityOperation
+    public enum EntityOperation : byte
     {
         Create, Update, Delete
     }

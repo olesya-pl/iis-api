@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Iis.Interfaces.Elastic
+﻿namespace Iis.Interfaces.Elastic
 {
-    public enum ElasticMappingItemType
+    public enum ElasticMappingItemType : byte
     {
         Text,
         Integer,

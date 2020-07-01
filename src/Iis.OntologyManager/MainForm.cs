@@ -41,7 +41,7 @@ namespace Iis.OntologyManager
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
 
-        private enum NodeViewType
+        private enum NodeViewType : byte
         {
             Entity,
             RelationEntity,
