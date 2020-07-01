@@ -222,9 +222,7 @@ namespace IIS.Core.Materials.EntityFramework
                                 .SelectMany(p => p.Features.Select(x => x.Node))
                                 .ToList();
 
-            result.Events = nodes.Where(x => IsEvent(x));
-
-            result.Events2 = nodes.Where(x => IsEvent(x)).Select(x => NodeToJObject(x));
+            result.Events = nodes.Where(x => IsEvent(x)).Select(x => NodeToJObject(x));
 
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
 
