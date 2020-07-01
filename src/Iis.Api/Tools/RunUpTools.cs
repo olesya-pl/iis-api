@@ -70,9 +70,6 @@ namespace IIS.Core.Tools
 
             switch (actionName)
             {
-                case "clear-types":
-                    await tools.ClearTypesAsync();
-                    break;
                 case "seed-contour-data":
                     await tools.SeedContourDataAsync();
                     break;

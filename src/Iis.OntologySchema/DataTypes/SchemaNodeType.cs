@@ -176,6 +176,7 @@ namespace Iis.OntologySchema.DataTypes
                 && IsArchived == nodeType.IsArchived
                 && Kind == nodeType.Kind
                 && IsAbstract == nodeType.IsAbstract
+                && UniqueValueFieldName == nodeType.UniqueValueFieldName
                 && scalarTypesAreEqual;
         }
 

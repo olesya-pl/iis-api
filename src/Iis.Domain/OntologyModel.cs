@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Iis.Domain
 {
-    public class OntologyModel
+    public class OntologyModel: IOntologyModel
     {
         public IEnumerable<NodeType> Types { get; }
 
@@ -21,23 +21,24 @@ namespace Iis.Domain
             return GetType<EntityType>(name);
         }
 
-        public T GetType<T>(string name) where T: NodeType
+        public T GetType<T>(string name) where T : NodeType
         {
             var type = GetTypeOrNull<T>(name);
 
-            if (type == null) {
+            if (type == null)
+            {
                 throw new ArgumentException($"Type '{name}' does not exist");
             }
 
             return type;
         }
 
-        public T GetTypeOrNull<T>(string name) where T: NodeType
+        public T GetTypeOrNull<T>(string name) where T : NodeType
         {
             return Types.OfType<T>().SingleOrDefault(type => type.Name == name);
         }
 
-        public IEnumerable<T> GetTypes<T>(string name) where T: NodeType
+        public IEnumerable<T> GetTypes<T>(string name) where T : NodeType
         {
             // TODO: remove this method. There should not be types with the same name
             //       this is a temporary hack while we have relations with the same name but different Source/Target

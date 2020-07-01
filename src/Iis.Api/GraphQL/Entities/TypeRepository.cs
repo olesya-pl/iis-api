@@ -21,14 +21,13 @@ namespace IIS.Core.GraphQL.Entities
 
     public class TypeRepository : TypeStorage
     {
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly OntologyQueryTypesCreator _creator;
         private readonly OntologyMutationTypesCreator[] _mutators;
-        private OntologyModel _ontology;
 
-        public TypeRepository(IOntologyProvider ontologyProvider)
+        public TypeRepository(IOntologyModel ontology)
         {
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _creator = new OntologyQueryTypesCreator(this);
             _mutators = new OntologyMutationTypesCreator[]
             {
@@ -40,7 +39,6 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
-            _ontology = _ontologyProvider.GetOntologyAsync().Result; // todo: to async method
             var entityTypes = _ontology.EntityTypes.ToList();
             if (entityTypes.Count == 0)
                 throw new OntologyTypesException("There are no entity types to register on graphql schema");

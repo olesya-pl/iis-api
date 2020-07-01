@@ -19,13 +19,13 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
         public const string ENTITY_TYPE = "Person";
         public const string FORM_DATA_TYPE = "form5";
 
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly IOntologyService _ontologyService;
         private readonly OntologyContext _ontologyContext;
 
-        public PersonForm5Processor(IOntologyProvider ontologyProvider, IOntologyService ontologyService, OntologyContext ontologyContext)
+        public PersonForm5Processor(IOntologyModel ontology, IOntologyService ontologyService, OntologyContext ontologyContext)
         {
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _ontologyService = ontologyService;
             _ontologyContext = ontologyContext;
         }
@@ -63,8 +63,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 throw new ArgumentException($"Can not parse {ENTITY_TYPE} id: {entityIdText}");
             var entity = await _ontologyService.LoadNodesAsync(personId, null)
                          ?? throw new ArgumentException($"{ENTITY_TYPE} with id {personId} was not found");
-            var ontology = await _ontologyProvider.GetOntologyAsync();
-            var type = ontology.GetEntityType(ENTITY_TYPE);
+            var type = _ontology.GetEntityType(ENTITY_TYPE);
             if (!entity.Type.IsSubtypeOf(type))
                 throw new ArgumentException($"Entity with id {personId} is {entity.Type.Name}, not {ENTITY_TYPE}");
 
@@ -183,7 +182,6 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
 
         private async Task Process26(Entity person, Form5 form)
         {
-            var ontology = await _ontologyProvider.GetOntologyAsync();
             async Task assignSigns(string propertyName, IEnumerable<SignEntity> signs)
             {
                 if (signs == null) return;
@@ -202,7 +200,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                     }
                     else
                     {
-                        targetType = ontology.GetEntityType(targetTypeName)
+                        targetType = _ontology.GetEntityType(targetTypeName)
                                      ?? throw new ArgumentException($"Type {targetTypeName} was not found");
                         if (!targetType.IsSubtypeOf(type))
                             throw new ArgumentException($"{targetTypeName} is not subtype of {type.Name}");

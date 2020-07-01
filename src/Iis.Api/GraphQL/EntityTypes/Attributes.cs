@@ -129,12 +129,12 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(EmbeddingRelationType source, OntologyModel ontology) : base(source)
+        public EntityAttributeRelation(EmbeddingRelationType source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
 
-        private OntologyModel _ontology;
+        private IOntologyModel _ontology;
 
         protected new EntityRelationMeta MetaObject => (EntityRelationMeta) base.MetaObject;
 
@@ -151,10 +151,9 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
-        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyProvider ontologyProvider,
+        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology,
             bool? concreteTypes = false)
         {
-            var ontology = await ontologyProvider.GetOntologyAsync();
             var types = ontology.GetChildTypes(Source.EntityType)?.OfType<Iis.Domain.EntityType>();
             if (types == null)
                 types = new[] {Source.EntityType};

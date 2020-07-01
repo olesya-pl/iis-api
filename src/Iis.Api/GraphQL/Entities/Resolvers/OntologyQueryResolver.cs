@@ -156,13 +156,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ------ All entities ----- //
 
-        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
+        public Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
-            var ontologyService = ctx.Service<IOntologyService>();
-            var ontologyProvider = ctx.Service<IOntologyProvider>();
+            var ontology = ctx.Service<IOntologyModel>();
 
-            var ontology = await ontologyProvider.GetOntologyAsync();
             var types = ontology.EntityTypes;
             if (filter?.Types != null)
                 types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
@@ -174,7 +172,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 ids = filter.MatchList;
             }
 
-            return Tuple.Create(types, ctx.CreateNodeFilter(), ids);
+            return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids));
         }
     }
 }

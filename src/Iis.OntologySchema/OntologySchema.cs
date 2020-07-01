@@ -166,6 +166,8 @@ namespace Iis.OntologySchema
                 nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
             }
 
+            nodeType.UniqueValueFieldName = updateParameter.UniqueValueFieldName;
+
             _storage.Aliases.Update(nodeType.Name, updateParameter.Aliases);
             return nodeType;
         }

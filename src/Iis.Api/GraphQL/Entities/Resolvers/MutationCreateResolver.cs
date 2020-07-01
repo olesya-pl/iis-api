@@ -17,12 +17,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         private readonly IFileService _fileService;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
 
-        public MutationCreateResolver(IOntologyProvider ontologyProvider, IOntologyService ontologyService,
+        public MutationCreateResolver(IOntologyModel ontology, IOntologyService ontologyService,
             IFileService fileService)
         {
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _ontologyService = ontologyService;
             _fileService = fileService;
         }
@@ -30,7 +30,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public MutationCreateResolver(IResolverContext ctx)
         {
             _fileService = ctx.Service<IFileService>();
-            _ontologyProvider = ctx.Service<IOntologyProvider>();
+            _ontology = ctx.Service<IOntologyModel>();
             _ontologyService = ctx.Service<IOntologyService>();
         }
 
@@ -38,8 +38,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var ontology = await _ontologyProvider.GetOntologyAsync();
-            var type = ontology.GetEntityType(typeName);
+            var type = _ontology.GetEntityType(typeName);
             var entity = await CreateEntity(type, data);
 
             return entity;
@@ -154,8 +153,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (props.TryGetValue("target", out var dictTarget))
                 {
                     var (typeName, unionData) = InputExtensions.ParseInputUnion(dictTarget);
-                    var ontology = await _ontologyProvider.GetOntologyAsync();
-                    var type = ontology.GetEntityType(typeName);
+                    var type = _ontology.GetEntityType(typeName);
                     return await CreateEntity(type, unionData);
                 }
 

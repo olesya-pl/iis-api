@@ -22,7 +22,6 @@ namespace IIS.Core.Materials.EntityFramework
 {
     public class MaterialProvider : IMaterialProvider
     {
-        private readonly SemaphoreSlim localObjectSemaphore = new SemaphoreSlim(1, int.MaxValue);
         private readonly OntologyContext _context;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
@@ -440,22 +439,7 @@ namespace IIS.Core.Materials.EntityFramework
                                     .Select(x => x.Id)
                                     .ToList();
             
-            var featureList = new List<Guid>();
-
-            await localObjectSemaphore.WaitAsync();
-
-            try
-            {
-                featureList = await _context.Relations
-                                            .Where(e => featureIdList.Contains(e.TargetNodeId))
-                                            .AsNoTracking()
-                                            .Select(e => e.SourceNodeId)
-                                            .ToListAsync();
-            }
-            finally
-            {
-                localObjectSemaphore.Release();
-            }
+            var featureList = await _ontologyService.GetNodeIdListByFeatureIdListAsync(featureIdList);
 
             featureList = featureList.Except(directIdList).ToList();
     
