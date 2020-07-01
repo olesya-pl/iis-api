@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Iis.Interfaces.Roles
+﻿namespace Iis.Interfaces.Roles
 {
-    public enum AccessOperation
+    public enum AccessOperation : byte
     {
         None,
         Create,

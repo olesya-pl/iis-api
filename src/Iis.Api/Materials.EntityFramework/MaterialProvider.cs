@@ -58,6 +58,8 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 IQueryable<MaterialEntity> materialsQuery
                     = GetMaterialQuery()
+                    .WithChildren()
+                    .WithFeatures()
                     .GetParentMaterialsQuery()
                     .ApplySorting(sortColumnName, sortOrder);
                 IQueryable<MaterialEntity> materialsCountQuery;
@@ -151,13 +153,24 @@ namespace IIS.Core.Materials.EntityFramework
             await _context.Semaphore.WaitAsync();
             try
             {
-                return await GetMaterialQuery().SingleOrDefaultAsync(m => m.Id == id);
+                return await GetMaterialQuery()
+                    .WithChildren()
+                    .WithFeatures()
+                    .SingleOrDefaultAsync(m => m.Id == id);
             }
             finally
             {
                 _context.Semaphore.Release();
             }
         }
+
+        private async Task<Material> GetSimplifiedMaterialAsync(Guid id)
+        {
+            var material = await GetMaterialEntityAsync(id);
+
+            return MapSimplifiedMaterial(material);
+        }
+
         public async Task<Material> GetMaterialAsync(Guid id)
         {
             var material = await GetMaterialEntityAsync(id);
@@ -205,6 +218,14 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MaterialSign>(entity);
         }
 
+        public Material MapSimplifiedMaterial(MaterialEntity material)
+        {
+            if (material == null) return null;
+            var result = _mapper.Map<Material>(material);
+            result.Assignee = _mapper.Map<User>(material.Assignee);
+            return result;
+        }
+
         public async Task<Material> MapAsync(MaterialEntity material)
         {
             if (material == null) return null;
@@ -226,7 +247,7 @@ namespace IIS.Core.Materials.EntityFramework
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
 
             result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
-            
+
             return result;
         }
 
@@ -281,7 +302,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<JObject> GetMaterialDocumentAsync(Guid materialId)
         {
-            var materialTask = GetMaterialAsync(materialId);
+            var materialTask = GetSimplifiedMaterialAsync(materialId);
 
             var mLResponsesTask = GetMlProcessingResultsAsync(materialId);
 
@@ -294,6 +315,7 @@ namespace IIS.Core.Materials.EntityFramework
                 new JProperty(nameof(Material.Source).ToLower(), material.Source),
                 new JProperty(nameof(Material.Type).ToLower(), material.Type),
                 new JProperty(nameof(Material.Content).ToLower(), material.Content),
+                new JProperty(nameof(Material.CreatedDate).ToLower(), material.CreatedDate),
                 new JProperty(nameof(Material.Importance).ToLower(), material.Importance?.Title),
                 new JProperty(nameof(Material.Reliability).ToLower(), material.Reliability?.Title),
                 new JProperty(nameof(Material.Relevance).ToLower(), material.Relevance?.Title),
@@ -340,7 +362,7 @@ namespace IIS.Core.Materials.EntityFramework
                 foreach (var mlHandler in mlHandlers)
                 {
                     var responses = mlResponses.Where(_ => _.MlHandlerName == mlHandler).ToArray();
-                    for (var i = 0; i < mlHandlers.Count(); i++)
+                    for (var i = 0; i < responses.Count(); i++)
                     {
                         var propertyName = $"{mlHandler}-{i + 1}";
 
@@ -438,11 +460,11 @@ namespace IIS.Core.Materials.EntityFramework
                                     .Where(x => IsObjectSign(x))
                                     .Select(x => x.Id)
                                     .ToList();
-            
+
             var featureList = await _ontologyService.GetNodeIdListByFeatureIdListAsync(featureIdList);
 
             featureList = featureList.Except(directIdList).ToList();
-    
+
             result.Add(featureList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Feature)));
             result.Add(directIdList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Direct)));
 
@@ -460,9 +482,6 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.SourceReliability)
                     .Include(m => m.ProcessedStatus)
                     .Include(m => m.SessionPriority)
-                    .Include(m => m.Children)
-                    .Include(m => m.MaterialInfos)
-                    .ThenInclude(m => m.MaterialFeatures)
                     .Include(m => m.Assignee)
                     .AsNoTracking();
         }

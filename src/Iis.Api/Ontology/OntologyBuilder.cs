@@ -15,7 +15,7 @@ namespace IIS.Core.Ontology
         // TODO: business logic, including name checking should be moved into respective domain classes
         private static readonly Regex NameRegex = new Regex("^[_a-zA-Z][_a-zA-Z0-9]*$");
 
-        private enum Kind { Attribute, Entity, Abstraction }
+        private enum Kind : byte { Attribute, Entity, Abstraction }
         internal struct Relation
         {
             public string TargetName;
