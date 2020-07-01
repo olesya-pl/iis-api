@@ -83,6 +83,7 @@ namespace Iis.UnitTests
             serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
             serviceCollection.AddTransient<IOntologyProvider>(factory => new Mock<IOntologyProvider>().Object);
             serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
+            serviceCollection.AddSingleton<IOntologyModel>(factory => new Mock<IOntologyModel>().Object);
 
             return new Utils
             {
