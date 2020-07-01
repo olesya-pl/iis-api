@@ -287,7 +287,7 @@ namespace IIS.Core.Materials.EntityFramework
             await Task.WhenAll(materialTask, mLResponsesTask);
 
             var material = await materialTask;
-            var mLResponses = await mLResponsesTask;
+            var mlResponses = await mLResponsesTask;
 
             var jDocument = new JObject(
                 new JProperty(nameof(Material.Source).ToLower(), material.Source),
@@ -307,7 +307,6 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 jDocument.Add(nameof(material.Title), material.Title);
             }
-
             if (!(material.Data is null) && material.Data.HasValues)
             {
                 var materialData = new JObject();
@@ -332,17 +331,21 @@ namespace IIS.Core.Materials.EntityFramework
                 jDocument.Add(new JProperty(nameof(Material.LoadData), JObject.Parse(material.LoadData.ToJson())));
             }
 
-            if (mLResponses.Any())
+            if (mlResponses.Any())
             {
-                var mlResponses = new JObject();
-                jDocument.Add(new JProperty(nameof(mlResponses), mlResponses));
-                foreach (var response in mLResponses)
+                var mlResponsesContainer = new JObject();
+                jDocument.Add(new JProperty(nameof(mlResponses), mlResponsesContainer));
+                var mlHandlers = mlResponses.GroupBy(_ => _.MlHandlerName).Select(_ => _.Key).ToArray();
+                foreach (var mlHandler in mlHandlers)
                 {
-                    var handlerName = response.MlHandlerName.ToLowerCamelCase().RemoveWhiteSpace();
+                    var responses = mlResponses.Where(_ => _.MlHandlerName == mlHandler).ToArray();
+                    for (var i = 0; i < mlHandlers.Count(); i++)
+                    {
+                        var propertyName = $"{mlHandler}-{i + 1}";
 
-                    var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
-
-                    mlResponses.Add(new JProperty(propertyName, response.ResponseText));
+                        mlResponsesContainer.Add(new JProperty(propertyName.ToLowerCamelCase().RemoveWhiteSpace(),
+                            responses[i].ResponseText));
+                    }
                 }
             }
 
@@ -404,13 +407,13 @@ namespace IIS.Core.Materials.EntityFramework
 
             var typeIdList = new List<Guid>();
 
-            if(type != null)
+            if (type != null)
             {
                 typeIdList = type.IncomingRelations
                                     .Select(p => p.SourceTypeId)
                                     .ToList();
-            } 
-            
+            }
+
             return _context.Nodes
                                 .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
                                 .Where(e => (!typeIdList.Any() ? true : typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
