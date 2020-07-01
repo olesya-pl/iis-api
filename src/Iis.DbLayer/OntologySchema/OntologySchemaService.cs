@@ -53,6 +53,8 @@ namespace Iis.DbLayer.OntologySchema
                     return LoadFromFile(schemaSource);
                 case SchemaSourceKind.Database:
                     return LoadFromDatabase(schemaSource);
+                case SchemaSourceKind.New:
+                    return new Iis.OntologySchema.OntologySchema(schemaSource);
             }
             throw new ArgumentException($"Invalid argument sourceKind = {schemaSource.SourceKind}");
         }

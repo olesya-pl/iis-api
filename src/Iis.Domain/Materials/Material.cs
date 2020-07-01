@@ -42,6 +42,6 @@ namespace Iis.Domain.Materials
         public JObject ObjectsOfStudy { get; set; }
         public IEnumerable<Node> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
-        public JObject ObjectsOfStudy2 { get; set; }
+        public IEnumerable<JObject> Events2 { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.DbLayer.Ontology.EntityFramework;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -48,7 +49,23 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (properties == null)
                 throw new ArgumentException($"{type.Name} creation ex nihilo is allowed only to God.");
-            var node = new Entity(Guid.NewGuid(), type);
+            Entity node;
+            if (type.HasUniqueValues)
+            {
+                node = await GetUniqueValueEntity(type, properties);
+            }
+            else
+            {
+                node = new Entity(Guid.NewGuid(), type);
+                await CreateProperties(node, properties);
+            }
+
+            await _ontologyService.SaveNodeAsync(node);
+            return node;
+        }
+
+        private async Task<Entity> CreateProperties(Entity node, Dictionary<string, object> properties)
+        {
             foreach (var (key, value) in properties)
             {
                 var embed = node.Type.GetProperty(key) ??
@@ -57,9 +74,17 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 foreach (var relation in relations)
                     node.AddNode(relation);
             }
-
-            await _ontologyService.SaveNodeAsync(node);
             return node;
+        }
+        private async Task<Entity> GetUniqueValueEntity(EntityType type, Dictionary<string, object> properties)
+        {
+            if (!properties.ContainsKey(type.UniqueValueFieldName))
+            {
+                return await CreateProperties(new Entity(Guid.NewGuid(), type), properties);
+            }
+            var value = properties[type.UniqueValueFieldName].ToString();
+            var existing = (Entity)await _ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName);
+            return existing ?? await CreateProperties(new Entity(Guid.NewGuid(), type), properties);
         }
 
         public async Task<IEnumerable<Relation>> CreateRelations(EmbeddingRelationType embed, object value)
@@ -138,6 +163,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
 
             throw new ArgumentException(nameof(embed));
-        }
+         }
     }
 }

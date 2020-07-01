@@ -18,7 +18,7 @@ namespace Iis.UnitTests.Users
 
         public OperatorsTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
 
         public void Dispose()

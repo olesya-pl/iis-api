@@ -19,14 +19,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public class OntologyService : IOntologyService
     {
         private readonly OntologyContext _context;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly OntologyModel _ontology;
         private readonly IMemoryCache _cache;
         private readonly IElasticService _elasticService;
 
         public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache, IElasticService elasticService)
         {
             _context = context;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontologyProvider.GetOntology();
             _cache = cache;
             _elasticService = elasticService;
         }
@@ -47,25 +47,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 _context.Nodes.Add(existing);
             }
 
-            foreach (EmbeddingRelationType relationType in source.Type.AllProperties)
-            {
-                if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
-                {
-                    Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
-                    RelationEntity existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id);
-                    ApplyChanges(existing, sourceRelation, existingRelation);
-                }
-                else
-                {
-                    IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
-                    IEnumerable<RelationEntity> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
-                    var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
-                    foreach (var pair in pairs)
-                    {
-                        ApplyChanges(existing, pair.Left, pair.Right);
-                    }
-                } 
-            }
+            SaveRelations(source, existing);
 
             await _context.SaveChangesAsync(cancellationToken);
             await _elasticService.PutNodeAsync(source.Id);
@@ -97,31 +79,36 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     existingNodes.Add(existing.Id, existing);
                 }
 
-                foreach (EmbeddingRelationType relationType in source.Type.AllProperties)
-                {
-                    if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
-                    {
-                        Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
-                        RelationEntity existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id);
-                        ApplyChanges(existing, sourceRelation, existingRelation);
-                    }
-                    else
-                    {
-                        IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
-                        IEnumerable<RelationEntity> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
-                        var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
-                        foreach (var pair in pairs)
-                        {
-                            ApplyChanges(existing, pair.Left, pair.Right);
-                        }
-                    }
-                }
+                SaveRelations(source, existing);
             }
 
             await _context.SaveChangesAsync(cancellationToken);
             foreach (Node source in nodes)
             {
                 await _elasticService.PutNodeAsync(source.Id);
+            }
+        }
+
+        private void SaveRelations(Node source, NodeEntity existing)
+        {
+            foreach (EmbeddingRelationType relationType in source.Type.AllProperties)
+            {
+                if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                {
+                    Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
+                    RelationEntity existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id);
+                    ApplyChanges(existing, sourceRelation, existingRelation);
+                }
+                else
+                {
+                    IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
+                    IEnumerable<RelationEntity> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
+                    var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
+                    foreach (var pair in pairs)
+                    {
+                        ApplyChanges(existing, pair.Left, pair.Right);
+                    }
+                }
             }
         }
 
@@ -223,7 +210,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private async Task<IEnumerable<Node>> GetNodesAsync(IQueryable<NodeEntity> relationsQ, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             NodeEntity[] ctxNodes;
             // workaround because of wrong generated query with distinct and order by
             var workaroundQ = from a in relationsQ.Distinct()
@@ -234,7 +220,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Take(filter.Limit)
                 .Select(r => r.Node)
                 .ToArrayAsync(cancellationToken);
-            return ctxNodes.Select(e => MapNode(e, ontology)).ToArray();
+            return ctxNodes.Select(e => MapNode(e)).ToArray();
         }
         public async Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
         {
@@ -242,11 +228,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             try
             {
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
                 var nodeEntities = await _context.Nodes
                                             .Where(node => !node.IsArchived && matchList.Contains(node.Id))
                                             .ToListAsync();
-                var nodes = nodeEntities.Select(e => MapNode(e, ontology));
+                var nodes = nodeEntities.Select(e => MapNode(e));
                 return (nodes, nodes.Count());
             }
             finally
@@ -259,8 +244,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
             {
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                     .Concat(types).Distinct().ToArray();
 
                 var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
@@ -270,7 +254,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     var nodeEntities = await _context.Nodes
                         .Where(node => !node.IsArchived && searchResult.ids.Contains(node.Id))
                         .ToListAsync();
-                    var nodes = nodeEntities.Select(e => MapNode(e, ontology));
+                    var nodes = nodeEntities.Select(e => MapNode(e));
                     return nodes;
 
                 }
@@ -299,8 +283,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
             {
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                     .Concat(types).Distinct().ToArray();
 
                 var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
@@ -329,9 +312,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
             {
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-                var types = ontology.EntityTypes.Where(p => p.Name == typeName);
-                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
+                var types = _ontology.EntityTypes.Where(p => p.Name == typeName);
+                var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                     .Concat(types).Distinct().ToArray();
 
                 var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
@@ -385,8 +367,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     ctxSource.OutgoingRelations = relations;
                 }
 
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-                var node = MapNode(ctxSource, ontology);
+                var node = MapNode(ctxSource);
 
                 return node;
             }
@@ -446,8 +427,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     FillRelations(nodes, relations);
                 }
 
-                var ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
-                return nodes.Select(n => MapNode(n, ontology)).ToList();
+                return nodes.Select(n => MapNode(n)).ToList();
             }
             finally
             {
@@ -485,17 +465,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             foreach (var relation in relations)
                 nodesDict[relation.SourceNodeId].OutgoingRelations.Add(relation);
         }
-        private Node MapNode(NodeEntity ctxNode, OntologyModel ontology)
+        private Node MapNode(NodeEntity ctxNode)
         {
-            return MapNode(ctxNode, ontology, new List<Node>());
+            return MapNode(ctxNode, new List<Node>());
         }
 
-        private Node MapNode(NodeEntity ctxNode, OntologyModel ontology, List<Node> mappedNodes)
+        private Node MapNode(NodeEntity ctxNode, List<Node> mappedNodes)
         {
             var m = mappedNodes.SingleOrDefault(e => e.Id == ctxNode.Id);
             if (m != null) return m;
 
-            var type = ontology.GetType(ctxNode.NodeTypeId)
+            var type = _ontology.GetType(ctxNode.NodeTypeId)
                        ?? throw new ArgumentException($"Ontology type with id {ctxNode.NodeTypeId} was not found.");
             Node node;
             if (type is AttributeType attrType)
@@ -516,14 +496,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             else if (type is EmbeddingRelationType relationType)
             {
                 node = new Relation(ctxNode.Id, relationType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
-                var target = MapNode(ctxNode.Relation.TargetNode, ontology, mappedNodes);
+                var target = MapNode(ctxNode.Relation.TargetNode, mappedNodes);
                 node.AddNode(target);
             }
             else throw new Exception($"Node mapping does not support ontology type {type.GetType()}.");
 
             foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived))
             {
-                var mapped = MapNode(relatedNode.Node, ontology, mappedNodes);
+                var mapped = MapNode(relatedNode.Node, mappedNodes);
                 node.AddNode(mapped);
             }
 
@@ -543,6 +523,60 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             Archive(ctxNode);
 
             await _context.SaveChangesAsync(cancellationToken);
+        }
+        private IQueryable<NodeEntity> GetNodeWithUniqueValuesQuery(Guid nodeTypeId, string value, string valueTypeName)
+        {
+            return 
+                from n in _context.Nodes
+                join r in _context.Relations on n.Id equals r.SourceNodeId
+                join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
+                join a in _context.Attributes on n2.Id equals a.Id
+                join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
+                where n.NodeTypeId == nodeTypeId
+                  && nt.Name == valueTypeName
+                  && (a.Value == value || value == null)
+                select n;
+        }
+        public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        {
+            var nodeEntities = await
+                (from n in _context.Nodes
+                 join r in _context.Relations on n.Id equals r.SourceNodeId
+                 join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
+                 join a in _context.Attributes on n2.Id equals a.Id
+                 join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
+                 where n.NodeTypeId == nodeTypeId
+                     && nt.Name == valueTypeName
+                     && (a.Value == value || value == null)
+                 select n).ToListAsync();
+
+            return nodeEntities
+                .Select(n => (Entity)MapNode(n))
+                .FirstOrDefault();
+        }
+        public async Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        {
+            return await 
+                (from n in _context.Nodes
+                join r in _context.Relations on n.Id equals r.SourceNodeId
+                join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
+                join a in _context.Attributes on n2.Id equals a.Id
+                join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
+                where n.NodeTypeId == nodeTypeId
+                    && nt.Name == valueTypeName
+                    && (a.Value.StartsWith(value))
+                select a).Take(limit).ToListAsync();
+        }
+        public async Task CreateRelation(Guid sourceNodeId, Guid targetNodeId)
+        {
+            var relationEntity = new RelationEntity
+            {
+                Id = Guid.NewGuid(),
+                SourceNodeId = sourceNodeId,
+                TargetNodeId = targetNodeId
+            };
+            _context.Relations.Add(relationEntity);
+            await _context.SaveChangesAsync();
         }
     }
 }
