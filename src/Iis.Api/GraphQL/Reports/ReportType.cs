@@ -17,9 +17,11 @@ namespace IIS.Core.GraphQL.Reports
         IOntologyType objectType;
         EntityType type;
 
-        public ReportType(TypeRepository typeRepository, [Service]IOntologyModel ontology)
+        public ReportType(TypeRepository typeRepository, IOntologyModel ontology)
         {
             _typeRepository   = typeRepository ?? throw new System.ArgumentNullException(nameof(typeRepository));
+            
+            _ontology = ontology;
 
             type = _ontology.GetTypeOrNull<EntityType>("Event");
 
