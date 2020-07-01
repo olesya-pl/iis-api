@@ -364,7 +364,7 @@ namespace IIS.Core.Materials.EntityFramework
                 foreach (var mlHandler in mlHandlers)
                 {
                     var responses = mlResponses.Where(_ => _.MlHandlerName == mlHandler).ToArray();
-                    for (var i = 0; i < mlHandlers.Count(); i++)
+                    for (var i = 0; i < responses.Count(); i++)
                     {
                         var propertyName = $"{mlHandler}-{i + 1}";
 
