@@ -580,5 +580,23 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _context.Relations.Add(relationEntity);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
+        {
+            await _context.Semaphore.WaitAsync();
+
+            try
+            {
+                return await _context.Relations
+                                .Where(e => featureIdList.Contains(e.TargetNodeId))
+                                .Select(e => e.SourceNodeId)
+                                .ToListAsync();
+                
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
     }
 }
