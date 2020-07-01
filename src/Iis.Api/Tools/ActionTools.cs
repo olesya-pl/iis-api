@@ -28,7 +28,6 @@ namespace IIS.Core.Tools
     {
         private readonly ILogger<ActionTools> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IOntologyProvider _ontologyProvider;
         private readonly OntologyTypeSaver _ontologyTypeSaver;
         private readonly Seeder _seeder;
         private readonly OntologyContext _ontologyContext;
@@ -38,7 +37,6 @@ namespace IIS.Core.Tools
         public ActionTools(
             ILogger<ActionTools> logger,
             IConfiguration configuration,
-            IOntologyProvider ontologyProvider,
             OntologyTypeSaver ontologyTypeSaver,
             Seeder seeder,
             OntologyContext ontologyContext,
@@ -47,19 +45,11 @@ namespace IIS.Core.Tools
         {
             _logger = logger;
             _configuration = configuration;
-            _ontologyProvider = ontologyProvider;
             _ontologyTypeSaver = ontologyTypeSaver;
             _seeder = seeder;
             _ontologyContext = ontologyContext;
             _runtimeSettings = runTimeSettings;
             _ontologySchemaService = ontologySchemaService;
-        }
-
-        public async Task ClearTypesAsync()
-        {
-            await _ontologyTypeSaver.ClearTypesAsync();
-            _ontologyProvider.Invalidate();
-            _logger.LogInformation("Types cleared.");
         }
 
         public async Task SeedContourDataAsync()
