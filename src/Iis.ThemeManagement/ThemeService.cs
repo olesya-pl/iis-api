@@ -22,14 +22,14 @@ namespace Iis.ThemeManagement
     {
         private readonly OntologyContext _context;
         private readonly IMapper _mapper;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
 
-        public ThemeService(OntologyContext context, IMapper mapper, IOntologyProvider ontologyProvider, IElasticService elasticService)
+        public ThemeService(OntologyContext context, IMapper mapper, IOntologyModel ontology, IElasticService elasticService)
         {
             _context = context;
             _mapper = mapper;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _elasticService = elasticService;
         }
 
@@ -112,10 +112,8 @@ namespace Iis.ThemeManagement
                                     .Where(e => e.UserId == userId)
                                     .ToListAsync();
 
-            var ontology = await _ontologyProvider.GetOntologyAsync(default(CancellationToken));
-
             var searchTasks = entities.Select(e => {
-                return ExecuteThemeQuery(e.Id, e.Type.ShortTitle, e.Query, ontology);
+                return ExecuteThemeQuery(e.Id, e.Type.ShortTitle, e.Query, _ontology);
             });
 
             var searchResults = await Task.WhenAll(searchTasks);
@@ -158,7 +156,7 @@ namespace Iis.ThemeManagement
                     .AsNoTracking();
         }
 
-        private async Task<(Guid Id, int Count)> ExecuteThemeQuery(Guid id, string typeKey, string query, OntologyModel ontology)
+        private async Task<(Guid Id, int Count)> ExecuteThemeQuery(Guid id, string typeKey, string query, IOntologyModel ontology)
         {
             const string Object = "О";
             const string Material = "М";
@@ -215,7 +213,7 @@ namespace Iis.ThemeManagement
             }
         }
 
-        private string[] GetOntologyIndexes(OntologyModel ontology, string typeName)
+        private string[] GetOntologyIndexes(IOntologyModel ontology, string typeName)
         {
             var types = ontology.EntityTypes.Where(p => p.Name == typeName);
 

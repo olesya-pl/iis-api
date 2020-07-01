@@ -100,6 +100,7 @@ namespace IIS.Core
                 
                 IOntologySchema ontologySchema;
                 IOntologyCache ontologyCache;
+                IOntologyModel ontology;
                 IisElasticConfiguration iisElasticConfiguration;
 
                 if (Program.IsStartedFromMain)
@@ -115,6 +116,9 @@ namespace IIS.Core
                         Data = dbConnectionString
                     };
                     ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+
+                    var ontologyProvider = new OntologyProvider(context);
+                    ontology = ontologyProvider.GetOntology();
                     
                     iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                     iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
@@ -124,16 +128,17 @@ namespace IIS.Core
                     ontologyCache = new OntologyCache(null);
                     ontologySchema = (new OntologySchemaService()).GetOntologySchema(null);
                     iisElasticConfiguration = new IisElasticConfiguration(null, null);
+                    ontology = new OntologyModel(new List<Iis.Domain.NodeType>());
                 }
 
                 services.AddSingleton<IOntologyCache>(ontologyCache);
                 services.AddSingleton(ontologySchema);
                 services.AddSingleton<IFieldToAliasMapper>(ontologySchema);
+                services.AddSingleton<IOntologyModel>(ontology);
                 services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
             }
 
             services.AddHttpContextAccessor();
-            services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddSingleton<MutationCreateResolver>();
             services.AddSingleton<MutationUpdateResolver>();
@@ -320,8 +325,7 @@ namespace IIS.Core
                 .CreateScope())
             {
                 var serviceProvider = serviceScope.ServiceProvider;
-                var ontologyProvider = serviceProvider.GetRequiredService<IOntologyProvider>();
-                var ontology = ontologyProvider.GetOntologyAsync().GetAwaiter().GetResult();
+                var ontology = serviceProvider.GetRequiredService<IOntologyModel>();
                 var types = ontology.EntityTypes.Where(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
                 var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
                     .Concat(types).Distinct().ToArray();

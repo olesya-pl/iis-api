@@ -21,7 +21,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private const string HIGHLIGHT = "highlight";
         private const string SignTypeName = "CellphoneSign";
         private readonly IElasticService _elasticService;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly MutationCreateResolver _createResolver;
         private readonly MutationUpdateResolver _updateResolver;
 
@@ -47,13 +47,13 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MergeNullValueHandling = MergeNullValueHandling.Ignore
         };
 
-        public GSMFeatureProcessor(IElasticService elasticService
-        , IOntologyProvider ontologyProvider
-        , MutationCreateResolver createResolver
-        , MutationUpdateResolver updateResolver)
+        public GSMFeatureProcessor(IElasticService elasticService,
+            IOntologyModel ontology,
+            MutationCreateResolver createResolver,
+            MutationUpdateResolver updateResolver)
         {
             _elasticService = elasticService;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _createResolver = createResolver;
             _updateResolver = updateResolver;
         }
@@ -62,9 +62,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             if (!FeaturesSectionExists(metadata)) return metadata;
 
-            var ontology = await _ontologyProvider.GetOntologyAsync();
-
-            var signType = ontology.GetEntityType(SignTypeName);
+            var signType = _ontology.GetEntityType(SignTypeName);
 
             var features = metadata.SelectToken(FeatureFields.FeaturesSection);
 

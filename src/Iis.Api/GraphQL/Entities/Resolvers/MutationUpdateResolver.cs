@@ -16,26 +16,26 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         private readonly MutationCreateResolver _mutationCreateResolver;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IResolverContext _resolverContext;
         private Guid _rootNodeId;
 
-        public MutationUpdateResolver(IOntologyProvider ontologyProvider
-        , IOntologyService ontologyService
-        , IChangeHistoryService changeHistoryService
-        , MutationCreateResolver mutationCreateResolver
-        , MutationDeleteResolver mutationDeleteResolver)
+        public MutationUpdateResolver(IOntologyService ontologyService,
+            IOntologyModel ontology,
+            IChangeHistoryService changeHistoryService,
+            MutationCreateResolver mutationCreateResolver,
+            MutationDeleteResolver mutationDeleteResolver)
         {
             _mutationCreateResolver = mutationCreateResolver;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _ontologyService = ontologyService;
             _changeHistoryService = changeHistoryService;
         }
         public MutationUpdateResolver(IResolverContext ctx)
         {
             _mutationCreateResolver = new MutationCreateResolver(ctx);
-            _ontologyProvider = ctx.Service<IOntologyProvider>();
+            _ontology = ctx.Service<IOntologyModel>();
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _resolverContext = ctx;
@@ -46,8 +46,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var id = ctx.Argument<Guid>("id");
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var ontology = await _ontologyProvider.GetOntologyAsync();
-            var type = ontology.GetEntityType(typeName);
+            var type = _ontology.GetEntityType(typeName);
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
@@ -169,8 +168,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (uvdict.ContainsKey("target"))
                 {
                     var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
-                    var ontology = await _ontologyProvider.GetOntologyAsync();
-                    var type = ontology.GetEntityType(typeName);
+                    var type = _ontology.GetEntityType(typeName);
                     var updatedNode = await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
                     if (relation.Target.Id != updatedNode.Id)
                     {

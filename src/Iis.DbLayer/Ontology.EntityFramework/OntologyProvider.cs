@@ -7,13 +7,14 @@ using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 using IIS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
-    public class OntologyProvider : BaseOntologyProvider, IOntologyProvider
+    public class OntologyProvider : IOntologyProvider
     {
         private readonly OntologyContext _context;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -24,12 +25,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _context = contextFactory;
         }
 
-        public Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(GetOntology());
-        }
-
-        public OntologyModel GetOntology()
+        public IOntologyModel GetOntology()
         {
             _locker.EnterReadLock();
             try
@@ -151,9 +147,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        protected override RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
+        protected RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
         {
-            var inversedRelation = base._addInversedRelation(relation, sourceType);
+            if (!(relation is EmbeddingRelationType relationType) || !relationType.HasInversed())
+                return null;
+
+            var meta = relationType.GetInversed();
+            var embeddingOptions = meta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
+            var name = meta.Code ?? sourceType.Name.ToLowerCamelcase();
+            var inversedRelation = new EmbeddingRelationType(Guid.NewGuid(), name, embeddingOptions, isInversed: true)
+            {
+                Title = meta.Title ?? sourceType.Title ?? name
+            };
+
+            inversedRelation.AddType(sourceType);
+            inversedRelation.AddType(relationType);
+            relationType.TargetType.AddType(inversedRelation);
 
             if (inversedRelation != null)
                 _types.Add(inversedRelation.Id, inversedRelation);

@@ -19,16 +19,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public class OntologyService : IOntologyService
     {
         private readonly OntologyContext _context;
-        private readonly OntologyModel _ontology;
+        private readonly IOntologyModel _ontology;
         private readonly IMemoryCache _cache;
         private readonly IElasticService _elasticService;
 
-        public OntologyService(OntologyContext context, IOntologyProvider ontologyProvider, IMemoryCache cache, IElasticService elasticService)
+        public OntologyService(OntologyContext context, IOntologyModel ontology, IMemoryCache cache, IElasticService elasticService)
         {
             _context = context;
-            _ontology = ontologyProvider.GetOntology();
             _cache = cache;
             _elasticService = elasticService;
+            _ontology = ontology;
         }
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
@@ -546,6 +546,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                  join a in _context.Attributes on n2.Id equals a.Id
                  join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
                  where n.NodeTypeId == nodeTypeId
+                     && !n.IsArchived && !n2.IsArchived
                      && nt.Name == valueTypeName
                      && (a.Value == value || value == null)
                  select n).ToListAsync();
@@ -563,6 +564,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 join a in _context.Attributes on n2.Id equals a.Id
                 join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
                 where n.NodeTypeId == nodeTypeId
+                    && !n.IsArchived && !n2.IsArchived
                     && nt.Name == valueTypeName
                     && (a.Value.StartsWith(value))
                 select a).Take(limit).ToListAsync();

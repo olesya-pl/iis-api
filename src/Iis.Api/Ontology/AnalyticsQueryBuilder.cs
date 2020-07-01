@@ -20,12 +20,12 @@ namespace IIS.Core.Ontology {
 
         private static string[] _possibleOperators = new string[] { ">", ">=", "<", "<=", "=" };
 
-        public AnalyticsQueryBuilder(OntologyModel ontology)
+        public AnalyticsQueryBuilder(IOntologyModel ontology)
         {
             _queryParser = new AnalyticsQueryParser(ontology);
         }
 
-        public static AnalyticsQueryBuilder From(OntologyModel ontology)
+        public static AnalyticsQueryBuilder From(IOntologyModel ontology)
         {
             return new AnalyticsQueryBuilder(ontology);
         }

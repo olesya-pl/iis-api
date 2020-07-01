@@ -15,16 +15,16 @@ namespace IIS.Core.Ontology.Seeding
     public class Seeder
     {
         private readonly ILogger<Seeder> _logger;
-        private IOntologyProvider _ontologyProvider;
+        private IOntologyModel _ontology;
         private IOntologyService _ontologyService;
 
         public Seeder(
             ILogger<Seeder> logger,
-            IOntologyProvider ontologyProvider,
+            IOntologyModel ontology,
             IOntologyService ontologyService)
         {
             _logger = logger;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _ontologyService = ontologyService;
         }
 
@@ -33,7 +33,6 @@ namespace IIS.Core.Ontology.Seeding
             var firstNodes = new List<Node>();
             var nodes = new List<Node>();
 
-            OntologyModel ontology = await _ontologyProvider.GetOntologyAsync(cancellationToken);
             string path = Path.Combine(Environment.CurrentDirectory, "data", subdir);
             IEnumerable<string> fileNames = Directory.EnumerateFiles(path);
             foreach (string fileName in fileNames)
@@ -51,7 +50,7 @@ namespace IIS.Core.Ontology.Seeding
                 foreach (JToken jToken in jArray.AsJEnumerable())
                 {
                     var jObject = (JObject)jToken;
-                    Entity entity = Map(jObject, ontology, typeName, firstNodes);
+                    Entity entity = Map(jObject, _ontology, typeName, firstNodes);
                     nodes.Add(entity);
                 }
             }
@@ -67,7 +66,7 @@ namespace IIS.Core.Ontology.Seeding
             await _ontologyService.SaveNodesAsync(firstNodes.Union(nodes).ToList(), cancellationToken);
         }
 
-        private Entity Map(JObject jObject, OntologyModel ontology, string typeName, List<Node> first)
+        private Entity Map(JObject jObject, IOntologyModel ontology, string typeName, List<Node> first)
         {
             EntityType type = ontology.GetEntityType(typeName);
             Entity entity = new Entity(Guid.NewGuid(), type);
