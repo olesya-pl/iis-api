@@ -77,7 +77,10 @@ namespace Iis.Elastic
             }
             else
             {
-                AddProperty(existingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
+                if (nameParts.Length > 1)
+                {
+                    AddProperty(existingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
+                }
             }
         }
 
