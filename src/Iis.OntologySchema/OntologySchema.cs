@@ -341,5 +341,17 @@ namespace Iis.OntologySchema
             }
             return new AttributeInfo(entityName, items);
         }
+        public void RemoveRelation(Guid relationId)
+        {
+            var relationType = _storage.RelationTypes[relationId];
+            if (relationType.TargetType.Kind == Kind.Attribute)
+            {
+                _storage.RemoveAttributeType(relationType.TargetType.Id);
+                _storage.RemoveNodeType(relationType.TargetType.Id);
+            }
+            _storage.RemoveNodeType(relationType.Id);
+            _storage.RemoveRelationType(relationType.Id);
+            relationType._sourceType.RemoveRelationType(relationType.Id);
+        }
     }
 }

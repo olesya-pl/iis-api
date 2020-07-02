@@ -11,7 +11,7 @@ namespace Iis.OntologySchema.DataTypes
     {
         private List<SchemaRelationType> _incomingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> IncomingRelations => _incomingRelations;
-        private List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
+        internal List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
 
         internal SchemaAttributeType _attributeType;
@@ -306,5 +306,14 @@ namespace Iis.OntologySchema.DataTypes
         }
 
         public override string ToString() => Name;
+        
+        internal void RemoveRelationType(Guid id)
+        {
+            var relation = _outgoingRelations.Single(r => r.Id == id);
+            if (relation != null)
+            {
+                _outgoingRelations.Remove(relation);
+            }
+        }
     }
 }
