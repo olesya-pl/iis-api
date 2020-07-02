@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
@@ -10,14 +9,13 @@ namespace IIS.Core.GraphQL.Materials
     public class Mutation
     {
         // ReSharper disable once UnusedMember.Global
-        public async Task<Material> CreateMaterial(
+        public async Task<CreateMaterialResponse> CreateMaterial(
             [Service] IMaterialProvider materialProvider,
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
             [Service] IFeatureProcessorFactory featureProcessorFactory,
             [GraphQLNonNullType] MaterialInput input)
         {
-            
             Iis.Domain.Materials.Material inputMaterial = mapper.Map<Iis.Domain.Materials.Material>(input);
 
             inputMaterial.Reliability = materialProvider.GetMaterialSign(input.ReliabilityText);
@@ -29,10 +27,7 @@ namespace IIS.Core.GraphQL.Materials
             inputMaterial.Metadata = await featureProcessorFactory.GetInstance(inputMaterial.Source).ProcessMetadata(inputMaterial.Metadata);
 
             await materialService.SaveAsync(inputMaterial);
-
-            Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
-
-            return mapper.Map<Material>(material);
+            return new CreateMaterialResponse { Id = inputMaterial.Id };
         }
 
         public async Task<Material> UpdateMaterial(

@@ -45,9 +45,12 @@ namespace Iis.Api
                 .ForMember(dest => dest.NodeTypeId, opts => opts.MapFrom(src => src.Type.Id))
                 .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Type.Name))
                 .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Type.Title));
+
             CreateMap<Iis.Domain.Materials.MaterialFeature, IIS.Core.GraphQL.Materials.MaterialFeature>();
+
             CreateMap<Iis.Domain.Materials.MaterialInfo, IIS.Core.GraphQL.Materials.MaterialInfo>()
                 .ForMember(dest => dest.Features, opts => opts.MapFrom(src => src.Features));
+
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
@@ -55,7 +58,6 @@ namespace Iis.Api
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Infos, opts => opts.MapFrom(src => src.Infos))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
-                .ForMember(dest => dest.Nodes, opts => opts.MapFrom(src => src.Nodes))
                 .ForMember(dest => dest.Events, opts => opts.MapFrom(src => src.Events))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.DataModel;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain
@@ -17,7 +18,9 @@ namespace Iis.Domain
         Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default);
         Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<EmbeddingRelationType> relationTypes, CancellationToken cancellationToken = default);
-
-
+        Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
+        Task CreateRelation(Guid sourceNodeId, Guid targetNodeId);
+        Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
+        Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
     }
 }

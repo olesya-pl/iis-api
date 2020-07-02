@@ -298,7 +298,7 @@ namespace Iis.Elastic
 
         private string ApplyFuzzinessOperator(string input)
         {
-            return $"{input}~";
+            return $"{input} OR {input}~";
         }
 
         private string EscapeElasticSpecificSymbols(string input, string escapePattern)

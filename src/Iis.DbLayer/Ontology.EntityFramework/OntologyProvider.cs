@@ -7,13 +7,14 @@ using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 using IIS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
-    public class OntologyProvider : BaseOntologyProvider, IOntologyProvider
+    public class OntologyProvider : IOntologyProvider
     {
         private readonly OntologyContext _context;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -24,50 +25,45 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _context = contextFactory;
         }
 
-        public async Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
+        public IOntologyModel GetOntology()
         {
-            // ReaderWriterLockSlim is used to allow multiple concurrent reads and only one exclusive write.
-            // Class member can be replaced with some distributed cache
-            return await Task.Run(() =>
+            _locker.EnterReadLock();
+            try
             {
-                _locker.EnterReadLock();
-                try
-                {
-                    // Try to hit in cache
-                    if (_ontology != null) return _ontology;
-                }
-                finally
-                {
-                    _locker.ExitReadLock();
-                }
+                // Try to hit in cache
+                if (_ontology != null) return _ontology;
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
 
-                _locker.EnterWriteLock();
-                try
-                {
-                    // Double check
-                    if (_ontology != null) return _ontology;
+            _locker.EnterWriteLock();
+            try
+            {
+                // Double check
+                if (_ontology != null) return _ontology;
 
-                    // Query primary source and update the cache
-                    var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                        .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
-                        .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
-                        .Include(e => e.AttributeType)
-                        .ToArray();
-                    var result = types.Select(e => MapType(e)).ToList();
-                    var relationTypes = _types.Values.Where(e => e is RelationType);
-                    // todo: refactor
-                    result.AddRange(relationTypes);
+                // Query primary source and update the cache
+                var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
+                    .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.AttributeType)
+                    .ToArray();
+                var result = types.Select(e => MapType(e)).ToList();
+                var relationTypes = _types.Values.Where(e => e is RelationType);
+                // todo: refactor
+                result.AddRange(relationTypes);
 
-                    _ontology = new OntologyModel(result);
-                    _types.Clear();
+                _ontology = new OntologyModel(result);
+                _types.Clear();
 
-                    return _ontology;
-                }
-                finally
-                {
-                    _locker.ExitWriteLock();
-                }
-            }, cancellationToken);
+                return _ontology;
+            }
+            finally
+            {
+                _locker.ExitWriteLock();
+            }
         }
 
         public void Invalidate()
@@ -151,9 +147,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        protected override RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
+        protected RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
         {
-            var inversedRelation = base._addInversedRelation(relation, sourceType);
+            if (!(relation is EmbeddingRelationType relationType) || !relationType.HasInversed())
+                return null;
+
+            var meta = relationType.GetInversed();
+            var embeddingOptions = meta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
+            var name = meta.Code ?? sourceType.Name.ToLowerCamelcase();
+            var inversedRelation = new EmbeddingRelationType(Guid.NewGuid(), name, embeddingOptions, isInversed: true)
+            {
+                Title = meta.Title ?? sourceType.Title ?? name
+            };
+
+            inversedRelation.AddType(sourceType);
+            inversedRelation.AddType(relationType);
+            relationType.TargetType.AddType(inversedRelation);
 
             if (inversedRelation != null)
                 _types.Add(inversedRelation.Id, inversedRelation);
@@ -167,6 +176,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;
+            ontologyType.UniqueValueFieldName = type.UniqueValueFieldName;
         }
     }
 }

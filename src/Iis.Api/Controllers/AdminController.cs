@@ -93,7 +93,9 @@ namespace Iis.Api.Controllers
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
-                new ElasticMappingProperty("Metadata.features.PhoneNumber", ElasticMappingPropertyType.Keyword)
+                new ElasticMappingProperty("Metadata.features.PhoneNumber", ElasticMappingPropertyType.Keyword),
+                new ElasticMappingProperty("createddate", ElasticMappingPropertyType.Date),
+                new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
@@ -104,7 +106,7 @@ namespace Iis.Api.Controllers
                                 .Select(async entity =>
                                 {
                                     var document = await _materialProvider.GetMaterialDocumentAsync(entity.Id);
-                                    return _elasticService.PutMaterialAsync(entity.Id, document, cancellationToken);
+                                    return await _elasticService.PutMaterialAsync(entity.Id, document, cancellationToken);
                                 });
 
             await Task.WhenAll(entityTasks);

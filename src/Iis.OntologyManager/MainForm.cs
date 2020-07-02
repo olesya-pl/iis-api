@@ -41,7 +41,7 @@ namespace Iis.OntologyManager
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
 
-        private enum NodeViewType
+        private enum NodeViewType : byte
         {
             Entity,
             RelationEntity,
@@ -116,6 +116,7 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
             _uiEntityTypeControl.OnCreateAttribute += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationAttribute, parentTypeId);
             _uiEntityTypeControl.OnCreateRelationEntity += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationEntity, parentTypeId);
+            _uiEntityTypeControl.OnDeleteRelationEntity += DeleteChildNode;
             _uiEntityTypeControl.OnSetInheritance += SetInheritance;
             _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
@@ -443,6 +444,11 @@ namespace Iis.OntologyManager
             _nodeTypeControls[nodeViewType].SetParentTypeId(parentTypeId);
             _nodeTypeControls[nodeViewType].CreateNew();
             _history.Add(_currentNodeType);
+        }
+        private void DeleteChildNode(IChildNodeType childNodeType)
+        {
+            _schema.RemoveRelation(childNodeType.RelationId);
+            SetNodeTypeView(_currentNodeType, false);
         }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {

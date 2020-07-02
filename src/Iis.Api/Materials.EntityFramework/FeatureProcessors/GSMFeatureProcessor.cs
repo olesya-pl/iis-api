@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-using Iis.Utility;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Domain;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
@@ -21,7 +21,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private const string HIGHLIGHT = "highlight";
         private const string SignTypeName = "CellphoneSign";
         private readonly IElasticService _elasticService;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly MutationCreateResolver _createResolver;
         private readonly MutationUpdateResolver _updateResolver;
 
@@ -30,6 +30,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             FeatureFields.IMSI,
             FeatureFields.PhoneNumber,
             FeatureFields.IMEI,
+            FeatureFields.DBObject
         };
         private static readonly Dictionary<string, string> signTypeFields = new Dictionary<string, string>
         {
@@ -46,24 +47,22 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MergeNullValueHandling = MergeNullValueHandling.Ignore
         };
 
-        public GSMFeatureProcessor(IElasticService elasticService
-        , IOntologyProvider ontologyProvider
-        , MutationCreateResolver createResolver
-        , MutationUpdateResolver updateResolver)
+        public GSMFeatureProcessor(IElasticService elasticService,
+            IOntologyModel ontology,
+            MutationCreateResolver createResolver,
+            MutationUpdateResolver updateResolver)
         {
             _elasticService = elasticService;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _createResolver = createResolver;
             _updateResolver = updateResolver;
         }
 
         public async Task<JObject> ProcessMetadata(JObject metadata)
         {
-            if (FeaturesSectionIsInvalid(metadata)) return metadata;
+            if (!FeaturesSectionExists(metadata)) return metadata;
 
-            var ontology = await _ontologyProvider.GetOntologyAsync();
-
-            var signType = ontology.GetEntityType(SignTypeName);
+            var signType = _ontology.GetEntityType(SignTypeName);
 
             var features = metadata.SelectToken(FeatureFields.FeaturesSection);
 
@@ -72,6 +71,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                 RemoveEmptyProperties(originalFeature);
 
                 var feature = NormalizeObject(originalFeature);
+
+                if(!feature.HasValues) continue;
 
                 var searchResult = await SearchExistingFeature(feature);
 
@@ -106,34 +107,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return metadata;
         }
 
-        private bool FeaturesSectionIsInvalid(JObject metadata)
-        {
-            if (metadata.ContainsKey(FeatureFields.FeaturesSection) &&
-                metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
-                metadata.SelectToken(FeatureFields.FeaturesSection).HasValues)
-            {
-                foreach (var feature in metadata.SelectToken(FeatureFields.FeaturesSection))
-                {
-                    var metadataItem = feature as JObject;
-                    if (metadataItem == null)
-                        return true;
-                    var prioritizedFieldExists = false;
-                    foreach (var prioritizedField in prioritizedFields)
-                    {
-                        if (metadataItem.ContainsKey(prioritizedField))
-                        {
-                            prioritizedFieldExists = true;
-                            break;
-                        }
-                    }
-                    if (!prioritizedFieldExists)
-                        return true;
-                }
-                return false;
-            }
-            return true;
-        }
-
+        private bool FeaturesSectionExists(JObject metadata) =>
+            metadata.ContainsKey(FeatureFields.FeaturesSection) &&
+            metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
+            metadata.SelectToken(FeatureFields.FeaturesSection).HasValues;
+        
         private async Task<(bool isExist, string fieldName, Guid? featureId, JObject feature)> SearchExistingFeature(JObject feature)
         {
             foreach (var field in prioritizedFields)

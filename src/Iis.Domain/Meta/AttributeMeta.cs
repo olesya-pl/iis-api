@@ -8,7 +8,7 @@ namespace Iis.Domain.Meta
         public SearchType? Kind { get; set; }
     }
     
-    public enum SearchType
+    public enum SearchType : byte
     {
         Keyword
     }

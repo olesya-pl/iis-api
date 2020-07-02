@@ -15,5 +15,6 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsArchived { get; }
         Kind Kind { get; }
         bool IsAbstract { get; }
+        string UniqueValueFieldName { get; }
     }
 }

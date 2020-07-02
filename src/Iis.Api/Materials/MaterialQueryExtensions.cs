@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Iis.DataModel.Materials;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -31,6 +32,20 @@ namespace IIS.Core.Materials.EntityFramework
                 _ => materialsQuery.OrderByDescending(p => p.CreatedDate),
             };
             return orderedQueryable.ThenBy(p => p.Id);
+        }
+
+        public static IQueryable<MaterialEntity> WithChildren(
+            this IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery.Include(m => m.Children);
+        }
+
+        public static IQueryable<MaterialEntity> WithFeatures(
+            this IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery
+                .Include(m => m.MaterialInfos)
+                .ThenInclude(m => m.MaterialFeatures);
         }
 
         public static IQueryable<MaterialEntity> GetParentMaterialsQuery(

@@ -2,18 +2,20 @@ using Iis.Interfaces.Elastic;
 using IIS.Domain;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.GraphQL.Entities.Resolvers;
+using Iis.Domain;
+
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
     public class FeatureProcessorFactory : IFeatureProcessorFactory
     {
         private readonly IElasticService _elasticService;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly MutationCreateResolver _createResolver;
         private readonly MutationUpdateResolver _updateResolver;
-        public FeatureProcessorFactory(IElasticService elasticService, IOntologyProvider ontologyProvider, MutationCreateResolver createResolver, MutationUpdateResolver updateResolver)
+        public FeatureProcessorFactory(IElasticService elasticService, IOntologyModel ontology, MutationCreateResolver createResolver, MutationUpdateResolver updateResolver)
         {
             _elasticService = elasticService;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _createResolver = createResolver;
             _updateResolver = updateResolver;
         }
@@ -21,7 +23,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             return materialSource switch
             {
-                "cell.voice" => new GSMFeatureProcessor(_elasticService, _ontologyProvider, _createResolver, _updateResolver),
+                "cell.voice" => new GSMFeatureProcessor(_elasticService, _ontology, _createResolver, _updateResolver),
                 _ => new DummyFeatureProcessor()
             };
         }

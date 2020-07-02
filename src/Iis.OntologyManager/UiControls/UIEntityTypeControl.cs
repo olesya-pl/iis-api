@@ -4,6 +4,7 @@ using Iis.OntologySchema.ChangeParameters;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,6 +15,7 @@ namespace Iis.OntologyManager.UiControls
         private TextBox txtName;
         private TextBox txtTitle;
         private RichTextBox txtAliases;
+        private ComboBox cmbUniqueValueFieldName;
         private DataGridView gridInheritedFrom;
         private DataGridView gridInheritedBy;
         private DataGridView gridEmbeddence;
@@ -28,6 +30,7 @@ namespace Iis.OntologyManager.UiControls
         public event Action<INodeTypeUpdateParameter> OnSave;
         public event Action<Guid> OnCreateAttribute;
         public event Action<Guid> OnCreateRelationEntity;
+        public event Action<IChildNodeType> OnDeleteRelationEntity;
         public event Action OnSetInheritance;
 
         public IChildNodeType SelectedChild
@@ -49,8 +52,17 @@ namespace Iis.OntologyManager.UiControls
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
             txtAliases.Lines = aliases.ToArray();
+            
             var children = nodeType.GetAllChildren();
             gridChildren.DataSource = children;
+            var attributesList = children
+                .Where(ch => ch.Kind == Kind.Attribute)
+                .OrderBy(ch => ch.Name)
+                .Select(ch => ch.Name)
+                .ToList();
+            attributesList.Insert(0, string.Empty);
+            cmbUniqueValueFieldName.DataSource = attributesList;
+
             var ancestors = nodeType.GetAllAncestors();
             gridInheritedFrom.DataSource = ancestors;
             gridInheritedBy.DataSource = nodeType.GetDirectDescendants();
@@ -71,6 +83,15 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(txtId = new TextBox { ReadOnly = true }, "Id");
             _container.Add(txtName = new TextBox(), "Name");
             _container.Add(txtTitle = new TextBox(), "Title");
+
+            cmbUniqueValueFieldName = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                DisplayMember = "",
+                ValueMember = "",
+                BackColor = _style.BackgroundColor
+            };
+            _container.Add(cmbUniqueValueFieldName, "Unique Value Field Name");
             _container.GoToNewColumn();
 
             gridInheritedFrom = GetRelationsGrid(nameof(gridInheritedFrom));
@@ -108,6 +129,8 @@ namespace Iis.OntologyManager.UiControls
             menuChildren.Items[1].Click += (sender, e) => { if (Id != null) OnCreateAttribute((Guid)Id); };
             menuChildren.Items.Add("Create Relation to Entity");
             menuChildren.Items[2].Click += (sender, e) => { if (Id != null) OnCreateRelationEntity((Guid)Id); };
+            menuChildren.Items.Add("Delete");
+            menuChildren.Items[3].Click += (sender, e) => { if (Id != null) gridChildrenEvent(OnDeleteRelationEntity); };
 
             gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
@@ -125,11 +148,12 @@ namespace Iis.OntologyManager.UiControls
             var isNew = string.IsNullOrEmpty(txtId.Text);
             return new NodeTypeUpdateParameter
             {
-                Id =  isNew ? (Guid?)null : new Guid(txtId.Text),
+                Id = isNew ? (Guid?)null : new Guid(txtId.Text),
                 Name = isNew ? txtName.Text : null,
                 Title = txtTitle.Text,
                 ParentTypeId = null,
-                Aliases = txtAliases.Lines
+                Aliases = txtAliases.Lines,
+                UniqueValueFieldName = string.IsNullOrEmpty(cmbUniqueValueFieldName.Text) ? null : cmbUniqueValueFieldName.Text
             };
         }
         private DataGridView GetRelationsGrid(string name)

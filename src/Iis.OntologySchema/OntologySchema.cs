@@ -18,6 +18,7 @@ namespace Iis.OntologySchema
         {
             SchemaSource = schemaSource;
             _mapper = GetMapper();
+            Initialize(new OntologyRawData());
         }
 
         public static OntologySchema GetInstance(IOntologyRawData ontologyRawData, IOntologySchemaSource schemaSource)
@@ -53,6 +54,13 @@ namespace Iis.OntologySchema
             return _storage.NodeTypes.Values
                 .Where(nt => (filter.Name == null || nt.Name.ToLower().Contains(filter.Name.ToLower().Trim()))
                     && filter.Kinds.Contains(nt.Kind));
+        }
+
+        public IEnumerable<INodeTypeLinked> GetEntityTypes()
+        {
+            return _storage.NodeTypes.Values
+                .Where(nt => nt.Kind == Kind.Entity)
+                .OrderBy(nt => nt.Name);
         }
 
         public INodeTypeLinked GetNodeTypeById(Guid id)
@@ -141,7 +149,7 @@ namespace Iis.OntologySchema
             return result;
         }
         
-        private void UpdateNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
+        private INodeTypeLinked UpdateNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
         {
             if (!string.IsNullOrEmpty(updateParameter.Title))
             {
@@ -158,9 +166,12 @@ namespace Iis.OntologySchema
                 nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
             }
 
+            nodeType.UniqueValueFieldName = updateParameter.UniqueValueFieldName;
+
             _storage.Aliases.Update(nodeType.Name, updateParameter.Aliases);
+            return nodeType;
         }
-        private void UpdateRelationNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
+        private INodeTypeLinked UpdateRelationNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
         {
             UpdateNodeType(nodeType, updateParameter);
 
@@ -176,8 +187,9 @@ namespace Iis.OntologySchema
             }
 
             UpdateNodeType(nodeType._relationType._targetType, updateParameter);
+            return nodeType;
         }
-        private void CreateEntityNodeType(INodeTypeUpdateParameter updateParameter)
+        private INodeTypeLinked CreateEntityNodeType(INodeTypeUpdateParameter updateParameter)
         {
             var nodeType = new SchemaNodeType
             {
@@ -189,8 +201,9 @@ namespace Iis.OntologySchema
             };
             _storage.AddNodeType(nodeType);
             UpdateNodeType(nodeType, updateParameter);
+            return nodeType;
         }
-        private void CreateAttributeNodeType(INodeTypeUpdateParameter updateParameter)
+        private INodeTypeLinked CreateAttributeNodeType(INodeTypeUpdateParameter updateParameter)
         {
             var attributeNodeType = new SchemaNodeType
             {
@@ -220,8 +233,9 @@ namespace Iis.OntologySchema
             };
             _storage.AddRelationType(relationType);
             UpdateRelationNodeType(relationNodeType, updateParameter);
+            return attributeNodeType;
         }
-        private void CreateRelationToEntity(INodeTypeUpdateParameter updateParameter)
+        private INodeTypeLinked CreateRelationToEntity(INodeTypeUpdateParameter updateParameter)
         {
             var relationNodeType = new SchemaNodeType()
             {
@@ -238,47 +252,45 @@ namespace Iis.OntologySchema
             };
             _storage.AddRelationType(relationType);
             UpdateRelationNodeType(relationNodeType, updateParameter);
+            return relationNodeType;
         }
-        private void CreateNodeType(INodeTypeUpdateParameter updateParameter)
+        private INodeTypeLinked CreateNodeType(INodeTypeUpdateParameter updateParameter)
         {
             if (updateParameter.EmbeddingOptions == null)
             {
-                CreateEntityNodeType(updateParameter);
+                return CreateEntityNodeType(updateParameter);
             }
             else if (updateParameter.ScalarType != null)
             {
-                CreateAttributeNodeType(updateParameter);
+                return CreateAttributeNodeType(updateParameter);
             }
             else if (updateParameter.TargetTypeId != null)
             {
-                CreateRelationToEntity(updateParameter);
+                return CreateRelationToEntity(updateParameter);
             }
             else
             {
                 throw new ArgumentException("Bad updateParameter");
             }
         }
-        public void UpdateNodeType(INodeTypeUpdateParameter updateParameter)
+        public INodeTypeLinked UpdateNodeType(INodeTypeUpdateParameter updateParameter)
         {
             if (updateParameter.Id == null)
             {
-                CreateNodeType(updateParameter);
-                return;
+                return CreateNodeType(updateParameter);
             }
             var nodeType = _storage.GetNodeTypeById((Guid)updateParameter.Id);
             
             switch (nodeType.Kind)
             {
                 case Kind.Entity:
-                    UpdateNodeType(nodeType, updateParameter);
-                    break;
+                    return UpdateNodeType(nodeType, updateParameter);
                 case Kind.Relation:
-                    UpdateRelationNodeType(nodeType, updateParameter);
-                    break;
+                    return UpdateRelationNodeType(nodeType, updateParameter);
                 case Kind.Attribute:
-                    UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
-                    break;
+                    return UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
             }
+            return null;
         }
 
         public void UpdateTargetType(Guid relationTypeId, Guid targetTypeId)
@@ -328,6 +340,18 @@ namespace Iis.OntologySchema
                 items.Add(item);
             }
             return new AttributeInfo(entityName, items);
+        }
+        public void RemoveRelation(Guid relationId)
+        {
+            var relationType = _storage.RelationTypes[relationId];
+            if (relationType.TargetType.Kind == Kind.Attribute)
+            {
+                _storage.RemoveAttributeType(relationType.TargetType.Id);
+                _storage.RemoveNodeType(relationType.TargetType.Id);
+            }
+            _storage.RemoveNodeType(relationType.Id);
+            _storage.RemoveRelationType(relationType.Id);
+            relationType._sourceType.RemoveRelationType(relationType.Id);
         }
     }
 }

@@ -1,6 +1,6 @@
 namespace IIS.Core.GraphQL.Entities
 {
-    public enum Operation
+    public enum Operation : byte
     {
         Read,
         Create,

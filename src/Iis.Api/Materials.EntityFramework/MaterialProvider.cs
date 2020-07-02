@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -57,12 +58,14 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 IQueryable<MaterialEntity> materialsQuery
                     = GetMaterialQuery()
+                    .WithChildren()
+                    .WithFeatures()
                     .GetParentMaterialsQuery()
                     .ApplySorting(sortColumnName, sortOrder);
                 IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
-                if(!string.IsNullOrWhiteSpace(filterQuery))
+                if (!string.IsNullOrWhiteSpace(filterQuery))
                 {
                     if (!_elasticService.UseElastic)
                     {
@@ -73,7 +76,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                     var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
                         _elasticService.MaterialIndexes,
-                        new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery});
+                        new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery });
 
                     var foundIds = searchResult.Items.Keys.ToList();
 
@@ -150,7 +153,10 @@ namespace IIS.Core.Materials.EntityFramework
             await _context.Semaphore.WaitAsync();
             try
             {
-                return await GetMaterialQuery().SingleOrDefaultAsync(m => m.Id == id);
+                return await GetMaterialQuery()
+                    .WithChildren()
+                    .WithFeatures()
+                    .SingleOrDefaultAsync(m => m.Id == id);
             }
             finally
             {
@@ -158,14 +164,23 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
+        private async Task<Material> GetSimplifiedMaterialAsync(Guid id)
+        {
+            var material = await GetMaterialEntityAsync(id);
+
+            return MapSimplifiedMaterial(material);
+        }
+
         public async Task<Material> GetMaterialAsync(Guid id)
         {
             var material = await GetMaterialEntityAsync(id);
+
             return await MapAsync(material);
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
         {
+
             await _context.Semaphore.WaitAsync();
             try
             {
@@ -193,14 +208,22 @@ namespace IIS.Core.Materials.EntityFramework
 
         public MaterialSign GetMaterialSign(string signValue)
         {
-            if(string.IsNullOrWhiteSpace(signValue)) return null;
+            if (string.IsNullOrWhiteSpace(signValue)) return null;
 
             var entity = _cache.MaterialSigns
                             .FirstOrDefault(ms => ms.Title == signValue);
 
-            if(entity is null) return null;
+            if (entity is null) return null;
 
             return _mapper.Map<MaterialSign>(entity);
+        }
+
+        public Material MapSimplifiedMaterial(MaterialEntity material)
+        {
+            if (material == null) return null;
+            var result = _mapper.Map<Material>(material);
+            result.Assignee = _mapper.Map<User>(material.Assignee);
+            return result;
         }
 
         public async Task<Material> MapAsync(MaterialEntity material)
@@ -219,10 +242,13 @@ namespace IIS.Core.Materials.EntityFramework
                                 .SelectMany(p => p.Features.Select(x => x.Node))
                                 .ToList();
 
-            result.Nodes = nodes.Where(x => IsObjectOfStudy(x));
             result.Events = nodes.Where(x => IsEvent(x));
 
+            result.Events2 = nodes.Where(x => IsEvent(x)).Select(x => NodeToJObject(x));
+
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
+
+            result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
 
             return result;
         }
@@ -230,12 +256,14 @@ namespace IIS.Core.Materials.EntityFramework
         private bool IsEvent(Node node)
         {
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
+
             return nodeType.IsEvent;
         }
 
         private bool IsObjectOfStudy(Node node)
         {
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
+
             return nodeType.IsObjectOfStudy;
         }
 
@@ -245,9 +273,10 @@ namespace IIS.Core.Materials.EntityFramework
 
             return nodeType.IsObjectSign;
         }
+
         private JObject NodeToJObject(Node node)
         {
-            var result = new JObject();
+            var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
 
             foreach (var attribute in node.GetChildAttributes())
             {
@@ -275,19 +304,20 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<JObject> GetMaterialDocumentAsync(Guid materialId)
         {
-            var materialTask = GetMaterialAsync(materialId);
+            var materialTask = GetSimplifiedMaterialAsync(materialId);
 
             var mLResponsesTask = GetMlProcessingResultsAsync(materialId);
 
             await Task.WhenAll(materialTask, mLResponsesTask);
 
             var material = await materialTask;
-            var mLResponses = await mLResponsesTask;
+            var mlResponses = await mLResponsesTask;
 
             var jDocument = new JObject(
                 new JProperty(nameof(Material.Source).ToLower(), material.Source),
                 new JProperty(nameof(Material.Type).ToLower(), material.Type),
                 new JProperty(nameof(Material.Content).ToLower(), material.Content),
+                new JProperty(nameof(Material.CreatedDate).ToLower(), material.CreatedDate),
                 new JProperty(nameof(Material.Importance).ToLower(), material.Importance?.Title),
                 new JProperty(nameof(Material.Reliability).ToLower(), material.Reliability?.Title),
                 new JProperty(nameof(Material.Relevance).ToLower(), material.Relevance?.Title),
@@ -302,7 +332,6 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 jDocument.Add(nameof(material.Title), material.Title);
             }
-
             if (!(material.Data is null) && material.Data.HasValues)
             {
                 var materialData = new JObject();
@@ -327,17 +356,21 @@ namespace IIS.Core.Materials.EntityFramework
                 jDocument.Add(new JProperty(nameof(Material.LoadData), JObject.Parse(material.LoadData.ToJson())));
             }
 
-            if (mLResponses.Any())
+            if (mlResponses.Any())
             {
-                var mlResponses = new JObject();
-                jDocument.Add(new JProperty(nameof(mlResponses), mlResponses));
-                foreach (var response in mLResponses)
+                var mlResponsesContainer = new JObject();
+                jDocument.Add(new JProperty(nameof(mlResponses), mlResponsesContainer));
+                var mlHandlers = mlResponses.GroupBy(_ => _.MlHandlerName).Select(_ => _.Key).ToArray();
+                foreach (var mlHandler in mlHandlers)
                 {
-                    var handlerName = response.MlHandlerName.ToLowerCamelCase().RemoveWhiteSpace();
+                    var responses = mlResponses.Where(_ => _.MlHandlerName == mlHandler).ToArray();
+                    for (var i = 0; i < responses.Count(); i++)
+                    {
+                        var propertyName = $"{mlHandler}-{i + 1}";
 
-                    var propertyName = $"{handlerName}-{response.Id.ToString("N")}";
-
-                    mlResponses.Add(new JProperty(propertyName, response.ResponseText));
+                        mlResponsesContainer.Add(new JProperty(propertyName.ToLowerCamelCase().RemoveWhiteSpace(),
+                            responses[i].ResponseText));
+                    }
                 }
             }
 
@@ -381,13 +414,63 @@ namespace IIS.Core.Materials.EntityFramework
 
         private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
         {
+            var nodeIdList = GetFeatureIdListThatRealtesToObjectId(nodeId);
+
+            nodeIdList.Add(nodeId);
+
             return _context.Materials
-                            .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                                (Material, MaterialInfo) => new { Material, MaterialInfo })
-                            .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                                (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                            .Where(m => m.MaterialFeature.NodeId == nodeId)
-                            .Select(m => m.MaterialInfoJoined.Material);
+                        .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                            (Material, MaterialInfo) => new { Material, MaterialInfo })
+                        .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                            (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                        .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
+                        .Select(m => m.MaterialInfoJoined.Material);
+        }
+        private IList<Guid> GetFeatureIdListThatRealtesToObjectId(Guid nodeId)
+        {
+            var type = _ontologySchema.GetEntityTypeByName("ObjectSign");
+
+            var typeIdList = new List<Guid>();
+
+            if (type != null)
+            {
+                typeIdList = type.IncomingRelations
+                                    .Select(p => p.SourceTypeId)
+                                    .ToList();
+            }
+
+            return _context.Nodes
+                                .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
+                                .Where(e => (!typeIdList.Any() ? true : typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
+                                .AsNoTracking()
+                                .Select(e => e.Node.Id)
+                                .ToList();
+        }
+
+        private async Task<JObject> GetObjectOfStudyListForMaterial(List<Node> nodeList)
+        {
+            var result = new JObject();
+
+            if (!nodeList.Any()) return result;
+
+            var directIdList = nodeList
+                                .Where(x => IsObjectOfStudy(x))
+                                .Select(x => x.Id)
+                                .ToList();
+
+            var featureIdList = nodeList
+                                    .Where(x => IsObjectSign(x))
+                                    .Select(x => x.Id)
+                                    .ToList();
+
+            var featureList = await _ontologyService.GetNodeIdListByFeatureIdListAsync(featureIdList);
+
+            featureList = featureList.Except(directIdList).ToList();
+
+            result.Add(featureList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Feature)));
+            result.Add(directIdList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Direct)));
+
+            return result;
         }
 
         private IQueryable<MaterialEntity> GetMaterialQuery()
@@ -401,9 +484,6 @@ namespace IIS.Core.Materials.EntityFramework
                     .Include(m => m.SourceReliability)
                     .Include(m => m.ProcessedStatus)
                     .Include(m => m.SessionPriority)
-                    .Include(m => m.Children)
-                    .Include(m => m.MaterialInfos)
-                    .ThenInclude(m => m.MaterialFeatures)
                     .Include(m => m.Assignee)
                     .AsNoTracking();
         }

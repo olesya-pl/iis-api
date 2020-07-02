@@ -20,7 +20,7 @@ namespace Iis.UnitTests.Materials
 
         public MaterialUpdateTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
         public void Dispose()
         {
