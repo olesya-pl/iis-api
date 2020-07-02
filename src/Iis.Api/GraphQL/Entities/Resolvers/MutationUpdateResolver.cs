@@ -87,7 +87,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     await _ontologyService.SaveNodeAsync(node);
                 }
             }
-            
+
             return node;
         }
 
@@ -256,10 +256,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     var oldValueObj = (oldRelation.Target as Attribute).Value;
                     var oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);
 
-                    if (oldValue != (string)value)
+                    var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
+
+                    if (oldValue != stringifiedValue)
                     {
                         await _changeHistoryService
-                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), oldValue, (string)value, requestId);
+                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), oldValue, stringifiedValue, requestId);
                     }
                 }
             }
