@@ -115,7 +115,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
                     Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
-                    RelationEntity existingRelation = existing.OutgoingRelations.SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id);
+                    RelationEntity existingRelation = existing.OutgoingRelations
+                        .SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id && !e.Node.IsArchived);
                     ApplyChanges(existing, sourceRelation, existingRelation);
                 }
                 else
@@ -296,7 +297,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             return FilterNodeAsync("ObjectOfStudy", filter, cancellationToken);
         }
-        
+
         public async Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
@@ -351,7 +352,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 _context.Semaphore.Release();
             }
         }
-        
+
         private IQueryable<NodeEntity> GetNodesInternal(IEnumerable<Guid> derived)
         {
             return _context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived);
@@ -545,7 +546,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         private IQueryable<NodeEntity> GetNodeWithUniqueValuesQuery(Guid nodeTypeId, string value, string valueTypeName)
         {
-            return 
+            return
                 from n in _context.Nodes
                 join r in _context.Relations on n.Id equals r.SourceNodeId
                 join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
@@ -626,7 +627,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                                 .Where(e => featureIdList.Contains(e.TargetNodeId))
                                 .Select(e => e.SourceNodeId)
                                 .ToListAsync();
-                
+
             }
             finally
             {
