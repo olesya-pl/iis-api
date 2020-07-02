@@ -36,7 +36,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
                 .SingleOrDefault();
 
-            if(objectOfStudyType != null)
+            if (objectOfStudyType != null)
             {
                 return objectOfStudyType.IncomingRelations
                     .Where(r => r.Kind == RelationKind.Inheritance)
@@ -94,14 +94,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var nodeEntity = await GetNodeQuery()
-                .Where(n => n.Id == id)
-                .SingleOrDefaultAsync();
-            
-            if (nodeEntity == null) return null;
+            try
+            {
+                await _context.Semaphore.WaitAsync(cancellationToken);
+                var nodeEntity = await GetNodeQuery()
+                    .Where(n => n.Id == id)
+                    .SingleOrDefaultAsync();
+                if (nodeEntity == null) return null;
 
-            var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
-            return extNode;
+                var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
+                return extNode;
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
         private async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
@@ -112,7 +119,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
                 if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
                 {
-                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, relation.Node.NodeType.Title ,cancellationToken);
+                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, relation.Node.NodeType.Title, cancellationToken);
                     result.Add(extNode);
                 }
             }
