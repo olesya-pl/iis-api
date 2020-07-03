@@ -489,7 +489,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var value = AttributeType.ParseValue(attribute.Value, attrType.ScalarTypeEnum);
                 node = new Attribute(ctxNode.Id, attrType, value, ctxNode.CreatedAt, ctxNode.UpdatedAt);
             }
-            else if (type is EntityType entityType)
+            else if (type is IEntityTypeModel entityType)
             {
                 node = new Entity(ctxNode.Id, entityType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
                 mappedNodes.Add(node);

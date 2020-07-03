@@ -61,7 +61,7 @@ namespace IIS.Core.Ontology {
 
         private void _tryToAddNode(Ast ast, string value)
         {
-            var (name, types, conditions) = _parseChunk<EntityType>(value);
+            var (name, types, conditions) = _parseChunk<IEntityTypeModel>(value);
             var type = types == null ? null : types.FirstOrDefault();
 
             if (conditions != null)

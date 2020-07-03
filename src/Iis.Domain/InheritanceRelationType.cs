@@ -7,7 +7,7 @@ namespace Iis.Domain
     {
         public static readonly string RelationName = "Is";
 
-        public EntityType ParentType => RelatedTypes.OfType<EntityType>().Single(); // Inheritance relation should always have single EntityType node (parent)
+        public IEntityTypeModel ParentType => RelatedTypes.OfType<IEntityTypeModel>().Single(); // Inheritance relation should always have single IEntityTypeModel node (parent)
 
         public override Type ClrType =>
             throw new NotSupportedException("Inheritance type does not have Clr type");

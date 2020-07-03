@@ -5,10 +5,10 @@ namespace Iis.Domain
 {
     public interface IOntologyModel
     {
-        IEnumerable<EntityType> EntityTypes { get; }
+        IEnumerable<IEntityTypeModel> EntityTypes { get; }
         IEnumerable<INodeTypeModel> Types { get; }
         IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type);
-        EntityType GetEntityType(string name);
+        IEntityTypeModel GetEntityType(string name);
         INodeTypeModel GetType(Guid id);
         T GetType<T>(string name) where T : INodeTypeModel;
         T GetTypeOrNull<T>(string name) where T : INodeTypeModel;

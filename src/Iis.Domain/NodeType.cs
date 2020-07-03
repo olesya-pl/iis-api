@@ -29,10 +29,10 @@ namespace Iis.Domain
         // todo: move to extensions?
 
         // tood: change to Type
-        public IEnumerable<EntityType> DirectParents =>
+        public IEnumerable<IEntityTypeModel> DirectParents =>
             RelatedTypes.OfType<IInheritanceRelationTypeModel>().Select(r => r.ParentType);
 
-        public IEnumerable<EntityType> AllParents =>
+        public IEnumerable<IEntityTypeModel> AllParents =>
             DirectParents.SelectMany(e => e.AllParents).Union(DirectParents);
 
         public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties =>

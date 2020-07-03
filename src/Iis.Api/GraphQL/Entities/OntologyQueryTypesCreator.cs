@@ -22,7 +22,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Object creation ----- //
 
-        protected void OnObject(EntityType type, IObjectTypeDescriptor d = null)
+        protected void OnObject(IEntityTypeModel type, IObjectTypeDescriptor d = null)
         {
             foreach (var parentInterface in type.AllParents.Select(_repository.GetOntologyType).OfType<InterfaceType>())
                 d?.Interface(parentInterface);
@@ -53,7 +53,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private void OnRelation(EntityType entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
+        private void OnRelation(IEntityTypeModel entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
             IObjectTypeDescriptor objectTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -71,7 +71,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Interfaces creation ----- //
 
-        protected void OnInterface(EntityType type, IInterfaceTypeDescriptor d = null)
+        protected void OnInterface(IEntityTypeModel type, IInterfaceTypeDescriptor d = null)
         {
             if (d == null) return;
             d.Name(OntologyInterfaceType.GetName(type));
@@ -89,7 +89,7 @@ namespace IIS.Core.GraphQL.Entities
             interfaceTypeDescriptor?.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
         }
 
-        private void OnRelation(EntityType entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
+        private void OnRelation(IEntityTypeModel entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -104,7 +104,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private OutputUnionType GetOutputUnionType(EntityType entityType,
+        private OutputUnionType GetOutputUnionType(IEntityTypeModel entityType,
             IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup)
         {
             if (relationTypeGroup.Any(r => !r.IsEntityType))
@@ -138,7 +138,7 @@ namespace IIS.Core.GraphQL.Entities
             return _repository.GetScalarOutputType(type.ScalarTypeEnum);
         }
 
-        public IOntologyType NewOntologyType(EntityType type)
+        public IOntologyType NewOntologyType(IEntityTypeModel type)
         {
             if (type.IsAbstract)
             {

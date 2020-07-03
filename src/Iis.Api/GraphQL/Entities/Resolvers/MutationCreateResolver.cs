@@ -44,7 +44,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return entity;
         }
 
-        public async Task<Entity> CreateEntity(EntityType type, Dictionary<string, object> properties)
+        public async Task<Entity> CreateEntity(IEntityTypeModel type, Dictionary<string, object> properties)
         {
             if (properties == null)
                 throw new ArgumentException($"{type.Name} creation ex nihilo is allowed only to God.");
@@ -75,7 +75,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
             return node;
         }
-        private async Task<Entity> GetUniqueValueEntity(EntityType type, Dictionary<string, object> properties)
+        private async Task<Entity> GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
         {
             if (!properties.ContainsKey(type.UniqueValueFieldName))
             {

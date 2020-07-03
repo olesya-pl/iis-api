@@ -7,11 +7,11 @@ namespace Iis.Domain
 {
     public interface INodeTypeModel
     {
-        IEnumerable<EntityType> AllParents { get; }
+        IEnumerable<IEntityTypeModel> AllParents { get; }
         IEnumerable<IEmbeddingRelationTypeModel> AllProperties { get; }
         Type ClrType { get; }
         DateTime CreatedAt { get; set; }
-        IEnumerable<EntityType> DirectParents { get; }
+        IEnumerable<IEntityTypeModel> DirectParents { get; }
         IEnumerable<IEmbeddingRelationTypeModel> DirectProperties { get; }
         bool HasUniqueValues { get; }
         Guid Id { get; }

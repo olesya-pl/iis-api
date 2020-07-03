@@ -154,11 +154,11 @@ namespace IIS.Core.GraphQL.EntityTypes
         public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology,
             bool? concreteTypes = false)
         {
-            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<Iis.Domain.EntityType>();
+            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<IEntityTypeModel>();
             if (types == null)
-                types = new[] {Source.EntityType};
+                types = new[] {Source.EntityType };
             else
-                types = types.Union(new[] {Source.EntityType});
+                types = types.Union(new[] {Source.EntityType });
 
             var metaTargetTypes = (Source.Meta as EntityRelationMeta)?.TargetTypes;
             if (metaTargetTypes != null && metaTargetTypes.Length > 0)

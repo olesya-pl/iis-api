@@ -70,7 +70,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
                 foreach (var node in view.Features.Nodes)
                 {
                     var type = _ontology.GetEntityType(node.Type)
-                               ?? throw new ArgumentException($"EntityType {node.Type} does not exist");
+                               ?? throw new ArgumentException($"IEntityTypeModel {node.Type} does not exist");
                     // TODO: should work with any entity type. Currently works only with entities which has value
                     var relationType = type.GetProperty("value");
                     MaterialFeature feat = ToDomain(node);
@@ -88,8 +88,8 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             }
         }
 
-        // uses hardcoded EntityType and RelationType
-        private async Task<MaterialFeature> MapToNodeDirect(MaterialFeature feature, EntityType type, IEmbeddingRelationTypeModel relationType)
+        // uses hardcoded IEntityTypeModel and RelationType
+        private async Task<MaterialFeature> MapToNodeDirect(MaterialFeature feature, IEntityTypeModel type, IEmbeddingRelationTypeModel relationType)
         {
             var relationTypeId = relationType.Id;
             var existingRelation = await _context.Relations
@@ -104,7 +104,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             return feature;
         }
 
-        private async Task<Node> CreateEntity(string value, EntityType type, IEmbeddingRelationTypeModel relationType)
+        private async Task<Node> CreateEntity(string value, IEntityTypeModel type, IEmbeddingRelationTypeModel relationType)
         {
             var entity = new Entity(Guid.NewGuid(), type);
             var relation = new Relation(Guid.NewGuid(), relationType);

@@ -34,12 +34,12 @@ namespace Iis.Domain.Meta
                 return attributeType.CreateMeta();
             if (type is IEmbeddingRelationTypeModel relationType)
                 return relationType.CreateMeta();
-            if (type is EntityType entityType)
+            if (type is IEntityTypeModel entityType)
                 return entityType.CreateMeta();
             throw new ArgumentException(nameof(type));
         }
 
-        public static EntityMeta CreateMeta(this EntityType type) =>
+        public static EntityMeta CreateMeta(this IEntityTypeModel type) =>
             CreateMeta<EntityMeta>(type, new MetaConverter<EntityMeta>(null));
 
         public static AttributeMeta CreateMeta(this IAttributeTypeModel type) =>

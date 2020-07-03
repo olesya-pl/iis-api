@@ -68,7 +68,7 @@ namespace IIS.Core.Ontology.Seeding
 
         private Entity Map(JObject jObject, IOntologyModel ontology, string typeName, List<Node> first)
         {
-            EntityType type = ontology.GetEntityType(typeName);
+            IEntityTypeModel type = ontology.GetEntityType(typeName);
             Entity entity = new Entity(Guid.NewGuid(), type);
             foreach (IEmbeddingRelationTypeModel relationType in type.AllProperties)
             {

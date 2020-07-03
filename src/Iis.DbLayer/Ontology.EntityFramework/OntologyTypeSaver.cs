@@ -75,7 +75,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _types.Add(type.Id, result); // Add to created types cache
 
             // Filling specific properties for different types
-            if (type is EntityType et)
+            if (type is IEntityTypeModel et)
             {
                 result.IsAbstract = et.IsAbstract;
                 result.Kind = Kind.Entity;

@@ -12,10 +12,10 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
     {
         private readonly IEnumerable<ObjectType> _objectTypes;
 
-        private readonly EntityType _source;
+        private readonly IEntityTypeModel _source;
         private readonly string _relationName;
 
-        public OutputUnionType(EntityType source, string relationName, IEnumerable<ObjectType> objectTypes)
+        public OutputUnionType(IEntityTypeModel source, string relationName, IEnumerable<ObjectType> objectTypes)
         {
             _source = source;
             _relationName = relationName;
@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 throw new ArgumentException("Two or more types are required to create a union.");
         }
 
-        public static string GetName(EntityType source, string relationName)
+        public static string GetName(IEntityTypeModel source, string relationName)
         {
             return $"{OntologyObjectType.GetName(source)}_{relationName}_Union";
         }

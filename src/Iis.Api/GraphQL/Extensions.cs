@@ -16,7 +16,7 @@ namespace IIS.Core.GraphQL
     {
         public static IObjectTypeDescriptor PopulateFields(this IOntologyFieldPopulator populator,
             IObjectTypeDescriptor descriptor,
-            IEnumerable<EntityType> entityTypes, params Operation[] operations)
+            IEnumerable<IEntityTypeModel> entityTypes, params Operation[] operations)
         {
             foreach (var type in entityTypes)
             foreach (var operation in operations)

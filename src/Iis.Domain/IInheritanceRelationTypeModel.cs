@@ -2,6 +2,6 @@
 {
     public interface IInheritanceRelationTypeModel: IRelationTypeModel
     {
-        EntityType ParentType { get; }
+        IEntityTypeModel ParentType { get; }
     }
 }

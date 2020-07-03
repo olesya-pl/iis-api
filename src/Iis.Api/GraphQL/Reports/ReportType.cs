@@ -15,7 +15,7 @@ namespace IIS.Core.GraphQL.Reports
         private readonly TypeRepository _typeRepository;
         private readonly IOntologyModel _ontology;
         IOntologyType objectType;
-        EntityType type;
+        IEntityTypeModel type;
 
         public ReportType(TypeRepository typeRepository, IOntologyModel ontology)
         {
@@ -23,7 +23,7 @@ namespace IIS.Core.GraphQL.Reports
             
             _ontology = ontology;
 
-            type = _ontology.GetTypeOrNull<EntityType>("Event");
+            type = _ontology.GetTypeOrNull<IEntityTypeModel>("Event");
 
             if (type == null)
                 throw new InvalidOperationException("Cannot find required type 'Event' in database. Add type to database or disable reports in configuration file using reportsAvailable : false");

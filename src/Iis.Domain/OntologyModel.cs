@@ -8,17 +8,17 @@ namespace Iis.Domain
     {
         public IEnumerable<INodeTypeModel> Types { get; }
 
-        public IEnumerable<EntityType> EntityTypes => Types.OfType<EntityType>();
+        public IEnumerable<IEntityTypeModel> EntityTypes => Types.OfType<IEntityTypeModel>();
 
         public OntologyModel(IEnumerable<INodeTypeModel> types)
         {
             Types = types;
         }
 
-        public EntityType GetEntityType(string name)
+        public IEntityTypeModel GetEntityType(string name)
         {
             // TODO: this method is redundant and can be removed
-            return GetType<EntityType>(name);
+            return GetType<IEntityTypeModel>(name);
         }
 
         public T GetType<T>(string name) where T : INodeTypeModel
