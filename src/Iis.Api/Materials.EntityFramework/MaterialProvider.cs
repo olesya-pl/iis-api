@@ -339,8 +339,14 @@ namespace IIS.Core.Materials.EntityFramework
                     .Select(token => new JProperty(token.Value<string>("Type"), token.Value<string>("Text")))
                     .Select(property =>
                     {
-                        materialData.Add(property);
-                        return property;
+                        if(materialData.ContainsKey(property.Name))
+                        {
+                            materialData[property.Name] = property.Value;
+                        } else
+                        {
+                            materialData.Add(property);
+                        }
+                        return true;
                     })
                     .ToList();
                 jDocument.Add(new JProperty(nameof(Material.Data), materialData));
