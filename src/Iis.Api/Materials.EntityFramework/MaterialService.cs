@@ -143,7 +143,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.ProcessedStatusId.HasValue) material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
             if (input.SessionPriorityId.HasValue) material.SessionPriorityId = input.SessionPriorityId.Value;
             if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
-            if (!string.IsNullOrWhiteSpace(input.Content)) material.Content = input.Content;
+            if (input.Content != null) material.Content = input.Content;
 
             var loadData = MaterialLoadData.MapLoadData(material.LoadData);
 
