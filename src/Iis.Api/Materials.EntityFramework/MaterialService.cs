@@ -212,6 +212,8 @@ namespace IIS.Core.Materials.EntityFramework
 
                 if (!Guid.TryParse(featureId, out Guid featureGuid)) continue;
 
+                if(featureGuid.Equals(Guid.Empty)) continue;
+                
                 result.Add(featureGuid);
             }
 
