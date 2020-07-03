@@ -35,12 +35,12 @@ namespace IIS.Core.GraphQL.Entities
             return Guid.Parse((string) obj);
         }
 
-        public static bool IsAssignableFrom(this NodeType target, NodeType source)
+        public static bool IsAssignableFrom(this INodeTypeModel target, INodeTypeModel source)
         {
             return source.Name == target.Name || source.AllParents.Any(t => t.Name == target.Name);
         }
 
-        public static async Task<Node> LoadNodeOfType(this IOntologyService service, Guid targetId, NodeType targetType)
+        public static async Task<Node> LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeModel targetType)
         {
             var existingNode = await service.LoadNodesAsync(targetId, null); // no fields needed, only type
             if (existingNode == null)

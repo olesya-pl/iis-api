@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL
             return d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
         }
 
-        public static IEnumerable<NodeType> GetInheritors(this NodeType type, IEnumerable<NodeType> ontology)
+        public static IEnumerable<INodeTypeModel> GetInheritors(this INodeTypeModel type, IEnumerable<INodeTypeModel> ontology)
         {
             return ontology.Where(t =>
                 t.RelatedTypes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));

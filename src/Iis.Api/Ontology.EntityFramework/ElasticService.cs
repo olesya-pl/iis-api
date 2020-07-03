@@ -213,7 +213,7 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
-        private Task<string> GetNodeByIdAsync(string indexName, string id, IEnumerable<NodeType> nodeTypes)
+        private Task<string> GetNodeByIdAsync(string indexName, string id, IEnumerable<INodeTypeModel> nodeTypes)
         {
             return _elasticManager.GetDocumentByIdAsync(indexName, id, nodeTypes.Select(nt => nt.Name).ToArray());
         }

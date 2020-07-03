@@ -12,7 +12,7 @@ namespace Iis.DataModel
         public bool IsArchived { get; set; }
 
         public Guid NodeTypeId { get; set; }
-        public virtual NodeTypeEntity NodeType { get; set; }
+        public virtual NodeTypeEntity INodeTypeModel { get; set; }
 
         public virtual ICollection<RelationEntity> IncomingRelations { get; set; } = new List<RelationEntity>();
         public virtual ICollection<RelationEntity> OutgoingRelations { get; set; } = new List<RelationEntity>();

@@ -24,7 +24,7 @@ namespace IIS.Core.Ontology
             public IMeta Meta;
             public string Title;
         }
-        private NodeType _builtType;
+        private INodeTypeModel _builtType;
         private event EventHandler<EventArgs> TypeBuilt;
         private bool _isBuilding;
 
@@ -146,7 +146,7 @@ namespace IIS.Core.Ontology
             return this;
         }
 
-        public NodeType Build()
+        public INodeTypeModel Build()
         {
             if (_builtType != null) return _builtType;
 
@@ -156,7 +156,7 @@ namespace IIS.Core.Ontology
             if (!NameRegex.IsMatch(_name))
                 throw new BuildException($"Type name '{_name}' is not valid");
 
-            var type = default(NodeType);
+            var type = default(INodeTypeModel);
             if (_kind == Kind.Attribute)
             {
                 type = new AttributeType(Guid.NewGuid(), _name, _scalarType);

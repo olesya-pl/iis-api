@@ -57,7 +57,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        public IEnumerable<NodeType> GetChildTypes(NodeType parent)
+        public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel parent)
         {
             return _ontology.GetChildTypes(parent);
         }
@@ -114,7 +114,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC MUTATOR TYPES ----- //
 
-        public MutatorInputType GetMutatorInputType(Operation operation, NodeType type)
+        public MutatorInputType GetMutatorInputType(Operation operation, INodeTypeModel type)
         {
             var name = MutatorInputType.GetName(operation, type.Name);
             return GetOrCreate(name, () => GetMutator(operation).NewMutatorInputType(type));

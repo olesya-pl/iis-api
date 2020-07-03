@@ -6,7 +6,7 @@ namespace Iis.Interfaces.Ontology.Schema
 {
     public interface IRelationTypeLinked: IRelationType
     {
-        INodeTypeLinked NodeType { get; }
+        INodeTypeLinked INodeTypeModel { get; }
         INodeTypeLinked SourceType { get; }
         INodeTypeLinked TargetType { get; }
         bool IsIdentical(IRelationTypeLinked relationType, bool includeTargetType);

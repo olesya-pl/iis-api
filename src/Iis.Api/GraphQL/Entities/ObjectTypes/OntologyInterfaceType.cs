@@ -11,7 +11,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         {
         }
 
-        public static string GetName(NodeType type)
+        public static string GetName(INodeTypeModel type)
         {
             return OntologyObjectType.GetName(type);
         }

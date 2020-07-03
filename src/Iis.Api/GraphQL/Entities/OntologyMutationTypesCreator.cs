@@ -22,7 +22,7 @@ namespace IIS.Core.GraphQL.Entities
         public Operation Operation { get; }
 
         // this return value should not be wrapped in NonNullType()
-        public MutatorInputType NewMutatorInputType(NodeType type)
+        public MutatorInputType NewMutatorInputType(INodeTypeModel type)
         {
             var configure = new Action<IInputObjectTypeDescriptor>(d =>
             {

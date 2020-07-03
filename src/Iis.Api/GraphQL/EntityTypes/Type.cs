@@ -9,16 +9,16 @@ using Iis.Domain;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
-    public class EntityTypeCollection : Collection<NodeType, EntityType>
+    public class EntityTypeCollection : Collection<INodeTypeModel, EntityType>
     {
         private IOntologyModel _ontology { get; }
 
-        public EntityTypeCollection(IEnumerable<NodeType> source, IOntologyModel ontology) : base(source)
+        public EntityTypeCollection(IEnumerable<INodeTypeModel> source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
 
-        protected override EntityType Select(NodeType arg)
+        protected override EntityType Select(INodeTypeModel arg)
         {
             return new EntityType(arg, _ontology);
         }
@@ -26,13 +26,13 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityType
     {
-        public EntityType(NodeType source, IOntologyModel ontology)
+        public EntityType(INodeTypeModel source, IOntologyModel ontology)
         {
             Source = source;
             _ontology = ontology;
         }
 
-        protected NodeType Source { get; }
+        protected INodeTypeModel Source { get; }
 
         private IOntologyModel _ontology { get; }
 

@@ -128,7 +128,7 @@ namespace IIS.Core
                     ontologyCache = new OntologyCache(null);
                     ontologySchema = (new OntologySchemaService()).GetOntologySchema(null);
                     iisElasticConfiguration = new IisElasticConfiguration(null, null);
-                    ontology = new OntologyModel(new List<Iis.Domain.NodeType>());
+                    ontology = new OntologyModel(new List<Iis.Domain.INodeTypeModel>());
                 }
 
                 services.AddSingleton<IOntologyCache>(ontologyCache);

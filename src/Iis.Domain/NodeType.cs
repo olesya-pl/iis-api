@@ -8,11 +8,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain
 {
-    public abstract class NodeType
+    public abstract class NodeType : INodeTypeModel
     {
-        private readonly List<NodeType> _relatedTypes;
+        private readonly List<INodeTypeModel> _relatedTypes;
 
-        public IEnumerable<NodeType> RelatedTypes => _relatedTypes;
+        public IEnumerable<INodeTypeModel> RelatedTypes => _relatedTypes;
 
         public abstract Type ClrType { get; }
 
@@ -43,7 +43,7 @@ namespace Iis.Domain
                 .Where(pp => DirectProperties.All(dp => dp.Name != pp.Name)) // Ignore parent properties with same name (overriden)
                 .Union(DirectProperties);
 
-        public bool IsObjectOfStudy => 
+        public bool IsObjectOfStudy =>
             AllParents.Any(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
         protected NodeType(Guid id, string name)
@@ -51,13 +51,13 @@ namespace Iis.Domain
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("The given string should not be empty or null", nameof(name));
 
-            _relatedTypes = new List<NodeType>();
+            _relatedTypes = new List<INodeTypeModel>();
 
             Id = id;
             Name = name;
         }
 
-        public bool IsSubtypeOf(NodeType type)
+        public bool IsSubtypeOf(INodeTypeModel type)
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
             if (Id == type.Id) return true;
@@ -69,7 +69,7 @@ namespace Iis.Domain
             return false;
         }
 
-        public void AddType(NodeType type)
+        public void AddType(INodeTypeModel type)
         {
             _relatedTypes.Add(type);
         }

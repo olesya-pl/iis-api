@@ -360,7 +360,7 @@ namespace IIS.Core.Ontology {
 
             private (string, string) _tableAndAliasFor(AnalyticsQueryParser.AstNode node, int index)
             {
-                var table = _tables[node.NodeType];
+                var table = _tables[node.INodeTypeModel];
                 var alias = node.Name ?? $"{table[0].ToString().ToLower()}_{index}";
                 return (table, alias);
             }

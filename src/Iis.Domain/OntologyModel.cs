@@ -6,11 +6,11 @@ namespace Iis.Domain
 {
     public class OntologyModel: IOntologyModel
     {
-        public IEnumerable<NodeType> Types { get; }
+        public IEnumerable<INodeTypeModel> Types { get; }
 
         public IEnumerable<EntityType> EntityTypes => Types.OfType<EntityType>();
 
-        public OntologyModel(IEnumerable<NodeType> types)
+        public OntologyModel(IEnumerable<INodeTypeModel> types)
         {
             Types = types;
         }
@@ -21,7 +21,7 @@ namespace Iis.Domain
             return GetType<EntityType>(name);
         }
 
-        public T GetType<T>(string name) where T : NodeType
+        public T GetType<T>(string name) where T : INodeTypeModel
         {
             var type = GetTypeOrNull<T>(name);
 
@@ -33,20 +33,20 @@ namespace Iis.Domain
             return type;
         }
 
-        public T GetTypeOrNull<T>(string name) where T : NodeType
+        public T GetTypeOrNull<T>(string name) where T : INodeTypeModel
         {
             return Types.OfType<T>().SingleOrDefault(type => type.Name == name);
         }
 
-        public IEnumerable<T> GetTypes<T>(string name) where T : NodeType
+        public IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeModel
         {
             // TODO: remove this method. There should not be types with the same name
             //       this is a temporary hack while we have relations with the same name but different Source/Target
             return Types.OfType<T>().Where(type => type.Name == name);
         }
 
-        public NodeType GetType(Guid id) => Types.SingleOrDefault(e => e.Id == id);
+        public INodeTypeModel GetType(Guid id) => Types.SingleOrDefault(e => e.Id == id);
 
-        public IEnumerable<NodeType> GetChildTypes(NodeType type) => EntityTypes.Where(etype => etype.IsSubtypeOf(type));
+        public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type) => EntityTypes.Where(etype => etype.IsSubtypeOf(type));
     }
 }

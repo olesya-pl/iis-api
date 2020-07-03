@@ -6,12 +6,12 @@ namespace Iis.Domain
     public interface IOntologyModel
     {
         IEnumerable<EntityType> EntityTypes { get; }
-        IEnumerable<NodeType> Types { get; }
-        IEnumerable<NodeType> GetChildTypes(NodeType type);
+        IEnumerable<INodeTypeModel> Types { get; }
+        IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type);
         EntityType GetEntityType(string name);
-        NodeType GetType(Guid id);
-        T GetType<T>(string name) where T : NodeType;
-        T GetTypeOrNull<T>(string name) where T : NodeType;
-        IEnumerable<T> GetTypes<T>(string name) where T : NodeType;
+        INodeTypeModel GetType(Guid id);
+        T GetType<T>(string name) where T : INodeTypeModel;
+        T GetTypeOrNull<T>(string name) where T : INodeTypeModel;
+        IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeModel;
     }
 }

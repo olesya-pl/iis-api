@@ -16,12 +16,12 @@ namespace IIS.Core.GraphQL.EntityTypes
         public async Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
             EntityTypesFilter filter = null)
         {
-            IEnumerable<NodeType> types;
+            IEnumerable<INodeTypeModel> types;
             if (filter != null)
             {
                 var et = ontology.GetEntityType(filter.Parent);
                 if (et == null)
-                    types = new List<NodeType>();
+                    types = new List<INodeTypeModel>();
                 else
                     types = ontology.GetChildTypes(et);
                 if (filter.ConcreteTypes)

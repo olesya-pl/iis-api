@@ -5,7 +5,7 @@ namespace Iis.DataModel
 {
     public class RelationTypeEntity : BaseEntity, IRelationType
     {
-        public virtual NodeTypeEntity NodeType { get; set; }
+        public virtual NodeTypeEntity INodeTypeModel { get; set; }
 
         public RelationKind Kind { get; set; }
         public EmbeddingOptions EmbeddingOptions { get; set; }

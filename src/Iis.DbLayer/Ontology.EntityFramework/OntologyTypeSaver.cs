@@ -40,19 +40,19 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await _ontologyContext.SaveChangesAsync();
         }
 
-        public void SaveTypes(IEnumerable<NodeType> types)
+        public void SaveTypes(IEnumerable<INodeTypeModel> types)
         {
             // for `types` you need to pass only EntityTypes and/or AttributeTypes
             // RelationTypes are walked recursively based on that 2 types
             ClearTypes();
-            foreach (NodeType type in types)
+            foreach (INodeTypeModel type in types)
                 SaveType(type);
 
             _ontologyContext.NodeTypes.AddRange(_types.Values);
             _ontologyContext.SaveChanges();
         }
 
-        private NodeTypeEntity SaveType(NodeType type, NodeType relationSourceType = null)
+        private NodeTypeEntity SaveType(INodeTypeModel type, INodeTypeModel relationSourceType = null)
         {
             if (type.Id == Guid.Empty)
                 throw new ArgumentException(nameof(type));

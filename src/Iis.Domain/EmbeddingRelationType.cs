@@ -19,7 +19,7 @@ namespace Iis.Domain
         // Embedding relation can have single attribute or single entity as a node
         public AttributeType AttributeType => RelatedTypes.OfType<AttributeType>().SingleOrDefault();
         public EntityType EntityType => RelatedTypes.OfType<EntityType>().SingleOrDefault();
-        public NodeType TargetType => (NodeType)AttributeType ?? EntityType;
+        public INodeTypeModel TargetType => (INodeTypeModel)AttributeType ?? EntityType;
         public IEnumerable<RelationType> RelationTypes => RelatedTypes.OfType<RelationType>();
         public bool IsAttributeType => RelatedTypes.OfType<AttributeType>().Any();
         public bool IsEntityType => RelatedTypes.OfType<EntityType>().Any();

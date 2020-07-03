@@ -19,14 +19,14 @@ namespace Iis.Domain.Meta
             return jo.ToObject<TMeta>(js);
         }
 
-        public static TMeta CreateMeta<TMeta>(NodeType type, JsonConverter typeConverter) where TMeta : IMeta
+        public static TMeta CreateMeta<TMeta>(INodeTypeModel type, JsonConverter typeConverter) where TMeta : IMeta
         {
             var js = CreateSerializer();
             js.Converters.Add(typeConverter);
             return type.GetFullMeta().ToObject<TMeta>(js);
         }
 
-        public static IMeta CreateMeta(this NodeType type)
+        public static IMeta CreateMeta(this INodeTypeModel type)
         {
             if (type?.MetaSource == null)
                 return null;
@@ -74,7 +74,7 @@ namespace Iis.Domain.Meta
 
         public static JObject Serialize(this IMeta meta) => JObject.FromObject(meta, CreateSerializer());
 
-        public static JObject GetFullMeta(this NodeType type)
+        public static JObject GetFullMeta(this INodeTypeModel type)
         {
             var settings = new JsonMergeSettings
             {

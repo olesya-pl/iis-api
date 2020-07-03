@@ -10,12 +10,12 @@ namespace Iis.Domain
         private readonly List<Node> _nodes;
 
         public Guid Id { get; set; }
-        public NodeType Type { get; }
+        public INodeTypeModel Type { get; }
         public IEnumerable<Node> Nodes => _nodes;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        protected Node(Guid id, NodeType type, DateTime createdAt = default, DateTime updatedAt = default)
+        protected Node(Guid id, INodeTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
         {
             _nodes = new List<Node>();
 

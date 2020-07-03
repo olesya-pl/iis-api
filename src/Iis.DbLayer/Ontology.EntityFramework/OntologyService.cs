@@ -240,7 +240,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 _context.Semaphore.Release();
             }
         }
-        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
@@ -279,7 +279,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return FilterNodeAsync("ObjectOfStudy", filter, cancellationToken);
         }
 
-        public async Task<int> GetNodesCountAsync(IEnumerable<NodeType> types, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try

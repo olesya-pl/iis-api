@@ -88,7 +88,7 @@ namespace IIS.Core.Ontology {
             });
         }
 
-        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: NodeType
+        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: INodeTypeModel
         {
             var value = rawValue;
             var conditionsIndex = value.IndexOf('{');
@@ -159,7 +159,7 @@ namespace IIS.Core.Ontology {
 
         public class AstNode {
             public string Name;
-            public virtual NodeType Type { get; private set; }
+            public virtual INodeTypeModel Type { get; private set; }
             public AstNode Next;
             public AstNode Prev;
             public virtual bool IsVirtual
@@ -167,12 +167,12 @@ namespace IIS.Core.Ontology {
                 get { return false; }
             }
 
-            public virtual string NodeType
+            public virtual string INodeTypeModel
             {
                 get { return GetType().Name; }
             }
 
-            public AstNode(NodeType type)
+            public AstNode(INodeTypeModel type)
             {
                 Type = type;
             }
@@ -201,12 +201,12 @@ namespace IIS.Core.Ontology {
 
         public class AstRef: AstNode
         {
-            public override string NodeType
+            public override string INodeTypeModel
             {
-                get { return this._ast.nodeByRef(Name).NodeType; }
+                get { return this._ast.nodeByRef(Name).INodeTypeModel; }
             }
 
-            public override NodeType Type
+            public override INodeTypeModel Type
             {
                 get { return this._ast.nodeByRef(Name).Type; }
             }
