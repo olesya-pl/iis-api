@@ -30,7 +30,7 @@ namespace Iis.Domain
 
         // tood: change to Type
         public IEnumerable<EntityType> DirectParents =>
-            RelatedTypes.OfType<InheritanceRelationType>().Select(r => r.ParentType);
+            RelatedTypes.OfType<IInheritanceRelationTypeModel>().Select(r => r.ParentType);
 
         public IEnumerable<EntityType> AllParents =>
             DirectParents.SelectMany(e => e.AllParents).Union(DirectParents);
@@ -61,7 +61,7 @@ namespace Iis.Domain
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
             if (Id == type.Id) return true;
-            foreach (var inheritance in RelatedTypes.OfType<InheritanceRelationType>())
+            foreach (var inheritance in RelatedTypes.OfType<IInheritanceRelationTypeModel>())
             {
                 var parent = inheritance.ParentType;
                 if (parent.IsSubtypeOf(type)) return true;

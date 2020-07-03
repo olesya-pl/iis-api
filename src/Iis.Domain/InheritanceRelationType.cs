@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace Iis.Domain
 {
-    public sealed class InheritanceRelationType : RelationType
+    public sealed class InheritanceRelationType : RelationType, IInheritanceRelationTypeModel
     {
         public static readonly string RelationName = "Is";
-        
+
         public EntityType ParentType => RelatedTypes.OfType<EntityType>().Single(); // Inheritance relation should always have single EntityType node (parent)
 
         public override Type ClrType =>

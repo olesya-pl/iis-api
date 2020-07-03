@@ -89,7 +89,7 @@ namespace IIS.Core.GraphQL
         public static IEnumerable<INodeTypeModel> GetInheritors(this INodeTypeModel type, IEnumerable<INodeTypeModel> ontology)
         {
             return ontology.Where(t =>
-                t.RelatedTypes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));
+                t.RelatedTypes.OfType<IInheritanceRelationTypeModel>().Any(r => r.ParentType.Name == type.Name));
         }
 
         public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
