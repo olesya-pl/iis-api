@@ -15,10 +15,10 @@ namespace Iis.Domain
 
         public override void AddNode(Node node)
         {
-            var relationType = (RelationType)node.Type;
-            if (relationType is EmbeddingRelationType)
+            var relationType = (IRelationTypeModel)node.Type;
+            if (relationType is IEmbeddingRelationTypeModel)
             {
-                var embeddingRelationType = (EmbeddingRelationType)relationType;
+                var embeddingRelationType = (IEmbeddingRelationTypeModel)relationType;
                 if (embeddingRelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
                     var existingNode = Nodes.SingleOrDefault(e => e.Type == relationType);

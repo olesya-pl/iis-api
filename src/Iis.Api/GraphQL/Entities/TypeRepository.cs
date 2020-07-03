@@ -151,14 +151,14 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- UPDATE TYPES ----- //
 
-        public RelationPatchType GetRelationPatchType(EmbeddingRelationType relationType)
+        public RelationPatchType GetRelationPatchType(IEmbeddingRelationTypeModel relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>
                 new RelationPatchType(relationType, this));
         }
 
-        public SingularRelationPatchType GetSingularRelationPatchType(EmbeddingRelationType relationType)
+        public SingularRelationPatchType GetSingularRelationPatchType(IEmbeddingRelationTypeModel relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>

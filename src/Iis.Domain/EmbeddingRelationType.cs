@@ -6,13 +6,13 @@ using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Domain
 {
-    public sealed class EmbeddingRelationType : RelationType
+    public sealed class EmbeddingRelationType : RelationType, IEmbeddingRelationTypeModel
     {
         public bool IsInversed { get; }
 
         public override Type ClrType => typeof(Relation);
 
-        public RelationMetaBase EmbeddingMeta => (RelationMetaBase) base.Meta;
+        public RelationMetaBase EmbeddingMeta => (RelationMetaBase)base.Meta;
 
         public EmbeddingOptions EmbeddingOptions { get; }
 
@@ -20,10 +20,10 @@ namespace Iis.Domain
         public IAttributeTypeModel IAttributeTypeModel => RelatedTypes.OfType<IAttributeTypeModel>().SingleOrDefault();
         public EntityType EntityType => RelatedTypes.OfType<EntityType>().SingleOrDefault();
         public INodeTypeModel TargetType => (INodeTypeModel)IAttributeTypeModel ?? EntityType;
-        public IEnumerable<RelationType> RelationTypes => RelatedTypes.OfType<RelationType>();
+        public IEnumerable<IRelationTypeModel> RelationTypes => RelatedTypes.OfType<IRelationTypeModel>();
         public bool IsAttributeType => RelatedTypes.OfType<IAttributeTypeModel>().Any();
         public bool IsEntityType => RelatedTypes.OfType<EntityType>().Any();
-        public EmbeddingRelationType DirectRelationType => RelatedTypes.OfType<EmbeddingRelationType>().Single();
+        public IEmbeddingRelationTypeModel DirectRelationType => RelatedTypes.OfType<IEmbeddingRelationTypeModel>().Single();
 
         public EmbeddingRelationType(Guid id, string name, EmbeddingOptions embeddingOptions, bool isInversed = false)
             : base(id, name)

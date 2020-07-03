@@ -8,11 +8,11 @@ namespace Iis.Domain
     public interface INodeTypeModel
     {
         IEnumerable<EntityType> AllParents { get; }
-        IEnumerable<EmbeddingRelationType> AllProperties { get; }
+        IEnumerable<IEmbeddingRelationTypeModel> AllProperties { get; }
         Type ClrType { get; }
         DateTime CreatedAt { get; set; }
         IEnumerable<EntityType> DirectParents { get; }
-        IEnumerable<EmbeddingRelationType> DirectProperties { get; }
+        IEnumerable<IEmbeddingRelationTypeModel> DirectProperties { get; }
         bool HasUniqueValues { get; }
         Guid Id { get; }
         bool IsObjectOfStudy { get; }
@@ -25,7 +25,7 @@ namespace Iis.Domain
         DateTime UpdatedAt { get; set; }
 
         void AddType(INodeTypeModel type);
-        EmbeddingRelationType GetProperty(string typeName);
+        IEmbeddingRelationTypeModel GetProperty(string typeName);
         bool IsSubtypeOf(INodeTypeModel type);
         string ToString();
     }

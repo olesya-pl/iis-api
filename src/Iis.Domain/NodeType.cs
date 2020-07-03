@@ -35,10 +35,10 @@ namespace Iis.Domain
         public IEnumerable<EntityType> AllParents =>
             DirectParents.SelectMany(e => e.AllParents).Union(DirectParents);
 
-        public IEnumerable<EmbeddingRelationType> DirectProperties =>
-            RelatedTypes.OfType<EmbeddingRelationType>();
+        public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties =>
+            RelatedTypes.OfType<IEmbeddingRelationTypeModel>();
 
-        public IEnumerable<EmbeddingRelationType> AllProperties =>
+        public IEnumerable<IEmbeddingRelationTypeModel> AllProperties =>
             AllParents.SelectMany(p => p.DirectProperties)
                 .Where(pp => DirectProperties.All(dp => dp.Name != pp.Name)) // Ignore parent properties with same name (overriden)
                 .Union(DirectProperties);
@@ -74,7 +74,7 @@ namespace Iis.Domain
             _relatedTypes.Add(type);
         }
 
-        public EmbeddingRelationType GetProperty(string typeName) =>
+        public IEmbeddingRelationTypeModel GetProperty(string typeName) =>
             AllProperties.SingleOrDefault(p => p.Name == typeName);
 
         public override string ToString()

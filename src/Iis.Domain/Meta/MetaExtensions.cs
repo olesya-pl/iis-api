@@ -32,7 +32,7 @@ namespace Iis.Domain.Meta
                 return null;
             if (type is IAttributeTypeModel attributeType)
                 return attributeType.CreateMeta();
-            if (type is EmbeddingRelationType relationType)
+            if (type is IEmbeddingRelationTypeModel relationType)
                 return relationType.CreateMeta();
             if (type is EntityType entityType)
                 return entityType.CreateMeta();
@@ -45,31 +45,31 @@ namespace Iis.Domain.Meta
         public static AttributeMeta CreateMeta(this IAttributeTypeModel type) =>
             CreateMeta<AttributeMeta>(type, new MetaConverter<AttributeMeta>(type.ScalarTypeEnum));
 
-        public static RelationMetaBase CreateMeta(this EmbeddingRelationType type) =>
+        public static RelationMetaBase CreateMeta(this IEmbeddingRelationTypeModel type) =>
             type.IsAttributeType ? (RelationMetaBase) CreateAttributeRelationMeta(type) : CreateEntityRelationMeta(type);
 
-        public static AttributeRelationMeta CreateAttributeRelationMeta(this EmbeddingRelationType type)
+        public static AttributeRelationMeta CreateAttributeRelationMeta(this IEmbeddingRelationTypeModel type)
         {
             if (!type.IsAttributeType) throw new ArgumentException(nameof(type));
             var converter = new MetaConverter<AttributeRelationMeta>(type.IAttributeTypeModel.ScalarTypeEnum);
             return CreateMeta<AttributeRelationMeta>(type, converter);
         }
 
-        public static EntityRelationMeta CreateEntityRelationMeta(this EmbeddingRelationType type)
+        public static EntityRelationMeta CreateEntityRelationMeta(this IEmbeddingRelationTypeModel type)
         {
             if (!type.IsEntityType) throw new ArgumentException(nameof(type));
             var converter = new MetaConverter<EntityRelationMeta>(null);
             return CreateMeta<EntityRelationMeta>(type, converter);
         }
 
-        public static bool IsComputed(this EmbeddingRelationType type) => type.GetComputed() != null;
+        public static bool IsComputed(this IEmbeddingRelationTypeModel type) => type.GetComputed() != null;
 
-        public static string GetComputed(this EmbeddingRelationType type)
+        public static string GetComputed(this IEmbeddingRelationTypeModel type)
             => (type.Meta as AttributeRelationMeta)?.Formula;
 
-        public static bool HasInversed(this EmbeddingRelationType type) => type.GetInversed() != null;
+        public static bool HasInversed(this IEmbeddingRelationTypeModel type) => type.GetInversed() != null;
 
-        public static InversedRelationMeta GetInversed(this EmbeddingRelationType type)
+        public static InversedRelationMeta GetInversed(this IEmbeddingRelationTypeModel type)
             => (type.Meta as EntityRelationMeta)?.Inversed;
 
         public static JObject Serialize(this IMeta meta) => JObject.FromObject(meta, CreateSerializer());

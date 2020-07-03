@@ -10,12 +10,12 @@ namespace Iis.Domain
         {
             get
             {
-                return Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(RelationType))
+                return Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(IRelationTypeModel))
                        ?? throw new Exception("Relation does not have a target.");
             }
             set
             {
-                var currentValue = Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(RelationType));
+                var currentValue = Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(IRelationTypeModel));
                 if (currentValue != null)
                     RemoveNode(currentValue);
                 AddNode(value);
@@ -25,7 +25,7 @@ namespace Iis.Domain
         public Attribute AttributeTarget => Nodes.OfType<Attribute>().Single();
         public Entity EntityTarget => Nodes.OfType<Entity>().Single();
 
-        public Relation(Guid id, RelationType type, DateTime createdAt = default, DateTime updatedAt = default)
+        public Relation(Guid id, IRelationTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
 

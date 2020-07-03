@@ -59,7 +59,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (_types.ContainsKey(type.Id))
                 return _types[type.Id];
 
-            if (type is EmbeddingRelationType rel && rel.IsInversed)
+            if (type is IEmbeddingRelationTypeModel rel && rel.IsInversed)
             {
                 // inversed relations are virtual and shouldn't be saved
                 return null;
@@ -88,11 +88,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     ScalarType = at.ScalarTypeEnum,
                 };
             }
-            else if (type is RelationType rt)
+            else if (type is IRelationTypeModel rt)
             {
                 result.Kind = Kind.Relation;
 
-                if (type is EmbeddingRelationType ert)
+                if (type is IEmbeddingRelationTypeModel ert)
                 {
                     result.RelationType = new RelationTypeEntity
                     {
@@ -122,7 +122,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else throw new NotImplementedException();
 
-            foreach (var node in type.RelatedTypes.OfType<RelationType>()) // saving only relation nodes
+            foreach (var node in type.RelatedTypes.OfType<IRelationTypeModel>()) // saving only relation nodes
                 SaveType(node, type);
 
             return result;

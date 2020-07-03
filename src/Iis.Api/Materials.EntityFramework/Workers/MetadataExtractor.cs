@@ -89,7 +89,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         }
 
         // uses hardcoded EntityType and RelationType
-        private async Task<MaterialFeature> MapToNodeDirect(MaterialFeature feature, EntityType type, EmbeddingRelationType relationType)
+        private async Task<MaterialFeature> MapToNodeDirect(MaterialFeature feature, EntityType type, IEmbeddingRelationTypeModel relationType)
         {
             var relationTypeId = relationType.Id;
             var existingRelation = await _context.Relations
@@ -104,7 +104,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             return feature;
         }
 
-        private async Task<Node> CreateEntity(string value, EntityType type, EmbeddingRelationType relationType)
+        private async Task<Node> CreateEntity(string value, EntityType type, IEmbeddingRelationTypeModel relationType)
         {
             var entity = new Entity(Guid.NewGuid(), type);
             var relation = new Relation(Guid.NewGuid(), relationType);
@@ -138,7 +138,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             }
         }
 
-        private async Task<EmbeddingRelationType> GetRelationType(string name, Guid sourceTypeId, Guid targetTypeId)
+        private async Task<IEmbeddingRelationTypeModel> GetRelationType(string name, Guid sourceTypeId, Guid targetTypeId)
         {
             // todo: change direct db access
             var ct = _context.NodeTypes.SingleOrDefault(e => e.Name == name);
@@ -159,7 +159,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             return rt;
         }
 
-        private async Task SaveRelation(Node node1, Node node2, EmbeddingRelationType rtype)
+        private async Task SaveRelation(Node node1, Node node2, IEmbeddingRelationTypeModel rtype)
         {
             var node = new Iis.DataModel.NodeEntity
             {

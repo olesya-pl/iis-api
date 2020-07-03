@@ -70,7 +70,7 @@ namespace IIS.Core.Ontology.Seeding
         {
             EntityType type = ontology.GetEntityType(typeName);
             Entity entity = new Entity(Guid.NewGuid(), type);
-            foreach (EmbeddingRelationType relationType in type.AllProperties)
+            foreach (IEmbeddingRelationTypeModel relationType in type.AllProperties)
             {
                 var jProperty = default(JProperty);
                 if (typeName == "Country" && relationType.Name == "code")

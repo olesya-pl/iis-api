@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return existing ?? await CreateProperties(new Entity(Guid.NewGuid(), type), properties);
         }
 
-        public async Task<IEnumerable<Relation>> CreateRelations(EmbeddingRelationType embed, object value)
+        public async Task<IEnumerable<Relation>> CreateRelations(IEmbeddingRelationTypeModel embed, object value)
         {
             switch (embed.EmbeddingOptions)
             {
@@ -100,7 +100,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        public async Task<IEnumerable<Relation>> CreateMultipleProperties(EmbeddingRelationType embed, object value)
+        public async Task<IEnumerable<Relation>> CreateMultipleProperties(IEmbeddingRelationTypeModel embed, object value)
         {
             var values = (IEnumerable<object>) value;
             var result = new List<Relation>();
@@ -119,7 +119,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return result;
         }
 
-        public async Task<Relation> CreateSingleProperty(EmbeddingRelationType embed, object value)
+        public async Task<Relation> CreateSingleProperty(IEmbeddingRelationTypeModel embed, object value)
         {
             var prop = new Relation(Guid.NewGuid(), embed);
             var target = await CreateNode(embed, value);
@@ -127,7 +127,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return prop;
         }
 
-        public async Task<Node> CreateNode(EmbeddingRelationType embed, object value) // attribute or entity
+        public async Task<Node> CreateNode(IEmbeddingRelationTypeModel embed, object value) // attribute or entity
         {
             if (embed.IsAttributeType)
             {

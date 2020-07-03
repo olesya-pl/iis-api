@@ -14,9 +14,9 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         private readonly string _typeName;
         private readonly IInputType _createType;
         private readonly IInputType _updateType;
-        private readonly EmbeddingRelationType _relationType;
+        private readonly IEmbeddingRelationTypeModel _relationType;
 
-        public RelationPatchType(EmbeddingRelationType relationType, TypeRepository typeRepository)
+        public RelationPatchType(IEmbeddingRelationTypeModel relationType, TypeRepository typeRepository)
         {
             _relationType = relationType;
             _typeName = GetName(relationType);
@@ -36,7 +36,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             }
         }
 
-        public static string GetName(EmbeddingRelationType relationType)
+        public static string GetName(IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsAttributeType)
                 return relationType.IAttributeTypeModel.ScalarTypeEnum.ToString();

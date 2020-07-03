@@ -16,8 +16,8 @@ namespace Iis.Domain
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
         Task SaveNodesAsync(IEnumerable<Node> node, CancellationToken cancellationToken = default);
         Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default);
-        Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<EmbeddingRelationType> relationTypes, CancellationToken cancellationToken = default);
+        Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default);
         Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task CreateRelation(Guid sourceNodeId, Guid targetNodeId);
         Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);

@@ -51,7 +51,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     .Include(e => e.IAttributeTypeModel)
                     .ToArray();
                 var result = types.Select(e => MapType(e)).ToList();
-                var relationTypes = _types.Values.Where(e => e is RelationType);
+                var relationTypes = _types.Values.Where(e => e is IRelationTypeModel);
                 // todo: refactor
                 result.AddRange(relationTypes);
 
@@ -121,7 +121,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     return _types[relationType.Id];
 
                 var type = relationType.INodeTypeModel;
-                var relation = default(RelationType);
+                IRelationTypeModel relation = null;
                 if (relationType.Kind == RelationKind.Embedding)
                 {
                     relation = new EmbeddingRelationType(type.Id, type.Name, relationType.EmbeddingOptions);
@@ -147,9 +147,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        protected RelationType _addInversedRelation(RelationType relation, INodeTypeModel sourceType)
+        protected IRelationTypeModel _addInversedRelation(IRelationTypeModel relation, INodeTypeModel sourceType)
         {
-            if (!(relation is EmbeddingRelationType relationType) || !relationType.HasInversed())
+            if (!(relation is IEmbeddingRelationTypeModel relationType) || !relationType.HasInversed())
                 return null;
 
             var meta = relationType.GetInversed();

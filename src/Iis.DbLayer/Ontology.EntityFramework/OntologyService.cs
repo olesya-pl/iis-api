@@ -91,7 +91,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private void SaveRelations(Node source, NodeEntity existing)
         {
-            foreach (EmbeddingRelationType relationType in source.Type.AllProperties)
+            foreach (IEmbeddingRelationTypeModel relationType in source.Type.AllProperties)
             {
                 if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
@@ -350,7 +350,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return relationsQ.Select(e => e.SourceNode);
         }
 
-        public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<RelationType> toLoad, CancellationToken cancellationToken = default)
+        public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
@@ -379,7 +379,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
 
         public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds,
-            IEnumerable<EmbeddingRelationType> relationTypes, CancellationToken cancellationToken = default)
+            IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
         {
             await _context.Semaphore.WaitAsync(cancellationToken);
             try
@@ -494,7 +494,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 node = new Entity(ctxNode.Id, entityType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
                 mappedNodes.Add(node);
             }
-            else if (type is EmbeddingRelationType relationType)
+            else if (type is IEmbeddingRelationTypeModel relationType)
             {
                 node = new Relation(ctxNode.Id, relationType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
                 var target = MapNode(ctxNode.Relation.TargetNode, mappedNodes);

@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL
             return descriptor;
         }
 
-        public static IOutputType WrapOutputType(this IOutputType type, EmbeddingRelationType relationType)
+        public static IOutputType WrapOutputType(this IOutputType type, IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsComputed())
                 return type;
@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        public static IInputType WrapInputType(this IInputType type, EmbeddingRelationType relationType)
+        public static IInputType WrapInputType(this IInputType type, IEmbeddingRelationTypeModel relationType)
         {
             switch (relationType.EmbeddingOptions)
             {
@@ -56,12 +56,12 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        public static string GetFieldName(this EmbeddingRelationType relationType)
+        public static string GetFieldName(this IEmbeddingRelationTypeModel relationType)
         {
             return relationType.Name;
         }
 
-        public static EntityOperation[] GetOperations(this EmbeddingRelationType relationType)
+        public static EntityOperation[] GetOperations(this IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsAttributeType) throw new ArgumentException("Can not check attribute relations for EntityOperations");
             return ((EntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations // check relation meta
@@ -70,7 +70,7 @@ namespace IIS.Core.GraphQL
                        .FirstOrDefault()?.AcceptsEmbeddedOperations;
         }
 
-        public static bool AcceptsOperation(this EmbeddingRelationType relationType, EntityOperation operation)
+        public static bool AcceptsOperation(this IEmbeddingRelationTypeModel relationType, EntityOperation operation)
         {
             var ops = relationType.GetOperations();
             return ops?.Contains(operation) == true;

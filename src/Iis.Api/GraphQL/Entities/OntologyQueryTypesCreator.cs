@@ -35,7 +35,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
         }
 
-        protected void OnRelation(EmbeddingRelationType relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
+        protected void OnRelation(IEmbeddingRelationTypeModel relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
         {
             var type = GetType(relationType);
             if (objectTypeDescriptor == null) return;
@@ -53,7 +53,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private void OnRelation(EntityType entityType, IGrouping<string, EmbeddingRelationType> relationTypeGroup,
+        private void OnRelation(EntityType entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
             IObjectTypeDescriptor objectTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -82,14 +82,14 @@ namespace IIS.Core.GraphQL.Entities
             d.ResolveAbstractType((ctx, obj) => ctx.Service<IOntologyQueryResolver>().ResolveAbstractType(ctx, obj));
         }
 
-        protected void OnRelation(EmbeddingRelationType relationType,
+        protected void OnRelation(IEmbeddingRelationTypeModel relationType,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             var type = GetType(relationType);
             interfaceTypeDescriptor?.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
         }
 
-        private void OnRelation(EntityType entityType, IGrouping<string, EmbeddingRelationType> relationTypeGroup,
+        private void OnRelation(EntityType entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -105,7 +105,7 @@ namespace IIS.Core.GraphQL.Entities
         }
 
         private OutputUnionType GetOutputUnionType(EntityType entityType,
-            IGrouping<string, EmbeddingRelationType> relationTypeGroup)
+            IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup)
         {
             if (relationTypeGroup.Any(r => !r.IsEntityType))
                 throw new ArgumentException(
@@ -120,7 +120,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Generic ----- //
 
-        private IOutputType GetType(EmbeddingRelationType relationType)
+        private IOutputType GetType(IEmbeddingRelationTypeModel relationType)
         {
             var type = relationType.IsAttributeType
                 ? GetAttributeType(relationType)
@@ -130,7 +130,7 @@ namespace IIS.Core.GraphQL.Entities
             return type;
         }
 
-        private IOutputType GetAttributeType(EmbeddingRelationType relationType)
+        private IOutputType GetAttributeType(IEmbeddingRelationTypeModel relationType)
         {
             var type = relationType.IAttributeTypeModel;
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
