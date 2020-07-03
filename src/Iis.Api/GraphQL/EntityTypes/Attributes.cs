@@ -123,7 +123,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
         }
 
-        public override string Type => Source.AttributeType.ScalarTypeEnum.ToString();
+        public override string Type => Source.IAttributeTypeModel.ScalarTypeEnum.ToString();
     }
 
 

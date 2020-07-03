@@ -48,7 +48,7 @@ namespace Iis.OntologySchema.Saver
                             var targetTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)targetType);
                             _context.NodeTypes.Add(targetTypeEntity);
 
-                            var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.AttributeType);
+                            var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.IAttributeTypeModel);
                             _context.AttributeTypes.Add(attributeTypeEntity);
                         }
                     }
@@ -103,7 +103,7 @@ namespace Iis.OntologySchema.Saver
                     {
                         _context.NodeTypes.Update(attributeNodeType);
 
-                        var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.AttributeType);
+                        var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.IAttributeTypeModel);
                         attributeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
                         _context.AttributeTypes.Update(attributeType);
                         

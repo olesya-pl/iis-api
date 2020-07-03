@@ -30,7 +30,7 @@ namespace Iis.Domain.Meta
         {
             if (type?.MetaSource == null)
                 return null;
-            if (type is AttributeType attributeType)
+            if (type is IAttributeTypeModel attributeType)
                 return attributeType.CreateMeta();
             if (type is EmbeddingRelationType relationType)
                 return relationType.CreateMeta();
@@ -42,7 +42,7 @@ namespace Iis.Domain.Meta
         public static EntityMeta CreateMeta(this EntityType type) =>
             CreateMeta<EntityMeta>(type, new MetaConverter<EntityMeta>(null));
 
-        public static AttributeMeta CreateMeta(this AttributeType type) =>
+        public static AttributeMeta CreateMeta(this IAttributeTypeModel type) =>
             CreateMeta<AttributeMeta>(type, new MetaConverter<AttributeMeta>(type.ScalarTypeEnum));
 
         public static RelationMetaBase CreateMeta(this EmbeddingRelationType type) =>
@@ -51,7 +51,7 @@ namespace Iis.Domain.Meta
         public static AttributeRelationMeta CreateAttributeRelationMeta(this EmbeddingRelationType type)
         {
             if (!type.IsAttributeType) throw new ArgumentException(nameof(type));
-            var converter = new MetaConverter<AttributeRelationMeta>(type.AttributeType.ScalarTypeEnum);
+            var converter = new MetaConverter<AttributeRelationMeta>(type.IAttributeTypeModel.ScalarTypeEnum);
             return CreateMeta<AttributeRelationMeta>(type, converter);
         }
 

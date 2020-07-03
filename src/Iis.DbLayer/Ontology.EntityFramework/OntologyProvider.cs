@@ -48,7 +48,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
                     .Include(e => e.IncomingRelations).ThenInclude(e => e.INodeTypeModel)
                     .Include(e => e.OutgoingRelations).ThenInclude(e => e.INodeTypeModel)
-                    .Include(e => e.AttributeType)
+                    .Include(e => e.IAttributeTypeModel)
                     .ToArray();
                 var result = types.Select(e => MapType(e)).ToList();
                 var relationTypes = _types.Values.Where(e => e is RelationType);
@@ -92,7 +92,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
                 if (type.Kind == Kind.Attribute)
                 {
-                    var attributeType = type.AttributeType;
+                    var attributeType = type.IAttributeTypeModel;
                     var attr = new AttributeType(type.Id, type.Name, attributeType.ScalarType);
                     _types.Add(type.Id, attr);
                     FillProperties(type, attr);

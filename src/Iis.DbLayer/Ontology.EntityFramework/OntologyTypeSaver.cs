@@ -80,10 +80,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 result.IsAbstract = et.IsAbstract;
                 result.Kind = Kind.Entity;
             }
-            else if (type is AttributeType at)
+            else if (type is IAttributeTypeModel at)
             {
                 result.Kind = Kind.Attribute;
-                result.AttributeType = new AttributeTypeEntity
+                result.IAttributeTypeModel = new AttributeTypeEntity
                 {
                     ScalarType = at.ScalarTypeEnum,
                 };

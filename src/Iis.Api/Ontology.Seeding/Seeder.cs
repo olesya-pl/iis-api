@@ -113,7 +113,7 @@ namespace IIS.Core.Ontology.Seeding
                 {
                     var relation = new Relation(Guid.NewGuid(), relationType);
                     var jValue = (JValue)jProperty.Value;
-                    var attribute = new Attribute(Guid.NewGuid(), (AttributeType)relationType.TargetType, jValue.Value);
+                    var attribute = new Attribute(Guid.NewGuid(), (IAttributeTypeModel)relationType.TargetType, jValue.Value);
                     relation.AddNode(attribute);
                     entity.AddNode(relation);
                 }

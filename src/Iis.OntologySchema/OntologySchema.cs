@@ -336,7 +336,7 @@ namespace Iis.OntologySchema
                 if (nodeType.Kind != Kind.Attribute) continue;
                 var aliases = _storage.Aliases.GetItem(key)?.Value?.Split(',') ?? null;
                 var shortDotName = key.Substring(key.IndexOf('.') + 1);
-                var item = new AttributeInfoItem(shortDotName, nodeType.AttributeType.ScalarType, aliases);
+                var item = new AttributeInfoItem(shortDotName, nodeType.IAttributeTypeModel.ScalarType, aliases);
                 items.Add(item);
             }
             return new AttributeInfo(entityName, items);

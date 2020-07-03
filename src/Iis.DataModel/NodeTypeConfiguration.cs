@@ -12,7 +12,7 @@ namespace Iis.DataModel
                 .ValueGeneratedNever();
 
             builder
-                .HasOne(p => p.AttributeType)
+                .HasOne(p => p.IAttributeTypeModel)
                 .WithOne(p => p.INodeTypeModel)
                 .HasForeignKey<AttributeTypeEntity>(p => p.Id);
             builder

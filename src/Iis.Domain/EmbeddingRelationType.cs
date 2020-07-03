@@ -17,11 +17,11 @@ namespace Iis.Domain
         public EmbeddingOptions EmbeddingOptions { get; }
 
         // Embedding relation can have single attribute or single entity as a node
-        public AttributeType AttributeType => RelatedTypes.OfType<AttributeType>().SingleOrDefault();
+        public IAttributeTypeModel IAttributeTypeModel => RelatedTypes.OfType<IAttributeTypeModel>().SingleOrDefault();
         public EntityType EntityType => RelatedTypes.OfType<EntityType>().SingleOrDefault();
-        public INodeTypeModel TargetType => (INodeTypeModel)AttributeType ?? EntityType;
+        public INodeTypeModel TargetType => (INodeTypeModel)IAttributeTypeModel ?? EntityType;
         public IEnumerable<RelationType> RelationTypes => RelatedTypes.OfType<RelationType>();
-        public bool IsAttributeType => RelatedTypes.OfType<AttributeType>().Any();
+        public bool IsAttributeType => RelatedTypes.OfType<IAttributeTypeModel>().Any();
         public bool IsEntityType => RelatedTypes.OfType<EntityType>().Any();
         public EmbeddingRelationType DirectRelationType => RelatedTypes.OfType<EmbeddingRelationType>().Single();
 

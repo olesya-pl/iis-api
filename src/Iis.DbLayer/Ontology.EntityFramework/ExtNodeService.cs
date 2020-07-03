@@ -61,7 +61,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             if (nodeEntity.Attribute == null) return null;
 
-            var scalarType = nodeEntity.INodeTypeModel.AttributeType.ScalarType;
+            var scalarType = nodeEntity.INodeTypeModel.IAttributeTypeModel.ScalarType;
             var value = nodeEntity.Attribute.Value;
             switch (scalarType)
             {
@@ -84,7 +84,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 NodeTypeTitle = nodeTypeTitle,
                 EntityTypeName = nodeEntity.INodeTypeModel.Name,
                 AttributeValue = GetAttributeValue(nodeEntity),
-                ScalarType = nodeEntity.INodeTypeModel?.AttributeType?.ScalarType,
+                ScalarType = nodeEntity.INodeTypeModel?.IAttributeTypeModel?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
                 Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, cancellationToken)
@@ -145,7 +145,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return _context.Nodes
                 .Include(n => n.Attribute)
                 .Include(n => n.INodeTypeModel)
-                .ThenInclude(nt => nt.AttributeType)
+                .ThenInclude(nt => nt.IAttributeTypeModel)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.INodeTypeModel)

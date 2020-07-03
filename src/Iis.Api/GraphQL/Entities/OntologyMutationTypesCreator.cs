@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.Entities
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             var type = relationType.IsAttributeType
-                ? TypeRepository.GetInputAttributeType(relationType.AttributeType).WrapInputType(relationType)
+                ? TypeRepository.GetInputAttributeType(relationType.IAttributeTypeModel).WrapInputType(relationType)
                 : TypeRepository.GetType<EntityRelationInputType>().WrapInputType(relationType);
             objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
         }
@@ -62,7 +62,7 @@ namespace IIS.Core.GraphQL.Entities
                     .WrapInputType(relationType);
 
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple && relationType.IsAttributeType)
-                type = TypeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeType)
+                type = TypeRepository.GetMultipleInputType(Operation.Create, relationType.IAttributeTypeModel)
                     .WrapInputType(relationType);
 
             if (type == null)
@@ -87,7 +87,7 @@ namespace IIS.Core.GraphQL.Entities
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
                 type = TypeRepository.GetRelationPatchType(relationType);
             else if (relationType.IsAttributeType)
-                type = TypeRepository.GetInputAttributeType(relationType.AttributeType);
+                type = TypeRepository.GetInputAttributeType(relationType.IAttributeTypeModel);
             else if (relationType.AcceptsOperation(EntityOperation.Update))
                 type = TypeRepository.GetSingularRelationPatchType(relationType);
             else
@@ -100,7 +100,7 @@ namespace IIS.Core.GraphQL.Entities
 //            else
 //            {
 //                type = relationType.IsAttributeType
-//                    ? TypeRepository.GetInputAttributeType(relationType.AttributeType)
+//                    ? TypeRepository.GetInputAttributeType(relationType.IAttributeTypeModel)
 //                    : TypeRepository.GetType<EntityRelationInputType>();
 //            }
             objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);

@@ -172,7 +172,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 Attribute = new AttributeEntity
                 {
                     Id = attribute.Id,
-                    Value = AttributeType.ValueToString(attribute.Value, ((AttributeType)attribute.Type).ScalarTypeEnum)
+                    Value = AttributeType.ValueToString(attribute.Value, ((IAttributeTypeModel)attribute.Type).ScalarTypeEnum)
                 }
             };
         }
@@ -479,7 +479,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var type = _ontology.GetType(ctxNode.NodeTypeId)
                        ?? throw new ArgumentException($"Ontology type with id {ctxNode.NodeTypeId} was not found.");
             Node node;
-            if (type is AttributeType attrType)
+            if (type is IAttributeTypeModel attrType)
             {
                 var attribute = ctxNode.Attribute ?? _context.Attributes.SingleOrDefault(attr => attr.Id == ctxNode.Id);
                 if (attribute == null)

@@ -15,7 +15,7 @@ namespace Iis.OntologySchema.DataTypes
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
 
         internal SchemaAttributeType _attributeType;
-        public IAttributeType AttributeType => _attributeType;
+        public IAttributeType IAttributeTypeModel => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
         internal void AddIncomingRelation(SchemaRelationType relationType)
@@ -46,7 +46,7 @@ namespace Iis.OntologySchema.DataTypes
                     RelationName = r.INodeTypeModel.Name,
                     RelationTitle = r.INodeTypeModel.Title,
                     RelationMeta = r.INodeTypeModel.Meta,
-                    ScalarType = r.TargetType.AttributeType?.ScalarType,
+                    ScalarType = r.TargetType.IAttributeTypeModel?.ScalarType,
                     EmbeddingOptions = r.EmbeddingOptions,
                     InheritedFrom = setInheritedFrom ? this.Name : string.Empty,
                     TargetType = r.TargetType
@@ -167,7 +167,7 @@ namespace Iis.OntologySchema.DataTypes
         private bool IsIdenticalBase(INodeTypeLinked nodeType)
         {
             var scalarTypesAreEqual = Kind == Kind.Attribute ?
-                AttributeType.ScalarType == nodeType.AttributeType.ScalarType :
+                IAttributeTypeModel.ScalarType == nodeType.IAttributeTypeModel.ScalarType :
                 true;
 
             return Name == nodeType.Name
@@ -189,7 +189,7 @@ namespace Iis.OntologySchema.DataTypes
             dict[nameof(IsArchived)] = IsArchived.ToString();
             dict[nameof(Kind)] = Kind.ToString();
             dict[nameof(IsAbstract)] = IsAbstract.ToString();
-            dict["ScalarType"] = AttributeType?.ScalarType.ToString() ?? string.Empty;
+            dict["ScalarType"] = IAttributeTypeModel?.ScalarType.ToString() ?? string.Empty;
             dict["EmbeddingOptions"] = RelationType?.EmbeddingOptions.ToString() ?? string.Empty;
             dict["RelationKind"] = RelationType?.Kind.ToString() ?? string.Empty;
             dict["RelationSourceName"] = RelationType?.SourceType.Name ?? string.Empty;
