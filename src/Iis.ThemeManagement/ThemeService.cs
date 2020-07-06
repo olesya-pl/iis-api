@@ -15,6 +15,7 @@ using Iis.DataModel.Themes;
 using Iis.Interfaces.Elastic;
 using Iis.ThemeManagement.Models;
 using Iis.Roles;
+using Iis.Interfaces.Repository;
 
 namespace Iis.ThemeManagement
 {
@@ -24,13 +25,19 @@ namespace Iis.ThemeManagement
         private readonly IMapper _mapper;
         private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
+        private readonly IMaterialRepository _repository;
 
-        public ThemeService(OntologyContext context, IMapper mapper, IOntologyModel ontology, IElasticService elasticService)
+        public ThemeService(OntologyContext context,
+            IMapper mapper,
+            IOntologyModel ontology,
+            IElasticService elasticService,
+            IMaterialRepository repository)
         {
             _context = context;
             _mapper = mapper;
             _ontology = ontology;
             _elasticService = elasticService;
+            _repository = repository;
         }
 
         public async Task<Guid> CreateThemeAsync(Theme theme)
@@ -198,19 +205,14 @@ namespace Iis.ThemeManagement
             }
         }
 
-        private async Task<int> GetCountOfParentMaterials(SearchByConfiguredFieldsResult searchResult)
+        private Task<int> GetCountOfParentMaterials(SearchByConfiguredFieldsResult searchResult)
         {
-            await _context.Semaphore.WaitAsync();
-            try
+            if (!searchResult.Items.Any())
             {
-                var foundMaterialIds = searchResult.Items.Keys.ToArray();
-                var count = await _context.Materials.CountAsync(p => p.ParentId == null && foundMaterialIds.Contains(p.Id));
-                return count;
+                return Task.FromResult(0);
             }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            var foundMaterialIds = searchResult.Items.Keys.ToArray();
+            return _repository.GetCountOfParentMaterials(foundMaterialIds);
         }
 
         private string[] GetOntologyIndexes(IOntologyModel ontology, string typeName)
