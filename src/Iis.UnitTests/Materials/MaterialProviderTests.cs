@@ -97,7 +97,7 @@ namespace Iis.UnitTests.Materials
                     info.Data = "{}";
                     foreach (var feature in info.MaterialFeatures)
                     {
-                        feature.Node.INodeTypeModel.Meta = null;
+                        feature.Node.NodeType.Meta = null;
                     }
                 }
             }
