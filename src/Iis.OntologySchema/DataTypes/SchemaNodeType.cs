@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.Comparison;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,39 @@ namespace Iis.OntologySchema.DataTypes
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
 
         internal SchemaAttributeType _attributeType;
-        public IAttributeType IAttributeTypeModel => _attributeType;
+        public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
+        public Type ClrType
+        {
+            get
+            {
+                if (AttributeType == null) return null;
+
+                switch (AttributeType.ScalarType)
+                {
+                    case ScalarType.String:
+                        return typeof(string);
+                    case ScalarType.Int:
+                        return typeof(int);
+                    case ScalarType.Decimal:
+                        return typeof(decimal);
+                    case ScalarType.Boolean:
+                        return typeof(bool);
+                    case ScalarType.Date:
+                        return typeof(DateTime);
+                    case ScalarType.Geo:
+                        return typeof(Dictionary<string, object>);
+                    case ScalarType.File:
+                        return typeof(Guid);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+        public bool HasUniqueValues => UniqueValueFieldName != null;
+        public IMeta MetaMeta => null;
+
         internal void AddIncomingRelation(SchemaRelationType relationType)
         {
             _incomingRelations.Add(relationType);
@@ -46,7 +77,7 @@ namespace Iis.OntologySchema.DataTypes
                     RelationName = r.INodeTypeModel.Name,
                     RelationTitle = r.INodeTypeModel.Title,
                     RelationMeta = r.INodeTypeModel.Meta,
-                    ScalarType = r.TargetType.IAttributeTypeModel?.ScalarType,
+                    ScalarType = r.TargetType.AttributeType?.ScalarType,
                     EmbeddingOptions = r.EmbeddingOptions,
                     InheritedFrom = setInheritedFrom ? this.Name : string.Empty,
                     TargetType = r.TargetType
@@ -167,7 +198,7 @@ namespace Iis.OntologySchema.DataTypes
         private bool IsIdenticalBase(INodeTypeLinked nodeType)
         {
             var scalarTypesAreEqual = Kind == Kind.Attribute ?
-                IAttributeTypeModel.ScalarType == nodeType.IAttributeTypeModel.ScalarType :
+                AttributeType.ScalarType == nodeType.AttributeType.ScalarType :
                 true;
 
             return Name == nodeType.Name
@@ -189,7 +220,7 @@ namespace Iis.OntologySchema.DataTypes
             dict[nameof(IsArchived)] = IsArchived.ToString();
             dict[nameof(Kind)] = Kind.ToString();
             dict[nameof(IsAbstract)] = IsAbstract.ToString();
-            dict["ScalarType"] = IAttributeTypeModel?.ScalarType.ToString() ?? string.Empty;
+            dict["ScalarType"] = AttributeType?.ScalarType.ToString() ?? string.Empty;
             dict["EmbeddingOptions"] = RelationType?.EmbeddingOptions.ToString() ?? string.Empty;
             dict["RelationKind"] = RelationType?.Kind.ToString() ?? string.Empty;
             dict["RelationSourceName"] = RelationType?.SourceType.Name ?? string.Empty;

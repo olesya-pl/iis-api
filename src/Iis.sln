@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Roles", "Iis.Roles\Iis.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.ThemeManagement", "Iis.ThemeManagement\Iis.ThemeManagement.csproj", "{588BDD66-7785-42A3-8718-92ADE68E9426}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.OntologyModelWrapper", "Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj", "{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{588BDD66-7785-42A3-8718-92ADE68E9426}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{588BDD66-7785-42A3-8718-92ADE68E9426}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{588BDD66-7785-42A3-8718-92ADE68E9426}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

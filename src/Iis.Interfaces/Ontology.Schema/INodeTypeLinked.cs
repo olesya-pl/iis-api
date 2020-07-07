@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iis.Interfaces.Meta;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,9 +18,12 @@ namespace Iis.Interfaces.Ontology.Schema
         Kind Kind { get; }
         bool IsAbstract { get; }
         string UniqueValueFieldName { get; }
+        bool HasUniqueValues { get; }
+        Type ClrType { get; }
+        IMeta MetaMeta { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
-        IAttributeType IAttributeTypeModel { get; }
+        IAttributeType AttributeType { get; }
         IRelationTypeLinked RelationType { get; }
         IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom);
         IReadOnlyList<IChildNodeType> GetAllChildren();

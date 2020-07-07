@@ -112,5 +112,13 @@ namespace Iis.UnitTests
             };
             return (new OntologySchemaService()).GetOntologySchema(schemaSource);
         }
+        public static OntologyContext GetContext()
+        {
+            return Instance.ServiceProvider.GetService<OntologyContext>();
+        }
+        public static OntologyContext GetRealDbContext()
+        {
+            return OntologyContext.GetContext(GetConnectionString());
+        }
     }
 }
