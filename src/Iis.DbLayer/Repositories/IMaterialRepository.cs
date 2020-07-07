@@ -1,7 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using Iis.DataModel.Materials;
+using System.Collections.Generic;
 
+using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 
 namespace Iis.DbLayer.Repository
@@ -17,5 +18,23 @@ namespace Iis.DbLayer.Repository
         /// <param name="id">Material ID</param>
         /// <param name="includes">define relation include</param>
         Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
+        
+        /// <summary>
+        /// Returns all the Materials
+        /// </summary>
+        /// <param name="includes">define relation include</param>
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
+        
+        /// <summary>
+        /// Returns all the Materials for given Assignee
+        /// </summary>
+        /// <param name="assigneeId">Assignee Id</param>
+        Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
+
+        /// <summary>
+        /// Returns all the Machine Learning Results for given Material
+        /// </summary>
+        /// <param name="materialId">given Material Id</param>
+        Task<IEnumerable<MLResponseEntity>> GetMachineLearningResultsForMaterialAsync(Guid materialId);
     }
 }

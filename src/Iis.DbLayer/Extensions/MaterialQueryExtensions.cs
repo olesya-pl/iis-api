@@ -20,5 +20,11 @@ namespace Iis.DbLayer.Extensions
                 .Include(m => m.MaterialInfos)
                 .ThenInclude(m => m.MaterialFeatures);
         }
+        public static IQueryable<MaterialEntity> OnlyParent(
+            this IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery
+                    .Where(p => p.ParentId == null);
+        }
     }
 }

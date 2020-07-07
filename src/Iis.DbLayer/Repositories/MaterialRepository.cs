@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 using Iis.DataModel;
@@ -17,12 +18,34 @@ namespace Iis.DbLayer.Repository
         {
             _context = context;
         }
-        public Task<MaterialEntity> GetMaterialByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
+
+        public Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
         {
             return GetMaterialsQuery(includes)
                     .SingleOrDefaultAsync();
         }
 
+        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes)
+        {
+            return await GetMaterialsQuery(includes)
+                            .ToArrayAsync();
+        }
+        
+        public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
+        {
+            return await GetMaterialsQuery(MaterialIncludeEnum.OnlyParent)
+                            .Where(p => p.AssigneeId == assigneeId)
+                            .ToArrayAsync();
+        }
+        
+        public async Task<IEnumerable<MLResponseEntity>> GetMachineLearningResultsForMaterialAsync(Guid materialId)
+        {
+            return await _context.MLResponses
+                            .Where(p => p.MaterialId == materialId)
+                            .AsNoTracking()
+                            .ToArrayAsync();
+        }
+        
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
             return _context.Materials
@@ -58,5 +81,6 @@ namespace Iis.DbLayer.Repository
 
             return resultQuery;
         }
+   
     }
 }
