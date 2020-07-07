@@ -17,7 +17,6 @@ namespace Iis.Domain
         bool HasUniqueValues { get; }
         string UniqueValueFieldName { get; set; }
         Type ClrType { get; }
-        IEnumerable<INodeTypeModel> RelatedTypes { get; }
         IEnumerable<IEntityTypeModel> DirectParents { get; }
         IEnumerable<IEntityTypeModel> AllParents { get; }
         IEnumerable<IEmbeddingRelationTypeModel> DirectProperties { get; }

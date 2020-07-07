@@ -144,7 +144,6 @@ namespace IIS.Core
             services.AddSingleton<MutationUpdateResolver>();
             services.AddSingleton<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
-            services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IMaterialProvider, MaterialProvider>();
             services.AddTransient<IMaterialService, MaterialService>();

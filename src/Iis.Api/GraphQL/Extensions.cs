@@ -81,17 +81,6 @@ namespace IIS.Core.GraphQL
             return d.Resolver(_ => throw new NotImplementedException());
         }
 
-        public static IObjectFieldDescriptor FieldNotImplemented(this IObjectTypeDescriptor d, string name)
-        {
-            return d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
-        }
-
-        public static IEnumerable<INodeTypeModel> GetInheritors(this INodeTypeModel type, IEnumerable<INodeTypeModel> ontology)
-        {
-            return ontology.Where(t =>
-                t.RelatedTypes.OfType<IInheritanceRelationTypeModel>().Any(r => r.ParentType.Name == type.Name));
-        }
-
         public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
             TValue value = default;

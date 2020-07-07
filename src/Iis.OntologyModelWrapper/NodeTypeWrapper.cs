@@ -4,6 +4,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.OntologyModelWrapper
@@ -16,11 +17,19 @@ namespace Iis.OntologyModelWrapper
             _source = source;
         }
 
-        public IEnumerable<IEntityTypeModel> AllParents => throw new NotImplementedException();
+        public IEnumerable<IEntityTypeModel> AllParents => _source.GetAllAncestors().Select(nt => new EntityTypeWrapper(nt));
 
-        public IEnumerable<IEmbeddingRelationTypeModel> AllProperties => throw new NotImplementedException();
+        public IEnumerable<IEmbeddingRelationTypeModel> AllProperties => _source.GetAllProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
 
-        public Type ClrType => this is IEntityTypeModel ? typeof(Entity) : _source.ClrType;
+        public Type ClrType
+        {
+            get
+            {
+                if (this is IEntityTypeModel) return typeof(Entity);
+                if (this is IEmbeddingRelationTypeModel) return typeof(Relation);
+                return _source.ClrType;
+            }
+        }
 
         public DateTime CreatedAt
         {
@@ -28,9 +37,9 @@ namespace Iis.OntologyModelWrapper
             set { throw new NotImplementedException(); }
         }
 
-        public IEnumerable<IEntityTypeModel> DirectParents => throw new NotImplementedException();
+        public IEnumerable<IEntityTypeModel> DirectParents => _source.GetDirectAncestors().Select(nt => new EntityTypeWrapper(nt));
 
-        public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties => throw new NotImplementedException();
+        public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties => _source.GetDirectProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
 
         public bool HasUniqueValues => _source.HasUniqueValues;
         public string UniqueValueFieldName
@@ -51,8 +60,6 @@ namespace Iis.OntologyModelWrapper
         public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public string Name => _source.Name;
-
-        public IEnumerable<INodeTypeModel> RelatedTypes => throw new NotImplementedException();
 
         public string Title
         {

@@ -46,8 +46,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
                 // Query primary source and update the cache
                 var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                    .Include(e => e.IncomingRelations).ThenInclude(e => e.INodeTypeModel)
-                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.INodeTypeModel)
+                    .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
                     .Include(e => e.IAttributeTypeModel)
                     .ToArray();
                 var result = types.Select(e => MapType(e)).ToList();
@@ -105,10 +105,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     _types.Add(type.Id, entity);
                     FillProperties(type, entity);
                     // Process relation inheritance first
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance && !r.NodeType.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     entity.Meta = entity.CreateMeta(); // todo: refactor. Creates meta with all parent types meta
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance && !r.NodeType.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     return entity;
                 }
@@ -120,7 +120,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (_types.ContainsKey(relationType.Id))
                     return _types[relationType.Id];
 
-                var type = relationType.INodeTypeModel;
+                var type = relationType.NodeType;
                 IRelationTypeModel relation = null;
                 if (relationType.Kind == RelationKind.Embedding)
                 {

@@ -42,7 +42,7 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             CheckNodeType(m, w);
             Assert.Equal(m.IsAbstract, w.IsAbstract);
         }
-        private void CheckNodeType(INodeTypeModel m, IEntityTypeModel w)
+        private void CheckNodeType(INodeTypeModel m, INodeTypeModel w)
         {
             Assert.Equal(m.Name, w.Name);
             Assert.Equal(m.ClrType, w.ClrType);
@@ -54,14 +54,43 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             Assert.Equal(m.HasUniqueValues, w.HasUniqueValues);
             Assert.Equal(m.UniqueValueFieldName, w.UniqueValueFieldName);
             Assert.Equal(m.IsObjectOfStudy, w.IsObjectOfStudy);
-            //Assert.Equal(m., w.);
-            //Assert.Equal(m., w.);
-            //Assert.Equal(m., w.);
-            //Assert.Equal(m., w.);
+
+            CheckEntityTypes(
+                m.DirectParents.OrderBy(et => et.Id).ToList(), 
+                w.DirectParents.OrderBy(et => et.Id).ToList());
+
+            CheckEntityTypes(
+                m.AllParents.OrderBy(et => et.Id).ToList(),
+                w.AllParents.OrderBy(et => et.Id).ToList());
+
+            if (m.Name == "EventComponent")
+            {
+                CheckEmbeddingRelationTypes(m.Name,
+                    m.DirectProperties.OrderBy(et => et.Id).ToList(),
+                    w.DirectProperties.OrderBy(et => et.Id).ToList());
+            }
+
+            CheckEmbeddingRelationTypes(m.Name,
+                m.AllProperties.OrderBy(et => et.Id).ToList(),
+                w.AllProperties.OrderBy(et => et.Id).ToList());
         }
         private void CheckMeta(IMeta m, IMeta w)
         {
 
+        }
+        private void CheckEmbeddingRelationTypes(string typeName, List<IEmbeddingRelationTypeModel> m, List<IEmbeddingRelationTypeModel> w)
+        {
+            var l1 = m.Where(r => !w.Any(t => t.Name == r.Name)).ToList();
+            var l2 = w.Where(r => !m.Any(t => t.Name == r.Name)).ToList();
+            Assert.Equal(m.Count, w.Count);
+            for (int i = 0; i < m.Count; i++)
+            {
+                CheckEmbeddingRelationType(m[i], w[i]);
+            }
+        }
+        private void CheckEmbeddingRelationType(IEmbeddingRelationTypeModel m, IEmbeddingRelationTypeModel w)
+        {
+            CheckNodeType(m, w);
         }
     }
 }

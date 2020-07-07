@@ -32,6 +32,8 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<INodeTypeLinked> GetDirectDescendants();
         IReadOnlyList<INodeTypeLinked> GetAllDescendants();
         IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded();
+        IEnumerable<INodeTypeLinked> GetDirectProperties();
+        IEnumerable<INodeTypeLinked> GetAllProperties();
         bool IsIdentical(INodeTypeLinked nodeType);
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();
