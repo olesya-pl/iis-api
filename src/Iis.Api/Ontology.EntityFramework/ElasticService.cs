@@ -60,7 +60,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     .Select(nt => nt.Name)
                     .ToList();
             }
-            
+
             EventIndexes = new[]{
                 "Event"
             };
@@ -211,11 +211,6 @@ namespace IIS.Core.Ontology.EntityFramework
                 NeedToDelete = toDelete.ToList(),
                 NeedToUpdate = dbIds
             };
-        }
-
-        private Task<string> GetNodeByIdAsync(string indexName, string id, IEnumerable<INodeTypeModel> nodeTypes)
-        {
-            return _elasticManager.GetDocumentByIdAsync(indexName, id, nodeTypes.Select(nt => nt.Name).ToArray());
         }
     }
 }
