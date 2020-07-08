@@ -25,5 +25,14 @@ namespace Iis.DbLayer.Repositories
                             .AsNoTracking()
                             .ToArrayAsync();
         }
+
+        public async Task<MLResponseEntity> SaveAsync(MLResponseEntity entity)
+        {
+            _context.Add(entity);
+
+            await _context.SaveChangesAsync();
+
+            return entity;
+        }
     }
 }

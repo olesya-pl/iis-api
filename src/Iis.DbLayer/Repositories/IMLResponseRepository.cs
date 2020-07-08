@@ -16,5 +16,11 @@ namespace Iis.DbLayer.Repositories
         /// </summary>
         /// <param name="materialId">given Material Id</param>
         Task<IEnumerable<MLResponseEntity>> GetAllForMaterialAsync(Guid materialId);
+
+        /// <summary>
+        /// Save Machine Learning Results
+        /// </summary>
+        /// <param name="entity">Machine Learning Results</param>
+        Task<MLResponseEntity> SaveAsync(MLResponseEntity entity);
     }
 }

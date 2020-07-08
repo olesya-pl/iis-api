@@ -4,15 +4,17 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
 using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore;
+
 using IIS.Core.Files;
-using Iis.Domain.Materials;
-using Iis.Interfaces.Elastic;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
+using Iis.DbLayer.Repositories;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-using IIS.Core.Materials.EntityFramework.FeatureProcessors;
-using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -25,6 +27,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialEventProducer _eventProducer;
         private readonly IMaterialProvider _materialProvider;
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
+        private readonly IMLResponseRepository _mLResponseRepository;
 
         public MaterialService(OntologyContext context,
             IFileService fileService,
@@ -32,7 +35,8 @@ namespace IIS.Core.Materials.EntityFramework
             IMapper mapper,
             IMaterialEventProducer eventProducer,
             IMaterialProvider materialProvider,
-            IEnumerable<IMaterialProcessor> materialProcessors)
+            IEnumerable<IMaterialProcessor> materialProcessors,
+            IMLResponseRepository mLResponseRepository)
         {
             _context = context;
             _fileService = fileService;
@@ -41,6 +45,7 @@ namespace IIS.Core.Materials.EntityFramework
             _eventProducer = eventProducer;
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
+            _mLResponseRepository = mLResponseRepository;
         }
 
         public async Task SaveAsync(Material material)
@@ -119,11 +124,9 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
         {
-            var responseEntity = _mapper.Map<MlResponse, MLResponseEntity>(response);
+            var responseEntity = _mapper.Map<MLResponseEntity>(response);
 
-            _context.MLResponses.Add(responseEntity);
-
-            _context.SaveChanges();
+            responseEntity = await _mLResponseRepository.SaveAsync(responseEntity);
 
             await PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
@@ -186,6 +189,19 @@ namespace IIS.Core.Materials.EntityFramework
                 return;
             }
             material.AssigneeId = assigneeId;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
+        {
+            var material = await _context.Materials.FirstOrDefaultAsync(p => p.Id == materialId);
+
+            if (material == null)
+            {
+                throw new ArgumentNullException($"Material with given id not found");
+            }
+
+            material.MlHandlersCount = handlersCount;
             await _context.SaveChangesAsync();
         }
 
@@ -258,19 +274,6 @@ namespace IIS.Core.Materials.EntityFramework
                 SourceType = info.SourceType,
                 SourceVersion = info.SourceVersion,
             };
-        }
-
-        public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
-        {
-            var material = await _context.Materials.FirstOrDefaultAsync(p => p.Id == materialId);
-
-            if (material == null)
-            {
-                throw new ArgumentNullException($"Material with given id not found");
-            }
-
-            material.MlHandlersCount = handlersCount;
-            await _context.SaveChangesAsync();
         }
     }
 }
