@@ -22,6 +22,7 @@ using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
+using IIS.Core.NodeMaterialRelation;
 using IIS.Core.Analytics.EntityFramework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,27 +36,27 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Iis.Elastic;
 using AutoMapper;
 using Iis.Api;
-using Iis.Api.Modules;
-using Iis.Api.Configuration;
-using Iis.Api.Bootstrap;
 using Iis.Api.Export;
+using Iis.Api.Modules;
+using Iis.Api.Bootstrap;
+using Iis.Api.Configuration;
+using Iis.Api.GraphQL.Access;
+using Iis.Interfaces.Roles;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DataModel.Roles;
-using Iis.Domain;
-using Iis.DbLayer.Ontology.EntityFramework;
-using Iis.DbLayer.OntologySchema;
 using Iis.Roles;
-using Iis.Api.GraphQL.Access;
-using Iis.Interfaces.Roles;
-using IIS.Core.NodeMaterialRelation;
-using Iis.Interfaces.Ontology.Schema;
+using Iis.Domain;
+using Iis.Elastic;
 using Iis.DbLayer.Elastic;
+using Iis.DbLayer.Repositories;
+using Iis.DbLayer.OntologySchema;
+using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.ThemeManagement;
 
 namespace IIS.Core
@@ -136,6 +137,8 @@ namespace IIS.Core
             }
 
             services.AddHttpContextAccessor();
+            services.AddTransient<IMLResponseRepository, MLResponseRepository>();
+            services.AddTransient<IMaterialRepository, MaterialRepository>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddSingleton<MutationCreateResolver>();
             services.AddSingleton<MutationUpdateResolver>();

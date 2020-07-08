@@ -18,7 +18,7 @@ namespace Iis.DbLayer.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<MLResponseEntity>> GetMachineLearningResultsForMaterialAsync(Guid materialId)
+        public async Task<IEnumerable<MLResponseEntity>> GetAllForMaterialAsync(Guid materialId)
         {
             return await _context.MLResponses
                             .Where(p => p.MaterialId == materialId)

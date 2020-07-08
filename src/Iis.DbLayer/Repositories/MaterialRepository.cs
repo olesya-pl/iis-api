@@ -67,6 +67,7 @@ namespace Iis.DbLayer.Repositories
                 {
                     MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
                     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
+                    MaterialIncludeEnum.OnlyParent => resultQuery.OnlyParent(),
                     _ => resultQuery
                 };
             }
