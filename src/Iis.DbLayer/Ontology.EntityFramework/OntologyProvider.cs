@@ -105,10 +105,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     _types.Add(type.Id, entity);
                     FillProperties(type, entity);
                     // Process relation inheritance first
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance && !r.NodeType.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     entity.Meta = entity.CreateMeta(); // todo: refactor. Creates meta with all parent types meta
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance && !r.NodeType.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     return entity;
                 }
