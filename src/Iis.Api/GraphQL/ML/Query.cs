@@ -15,7 +15,7 @@ namespace IIS.Core.GraphQL.ML
             [Service] IMapper mapper,
             Guid materialId)
         {
-            var mlResults = await materialProvider.GetMlProcessingResultsAsync(materialId);
+            var mlResults = await materialProvider.GetMLProcessingResultsAsync(materialId);
             
             return mlResults.Select(p => mapper.Map<MlProcessingResult>(p)).ToList();
         } 

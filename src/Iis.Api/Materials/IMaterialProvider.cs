@@ -12,7 +12,7 @@ namespace IIS.Core.Materials
     public interface IMaterialProvider
     {
         Task<Material> GetMaterialAsync(Guid id);
-        Task<MaterialEntity> GetMaterialEntityAsync(Guid id);
+
         Task<(IEnumerable<Material> Materials,
             int Count,
             Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(int limit,
@@ -27,7 +27,7 @@ namespace IIS.Core.Materials
         MaterialSign GetMaterialSign(string signValue);
         MaterialSign GetMaterialSign(Guid id);
         Task<Material> MapAsync(MaterialEntity material);
-        Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId);
+        Task<List<MlProcessingResult>> GetMLProcessingResultsAsync(Guid materialId);
         Task<JObject> GetMaterialDocumentAsync(Guid materialId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);

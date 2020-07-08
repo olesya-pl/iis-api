@@ -140,27 +140,11 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        public async Task<MaterialEntity> GetMaterialEntityAsync(Guid id)
-        {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                return await GetMaterialQuery()
-                    .WithChildren()
-                    .WithFeatures()
-                    .SingleOrDefaultAsync(m => m.Id == id);
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
-        }
-
         public async Task<Material> GetMaterialAsync(Guid id)
         {
-            var material = await GetMaterialEntityAsync(id);
+            var entity = await _materialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures);
 
-            return await MapAsync(material);
+            return await MapAsync(entity);
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
@@ -221,7 +205,7 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        public async Task<List<MlProcessingResult>> GetMlProcessingResultsAsync(Guid materialId)
+        public async Task<List<MlProcessingResult>> GetMLProcessingResultsAsync(Guid materialId)
         {
             var entities = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
 
@@ -254,7 +238,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             var materialTask = GetSimplifiedMaterialAsync(materialId);
 
-            var mLResponsesTask = GetMlProcessingResultsAsync(materialId);
+            var mLResponsesTask = GetMLProcessingResultsAsync(materialId);
 
             await Task.WhenAll(materialTask, mLResponsesTask);
 
@@ -342,7 +326,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             mappingTasks = (await materialsByNode
                                  .ToArrayAsync())
-                                 .Select(async e => await MapAsync(await GetMaterialEntityAsync(e.Id)));
+                                 .Select(async e => await MapAsync(await _materialRepository.GetByIdAsync(e.Id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)));
 
             materials = await Task.WhenAll(mappingTasks);
 
