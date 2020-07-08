@@ -9,7 +9,7 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
 
-namespace Iis.DbLayer.Repository
+namespace Iis.DbLayer.Repositories
 {
     public class MaterialRepository : IMaterialRepository
     {
@@ -35,14 +35,6 @@ namespace Iis.DbLayer.Repository
         {
             return await GetMaterialsQuery(MaterialIncludeEnum.OnlyParent)
                             .Where(p => p.AssigneeId == assigneeId)
-                            .ToArrayAsync();
-        }
-        
-        public async Task<IEnumerable<MLResponseEntity>> GetMachineLearningResultsForMaterialAsync(Guid materialId)
-        {
-            return await _context.MLResponses
-                            .Where(p => p.MaterialId == materialId)
-                            .AsNoTracking()
                             .ToArrayAsync();
         }
         
