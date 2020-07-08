@@ -31,7 +31,7 @@ namespace Iis.Domain.Meta
             JsonSerializer serializer)
         {
             var jo = JObject.Load(reader);
-            return jo.ToObject<TMeta>(js);
+             return jo.ToObject<TMeta>(js);
         }
     }
 

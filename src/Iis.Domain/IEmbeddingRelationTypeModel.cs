@@ -1,4 +1,5 @@
 ﻿using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using System.Collections.Generic;
 
@@ -16,5 +17,6 @@ namespace Iis.Domain
         bool IsInversed { get; }
         IEnumerable<IRelationTypeModel> RelationTypes { get; }
         INodeTypeModel TargetType { get; }
+        bool AcceptsOperation(EntityOperation create);
     }
 }

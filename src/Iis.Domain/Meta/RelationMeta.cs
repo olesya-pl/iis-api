@@ -3,14 +3,14 @@ using Iis.Interfaces.Meta;
 namespace Iis.Domain.Meta
 {
 
-    public class RelationMetaBase : IMeta
+    public class RelationMetaBase : IRelationMetaBase
     {
         public int? SortOrder { get; set; }
         public string Title { get; set; }
         public FormField FormField { get; set; }
         public ContainerMeta Container { get; set; }
         public bool Multiple { get; set; }
-        public IValidation Validation { get; set; }
+        public Validation Validation { get; set; }
     }
 
     // Entity to entity relation
@@ -35,14 +35,9 @@ namespace Iis.Domain.Meta
         public bool Editable { get; set; }
     }
 
-    public enum EntityOperation : byte
-    {
-        Create, Update, Delete
-    }
-
     // TODO: this should be an anonymous object, something like JObject
     //       different clients will have different UI components and their configuration cannot be statically described in code!
-    public class FormField
+    public class FormField : IFormField
     {
         public string Type { get; set; }
         public int? Lines { get; set; }

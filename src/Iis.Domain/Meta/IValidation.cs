@@ -2,6 +2,6 @@ namespace Iis.Domain.Meta
 {
     public interface IValidation
     {
-        bool? Required { get; set; } 
+        bool? Required { get; set; }
     }
 }

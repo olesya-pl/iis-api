@@ -154,7 +154,7 @@ namespace Iis.OntologySchema.DataTypes
                 result.AddRange(directAncestor.GetAllAncestors());
             }
 
-            return result;
+            return result.Distinct().ToList();
         }
 
         public bool IsInheritedFrom(string nodeTypeName)

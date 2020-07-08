@@ -1,5 +1,6 @@
 ﻿using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
@@ -29,5 +30,10 @@ namespace Iis.OntologyModelWrapper
         public IEnumerable<IRelationTypeModel> RelationTypes => throw new NotImplementedException();
 
         public INodeTypeModel TargetType => throw new NotImplementedException();
+
+        public bool AcceptsOperation(EntityOperation create)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

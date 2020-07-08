@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Domain
@@ -35,6 +36,11 @@ namespace Iis.Domain
         public override string ToString()
         {
             return $"{GetType()} '{Name}' to {TargetType}";
+        }
+
+        public bool AcceptsOperation(EntityOperation create)
+        {
+            return false;
         }
     }
 }

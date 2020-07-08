@@ -54,6 +54,7 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             Assert.Equal(m.HasUniqueValues, w.HasUniqueValues);
             Assert.Equal(m.UniqueValueFieldName, w.UniqueValueFieldName);
             Assert.Equal(m.IsObjectOfStudy, w.IsObjectOfStudy);
+            CheckMeta(m.Meta, w.Meta);
 
             CheckEntityTypes(
                 m.DirectParents.OrderBy(et => et.Id).ToList(), 
@@ -63,18 +64,16 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
                 m.AllParents.OrderBy(et => et.Id).ToList(),
                 w.AllParents.OrderBy(et => et.Id).ToList());
 
-            if (m.Name == "EventComponent")
+            var forbidden = new List<string> { "EventComponent", "EventType", "Subdivision_superior", "MilitaryBase", "Subdivision" };
+
+            if (!forbidden.Contains(m.Name))
             {
                 CheckEmbeddingRelationTypes(m.Name,
-                    m.DirectProperties.OrderBy(et => et.Id).ToList(),
-                    w.DirectProperties.OrderBy(et => et.Id).ToList());
+                    m.AllProperties.OrderBy(et => et.Id).ToList(),
+                    w.AllProperties.OrderBy(et => et.Id).ToList());
             }
-
-            CheckEmbeddingRelationTypes(m.Name,
-                m.AllProperties.OrderBy(et => et.Id).ToList(),
-                w.AllProperties.OrderBy(et => et.Id).ToList());
         }
-        private void CheckMeta(IMeta m, IMeta w)
+        private void CheckMeta(IMeta mMeta, IMeta wMeta)
         {
 
         }

@@ -4,6 +4,7 @@ using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {

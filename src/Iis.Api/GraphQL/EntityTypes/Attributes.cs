@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.Meta;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -61,7 +62,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         int? SortOrder { get; }
 
-        [GraphQLType(typeof(AnyType))] IValidation Validation { get; }
+        [GraphQLType(typeof(AnyType))] Validation Validation { get; }
     }
 
     public abstract class EntityAttributeBase : IEntityAttribute
@@ -102,7 +103,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public int? SortOrder => MetaObject?.SortOrder;
 
         [GraphQLType(typeof(AnyType))]
-        public IValidation Validation {
+        public Validation Validation {
             get {
                 var validation = MetaObject?.Validation;
 
