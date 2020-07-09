@@ -19,11 +19,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _createResolver = createResolver;
             _updateResolver = updateResolver;
         }
-        public IFeatureProcessor GetInstance(string materialSource)
+        public IFeatureProcessor GetInstance(string materialSource, string materialType)
         {
             return materialSource switch
             {
-                "cell.voice" => new GSMFeatureProcessor(_elasticService, _ontology, _createResolver, _updateResolver),
+                "cell.voice" when materialType == "audio" => new GSMFeatureProcessor(_elasticService, _ontology, _createResolver, _updateResolver),
                 _ => new DummyFeatureProcessor()
             };
         }
