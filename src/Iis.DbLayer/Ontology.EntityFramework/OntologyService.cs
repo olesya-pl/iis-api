@@ -33,40 +33,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
-            NodeEntity existing = _context.Nodes.Local.FirstOrDefault(e => e.Id == source.Id);
-
-            if (existing is null)
+            try
             {
-                existing = new NodeEntity
-                {
-                    Id = source.Id,
-                    NodeTypeId = source.Type.Id,
-                    CreatedAt = source.CreatedAt,
-                    UpdatedAt = source.UpdatedAt
-                };
-                _context.Nodes.Add(existing);
-            }
+                await _context.Semaphore.WaitAsync(cancellationToken);
+                NodeEntity existing = _context.Nodes.Local.FirstOrDefault(e => e.Id == source.Id);
 
-            SaveRelations(source, existing);
-
-            await _context.SaveChangesAsync(cancellationToken);
-            await _elasticService.PutNodeAsync(source.Id);
-        }
-
-        public async Task SaveNodesAsync(IEnumerable<Node> nodes, CancellationToken cancellationToken = default)
-        {
-            IQueryable<NodeEntity> query =
-                from node in _context.Nodes
-                    .Include(x => x.Relation)
-                    .Include(x => x.Attribute)
-                    .Include(x => x.OutgoingRelations)
-                        .ThenInclude(x => x.Node)
-                select node;
-            Dictionary<Guid, NodeEntity> existingNodes = await query.ToDictionaryAsync(x => x.Id, cancellationToken);
-
-            foreach (Node source in nodes)
-            {
-                if (!existingNodes.TryGetValue(source.Id, out NodeEntity existing))
+                if (existing is null)
                 {
                     existing = new NodeEntity
                     {
@@ -76,13 +48,60 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         UpdatedAt = source.UpdatedAt
                     };
                     _context.Nodes.Add(existing);
-                    existingNodes.Add(existing.Id, existing);
                 }
 
                 SaveRelations(source, existing);
+
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            finally
+            {
+                _context.Semaphore.Release();
             }
 
-            await _context.SaveChangesAsync(cancellationToken);
+            await _elasticService.PutNodeAsync(source.Id);
+        }
+
+        public async Task SaveNodesAsync(IEnumerable<Node> nodes, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await _context.Semaphore.WaitAsync(cancellationToken);
+                IQueryable<NodeEntity> query =
+                    from node in _context.Nodes
+                        .Include(x => x.Relation)
+                        .Include(x => x.Attribute)
+                        .Include(x => x.OutgoingRelations)
+                        .ThenInclude(x => x.Node)
+                    select node;
+                Dictionary<Guid, NodeEntity>
+                    existingNodes = await query.ToDictionaryAsync(x => x.Id, cancellationToken);
+
+                foreach (Node source in nodes)
+                {
+                    if (!existingNodes.TryGetValue(source.Id, out NodeEntity existing))
+                    {
+                        existing = new NodeEntity
+                        {
+                            Id = source.Id,
+                            NodeTypeId = source.Type.Id,
+                            CreatedAt = source.CreatedAt,
+                            UpdatedAt = source.UpdatedAt
+                        };
+                        _context.Nodes.Add(existing);
+                        existingNodes.Add(existing.Id, existing);
+                    }
+
+                    SaveRelations(source, existing);
+                }
+
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+
             foreach (Node source in nodes)
             {
                 await _elasticService.PutNodeAsync(source.Id);
@@ -214,7 +233,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             NodeEntity[] ctxNodes;
             // workaround because of wrong generated query with distinct and order by
             var workaroundQ = from a in relationsQ.Distinct()
-                                select new { Node = a, dummy = string.Empty };
+                              select new { Node = a, dummy = string.Empty };
 
             ctxNodes = await workaroundQ
                 .Skip(filter.Offset)
@@ -540,35 +559,51 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
-            var nodeEntities = await
-                (from n in _context.Nodes
-                 join r in _context.Relations on n.Id equals r.SourceNodeId
-                 join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
-                 join a in _context.Attributes on n2.Id equals a.Id
-                 join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
-                 where n.NodeTypeId == nodeTypeId
-                     && !n.IsArchived && !n2.IsArchived
-                     && nt.Name == valueTypeName
-                     && (a.Value == value || value == null)
-                 select n).ToListAsync();
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                var nodeEntities = await
+                    (from n in _context.Nodes
+                     join r in _context.Relations on n.Id equals r.SourceNodeId
+                     join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
+                     join a in _context.Attributes on n2.Id equals a.Id
+                     join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
+                     where n.NodeTypeId == nodeTypeId
+                          && !n.IsArchived && !n2.IsArchived
+                          && nt.Name == valueTypeName
+                          && (a.Value == value || value == null)
+                     select n).ToListAsync();
 
-            return nodeEntities
-                .Select(n => (Entity)MapNode(n))
-                .FirstOrDefault();
+                return nodeEntities
+                    .Select(n => (Entity)MapNode(n))
+                    .FirstOrDefault();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
         public async Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
-            return await
-                (from n in _context.Nodes
-                join r in _context.Relations on n.Id equals r.SourceNodeId
-                join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
-                join a in _context.Attributes on n2.Id equals a.Id
-                join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
-                where n.NodeTypeId == nodeTypeId
-                    && !n.IsArchived && !n2.IsArchived
-                    && nt.Name == valueTypeName
-                    && (a.Value.StartsWith(value))
-                select a).Take(limit).ToListAsync();
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                return await
+                    (from n in _context.Nodes
+                     join r in _context.Relations on n.Id equals r.SourceNodeId
+                     join n2 in _context.Nodes on r.TargetNodeId equals n2.Id
+                     join a in _context.Attributes on n2.Id equals a.Id
+                     join nt in _context.NodeTypes on n2.NodeTypeId equals nt.Id
+                     where n.NodeTypeId == nodeTypeId
+                         && !n.IsArchived && !n2.IsArchived
+                         && nt.Name == valueTypeName
+                         && (a.Value.StartsWith(value))
+                     select a).Take(limit).ToListAsync();
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
         public async Task CreateRelation(Guid sourceNodeId, Guid targetNodeId)
         {

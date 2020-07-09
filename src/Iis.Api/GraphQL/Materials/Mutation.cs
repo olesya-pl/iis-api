@@ -24,9 +24,10 @@ namespace IIS.Core.GraphQL.Materials
 
             inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
 
-            inputMaterial.Metadata = await featureProcessorFactory.GetInstance(inputMaterial.Source).ProcessMetadata(inputMaterial.Metadata);
+            inputMaterial.Metadata = await featureProcessorFactory.GetInstance(inputMaterial.Source, inputMaterial.Type).ProcessMetadata(inputMaterial.Metadata);
 
             await materialService.SaveAsync(inputMaterial);
+            
             return new CreateMaterialResponse { Id = inputMaterial.Id };
         }
 
