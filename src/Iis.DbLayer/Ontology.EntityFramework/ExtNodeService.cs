@@ -36,7 +36,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
                 .SingleOrDefault();
 
-            if(objectOfStudyType != null)
+            if (objectOfStudyType != null)
             {
                 return objectOfStudyType.IncomingRelations
                     .Where(r => r.Kind == RelationKind.Inheritance)
@@ -61,7 +61,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             if (nodeEntity.Attribute == null) return null;
 
-            var scalarType = nodeEntity.INodeTypeModel.IAttributeTypeModel.ScalarType;
+            var scalarType = nodeEntity.NodeType.IAttributeTypeModel.ScalarType;
             var value = nodeEntity.Attribute.Value;
             switch (scalarType)
             {
@@ -82,9 +82,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
                 NodeTypeName = nodeTypeName,
                 NodeTypeTitle = nodeTypeTitle,
-                EntityTypeName = nodeEntity.INodeTypeModel.Name,
+                EntityTypeName = nodeEntity.NodeType.Name,
                 AttributeValue = GetAttributeValue(nodeEntity),
-                ScalarType = nodeEntity.INodeTypeModel?.IAttributeTypeModel?.ScalarType,
+                ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
                 Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, cancellationToken)
@@ -94,14 +94,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var nodeEntity = await GetNodeQuery()
-                .Where(n => n.Id == id)
-                .SingleOrDefaultAsync();
-            
-            if (nodeEntity == null) return null;
+            try
+            {
+                await _context.Semaphore.WaitAsync(cancellationToken);
+                var nodeEntity = await GetNodeQuery()
+                    .Where(n => n.Id == id)
+                    .SingleOrDefaultAsync();
+                if (nodeEntity == null) return null;
 
-            var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.INodeTypeModel.Name, nodeEntity.INodeTypeModel.Title, cancellationToken);
-            return extNode;
+                var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
+                return extNode;
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
         private async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
@@ -112,7 +119,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
                 if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
                 {
-                    var extNode = await MapExtNodeAsync(node, relation.Node.INodeTypeModel.Name, relation.Node.INodeTypeModel.Title ,cancellationToken);
+                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, relation.Node.NodeType.Title, cancellationToken);
                     result.Add(extNode);
                 }
             }
@@ -132,7 +139,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             foreach (var node in nodes)
             {
-                Console.WriteLine($"{++cnt}/{total}: {node.Id};{node.INodeTypeModel.Name}");
+                Console.WriteLine($"{++cnt}/{total}: {node.Id};{node.NodeType.Name}");
                 var extNode = await GetExtNodeByIdAsync(node.Id, cancellationToken);
                 result.Add(extNode);
             }
@@ -144,11 +151,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             return _context.Nodes
                 .Include(n => n.Attribute)
-                .Include(n => n.INodeTypeModel)
+                .Include(n => n.NodeType)
                 .ThenInclude(nt => nt.IAttributeTypeModel)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
-                .ThenInclude(rn => rn.INodeTypeModel)
+                .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode)
                 .Where(n => !n.IsArchived);

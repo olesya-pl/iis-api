@@ -71,6 +71,54 @@ namespace Iis.UnitTests.Materials
         }
 
         [Theory, RecursiveAutoData]
+        public async Task Update_ContentIsNull_DoesNotUpdate(MaterialEntity material)
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.Add(material);
+            material.Data = material.Metadata = material.LoadData = null;
+            material.MaterialInfos = new List<MaterialInfoEntity>();
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<IMaterialService>();
+            await sut.UpdateMaterialAsync(new MaterialUpdateInput {
+                Id = material.Id,
+                Title = "UpdatedTitle"
+            });
+
+            //assert
+            var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
+            var res = await provider.GetMaterialAsync(material.Id);
+            Assert.Equal(material.Content, res.Content);
+        }
+
+        [Theory, RecursiveAutoData]
+        public async Task Update_IsEmptyString_Updated(MaterialEntity material)
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.Add(material);
+            material.Data = material.Metadata = material.LoadData = null;
+            material.MaterialInfos = new List<MaterialInfoEntity>();
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<IMaterialService>();
+            await sut.UpdateMaterialAsync(new MaterialUpdateInput
+            {
+                Id = material.Id,
+                Title = "UpdatedTitle",
+                Content = string.Empty
+            });
+
+            //assert
+            var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
+            var res = await provider.GetMaterialAsync(material.Id);
+            Assert.Equal(string.Empty, res.Content);
+        }
+
+        [Theory, RecursiveAutoData]
         public async Task UpdateSessionPriority_ReturnsSessionPriorityBack(
             MaterialEntity materialEntity,
             MaterialSignTypeEntity typeEntity,

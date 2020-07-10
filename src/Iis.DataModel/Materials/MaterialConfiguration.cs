@@ -68,6 +68,10 @@ namespace Iis.DataModel.Materials
             builder.Property(e => e.MlHandlersCount)
                 .IsRequired(true)
                 .HasDefaultValue(0);
+
+            builder.Property(e => e.Content)
+                .IsRequired(true)
+                .HasDefaultValue("");
         }
     }
 }

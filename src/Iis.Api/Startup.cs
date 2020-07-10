@@ -60,6 +60,8 @@ using IIS.Core.NodeMaterialRelation;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DbLayer.Elastic;
 using Iis.ThemeManagement;
+using Iis.DbLayer.Repository;
+using Iis.Interfaces.Repository;
 
 namespace IIS.Core
 {
@@ -97,7 +99,7 @@ namespace IIS.Core
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Singleton);
                 using var context = OntologyContext.GetContext(dbConnectionString);
-                
+
                 IOntologySchema ontologySchema;
                 IOntologyCache ontologyCache;
                 IOntologyModel ontology;
@@ -119,7 +121,7 @@ namespace IIS.Core
 
                     var ontologyProvider = new OntologyProvider(context);
                     ontology = ontologyProvider.GetOntology();
-                    
+
                     iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                     iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
                 }
@@ -244,6 +246,8 @@ namespace IIS.Core
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<GraphQLAccessList>();
+
+            services.AddTransient<INodeRepository, NodeRepository>();
         }
 
 

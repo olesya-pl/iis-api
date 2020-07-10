@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
+    <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
