@@ -8,6 +8,12 @@ namespace Iis.OntologySchema.DataTypes
         bool? HasFewEntities { get; set; }
         int? SortOrder { get; set; }
         string Title { get; set; }
+        string Formula { get; set; }
+        string Format { get; set; }
+        EntityOperation[] AcceptsEntityOperations { get; set; }
+        EntityOperation[] AcceptsEmbeddedOperations { get; set; }
+        string Type { get; set; }
+        string[] TargetTypes { get; set; }
         IFormField FormField { get; set; }
         IContainerMeta Container { get; set; }
         bool Multiple { get; set; }

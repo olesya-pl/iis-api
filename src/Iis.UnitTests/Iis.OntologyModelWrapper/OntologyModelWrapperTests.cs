@@ -87,22 +87,82 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             var schemaMeta = (ISchemaMeta)wMeta;
             if (mMeta is EntityMeta mEntityMeta)
             {
-                Assert.Equal(mEntityMeta.SortOrder, schemaMeta.SortOrder);
+                CheckEntityMeta(mEntityMeta, schemaMeta);
+            }
+            if (mMeta is RelationMetaBase)
+            {
+                CheckRelationMetaBase((RelationMetaBase)mMeta, schemaMeta);
             }
             if (mMeta is EntityRelationMeta erMeta)
             {
-                CheckInversedMeta(erMeta.Inversed, schemaMeta.Inversed);
+                CheckEntityRelationMeta(erMeta, schemaMeta);
             }
+            if (mMeta is AttributeRelationMeta arMeta)
+            {
+                Assert.Equal(arMeta.Formula, schemaMeta.Formula);
+                Assert.Equal(arMeta.Format, schemaMeta.Format);
+            }
+            if (mMeta is AttributeMeta aMeta)
+            {
+                Assert.Null(aMeta.Kind);
+                Assert.Null(aMeta.Validation);
+            }
+        }
+        private void CheckEntityMeta(EntityMeta m, ISchemaMeta w)
+        {
+            Assert.Equal(m.SortOrder, w.SortOrder);
+            Assert.Equal(m.ExposeOnApi, w.ExposeOnApi);
+            Assert.Equal(m.HasFewEntities, w.HasFewEntities);
+            Assert.Equal(m.AcceptsEmbeddedOperations, w.AcceptsEmbeddedOperations);
+            CheckContainers(m.Container, w.Container);
+            CheckFormFields(m.FormField, w.FormField);
+        }
+        private void CheckEntityRelationMeta(EntityRelationMeta m, ISchemaMeta w)
+        {
+            Assert.Equal(m.Type, w.Type);
+            Assert.Equal(m.AcceptsEntityOperations, w.AcceptsEntityOperations);
+            Assert.Equal(m.TargetTypes, w.TargetTypes);
+            CheckInversedMeta(m.Inversed, w.Inversed);
+        }
+        private void CheckRelationMetaBase(RelationMetaBase m, ISchemaMeta w)
+        {
+            Assert.Equal(m.Multiple, w.Multiple);
+            Assert.Equal(m.SortOrder, w.SortOrder);
+            Assert.Equal(m.Title, w.Title);
+            Assert.Equal(m.Validation?.Required, w.Validation?.Required);
+            CheckFormFields(m.FormField, w.FormField);
+            CheckContainers(m.Container, w.Container);
+        }
+        private void CheckContainers(ContainerMeta m, IContainerMeta w)
+        {
+            if (m == null && w == null) return;
+            Assert.Equal(m.Id, w.Id);
+            Assert.Equal(m.Title, w.Title);
+            Assert.Equal(m.Type, w.Type);
+        }
+        private void CheckFormFields(FormField m, IFormField w)
+        {
+            if (m == null && w == null) return;
+            Assert.Equal(m.Type, w.Type);
+            Assert.Equal(m.HasIndexColumn, w.HasIndexColumn);
+            Assert.Equal(m.Lines, w.Lines);
+            Assert.Equal(m.Hint, w.Hint);
+            Assert.Equal(m.Icon, w.Icon);
+            Assert.Equal(m.IncludeParent, w.IncludeParent);
+            Assert.Equal(m.Layout, w.Layout);
+            Assert.Equal(m.RadioType, w.RadioType);
         }
         private void CheckInversedMeta(InversedRelationMeta m, IInversedRelationMeta w)
         {
             if (m == null && w == null) return;
             Assert.Equal(m.Code, w.Code);
-            //Assert.False(m.Editable);
-            //Assert.Null(m.SortOrder);
             Assert.Equal(m.Title, w.Title);
-            Assert.Null(m.Container);
             Assert.Equal(m.Multiple, w.Multiple);
+           
+            Assert.False(m.Editable);
+            Assert.Null(m.FormField);
+            Assert.Null(m.SortOrder);
+            Assert.Null(m.Container);
             Assert.Null(m.Validation);
         }
         private void CheckEmbeddingRelationTypes(string typeName, List<IEmbeddingRelationTypeModel> m, List<IEmbeddingRelationTypeModel> w)
