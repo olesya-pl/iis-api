@@ -1,11 +1,10 @@
-﻿using Iis.Interfaces.Meta;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.Domain.Meta
+namespace Iis.Interfaces.Meta
 {
-    public interface IContainerMeta: IMeta
+    public interface IContainerMeta : IMeta
     {
         Guid Id { get; }
         string Title { get; }

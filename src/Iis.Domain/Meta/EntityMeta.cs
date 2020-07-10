@@ -3,7 +3,7 @@ using System;
 
 namespace Iis.Domain.Meta
 {
-    public class EntityMeta : IEntityMeta
+    public class EntityMeta: IMeta
     {
         public int? SortOrder { get; set; }
         public bool? ExposeOnApi { get; set; }

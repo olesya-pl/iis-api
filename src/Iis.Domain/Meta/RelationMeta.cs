@@ -3,7 +3,7 @@ using Iis.Interfaces.Meta;
 namespace Iis.Domain.Meta
 {
 
-    public class RelationMetaBase : IRelationMetaBase
+    public class RelationMetaBase: IMeta
     {
         public int? SortOrder { get; set; }
         public string Title { get; set; }

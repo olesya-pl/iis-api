@@ -1,17 +1,16 @@
-﻿using Iis.Interfaces.Meta;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Iis.OntologySchema.DataTypes
+namespace Iis.Interfaces.Meta
 {
-    public interface ISchemaMeta: IMeta
+    public interface IRelationMetaBase : IMeta
     {
-        bool? ExposeOnApi { get; set; }
-        bool? HasFewEntities { get; set; }
         int? SortOrder { get; set; }
         string Title { get; set; }
         IFormField FormField { get; set; }
         IContainerMeta Container { get; set; }
         bool Multiple { get; set; }
         IValidation Validation { get; set; }
-        IInversedRelationMeta Inversed { get; set; }
     }
 }

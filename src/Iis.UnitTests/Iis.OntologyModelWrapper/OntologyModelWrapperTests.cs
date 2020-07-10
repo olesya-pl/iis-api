@@ -1,4 +1,5 @@
-﻿using Iis.DbLayer.Ontology.EntityFramework;
+﻿using Iis.DataModel;
+using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
@@ -18,11 +19,15 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         [Fact]
         public void TestModelsIdentity()
         {
-            var context = Utils.GetRealDbContext();
+            TestModelsIdentityByConnectionString("Server = localhost; Database = contour_dev_net; Username = postgres; Password = 123");
+            TestModelsIdentityByConnectionString("Server = dev-db.odysseus.lcl; Database = od_dev; Username = postgres; Password = S1mpl3xTLS2709");
+        }
+        private void TestModelsIdentityByConnectionString(string connectionString)
+        {
+            var context = OntologyContext.GetContext(connectionString);
             var ontologyProvider = new OntologyProvider(context);
             var model = ontologyProvider.GetOntology();
-            var schema = Utils.GetOntologySchemaFromDb();
-            var type = schema.GetEntityTypeByName("AcademicDegree");
+            var schema = Utils.GetOntologySchemaFromDb(connectionString);
             var wrapper = new OntologyWrapper(schema);
             CheckIdentity(model, wrapper);
         }
@@ -67,7 +72,8 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
                 m.AllParents.OrderBy(et => et.Id).ToList(),
                 w.AllParents.OrderBy(et => et.Id).ToList());
 
-            var forbidden = new List<string> { "EventComponent", "EventType", "Subdivision_superior", "MilitaryBase", "Subdivision" };
+            var forbidden = new List<string>();
+                //new List<string> { "EventComponent", "EventType", "Subdivision_superior", "MilitaryBase", "Subdivision" };
 
             if (!forbidden.Contains(m.Name))
             {
@@ -79,19 +85,38 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         private void CheckMeta(IMeta mMeta, IMeta wMeta)
         {
             var schemaMeta = (ISchemaMeta)wMeta;
-            if (mMeta is IEntityMeta mEntityMeta)
+            if (mMeta is EntityMeta mEntityMeta)
             {
                 Assert.Equal(mEntityMeta.SortOrder, schemaMeta.SortOrder);
             }
+            if (mMeta is EntityRelationMeta erMeta)
+            {
+                CheckInversedMeta(erMeta.Inversed, schemaMeta.Inversed);
+            }
+        }
+        private void CheckInversedMeta(InversedRelationMeta m, IInversedRelationMeta w)
+        {
+            if (m == null && w == null) return;
+            Assert.Equal(m.Code, w.Code);
+            //Assert.False(m.Editable);
+            //Assert.Null(m.SortOrder);
+            Assert.Equal(m.Title, w.Title);
+            Assert.Null(m.Container);
+            Assert.Equal(m.Multiple, w.Multiple);
+            Assert.Null(m.Validation);
         }
         private void CheckEmbeddingRelationTypes(string typeName, List<IEmbeddingRelationTypeModel> m, List<IEmbeddingRelationTypeModel> w)
         {
             var l1 = m.Where(r => !w.Any(t => t.Name == r.Name)).ToList();
             var l2 = w.Where(r => !m.Any(t => t.Name == r.Name)).ToList();
-            Assert.Equal(m.Count, w.Count);
+            //Assert.Equal(m.Count, w.Count);
             for (int i = 0; i < m.Count; i++)
             {
-                CheckEmbeddingRelationType(m[i], w[i]);
+                var wrapper = w.SingleOrDefault(emb => emb.Id == m[i].Id);
+                if (wrapper != null)
+                {
+                    CheckEmbeddingRelationType(m[i], wrapper);
+                }
             }
         }
         private void CheckEmbeddingRelationType(IEmbeddingRelationTypeModel m, IEmbeddingRelationTypeModel w)

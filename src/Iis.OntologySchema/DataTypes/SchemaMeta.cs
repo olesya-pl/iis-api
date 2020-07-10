@@ -12,6 +12,13 @@ namespace Iis.OntologySchema.DataTypes
         public int? SortOrder { get; set; }
         public bool? ExposeOnApi { get; set; }
         public bool? HasFewEntities { get; set; }
+        public string Title { get; set; }
+        public IFormField FormField { get; set; }
+        public IContainerMeta Container { get; set; }
+        public bool Multiple { get; set; }
+        public IValidation Validation { get; set; }
+        public IInversedRelationMeta Inversed { get; set; }
+
         public SchemaMeta(string json)
         {
             if (string.IsNullOrEmpty(json)) return;
@@ -19,6 +26,12 @@ namespace Iis.OntologySchema.DataTypes
             if (jObj.ContainsKey("SortOrder"))
             {
                 SortOrder = int.Parse(jObj["SortOrder"].ToString());
+            }
+            if (jObj.ContainsKey("Inversed"))
+            {
+                var jInversed = (JObject)jObj["Inversed"];
+                Inversed = jInversed.ToObject<SchemaInversedMeta>();
+
             }
 
         }

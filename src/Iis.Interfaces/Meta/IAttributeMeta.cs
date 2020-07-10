@@ -1,11 +1,10 @@
-﻿using Iis.Interfaces.Meta;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.Domain.Meta
+namespace Iis.Interfaces.Meta
 {
-    public interface IAttributeMeta: IMeta
+    public interface IAttributeMeta : IMeta
     {
         IValidation Validation { get; set; }
         SearchType? Kind { get; set; }

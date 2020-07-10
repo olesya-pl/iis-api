@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.Domain.Meta
+namespace Iis.Interfaces.Meta
 {
-    public interface IEntityRelationMeta: IRelationMetaBase
+    public interface IAttributeRelationMeta : IMeta
     {
     }
 }

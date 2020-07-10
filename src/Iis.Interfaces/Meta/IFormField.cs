@@ -1,4 +1,4 @@
-﻿namespace Iis.Domain.Meta
+﻿namespace Iis.Interfaces.Meta
 {
     public interface IFormField
     {
