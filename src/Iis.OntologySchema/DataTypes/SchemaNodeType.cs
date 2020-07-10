@@ -47,7 +47,14 @@ namespace Iis.OntologySchema.DataTypes
             }
         }
         public bool HasUniqueValues => UniqueValueFieldName != null;
-        public IMeta MetaMeta => null;
+        private ISchemaMeta _metaMeta;
+        public ISchemaMeta MetaMeta => new SchemaMeta(GetMetaDeep());
+        public string GetMetaDeep()
+        {
+            if (!string.IsNullOrEmpty(Meta)) return Meta;
+            var parent = GetDirectAncestors().FirstOrDefault();
+            return parent?.GetMetaDeep();
+        }
 
         internal void AddIncomingRelation(SchemaRelationType relationType)
         {

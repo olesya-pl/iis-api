@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Meta;
+using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,11 +21,12 @@ namespace Iis.Interfaces.Ontology.Schema
         string UniqueValueFieldName { get; }
         bool HasUniqueValues { get; }
         Type ClrType { get; }
-        IMeta MetaMeta { get; }
+        ISchemaMeta MetaMeta { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
         IAttributeType AttributeType { get; }
         IRelationTypeLinked RelationType { get; }
+        string GetMetaDeep();
         IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom);
         IReadOnlyList<IChildNodeType> GetAllChildren();
         IReadOnlyList<INodeTypeLinked> GetDirectAncestors();

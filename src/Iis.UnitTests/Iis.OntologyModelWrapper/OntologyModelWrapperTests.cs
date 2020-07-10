@@ -1,7 +1,9 @@
 ﻿using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.Domain;
+using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.OntologyModelWrapper;
+using Iis.OntologySchema.DataTypes;
 using IIS.Domain;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,7 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             var ontologyProvider = new OntologyProvider(context);
             var model = ontologyProvider.GetOntology();
             var schema = Utils.GetOntologySchemaFromDb();
+            var type = schema.GetEntityTypeByName("AcademicDegree");
             var wrapper = new OntologyWrapper(schema);
             CheckIdentity(model, wrapper);
         }
@@ -51,7 +54,7 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             Assert.Equal(m.Title, w.Title);
             //Assert.Equal(m.MetaSource, w.MetaSource);
             Assert.Equal(m.UpdatedAt, w.UpdatedAt);
-            Assert.Equal(m.HasUniqueValues, w.HasUniqueValues);
+            Assert.Equal(m.HasUniqueValues, w.HasUniqueValues); 
             Assert.Equal(m.UniqueValueFieldName, w.UniqueValueFieldName);
             Assert.Equal(m.IsObjectOfStudy, w.IsObjectOfStudy);
             CheckMeta(m.Meta, w.Meta);
@@ -75,7 +78,11 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         }
         private void CheckMeta(IMeta mMeta, IMeta wMeta)
         {
-
+            var schemaMeta = (ISchemaMeta)wMeta;
+            if (mMeta is IEntityMeta mEntityMeta)
+            {
+                Assert.Equal(mEntityMeta.SortOrder, schemaMeta.SortOrder);
+            }
         }
         private void CheckEmbeddingRelationTypes(string typeName, List<IEmbeddingRelationTypeModel> m, List<IEmbeddingRelationTypeModel> w)
         {

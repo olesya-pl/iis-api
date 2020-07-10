@@ -1,6 +1,7 @@
 ﻿using Iis.Domain;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyModelWrapper.Meta;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -54,7 +55,10 @@ namespace Iis.OntologyModelWrapper
 
         public IMeta Meta
         {
-            get { return _source.MetaMeta; }
+            get 
+            {
+                return _source.MetaMeta; 
+            }
             set { throw new NotImplementedException(); }
         }
         public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
