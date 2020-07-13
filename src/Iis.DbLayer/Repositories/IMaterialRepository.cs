@@ -32,13 +32,22 @@ namespace Iis.DbLayer.Repositories
         /// <param name="offset">page offset</param>
         /// <param name="sortColumnName">sorting ColumnName</param>
         /// <param name="offset">sorting Order</param>
-        /// <returns></returns>
         Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
+
+        /// <summary>
+        /// Returns all the Materials for given list of Material Identities with paggination
+        /// </summary>
+        /// <param name="materialIdList">list of Material Identities</param>
+        /// <param name="limit">page limit</param>
+        /// <param name="offset">page offset</param>
+        /// <param name="sortColumnName">sorting ColumnName</param>
+        /// <param name="offset">sorting Order</param>
+        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null);
         
         /// <summary>
         /// Returns all the Materials for given list of Material Type with paggination
         /// </summary>
-        /// <param name="types">given list of Material Type</param>
+        /// <param name="types">list of Material Type</param>
         /// <param name="limit">page limit</param>
         /// <param name="offset">page offset</param>
         /// <param name="sortColumnName">sorting ColumnName</param>

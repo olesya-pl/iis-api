@@ -24,6 +24,7 @@ namespace IIS.Core.Materials.EntityFramework
 {
     public class MaterialProvider : IMaterialProvider
     {
+        private const int MaxResultWindow = 10000;
         private readonly OntologyContext _context;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
@@ -62,15 +63,9 @@ namespace IIS.Core.Materials.EntityFramework
 
             try
             {
-                IQueryable<MaterialEntity> materialsQuery
-                    = GetMaterialQuery()
-                    .WithChildren()
-                    .WithFeatures()
-                    .GetParentMaterialsQuery()
-                    .ApplySorting(sortColumnName, sortOrder);
-                IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
+                (IEnumerable<MaterialEntity> Materials, int TotalCount) materialResult;
                 
                 if (!string.IsNullOrWhiteSpace(filterQuery))
                 {
@@ -79,31 +74,22 @@ namespace IIS.Core.Materials.EntityFramework
                         return (new List<Material>(), 0, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
                     }
 
-                    const int MaxResultWindow = 10000;
+                    var filter = new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery };
 
-                    var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
-                        _elasticService.MaterialIndexes,
-                        new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery });
+                    var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(_elasticService.MaterialIndexes, filter);
 
-                    var foundIds = searchResult.Items.Keys.ToList();
+                    var matchedIdList = searchResult.Items.Keys.ToList();
 
-                    materialsCountQuery = materialsQuery = materialsQuery
-                                        .Where(e => foundIds.Contains(e.Id));
 
-                    mappingTasks = (await materialsQuery
-                                        .Skip(offset)
-                                        .Take(limit)
-                                        .ToArrayAsync())
-                                            .Select(async entity => await MapAsync(entity));
+                    materialResult = await _materialRepository.GetAllAsync(matchedIdList, limit, offset, sortColumnName, sortOrder);
+
+                    mappingTasks = materialResult.Materials
+                                    .Select(async entity => await MapAsync(entity));
 
                     materials = await Task.WhenAll(mappingTasks);
 
-                    var count = await materialsCountQuery.CountAsync();
-
-                    return (materials, count, searchResult.Items);
+                    return (materials, materialResult.TotalCount, searchResult.Items);
                 }
-
-                (IEnumerable<MaterialEntity> Materials, int TotalCount) materialResult;
 
                 if(types != null)
                 {
@@ -121,9 +107,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 materials = await UpdateProcessedMLHandlersCount(materials);
 
-                var materialsCount = materialResult.TotalCount;
-
-                return (materials, materialsCount, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
+                return (materials, materialResult.TotalCount, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
             }
             finally
             {
@@ -467,21 +451,6 @@ namespace IIS.Core.Materials.EntityFramework
             result.Add(directIdList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Direct)));
 
             return result;
-        }
-
-        private IQueryable<MaterialEntity> GetMaterialQuery()
-        {
-            return _context.Materials
-                    .AsNoTracking()
-                    .Include(m => m.Importance)
-                    .Include(m => m.Reliability)
-                    .Include(m => m.Relevance)
-                    .Include(m => m.Completeness)
-                    .Include(m => m.SourceReliability)
-                    .Include(m => m.ProcessedStatus)
-                    .Include(m => m.SessionPriority)
-                    .Include(m => m.Assignee)
-                    .AsNoTracking();
         }
 
         private async Task<Material[]> MapChildren(MaterialEntity material)
