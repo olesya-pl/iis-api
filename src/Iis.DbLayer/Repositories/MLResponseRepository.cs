@@ -26,6 +26,23 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
         
+        public async Task<IEnumerable<(Guid MaterialId, int Count)>> GetAllForMaterialsAsync(IReadOnlyCollection<Guid> materialIdList)
+        {
+            if(materialIdList is null || !materialIdList.Any()) return new List<(Guid MaterialId, int Count)>();
+
+            var result = await _context.MLResponses
+                                .Where(e => materialIdList.Contains(e.MaterialId))
+                                .GroupBy(e => e.MaterialId)
+                                .Select(ge => new { MaterialId = ge.Key, Count = ge.Count()})
+                                .AsNoTracking()
+                                .ToArrayAsync();
+
+            return result
+                    .Select(e => (MaterialId:e.MaterialId, Count: e.Count))
+                    .ToArray();
+        }
+ 
+
         public async Task<MLResponseEntity> SaveAsync(MLResponseEntity entity)
         {
             _context.Add(entity);

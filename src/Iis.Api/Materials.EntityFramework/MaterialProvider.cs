@@ -53,11 +53,8 @@ namespace IIS.Core.Materials.EntityFramework
             _mapper = mapper;
         }
 
-        public async Task<(
-            IEnumerable<Material> Materials,
-            int Count,
-            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(
-            int limit, int offset, string filterQuery,
+        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> 
+            GetMaterialsAsync(int limit, int offset, string filterQuery,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null,
             string sortColumnName = null, string sortOrder = null)
         {
@@ -122,7 +119,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 materials = await Task.WhenAll(mappingTasks);
 
-                PopulateProcessedMlHandlersCount(materials);
+                materials = await UpdateProcessedMLHandlersCount(materials);
 
                 var materialsCount = materialResult.TotalCount;
 
@@ -392,21 +389,22 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        private void PopulateProcessedMlHandlersCount(IEnumerable<Material> materials)
+        private async Task<IEnumerable<Material>> UpdateProcessedMLHandlersCount(IEnumerable<Material> materials)
         {
-            var materialIds = materials.Select(p => p.Id).ToArray();
+            var materialIds = Array.AsReadOnly(materials.Select(p => p.Id).ToArray());
 
-            foreach (var item in _context.MLResponses.Where(p => materialIds.Contains(p.MaterialId))
-                 .GroupBy(p => p.MaterialId)
-                 .Select(p => new { id = p.Key, count = p.Count() }))
-            {
-                var material = materials.FirstOrDefault(p => p.Id == item.id);
-                if (material == null)
-                {
-                    continue;
-                }
-                material.ProcessedMlHandlersCount = item.count;
-            }
+            var mlResults = await _mLResponseRepository.GetAllForMaterialsAsync(materialIds);
+
+            materials.Join(
+                mlResults, 
+                m => m.Id,
+                ml => ml.MaterialId,
+                (material, result) => {
+                    material.ProcessedMlHandlersCount = result.Count;
+                    return material;
+                }).ToList();
+
+            return materials;
         }
 
         private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
