@@ -4,15 +4,6 @@ using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.Materials
 {
-    public class MaterialFeature
-    {
-        [GraphQLType(typeof(NonNullType<IdType>))]
-        public Guid Id { get; set; }
-        public string Relation { get; set; }
-        public string Value { get; set; }
-        public MaterialFeatureNode Node { get; set; }
-    }
-
     public class MaterialFeatureNode
     {
         public string Id { get; set; }

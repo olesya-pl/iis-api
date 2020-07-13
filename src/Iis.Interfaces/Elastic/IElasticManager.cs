@@ -12,7 +12,7 @@ namespace Iis.Interfaces.Elastic
         Task<bool> DeleteDocumentAsync(string indexName, string documentId);
         Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName);
-        Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames, string id);
+        Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames, string id, CancellationToken token = default);
         Task CreateIndexesAsync(IEnumerable<string> indexNames, JObject mappingConfiguration = null, CancellationToken token = default);
         Task<bool> DeleteIndexAsync(string indexName, CancellationToken cancellationToken = default);
         Task<bool> DeleteIndexesAsync(IEnumerable<string> indexNames, CancellationToken cancellationToken = default);

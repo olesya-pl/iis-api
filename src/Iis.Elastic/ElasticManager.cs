@@ -85,7 +85,8 @@ namespace Iis.Elastic
         }
 
         public async Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames,
-            string documentId)
+            string documentId,
+            CancellationToken token = default)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(
                 GetRealIndexNames(indexNames),
@@ -99,7 +100,7 @@ namespace Iis.Elastic
                         }
                     },
                     _source = "*"
-                }));
+                }), null, token);
 
             if (!searchResponse.Success)
             {
