@@ -2,6 +2,7 @@
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.Repository;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,21 +23,21 @@ namespace Iis.Api.Controllers
         IElasticService _elasticService;
         IMaterialProvider _materialProvider;
         IOntologySchema _ontologySchema;
-        IElasticSerializer _elasticSerializer;
+        INodeRepository _nodeRepository;
         public AdminController(
             IExtNodeService extNodeService,
             IMaterialProvider materialProvider,
             IElasticService elasticService,
             IElasticManager elasticManager,
-            IElasticSerializer elasticSerializer,
-            IOntologySchema ontologySchema)
+            IOntologySchema ontologySchema,
+            INodeRepository nodeRepository)
         {
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
             _elasticService = elasticService;
-            _elasticSerializer = elasticSerializer;
             _materialProvider = materialProvider;
             _ontologySchema = ontologySchema;
+            _nodeRepository = nodeRepository;
         }
 
         [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
@@ -117,12 +118,11 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> GetElasticJson(string id, CancellationToken cancellationToken)
         {
             var uid = new Guid(id);
-            var extNode = await _extNodeService.GetExtNodeByIdAsync(uid);
-            if (extNode == null)
+            var jObj = await _nodeRepository.GetJsonNodeByIdAsync(uid, cancellationToken);
+            if (jObj == null)
             {
                 return Content($"Entity is not found for id = {uid}");
             }
-            var jObj = _elasticSerializer.GetJsonObjectByExtNode(extNode);
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
         }

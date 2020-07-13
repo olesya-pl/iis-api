@@ -14,7 +14,6 @@ namespace Iis.Interfaces.Elastic
         IEnumerable<string> EventIndexes { get; }
         IEnumerable<string> FeatureIndexes { get; }
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<bool> PutNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default);
         Task<bool> PutMaterialAsync(Guid materialId, JObject materialDocument, CancellationToken cancellation = default);
         Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default);
         Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);

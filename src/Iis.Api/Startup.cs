@@ -248,7 +248,7 @@ namespace IIS.Core
             services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<GraphQLAccessList>();
 
-            services.AddTransient<INodeRepository, NodeRepository>();
+            services.RegisterRepositories();
         }
 
 

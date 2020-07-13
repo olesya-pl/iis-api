@@ -38,7 +38,7 @@ namespace Iis.Api.Export
         {
             try
             {
-                var node = await _nodeRepository.GetNodeById(id);
+                var node = await _nodeRepository.GetJsonNodeByIdAsync(id);
                 await using var memoryStream = new MemoryStream();
                 using (var doc = WordprocessingDocument.Create(memoryStream, WordprocessingDocumentType.Document, true))
                 {
