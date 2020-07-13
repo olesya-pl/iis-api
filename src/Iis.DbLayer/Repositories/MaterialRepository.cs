@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,12 @@ namespace Iis.DbLayer.Repositories
     public class MaterialRepository : IMaterialRepository
     {
         private readonly OntologyContext _context;
+        private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
+        {
+            MaterialIncludeEnum.WithChildren,
+            MaterialIncludeEnum.WithFeatures
+        };
+
         public MaterialRepository(OntologyContext context)
         {
             _context = context;
@@ -31,9 +38,20 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
         
+        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName, string sortOrder)
+        {
+            return GetAllWithPredicateAsync(limit, offset, null, sortColumnName, sortOrder);
+        }
+
+        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null)
+        {
+            return GetAllWithPredicateAsync(limit, offset, (e)=> types.Contains(e.Type), sortColumnName, sortOrder);
+        }
+
         public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
         {
-            return await GetMaterialsQuery(MaterialIncludeEnum.OnlyParent)
+            return await GetMaterialsQuery()
+                            .OnlyParent()
                             .Where(p => p.AssigneeId == assigneeId)
                             .ToArrayAsync();
         }
@@ -67,13 +85,35 @@ namespace Iis.DbLayer.Repositories
                 {
                     MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
                     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
-                    MaterialIncludeEnum.OnlyParent => resultQuery.OnlyParent(),
                     _ => resultQuery
                 };
             }
 
             return resultQuery;
         }
-   
+        
+        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit, int offset, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
+        {
+            var materialQuery = predicate is null
+                                ? GetMaterialsQuery(_includeAll)
+                                    .OnlyParent()
+                                : (IQueryable<MaterialEntity>)
+                                    GetMaterialsQuery(_includeAll)
+                                    .OnlyParent()
+                                    .Where(predicate);
+
+            var materialCountQuery = materialQuery;
+
+            var materials = await materialQuery
+                                    .ApplySorting(sortColumnName, sortOrder)
+                                    .Skip(offset)
+                                    .Take(limit)
+                                    .ToArrayAsync();
+            
+            var materialCount = await materialCountQuery.CountAsync();
+
+
+            return (materials, materialCount);
+        }
     }
 }

@@ -74,6 +74,7 @@ namespace IIS.Core.Materials.EntityFramework
                 IQueryable<MaterialEntity> materialsCountQuery;
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
+                
                 if (!string.IsNullOrWhiteSpace(filterQuery))
                 {
                     if (!_elasticService.UseElastic)
@@ -105,32 +106,25 @@ namespace IIS.Core.Materials.EntityFramework
                     return (materials, count, searchResult.Items);
                 }
 
-                if (nodeIds == null)
+                (IEnumerable<MaterialEntity> Materials, int TotalCount) materialResult;
+
+                if(types != null)
                 {
-                    if (types != null) materialsQuery = materialsQuery.Where(e => types.Contains(e.Type));
-                }
+                    materialResult = await _materialRepository.GetAllAsync(types, limit, offset);
+                } 
                 else
                 {
-                    var nodeIdsArr = nodeIds.ToArray();
-
-                    materialsQuery = materialsQuery
-                        .Where(m => m.MaterialInfos.Any(i => i.MaterialFeatures.Any(f => nodeIdsArr.Contains(f.NodeId))))
-                        .OrderByDescending(m => m.CreatedDate);
+                    materialResult = await _materialRepository.GetAllAsync(limit, offset);
                 }
 
-                materialsCountQuery = materialsQuery;
-
-                materialsQuery = materialsQuery
-                                    .Skip(offset)
-                                    .Take(limit);
-
-                mappingTasks = (await materialsQuery.ToArrayAsync())
+                mappingTasks = materialResult.Materials
                                     .Select(async entity => await MapAsync(entity));
 
                 materials = await Task.WhenAll(mappingTasks);
+
                 PopulateProcessedMlHandlersCount(materials);
 
-                var materialsCount = await materialsCountQuery.CountAsync();
+                var materialsCount = materialResult.TotalCount;
 
                 return (materials, materialsCount, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
             }
