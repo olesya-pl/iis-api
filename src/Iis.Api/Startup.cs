@@ -141,6 +141,7 @@ namespace IIS.Core
             services.AddHttpContextAccessor();
             services.AddTransient<IMLResponseRepository, MLResponseRepository>();
             services.AddTransient<IMaterialRepository, MaterialRepository>();
+            services.AddTransient<IMaterialSignRepository, MaterialSignRepository>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddSingleton<MutationCreateResolver>();
             services.AddSingleton<MutationUpdateResolver>();

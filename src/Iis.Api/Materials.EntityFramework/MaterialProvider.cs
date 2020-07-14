@@ -28,29 +28,29 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly OntologyContext _context;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
-        private readonly IOntologyCache _cache;
         private readonly IElasticService _elasticService;
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMaterialRepository _materialRepository;
+        private readonly IMaterialSignRepository _materialSignRepository;
 
         public MaterialProvider(OntologyContext context,
             IOntologyService ontologyService,
             IOntologySchema ontologySchema,
             IElasticService elasticService,
-            IOntologyCache cache,
             IMLResponseRepository mLResponseRepository,
             IMaterialRepository materialRepository,
+            IMaterialSignRepository materialSignRepository,
             IMapper mapper)
         {
             _context = context;
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
             _elasticService = elasticService;
-            _cache = cache;
 
             _mLResponseRepository = mLResponseRepository;
             _materialRepository = materialRepository;
+            _materialSignRepository = materialSignRepository;
             _mapper = mapper;
         }
 
@@ -129,24 +129,19 @@ namespace IIS.Core.Materials.EntityFramework
 
         public IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName)
         {
-            return _cache.MaterialSigns
-                .Where(ms => ms.MaterialSignType.Name == typeName)
-                .OrderBy(ms => ms.OrderNumber)
-                .ToList();
+            return _materialSignRepository.GetAllByTypeName(typeName);
         }
 
         public MaterialSign GetMaterialSign(Guid id)
         {
-            var materialSignEntity = _cache.GetMaterialSign(id);
-            return _mapper.Map<MaterialSign>(materialSignEntity);
+            var entity = _materialSignRepository.GetById(id);
+
+            return _mapper.Map<MaterialSign>(entity);
         }
 
         public MaterialSign GetMaterialSign(string signValue)
         {
-            if (string.IsNullOrWhiteSpace(signValue)) return null;
-
-            var entity = _cache.MaterialSigns
-                            .FirstOrDefault(ms => ms.Title == signValue);
+            var entity = _materialSignRepository.GetByValue(signValue);
 
             if (entity is null) return null;
 

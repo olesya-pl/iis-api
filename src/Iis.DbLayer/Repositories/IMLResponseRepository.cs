@@ -7,7 +7,7 @@ using Iis.DataModel.Materials;
 namespace Iis.DbLayer.Repositories
 {
     /// <summary>
-    /// Defines repository that provides methods to work MLRespo entity(s)
+    /// Defines repository that provides methods to work ML Response entity(s)
     /// </summary>
     public interface IMLResponseRepository
     {
