@@ -45,12 +45,7 @@ namespace AcceptanceTests.Steps
                     materials(pagination:{pageSize:" + pageSize + @", page:" + page + @"}){
                         count
                         items{
-                            id,
-                            metadata
-                            {
-                                type,
-                                source
-                            }
+                            id
                         }
                     }
                 }"
@@ -58,7 +53,7 @@ namespace AcceptanceTests.Steps
 
             var graphQlClient = GraphQLHttpClientFactory.CreateContourGraphQLHttpClient();
             graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
-            var response = await graphQlClient.SendMutationAsync<MaterialResponse>(request);
+            var response = await graphQlClient.SendQueryAsync<MaterialResponse>(request);
             return response.Data;
         }
 
