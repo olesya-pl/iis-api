@@ -20,7 +20,7 @@ namespace Iis.DataModel
         public virtual List<RelationTypeEntity> IncomingRelations { get; set; } = new List<RelationTypeEntity>();
         public virtual List<RelationTypeEntity> OutgoingRelations { get; set; } = new List<RelationTypeEntity>();
 
-        public virtual AttributeTypeEntity AttributeType { get; set; }
+        public virtual AttributeTypeEntity IAttributeTypeModel { get; set; }
         public virtual RelationTypeEntity RelationType { get; set; }
 
         [JsonIgnore]

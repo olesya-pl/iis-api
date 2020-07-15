@@ -11,9 +11,9 @@ namespace IIS.Core.GraphQL.Entities.InputTypes
         public static string ANY_OF_CRITERIA_FIELD = "_anyOf";
         public static string EXACT_MATCH_CRITERIA_FIELD = "_exactMatch";
 
-        private readonly EntityType _type;
+        private readonly IEntityTypeModel _type;
 
-        public CriteriaInputType(EntityType type)
+        public CriteriaInputType(IEntityTypeModel type)
         {
             _type = type;
         }

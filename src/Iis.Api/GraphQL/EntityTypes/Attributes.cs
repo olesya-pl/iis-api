@@ -66,13 +66,13 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public abstract class EntityAttributeBase : IEntityAttribute
     {
-        public EntityAttributeBase(EmbeddingRelationType source)
+        public EntityAttributeBase(IEmbeddingRelationTypeModel source)
         {
             Source = source;
             MetaObject = Source.EmbeddingMeta;
         }
 
-        protected EmbeddingRelationType Source { get; }
+        protected IEmbeddingRelationTypeModel Source { get; }
         protected RelationMetaBase MetaObject { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
@@ -119,17 +119,17 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributePrimitive : EntityAttributeBase
     {
-        public EntityAttributePrimitive(EmbeddingRelationType source) : base(source)
+        public EntityAttributePrimitive(IEmbeddingRelationTypeModel source) : base(source)
         {
         }
 
-        public override string Type => Source.AttributeType.ScalarTypeEnum.ToString();
+        public override string Type => Source.IAttributeTypeModel.ScalarTypeEnum.ToString();
     }
 
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(EmbeddingRelationType source, IOntologyModel ontology) : base(source)
+        public EntityAttributeRelation(IEmbeddingRelationTypeModel source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
@@ -154,11 +154,11 @@ namespace IIS.Core.GraphQL.EntityTypes
         public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology,
             bool? concreteTypes = false)
         {
-            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<Iis.Domain.EntityType>();
+            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<IEntityTypeModel>();
             if (types == null)
-                types = new[] {Source.EntityType};
+                types = new[] {Source.EntityType };
             else
-                types = types.Union(new[] {Source.EntityType});
+                types = types.Union(new[] {Source.EntityType });
 
             var metaTargetTypes = (Source.Meta as EntityRelationMeta)?.TargetTypes;
             if (metaTargetTypes != null && metaTargetTypes.Length > 0)

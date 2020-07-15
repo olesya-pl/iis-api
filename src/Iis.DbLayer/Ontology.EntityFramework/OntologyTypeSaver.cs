@@ -40,26 +40,26 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await _ontologyContext.SaveChangesAsync();
         }
 
-        public void SaveTypes(IEnumerable<NodeType> types)
+        public void SaveTypes(IEnumerable<INodeTypeModel> types)
         {
             // for `types` you need to pass only EntityTypes and/or AttributeTypes
             // RelationTypes are walked recursively based on that 2 types
             ClearTypes();
-            foreach (NodeType type in types)
+            foreach (INodeTypeModel type in types)
                 SaveType(type);
 
             _ontologyContext.NodeTypes.AddRange(_types.Values);
             _ontologyContext.SaveChanges();
         }
 
-        private NodeTypeEntity SaveType(NodeType type, NodeType relationSourceType = null)
+        private NodeTypeEntity SaveType(INodeTypeModel type, INodeTypeModel relationSourceType = null)
         {
             if (type.Id == Guid.Empty)
                 throw new ArgumentException(nameof(type));
             if (_types.ContainsKey(type.Id))
                 return _types[type.Id];
 
-            if (type is EmbeddingRelationType rel && rel.IsInversed)
+            if (type is IEmbeddingRelationTypeModel rel && rel.IsInversed)
             {
                 // inversed relations are virtual and shouldn't be saved
                 return null;
@@ -75,24 +75,24 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _types.Add(type.Id, result); // Add to created types cache
 
             // Filling specific properties for different types
-            if (type is EntityType et)
+            if (type is IEntityTypeModel et)
             {
                 result.IsAbstract = et.IsAbstract;
                 result.Kind = Kind.Entity;
             }
-            else if (type is AttributeType at)
+            else if (type is IAttributeTypeModel at)
             {
                 result.Kind = Kind.Attribute;
-                result.AttributeType = new AttributeTypeEntity
+                result.IAttributeTypeModel = new AttributeTypeEntity
                 {
                     ScalarType = at.ScalarTypeEnum,
                 };
             }
-            else if (type is RelationType rt)
+            else if (type is IRelationTypeModel rt)
             {
                 result.Kind = Kind.Relation;
 
-                if (type is EmbeddingRelationType ert)
+                if (type is IEmbeddingRelationTypeModel ert)
                 {
                     result.RelationType = new RelationTypeEntity
                     {
@@ -122,7 +122,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else throw new NotImplementedException();
 
-            foreach (var node in type.RelatedTypes.OfType<RelationType>()) // saving only relation nodes
+            foreach (var node in type.RelatedTypes.OfType<IRelationTypeModel>()) // saving only relation nodes
                 SaveType(node, type);
 
             return result;

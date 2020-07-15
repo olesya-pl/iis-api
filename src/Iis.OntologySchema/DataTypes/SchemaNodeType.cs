@@ -11,11 +11,11 @@ namespace Iis.OntologySchema.DataTypes
     {
         private List<SchemaRelationType> _incomingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> IncomingRelations => _incomingRelations;
-        private List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
+        internal List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
 
         internal SchemaAttributeType _attributeType;
-        public IAttributeType AttributeType => _attributeType;
+        public IAttributeType IAttributeTypeModel => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
         internal void AddIncomingRelation(SchemaRelationType relationType)
@@ -42,11 +42,11 @@ namespace Iis.OntologySchema.DataTypes
                     Name = r.TargetType.Name,
                     Title = r.TargetType.Title,
                     Kind = r.TargetType.Kind,
-                    RelationId = r.NodeType.Id,
-                    RelationName = r.NodeType.Name,
-                    RelationTitle = r.NodeType.Title,
-                    RelationMeta = r.NodeType.Meta,
-                    ScalarType = r.TargetType.AttributeType?.ScalarType,
+                    RelationId = r.INodeTypeModel.Id,
+                    RelationName = r.INodeTypeModel.Name,
+                    RelationTitle = r.INodeTypeModel.Title,
+                    RelationMeta = r.INodeTypeModel.Meta,
+                    ScalarType = r.TargetType.IAttributeTypeModel?.ScalarType,
                     EmbeddingOptions = r.EmbeddingOptions,
                     InheritedFrom = setInheritedFrom ? this.Name : string.Empty,
                     TargetType = r.TargetType
@@ -134,11 +134,11 @@ namespace Iis.OntologySchema.DataTypes
                     }
                     else if (RelationType.TargetType.Kind == Kind.Entity)
                     {
-                        return $"{RelationType.SourceType.Name}->{RelationType.NodeType.Name}";
+                        return $"{RelationType.SourceType.Name}->{RelationType.INodeTypeModel.Name}";
                     }
                     else
                     {
-                        return $"{RelationType.SourceType.Name}.{RelationType.NodeType.Name}";
+                        return $"{RelationType.SourceType.Name}.{RelationType.INodeTypeModel.Name}";
                     }
             }
 
@@ -167,7 +167,7 @@ namespace Iis.OntologySchema.DataTypes
         private bool IsIdenticalBase(INodeTypeLinked nodeType)
         {
             var scalarTypesAreEqual = Kind == Kind.Attribute ?
-                AttributeType.ScalarType == nodeType.AttributeType.ScalarType :
+                IAttributeTypeModel.ScalarType == nodeType.IAttributeTypeModel.ScalarType :
                 true;
 
             return Name == nodeType.Name
@@ -189,7 +189,7 @@ namespace Iis.OntologySchema.DataTypes
             dict[nameof(IsArchived)] = IsArchived.ToString();
             dict[nameof(Kind)] = Kind.ToString();
             dict[nameof(IsAbstract)] = IsAbstract.ToString();
-            dict["ScalarType"] = AttributeType?.ScalarType.ToString() ?? string.Empty;
+            dict["ScalarType"] = IAttributeTypeModel?.ScalarType.ToString() ?? string.Empty;
             dict["EmbeddingOptions"] = RelationType?.EmbeddingOptions.ToString() ?? string.Empty;
             dict["RelationKind"] = RelationType?.Kind.ToString() ?? string.Empty;
             dict["RelationSourceName"] = RelationType?.SourceType.Name ?? string.Empty;
@@ -238,7 +238,7 @@ namespace Iis.OntologySchema.DataTypes
             {
                 if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
 
-                var relationTypeName = $"{dotName}.{relationType.NodeType.Name}";
+                var relationTypeName = $"{dotName}.{relationType.INodeTypeModel.Name}";
                 var relationAttributes = relationType._targetType.GetNodeTypesRecursive(relationTypeName);
                 result.AddRange(relationAttributes);
             }
@@ -277,7 +277,7 @@ namespace Iis.OntologySchema.DataTypes
             foreach (var relation in OutgoingRelations)
             {
                 string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity
-                    ? relation.NodeType.Name
+                    ? relation.INodeTypeModel.Name
                     : null;
                 result.AddRange(relation.TargetType.GetAttributeDotNamesRecursiveWithLimit(relationName, recursionLevel + 1));
             }
@@ -288,7 +288,7 @@ namespace Iis.OntologySchema.DataTypes
         internal SchemaRelationType GetRelationByName(string relationName)
         {
             return _outgoingRelations
-                .Where(r => r.NodeType.Name == relationName)
+                .Where(r => r.INodeTypeModel.Name == relationName)
                 .SingleOrDefault();
         }
 
@@ -296,7 +296,7 @@ namespace Iis.OntologySchema.DataTypes
         {
             var nodeType = OutgoingRelations
                 .Where(r => r.Kind == RelationKind.Embedding
-                    && r.NodeType.Name == dotNameParts[0])
+                    && r.INodeTypeModel.Name == dotNameParts[0])
                 .Select(r => r.TargetType)
                 .Single();
 
@@ -306,5 +306,14 @@ namespace Iis.OntologySchema.DataTypes
         }
 
         public override string ToString() => Name;
+        
+        internal void RemoveRelationType(Guid id)
+        {
+            var relation = _outgoingRelations.Single(r => r.Id == id);
+            if (relation != null)
+            {
+                _outgoingRelations.Remove(relation);
+            }
+        }
     }
 }

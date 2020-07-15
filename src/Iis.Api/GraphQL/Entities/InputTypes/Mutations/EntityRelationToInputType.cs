@@ -10,16 +10,16 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
     {
         private readonly Operation _operation;
         private readonly EntityUnionInputType _target;
-        private readonly NodeType _type;
+        private readonly INodeTypeModel _type;
 
-        public EntityRelationToInputType(Operation operation, NodeType type, EntityUnionInputType target)
+        public EntityRelationToInputType(Operation operation, INodeTypeModel type, EntityUnionInputType target)
         {
             _operation = operation;
             _target = target;
             _type = type;
         }
 
-        public static string GetName(Operation operation, NodeType type)
+        public static string GetName(Operation operation, INodeTypeModel type)
         {
             return $"RelationTo_{operation.Short()}_{OntologyObjectType.GetName(type)}";
         }

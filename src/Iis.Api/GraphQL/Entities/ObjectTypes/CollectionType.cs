@@ -23,7 +23,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             descriptor.Field("count").Type<IntType>()
                 .Resolver(async ctx =>
                 {
-                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<EntityType>, ElasticFilter,IEnumerable<Guid>>>();
+                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter,IEnumerable<Guid>>>();
                     var service = ctx.Service<IOntologyService>();
                     
                     if(matchList != null && matchList.Any())
@@ -37,7 +37,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 .Type(new NonNullType(new ListType(new NonNullType(_itemsType))))
                 .Resolver(async ctx =>
                 {
-                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>>();
+                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>>();
                     var service = ctx.Service<IOntologyService>();
                     
                     if(matchList != null && matchList.Any())

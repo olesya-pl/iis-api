@@ -57,6 +57,11 @@ namespace Iis.DataModel.Materials
                 .WithMany()
                 .HasForeignKey(e => e.ProcessedStatusSignId);
 
+            builder
+                .Property(e => e.ProcessedStatusSignId)
+                .IsRequired(true)
+                .HasDefaultValue(MaterialEntity.ProcessingStatusNotProcessedSignId);
+
             builder.Property(e => e.ParentId).IsRequired(false);
             builder.Property(e => e.FileId).IsRequired(false);
 
@@ -68,6 +73,10 @@ namespace Iis.DataModel.Materials
             builder.Property(e => e.MlHandlersCount)
                 .IsRequired(true)
                 .HasDefaultValue(0);
+
+            builder.Property(e => e.Content)
+                .IsRequired(true)
+                .HasDefaultValue("");
         }
     }
 }

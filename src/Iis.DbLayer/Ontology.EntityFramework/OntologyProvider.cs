@@ -46,12 +46,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
                 // Query primary source and update the cache
                 var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                    .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
-                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
-                    .Include(e => e.AttributeType)
+                    .Include(e => e.IncomingRelations).ThenInclude(e => e.INodeTypeModel)
+                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.INodeTypeModel)
+                    .Include(e => e.IAttributeTypeModel)
                     .ToArray();
                 var result = types.Select(e => MapType(e)).ToList();
-                var relationTypes = _types.Values.Where(e => e is RelationType);
+                var relationTypes = _types.Values.Where(e => e is IRelationTypeModel);
                 // todo: refactor
                 result.AddRange(relationTypes);
 
@@ -79,20 +79,20 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        private Dictionary<Guid, NodeType> _types = new Dictionary<Guid, NodeType>();
-        private NodeType MapType(NodeTypeEntity ctxType)
+        private Dictionary<Guid, INodeTypeModel> _types = new Dictionary<Guid, INodeTypeModel>();
+        private INodeTypeModel MapType(NodeTypeEntity ctxType)
         {
             var types = mapType(ctxType);
             return types;
 
-            NodeType mapType(NodeTypeEntity type)
+            INodeTypeModel mapType(NodeTypeEntity type)
             {
                 if (_types.ContainsKey(type.Id))
                     return _types[type.Id];
 
                 if (type.Kind == Kind.Attribute)
                 {
-                    var attributeType = type.AttributeType;
+                    var attributeType = type.IAttributeTypeModel;
                     var attr = new AttributeType(type.Id, type.Name, attributeType.ScalarType);
                     _types.Add(type.Id, attr);
                     FillProperties(type, attr);
@@ -105,23 +105,23 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     _types.Add(type.Id, entity);
                     FillProperties(type, entity);
                     // Process relation inheritance first
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance && !r.INodeTypeModel.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     entity.Meta = entity.CreateMeta(); // todo: refactor. Creates meta with all parent types meta
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance && !r.INodeTypeModel.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     return entity;
                 }
                 throw new Exception("Unsupported type.");
             }
 
-            NodeType mapRelation(RelationTypeEntity relationType)
+            INodeTypeModel mapRelation(RelationTypeEntity relationType)
             {
                 if (_types.ContainsKey(relationType.Id))
                     return _types[relationType.Id];
 
-                var type = relationType.NodeType;
-                var relation = default(RelationType);
+                var type = relationType.INodeTypeModel;
+                IRelationTypeModel relation = null;
                 if (relationType.Kind == RelationKind.Embedding)
                 {
                     relation = new EmbeddingRelationType(type.Id, type.Name, relationType.EmbeddingOptions);
@@ -147,9 +147,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        protected RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
+        protected IRelationTypeModel _addInversedRelation(IRelationTypeModel relation, INodeTypeModel sourceType)
         {
-            if (!(relation is EmbeddingRelationType relationType) || !relationType.HasInversed())
+            if (!(relation is IEmbeddingRelationTypeModel relationType) || !relationType.HasInversed())
                 return null;
 
             var meta = relationType.GetInversed();
@@ -170,7 +170,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return inversedRelation;
         }
 
-        private static void FillProperties(NodeTypeEntity type, NodeType ontologyType)
+        private static void FillProperties(NodeTypeEntity type, INodeTypeModel ontologyType)
         {
             ontologyType.Title = type.Title;
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);

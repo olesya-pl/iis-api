@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Iis.Domain
 {
-    public sealed class AttributeType : NodeType
+    public sealed class AttributeType : NodeType, IAttributeTypeModel
     {
         public ScalarType ScalarTypeEnum { get; }
 

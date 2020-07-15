@@ -9,8 +9,8 @@ namespace IIS.Core.Ontology.ComputedProperties
 {
     public interface IComputedPropertyResolver
     {
-        object Resolve(EmbeddingRelationType relationType, Node node);
-        List<string> GetRequiredFields(EmbeddingRelationType relationType);
+        object Resolve(IEmbeddingRelationTypeModel relationType, Node node);
+        List<string> GetRequiredFields(IEmbeddingRelationTypeModel relationType);
     }
 
     public class ComputedPropertyResolver : IComputedPropertyResolver
@@ -23,7 +23,7 @@ namespace IIS.Core.Ontology.ComputedProperties
             return formula;
         }
 
-        private string GetFormula(EmbeddingRelationType relationType)
+        private string GetFormula(IEmbeddingRelationTypeModel relationType)
         {
             var formula = (relationType.Meta as AttributeRelationMeta)?.Formula;
             if (formula == null)
@@ -31,7 +31,7 @@ namespace IIS.Core.Ontology.ComputedProperties
             return CleanFormula(formula);
         }
 
-        public object Resolve(EmbeddingRelationType relationType, Node node)
+        public object Resolve(IEmbeddingRelationTypeModel relationType, Node node)
         {
             var formula = GetFormula(relationType);
             var context = new ExpressionContext();
@@ -45,7 +45,7 @@ namespace IIS.Core.Ontology.ComputedProperties
             return result;
         }
 
-        public List<string> GetRequiredFields(EmbeddingRelationType relationType)
+        public List<string> GetRequiredFields(IEmbeddingRelationTypeModel relationType)
         {
             var formula = GetFormula(relationType);
             var list = new List<string>();

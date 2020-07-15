@@ -12,16 +12,16 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         private readonly string _typeName;
         private readonly IInputType _createType;
         private readonly IInputType _updateType;
-        private readonly EmbeddingRelationType _relationType;
+        private readonly IEmbeddingRelationTypeModel _relationType;
 
-        public SingularRelationPatchType(EmbeddingRelationType relationType, TypeRepository typeRepository)
+        public SingularRelationPatchType(IEmbeddingRelationTypeModel relationType, TypeRepository typeRepository)
         {
             _relationType = relationType;
             _typeName = GetName(relationType);
             if (relationType.IsAttributeType)
             {
-                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeType);
-                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.AttributeType);
+                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.IAttributeTypeModel);
+                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.IAttributeTypeModel);
             }
             else if (relationType.IsEntityType)
             {
@@ -46,10 +46,10 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
                 d.Field("update").Type(_updateType);
         }
 
-        public static string GetName(EmbeddingRelationType relationType)
+        public static string GetName(IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsAttributeType)
-                return relationType.AttributeType.ScalarTypeEnum.ToString();
+                return relationType.IAttributeTypeModel.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
                 var ops = relationType.GetOperations();

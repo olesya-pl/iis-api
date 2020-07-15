@@ -51,7 +51,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
         }
-        public Task<Entity> UpdateEntity(EntityType type, Guid id, Dictionary<string, object> properties)
+        public Task<Entity> UpdateEntity(IEntityTypeModel type, Guid id, Dictionary<string, object> properties)
         {
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
@@ -59,7 +59,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return UpdateEntity(type, id, properties, string.Empty, requestId);
         }
         private async Task<Entity> UpdateEntity(
-            EntityType type, Guid id,
+            IEntityTypeModel type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
         {
             var node = (Entity) await _ontologyService.LoadNodesAsync(id, null);
@@ -87,12 +87,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     await _ontologyService.SaveNodeAsync(node);
                 }
             }
-            
+
             return node;
         }
 
         protected virtual async Task UpdateRelations(
-            Node node, EmbeddingRelationType embed,
+            Node node, IEmbeddingRelationTypeModel embed,
             object value, string dotName, Guid requestId)
         {
             switch (embed.EmbeddingOptions)
@@ -110,7 +110,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         protected virtual async Task UpdateMultipleProperties(
-            Node node, EmbeddingRelationType embed,
+            Node node, IEmbeddingRelationTypeModel embed,
             object value, string dotName, Guid requestId)
         {
             // patch input on multiple property
@@ -149,7 +149,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        protected async Task ApplyUpdate(Node node, EmbeddingRelationType embed, object uv, string dotName, Guid requestId)
+        protected async Task ApplyUpdate(Node node, IEmbeddingRelationTypeModel embed, object uv, string dotName, Guid requestId)
         {
             var uvdict = (Dictionary<string, object>) uv; // RelationTo_U_Entity
             Relation relation;
@@ -201,7 +201,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         protected virtual async Task UpdateSingleProperty(
-            Node node, EmbeddingRelationType embed,
+            Node node, IEmbeddingRelationTypeModel embed,
             object value, string dotName, Guid requestId)
         {
             var existingRelation = node.GetRelationOrDefault(embed);
@@ -231,7 +231,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        protected virtual async Task UpdateSingleProperty(Node node, EmbeddingRelationType embed, object value,
+        protected virtual async Task UpdateSingleProperty(Node node, IEmbeddingRelationTypeModel embed, object value,
             Relation oldRelation, string dotName, Guid requestId)
         {
             if (oldRelation != null)
@@ -256,10 +256,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     var oldValueObj = (oldRelation.Target as Attribute).Value;
                     var oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);
 
-                    if (oldValue != (string)value)
+                    var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
+
+                    if (oldValue != stringifiedValue)
                     {
                         await _changeHistoryService
-                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), oldValue, (string)value, requestId);
+                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), oldValue, stringifiedValue, requestId);
                     }
                 }
             }

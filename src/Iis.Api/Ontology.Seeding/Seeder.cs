@@ -68,9 +68,9 @@ namespace IIS.Core.Ontology.Seeding
 
         private Entity Map(JObject jObject, IOntologyModel ontology, string typeName, List<Node> first)
         {
-            EntityType type = ontology.GetEntityType(typeName);
+            IEntityTypeModel type = ontology.GetEntityType(typeName);
             Entity entity = new Entity(Guid.NewGuid(), type);
-            foreach (EmbeddingRelationType relationType in type.AllProperties)
+            foreach (IEmbeddingRelationTypeModel relationType in type.AllProperties)
             {
                 var jProperty = default(JProperty);
                 if (typeName == "Country" && relationType.Name == "code")
@@ -113,7 +113,7 @@ namespace IIS.Core.Ontology.Seeding
                 {
                     var relation = new Relation(Guid.NewGuid(), relationType);
                     var jValue = (JValue)jProperty.Value;
-                    var attribute = new Attribute(Guid.NewGuid(), (AttributeType)relationType.TargetType, jValue.Value);
+                    var attribute = new Attribute(Guid.NewGuid(), (IAttributeTypeModel)relationType.TargetType, jValue.Value);
                     relation.AddNode(attribute);
                     entity.AddNode(relation);
                 }

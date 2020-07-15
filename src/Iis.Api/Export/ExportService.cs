@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,8 +7,9 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Repository;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.Api.Export
 {
@@ -22,21 +24,21 @@ namespace Iis.Api.Export
         };
 
         private readonly ILogger<ExportService> _logger;
-        private readonly IExtNodeService _nodeService;
+        private readonly INodeRepository _nodeRepository;
 
         public ExportService(
             ILogger<ExportService> logger,
-            IExtNodeService nodeService)
+            INodeRepository nodeRepository)
         {
             _logger = logger;
-            _nodeService = nodeService;
+            _nodeRepository = nodeRepository;
         }
 
         public async Task<byte[]> ExportNodeAsync(Guid id)
         {
             try
             {
-                var node = await _nodeService.GetExtNodeByIdAsync(id);
+                var node = await _nodeRepository.GetJsonNodeByIdAsync(id);
                 await using var memoryStream = new MemoryStream();
                 using (var doc = WordprocessingDocument.Create(memoryStream, WordprocessingDocumentType.Document, true))
                 {
@@ -48,7 +50,7 @@ namespace Iis.Api.Export
                     var body = mainPart.Document.Body;
 
                     AppendNodeType(node, body);
-                    AppendNodes(node.Children, body);
+                    AppendNodes(node, body);
 
                     doc.Close();
                 }
@@ -62,7 +64,7 @@ namespace Iis.Api.Export
             }
         }
 
-        private static void AppendNodeType(IExtNode node, Body container)
+        private static void AppendNodeType(JObject node, Body container)
         {
             var headerParagraph = container.AppendChild(new Paragraph());
             var headerRun = new Run()
@@ -78,28 +80,25 @@ namespace Iis.Api.Export
                 RunProperties = GetValueStyles()
             };
             valueParagraph.Append(valueRun);
-            valueRun.AppendChild(new Text($"{node.NodeTypeTitle}"));
+            valueRun.AppendChild(new Text($"{node["NodeTypeTitle"]}"));
         }
 
-        private static void AppendNodes(IReadOnlyCollection<IExtNode> nodes, Body container)
+        private static void AppendNodes(JObject nodes, Body container)
         {
-            var childNodes = nodes
-                .Where(p => !NodeTypesToExclude.Contains(p.NodeTypeName));
-
-            var nameNode = childNodes.FirstOrDefault(p => p.NodeTypeName == NameNodeTypeName);
-
+            var nameNode = nodes.Properties().FirstOrDefault(p => p.Name == NameNodeTypeName);
             if (nameNode != null)
             {
                 AppendNameNode(container, nameNode);
             }
 
-            foreach (var childNode in childNodes.Where(p => p.NodeTypeName != NameNodeTypeName))
+            foreach (var childNode in ((IEnumerable<KeyValuePair<string, JToken>>)nodes)
+                .Where(p => !NodeTypesToExclude.Contains(p.Key)))
             {
-                AppendRegularNode(container, childNode);
+                AppendRegularNode(container, childNode.Key, childNode.Value);
             }
         }
 
-        private static void AppendRegularNode(Body container, IExtNode childNode)
+        private static void AppendRegularNode(Body container, string name, JToken childNode)
         {
             var headerParagraph = container.AppendChild(new Paragraph());
 
@@ -108,9 +107,14 @@ namespace Iis.Api.Export
                 RunProperties = GetHeaderStyles()
             };
             headerParagraph.Append(headerRun);
-            headerRun.AppendChild(new Text($"{childNode.NodeTypeTitle}"));
 
-            if (childNode.IsAttribute && childNode.AttributeValue != null)
+            headerRun.AppendChild(new Text(name));
+
+            if (childNode is JObject)
+            {
+                AppendNodes(childNode as JObject, container);
+            }
+            else
             {
                 var valueParagraph = container.AppendChild(new Paragraph());
                 var valueRun = new Run()
@@ -118,12 +122,7 @@ namespace Iis.Api.Export
                     RunProperties = GetValueStyles()
                 };
                 valueParagraph.Append(valueRun);
-                valueRun.AppendChild(new Text(FormatAttributeValue(childNode.AttributeValue.ToString())));
-            }
-
-            if (childNode.Children.Any())
-            {
-                AppendNodes(childNode.Children, container);
+                valueRun.AppendChild(new Text(FormatAttributeValue(childNode.ToString())));
             }
         }
 
@@ -149,7 +148,7 @@ namespace Iis.Api.Export
             }
         }
 
-        private static void AppendNameNode(Body container, IExtNode nameNode)
+        private static void AppendNameNode(Body container, JProperty nameNode)
         {
             var paragraph = container.AppendChild(new Paragraph());
             var valueRun = new Run()
@@ -157,7 +156,7 @@ namespace Iis.Api.Export
                 RunProperties = GetValueStyles()
             };
             paragraph.Append(valueRun);
-            valueRun.AppendChild(new Text($"{nameNode.AttributeValue}"));
+            valueRun.AppendChild(new Text($"{nameNode.Value}"));
         }
 
         private static RunProperties GetValueStyles()

@@ -236,7 +236,7 @@ namespace IIS.Core.Ontology {
 
                 if (castType && node is AnalyticsQueryParser.AstAttribute attr && attr.Type != null)
                 {
-                    var type = (AttributeType)attr.Type;
+                    var type = (IAttributeTypeModel)attr.Type;
 
                     if (_dataTypesToSqlTypes.ContainsKey(type.ScalarTypeEnum))
                         field += $"::{_dataTypesToSqlTypes[type.ScalarTypeEnum]}";
@@ -360,7 +360,7 @@ namespace IIS.Core.Ontology {
 
             private (string, string) _tableAndAliasFor(AnalyticsQueryParser.AstNode node, int index)
             {
-                var table = _tables[node.NodeType];
+                var table = _tables[node.INodeTypeModel];
                 var alias = node.Name ?? $"{table[0].ToString().ToLower()}_{index}";
                 return (table, alias);
             }
@@ -400,7 +400,7 @@ namespace IIS.Core.Ontology {
                 if (!(node is AnalyticsQueryParser.AstAttribute) || node.Type == null)
                     return condition.Value;
 
-                var attrType = (AttributeType)node.Type;
+                var attrType = (IAttributeTypeModel)node.Type;
 
                 return AttributeType.ParseValue(condition.Value.ToString(), attrType.ScalarTypeEnum);
             }

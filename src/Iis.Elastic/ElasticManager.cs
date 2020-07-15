@@ -84,26 +84,30 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(searchResponse);
         }
 
-        public async Task<string> GetDocumentByIdAsync(string indexName, string documentId, string[] documentFields)
+        public async Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames,
+            string documentId,
+            CancellationToken token = default)
         {
-            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
-            {
-                query = new
+            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(
+                GetRealIndexNames(indexNames),
+                PostData.Serializable(new
                 {
-                    match = new
+                    query = new
                     {
-                        _id = documentId
-                    }
-                },
-                _source = documentFields
-            }));
+                        match = new
+                        {
+                            _id = documentId
+                        }
+                    },
+                    _source = "*"
+                }), null, token);
 
             if (!searchResponse.Success)
             {
-                return string.Empty;
+                return new ElasticSearchResult();
             }
 
-            return searchResponse.Body;
+            return _resultExtractor.GetFromResponse(searchResponse);
         }
 
         public async Task CreateIndexesAsync(IEnumerable<string> indexNames, JObject mappingConfiguration = null, CancellationToken token = default)
@@ -298,7 +302,7 @@ namespace Iis.Elastic
 
         private string ApplyFuzzinessOperator(string input)
         {
-            return $"{input}~";
+            return $"{input} OR {input}~";
         }
 
         private string EscapeElasticSpecificSymbols(string input, string escapePattern)

@@ -23,12 +23,19 @@ namespace Iis.OntologySchema.DataTypes
 
         public void Initialize(IOntologyRawData ontologyRawData)
         {
-            NodeTypes = ontologyRawData.NodeTypes.ToDictionary(nt => nt.Id, nt => _mapper.Map<SchemaNodeType>(nt));
+            NodeTypes = ontologyRawData.NodeTypes.Where(nt => !nt.IsArchived).ToDictionary(nt => nt.Id, nt => _mapper.Map<SchemaNodeType>(nt));
             RelationTypes = ontologyRawData.RelationTypes.ToDictionary(r => r.Id, r => _mapper.Map<SchemaRelationType>(r));
             AttributeTypes = ontologyRawData.AttributeTypes.ToDictionary(at => at.Id, at => _mapper.Map<SchemaAttributeType>(at));
             Aliases = new SchemaAliases(ontologyRawData.Aliases);
-            foreach (var relationType in RelationTypes.Values)
+            foreach (var relationId in RelationTypes.Keys)
             {
+                var relationType = RelationTypes[relationId];
+                if (IsArchived(relationType))
+                {
+                    RelationTypes.Remove(relationId);
+                    continue;
+                }
+                
                 var nodeType = NodeTypes[relationType.Id];
                 relationType.SetNodeType(nodeType);
                 nodeType.SetRelationType(relationType);
@@ -42,9 +49,16 @@ namespace Iis.OntologySchema.DataTypes
                 targetType.AddIncomingRelation(relationType);
             }
 
-            foreach (var attributeType in AttributeTypes.Values)
+            foreach (var attributeId in AttributeTypes.Keys)
             {
-                NodeTypes[attributeType.Id]._attributeType = attributeType;
+                if (!NodeTypeExists(attributeId))
+                {
+                    AttributeTypes.Remove(attributeId);
+                }
+                else
+                {
+                    NodeTypes[attributeId]._attributeType = AttributeTypes[attributeId];
+                }
             }
 
             foreach (var nodeType in Entities)
@@ -85,7 +99,7 @@ namespace Iis.OntologySchema.DataTypes
 
         public SchemaNodeType GetNodeTypeById(Guid id)
         {
-            return NodeTypes.Values.SingleOrDefault(nt => nt.Id == id);
+            return NodeTypes[id];
         }
         public void AddNodeType(SchemaNodeType nodeType)
         {
@@ -123,6 +137,26 @@ namespace Iis.OntologySchema.DataTypes
             {
                 nodeType._attributeType = attributeType;
             }
+        }
+        public void RemoveNodeType(Guid id)
+        {
+            NodeTypes.Remove(id);
+        }
+        public void RemoveRelationType(Guid id)
+        {
+            RelationTypes.Remove(id);
+        }
+        public void RemoveAttributeType(Guid id)
+        {
+            AttributeTypes.Remove(id);
+        }
+        private bool NodeTypeExists(Guid id) => NodeTypes.ContainsKey(id);
+
+        private bool IsArchived(SchemaRelationType relationType)
+        {
+            return !NodeTypeExists(relationType.Id) 
+                || !NodeTypeExists(relationType.SourceTypeId) 
+                || !NodeTypeExists(relationType.TargetTypeId);
         }
     }
 }

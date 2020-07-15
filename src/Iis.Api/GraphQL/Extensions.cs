@@ -16,7 +16,7 @@ namespace IIS.Core.GraphQL
     {
         public static IObjectTypeDescriptor PopulateFields(this IOntologyFieldPopulator populator,
             IObjectTypeDescriptor descriptor,
-            IEnumerable<EntityType> entityTypes, params Operation[] operations)
+            IEnumerable<IEntityTypeModel> entityTypes, params Operation[] operations)
         {
             foreach (var type in entityTypes)
             foreach (var operation in operations)
@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL
             return descriptor;
         }
 
-        public static IOutputType WrapOutputType(this IOutputType type, EmbeddingRelationType relationType)
+        public static IOutputType WrapOutputType(this IOutputType type, IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsComputed())
                 return type;
@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        public static IInputType WrapInputType(this IInputType type, EmbeddingRelationType relationType)
+        public static IInputType WrapInputType(this IInputType type, IEmbeddingRelationTypeModel relationType)
         {
             switch (relationType.EmbeddingOptions)
             {
@@ -56,12 +56,12 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        public static string GetFieldName(this EmbeddingRelationType relationType)
+        public static string GetFieldName(this IEmbeddingRelationTypeModel relationType)
         {
             return relationType.Name;
         }
 
-        public static EntityOperation[] GetOperations(this EmbeddingRelationType relationType)
+        public static EntityOperation[] GetOperations(this IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsAttributeType) throw new ArgumentException("Can not check attribute relations for EntityOperations");
             return ((EntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations // check relation meta
@@ -70,7 +70,7 @@ namespace IIS.Core.GraphQL
                        .FirstOrDefault()?.AcceptsEmbeddedOperations;
         }
 
-        public static bool AcceptsOperation(this EmbeddingRelationType relationType, EntityOperation operation)
+        public static bool AcceptsOperation(this IEmbeddingRelationTypeModel relationType, EntityOperation operation)
         {
             var ops = relationType.GetOperations();
             return ops?.Contains(operation) == true;
@@ -86,10 +86,10 @@ namespace IIS.Core.GraphQL
             return d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
         }
 
-        public static IEnumerable<NodeType> GetInheritors(this NodeType type, IEnumerable<NodeType> ontology)
+        public static IEnumerable<INodeTypeModel> GetInheritors(this INodeTypeModel type, IEnumerable<INodeTypeModel> ontology)
         {
             return ontology.Where(t =>
-                t.RelatedTypes.OfType<InheritanceRelationType>().Any(r => r.ParentType.Name == type.Name));
+                t.RelatedTypes.OfType<IInheritanceRelationTypeModel>().Any(r => r.ParentType.Name == type.Name));
         }
 
         public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)

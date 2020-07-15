@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Iis.Domain
 {
-    public sealed class EntityType : NodeType
+    public sealed class EntityType : NodeType, IEntityTypeModel
     {
         public bool IsAbstract { get; }
 

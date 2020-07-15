@@ -57,7 +57,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        public IEnumerable<NodeType> GetChildTypes(NodeType parent)
+        public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel parent)
         {
             return _ontology.GetChildTypes(parent);
         }
@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- READ QUERY TYPES ----- //
 
-        public IOntologyType GetOntologyType(EntityType type)
+        public IOntologyType GetOntologyType(IEntityTypeModel type)
         {
             return GetOrCreate(type.Name, () => _creator.NewOntologyType(type));
         }
@@ -91,7 +91,7 @@ namespace IIS.Core.GraphQL.Entities
                 new MultipleOutputType(name, GetScalarOutputType(scalarType)));
         }
 
-        public OutputUnionType GetOutputUnionType(EntityType source, string propertyName,
+        public OutputUnionType GetOutputUnionType(IEntityTypeModel source, string propertyName,
             IEnumerable<ObjectType> outputTypes)
         {
             var name = OutputUnionType.GetName(source, propertyName);
@@ -102,7 +102,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC SCHEMA TYPES ----- //
 
-        public IInputType GetInputAttributeType(AttributeType attributeType)
+        public IInputType GetInputAttributeType(IAttributeTypeModel attributeType)
         {
             IInputType type;
             if (attributeType.ScalarTypeEnum == OScalarType.File)
@@ -114,34 +114,34 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC MUTATOR TYPES ----- //
 
-        public MutatorInputType GetMutatorInputType(Operation operation, NodeType type)
+        public MutatorInputType GetMutatorInputType(Operation operation, INodeTypeModel type)
         {
             var name = MutatorInputType.GetName(operation, type.Name);
             return GetOrCreate(name, () => GetMutator(operation).NewMutatorInputType(type));
         }
 
-        public MutatorResponseType GetMutatorResponseType(Operation operation, EntityType type)
+        public MutatorResponseType GetMutatorResponseType(Operation operation, IEntityTypeModel type)
         {
             var name = MutatorResponseType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new MutatorResponseType(GetMutator(operation).Operation, type, GetOntologyType(type)));
         }
 
-        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, EntityType type)
+        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, IEntityTypeModel type)
         {
             var name = EntityRelationToInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new EntityRelationToInputType(operation, type, GetEntityUnionInputType(operation, type)));
         }
 
-        public EntityUnionInputType GetEntityUnionInputType(Operation operation, EntityType type)
+        public EntityUnionInputType GetEntityUnionInputType(Operation operation, IEntityTypeModel type)
         {
             var name = EntityUnionInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new EntityUnionInputType(operation, type, this));
         }
 
-        public MultipleInputType GetMultipleInputType(Operation operation, AttributeType type)
+        public MultipleInputType GetMultipleInputType(Operation operation, IAttributeTypeModel type)
         {
             var scalarName = type.ScalarTypeEnum.ToString();
             var name = MultipleInputType.GetName(operation, scalarName);
@@ -151,14 +151,14 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- UPDATE TYPES ----- //
 
-        public RelationPatchType GetRelationPatchType(EmbeddingRelationType relationType)
+        public RelationPatchType GetRelationPatchType(IEmbeddingRelationTypeModel relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>
                 new RelationPatchType(relationType, this));
         }
 
-        public SingularRelationPatchType GetSingularRelationPatchType(EmbeddingRelationType relationType)
+        public SingularRelationPatchType GetSingularRelationPatchType(IEmbeddingRelationTypeModel relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>

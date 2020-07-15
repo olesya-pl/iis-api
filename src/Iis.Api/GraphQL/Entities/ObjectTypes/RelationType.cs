@@ -32,16 +32,16 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             }
 
             [GraphQLType(typeof(EmbeddingRelationTypeType))]
-            public EmbeddingRelationType Type([Parent] Relation parent)
+            public IEmbeddingRelationTypeModel Type([Parent] Relation parent)
             {
-                return parent.Type as EmbeddingRelationType;
+                return parent.Type as IEmbeddingRelationTypeModel;
             }
         }
     }
 
-    public class EmbeddingRelationTypeType : ObjectType<EmbeddingRelationType>
+    public class EmbeddingRelationTypeType : ObjectType<IEmbeddingRelationTypeModel>
     {
-        protected override void Configure(IObjectTypeDescriptor<EmbeddingRelationType> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<IEmbeddingRelationTypeModel> descriptor)
         {
             descriptor.BindFields(BindingBehavior.Explicit);
             descriptor.Include<Resolvers>();
@@ -50,19 +50,19 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         private class Resolvers
         {
             [GraphQLType(typeof(NonNullType<IdType>))]
-            public Guid Id([Parent] EmbeddingRelationType parent)
+            public Guid Id([Parent] IEmbeddingRelationTypeModel parent)
             {
                 return parent.Id;
             }
 
             [GraphQLNonNullType]
-            public string Code([Parent] EmbeddingRelationType parent)
+            public string Code([Parent] IEmbeddingRelationTypeModel parent)
             {
                 return parent.Name;
             }
 
             [GraphQLNonNullType]
-            public string Title([Parent] EmbeddingRelationType parent)
+            public string Title([Parent] IEmbeddingRelationTypeModel parent)
             {
                 return parent.Title;
             }

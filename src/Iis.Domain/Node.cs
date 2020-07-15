@@ -10,12 +10,12 @@ namespace Iis.Domain
         private readonly List<Node> _nodes;
 
         public Guid Id { get; set; }
-        public NodeType Type { get; }
+        public INodeTypeModel Type { get; }
         public IEnumerable<Node> Nodes => _nodes;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        protected Node(Guid id, NodeType type, DateTime createdAt = default, DateTime updatedAt = default)
+        protected Node(Guid id, INodeTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
         {
             _nodes = new List<Node>();
 
@@ -42,23 +42,23 @@ namespace Iis.Domain
             return attribute?.Value;
         }
 
-        public IEnumerable<Relation> GetRelations(RelationType relationType) =>
+        public IEnumerable<Relation> GetRelations(IRelationTypeModel relationType) =>
             Nodes.OfType<Relation>().Where(r => r.Type.Name == relationType.Name);
 
-        public EmbeddingRelationType GetRelationType(string relationTypeName) =>
+        public IEmbeddingRelationTypeModel GetRelationType(string relationTypeName) =>
             Type.GetProperty(relationTypeName) ??
             throw new ArgumentException($"Relation with name {relationTypeName} does not exist");
 
         // Only single relations
-        public Relation GetRelation(EmbeddingRelationType relationType) =>
+        public Relation GetRelation(IEmbeddingRelationTypeModel relationType) =>
             GetRelations(relationType).SingleOrDefault()
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name}");
 
-        public Relation GetRelationOrDefault(EmbeddingRelationType relationType) =>
+        public Relation GetRelationOrDefault(IEmbeddingRelationTypeModel relationType) =>
             GetRelations(relationType).SingleOrDefault();
 
         // For single or multiple relations
-        public Relation GetRelation(EmbeddingRelationType relationType, Guid relationId) =>
+        public Relation GetRelation(IEmbeddingRelationTypeModel relationType, Guid relationId) =>
             GetRelations(relationType).SingleOrDefault(r => r.Id == relationId)
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name} with id {relationId}");
 
@@ -80,7 +80,7 @@ namespace Iis.Domain
                 foreach (var child in children)
                 {
                     var sb = new StringBuilder();
-                    if (this.Type is RelationType)
+                    if (this.Type is IRelationTypeModel)
                     {
                         sb.Append(this.Type.Name);
                     }

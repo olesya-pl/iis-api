@@ -278,7 +278,10 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Content")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
@@ -307,7 +310,10 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ProcessedStatusSignId")
-                        .HasColumnType("uuid");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValue(new Guid("0a641312-abb7-4b40-a766-0781308eb077"));
 
                     b.Property<Guid?>("RelevanceSignId")
                         .HasColumnType("uuid");
@@ -1139,8 +1145,8 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.AttributeTypeEntity", b =>
                 {
-                    b.HasOne("Iis.DataModel.NodeTypeEntity", "NodeType")
-                        .WithOne("AttributeType")
+                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
+                        .WithOne("IAttributeTypeModel")
                         .HasForeignKey("Iis.DataModel.AttributeTypeEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1170,7 +1176,9 @@ namespace Iis.DataModel.Migrations
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "ProcessedStatus")
                         .WithMany()
-                        .HasForeignKey("ProcessedStatusSignId");
+                        .HasForeignKey("ProcessedStatusSignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Relevance")
                         .WithMany()
@@ -1254,7 +1262,7 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.RelationTypeEntity", b =>
                 {
-                    b.HasOne("Iis.DataModel.NodeTypeEntity", "NodeType")
+                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
                         .WithOne("RelationType")
                         .HasForeignKey("Iis.DataModel.RelationTypeEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)

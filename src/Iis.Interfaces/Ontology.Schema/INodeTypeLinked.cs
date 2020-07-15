@@ -19,7 +19,7 @@ namespace Iis.Interfaces.Ontology.Schema
         string UniqueValueFieldName { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
-        IAttributeType AttributeType { get; }
+        IAttributeType IAttributeTypeModel { get; }
         IRelationTypeLinked RelationType { get; }
         IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom);
         IReadOnlyList<IChildNodeType> GetAllChildren();

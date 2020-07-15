@@ -43,7 +43,6 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> Tags { get; set; } = new List<string>();
         public IEnumerable<string> States { get; set; } = new List<string>();
         public IEnumerable<Material> Children { get; set; } = new List<Material>();
-        public IEnumerable<MaterialInfo> Infos { get; set; } = new List<MaterialInfo>();
 
         [GraphQLType(typeof(JsonScalarType))]
         public JToken Highlight { get; set; }

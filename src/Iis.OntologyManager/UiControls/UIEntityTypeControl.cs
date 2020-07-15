@@ -30,6 +30,7 @@ namespace Iis.OntologyManager.UiControls
         public event Action<INodeTypeUpdateParameter> OnSave;
         public event Action<Guid> OnCreateAttribute;
         public event Action<Guid> OnCreateRelationEntity;
+        public event Action<IChildNodeType> OnDeleteRelationEntity;
         public event Action OnSetInheritance;
 
         public IChildNodeType SelectedChild
@@ -90,7 +91,7 @@ namespace Iis.OntologyManager.UiControls
                 ValueMember = "",
                 BackColor = _style.BackgroundColor
             };
-            _container.Add(cmbUniqueValueFieldName, "Имя поля уникальности");
+            _container.Add(cmbUniqueValueFieldName, "Unique Value Field Name");
             _container.GoToNewColumn();
 
             gridInheritedFrom = GetRelationsGrid(nameof(gridInheritedFrom));
@@ -128,6 +129,8 @@ namespace Iis.OntologyManager.UiControls
             menuChildren.Items[1].Click += (sender, e) => { if (Id != null) OnCreateAttribute((Guid)Id); };
             menuChildren.Items.Add("Create Relation to Entity");
             menuChildren.Items[2].Click += (sender, e) => { if (Id != null) OnCreateRelationEntity((Guid)Id); };
+            menuChildren.Items.Add("Delete");
+            menuChildren.Items[3].Click += (sender, e) => { if (Id != null) gridChildrenEvent(OnDeleteRelationEntity); };
 
             gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });

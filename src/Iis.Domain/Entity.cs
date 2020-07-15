@@ -7,7 +7,7 @@ namespace Iis.Domain
 {
     public sealed class Entity : Node
     {
-        public Entity(Guid id, EntityType type, DateTime createdAt = default, DateTime updatedAt = default)
+        public Entity(Guid id, IEntityTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
 
@@ -15,10 +15,10 @@ namespace Iis.Domain
 
         public override void AddNode(Node node)
         {
-            var relationType = (RelationType)node.Type;
-            if (relationType is EmbeddingRelationType)
+            var relationType = (IRelationTypeModel)node.Type;
+            if (relationType is IEmbeddingRelationTypeModel)
             {
-                var embeddingRelationType = (EmbeddingRelationType)relationType;
+                var embeddingRelationType = (IEmbeddingRelationTypeModel)relationType;
                 if (embeddingRelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
                     var existingNode = Nodes.SingleOrDefault(e => e.Type == relationType);
@@ -71,7 +71,7 @@ namespace Iis.Domain
                 throw new ArgumentException($"Unable to set non-Entity and non-Guid value to attribute {Type.Name}.{embed.Name}");
 
             var targetNodes = embed.IsAttributeType
-                ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.AttributeType, t))
+                ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.IAttributeTypeModel, t))
                 : targets.Select(t => t is Guid guid
                     ? new Entity(guid, embed.EntityType) // Convert guids to node instances
                     : t).Cast<Node>();

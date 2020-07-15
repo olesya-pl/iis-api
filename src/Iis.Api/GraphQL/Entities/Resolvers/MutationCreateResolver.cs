@@ -44,7 +44,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return entity;
         }
 
-        public async Task<Entity> CreateEntity(EntityType type, Dictionary<string, object> properties)
+        public async Task<Entity> CreateEntity(IEntityTypeModel type, Dictionary<string, object> properties)
         {
             if (properties == null)
                 throw new ArgumentException($"{type.Name} creation ex nihilo is allowed only to God.");
@@ -75,7 +75,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
             return node;
         }
-        private async Task<Entity> GetUniqueValueEntity(EntityType type, Dictionary<string, object> properties)
+        private async Task<Entity> GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
         {
             if (!properties.ContainsKey(type.UniqueValueFieldName))
             {
@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return existing ?? await CreateProperties(new Entity(Guid.NewGuid(), type), properties);
         }
 
-        public async Task<IEnumerable<Relation>> CreateRelations(EmbeddingRelationType embed, object value)
+        public async Task<IEnumerable<Relation>> CreateRelations(IEmbeddingRelationTypeModel embed, object value)
         {
             switch (embed.EmbeddingOptions)
             {
@@ -100,7 +100,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        public async Task<IEnumerable<Relation>> CreateMultipleProperties(EmbeddingRelationType embed, object value)
+        public async Task<IEnumerable<Relation>> CreateMultipleProperties(IEmbeddingRelationTypeModel embed, object value)
         {
             var values = (IEnumerable<object>) value;
             var result = new List<Relation>();
@@ -119,7 +119,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return result;
         }
 
-        public async Task<Relation> CreateSingleProperty(EmbeddingRelationType embed, object value)
+        public async Task<Relation> CreateSingleProperty(IEmbeddingRelationTypeModel embed, object value)
         {
             var prop = new Relation(Guid.NewGuid(), embed);
             var target = await CreateNode(embed, value);
@@ -127,18 +127,18 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return prop;
         }
 
-        public async Task<Node> CreateNode(EmbeddingRelationType embed, object value) // attribute or entity
+        public async Task<Node> CreateNode(IEmbeddingRelationTypeModel embed, object value) // attribute or entity
         {
             if (embed.IsAttributeType)
             {
-                if (embed.AttributeType.ScalarTypeEnum == ScalarType.File)
+                if (embed.IAttributeTypeModel.ScalarTypeEnum == ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.AttributeType.ScalarTypeEnum == ScalarType.Geo)
+                else if (embed.IAttributeTypeModel.ScalarTypeEnum == ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
-                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum);
-                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
+                    value = AttributeType.ParseValue(value.ToString(), embed.IAttributeTypeModel.ScalarTypeEnum);
+                return new Attribute(Guid.NewGuid(), embed.IAttributeTypeModel, value);
             }
 
             if (embed.IsEntityType)

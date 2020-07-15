@@ -193,7 +193,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                         continue;
 
                     var targetTypeName = StripPrefix(sign.Typename, "Entity");
-                    EntityType targetType;
+                    IEntityTypeModel targetType;
                     if (targetTypeName == type.Name)
                     {
                         targetType = type;

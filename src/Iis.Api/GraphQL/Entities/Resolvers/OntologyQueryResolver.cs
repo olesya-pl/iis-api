@@ -38,14 +38,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return ctx.Parent<Node>().Id;
         }
 
-        public async Task<Entity> ResolveEntity(IResolverContext ctx, EntityType type)
+        public async Task<Entity> ResolveEntity(IResolverContext ctx, IEntityTypeModel type)
         {
             var id = ctx.Argument<Guid>("id");
-            var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, EmbeddingRelationType>(id, null), default);
+            var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, IEmbeddingRelationTypeModel>(id, null), default);
             return node as Entity; // return null if node was not entity
         }
 
-        public async Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, EntityType type)
+        public async Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, IEntityTypeModel type)
         {
             var nf = ctx.CreateNodeFilter(type);
 
@@ -58,13 +58,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 ids = filter.MatchList;
             }
 
-            return Tuple.Create((IEnumerable<EntityType>) new[] {type}, nf, ids);
+            return Tuple.Create((IEnumerable<IEntityTypeModel>) new[] {type}, nf, ids);
         }
 
         // ----- Relations to attributes ----- //
 
         // Resolve single entity-attribute relation. Return any scalar type.
-        public async Task<object> ResolveAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType)
+        public async Task<object> ResolveAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType)
         {
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
@@ -82,7 +82,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         // resolve multiple entity-[attribute] relation
-        public async Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType)
+        public async Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType)
         {
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
@@ -105,7 +105,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         // ----- Relations to entities ----- //
 
         // Resolve one or multiple relations to entity. Return either Entity or IEnumerable<Entity>
-        public async Task<object> ResolveEntityRelation(IResolverContext ctx, EmbeddingRelationType relationType)
+        public async Task<object> ResolveEntityRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType)
         {
             var ontologyService = ctx.Service<IOntologyService>();
             var parent = ctx.Parent<Node>();
@@ -156,7 +156,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ------ All entities ----- //
 
-        public Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
+        public Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
             var ontology = ctx.Service<IOntologyModel>();

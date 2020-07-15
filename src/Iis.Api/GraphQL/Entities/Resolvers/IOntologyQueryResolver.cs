@@ -13,16 +13,16 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         ObjectType ResolveAbstractType(IResolverContext context, object resolverResult);
         Task<Guid> ResolveId(IResolverContext ctx);
-        Task<Entity> ResolveEntity(IResolverContext ctx, EntityType type);
-        Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, EntityType type);
-        Task<object> ResolveAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType);
-        Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, EmbeddingRelationType relationType);
+        Task<Entity> ResolveEntity(IResolverContext ctx, IEntityTypeModel type);
+        Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, IEntityTypeModel type);
+        Task<object> ResolveAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
+        Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
         Task<object> ResolveMultipleAttributeRelationTarget(IResolverContext ctx);
         Task<object> ResolveAttributeValue(IResolverContext ctx, Attribute attribute);
-        Task<object> ResolveEntityRelation(IResolverContext ctx, EmbeddingRelationType relationType);
+        Task<object> ResolveEntityRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
-        Task<Tuple<IEnumerable<EntityType>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
+        Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
     }
 }

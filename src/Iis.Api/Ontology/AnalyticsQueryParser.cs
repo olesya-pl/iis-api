@@ -55,13 +55,13 @@ namespace IIS.Core.Ontology {
 
         private void _tryToAddAttribute(Ast ast, string value)
         {
-            var (name, types, conditions) = _parseChunk<AttributeType>(value);
+            var (name, types, conditions) = _parseChunk<IAttributeTypeModel>(value);
             ast.Add(new AstAttribute(types.FirstOrDefault(), conditions) { Name = name });
         }
 
         private void _tryToAddNode(Ast ast, string value)
         {
-            var (name, types, conditions) = _parseChunk<EntityType>(value);
+            var (name, types, conditions) = _parseChunk<IEntityTypeModel>(value);
             var type = types == null ? null : types.FirstOrDefault();
 
             if (conditions != null)
@@ -81,14 +81,14 @@ namespace IIS.Core.Ontology {
 
         private void _tryToAddRelation(Ast ast, string value, bool isDirect)
         {
-            var (name, relationTypes, _) = _parseChunk<RelationType>(value);
+            var (name, relationTypes, _) = _parseChunk<IRelationTypeModel>(value);
 
             ast.Add(new AstRelation(relationTypes, isDirect) {
                 Name = name
             });
         }
 
-        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: NodeType
+        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: INodeTypeModel
         {
             var value = rawValue;
             var conditionsIndex = value.IndexOf('{');
@@ -159,7 +159,7 @@ namespace IIS.Core.Ontology {
 
         public class AstNode {
             public string Name;
-            public virtual NodeType Type { get; private set; }
+            public virtual INodeTypeModel Type { get; private set; }
             public AstNode Next;
             public AstNode Prev;
             public virtual bool IsVirtual
@@ -167,12 +167,12 @@ namespace IIS.Core.Ontology {
                 get { return false; }
             }
 
-            public virtual string NodeType
+            public virtual string INodeTypeModel
             {
                 get { return GetType().Name; }
             }
 
-            public AstNode(NodeType type)
+            public AstNode(INodeTypeModel type)
             {
                 Type = type;
             }
@@ -186,14 +186,14 @@ namespace IIS.Core.Ontology {
         public class AstRelation : AstNode {
             public readonly bool IsDirect;
 
-            public readonly IEnumerable<RelationType> Types;
+            public readonly IEnumerable<IRelationTypeModel> Types;
 
             public override Guid[] TypeIds
             {
                 get { return Types.Select(type => type.Id).ToArray(); }
             }
 
-            public AstRelation(IEnumerable<RelationType> types, bool isDirect): base(null) {
+            public AstRelation(IEnumerable<IRelationTypeModel> types, bool isDirect): base(null) {
                 Types = types;
                 IsDirect = isDirect;
             }
@@ -201,12 +201,12 @@ namespace IIS.Core.Ontology {
 
         public class AstRef: AstNode
         {
-            public override string NodeType
+            public override string INodeTypeModel
             {
-                get { return this._ast.nodeByRef(Name).NodeType; }
+                get { return this._ast.nodeByRef(Name).INodeTypeModel; }
             }
 
-            public override NodeType Type
+            public override INodeTypeModel Type
             {
                 get { return this._ast.nodeByRef(Name).Type; }
             }
@@ -227,11 +227,11 @@ namespace IIS.Core.Ontology {
         {
             public readonly JObject Conditions;
 
-            public AstAttribute(AttributeType type): base(type)
+            public AstAttribute(IAttributeTypeModel type): base(type)
             {
             }
 
-            public AstAttribute(AttributeType type, string conditions): base(type)
+            public AstAttribute(IAttributeTypeModel type, string conditions): base(type)
             {
                 try {
                     Conditions = conditions == null ? null : JObject.Parse(conditions);
