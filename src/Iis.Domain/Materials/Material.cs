@@ -40,8 +40,7 @@ namespace Iis.Domain.Materials
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public JObject ObjectsOfStudy { get; set; }
-        public IEnumerable<Node> Events { get; set; }
+        public IEnumerable<JObject> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
-        public IEnumerable<JObject> Events2 { get; set; }
     }
 }

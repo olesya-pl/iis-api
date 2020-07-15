@@ -49,14 +49,12 @@ namespace IIS.Core.GraphQL.Materials
 
         [GraphQLType(typeof(JsonScalarType))]
         public JObject ObjectsOfStudy { get; set; }
-        public IEnumerable<MaterialFeatureNode> Events { get; set; }
+
+        [GraphQLType(typeof(ListType<JsonScalarType>))]
+        public IEnumerable<JObject> Events { get; set; }
 
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Features { get; set; }
-
-        [GraphQLType(typeof(ListType<JsonScalarType>))]
-        public IEnumerable<JObject> Events2 { get; set; }
-
         public User Assignee { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
