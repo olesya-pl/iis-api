@@ -164,7 +164,7 @@ namespace IIS.Core.Materials.EntityFramework
                                 .SelectMany(p => p.Features.Select(x => x.Node))
                                 .ToList();
 
-            result.Events = nodes.Where(x => IsEvent(x)).Select(x => NodeToJObject(x));
+            result.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
 
             result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
 
@@ -359,6 +359,20 @@ namespace IIS.Core.Materials.EntityFramework
             var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
 
             foreach (var attribute in node.GetChildAttributes())
+            {
+                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
+            }
+
+            return result;
+        }
+
+        private JObject EventToJObject(Node node)
+        {
+            var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
+            
+            var attributies = node.GetChildAttributes().Where(a => a.dotName == "name" || a.dotName == "description");
+
+            foreach (var attribute in attributies)
             {
                 result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
             }
