@@ -38,15 +38,18 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
         
-        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(IEnumerable<Guid> nodeIdList)
+        public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
-            var val1 =  await GetSimplifiedMaterialsForNodeIdListQuery(nodeIdList)
-                            .ToArrayAsync();
-
-            return new List<MaterialEntity>();
+            var materialIdList =  await GetOnlyMaterialsForNodeIdListQuery(nodeIdList)
+                                .Select(e => e.Id)
+                                .ToArrayAsync();
+            
+            var materialResult = await GetAllAsync(materialIdList, 0, 0);
+            
+            return materialResult.Entities;
         }
 
-        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName, string sortOrder)
+        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null)
         {
             return GetAllWithPredicateAsync(limit, offset, sortColumnName: sortColumnName, sortOrder: sortOrder);
         }
@@ -69,6 +72,40 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
         
+        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
+        {
+            var materialQuery = predicate is null
+                                ? GetMaterialsQuery(_includeAll)
+                                    .OnlyParent()
+                                : (IQueryable<MaterialEntity>)
+                                    GetMaterialsQuery(_includeAll)
+                                    .OnlyParent()
+                                    .Where(predicate);
+
+            var materialCountQuery = materialQuery;
+            
+            if(limit == 0)
+            {
+                materialQuery = materialQuery
+                                    .ApplySorting(sortColumnName, sortOrder);
+            } 
+            else
+            {
+                materialQuery = materialQuery 
+                                    .ApplySorting(sortColumnName, sortOrder)
+                                    .Skip(offset)
+                                    .Take(limit);
+            }
+
+            var materials = await materialQuery
+                                    .ToArrayAsync();
+            
+            var materialCount = await materialCountQuery.CountAsync();
+
+
+            return (materials, materialCount);
+        }
+        
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
             return _context.Materials
@@ -83,7 +120,7 @@ namespace Iis.DbLayer.Repositories
                     .AsNoTracking();
         }
         
-        private IQueryable<MaterialEntity> GetSimplifiedMaterialsForNodeIdListQuery(IEnumerable<Guid> nodeIdList)
+        private IQueryable<MaterialEntity> GetOnlyMaterialsForNodeIdListQuery(IEnumerable<Guid> nodeIdList)
         {
             return _context.Materials
                         .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
@@ -114,30 +151,6 @@ namespace Iis.DbLayer.Repositories
             }
 
             return resultQuery;
-        }
-        
-        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit, int offset, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
-        {
-            var materialQuery = predicate is null
-                                ? GetMaterialsQuery(_includeAll)
-                                    .OnlyParent()
-                                : (IQueryable<MaterialEntity>)
-                                    GetMaterialsQuery(_includeAll)
-                                    .OnlyParent()
-                                    .Where(predicate);
-
-            var materialCountQuery = materialQuery;
-
-            var materials = await materialQuery
-                                    .ApplySorting(sortColumnName, sortOrder)
-                                    .Skip(offset)
-                                    .Take(limit)
-                                    .ToArrayAsync();
-            
-            var materialCount = await materialCountQuery.CountAsync();
-
-
-            return (materials, materialCount);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Iis.DbLayer.Repositories
         /// </summary>
         /// <param name="nodeIdList">list of related node id</param>
         /// <returns></returns>
-        Task<IEnumerable<MaterialEntity>> GetAllAsync(IEnumerable<Guid> nodeIdList);
+        Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
         
         /// <summary>
         /// Returns all the Materials with paggination

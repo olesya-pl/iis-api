@@ -297,6 +297,8 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Material> materials;
 
             IQueryable<MaterialEntity> materialsByNode = GetMaterialByNodeIdQuery(nodeId);
+            //TODO: we need to add logic that provides list of NodeId 
+            //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
 
             mappingTasks = (await materialsByNode
                                  .ToArrayAsync())
