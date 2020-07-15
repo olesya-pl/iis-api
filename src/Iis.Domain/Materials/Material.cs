@@ -11,9 +11,8 @@ namespace Iis.Domain.Materials
         public Guid? ParentId { get; set; }
         public JArray Data { get; set; }
         public JObject Metadata { get; set; }
-        public string Type { get; set; }
-        public string Source { get; set; }
-        public string Content { get; set; }
+        public string Type { get; set;}
+        public string Source { get; set;}
         public MaterialSign Importance { get; set; }
         public Guid? ImportanceSignId => Importance?.Id;
         public MaterialSign Reliability { get; set; }

@@ -29,24 +29,5 @@ namespace Iis.Domain.Materials
             json["states"] = new JArray(States);
             return json.ToString();
         }
-        public static MaterialLoadData MapLoadData(string loadData)
-        {
-            var result = new Domain.Materials.MaterialLoadData();
-            
-            if(string.IsNullOrWhiteSpace(loadData)) return result;
-
-            var json = JObject.Parse(loadData);
-
-            if (json.ContainsKey("from")) result.From = (string)json["from"];
-            if (json.ContainsKey("code")) result.Code = (string)json["code"];
-            if (json.ContainsKey("coordinates")) result.Coordinates = (string)json["coordinates"];
-            if (json.ContainsKey("loadedBy")) result.LoadedBy = (string)json["loadedBy"];
-            if (json.ContainsKey("receivingDate")) result.ReceivingDate = (DateTime?)json["receivingDate"];
-            if (json.ContainsKey("objects")) result.Objects = json["objects"].Value<JArray>().ToObject<List<string>>();
-            if (json.ContainsKey("tags")) result.Tags = json["tags"].Value<JArray>().ToObject<List<string>>();
-            if (json.ContainsKey("states")) result.States = json["states"].Value<JArray>().ToObject<List<string>>();
-
-            return result;
-        }
     }
 }

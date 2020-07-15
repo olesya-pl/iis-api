@@ -126,8 +126,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var json = serializer.GetJsonObjectByExtNode(extNode);
             var sign = json["sign"] as JArray;
             Assert.NotNull(sign);
-            Assert.Contains(JToken.Parse($@"{{""value"":""{signValue1}""}}"), sign.Children());
-            Assert.Contains(JToken.Parse($@"{{""value"":""{signValue2}""}}"), sign.Children());
+            Assert.Contains(JToken.Parse(@$"{{""value"":""{signValue1}""}}"), sign.Children());
+            Assert.Contains(JToken.Parse(@$"{{""value"":""{signValue2}""}}"), sign.Children());
         }
     }
 }

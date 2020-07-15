@@ -105,11 +105,7 @@ namespace IIS.Core.Materials
 
         public void SendAvailableForOperatorEvent(Guid materialId)
         {
-            _channel.QueueDeclare(
-                queue: _assignerConfiguration.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false);
+            _channel.QueueDeclare(_assignerConfiguration.QueueName, true, false);
 
             var body = Encoding.UTF8.GetBytes(materialId.ToString());
 

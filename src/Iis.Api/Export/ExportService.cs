@@ -110,7 +110,7 @@ namespace Iis.Api.Export
             headerParagraph.Append(headerRun);
             headerRun.AppendChild(new Text($"{childNode.NodeTypeTitle}"));
 
-            if (childNode.IsAttribute && childNode.AttributeValue != null)
+            if (childNode.IsAttribute && !string.IsNullOrEmpty(childNode.AttributeValue))
             {
                 var valueParagraph = container.AppendChild(new Paragraph());
                 var valueRun = new Run()
@@ -118,7 +118,7 @@ namespace Iis.Api.Export
                     RunProperties = GetValueStyles()
                 };
                 valueParagraph.Append(valueRun);
-                valueRun.AppendChild(new Text(FormatAttributeValue(childNode.AttributeValue.ToString())));
+                valueRun.AppendChild(new Text(FormatAttributeValue(childNode.AttributeValue)));
             }
 
             if (childNode.Children.Any())

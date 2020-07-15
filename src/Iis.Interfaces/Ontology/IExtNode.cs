@@ -10,8 +10,7 @@ namespace Iis.Interfaces.Ontology
         string NodeTypeId { get; }
         string NodeTypeName { get; }
         string NodeTypeTitle { get; }
-        string EntityTypeName { get; }
-        object AttributeValue { get; }
+        string AttributeValue { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }
         IReadOnlyList<IExtNode> Children { get; }

@@ -38,4 +38,3 @@ msbuild.wrn
 
 #data storage
 data_storage/
-/src/Iis.Api/Logs/*

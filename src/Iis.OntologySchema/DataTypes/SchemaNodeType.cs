@@ -71,19 +71,6 @@ namespace Iis.OntologySchema.DataTypes
             return IncomingRelations.Where(r => r.Kind == RelationKind.Inheritance).Select(r => r.SourceType).ToList();
         }
 
-        public IReadOnlyList<INodeTypeLinked> GetAllDescendants()
-        {
-            var result = new List<INodeTypeLinked>();
-            var directDescendants = GetDirectDescendants();
-            foreach (var directDescendant in directDescendants)
-            {
-                result.Add(directDescendant);
-                result.AddRange(directDescendant.GetAllDescendants());
-            }
-
-            return result;
-        }
-        
         public IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded()
         {
             return IncomingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(r => r.SourceType).ToList();
@@ -106,14 +93,6 @@ namespace Iis.OntologySchema.DataTypes
 
             return result;
         }
-
-        public bool IsInheritedFrom(string nodeTypeName)
-        {
-            var ancestors = GetAllAncestors();
-            return ancestors.Any(nt => nt.Name == nodeTypeName);
-        }
-
-        public bool IsObjectOfStudy => IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
 
         public string GetStringCode()
         {
@@ -238,41 +217,6 @@ namespace Iis.OntologySchema.DataTypes
             }
 
             return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
-        }
-
-        private List<AttributeInfoItem> GetAttributesInfoRecursive(string parentName = null)
-        {
-            var result = new List<AttributeInfoItem>();
-
-            if (Kind == Kind.Attribute)
-            {
-                var dotName = parentName ?? Name;
-                result.Add(new AttributeInfoItem (dotName, _attributeType.ScalarType ));
-            }
-
-            if (Kind == Kind.Entity && Name == EntityTypeNames.FuzzyDate.ToString())
-            {
-                result.Add(new AttributeInfoItem (parentName, ScalarType.Date));
-            }
-            else
-            {
-                foreach (var relationType in _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding))
-                {
-                    if (relationType.TargetType.IsObjectOfStudy) continue;
-
-                    var relationTypeName = parentName == null ? relationType.NodeType.Name : $"{parentName}.{relationType.NodeType.Name}";
-                    var relationAttributes = relationType._targetType.GetAttributesInfoRecursive(relationTypeName);
-                    result.AddRange(relationAttributes);
-                }
-            }
-
-            return result;
-        }
-
-        public IAttributeInfoList GetAttributesInfo()
-        {
-            var items = GetAttributesInfoRecursive();
-            return new AttributeInfo(Name, items);
         }
 
         public List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)

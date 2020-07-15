@@ -48,11 +48,6 @@ namespace IIS.Core.Materials
             }
 
             _channel = _connection.CreateModel();
-            _channel.QueueDeclare(
-                queue: _configuration.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -84,7 +79,7 @@ namespace IIS.Core.Materials
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("MaterialOperatorAssigner. Exception={e}", e);
+                    _logger.LogError("MaterialOperatorAssigner. Exception.", e);
                 }
             }
         }

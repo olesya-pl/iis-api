@@ -13,6 +13,6 @@ namespace Iis.Interfaces.Elastic
     {
         string Identifier { get; set; }
         JToken Higlight { get; set; }
-        JObject SearchResult { get; set; }
+        public JObject SearchResult { get; set; }
     }
 }

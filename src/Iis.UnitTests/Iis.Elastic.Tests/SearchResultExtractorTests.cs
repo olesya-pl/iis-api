@@ -17,7 +17,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             //act
             var sut = new SearchResultExtractor();
             var res = sut.GetFromResponse(new StringResponse(
-                $@"{{
+                @$"{{
    ""took"":16,
    ""timed_out"":false,
    ""_shards"":{{

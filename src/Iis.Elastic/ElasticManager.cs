@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
+
 
 namespace Iis.Elastic
 {
@@ -134,16 +134,6 @@ namespace Iis.Elastic
 
             return response.Success;
         }
-
-        public async Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default)
-        {
-            var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
-            var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
-            var jObject = mappingConfiguration.ConvertToJObject();
-            var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
-            return response.Success;
-        }
-        
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new

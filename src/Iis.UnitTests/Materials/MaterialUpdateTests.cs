@@ -70,54 +70,6 @@ namespace Iis.UnitTests.Materials
             Assert.Equal(assignee.Id, res.AssigneeId);
         }
 
-        [Theory, RecursiveAutoData]
-        public async Task UpdateSessionPriority_ReturnsSessionPriorityBack(
-            MaterialEntity materialEntity,
-            MaterialSignTypeEntity typeEntity,
-            MaterialSignEntity important
-            )
-        {
-            //arrange
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
-
-            typeEntity.Name = "Session Priority";
-            typeEntity.Title = "Пріоритет сесії";
-            typeEntity.MaterialSigns = null;
-
-            important.MaterialSignType = null;
-            important.MaterialSignTypeId = typeEntity.Id;
-            important.OrderNumber = 1;
-            important.ShortTitle = "1";
-            important.Title = "Перша категорія";
-
-            materialEntity.File = null;
-            materialEntity.FileId = null;
-
-            materialEntity.Data = null;
-            materialEntity.Metadata = null;
-            materialEntity.LoadData = null;
-            materialEntity.MaterialInfos = null;
-
-            materialEntity.SessionPriority = null;
-            materialEntity.SessionPriority = null;
-
-            context.MaterialSignTypes.Add(typeEntity);
-            context.MaterialSigns.Add(important);
-            context.Materials.Add(materialEntity);
-
-            await context.SaveChangesAsync();
-
-            //act
-            var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
-            var material = await materialService.UpdateMaterial(new MaterialUpdateInput {
-                Id = materialEntity.Id,
-                SessionPriorityId = important.Id
-            });
-
-            //assert
-            Assert.Equal(important.Id, material.SessionPriority.Id);
-        }
-
         [Theory(DisplayName = "Set status as Оброблено"), RecursiveAutoData]
         public async Task SetProcessStatusAsProcessed(MaterialSignTypeEntity typeEntity,
             MaterialSignEntity processed,
