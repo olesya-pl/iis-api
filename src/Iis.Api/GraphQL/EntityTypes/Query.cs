@@ -13,10 +13,9 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
 
         [GraphQLNonNullType]
-        public async Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyProvider ontologyProvider,
+        public async Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
             EntityTypesFilter filter = null)
         {
-            var ontology = await ontologyProvider.GetOntologyAsync();
             IEnumerable<NodeType> types;
             if (filter != null)
             {
@@ -35,12 +34,11 @@ namespace IIS.Core.GraphQL.EntityTypes
             return new EntityTypeCollection(types, ontology);
         }
 
-        public async Task<EntityType> GetEntityType([Service]IOntologyProvider ontologyProvider,
+        public Task<EntityType> GetEntityType([Service]IOntologyModel ontology,
             [GraphQLNonNullType] string code)
         {
-            var ontology = await ontologyProvider.GetOntologyAsync();
             var type = ontology.GetEntityType(code);
-            return type == null ? null : new EntityType(type, ontology);
+            return Task.FromResult(type == null ? null : new EntityType(type, ontology));
         }
     }
 }

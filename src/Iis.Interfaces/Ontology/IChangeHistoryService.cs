@@ -6,7 +6,7 @@ namespace Iis.Interfaces.Ontology
 {
     public interface IChangeHistoryService
     {
-        Task SaveChange(string attributeDotName, Guid targetId, string userName, string oldValue, string newValue);
+        Task SaveChange(string attributeDotName, Guid targetId, string userName, string oldValue, string newValue, Guid requestId);
         Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistory(Guid targetId, string propertyName);
     }
 }

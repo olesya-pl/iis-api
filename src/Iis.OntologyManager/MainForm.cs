@@ -36,8 +36,18 @@ namespace Iis.OntologyManager
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         ISchemaCompareResult _compareResult;
         UiFilterControl _filterControl;
-        Font SelectedFont { get; set; }
-        Font TypeHeaderNameFont { get; set; }
+        UiEntityTypeControl _uiEntityTypeControl;
+        UiRelationAttributeControl _uiRelationAttributeControl;
+        UiRelationEntityControl _uiRelationEntityControl;
+        Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
+
+        private enum NodeViewType : byte
+        {
+            Entity,
+            RelationEntity,
+            RelationAttribute
+        }
+
         string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
         INodeTypeLinked SelectedNodeType
         {
@@ -60,12 +70,13 @@ namespace Iis.OntologyManager
             _schemaService = schemaService;
             _schemaSources = GetSchemaSources();
             
-            SelectedFont = new Font(DefaultFont, FontStyle.Bold);
-            TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold);
             SuspendLayout();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
-            SetAdditionalControls();
+            gridTypes.CellFormatting += _style.GridTypes_CellFormatting;
+            AddGridTypesMenu();
+            SetControlsTabMain(panelRight);
+            SetControlsTopPanel();
             CreateComparisonPanel();
             LoadCurrentSchema();
             ResumeLayout();
@@ -97,12 +108,43 @@ namespace Iis.OntologyManager
             pnlBottom.BorderStyle = BorderStyle.FixedSingle;
             pnlBottom.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             SetTypeViewHeader(pnlTop);
-            SetTypeViewControls(pnlBottom);
+            var pnlEntityType = _uiControlsCreator.GetFillPanel(pnlBottom, false);
+            _uiEntityTypeControl = new UiEntityTypeControl(_uiControlsCreator);
+            _uiEntityTypeControl.Initialize(_style, pnlEntityType);
+            _uiEntityTypeControl.OnShowRelationType += ChildrenShowRelation;
+            _uiEntityTypeControl.OnShowTargetType += (childNodeType) => SetNodeTypeView(childNodeType.TargetType, true);
+            _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
+            _uiEntityTypeControl.OnCreateAttribute += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationAttribute, parentTypeId);
+            _uiEntityTypeControl.OnCreateRelationEntity += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationEntity, parentTypeId);
+            _uiEntityTypeControl.OnSetInheritance += SetInheritance;
+            _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
+
+            var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiRelationAttributeControl = new UiRelationAttributeControl(_uiControlsCreator);
+            _uiRelationAttributeControl.Initialize(_style, pnlRelationAttribute);
+            _uiRelationAttributeControl.OnSave += OnNodeTypeSaveClick;
+
+            var pnlRelationEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator, GetAllEntities);
+            _uiRelationEntityControl.Initialize(_style, pnlRelationEntity);
+            _uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
+
+            _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
+            _nodeTypeControls[NodeViewType.RelationEntity] = _uiRelationEntityControl;
+            _nodeTypeControls[NodeViewType.RelationAttribute] = _uiRelationAttributeControl;
 
             rootPanel.SuspendLayout();
             rootPanel.Controls.Add(pnlTop);
             rootPanel.Controls.Add(pnlBottom);
             rootPanel.ResumeLayout();
+        }
+
+        private void AddGridTypesMenu()
+        {
+            var menu = new ContextMenuStrip();
+            menu.Items.Add("Add New Entity Type");
+            menu.Items[0].Click += (sender, e) => { CreateNewNodeType(NodeViewType.Entity, null); };
+            gridTypes.ContextMenuStrip = menu;
         }
 
         private void SetTypeViewHeader(Panel rootPanel)
@@ -115,13 +157,13 @@ namespace Iis.OntologyManager
                 Width = 60,
                 Text = "Back"
             };
-            btnTypeBack.Click += btnTypeBack_Click;
+            btnTypeBack.Click += (sender, e) => { GoBack(); };
 
             lblTypeHeaderName = new Label
             {
                 Location = new Point(btnTypeBack.Right + _style.MarginHor, _style.MarginVer),
                 ForeColor = Color.DarkBlue,
-                Font = TypeHeaderNameFont,
+                Font = _style.TypeHeaderNameFont,
                 AutoSize = true,
                 Text = ""
             };
@@ -130,78 +172,12 @@ namespace Iis.OntologyManager
             rootPanel.Controls.Add(lblTypeHeaderName);
             rootPanel.ResumeLayout();
         }
-        
-        private DataGridView GetRelationsGrid(string name)
-        {
-            var grid = _uiControlsCreator.GetDataGridView(name, null,
-                new List<string> { "Name" });
-            grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            grid.CellFormatting += gridTypes_CellFormatting;
-            grid.DoubleClick += gridInheritance_DoubleClick;
-            return grid;
-        }
-
-        private void SetTypeViewControls(Panel rootPanel)
-        {
-            rootPanel.SuspendLayout();
-
-            var container = new UiContainerManager(rootPanel, _style);
-
-            container.Add(txtId = new TextBox { ReadOnly = true }, "Id");
-            container.Add(txtName = new TextBox(), "Name");
-            container.Add(txtTitle = new TextBox(), "Title");
-            container.GoToNewColumn();
-
-            gridInheritedFrom = GetRelationsGrid(nameof(gridInheritedFrom));
-            container.Add(gridInheritedFrom, "Inherited From:", true);
-            container.GoToNewColumn();
-
-            gridInheritedBy = GetRelationsGrid(nameof(gridInheritedBy));
-            container.Add(gridInheritedBy, "Ancestor To:", true);
-            container.GoToNewColumn();
-
-            gridEmbeddence = GetRelationsGrid(nameof(gridEmbeddence));
-            container.Add(gridEmbeddence, "Embedded By:", true);
-            container.GoToNewColumn();
-
-            container.GoToNewColumn();
-            container.Add(txtMeta = new RichTextBox(), "Meta", true);
-
-            container.GoToNewColumn(_style.ButtonWidthDefault);
-            btnTypeSave = new Button { Text = "Save" };
-            btnTypeSave.Click += (sender, e) => { SaveTypeProperties(); };
-            container.Add(btnTypeSave);
-
-            
-            container.GoToBottom();
-            container.StepDown();
-            container.SetFullWidthColumn();
-
-            menuChildren = new ContextMenuStrip();
-            menuChildren.Items.Add("Show Relation");
-            menuChildren.Items[0].Click += (sender, e) => { gridChildrenEvent(ChildrenShowRelation); };
-            menuChildren.Items.Add("Change Target Type");
-            menuChildren.Items[1].Click += (sender, e) => { gridChildrenEvent(ChildrenChangeTargetType); };
-
-            gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
-                new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
-            gridChildren.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            gridChildren.ColumnHeadersVisible = true;
-            gridChildren.AutoGenerateColumns = false;
-            gridChildren.DoubleClick += gridChildren_DoubleClick;
-            gridChildren.CellFormatting += gridChildren_CellFormatting;
-            gridChildren.ContextMenuStrip = menuChildren;
-
-            container.Add(gridChildren, null, true);
-            rootPanel.ResumeLayout();
-        }
-
         public void CreateComparisonPanel()
         {
             const int ComparisonMargin = 30;
             const int BtnCloseSize = 20;
             const int BtnCloseMargin = 5;
-            panelComparison = new Panel { 
+            panelComparison = new Panel {
                 Name = "panelComparison",
                 Location = new Point(ComparisonMargin, ComparisonMargin),
                 Size = new Size(this.ClientSize.Width - ComparisonMargin * 2, this.ClientSize.Height - ComparisonMargin * 2),
@@ -252,7 +228,7 @@ namespace Iis.OntologyManager
             panelTop.SuspendLayout();
             var container = new UiContainerManager(panelTop, _style);
             _filterControl = new UiFilterControl();
-            _filterControl.Initialize(_style);
+            _filterControl.Initialize(_style, null);
             _filterControl.OnChange += ReloadTypes;
             container.AddPanel(_filterControl.MainPanel);
 
@@ -275,33 +251,10 @@ namespace Iis.OntologyManager
 
             panelTop.ResumeLayout();
         }
-
-        private void SetAdditionalControls()
-        {
-            SetControlsTabMain(panelRight);
-            SetControlsTopPanel();
-        }
-
         #endregion
 
         #region UI Control Events
-        private void gridChildren_DoubleClick(object sender, EventArgs e)
-        {
-            gridChildrenEvent(cnt => SetNodeTypeView(cnt.TargetType, true));
-        }
-        private void menuChildren_showRelationClick(object sender, EventArgs e)
-        {
-            gridChildrenEvent(ChildrenShowRelation);
-        }
-        private void gridInheritance_DoubleClick(object sender, EventArgs e)
-        {
-            var grid = (DataGridView)sender;
-            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            if (selectedRow == null) return;
-            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
-            SetNodeTypeView(nodeType, true);
-        }
-        private void btnTypeBack_Click(object sender, EventArgs e)
+        private void GoBack()
         {
             if (_history.Count == 0) return;
             var nodeType = _history[_history.Count - 1];
@@ -334,60 +287,6 @@ namespace Iis.OntologyManager
             if (SelectedNodeType == null) return;
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
-        }
-
-        private Color GetColorByNodeType(Kind kind)
-        {
-            switch (kind)
-            {
-                case Kind.Entity:
-                    return _style.EntityTypeBackColor;
-                case Kind.Attribute:
-                    return _style.AttributeTypeBackColor;
-                case Kind.Relation:
-                    return _style.RelationTypeBackColor;
-                default:
-                    return _style.BackgroundColor;
-            }
-        }
-
-        private void gridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            var grid = (DataGridView)sender;
-            var nodeType = (INodeTypeLinked)grid.Rows[e.RowIndex].DataBoundItem;
-            if (nodeType == null) return;
-            var color = GetColorByNodeType(nodeType.Kind);
-            var row = (DataGridViewRow)grid.Rows[e.RowIndex];
-            var style = row.DefaultCellStyle;
-
-            style.BackColor = color;
-            style.SelectionBackColor = color;
-            style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
-            style.Font = row.Selected ? SelectedFont : DefaultFont;
-        }
-
-        private void gridChildren_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            var grid = (DataGridView)sender;
-            var nodeType = (IChildNodeType)grid.Rows[e.RowIndex].DataBoundItem;
-            if (nodeType == null) return;
-            var color = GetColorByNodeType(nodeType.Kind);
-            var row = (DataGridViewRow)grid.Rows[e.RowIndex];
-            var style = row.DefaultCellStyle;
-
-            style.BackColor = color;
-            style.SelectionBackColor = color;
-            style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
-            style.Font = row.Selected ? SelectedFont : DefaultFont;
-        }
-
-        private void gridChildrenEvent(Action<IChildNodeType> action)
-        {
-            var grid = gridChildren;
-            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            if (selectedRow == null) return;
-            var childNodeType = (IChildNodeType)selectedRow.DataBoundItem;
-            action(childNodeType);
         }
 
         #endregion
@@ -431,6 +330,23 @@ namespace Iis.OntologyManager
 
             return result;
         }
+        private List<INodeTypeLinked> GetAllEntities()
+        {
+            var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
+            return _schema.GetTypes(filter).OrderBy(t => t.Name).ToList();
+        }
+        private void OnNodeTypeSaveClick(INodeTypeUpdateParameter updateParameter)
+        {
+            _schema.UpdateNodeType(updateParameter);
+            if (updateParameter.Id == null && updateParameter.ParentTypeId == null)
+            {
+                ReloadTypes(_filterControl.GetModel());
+            }
+            else
+            {
+                GoBack();
+            }
+        }
         #endregion
 
         #region Compare Logic
@@ -442,15 +358,15 @@ namespace Iis.OntologyManager
             _compareResult = _schema.CompareTo(schema);
             txtComparison.Text = GetCompareText(_compareResult);
         }
-        private string GetCompareText(string title, IEnumerable<INodeTypeLinked> nodeTypes)
+        private string GetCompareText(string title, IEnumerable<string> lines)
         {
             var sb = new StringBuilder();
             sb.AppendLine("===============");
             sb.AppendLine(title);
             sb.AppendLine("===============");
-            foreach (var nodeType in nodeTypes)
+            foreach (var line in lines)
             {
-                sb.AppendLine(nodeType.GetStringCode());
+                sb.AppendLine(line);
             }
 
             return sb.ToString();
@@ -458,8 +374,8 @@ namespace Iis.OntologyManager
         private string GetCompareText(ISchemaCompareResult compareResult)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd));
-            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete));
+            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd.Select(item => item.GetStringCode())));
+            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete.Select(item => item.GetStringCode())));
             sb.AppendLine("===============");
             sb.AppendLine("NODES TO UPDATE");
             sb.AppendLine("===============");
@@ -473,6 +389,9 @@ namespace Iis.OntologyManager
                 }
                 sb.AppendLine();
             }
+            sb.AppendLine(GetCompareText("ALIASES TO ADD", compareResult.AliasesToAdd.Select(item => item.ToString())));
+            sb.AppendLine(GetCompareText("ALIASES TO DELETE", compareResult.AliasesToDelete.Select(item => item.ToString())));
+            sb.AppendLine(GetCompareText("ALIASES TO UPDATE", compareResult.AliasesToUpdate.Select(item => item.ToString())));
             return sb.ToString();
         }
         private void UpdateComparedDatabase()
@@ -491,46 +410,58 @@ namespace Iis.OntologyManager
         #endregion
 
         #region Node Type Logic
+        private NodeViewType GetNodeViewType(INodeTypeLinked nodeType)
+        {
+            if (nodeType.Kind == Kind.Entity) return NodeViewType.Entity;
+
+            if (nodeType.Kind == Kind.Relation)
+            {
+                return nodeType.RelationType.TargetType.Kind == Kind.Entity ?
+                    NodeViewType.RelationEntity :
+                    NodeViewType.RelationAttribute;
+            }
+
+            throw new ArgumentException($"Cannot get NodeViewType for {nodeType.Id}");
+        }
+        private void SetInheritance()
+        {
+            var newTargetType = ChooseEntityTypeFromCombo();
+            if (newTargetType == null) return;
+            _schema.SetInheritance(_currentNodeType.Id, newTargetType.Id);
+            SetNodeTypeView(_currentNodeType, false);
+        }
+        private void SetNodeTypeViewVisibility(NodeViewType nodeViewType)
+        {
+            foreach (var key in _nodeTypeControls.Keys)
+            {
+                _nodeTypeControls[key].Visible = nodeViewType == key;
+            }
+        }
+        private void CreateNewNodeType(NodeViewType nodeViewType, Guid? parentTypeId)
+        {
+            SetNodeTypeViewVisibility(nodeViewType);
+            _nodeTypeControls[nodeViewType].SetParentTypeId(parentTypeId);
+            _nodeTypeControls[nodeViewType].CreateNew();
+            _history.Add(_currentNodeType);
+        }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
-            var a = nodeType.GetAttributeDotNamesRecursive();
             if (addToHistory && _currentNodeType != null)
             {
                 _history.Add(_currentNodeType);
             }
+            var nodeViewType = GetNodeViewType(nodeType);
+            SetNodeTypeViewVisibility(nodeViewType);
+            var aliases = nodeType.Kind == Kind.Entity ? _schema.Aliases.GetStrings(nodeType.Name) : new List<string>();
+            _nodeTypeControls[nodeViewType].SetUiValues(nodeType, aliases);
+
             lblTypeHeaderName.Text = nodeType.Name;
-            txtId.Text = nodeType.Id.ToString("N");
-            txtName.Text = nodeType.Name;
-            txtTitle.Text = nodeType.Title;
-            var children = nodeType.GetAllChildren();
-            gridChildren.DataSource = children;
-            var ancestors = nodeType.GetAllAncestors();
-            gridInheritedFrom.DataSource = ancestors;
-            gridInheritedBy.DataSource = nodeType.GetDirectDescendants();
-            gridEmbeddence.DataSource = nodeType.GetNodeTypesThatEmbedded();
-            txtMeta.Text = nodeType.Meta;
             _currentNodeType = nodeType;
-        }
-        private void SaveTypeProperties()
-        {
-            if (_currentNodeType == null) return;
-            var updateParameter = new NodeTypeUpdateParameter
-            {
-                Id = _currentNodeType.Id,
-                Title = txtTitle.Text,
-                Meta = txtMeta.Text
-            };
-            _schema.UpdateNodeType(updateParameter);
         }
         private INodeTypeLinked ChooseEntityTypeFromCombo()
         {
-            var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
-            var entities = _schema.GetTypes(filter)
-                .OrderBy(t => t.Name)
-                .ToList();
-            return _uiControlsCreator.ChooseFromModalComboBox(entities, "Name");
+            return _uiControlsCreator.ChooseFromModalComboBox(GetAllEntities(), "Name");
         }
-
         public void ReloadTypes(IGetTypesFilter filter)
         {
             if (_schema == null) return;

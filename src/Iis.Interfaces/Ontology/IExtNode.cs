@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,10 +11,14 @@ namespace Iis.Interfaces.Ontology
         string NodeTypeId { get; }
         string NodeTypeName { get; }
         string NodeTypeTitle { get; }
-        string AttributeValue { get; }
+        string EntityTypeName { get; }
+        object AttributeValue { get; }
+        ScalarType? ScalarType { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }
         IReadOnlyList<IExtNode> Children { get; }
         bool IsAttribute { get; }
+        List<IGeoCoordinates> GetCoordinates();
+        List<IExtNode> GetAttributesRecursive(ScalarType scalarType);
     }
 }

@@ -13,6 +13,7 @@ using Iis.Domain.Elastic;
 using Iis.DataModel;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -22,6 +23,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private IElasticSerializer _elasticSerializer;
         private IExtNodeService _extNodeService;
         private IElasticConfiguration _elasticConfiguration;
+        private IOntologySchema _ontologySchema;
         private RunTimeSettings _runTimeSettings;
         private readonly OntologyContext _context;
         private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
@@ -29,6 +31,8 @@ namespace IIS.Core.Ontology.EntityFramework
         public IEnumerable<string> MaterialIndexes { get; }
         public IEnumerable<string> OntologyIndexes { get; }
         public IEnumerable<string> EventIndexes { get; }
+        public IEnumerable<string> FeatureIndexes { get; }
+
         public bool UseElastic { get; private set; }
 
         public ElasticService(
@@ -36,40 +40,36 @@ namespace IIS.Core.Ontology.EntityFramework
             IElasticSerializer elasticSerializer,
             IExtNodeService extNodeService,
             IElasticConfiguration elasticConfiguration,
+            IOntologySchema ontologySchema,
             RunTimeSettings runTimeSettings,
             OntologyContext context)
         {
             _elasticManager = elasticManager;
             _elasticSerializer = elasticSerializer;
             _extNodeService = extNodeService;
+            _ontologySchema = ontologySchema;
             _runTimeSettings = runTimeSettings;
             _elasticConfiguration = elasticConfiguration;
             _context = context;
 
-            OntologyIndexes = new[] {
-                "Organization",
-                "Person",
-                "ObjectOfStudy",
-                "Radionetwork",
-                "MilitaryMachinery",
-                "Unknown",
-                "MilitaryBase",
-                "Infrastructure",
-                "Subdivision",
-                "SecondarySpecialEducationalInstitution",
-                "HigherEducationalInstitution",
-                "EducationalInstitution",
-                "MilitaryOrganization",
-                "TerrorOrganization"
-            };
+            var objectOfStudyType = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
+            if (objectOfStudyType != null)
+            {
+                OntologyIndexes = objectOfStudyType.GetAllDescendants()
+                    .Where(nt => !nt.IsAbstract)
+                    .Select(nt => nt.Name)
+                    .ToList();
+            }
             
             EventIndexes = new[]{
                 "Event"
             };
 
-            UseElastic = _context.NodeTypes.Any(nt => nt.Name == "ObjectOfStudy");
+            UseElastic = _context.NodeTypes.Any(nt => nt.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
             MaterialIndexes = new[] { "Materials" };
+
+            FeatureIndexes = new[] {"Features"};
         }
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
@@ -150,6 +150,16 @@ namespace IIS.Core.Ontology.EntityFramework
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), materialId.ToString("N"), materialDocument.ToString(Formatting.None));
         }
 
+        public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
+        {
+            if (!UseElastic) return true;
+
+            if (!_runTimeSettings.PutSavedToElastic) return false;
+
+            if (featureDocument is null) return false;
+
+            return await _elasticManager.PutDocumentAsync(FeatureIndexes.FirstOrDefault(), featureId.ToString("N"), featureDocument.ToString(Formatting.None));
+        }
         public bool TypesAreSupported(IEnumerable<string> typeNames)
         {
             return OntologyIndexesAreSupported(typeNames);

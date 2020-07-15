@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
@@ -14,24 +13,29 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public class ChangeHistoryService : IChangeHistoryService
     {
         OntologyContext _context;
-        IOntologySchema _schema;
-        public ChangeHistoryService(OntologyContext context, IOntologySchema schema)
+        public ChangeHistoryService(OntologyContext context)
         {
             _context = context;
-            _schema = schema;
         }
 
-        public async Task SaveChange(string attributeDotName, Guid targetId, string userName, string oldValue, string newValue)
+        public async Task SaveChange(
+            string attributeDotName,
+            Guid targetId,
+            string userName,
+            string oldValue,
+            string newValue,
+            Guid requestId)
         {
             var changeHistoryEntity = new ChangeHistoryEntity
             {
                 Id = Guid.NewGuid(),
                 TargetId = targetId,
-                UserName = userName, 
+                UserName = userName,
                 PropertyName = attributeDotName,
                 Date = DateTime.Now,
                 OldValue = oldValue,
-                NewValue = newValue
+                NewValue = newValue,
+                RequestId = requestId
             };
             _context.Add(changeHistoryEntity);
             await _context.SaveChangesAsync();

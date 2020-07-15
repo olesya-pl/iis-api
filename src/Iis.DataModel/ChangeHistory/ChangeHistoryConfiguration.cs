@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DataModel.ChangeHistory
 {
@@ -15,6 +12,10 @@ namespace Iis.DataModel.ChangeHistory
                 .ValueGeneratedNever();
 
             builder.HasIndex(p => p.TargetId);
+
+            builder.Property(p => p.RequestId)
+                .IsRequired(true)
+                .HasDefaultValueSql("uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13) placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)");
         }
     }
 }

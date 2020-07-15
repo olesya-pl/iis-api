@@ -69,6 +69,8 @@ namespace Iis.DbLayer.Elastic
             {
                 nameof(Material.Source).ToLower(),
                 nameof(Material.Type).ToLower(),
+                nameof(Material.Content).ToLower(),
+                nameof(Material.CreatedDate).ToLower(),
                 nameof(Material.Importance).ToLower(),
                 nameof(Material.Reliability).ToLower(),
                 nameof(Material.Relevance).ToLower(),
@@ -81,6 +83,7 @@ namespace Iis.DbLayer.Elastic
                 "mlResponses.*",
                 $"{nameof(Material.Data)}.*",
                 $"{nameof(Material.LoadData)}.*",
+                $"{nameof(Material.Metadata)}.*",
                 $"{nameof(Material.Assignee)}.*"
             };
         }

@@ -15,7 +15,7 @@ namespace Iis.UnitTests.UserManagement
         private readonly IMapper _mapper;
         public Mappings()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
             _mapper = _serviceProvider.GetRequiredService<IMapper>();
         }
         public void Dispose()

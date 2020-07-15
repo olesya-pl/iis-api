@@ -13,17 +13,17 @@ namespace IIS.Core.GraphQL.Reports
     public class ReportType : ObjectType<Report>
     {
         private readonly TypeRepository _typeRepository;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         IOntologyType objectType;
         EntityType type;
 
-        public ReportType(TypeRepository typeRepository, [Service] IOntologyProvider ontologyProvider)
+        public ReportType(TypeRepository typeRepository, IOntologyModel ontology)
         {
             _typeRepository   = typeRepository ?? throw new System.ArgumentNullException(nameof(typeRepository));
-            _ontologyProvider = ontologyProvider;
+            
+            _ontology = ontology;
 
-            var ontology = _ontologyProvider.GetOntologyAsync().Result;
-            type = ontology.GetTypeOrNull<EntityType>("Event");
+            type = _ontology.GetTypeOrNull<EntityType>("Event");
 
             if (type == null)
                 throw new InvalidOperationException("Cannot find required type 'Event' in database. Add type to database or disable reports in configuration file using reportsAvailable : false");

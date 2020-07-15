@@ -16,9 +16,11 @@ using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
-using IIS.Core.Ontology;
+using IIS.Core.Materials.FeatureProcessors;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
+using IIS.Core.GraphQL.Entities.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,8 +41,9 @@ using Iis.Api;
 using Iis.Api.Modules;
 using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
-using Iis.Api.Ontology.Migration;
 using AutoMapper;
+using Iis.Api.bo;
+using Iis.Api.Bootstrap;
 using Iis.Api.Export;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
@@ -94,27 +97,52 @@ namespace IIS.Core
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Singleton);
                 using var context = OntologyContext.GetContext(dbConnectionString);
-                context.Database.Migrate();
-                (new FillDataForRoles(context)).Execute();
-                var ontologyCache = new OntologyCache(context);
-                services.AddSingleton<IOntologyCache>(ontologyCache);
+                
+                IOntologySchema ontologySchema;
+                IOntologyCache ontologyCache;
+                IOntologyModel ontology;
+                IisElasticConfiguration iisElasticConfiguration;
 
-                var schemaSource = new OntologySchemaSource
+                if (Program.IsStartedFromMain)
                 {
-                    Title = "DB",
-                    SourceKind = SchemaSourceKind.Database,
-                    Data = dbConnectionString
-                };
-                var ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                    context.Database.Migrate();
+                    (new FillDataForRoles(context)).Execute();
+                    ontologyCache = new OntologyCache(context);
+
+                    var schemaSource = new OntologySchemaSource
+                    {
+                        Title = "DB",
+                        SourceKind = SchemaSourceKind.Database,
+                        Data = dbConnectionString
+                    };
+                    ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+
+                    var ontologyProvider = new OntologyProvider(context);
+                    ontology = ontologyProvider.GetOntology();
+                    
+                    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
+                    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
+                }
+                else
+                {
+                    ontologyCache = new OntologyCache(null);
+                    ontologySchema = (new OntologySchemaService()).GetOntologySchema(null);
+                    iisElasticConfiguration = new IisElasticConfiguration(null, null);
+                    ontology = new OntologyModel(new List<Iis.Domain.NodeType>());
+                }
+
+                services.AddSingleton<IOntologyCache>(ontologyCache);
                 services.AddSingleton(ontologySchema);
-                var iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
-                iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
+                services.AddSingleton<IFieldToAliasMapper>(ontologySchema);
+                services.AddSingleton<IOntologyModel>(ontology);
                 services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
             }
 
             services.AddHttpContextAccessor();
-            services.AddSingleton<IOntologyProvider, OntologyProvider>();
             services.AddTransient<IOntologyService, OntologyService>();
+            services.AddSingleton<MutationCreateResolver>();
+            services.AddSingleton<MutationUpdateResolver>();
+            services.AddSingleton<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
             services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
@@ -122,7 +150,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
-            services.AddTransient<MigrationService>();
             services.AddTransient<OntologySchemaService>();
             services.AddSingleton<RunTimeSettings>();
             services.AddScoped<ExportService>();
@@ -132,6 +159,7 @@ namespace IIS.Core
             services.AddTransient<ThemeService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
+            services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
@@ -274,8 +302,11 @@ namespace IIS.Core
                     .AllowAnyMethod()
             );
 
-            app.UseSerilogRequestLogging();
+            app.UseMiddleware<LogHeaderMiddleware>();
 
+#if !DEBUG
+            app.UseMiddleware<LoggingMiddleware>();
+#endif
             app.UseGraphQL();
             app.UsePlayground();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
@@ -294,9 +325,8 @@ namespace IIS.Core
                 .CreateScope())
             {
                 var serviceProvider = serviceScope.ServiceProvider;
-                var ontologyProvider = serviceProvider.GetRequiredService<IOntologyProvider>();
-                var ontology = ontologyProvider.GetOntologyAsync().GetAwaiter().GetResult();
-                var types = ontology.EntityTypes.Where(p => p.Name == "ObjectOfStudy");
+                var ontology = serviceProvider.GetRequiredService<IOntologyModel>();
+                var types = ontology.EntityTypes.Where(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
                 var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
                     .Concat(types).Distinct().ToArray();
 
@@ -348,31 +378,6 @@ namespace IIS.Core
             }
 
             await c.Response.WriteAsync(result);
-        }
-    }
-
-    class AppErrorFilter : IErrorFilter
-    {
-        public IError OnError(IError error)
-        {
-            if (error.Exception is InvalidOperationException || error.Exception is InvalidCredentialException)
-            {
-
-                return error.WithCode("BAD_REQUEST")
-                    .WithMessage(error.Exception.Message);
-            }
-
-            if (error.Exception is AuthenticationException)
-            {
-                return error.WithCode("UNAUTHENTICATED");
-            }
-
-            if (error.Exception is AccessViolationException)
-            {
-                return error.WithCode("ACCESS_DENIED");
-            }
-
-            return error;
         }
     }
 }

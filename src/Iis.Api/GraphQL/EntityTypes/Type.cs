@@ -11,9 +11,9 @@ namespace IIS.Core.GraphQL.EntityTypes
 {
     public class EntityTypeCollection : Collection<NodeType, EntityType>
     {
-        private OntologyModel _ontology { get; }
+        private IOntologyModel _ontology { get; }
 
-        public EntityTypeCollection(IEnumerable<NodeType> source, OntologyModel ontology) : base(source)
+        public EntityTypeCollection(IEnumerable<NodeType> source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
@@ -26,7 +26,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityType
     {
-        public EntityType(NodeType source, OntologyModel ontology)
+        public EntityType(NodeType source, IOntologyModel ontology)
         {
             Source = source;
             _ontology = ontology;
@@ -34,7 +34,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         protected NodeType Source { get; }
 
-        private OntologyModel _ontology { get; }
+        private IOntologyModel _ontology { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -63,6 +63,10 @@ namespace IIS.Core.GraphQL.EntityTypes
             var props = Source.AllProperties.OrderBy(a => a.CreatedAt);
             return props.Select(CreateEntityAttribute);
         }
+
+        [GraphQLNonNullType]
+        [GraphQLDescription("Entity contains unique values and needs dropdown tip on UI")]
+        public bool HasUniqueValues => Source.HasUniqueValues;
 
         protected IEntityAttribute CreateEntityAttribute(EmbeddingRelationType relationType)
         {

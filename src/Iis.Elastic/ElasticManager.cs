@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Elastic;
-
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Elastic
 {
@@ -106,13 +106,13 @@ namespace Iis.Elastic
             return searchResponse.Body;
         }
 
-        public async Task CreateIndexesAsync(IEnumerable<string> indexNames, CancellationToken token)
+        public async Task CreateIndexesAsync(IEnumerable<string> indexNames, JObject mappingConfiguration = null, CancellationToken token = default)
         {
             foreach (string indexName in indexNames)
             {
                 if (!await IndexExistsAsync(indexName, token))
                 {
-                    await CreateIndexAsync(indexName, token);
+                    await CreateIndexAsync(indexName, mappingConfiguration, token);
                 }
             }
         }
@@ -134,6 +134,42 @@ namespace Iis.Elastic
 
             return response.Success;
         }
+
+        public async Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default)
+        {
+            var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
+            var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
+            var jObject = mappingConfiguration.ToJObject();
+            ApplyRussianAnalyzerAsync(jObject);
+            var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
+            return response.Success;
+        }
+
+        public void ApplyRussianAnalyzerAsync(JObject createRequest)
+        {
+            var analyzerSettings = @"{
+            ""analysis"": {
+                ""filter"": {
+                    ""russian_stop"": {
+                        ""type"": ""stop"",
+                        ""stopwords"": ""_russian_""
+                    },
+                    ""russian_stemmer"": {
+                        ""type"": ""stemmer"",
+                        ""language"": ""russian""
+                    }
+                },
+            ""analyzer"": {
+                ""default"": {
+                    ""tokenizer"": ""standard"",
+                    ""filter"": [
+                        ""lowercase"",
+                        ""russian_stop"",
+                        ""russian_stemmer""
+                ]}}}}";
+            createRequest["settings"] = JObject.Parse(analyzerSettings);
+        }
+
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
@@ -150,10 +186,23 @@ namespace Iis.Elastic
             return searchResponse.Success || searchResponse.HttpStatusCode != 404;
         }
 
-        private async Task<bool> CreateIndexAsync(string indexName, CancellationToken token)
+        private async Task<bool> CreateIndexAsync(string indexName, JObject mappingConfiguration = null, CancellationToken token = default)
         {
-            StringResponse response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, GetRealIndexName(indexName), token);
+            var request = new JObject();
+            ApplyRussianAnalyzerAsync(request);
+            ApplyMappingConfiguration(request, mappingConfiguration);
+            var response =
+                await DoRequestAsync(HttpMethod.PUT, GetRealIndexName(indexName), request.ToString(), token);
             return response.Success;
+        }
+
+        private void ApplyMappingConfiguration(JObject request, JObject mappingConfiguration)
+        {
+            if (mappingConfiguration == null)
+            {
+                return;
+            }
+            request.Merge(mappingConfiguration);
         }
 
         private string GetSearchJson(IIisElasticSearchParams searchParams)
@@ -249,7 +298,7 @@ namespace Iis.Elastic
 
         private string ApplyFuzzinessOperator(string input)
         {
-            return $"{input}~";
+            return $"{input} OR {input}~";
         }
 
         private string EscapeElasticSpecificSymbols(string input, string escapePattern)

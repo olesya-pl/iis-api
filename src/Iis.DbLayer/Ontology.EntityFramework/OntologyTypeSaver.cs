@@ -6,7 +6,6 @@ using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
-using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -86,7 +85,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 result.Kind = Kind.Attribute;
                 result.AttributeType = new AttributeTypeEntity
                 {
-                    ScalarType = Map(at.ScalarTypeEnum),
+                    ScalarType = at.ScalarTypeEnum,
                 };
             }
             else if (type is RelationType rt)
@@ -128,22 +127,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-
-        private static Interfaces.Ontology.Schema.ScalarType Map(Domain.ScalarType scalarType)
-        {
-            switch (scalarType)
-            {
-                case Domain.ScalarType.Boolean: return Interfaces.Ontology.Schema.ScalarType.Boolean;
-                case Domain.ScalarType.DateTime: return Interfaces.Ontology.Schema.ScalarType.Date;
-                case Domain.ScalarType.Decimal: return Interfaces.Ontology.Schema.ScalarType.Decimal;
-                case Domain.ScalarType.File: return Interfaces.Ontology.Schema.ScalarType.File;
-                case Domain.ScalarType.Geo: return Interfaces.Ontology.Schema.ScalarType.Geo;
-                case Domain.ScalarType.Integer: return Interfaces.Ontology.Schema.ScalarType.Int;
-                case Domain.ScalarType.String: return Interfaces.Ontology.Schema.ScalarType.String;
-                default: throw new NotImplementedException();
-            }
-        }
-
         private static Interfaces.Ontology.Schema.EmbeddingOptions Map(EmbeddingOptions embeddingOptions)
         {
             switch (embeddingOptions)

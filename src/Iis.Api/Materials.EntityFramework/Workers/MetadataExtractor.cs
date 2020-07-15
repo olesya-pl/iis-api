@@ -10,7 +10,6 @@ using Iis.Domain.Materials;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
-using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 using Material = Iis.Domain.Materials.Material;
 using Node = Iis.Domain.Node;
 using IIS.Domain;
@@ -25,14 +24,14 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         private readonly OntologyContext _context;
         private readonly IMaterialProvider _materialProvider;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
 
-        public MetadataExtractor(OntologyContext context, IMaterialProvider materialProvider, IOntologyService ontologyService, IOntologyProvider ontologyProvider)
+        public MetadataExtractor(OntologyContext context, IMaterialProvider materialProvider, IOntologyService ontologyService, IOntologyModel ontology)
         {
             _context = context;
             _materialProvider = materialProvider;
             _ontologyService = ontologyService;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
         }
 
         public async Task ExtractInfoAsync(Material material)
@@ -64,14 +63,13 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         private async Task ExtractFeatures(MaterialInfo info)
         {
             var view = info.Data.ToObject<Metadata>();
-            var ontology = await _ontologyProvider.GetOntologyAsync();
             var features = new List<MaterialFeature>();
             await _context.Semaphore.WaitAsync();
             try
             {
                 foreach (var node in view.Features.Nodes)
                 {
-                    var type = ontology.GetEntityType(node.Type)
+                    var type = _ontology.GetEntityType(node.Type)
                                ?? throw new ArgumentException($"EntityType {node.Type} does not exist");
                     // TODO: should work with any entity type. Currently works only with entities which has value
                     var relationType = type.GetProperty("value");

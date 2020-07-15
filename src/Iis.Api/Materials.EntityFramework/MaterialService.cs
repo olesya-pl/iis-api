@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
+using Newtonsoft.Json.Linq;
 using IIS.Core.Files;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
@@ -10,6 +11,8 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.Interfaces.Materials;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -40,12 +43,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProcessors = materialProcessors;
         }
 
-        private async Task SaveAsync(Material material)
-        {
-            await SaveAsync(material, null);
-        }
-
-        public async Task SaveAsync(Material material, IEnumerable<IIS.Core.GraphQL.Materials.Node> nodes)
+        public async Task SaveAsync(Material material)
         {
             if (material.File != null) // if material has attached file
             {
@@ -69,21 +67,44 @@ namespace IIS.Core.Materials.EntityFramework
 
             foreach (var child in material.Children)
             {
-                child.ParentId = material.Id;
-                await SaveAsync(child);
+                await _context.Semaphore.WaitAsync();
+                try
+                {
+                    child.ParentId = material.Id;
+                    await SaveAsync(child);
+                }
+                finally
+                {
+                    _context.Semaphore.Release();
+                }
             }
 
             foreach (var info in material.Infos)
                 _context.Add(Map(info, material.Id));
 
+            foreach (var featureId in GetNodeIdentitiesFromFeatures(material.Metadata))
+            {
+                _context.MaterialFeatures.Add(new MaterialFeatureEntity
+                {
+                    NodeId = featureId,
+                    MaterialInfo = new MaterialInfoEntity
+                    {
+                        MaterialId = material.Id
+                    }
+                });
+            }
+
             await _context.SaveChangesAsync();
 
-            await PutMaterialToElasticSearch(materialEntity.Id);
+            await PutMaterialToElasticSearchAsync(materialEntity.Id);
 
-            _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage{Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type});
+            if (material.ParentId == null)
+            {
+                _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
+            }
+            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type });
+
             // todo: put message to rabbit instead of calling another service directly
-
             if (material.Metadata.SelectToken("Features.Nodes") != null)
             {
                 foreach (var processor in _materialProcessors)
@@ -93,9 +114,7 @@ namespace IIS.Core.Materials.EntityFramework
             // todo: multiple queues for different material types
             if (material.File != null && material.Type == "cell.voice")
                 _eventProducer.SendMaterialAddedEventAsync(
-                    new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id});
-
-            SendIcaoEvent(nodes);
+                    new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
         }
 
         public async Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
@@ -106,16 +125,16 @@ namespace IIS.Core.Materials.EntityFramework
 
             _context.SaveChanges();
 
-            await PutMaterialToElasticSearch(responseEntity.MaterialId);
+            await PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
             return _mapper.Map<MlResponse>(responseEntity);
         }
 
-        public async Task<Material> UpdateMaterial(IMaterialUpdateInput input)
+        public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)
         {
             var material = _context.Materials.FirstOrDefault(p => p.Id == input.Id);
 
-            if (string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
+            if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
             if (input.ImportanceId.HasValue) material.ImportanceSignId = input.ImportanceId.Value;
             if (input.ReliabilityId.HasValue) material.ReliabilitySignId = input.ReliabilityId.Value;
             if (input.RelevanceId.HasValue) material.RelevanceSignId = input.RelevanceId.Value;
@@ -123,23 +142,82 @@ namespace IIS.Core.Materials.EntityFramework
             if (input.SourceReliabilityId.HasValue) material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
             if (input.ProcessedStatusId.HasValue) material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
             if (input.SessionPriorityId.HasValue) material.SessionPriorityId = input.SessionPriorityId.Value;
-            var loadData = new MaterialLoadData();
+            if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
+            if (!string.IsNullOrWhiteSpace(input.Content)) material.Content = input.Content;
+
+            var loadData = MaterialLoadData.MapLoadData(material.LoadData);
+
             if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
             if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
             if (input.States != null) loadData.States = new List<string>(input.States);
-            material.LoadData = loadData.ToJson();
-            if (input.AssigneeId != null) material.AssigneeId = input.AssigneeId;
 
-            await UpdateAsync(material);
+            material.LoadData = loadData.ToJson();
+
+            await UpdateMaterialAsync(material);
 
             return await _materialProvider.GetMaterialAsync(input.Id);
         }
 
-        private async Task<bool> PutMaterialToElasticSearch(Guid materialId)
+        public async Task UpdateMaterialAsync(MaterialEntity material)
+        {
+            await _context.Semaphore.WaitAsync();
+            try
+            {
+                _context.Update(material);
+
+                await _context.SaveChangesAsync();
+
+                await PutMaterialToElasticSearchAsync(material.Id);
+
+                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+        }
+
+        public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
+        {
+            var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
+            if (material == null)
+            {
+                return;
+            }
+            material.AssigneeId = assigneeId;
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId)
         {
             var materialDocument = await _materialProvider.GetMaterialDocumentAsync(materialId);
 
             return await _elasticService.PutMaterialAsync(materialId, materialDocument);
+        }
+
+        private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
+        {
+            var result = new List<Guid>();
+
+            var features = metadata.SelectToken(FeatureFields.FeaturesSection);
+
+            if (features is null) return result;
+
+            foreach (JObject feature in features)
+            {
+                var featureId = feature.GetValue(FeatureFields.featureId)?.Value<string>();
+
+                if (string.IsNullOrWhiteSpace(featureId)) continue;
+
+                if (!Guid.TryParse(featureId, out Guid featureGuid)) continue;
+
+                if(featureGuid.Equals(Guid.Empty)) continue;
+                
+                result.Add(featureGuid);
+            }
+
+            return result;
         }
 
         private Guid GetIcaoNode(string icaoValue)
@@ -184,36 +262,17 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        public async Task<Material> AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
+        public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
         {
-            var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
+            var material = await _context.Materials.FirstOrDefaultAsync(p => p.Id == materialId);
+
             if (material == null)
             {
-                throw new ArgumentNullException("No material found by given id");
+                throw new ArgumentNullException($"Material with given id not found");
             }
-            material.AssigneeId = assigneeId;
+
+            material.MlHandlersCount = handlersCount;
             await _context.SaveChangesAsync();
-            return await _materialProvider.GetMaterialAsync(materialId);
-        }
-
-        public async Task UpdateAsync(MaterialEntity material)
-        {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                _context.Update(material);
-
-                await _context.SaveChangesAsync();
-
-                await PutMaterialToElasticSearch(material.Id);
-
-                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
-
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Linq;
 
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
+using System;
 
 namespace Iis.Elastic
 {
@@ -28,6 +30,20 @@ namespace Iis.Elastic
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
             }
 
+            var coordinates = extNode.GetCoordinates();
+            if (coordinates != null && coordinates.Count > 0)
+            {
+                var coords = new JArray();
+                foreach (var coord in coordinates)
+                {
+                    var item = new JObject();
+                    item["lat"] = coord.Latitude;
+                    item["lang"] = coord.Langitude;
+                    coords.Add(item);
+                }
+                json["__coordinates"] = coords;
+            }
+
             foreach (var childGroup in extNode.Children.GroupBy(p => p.NodeTypeName))
             {
                 var key = childGroup.Key;
@@ -50,16 +66,40 @@ namespace Iis.Elastic
             return json;
         }
 
+        private JToken GetFuzzyDateJToken(IExtNode extNode)
+        {
+            int? year = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "year")?.AttributeValue;
+            if (year == null)
+            {
+                return null;
+            }
+            int month = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "month")?.AttributeValue ?? 1;
+            int day = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "day")?.AttributeValue ?? 1;
+
+            try
+            {
+                var date = new DateTime((int)year, (int)month, (int)day);
+                return JToken.FromObject(date);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private JToken GetExtNodeValue(IExtNode extNode)
         {
-            if (extNode.IsAttribute)
+            if (extNode.EntityTypeName == EntityTypeNames.FuzzyDate.ToString())
             {
-                return extNode.AttributeValue;
+                return GetFuzzyDateJToken(extNode);
             }
-            else
+
+            if (extNode.IsAttribute && extNode.AttributeValue != null)
             {
-                return GetJsonObjectByExtNode(extNode, false);
+                return JToken.FromObject(extNode.AttributeValue);
             }
+            
+            return GetJsonObjectByExtNode(extNode, false);
         }
     }
 }

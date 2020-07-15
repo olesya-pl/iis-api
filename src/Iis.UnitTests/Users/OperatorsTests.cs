@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.DataModel.Roles;
 using Iis.Roles;
 using Iis.UnitTests.TestHelpers;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace Iis.UnitTests.Users
 
         public OperatorsTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
 
         public void Dispose()
@@ -34,6 +35,13 @@ namespace Iis.UnitTests.Users
         {
             //arrange
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            foreach (var user in data)
+            {
+                user.UserRoles.Add(new UserRoleEntity {
+                    RoleId = RoleEntity.OperatorRoleId,
+                    User = user
+                });
+            }
             context.AddRange(data);
             context.SaveChanges();
 
@@ -59,6 +67,19 @@ namespace Iis.UnitTests.Users
         {
             //arrange
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
+
+            operator1.UserRoles.Add(new UserRoleEntity
+            {
+                RoleId = RoleEntity.OperatorRoleId,
+                User = operator1
+            });
+
+            operator2.UserRoles.Add(new UserRoleEntity
+            {
+                RoleId = RoleEntity.OperatorRoleId,
+                User = operator2
+            });
+
             context.AddRange(new[] { operator1, operator2 });
 
             for (var i = 0; i < 20; i++)
@@ -66,6 +87,8 @@ namespace Iis.UnitTests.Users
                 dummyMaterial.AssigneeId = operator1.Id;
                 dummyMaterial.Assignee = operator1;
                 dummyMaterial.Id = new Guid();
+                dummyMaterial.ParentId = null;
+                dummyMaterial.Parent = null;
                 context.Add(dummyMaterial);
                 context.SaveChanges();
             }
@@ -118,6 +141,14 @@ namespace Iis.UnitTests.Users
             }
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            foreach (var user in operators)
+            {
+                user.UserRoles.Add(new UserRoleEntity
+                {
+                    RoleId = RoleEntity.OperatorRoleId,
+                    User = user
+                });
+            }
             context.AddRange(operators);
             context.AddRange(materials);
             context.SaveChanges();

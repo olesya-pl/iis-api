@@ -10,8 +10,9 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OScalarType = Iis.Domain.ScalarType;
+using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using IIS.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -20,11 +21,11 @@ namespace IIS.Core.GraphQL.EntityTypes
         protected override void Configure(IEnumTypeDescriptor descriptor)
         {
             descriptor.Name("EntityAttributeType");
-            descriptor.Item(OScalarType.Integer.ToString()).Name("int");
+            descriptor.Item(OScalarType.Int.ToString()).Name("int");
             descriptor.Item(OScalarType.Decimal.ToString()).Name("float");
             descriptor.Item(OScalarType.String.ToString()).Name("string");
             descriptor.Item(OScalarType.Boolean.ToString()).Name("boolean");
-            descriptor.Item(OScalarType.DateTime.ToString()).Name("date");
+            descriptor.Item(OScalarType.Date.ToString()).Name("date");
             descriptor.Item(OScalarType.Geo.ToString()).Name("geo");
             descriptor.Item(OScalarType.File.ToString()).Name("file");
             descriptor.Item("relation").Name("relation");
@@ -50,8 +51,8 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType] string Title { get; }
 
         [GraphQLNonNullType] string Code { get; }
-
         [GraphQLNonNullType] bool Editable { get; }
+        [GraphQLNonNullType] bool IsLinkToObjectOfStudy { get; }
 
         bool Multiple { get; }
         string Format { get; }
@@ -90,6 +91,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
         public string Format => (MetaObject as AttributeRelationMeta)?.Format;
+        [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.TargetType.IsObjectOfStudy;
 
         [GraphQLType(typeof(AnyType))]
         public FormField FormField => MetaObject?.FormField;
@@ -127,12 +129,12 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(EmbeddingRelationType source, OntologyModel ontology) : base(source)
+        public EntityAttributeRelation(EmbeddingRelationType source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
 
-        private OntologyModel _ontology;
+        private IOntologyModel _ontology;
 
         protected new EntityRelationMeta MetaObject => (EntityRelationMeta) base.MetaObject;
 
@@ -149,10 +151,9 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
-        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyProvider ontologyProvider,
+        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology,
             bool? concreteTypes = false)
         {
-            var ontology = await ontologyProvider.GetOntologyAsync();
             var types = ontology.GetChildTypes(Source.EntityType)?.OfType<Iis.Domain.EntityType>();
             if (types == null)
                 types = new[] {Source.EntityType};

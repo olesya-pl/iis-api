@@ -25,6 +25,9 @@ namespace Iis.OntologySchema.Saver
             AddNodes(compareResult.ItemsToAdd);
             DeleteNodes(compareResult.ItemsToDelete);
             UpdateNodes(compareResult.ItemsToUpdate, schemaTo);
+            AddAliases(compareResult.AliasesToAdd);
+            UpdateAliases(compareResult.AliasesToUpdate);
+            DeleteAliases(compareResult.AliasesToDelete);
             _context.SaveChanges();
         }
 
@@ -54,7 +57,6 @@ namespace Iis.OntologySchema.Saver
                 }
             }
         }
-
         private void DeleteNodes(IReadOnlyList<INodeTypeLinked> nodeTypesToDelete)
         {
             foreach (var nodeType in nodeTypesToDelete)
@@ -64,7 +66,6 @@ namespace Iis.OntologySchema.Saver
                 _context.NodeTypes.Update(nodeTypeEntity);
             }
         }
-
         private void UpdateNodes(IReadOnlyList<ISchemaCompareDiffItem> itemsToUpdate, ISchemaEntityTypeFinder entityTypeFinder)
         {
             var updatedAttributesIds = new List<Guid>();
@@ -111,7 +112,36 @@ namespace Iis.OntologySchema.Saver
                 }
             }
         }
-
+        private void AddAliases(IEnumerable<IAlias> aliasesToAdd)
+        {
+            foreach (var alias in aliasesToAdd)
+            {
+                var aliasEntity = new AliasEntity
+                {
+                    Id = Guid.NewGuid(),
+                    DotName = alias.DotName,
+                    Value = alias.Value
+                };
+                _context.Aliases.Add(aliasEntity);
+            }
+        }
+        private void UpdateAliases(IEnumerable<IAlias> aliasesToUpdate)
+        {
+            foreach (var alias in aliasesToUpdate)
+            {
+                var aliasEntity = _context.Aliases.Single(a => a.DotName == alias.DotName);
+                aliasEntity.Value = alias.Value;
+                _context.Aliases.Update(aliasEntity);
+            }
+        }
+        private void DeleteAliases(IEnumerable<IAlias> aliasesToDelete)
+        {
+            foreach (var alias in aliasesToDelete)
+            {
+                var aliasEntity = _context.Aliases.Single(a => a.DotName == alias.DotName);
+                _context.Aliases.Remove(aliasEntity);
+            }
+        }
         private IMapper GetMapper()
         {
             var configuration = new MapperConfiguration(cfg =>

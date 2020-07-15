@@ -16,8 +16,24 @@ namespace Iis.DataModel.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            modelBuilder.Entity("Iis.DataModel.AliasEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DotName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Aliases");
+                });
 
             modelBuilder.Entity("Iis.DataModel.Analytics.AnalyticIndicatorEntity", b =>
                 {
@@ -152,6 +168,11 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("PropertyName")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13) placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)");
+
                     b.Property<Guid>("TargetId")
                         .HasColumnType("uuid");
 
@@ -256,6 +277,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid?>("CompletenessSignId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -273,6 +297,11 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<string>("Metadata")
                         .HasColumnType("text");
+
+                    b.Property<int>("MlHandlersCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid");
@@ -700,6 +729,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
+                    b.Property<string>("UniqueValueFieldName")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -941,6 +973,9 @@ namespace Iis.DataModel.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
 
                     b.Property<string>("Query")
                         .IsRequired()

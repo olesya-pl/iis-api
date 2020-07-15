@@ -1,21 +1,21 @@
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using IIS.Core.Materials;
+using IIS.Core.Materials.FeatureProcessors;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public class Mutation
     {
         // ReSharper disable once UnusedMember.Global
-        public async Task<Material> CreateMaterial(
+        public async Task<CreateMaterialResponse> CreateMaterial(
             [Service] IMaterialProvider materialProvider,
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
+            [Service] IFeatureProcessorFactory featureProcessorFactory,
             [GraphQLNonNullType] MaterialInput input)
         {
-            
             Iis.Domain.Materials.Material inputMaterial = mapper.Map<Iis.Domain.Materials.Material>(input);
 
             inputMaterial.Reliability = materialProvider.GetMaterialSign(input.ReliabilityText);
@@ -24,11 +24,11 @@ namespace IIS.Core.GraphQL.Materials
 
             inputMaterial.LoadData = mapper.Map<Iis.Domain.Materials.MaterialLoadData>(input);
 
-            await materialService.SaveAsync(inputMaterial, input?.Metadata?.Features?.Nodes?.ToList());
+            inputMaterial.Metadata = await featureProcessorFactory.GetInstance(inputMaterial.Source, inputMaterial.Type).ProcessMetadata(inputMaterial.Metadata);
 
-            Iis.Domain.Materials.Material material = await materialProvider.GetMaterialAsync(inputMaterial.Id);
-
-            return mapper.Map<Material>(material);
+            await materialService.SaveAsync(inputMaterial);
+            
+            return new CreateMaterialResponse { Id = inputMaterial.Id };
         }
 
         public async Task<Material> UpdateMaterial(
@@ -36,16 +36,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
-            var material = await materialService.UpdateMaterial(input);
-            return mapper.Map<Material>(material);
-        }
-
-        public async Task<Material> AssignMaterialOperator(
-            [Service] IMaterialService materialService,
-            [Service] IMapper mapper,
-            [GraphQLNonNullType] AssignMaterialOperatorInput input)
-        {
-            var material = await materialService.AssignMaterialOperatorAsync(input.MaterialId, input.AssigneeId);
+            var material = await materialService.UpdateMaterialAsync(input);
             return mapper.Map<Material>(material);
         }
     }

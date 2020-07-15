@@ -3,11 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <VersionPrefix>0.1.0</VersionPrefix>
-    <VersionSuffix Condition="'$(IIS_VERSION_SUFFIX)' != ''">$(IIS_VERSION_SUFFIX)</VersionSuffix>
     <SourceRevisionId Condition="'$(IIS_SOURCE_REVISION_ID)' != ''">$(IIS_SOURCE_REVISION_ID)</SourceRevisionId>
     <UserSecretsId>7fbdec57-37c4-4ac5-bbe0-b67a05e1794d</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Logs\**" />
+    <Content Remove="Logs\**" />
+    <EmbeddedResource Remove="Logs\**" />
+    <None Remove="Logs\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.0.0" />
@@ -21,15 +26,17 @@
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.62" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.62" />
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.3.4" />
     <PackageReference Include="protobuf-net" Version="2.4.4" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
@@ -37,6 +44,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
   </ItemGroup>

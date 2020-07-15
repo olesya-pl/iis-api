@@ -71,6 +71,19 @@ namespace Iis.OntologySchema.DataTypes
             return IncomingRelations.Where(r => r.Kind == RelationKind.Inheritance).Select(r => r.SourceType).ToList();
         }
 
+        public IReadOnlyList<INodeTypeLinked> GetAllDescendants()
+        {
+            var result = new List<INodeTypeLinked>();
+            var directDescendants = GetDirectDescendants();
+            foreach (var directDescendant in directDescendants)
+            {
+                result.Add(directDescendant);
+                result.AddRange(directDescendant.GetAllDescendants());
+            }
+
+            return result;
+        }
+
         public IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded()
         {
             return IncomingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(r => r.SourceType).ToList();
@@ -93,6 +106,18 @@ namespace Iis.OntologySchema.DataTypes
 
             return result;
         }
+
+        public bool IsInheritedFrom(string nodeTypeName)
+        {
+            var ancestors = GetAllAncestors();
+            return ancestors.Any(nt => nt.Name == nodeTypeName);
+        }
+
+        public bool IsObjectOfStudy => IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
+
+        public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
+
+        public bool IsObjectSign => IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
 
         public string GetStringCode()
         {
@@ -151,6 +176,7 @@ namespace Iis.OntologySchema.DataTypes
                 && IsArchived == nodeType.IsArchived
                 && Kind == nodeType.Kind
                 && IsAbstract == nodeType.IsAbstract
+                && UniqueValueFieldName == nodeType.UniqueValueFieldName
                 && scalarTypesAreEqual;
         }
 
@@ -201,22 +227,32 @@ namespace Iis.OntologySchema.DataTypes
             IsAbstract = nodeType.IsAbstract;
         }
 
-        public List<string> GetAttributeDotNamesRecursive(string parentName = null)
+        public List<(string dotName, SchemaNodeType nodeType)> GetNodeTypesRecursive(string parentName = null)
         {
-            var result = new List<string>();
+            var result = new List<(string dotName, SchemaNodeType nodeType)>();
 
-            if (Kind == Kind.Attribute)
+            var dotName = parentName ?? Name;
+            result.Add((dotName, this));
+
+            foreach (var relationType in GetEmbeddingRelationsIncludeInherited())
             {
-                result.Add(Name);
-            }
+                if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
 
-            foreach (var relation in OutgoingRelations)
+                var relationTypeName = $"{dotName}.{relationType.NodeType.Name}";
+                var relationAttributes = relationType._targetType.GetNodeTypesRecursive(relationTypeName);
+                result.AddRange(relationAttributes);
+            }
+            return result;
+        }
+
+        private IEnumerable<SchemaRelationType> GetEmbeddingRelationsIncludeInherited()
+        {
+            var result = _outgoingRelations.Where(r => r.Kind == RelationKind.Embedding).ToList();
+            foreach (SchemaNodeType ancestor in GetAllAncestors())
             {
-                string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity ? relation.NodeType.Name : null;
-                result.AddRange(relation.TargetType.GetAttributeDotNamesRecursive(relationName));
+                result.AddRange(ancestor.GetEmbeddingRelationsIncludeInherited());
             }
-
-            return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
+            return result;
         }
 
         public List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)
@@ -254,6 +290,19 @@ namespace Iis.OntologySchema.DataTypes
             return _outgoingRelations
                 .Where(r => r.NodeType.Name == relationName)
                 .SingleOrDefault();
+        }
+
+        public INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts)
+        {
+            var nodeType = OutgoingRelations
+                .Where(r => r.Kind == RelationKind.Embedding
+                    && r.NodeType.Name == dotNameParts[0])
+                .Select(r => r.TargetType)
+                .Single();
+
+            return dotNameParts.Length == 1 ? 
+                nodeType : 
+                nodeType.GetNodeTypeByDotNameParts(dotNameParts.Skip(1).ToArray());
         }
 
         public override string ToString() => Name;

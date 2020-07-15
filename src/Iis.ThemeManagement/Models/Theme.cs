@@ -12,5 +12,6 @@ namespace Iis.ThemeManagement.Models
         public string Query { get; set; }
         public ThemeType Type { get; set; }
         public User User { get; set; }
+        public string Comment { get; set; }
     }
 }

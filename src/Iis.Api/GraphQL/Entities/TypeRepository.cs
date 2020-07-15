@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.InputTypes.Mutations;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes.Mutations;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using IIS.Domain;
+using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
+using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -20,14 +21,13 @@ namespace IIS.Core.GraphQL.Entities
 
     public class TypeRepository : TypeStorage
     {
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly OntologyQueryTypesCreator _creator;
         private readonly OntologyMutationTypesCreator[] _mutators;
-        private OntologyModel _ontology;
 
-        public TypeRepository(IOntologyProvider ontologyProvider)
+        public TypeRepository(IOntologyModel ontology)
         {
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _creator = new OntologyQueryTypesCreator(this);
             _mutators = new OntologyMutationTypesCreator[]
             {
@@ -39,7 +39,6 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
-            _ontology = _ontologyProvider.GetOntologyAsync().Result; // todo: to async method
             var entityTypes = _ontology.EntityTypes.ToList();
             if (entityTypes.Count == 0)
                 throw new OntologyTypesException("There are no entity types to register on graphql schema");
@@ -75,17 +74,17 @@ namespace IIS.Core.GraphQL.Entities
             return GetOrCreate(type.Name, () => _creator.NewOntologyType(type));
         }
 
-        public IOutputType GetScalarOutputType(Iis.Domain.ScalarType scalarType)
+        public IOutputType GetScalarOutputType(OScalarType scalarType)
         {
             IOutputType type;
-            if (scalarType == Iis.Domain.ScalarType.File)
+            if (scalarType == OScalarType.File)
                 type = GetType<AttachmentType>();
             else
                 type = Scalars[scalarType];
             return type;
         }
 
-        public IOutputType GetMultipleOutputType(Iis.Domain.ScalarType scalarType)
+        public IOutputType GetMultipleOutputType(OScalarType scalarType)
         {
             var name = scalarType.ToString();
             return GetOrCreate(name, () =>
@@ -106,7 +105,7 @@ namespace IIS.Core.GraphQL.Entities
         public IInputType GetInputAttributeType(AttributeType attributeType)
         {
             IInputType type;
-            if (attributeType.ScalarTypeEnum == Iis.Domain.ScalarType.File)
+            if (attributeType.ScalarTypeEnum == OScalarType.File)
                 type = GetType<FileValueInputType>();
             else
                 type = Scalars[attributeType.ScalarTypeEnum];

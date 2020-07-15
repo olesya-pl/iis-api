@@ -11,8 +11,9 @@ namespace Iis.Domain.Materials
         public Guid? ParentId { get; set; }
         public JArray Data { get; set; }
         public JObject Metadata { get; set; }
-        public string Type { get; set;}
-        public string Source { get; set;}
+        public string Type { get; set; }
+        public string Source { get; set; }
+        public string Content { get; set; }
         public MaterialSign Importance { get; set; }
         public Guid? ImportanceSignId => Importance?.Id;
         public MaterialSign Reliability { get; set; }
@@ -36,5 +37,11 @@ namespace Iis.Domain.Materials
         public MaterialLoadData LoadData { get; set; }
         public User Assignee { get; set; }
         public Guid? AssigneeId { get; set; }
+        public int MlHandlersCount { get; set; }
+        public int ProcessedMlHandlersCount { get; set; }
+        public JObject ObjectsOfStudy { get; set; }
+        public IEnumerable<Node> Events { get; set; }
+        public IEnumerable<JObject> Features { get; set; }
+        public IEnumerable<JObject> Events2 { get; set; }
     }
 }

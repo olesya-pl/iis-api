@@ -17,7 +17,7 @@ namespace Iis.UnitTests.UserManagement
 
         public UserServiceCreateUpdate()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
         public void Dispose()
         {

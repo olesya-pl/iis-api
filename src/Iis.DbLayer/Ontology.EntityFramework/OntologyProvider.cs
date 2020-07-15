@@ -7,14 +7,14 @@ using Iis.DataModel;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 using IIS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using EmbeddingOptions = Iis.Domain.EmbeddingOptions;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
-    public class OntologyProvider : BaseOntologyProvider, IOntologyProvider
+    public class OntologyProvider : IOntologyProvider
     {
         private readonly OntologyContext _context;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -25,50 +25,45 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _context = contextFactory;
         }
 
-        public async Task<OntologyModel> GetOntologyAsync(CancellationToken cancellationToken = default)
+        public IOntologyModel GetOntology()
         {
-            // ReaderWriterLockSlim is used to allow multiple concurrent reads and only one exclusive write.
-            // Class member can be replaced with some distributed cache
-            return await Task.Run(() =>
+            _locker.EnterReadLock();
+            try
             {
-                _locker.EnterReadLock();
-                try
-                {
-                    // Try to hit in cache
-                    if (_ontology != null) return _ontology;
-                }
-                finally
-                {
-                    _locker.ExitReadLock();
-                }
+                // Try to hit in cache
+                if (_ontology != null) return _ontology;
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
 
-                _locker.EnterWriteLock();
-                try
-                {
-                    // Double check
-                    if (_ontology != null) return _ontology;
+            _locker.EnterWriteLock();
+            try
+            {
+                // Double check
+                if (_ontology != null) return _ontology;
 
-                    // Query primary source and update the cache
-                    var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                        .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
-                        .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
-                        .Include(e => e.AttributeType)
-                        .ToArray();
-                    var result = types.Select(e => MapType(e)).ToList();
-                    var relationTypes = _types.Values.Where(e => e is RelationType);
-                    // todo: refactor
-                    result.AddRange(relationTypes);
+                // Query primary source and update the cache
+                var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
+                    .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.AttributeType)
+                    .ToArray();
+                var result = types.Select(e => MapType(e)).ToList();
+                var relationTypes = _types.Values.Where(e => e is RelationType);
+                // todo: refactor
+                result.AddRange(relationTypes);
 
-                    _ontology = new OntologyModel(result);
-                    _types.Clear();
+                _ontology = new OntologyModel(result);
+                _types.Clear();
 
-                    return _ontology;
-                }
-                finally
-                {
-                    _locker.ExitWriteLock();
-                }
-            }, cancellationToken);
+                return _ontology;
+            }
+            finally
+            {
+                _locker.ExitWriteLock();
+            }
         }
 
         public void Invalidate()
@@ -98,7 +93,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (type.Kind == Kind.Attribute)
                 {
                     var attributeType = type.AttributeType;
-                    var attr = new AttributeType(type.Id, type.Name, MapScalarType(attributeType.ScalarType));
+                    var attr = new AttributeType(type.Id, type.Name, attributeType.ScalarType);
                     _types.Add(type.Id, attr);
                     FillProperties(type, attr);
                     attr.Meta = attr.CreateMeta(); // todo: refactor meta creation
@@ -110,10 +105,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     _types.Add(type.Id, entity);
                     FillProperties(type, entity);
                     // Process relation inheritance first
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance && !r.NodeType.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     entity.Meta = entity.CreateMeta(); // todo: refactor. Creates meta with all parent types meta
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance && !r.NodeType.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     return entity;
                 }
@@ -129,7 +124,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var relation = default(RelationType);
                 if (relationType.Kind == RelationKind.Embedding)
                 {
-                    relation = new EmbeddingRelationType(type.Id, type.Name, Map(relationType.EmbeddingOptions));
+                    relation = new EmbeddingRelationType(type.Id, type.Name, relationType.EmbeddingOptions);
                     FillProperties(type, relation);
                     _types.Add(type.Id, relation);
                     var target = mapType(relationType.TargetType);
@@ -152,9 +147,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        protected override RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
+        protected RelationType _addInversedRelation(RelationType relation, NodeType sourceType)
         {
-            var inversedRelation = base._addInversedRelation(relation, sourceType);
+            if (!(relation is EmbeddingRelationType relationType) || !relationType.HasInversed())
+                return null;
+
+            var meta = relationType.GetInversed();
+            var embeddingOptions = meta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
+            var name = meta.Code ?? sourceType.Name.ToLowerCamelcase();
+            var inversedRelation = new EmbeddingRelationType(Guid.NewGuid(), name, embeddingOptions, isInversed: true)
+            {
+                Title = meta.Title ?? sourceType.Title ?? name
+            };
+
+            inversedRelation.AddType(sourceType);
+            inversedRelation.AddType(relationType);
+            relationType.TargetType.AddType(inversedRelation);
 
             if (inversedRelation != null)
                 _types.Add(inversedRelation.Id, inversedRelation);
@@ -168,32 +176,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             ontologyType.MetaSource = type.Meta == null ? null : JObject.Parse(type.Meta);
             ontologyType.CreatedAt = type.CreatedAt;
             ontologyType.UpdatedAt = type.UpdatedAt;
-        }
-
-        private static Domain.ScalarType MapScalarType(Interfaces.Ontology.Schema.ScalarType scalarType)
-        {
-            switch (scalarType)
-            {
-                case Interfaces.Ontology.Schema.ScalarType.Boolean: return Domain.ScalarType.Boolean;
-                case Interfaces.Ontology.Schema.ScalarType.Date: return Domain.ScalarType.DateTime;
-                case Interfaces.Ontology.Schema.ScalarType.Decimal: return Domain.ScalarType.Decimal;
-                case Interfaces.Ontology.Schema.ScalarType.File: return Domain.ScalarType.File;
-                case Interfaces.Ontology.Schema.ScalarType.Geo: return Domain.ScalarType.Geo;
-                case Interfaces.Ontology.Schema.ScalarType.Int: return Domain.ScalarType.Integer;
-                case Interfaces.Ontology.Schema.ScalarType.String: return Domain.ScalarType.String;
-                default: throw new NotImplementedException();
-            }
-        }
-
-        private static EmbeddingOptions Map(Interfaces.Ontology.Schema.EmbeddingOptions embeddingOptions)
-        {
-            switch (embeddingOptions)
-            {
-                case Interfaces.Ontology.Schema.EmbeddingOptions.Optional: return EmbeddingOptions.Optional;
-                case Interfaces.Ontology.Schema.EmbeddingOptions.Required: return EmbeddingOptions.Required;
-                case Interfaces.Ontology.Schema.EmbeddingOptions.Multiple: return EmbeddingOptions.Multiple;
-                default: throw new ArgumentOutOfRangeException(nameof(embeddingOptions), embeddingOptions, null);
-            }
+            ontologyType.UniqueValueFieldName = type.UniqueValueFieldName;
         }
     }
 }

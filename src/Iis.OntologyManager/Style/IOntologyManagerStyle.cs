@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace Iis.OntologyManager.Style
 {
@@ -14,5 +16,10 @@ namespace Iis.OntologyManager.Style
         int MarginVer { get; }
         int MarginVerSmall { get; }
         Color RelationTypeBackColor { get; }
+        Font DefaultFont { get; }
+        Font SelectedFont { get; }
+        Font TypeHeaderNameFont { get; }
+        Color GetColorByNodeType(Kind kind);
+        void GridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e);
     }
 }

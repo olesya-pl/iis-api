@@ -36,7 +36,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(nt => nt.Name == "ObjectOfStudy" && nt.Kind == Kind.Entity)
                 .SingleOrDefault();
 
-            if(objectOfStudyType != null)
+            if (objectOfStudyType != null)
             {
                 return objectOfStudyType.IncomingRelations
                     .Where(r => r.Kind == RelationKind.Inheritance)
@@ -57,6 +57,23 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
+        private object GetAttributeValue(NodeEntity nodeEntity)
+        {
+            if (nodeEntity.Attribute == null) return null;
+
+            var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
+            var value = nodeEntity.Attribute.Value;
+            switch (scalarType)
+            {
+                case ScalarType.Int:
+                    return Convert.ToInt32(value);
+                case ScalarType.Date:
+                    return Convert.ToDateTime(value);
+                default:
+                    return value.ToString();
+            }
+        }
+
         private async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
         {
             var extNode = new ExtNode
@@ -65,7 +82,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
                 NodeTypeName = nodeTypeName,
                 NodeTypeTitle = nodeTypeTitle,
-                AttributeValue = nodeEntity.Attribute?.Value,
+                EntityTypeName = nodeEntity.NodeType.Name,
+                AttributeValue = GetAttributeValue(nodeEntity),
+                ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
                 Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, cancellationToken)
@@ -75,11 +94,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<IExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var nodeEntity = await GetNodeQuery()
-                .Where(n => n.Id == id)
-                .SingleOrDefaultAsync();
-            var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
-            return extNode;
+            try
+            {
+                await _context.Semaphore.WaitAsync(cancellationToken);
+                var nodeEntity = await GetNodeQuery()
+                    .Where(n => n.Id == id)
+                    .SingleOrDefaultAsync();
+                if (nodeEntity == null) return null;
+
+                var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
+                return extNode;
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
         }
 
         private async Task<List<IExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
@@ -90,7 +119,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
                 if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
                 {
-                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, relation.Node.NodeType.Title ,cancellationToken);
+                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, relation.Node.NodeType.Title, cancellationToken);
                     result.Add(extNode);
                 }
             }
@@ -123,6 +152,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return _context.Nodes
                 .Include(n => n.Attribute)
                 .Include(n => n.NodeType)
+                .ThenInclude(nt => nt.AttributeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.NodeType)

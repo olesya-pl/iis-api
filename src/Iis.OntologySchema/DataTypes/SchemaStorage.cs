@@ -17,12 +17,16 @@ namespace Iis.OntologySchema.DataTypes
         public Dictionary<Guid, SchemaNodeType> NodeTypes { get; private set; }
         public Dictionary<Guid, SchemaRelationType> RelationTypes { get; private set; }
         public Dictionary<Guid, SchemaAttributeType> AttributeTypes { get; private set; }
+        public SchemaAliases Aliases { get; private set; }
+        public Dictionary<string, SchemaNodeType> DotNameTypes { get; private set; } = new Dictionary<string, SchemaNodeType>();
+        public IEnumerable<SchemaNodeType> Entities => NodeTypes.Values.Where(nt => !nt.IsArchived && nt.Kind == Kind.Entity);
 
         public void Initialize(IOntologyRawData ontologyRawData)
         {
             NodeTypes = ontologyRawData.NodeTypes.ToDictionary(nt => nt.Id, nt => _mapper.Map<SchemaNodeType>(nt));
             RelationTypes = ontologyRawData.RelationTypes.ToDictionary(r => r.Id, r => _mapper.Map<SchemaRelationType>(r));
             AttributeTypes = ontologyRawData.AttributeTypes.ToDictionary(at => at.Id, at => _mapper.Map<SchemaAttributeType>(at));
+            Aliases = new SchemaAliases(ontologyRawData.Aliases);
             foreach (var relationType in RelationTypes.Values)
             {
                 var nodeType = NodeTypes[relationType.Id];
@@ -37,9 +41,20 @@ namespace Iis.OntologySchema.DataTypes
                 relationType.SetTargetType(targetType);
                 targetType.AddIncomingRelation(relationType);
             }
+
             foreach (var attributeType in AttributeTypes.Values)
             {
                 NodeTypes[attributeType.Id]._attributeType = attributeType;
+            }
+
+            foreach (var nodeType in Entities)
+            {
+                DotNameTypes[nodeType.Name] = nodeType;
+                var childInfos = nodeType.GetNodeTypesRecursive();
+                foreach (var childInfo in childInfos)
+                {
+                    DotNameTypes[childInfo.dotName] = childInfo.nodeType;
+                }
             }
         }
 
@@ -58,6 +73,11 @@ namespace Iis.OntologySchema.DataTypes
             return AttributeTypes.Values.Select(at => _mapper.Map<SchemaAttributeTypeRaw>(at));
         }
 
+        public IEnumerable<IAlias> GetAliases()
+        {
+            return Aliases.Items;
+        }
+
         public Dictionary<string, INodeTypeLinked> GetStringCodes()
         {
             return NodeTypes.Values.Where(nt => nt.GetStringCode() != null).ToDictionary(nt => nt.GetStringCode(), nt => (INodeTypeLinked)nt);
@@ -66,6 +86,43 @@ namespace Iis.OntologySchema.DataTypes
         public SchemaNodeType GetNodeTypeById(Guid id)
         {
             return NodeTypes.Values.SingleOrDefault(nt => nt.Id == id);
+        }
+        public void AddNodeType(SchemaNodeType nodeType)
+        {
+            NodeTypes[nodeType.Id] = nodeType;
+        }
+        public void AddRelationType(SchemaRelationType relationType)
+        {
+            RelationTypes[relationType.Id] = relationType;
+            var nodeType = NodeTypes[relationType.Id];
+            if (nodeType != null)
+            {
+                nodeType._relationType = relationType;
+                relationType._nodeType = nodeType;
+            }
+
+            var sourceNodeType = NodeTypes[relationType.SourceTypeId];
+            if (sourceNodeType != null)
+            {
+                sourceNodeType.AddOutgoingRelation(relationType);
+                relationType._sourceType = sourceNodeType;
+            }
+
+            var targetNodeType = NodeTypes[relationType.TargetTypeId];
+            if (targetNodeType != null)
+            {
+                targetNodeType.AddIncomingRelation(relationType);
+                relationType._targetType = targetNodeType;
+            }
+        }
+        public void AddAttributeType(SchemaAttributeType attributeType)
+        {
+            AttributeTypes[attributeType.Id] = attributeType;
+            var nodeType = NodeTypes[attributeType.Id];
+            if (nodeType != null)
+            {
+                nodeType._attributeType = attributeType;
+            }
         }
     }
 }

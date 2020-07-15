@@ -7,9 +7,9 @@ using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology {
     public class AnalyticsQueryParser {
-        private readonly OntologyModel _ontology;
+        private readonly IOntologyModel _ontology;
 
-        public AnalyticsQueryParser(OntologyModel ontology) {
+        public AnalyticsQueryParser(IOntologyModel ontology) {
             _ontology = ontology;
         }
 

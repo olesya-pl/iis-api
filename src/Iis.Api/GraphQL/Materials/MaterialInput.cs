@@ -10,12 +10,13 @@ namespace IIS.Core.GraphQL.Materials
 {
     public class MaterialInput
     {
-        [GraphQLNonNullType] public Metadata Metadata { get; set; }
+        [GraphQLNonNullType] public string Metadata { get; set; }
         [GraphQLType(typeof(IdType))] public Guid? ParentId { get; set; }
         [GraphQLType(typeof(IdType))] public Guid? FileId { get; set; }
         public IEnumerable<Data> Data { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
+        public string Content { get; set; }
         public string ImportanceText { get; set; }
         public string ReliabilityText { get; set; }
         public string SourceReliabilityText { get; set; }
@@ -27,7 +28,7 @@ namespace IIS.Core.GraphQL.Materials
         public string Code { get; set; }
         public string From { get; set; }
         public string LoadedBy { get; set; }
-        public Guid DocumentId { get; set; }
+        public Guid? DocumentId { get; set; }
         public DateTime? CreationDate { get; set; }
         public IEnumerable<DateTime> ModificationDates { get; set; }
         public string Coordinates { get; set; }

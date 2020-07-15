@@ -1,9 +1,10 @@
 ﻿namespace Iis.Interfaces.Ontology.Schema
 {
-    public enum SchemaSourceKind
+    public enum SchemaSourceKind : byte
     {
         File,
-        Database
+        Database,
+        New
     }
     public interface IOntologySchemaSource
     {

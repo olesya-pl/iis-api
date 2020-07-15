@@ -11,6 +11,7 @@ using Iis.DataModel.Themes;
 
 using Iis.ThemeManagement;
 using Iis.ThemeManagement.Models;
+using Iis.Roles;
 
 namespace Iis.UnitTests.ThemeManagement
 {
@@ -20,12 +21,12 @@ namespace Iis.UnitTests.ThemeManagement
 
         public ThemeServiceTests()
         {
-            _serviceProvider = Utils.SetupInMemoryDb();
+            _serviceProvider = Utils.GetServiceProvider();
         }
         public void Dispose()
         {
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            
+
             context.ThemeTypes.RemoveRange(context.ThemeTypes);
             context.Themes.RemoveRange(context.Themes);
             context.SaveChanges();
@@ -75,18 +76,69 @@ namespace Iis.UnitTests.ThemeManagement
             Assert.Equal(theme.Id, themeId);
         }
 
+        [Theory, RecursiveAutoData]
+        public async Task UpdateTheme_UsernameAndTypeEmpty_ExistingValuesUnchanged(ThemeEntity theme)
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.Themes.Add(theme);
+            context.SaveChanges();
+
+            //act
+            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            await service.UpdateThemeAsync(new Theme {
+                Title = "Updated",
+                Query = theme.Query,
+                Id = theme.Id
+            });
+
+            //assert
+            var result = await service.GetThemeAsync(theme.Id);
+            Assert.Equal("Updated", result.Title);
+            Assert.Equal(theme.Type.Title, result.Type.Title);
+            Assert.Equal(theme.User.Username, result.User.UserName);
+        }
+
+        [Theory, RecursiveAutoData]
+        public async Task UpdateTheme_UsernameAndTypeProvided_ExistingValuesUnchanged(ThemeEntity theme,
+            ThemeTypeEntity themeType, UserEntity user)
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.Themes.Add(theme);
+            context.ThemeTypes.Add(themeType);
+            context.Users.Add(user);
+            context.SaveChanges();
+
+            //act
+            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            await service.UpdateThemeAsync(new Theme
+            {
+                Title = "Updated",
+                Query = theme.Query,
+                Id = theme.Id,
+                Type = new ThemeType { Id = themeType.Id},
+                User = new User { Id = user.Id}
+            });
+
+            //assert
+            var result = await service.GetThemeAsync(theme.Id);
+            Assert.Equal(themeType.Title, result.Type.Title);
+            Assert.Equal(user.Username, result.User.UserName);
+        }
+
         [Theory(DisplayName = "Delete Theme"), RecursiveAutoData]
         public async Task DeleteTheme(
             ThemeEntity themeEntity)
         {
             //arrange: begin
             var service = _serviceProvider.GetRequiredService<ThemeService>();
-            
+
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            
+
             context.Themes.Add(themeEntity);
             context.SaveChanges();
-            
+
             //arrange: end
             var theme = await service.DeleteThemeAsync(themeEntity.Id);
 

@@ -18,16 +18,16 @@ namespace IIS.Core.GraphQL
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly TypeRepository _typeRepository;
-        private readonly IOntologyProvider _ontologyProvider;
+        private readonly IOntologyModel _ontology;
         private readonly IOntologyFieldPopulator _populator;
         private readonly IConfiguration _configuration;
         private ISchema _schema;
 
-        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyProvider ontologyProvider, IOntologyFieldPopulator populator, IConfiguration configuration)
+        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyModel ontology, IOntologyFieldPopulator populator, IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
-            _ontologyProvider = ontologyProvider;
+            _ontology = ontology;
             _populator = populator;
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
@@ -46,10 +46,11 @@ namespace IIS.Core.GraphQL
         {
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
             RegisterTypes(builder);
-            var ontology = TryRegisterOntologyTypes(builder);
+            TryRegisterOntologyTypes(builder);
             builder.AddQueryType(d =>
             {
                 d.Name("QueryType");
+                d.Include<Entities.ObjectSignQuery>();
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
                 d.Include<Roles.Query>();
@@ -67,8 +68,8 @@ namespace IIS.Core.GraphQL
                 {
                     d.Include<Reports.Query>();
                 }
-                if (ontology != null)
-                    ConfigureOntologyQuery(d, ontology);
+                if (_ontology != null)
+                    ConfigureOntologyQuery(d, _ontology);
             });
             builder.AddMutationType(d =>
             {
@@ -87,8 +88,8 @@ namespace IIS.Core.GraphQL
                 {
                     d.Include<Reports.Mutation>();
                 }
-                if (ontology != null)
-                    ConfigureOntologyMutation(d, ontology);
+                if (_ontology != null)
+                    ConfigureOntologyMutation(d, _ontology);
             });
             return builder.Create();
         }
@@ -100,25 +101,24 @@ namespace IIS.Core.GraphQL
                 .AddType<EntityTypes.EntityAttributeRelation>();
         }
 
-        public OntologyModel TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder)
+        public void TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder)
         {
             try
             {
-                var ontology = _ontologyProvider.GetOntologyAsync().Result; // todo: refactor GetSchema to async
                 _typeRepository.InitializeTypes();
                 foreach (var type in _typeRepository.AllTypes)
+                {
                     schemaBuilder.AddType(type);
-                return ontology;
+                }
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine("Unable to register ontology types");
                 Console.Error.WriteLine(ex);
-                return null;
             }
         }
 
-        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, OntologyModel ontology)
+        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, IOntologyModel ontology)
         {
             var typesToPopulate = ontology.EntityTypes
 //                .Where(t => t.CreateMeta().ExposeOnApi != false)
@@ -137,7 +137,7 @@ namespace IIS.Core.GraphQL
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().GetAllEntities(ctx));
         }
 
-        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, OntologyModel ontology)
+        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, IOntologyModel ontology)
         {
             var typesToPopulate = ontology.EntityTypes;
             typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);

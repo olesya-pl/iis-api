@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.ChangeHistory
 {
@@ -13,5 +12,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
         public DateTime Date { get; set; }
         public string OldValue { get; set; }
         public string NewValue { get; set; }
+        [GraphQLType(typeof(IdType))]
+        public Guid RequestId { get; set; }
     }
 }
