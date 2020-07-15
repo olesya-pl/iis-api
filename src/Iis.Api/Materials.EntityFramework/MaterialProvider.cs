@@ -54,7 +54,7 @@ namespace IIS.Core.Materials.EntityFramework
             _mapper = mapper;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> 
+        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)>
             GetMaterialsAsync(int limit, int offset, string filterQuery,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null,
             string sortColumnName = null, string sortOrder = null)
@@ -66,7 +66,7 @@ namespace IIS.Core.Materials.EntityFramework
                 IEnumerable<Task<Material>> mappingTasks;
                 IEnumerable<Material> materials;
                 (IEnumerable<MaterialEntity> Materials, int TotalCount) materialResult;
-                
+
                 if (!string.IsNullOrWhiteSpace(filterQuery))
                 {
                     if (!_elasticService.UseElastic)
@@ -94,7 +94,7 @@ namespace IIS.Core.Materials.EntityFramework
                 if(types != null)
                 {
                     materialResult = await _materialRepository.GetAllAsync(types, limit, offset);
-                } 
+                }
                 else
                 {
                     materialResult = await _materialRepository.GetAllAsync(limit, offset);
@@ -369,7 +369,7 @@ namespace IIS.Core.Materials.EntityFramework
         private JObject EventToJObject(Node node)
         {
             var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
-            
+
             var attributies = node.GetChildAttributes().Where(a => a.dotName == "name" || a.dotName == "description");
 
             foreach (var attribute in attributies)
@@ -387,7 +387,7 @@ namespace IIS.Core.Materials.EntityFramework
             var mlResults = await _mLResponseRepository.GetAllForMaterialsAsync(materialIds);
 
             materials.Join(
-                mlResults, 
+                mlResults,
                 m => m.Id,
                 ml => ml.MaterialId,
                 (material, result) => {
@@ -412,7 +412,7 @@ namespace IIS.Core.Materials.EntityFramework
                         .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
                         .Select(m => m.MaterialInfoJoined.Material);
         }
-        
+
         private IList<Guid> GetFeatureIdListThatRealtesToObjectId(Guid nodeId)
         {
             var type = _ontologySchema.GetEntityTypeByName("ObjectSign");
