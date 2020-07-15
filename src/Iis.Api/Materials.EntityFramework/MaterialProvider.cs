@@ -287,11 +287,11 @@ namespace IIS.Core.Materials.EntityFramework
         private JObject EventToJObject(Node node)
         {
             var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
+            
+            var attributies = node.GetChildAttributes().Where(a => a.dotName == "name" || a.dotName == "description");
 
-            foreach (var attribute in node.GetChildAttributes())
+            foreach (var attribute in attributies)
             {
-                if(attribute.dotName != "name" && attribute.dotName != "description") continue;
-                
                 result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
             }
 
