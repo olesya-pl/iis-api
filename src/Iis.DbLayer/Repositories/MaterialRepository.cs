@@ -29,7 +29,7 @@ namespace Iis.DbLayer.Repositories
         public Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
         {
             return GetMaterialsQuery(includes)
-                    .SingleOrDefaultAsync();
+                    .SingleOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes)
