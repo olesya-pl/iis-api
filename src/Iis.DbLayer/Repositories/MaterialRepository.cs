@@ -38,6 +38,14 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
         
+        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(IEnumerable<Guid> nodeIdList)
+        {
+            var val1 =  await GetSimplifiedMaterialsForNodeIdListQuery(nodeIdList)
+                            .ToArrayAsync();
+
+            return new List<MaterialEntity>();
+        }
+
         public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName, string sortOrder)
         {
             return GetAllWithPredicateAsync(limit, offset, sortColumnName: sortColumnName, sortOrder: sortOrder);
@@ -73,6 +81,17 @@ namespace Iis.DbLayer.Repositories
                     .Include(m => m.SessionPriority)
                     .Include(m => m.Assignee)
                     .AsNoTracking();
+        }
+        
+        private IQueryable<MaterialEntity> GetSimplifiedMaterialsForNodeIdListQuery(IEnumerable<Guid> nodeIdList)
+        {
+            return _context.Materials
+                        .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                            (Material, MaterialInfo) => new { Material, MaterialInfo })
+                        .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                            (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                        .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
+                        .Select(m => m.MaterialInfoJoined.Material);
         }
         
         private IQueryable<MaterialEntity> GetMaterialsQuery(params MaterialIncludeEnum[] includes)

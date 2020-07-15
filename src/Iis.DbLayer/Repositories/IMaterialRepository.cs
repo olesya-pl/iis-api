@@ -26,6 +26,13 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
         
         /// <summary>
+        /// Returns all the Materials for given list of related node id
+        /// </summary>
+        /// <param name="nodeIdList">list of related node id</param>
+        /// <returns></returns>
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(IEnumerable<Guid> nodeIdList);
+        
+        /// <summary>
         /// Returns all the Materials with paggination
         /// </summary>
         /// <param name="limit">page limit</param>
