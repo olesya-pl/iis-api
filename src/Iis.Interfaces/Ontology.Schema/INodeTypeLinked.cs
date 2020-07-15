@@ -21,6 +21,9 @@ namespace Iis.Interfaces.Ontology.Schema
         string UniqueValueFieldName { get; }
         bool HasUniqueValues { get; }
         Type ClrType { get; }
+        bool HasInversed { get; }
+        bool IsInversed { get; }
+        void SetIsInversed();
         ISchemaMeta MetaMeta { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }

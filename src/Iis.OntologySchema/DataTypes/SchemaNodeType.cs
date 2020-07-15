@@ -15,6 +15,7 @@ namespace Iis.OntologySchema.DataTypes
         internal List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
 
+
         internal SchemaAttributeType _attributeType;
         public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
@@ -123,7 +124,9 @@ namespace Iis.OntologySchema.DataTypes
         }
         public IEnumerable<INodeTypeLinked> GetDirectProperties()
         {
-            return OutgoingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(rt => rt.NodeType);
+            return IsInversed ? 
+                new List<INodeTypeLinked> { RelationType.DirectRelationType.NodeType } :
+                OutgoingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(rt => rt.NodeType);
         }
         public IEnumerable<INodeTypeLinked> GetAllProperties()
         {
@@ -220,7 +223,13 @@ namespace Iis.OntologySchema.DataTypes
 
             throw new ArgumentException($"IsIdentical met sad situation with item {GetStringCode()}");
         }
+        public bool HasInversed => MetaMeta.Inversed != null;
+        public bool IsInversed { get; private set; }
 
+        public void SetIsInversed()
+        {
+            IsInversed = true;
+        }
         private bool IsIdenticalBase(INodeTypeLinked nodeType)
         {
             var scalarTypesAreEqual = Kind == Kind.Attribute ?

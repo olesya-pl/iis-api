@@ -25,7 +25,7 @@ namespace Iis.OntologyModelWrapper
 
         public bool IsEntityType => throw new NotImplementedException();
 
-        public bool IsInversed => throw new NotImplementedException();
+        public bool IsInversed => _source.IsInversed;
 
         public IEnumerable<IRelationTypeModel> RelationTypes => throw new NotImplementedException();
 
@@ -35,5 +35,7 @@ namespace Iis.OntologyModelWrapper
         {
             throw new NotImplementedException();
         }
+
+        public override string ToString() => Name;
     }
 }

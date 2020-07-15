@@ -109,7 +109,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         entity.AddType(mapRelation(outgoingRelation));
                     entity.Meta = entity.CreateMeta(); // todo: refactor. Creates meta with all parent types meta
                     foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance && !r.NodeType.IsArchived))
-                        entity.AddType(mapRelation(outgoingRelation));
+                        entity.AddType(mapRelation(outgoingRelation));             
                     return entity;
                 }
                 throw new Exception("Unsupported type.");
@@ -162,7 +162,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             inversedRelation.AddType(sourceType);
             inversedRelation.AddType(relationType);
-            relationType.TargetType.AddType(inversedRelation);
+            relationType.TargetType.AddType (inversedRelation);
 
             if (inversedRelation != null)
                 _types.Add(inversedRelation.Id, inversedRelation);

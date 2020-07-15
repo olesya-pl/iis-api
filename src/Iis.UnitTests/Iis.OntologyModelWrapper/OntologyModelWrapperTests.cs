@@ -29,6 +29,13 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             var model = ontologyProvider.GetOntology();
             var schema = Utils.GetOntologySchemaFromDb(connectionString);
             var wrapper = new OntologyWrapper(schema);
+
+            var subdivision = schema.GetEntityTypeByName("Subdivision");
+            if (subdivision != null)
+            {
+                var dp = subdivision.GetDirectProperties().ToList();
+                var ap = subdivision.GetAllProperties().ToList();
+            }
             CheckIdentity(model, wrapper);
         }
         private void CheckIdentity(IOntologyModel model, IOntologyModel wrapper)
@@ -54,10 +61,9 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         {
             Assert.Equal(m.Name, w.Name);
             Assert.Equal(m.ClrType, w.ClrType);
-            Assert.Equal(m.Id, w.Id);
+            //Assert.Equal(m.Id, w.Id);
             Assert.Equal(m.CreatedAt, w.CreatedAt);
             Assert.Equal(m.Title, w.Title);
-            //Assert.Equal(m.MetaSource, w.MetaSource);
             Assert.Equal(m.UpdatedAt, w.UpdatedAt);
             Assert.Equal(m.HasUniqueValues, w.HasUniqueValues); 
             Assert.Equal(m.UniqueValueFieldName, w.UniqueValueFieldName);
@@ -169,14 +175,16 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         {
             var l1 = m.Where(r => !w.Any(t => t.Name == r.Name)).ToList();
             var l2 = w.Where(r => !m.Any(t => t.Name == r.Name)).ToList();
-            //Assert.Equal(m.Count, w.Count);
+            
+            Assert.Equal(m.Count, w.Count);
             for (int i = 0; i < m.Count; i++)
             {
-                var wrapper = w.SingleOrDefault(emb => emb.Id == m[i].Id);
-                if (wrapper != null)
+                var wrapper = w.SingleOrDefault(emb => emb.Id == m[i].Id && emb.IsInversed == m[i].IsInversed);
+                if (wrapper == null && m[i].IsInversed)
                 {
-                    CheckEmbeddingRelationType(m[i], wrapper);
+                    wrapper = w.SingleOrDefault(emb => emb.Name == m[i].Name && emb.IsInversed);
                 }
+                CheckEmbeddingRelationType(m[i], wrapper);
             }
         }
         private void CheckEmbeddingRelationType(IEmbeddingRelationTypeModel m, IEmbeddingRelationTypeModel w)

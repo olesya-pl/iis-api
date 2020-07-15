@@ -10,9 +10,11 @@ namespace Iis.OntologySchema.DataTypes
         internal SchemaNodeType _nodeType;
         internal SchemaNodeType _sourceType;
         internal SchemaNodeType _targetType;
+        internal SchemaRelationType _directRelationType;
         public INodeTypeLinked NodeType => _nodeType;
         public INodeTypeLinked SourceType => _sourceType;
         public INodeTypeLinked TargetType => _targetType;
+        public IRelationTypeLinked DirectRelationType => _directRelationType;
         public override string ToString()
         {
             return $"{SourceType.Name}.{NodeType.Name}";

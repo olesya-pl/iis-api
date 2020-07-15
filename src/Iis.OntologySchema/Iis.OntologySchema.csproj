@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
 
 </Project>
