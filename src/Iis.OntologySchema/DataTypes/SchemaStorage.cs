@@ -60,16 +60,7 @@ namespace Iis.OntologySchema.DataTypes
                     NodeTypes[attributeId]._attributeType = AttributeTypes[attributeId];
                 }
             }
-
-            foreach (var nodeType in Entities)
-            {
-                DotNameTypes[nodeType.Name] = nodeType;
-                var childInfos = nodeType.GetNodeTypesRecursive();
-                foreach (var childInfo in childInfos)
-                {
-                    DotNameTypes[childInfo.dotName] = childInfo.nodeType;
-                }
-            }
+            SetDotNameTypes();
         }
 
         public IEnumerable<SchemaNodeTypeRaw> GetNodeTypesRaw()
@@ -149,6 +140,19 @@ namespace Iis.OntologySchema.DataTypes
         public void RemoveAttributeType(Guid id)
         {
             AttributeTypes.Remove(id);
+        }
+        public void SetDotNameTypes()
+        {
+            DotNameTypes.Clear();
+            foreach (var nodeType in Entities)
+            {
+                DotNameTypes[nodeType.Name] = nodeType;
+                var childInfos = nodeType.GetNodeTypesRecursive();
+                foreach (var childInfo in childInfos)
+                {
+                    DotNameTypes[childInfo.dotName] = childInfo.nodeType;
+                }
+            }
         }
         private bool NodeTypeExists(Guid id) => NodeTypes.ContainsKey(id);
 
