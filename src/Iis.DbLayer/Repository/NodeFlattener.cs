@@ -15,34 +15,18 @@ namespace Iis.DbLayer.Repository
     {
         private readonly OntologyContext _context;
         private readonly IElasticSerializer _elasticSerializer;
-        private readonly IOntologySchema _ontologySchema;
-        private List<Guid> _objectOfStudyTypes;
-        private List<Guid> ObjectOfStudyTypes
-        {
-            get
-            {
-                return _objectOfStudyTypes ?? (_objectOfStudyTypes = GetObjectOfStudyTypes());
-            }
-        }
-
-        private List<Guid> GetObjectOfStudyTypes()
-        {
-            return _ontologySchema
-                .GetEntityTypes()
-                .Where(nt => nt.IsObjectOfStudy)
-                .Select(p => p.Id).ToList();
-        }
 
         public NodeFlattener(OntologyContext context,
-            IElasticSerializer elasticSerializer,
-            IOntologySchema ontologySchema)
+            IElasticSerializer elasticSerializer)
         {
             _context = context;
             _elasticSerializer = elasticSerializer;
-            _ontologySchema = ontologySchema;
         }
 
-        private async Task<ExtNode> GetExtNodeByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        private async Task<ExtNode> GetExtNodeByIdAsync(
+            Guid id,
+            List<Guid> visitedRelationIds,
+            CancellationToken cancellationToken = default)
         {
             var nodeEntity = await GetNodeQuery()
                 .Where(n => n.Id == id)
@@ -50,11 +34,21 @@ namespace Iis.DbLayer.Repository
 
             if (nodeEntity == null) return null;
 
-            var extNode = await MapExtNodeAsync(nodeEntity, nodeEntity.NodeType.Name, nodeEntity.NodeType.Title, cancellationToken);
+            var extNode = await MapExtNodeAsync(
+                nodeEntity,
+                nodeEntity.NodeType.Name,
+                nodeEntity.NodeType.Title,
+                visitedRelationIds,
+                cancellationToken);
             return extNode;
         }
 
-        private async Task<ExtNode> MapExtNodeAsync(NodeEntity nodeEntity, string nodeTypeName, string nodeTypeTitle, CancellationToken cancellationToken = default)
+        private async Task<ExtNode> MapExtNodeAsync(
+            NodeEntity nodeEntity,
+            string nodeTypeName,
+            string nodeTypeTitle,
+            List<Guid> visitedRelationIds,
+            CancellationToken cancellationToken = default)
         {
             var extNode = new ExtNode
             {
@@ -67,7 +61,7 @@ namespace Iis.DbLayer.Repository
                 ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
-                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, cancellationToken)
+                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedRelationIds, cancellationToken)
             };
             return extNode;
         }
@@ -83,21 +77,30 @@ namespace Iis.DbLayer.Repository
                 case ScalarType.Int:
                     return Convert.ToInt32(value);
                 case ScalarType.Date:
-                    return Convert.ToDateTime(value);
+                //return Convert.ToDateTime(value);
                 default:
                     return value.ToString();
             }
         }
 
-        private async Task<List<ExtNode>> GetExtNodesByRelations(IEnumerable<RelationEntity> relations, CancellationToken cancellationToken = default)
+        private async Task<List<ExtNode>> GetExtNodesByRelations(
+            IEnumerable<RelationEntity> relations,
+            List<Guid> visitedRelationIds,
+            CancellationToken cancellationToken = default)
         {
             var result = new List<ExtNode>();
             foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.TargetNode.IsArchived))
             {
-                var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
-                if (!ObjectOfStudyTypes.Contains(node.NodeTypeId))
+                if (!visitedRelationIds.Contains(relation.Id))
                 {
-                    var extNode = await MapExtNodeAsync(node, relation.Node.NodeType.Name, relation.Node.NodeType.Title, cancellationToken);
+                    visitedRelationIds.Add(relation.Id);
+                    var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
+                    var extNode = await MapExtNodeAsync(
+                        node,
+                        relation.Node.NodeType.Name,
+                        relation.Node.NodeType.Title,
+                        visitedRelationIds,
+                        cancellationToken);
                     result.Add(extNode);
                 }
             }
@@ -120,7 +123,7 @@ namespace Iis.DbLayer.Repository
 
         public async Task<FlattenNodeResult> FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {
-            var extNode = await GetExtNodeByIdAsync(id, cancellationToken);
+            var extNode = await GetExtNodeByIdAsync(id, new List<Guid>(), cancellationToken);
             return new FlattenNodeResult
             {
                 SerializedNode = _elasticSerializer.GetJsonByExtNode(extNode),
