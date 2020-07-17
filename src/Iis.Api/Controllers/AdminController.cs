@@ -1,8 +1,8 @@
-﻿using Iis.Elastic;
+﻿using Iis.DbLayer.Repositories;
+using Iis.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Interfaces.Repository;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -24,13 +24,15 @@ namespace Iis.Api.Controllers
         IMaterialProvider _materialProvider;
         IOntologySchema _ontologySchema;
         INodeRepository _nodeRepository;
+        IMaterialRepository _materialRepository;
         public AdminController(
             IExtNodeService extNodeService,
             IMaterialProvider materialProvider,
             IElasticService elasticService,
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
-            INodeRepository nodeRepository)
+            INodeRepository nodeRepository,
+            IMaterialRepository materialRepository)
         {
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
@@ -38,6 +40,7 @@ namespace Iis.Api.Controllers
             _materialProvider = materialProvider;
             _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
+            _materialRepository = materialRepository;
         }
 
         [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
@@ -96,19 +99,22 @@ namespace Iis.Api.Controllers
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
                 new ElasticMappingProperty("Metadata.features.PhoneNumber", ElasticMappingPropertyType.Keyword),
                 new ElasticMappingProperty("createddate", ElasticMappingPropertyType.Date),
-                new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date)
+                new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date),
+                new ElasticMappingProperty("Data.Text", ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty("Children.Data.Text", ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
-            var entityTasks = materialEntities
-                                .Select(async entity =>
-                                {
-                                    var document = await _materialProvider.GetMaterialDocumentAsync(entity.Id);
-                                    return await _elasticService.PutMaterialAsync(entity.Id, document, cancellationToken);
-                                });
+            var entityTasks =
+                materialEntities
+                    .Select(async entity =>
+                    {
+                        return await _materialRepository.PutMaterialToElasticSearchAsync(entity.Id, cancellationToken);
+                    });
 
             await Task.WhenAll(entityTasks);
             return Content($"{materialEntities.Count()} materials completed");

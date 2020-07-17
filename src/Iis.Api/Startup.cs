@@ -58,8 +58,6 @@ using Iis.DbLayer.Repositories;
 using Iis.DbLayer.OntologySchema;
 using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.ThemeManagement;
-using Iis.DbLayer.Repository;
-using Iis.Interfaces.Repository;
 
 namespace IIS.Core
 {
@@ -139,9 +137,6 @@ namespace IIS.Core
             }
 
             services.AddHttpContextAccessor();
-            services.AddTransient<IMLResponseRepository, MLResponseRepository>();
-            services.AddTransient<IMaterialRepository, MaterialRepository>();
-            services.AddTransient<IMaterialSignRepository, MaterialSignRepository>();
             services.AddTransient<IOntologyService, OntologyService>();
             services.AddSingleton<MutationCreateResolver>();
             services.AddSingleton<MutationUpdateResolver>();

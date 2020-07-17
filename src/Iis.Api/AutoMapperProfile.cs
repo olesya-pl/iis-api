@@ -20,6 +20,7 @@ using Iis.Interfaces.Roles;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Ontology;
+using System.Security.Cryptography;
 
 namespace Iis.Api
 {
@@ -183,7 +184,36 @@ namespace Iis.Api
                 .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags))
                 .ForMember(dest => dest.States, opts => opts.MapFrom(src => src.States));
 
+            CreateMap<UserEntity, DbLayer.Repositories.Assignee>();
+            CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
+            CreateMap<MaterialEntity, DbLayer.Repositories.MaterialDocument>()
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
+                .ForMember(dest => dest.Importance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Importance)))
+                .ForMember(dest => dest.Reliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Reliability)))
+                .ForMember(dest => dest.Relevance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Relevance)))
+                .ForMember(dest => dest.Completeness, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Completeness)))
+                .ForMember(dest => dest.SourceReliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SourceReliability)))
+                .ForMember(dest => dest.ProcessedStatus, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.ProcessedStatus)))
+                .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
+                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SessionPriority)))
+                .ForMember(dest => dest.LoadData, opts =>
+                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)))
+                .ForMember(dest => dest.Data, opts =>
+                    opts.MapFrom(src => src.Data == null ? null : JsonConvert.DeserializeObject<Iis.DbLayer.Repositories.Data[]>(src.Data)));
 
+            CreateMap<DbLayer.Repositories.Assignee, Iis.Roles.User>();                
+            CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
+            CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
+            CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null: JArray.FromObject(src.Data)))
+                .ForMember(dest => dest.Children, opts => opts.Ignore())
+                .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
 
             CreateMap<IChangeHistoryItem, Iis.DataModel.ChangeHistory.ChangeHistoryEntity>();
             CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();

@@ -12,7 +12,7 @@ using Iis.Domain.Elastic;
 using Iis.DataModel;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Interfaces.Repository;
+using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -24,6 +24,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly RunTimeSettings _runTimeSettings;
         private readonly OntologyContext _context;
         private readonly INodeRepository _nodeRepository;
+        private readonly IMaterialRepository _materialRepository;
         private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
 
         public IEnumerable<string> MaterialIndexes { get; }
@@ -38,6 +39,7 @@ namespace IIS.Core.Ontology.EntityFramework
             IElasticConfiguration elasticConfiguration,
             IOntologySchema ontologySchema,
             INodeRepository nodeRepository,
+            IMaterialRepository materialRepository,
             RunTimeSettings runTimeSettings,
             OntologyContext context)
         {
@@ -47,6 +49,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _elasticConfiguration = elasticConfiguration;
             _context = context;
             _nodeRepository = nodeRepository;
+            _materialRepository = materialRepository;
 
             var objectOfStudyType = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
             if (objectOfStudyType != null)
@@ -117,22 +120,21 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
+        public Task<SearchByConfiguredFieldsResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        {
+            if (!UseElastic)
+            {
+                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
+            }
+
+            return _materialRepository.SearchMaterials(filter, cancellationToken);
+        }
+
         public Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
 
             return _nodeRepository.PutNodeAsync(id, cancellationToken);
-        }
-
-        public async Task<bool> PutMaterialAsync(Guid materialId, JObject materialDocument, CancellationToken cancellation = default)
-        {
-            if (!UseElastic) return true;
-
-            if (!_runTimeSettings.PutSavedToElastic) return false;
-
-            if (materialDocument is null) return false;
-
-            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), materialId.ToString("N"), materialDocument.ToString(Formatting.None));
         }
 
         public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)

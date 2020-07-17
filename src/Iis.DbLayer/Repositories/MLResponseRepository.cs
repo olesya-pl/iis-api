@@ -9,7 +9,7 @@ using Iis.DataModel.Materials;
 
 namespace Iis.DbLayer.Repositories
 {
-    public class MLResponseRepository : IMLResponseRepository
+    internal class MLResponseRepository : IMLResponseRepository
     {
         private readonly OntologyContext _context;
 

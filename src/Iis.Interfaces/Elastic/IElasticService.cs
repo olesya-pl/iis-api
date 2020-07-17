@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Ontology;
 
 namespace Iis.Interfaces.Elastic
 {
@@ -14,10 +13,10 @@ namespace Iis.Interfaces.Elastic
         IEnumerable<string> EventIndexes { get; }
         IEnumerable<string> FeatureIndexes { get; }
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<bool> PutMaterialAsync(Guid materialId, JObject materialDocument, CancellationToken cancellation = default);
         Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default);
         Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchByConfiguredFieldsResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        Task<SearchByConfiguredFieldsResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         bool TypesAreSupported(IEnumerable<string> typeNames);
         bool UseElastic { get; }
     }

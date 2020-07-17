@@ -9,21 +9,45 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
+using Iis.Interfaces.Elastic;
+using AutoMapper;
+using Newtonsoft.Json;
+using System.Threading;
+using Newtonsoft.Json.Linq;
+using Iis.Utility;
+using Iis.Domain.Elastic;
 
 namespace Iis.DbLayer.Repositories
 {
-    public class MaterialRepository : IMaterialRepository
+    internal class MaterialRepository : IMaterialRepository
     {
-        private readonly OntologyContext _context;
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
             MaterialIncludeEnum.WithFeatures
         };
 
-        public MaterialRepository(OntologyContext context)
+        private readonly OntologyContext _context;
+        private readonly IMLResponseRepository _mLResponseRepository;
+        private readonly IElasticManager _elasticManager;
+        private readonly IElasticConfiguration _elasticConfiguration;
+        private readonly IMapper _mapper;
+
+        public string[] MaterialIndexes { get; }
+
+        public MaterialRepository(OntologyContext context,
+            IMLResponseRepository mLResponseRepository,
+            IElasticManager elasticManager,
+            IElasticConfiguration elasticConfiguration,
+            IMapper mapper)
         {
             _context = context;
+            _mLResponseRepository = mLResponseRepository;
+            _elasticManager = elasticManager;
+            _elasticConfiguration = elasticConfiguration;
+            _mapper = mapper;
+
+            MaterialIndexes = new[] { "Materials" };
         }
 
         public Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
@@ -37,15 +61,15 @@ namespace Iis.DbLayer.Repositories
             return await GetMaterialsQuery(includes)
                             .ToArrayAsync();
         }
-        
+
         public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
             var materialIdList =  await GetOnlyMaterialsForNodeIdListQuery(nodeIdList)
                                 .Select(e => e.Id)
                                 .ToArrayAsync();
-            
+
             var materialResult = await GetAllAsync(materialIdList, 0, 0);
-            
+
             return materialResult.Entities;
         }
 
@@ -71,7 +95,73 @@ namespace Iis.DbLayer.Repositories
                             .Where(p => p.AssigneeId == assigneeId)
                             .ToArrayAsync();
         }
-        
+
+        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
+        {
+            var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                .SingleOrDefaultAsync(p => p.Id == materialId);
+
+            var materialDocument = _mapper.Map<MaterialDocument>(material);
+
+            materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
+
+            materialDocument.NodeIds = material.MaterialInfos
+                .SelectMany(p => p.MaterialFeatures)
+                .Select(p => p.NodeId)
+                .ToArray();
+
+            await PopulateMLResponses(materialId, materialDocument);
+
+            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
+                materialId.ToString("N"),
+                JsonConvert.SerializeObject(materialDocument),
+                token);
+        }
+
+        public async Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        {
+            var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = MaterialIndexes.ToList(),
+                Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL",
+                From = filter.Offset,
+                Size = filter.Limit,
+                SearchFields = materialFields
+            };
+            var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
+            return new SearchByConfiguredFieldsResult
+            {
+                Count = searchResult.Count,
+                Items = searchResult.Items
+                    .ToDictionary(k => new Guid(k.Identifier),
+                    v => new SearchByConfiguredFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+            };
+        }
+
+        private async Task PopulateMLResponses(Guid materialId, MaterialDocument materialDocument)
+        {
+            var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
+            if (mlResponses.Any())
+            {
+                var mlResponsesContainer = new JObject();
+                materialDocument.MLResponses = mlResponsesContainer;
+                var mlHandlers = mlResponses.GroupBy(_ => _.MLHandlerName).Select(_ => _.Key).ToArray();
+                foreach (var mlHandler in mlHandlers)
+                {
+                    var responses = mlResponses.Where(_ => _.MLHandlerName == mlHandler).ToArray();
+                    for (var i = 0; i < responses.Count(); i++)
+                    {
+                        var propertyName = $"{mlHandler}-{i + 1}";
+
+                        mlResponsesContainer.Add(new JProperty(propertyName.ToLowerCamelCase().RemoveWhiteSpace(),
+                            responses[i].OriginalResponse));
+                    }
+                }
+            }
+        }
+
+
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
         {
             var materialQuery = predicate is null
@@ -83,15 +173,15 @@ namespace Iis.DbLayer.Repositories
                                     .Where(predicate);
 
             var materialCountQuery = materialQuery;
-            
+
             if(limit == 0)
             {
                 materialQuery = materialQuery
                                     .ApplySorting(sortColumnName, sortOrder);
-            } 
+            }
             else
             {
-                materialQuery = materialQuery 
+                materialQuery = materialQuery
                                     .ApplySorting(sortColumnName, sortOrder)
                                     .Skip(offset)
                                     .Take(limit);
@@ -99,13 +189,13 @@ namespace Iis.DbLayer.Repositories
 
             var materials = await materialQuery
                                     .ToArrayAsync();
-            
+
             var materialCount = await materialCountQuery.CountAsync();
 
 
             return (materials, materialCount);
         }
-        
+
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
             return _context.Materials
@@ -119,7 +209,7 @@ namespace Iis.DbLayer.Repositories
                     .Include(m => m.Assignee)
                     .AsNoTracking();
         }
-        
+
         private IQueryable<MaterialEntity> GetOnlyMaterialsForNodeIdListQuery(IEnumerable<Guid> nodeIdList)
         {
             return _context.Materials
@@ -130,11 +220,11 @@ namespace Iis.DbLayer.Repositories
                         .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
                         .Select(m => m.MaterialInfoJoined.Material);
         }
-        
+
         private IQueryable<MaterialEntity> GetMaterialsQuery(params MaterialIncludeEnum[] includes)
         {
             if(!includes.Any()) return GetSimplifiedMaterialsQuery();
-            
+
             includes = includes.Distinct()
                                 .ToArray();
 
@@ -145,6 +235,7 @@ namespace Iis.DbLayer.Repositories
                 resultQuery = include switch
                 {
                     MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
+                    MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
                     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
                     _ => resultQuery
                 };

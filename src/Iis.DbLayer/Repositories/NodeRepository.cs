@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.DbLayer.Repositories.Helpers;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Interfaces.Repository;
 using Newtonsoft.Json.Linq;
 
-namespace Iis.DbLayer.Repository
+namespace Iis.DbLayer.Repositories
 {
     internal class NodeRepository : INodeRepository
     {

@@ -20,6 +20,16 @@ namespace Iis.DbLayer.Extensions
                 .Include(m => m.MaterialInfos)
                 .ThenInclude(m => m.MaterialFeatures);
         }
+
+        public static IQueryable<MaterialEntity> WithNodes(
+            this IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery
+                .Include(m => m.MaterialInfos)
+                .ThenInclude(m => m.MaterialFeatures)
+                .ThenInclude(m => m.Node);
+        }
+
         public static IQueryable<MaterialEntity> OnlyParent(
             this IQueryable<MaterialEntity> materialQuery)
         {

@@ -9,7 +9,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Iis.DbLayer.Repository
+namespace Iis.DbLayer.Repositories.Helpers
 {
     internal class NodeFlattener
     {

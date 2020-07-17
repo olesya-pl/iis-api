@@ -28,7 +28,7 @@ namespace Iis.Domain.Materials
         public Guid? ProcessedStatusSignId => ProcessedStatus?.Id;
         public MaterialSign SessionPriority { get; set; }
         public Guid? SessionPriorityId => SessionPriority?.Id;
-        public List<Material> Children { get; } = new List<Material>();
+        public List<Material> Children { get; set; } = new List<Material>();
         public FileInfo File { get; set; }
         public Guid? FileId => File?.Id;
         public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();

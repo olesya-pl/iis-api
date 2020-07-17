@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace Iis.Interfaces.Repository
+namespace Iis.DbLayer.Repositories
 {
     public interface INodeRepository
     {

@@ -15,6 +15,7 @@ namespace Iis.Elastic
     {
         private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
         private const string RemoveSymbolsPattern = "№";
+        public const string NullValue = "NULL";
         ElasticLowLevelClient _lowLevelClient;
         ElasticConfiguration _configuration;
         SearchResultExtractor _resultExtractor;

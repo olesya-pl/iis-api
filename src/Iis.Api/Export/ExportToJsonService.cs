@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Iis.Interfaces.Repository;
+using Iis.DbLayer.Repositories;
 using Newtonsoft.Json;
 
 namespace Iis.Api.Export

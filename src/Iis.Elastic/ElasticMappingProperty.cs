@@ -17,7 +17,7 @@ namespace Iis.Elastic
     public class ElasticMappingProperty
     {
         public ElasticMappingProperty() { }
-        public ElasticMappingProperty(string dotName, ElasticMappingPropertyType type)
+        public ElasticMappingProperty(string dotName, ElasticMappingPropertyType type, bool supportsNullValue = false)
         {
             var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
             Name = splitted[0];
@@ -33,12 +33,14 @@ namespace Iis.Elastic
                     new ElasticMappingProperty(string.Join('.', splitted.Skip(1)), type)
                 };
             }
+            SupportsNullValue = supportsNullValue;
         }
 
         public string Name { get; set; }
         public ElasticMappingPropertyType Type { get; set; }
         public string Path { get; set; }
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
+        public bool SupportsNullValue { get; }
 
         public JObject ToJObject()
         {
@@ -46,6 +48,10 @@ namespace Iis.Elastic
             if (this.Type != ElasticMappingPropertyType.Nested)
             {
                 result["type"] = this.Type.ToString().ToLower();
+            }
+            if (SupportsNullValue)
+            {
+                result["null_value"] = ElasticManager.NullValue;
             }
 
             if (this.Type == ElasticMappingPropertyType.Alias)

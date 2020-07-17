@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using Iis.Api.Export;
-using Iis.Interfaces.Repository;
+using Iis.DbLayer.Repositories;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;

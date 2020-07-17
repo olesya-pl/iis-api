@@ -15,6 +15,7 @@ using Iis.Domain.MachineLearning;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
+using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -23,29 +24,29 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly OntologyContext _context;
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
-        private readonly IElasticService _elasticService;
         private readonly IMaterialEventProducer _eventProducer;
         private readonly IMaterialProvider _materialProvider;
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
         private readonly IMLResponseRepository _mLResponseRepository;
+        private readonly IMaterialRepository _materialRepository;
 
         public MaterialService(OntologyContext context,
             IFileService fileService,
-            IElasticService elasticService,
             IMapper mapper,
             IMaterialEventProducer eventProducer,
             IMaterialProvider materialProvider,
             IEnumerable<IMaterialProcessor> materialProcessors,
-            IMLResponseRepository mLResponseRepository)
+            IMLResponseRepository mLResponseRepository,
+            IMaterialRepository materialRepository)
         {
             _context = context;
             _fileService = fileService;
-            _elasticService = elasticService;
             _mapper = mapper;
             _eventProducer = eventProducer;
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
             _mLResponseRepository = mLResponseRepository;
+            _materialRepository = materialRepository;
         }
 
         public async Task SaveAsync(Material material)
@@ -101,7 +102,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             await _context.SaveChangesAsync();
 
-            await PutMaterialToElasticSearchAsync(materialEntity.Id);
+            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
 
             if (material.ParentId == null)
             {
@@ -128,7 +129,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             responseEntity = await _mLResponseRepository.SaveAsync(responseEntity);
 
-            await PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
+            await _materialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
             return _mapper.Map<MlResponse>(responseEntity);
         }
@@ -170,7 +171,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 await _context.SaveChangesAsync();
 
-                await PutMaterialToElasticSearchAsync(material.Id);
+                await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
 
                 _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
 
@@ -190,6 +191,7 @@ namespace IIS.Core.Materials.EntityFramework
             }
             material.AssigneeId = assigneeId;
             await _context.SaveChangesAsync();
+            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
         }
 
         public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
@@ -201,15 +203,9 @@ namespace IIS.Core.Materials.EntityFramework
                 throw new ArgumentNullException($"Material with given id not found");
             }
 
-            material.MlHandlersCount = handlersCount;
+            material.MlHandlersCount += handlersCount;
             await _context.SaveChangesAsync();
-        }
-
-        private async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId)
-        {
-            var materialDocument = await _materialProvider.GetMaterialDocumentAsync(materialId);
-
-            return await _elasticService.PutMaterialAsync(materialId, materialDocument);
+            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
         }
 
         private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
@@ -229,40 +225,11 @@ namespace IIS.Core.Materials.EntityFramework
                 if (!Guid.TryParse(featureId, out Guid featureGuid)) continue;
 
                 if(featureGuid.Equals(Guid.Empty)) continue;
-                
+
                 result.Add(featureGuid);
             }
 
             return result;
-        }
-
-        private Guid GetIcaoNode(string icaoValue)
-        {
-            var q = from n in _context.Nodes
-                    join t in _context.NodeTypes on n.NodeTypeId equals t.Id
-                    join r in _context.Relations on n.Id equals r.SourceNodeId
-                    join rp in _context.Relations on n.Id equals rp.TargetNodeId
-                    join a in _context.Attributes on r.TargetNodeId equals a.Id
-                    where t.Name == "ICAOSign" && a.Value == icaoValue
-                    select rp.SourceNodeId;
-
-            return q.FirstOrDefault();
-        }
-
-        private void SendIcaoEvent(IEnumerable<GraphQL.Materials.Node> nodes)
-        {
-            if (nodes == null) return;
-            var node = nodes.Where(n => n.UpdateField != null).SingleOrDefault();
-            if (node == null) return;
-
-            var entityId = GetIcaoNode(node.Value);
-            var materialAddedEvent = new MaterialAddedEvent
-            {
-                EntityId = entityId,
-                Nodes = new List<GraphQL.Materials.Node> { node }
-            };
-
-            _eventProducer.SendMaterialAddedEventAsync(materialAddedEvent);
         }
 
         private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
