@@ -98,24 +98,33 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
-            var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+            try
+            {
+                await _context.Semaphore.WaitAsync();
+                var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                 .SingleOrDefaultAsync(p => p.Id == materialId);
 
-            var materialDocument = _mapper.Map<MaterialDocument>(material);
+                var materialDocument = _mapper.Map<MaterialDocument>(material);
 
-            materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
+                materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
-            materialDocument.NodeIds = material.MaterialInfos
-                .SelectMany(p => p.MaterialFeatures)
-                .Select(p => p.NodeId)
-                .ToArray();
+                materialDocument.NodeIds = material.MaterialInfos
+                    .SelectMany(p => p.MaterialFeatures)
+                    .Select(p => p.NodeId)
+                    .ToArray();
 
-            await PopulateMLResponses(materialId, materialDocument);
+                await PopulateMLResponses(materialId, materialDocument);
 
-            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                materialId.ToString("N"),
-                JsonConvert.SerializeObject(materialDocument),
-                token);
+                return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
+                    materialId.ToString("N"),
+                    JsonConvert.SerializeObject(materialDocument),
+                    token);
+            }
+            finally
+            {
+                _context.Semaphore.Release();
+            }
+
         }
 
         public async Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
