@@ -21,5 +21,14 @@ namespace AcceptanceTests
         {
             return new GraphQLHttpClient(@"http://192.168.88.65:5000", new NewtonsoftJsonSerializer());
         }
+
+        public static GraphQLHttpClient WithAuthToken(this GraphQLHttpClient graphQLClient, string authToken)
+        {
+            graphQLClient.HttpClient.DefaultRequestHeaders.Remove("Authorization");
+
+            graphQLClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
+
+            return graphQLClient;
+        }
     }
 }

@@ -92,5 +92,27 @@ namespace AcceptanceTests.Steps
                                             .Any(value => value.ToString() == "UNAUTHENTICATED");
         }
 
+        public async Task<EventStateListResponse> GetEventStates(int page, int pageSize, string authToken)
+        {
+            var request = new GraphQLRequest
+            {
+                Query =
+                    @"query{
+                    entityEventStateList(pagination:{pageSize:" + pageSize + @", page:" + page + @"}){
+                        count
+                        items{
+                            id
+                            name
+                        }
+                    }
+                }"
+            };
+
+            var graphQlClient = GraphQLHttpClientFactory.CreateContourGraphQLHttpClient();
+            graphQlClient.HttpClient.DefaultRequestHeaders.Add("Authorization", authToken);
+            var response = await graphQlClient.SendQueryAsync<EventStateListResponse>(request);
+            return response.Data;
+        }
+
     }
 }
