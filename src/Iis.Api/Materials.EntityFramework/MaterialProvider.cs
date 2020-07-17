@@ -33,6 +33,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMaterialRepository _materialRepository;
         private readonly IMaterialSignRepository _materialSignRepository;
+        private readonly IOntologyRepository _ontologyRepository;
 
         public MaterialProvider(OntologyContext context,
             IOntologyService ontologyService,
@@ -41,6 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
             IMLResponseRepository mLResponseRepository,
             IMaterialRepository materialRepository,
             IMaterialSignRepository materialSignRepository,
+            IOntologyRepository ontologyRepository,
             IMapper mapper)
         {
             _context = context;
@@ -51,6 +53,7 @@ namespace IIS.Core.Materials.EntityFramework
             _mLResponseRepository = mLResponseRepository;
             _materialRepository = materialRepository;
             _materialSignRepository = materialSignRepository;
+            _ontologyRepository = ontologyRepository;
             _mapper = mapper;
         }
 
@@ -80,8 +83,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                     var matchedIdList = searchResult.Items.Keys.ToList();
 
-
-                    materialResult = await _materialRepository.GetAllAsync(matchedIdList, limit, offset, sortColumnName, sortOrder);
+                    materialResult = await _materialRepository.GetAllParentsAsync(matchedIdList, limit, offset, sortColumnName, sortOrder);
 
                     mappingTasks = materialResult.Materials
                                     .Select(async entity => await MapAsync(entity));
@@ -93,11 +95,11 @@ namespace IIS.Core.Materials.EntityFramework
 
                 if(types != null)
                 {
-                    materialResult = await _materialRepository.GetAllAsync(types, limit, offset);
+                    materialResult = await _materialRepository.GetAllParentsAsync(types, limit, offset, sortColumnName, sortOrder);
                 }
                 else
                 {
-                    materialResult = await _materialRepository.GetAllAsync(limit, offset);
+                    materialResult = await _materialRepository.GetAllParentsAsync(limit, offset, sortColumnName, sortOrder);
                 }
 
                 mappingTasks = materialResult.Materials
@@ -189,17 +191,20 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, materials.Count());
         }
 
-        public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
+        public async Task<IEnumerable<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
         {
-            return GetMaterialByNodeIdQuery(nodeId)
-                .GetParentMaterialsQuery()
-                .GroupBy(p => p.Type)
-                .Select(group => new MaterialsCountByType
-                {
-                    Count = group.Count(),
-                    Type = group.Key
-                })
-                .ToListAsync();
+            var nodeIdList = await GetNodeIdRelatedToNodeIdAsync(nodeId);
+
+            var materialEntities = await _materialRepository.GetAllParentsOnlyForRelatedNodeListAsync(nodeIdList);
+
+            return materialEntities
+                    .GroupBy(p => p.Type)
+                    .Select(group => new MaterialsCountByType
+                    {
+                        Count = group.Count(),
+                        Type = group.Key
+                    })
+                    .ToList();
         }
 
         public async Task<JObject> GetMaterialDocumentAsync(Guid materialId)
@@ -296,13 +301,12 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Task<Material>> mappingTasks;
             IEnumerable<Material> materials;
 
-            IQueryable<MaterialEntity> materialsByNode = GetMaterialByNodeIdQuery(nodeId);
-            //TODO: we need to add logic that provides list of NodeId 
-            //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
+            var nodeIdList = await GetNodeIdRelatedToNodeIdAsync(nodeId);
 
-            mappingTasks = (await materialsByNode
-                                 .ToArrayAsync())
-                                 .Select(async e => await MapAsync(await _materialRepository.GetByIdAsync(e.Id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)));
+            var materialEntities = await _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList);
+
+            mappingTasks = materialEntities
+                                 .Select(async e => await MapAsync(e));
 
             materials = await Task.WhenAll(mappingTasks);
 
@@ -399,43 +403,20 @@ namespace IIS.Core.Materials.EntityFramework
 
             return materials;
         }
-
-        private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
+        private async Task<IEnumerable<Guid>> GetNodeIdRelatedToNodeIdAsync(Guid nodeId)
         {
-            var nodeIdList = GetFeatureIdListThatRealtesToObjectId(nodeId);
-
-            nodeIdList.Add(nodeId);
-
-            return _context.Materials
-                        .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                            (Material, MaterialInfo) => new { Material, MaterialInfo })
-                        .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                            (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                        .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
-                        .Select(m => m.MaterialInfoJoined.Material);
-        }
-
-        private IList<Guid> GetFeatureIdListThatRealtesToObjectId(Guid nodeId)
-        {
-            var type = _ontologySchema.GetEntityTypeByName("ObjectSign");
-
-            var typeIdList = new List<Guid>();
-
-            if (type != null)
+            var resultList = new List<Guid>
             {
-                typeIdList = type.IncomingRelations
-                                    .Select(p => p.SourceTypeId)
-                                    .ToList();
-            }
+                nodeId
+            };
 
-            return _context.Nodes
-                                .Join(_context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                                .Where(e => (!typeIdList.Any() ? true : typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
-                                .AsNoTracking()
-                                .Select(e => e.Node.Id)
-                                .ToList();
+            var featureIdList = await _ontologyRepository.GetFeatureIdListRelatedToNodeIdAsync(nodeId);
+
+            resultList.AddRange(featureIdList);
+
+            return resultList; 
         }
-
+        
         private async Task<JObject> GetObjectOfStudyListForMaterial(List<Node> nodeList)
         {
             var result = new JObject();

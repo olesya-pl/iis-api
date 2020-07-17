@@ -41,27 +41,39 @@ namespace Iis.DbLayer.Repositories
         public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
             var materialIdList =  await GetOnlyMaterialsForNodeIdListQuery(nodeIdList)
-                                .Select(e => e.Id)
-                                .ToArrayAsync();
+                                            .Select(e => e.Id)
+                                            .ToArrayAsync();
             
-            var materialResult = await GetAllAsync(materialIdList, 0, 0);
-            
-            return materialResult.Entities;
+            return await GetMaterialsQuery(_includeAll)
+                                            .Where(e => materialIdList.Contains(e.Id))
+                                            .ToArrayAsync();
         }
 
-        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null)
+        public async Task<IEnumerable<MaterialEntity>> GetAllParentsOnlyForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
-            return GetAllWithPredicateAsync(limit, offset, sortColumnName: sortColumnName, sortOrder: sortOrder);
+            var materialIdList =  await GetOnlyMaterialsForNodeIdListQuery(nodeIdList)
+                                            .Select(e => e.Id)
+                                            .ToArrayAsync();
+
+            return await GetMaterialsQuery(_includeAll)
+                                            .OnlyParent()
+                                            .Where(e => materialIdList.Contains(e.Id))
+                                            .ToArrayAsync();
+        }
+        
+        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllParentsAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null)
+        {
+            return GetAllParentsWithPredicateAsync(limit, offset, sortColumnName: sortColumnName, sortOrder: sortOrder);
         }
 
-        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null)
+        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllParentsAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null)
         {
-            return GetAllWithPredicateAsync(limit, offset, e => materialIdList.Contains(e.Id), sortColumnName, sortOrder);
+            return GetAllParentsWithPredicateAsync(limit, offset, e => materialIdList.Contains(e.Id), sortColumnName, sortOrder);
         }
 
-        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null)
+        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllParentsAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null)
         {
-            return GetAllWithPredicateAsync(limit, offset, e => types.Contains(e.Type), sortColumnName, sortOrder);
+            return GetAllParentsWithPredicateAsync(limit, offset, e => types.Contains(e.Type), sortColumnName, sortOrder);
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
@@ -72,13 +84,12 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
         
-        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
+        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllParentsWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
         {
             var materialQuery = predicate is null
                                 ? GetMaterialsQuery(_includeAll)
                                     .OnlyParent()
-                                : (IQueryable<MaterialEntity>)
-                                    GetMaterialsQuery(_includeAll)
+                                : GetMaterialsQuery(_includeAll)
                                     .OnlyParent()
                                     .Where(predicate);
 

@@ -31,35 +31,42 @@ namespace Iis.DbLayer.Repositories
         /// <param name="nodeIdList">list of related node id</param>
         /// <returns></returns>
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
+
+        /// <summary>
+        /// Returns all the Materials (Parents Only) for given list of related node id
+        /// </summary>
+        /// <param name="nodeIdList">list of related node id</param>
+        /// <returns></returns>
+        Task<IEnumerable<MaterialEntity>> GetAllParentsOnlyForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
         
         /// <summary>
-        /// Returns all the Materials with paggination
+        /// Returns all the Materials (Parents Only) with paggination
         /// </summary>
         /// <param name="limit">page limit</param>
         /// <param name="offset">page offset</param>
         /// <param name="sortColumnName">sorting ColumnName</param>
         /// <param name="offset">sorting Order</param>
-        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
+        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllParentsAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
 
         /// <summary>
-        /// Returns all the Materials for given list of Material Identities with paggination
+        /// Returns all the Materials (Parents Only) for given list of Material Identities with paggination
         /// </summary>
         /// <param name="materialIdList">list of Material Identities</param>
         /// <param name="limit">page limit</param>
         /// <param name="offset">page offset</param>
         /// <param name="sortColumnName">sorting ColumnName</param>
         /// <param name="offset">sorting Order</param>
-        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null);
+        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllParentsAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null);
         
         /// <summary>
-        /// Returns all the Materials for given list of Material Type with paggination
+        /// Returns all the Materials (Parents Only) for given list of Material Type with paggination
         /// </summary>
         /// <param name="types">list of Material Type</param>
         /// <param name="limit">page limit</param>
         /// <param name="offset">page offset</param>
         /// <param name="sortColumnName">sorting ColumnName</param>
         /// <param name="offset">sorting Order</param>
-        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
+        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllParentsAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
         
         /// <summary>
         /// Returns all the Materials for given Assignee

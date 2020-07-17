@@ -30,7 +30,7 @@ namespace IIS.Core.Materials
         Task<List<MlProcessingResult>> GetMLProcessingResultsAsync(Guid materialId);
         Task<JObject> GetMaterialDocumentAsync(Guid materialId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
-        Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
+        Task<IEnumerable<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
     }
 }
