@@ -5,33 +5,24 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain.Meta
 {
-    public abstract class TypeMetaConverterBase : JsonConverter<IMeta>
+    public class MetaConverter<TMeta> : JsonConverter<IMeta> where TMeta : IMeta
     {
         protected readonly JsonSerializer js;
-
-        protected TypeMetaConverterBase(ScalarType? scalarType)
+        public MetaConverter(ScalarType? scalarType)
         {
-            js = new JsonSerializer {MissingMemberHandling = MissingMemberHandling.Error};
+            js = new JsonSerializer { MissingMemberHandling = MissingMemberHandling.Error };
             js.Converters.Add(new ValidationConverter(scalarType, js));
-        }
-
-        public override void WriteJson(JsonWriter writer, IMeta value, JsonSerializer serializer)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
-
-    public class MetaConverter<TMeta> : TypeMetaConverterBase where TMeta : IMeta
-    {
-        public MetaConverter(ScalarType? scalarType) : base(scalarType)
-        {
         }
 
         public override IMeta ReadJson(JsonReader reader, System.Type objectType, IMeta existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
             var jo = JObject.Load(reader);
-             return jo.ToObject<TMeta>(js);
+            return jo.ToObject<TMeta>(js);
+        }
+        public override void WriteJson(JsonWriter writer, IMeta value, JsonSerializer serializer)
+        {
+            throw new System.NotImplementedException();
         }
     }
 

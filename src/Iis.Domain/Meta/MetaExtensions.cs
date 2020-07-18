@@ -12,13 +12,6 @@ namespace Iis.Domain.Meta
             {MissingMemberHandling = MissingMemberHandling.Error, NullValueHandling = NullValueHandling.Ignore};
         public static JsonSerializer CreateSerializer() => JsonSerializer.Create(SerializerSettings);
 
-        public static TMeta CreateMeta<TMeta>(JObject jo, JsonConverter typeConverter) where TMeta : IMeta
-        {
-            var js = CreateSerializer();
-            js.Converters.Add(typeConverter);
-            return jo.ToObject<TMeta>(js);
-        }
-
         public static TMeta CreateMeta<TMeta>(INodeTypeModel type, JsonConverter typeConverter) where TMeta : IMeta
         {
             var js = CreateSerializer();
@@ -33,7 +26,7 @@ namespace Iis.Domain.Meta
             if (type is IAttributeTypeModel attributeType)
                 return attributeType.CreateMeta();
             if (type is IEmbeddingRelationTypeModel relationType)
-                return relationType.CreateMeta();
+                return relationType.CreateMeta(); 
             if (type is IEntityTypeModel entityType)
                 return entityType.CreateMeta();
             throw new ArgumentException(nameof(type));
@@ -59,7 +52,10 @@ namespace Iis.Domain.Meta
         {
             if (!type.IsEntityType) throw new ArgumentException(nameof(type));
             var converter = new MetaConverter<EntityRelationMeta>(null);
-            return CreateMeta<EntityRelationMeta>(type, converter);
+            var metaObj = type.GetFullMeta();
+            var result = type.GetFullMeta().ToObject<EntityRelationMeta>();
+            return result;
+            //return CreateMeta<EntityRelationMeta>(type, converter);
         }
 
         public static bool IsComputed(this IEmbeddingRelationTypeModel type) => type.GetComputed() != null;
@@ -69,7 +65,7 @@ namespace Iis.Domain.Meta
 
         public static bool HasInversed(this IEmbeddingRelationTypeModel type) => type.GetInversed() != null;
 
-        public static InversedRelationMeta GetInversed(this IEmbeddingRelationTypeModel type)
+        public static IInversedRelationMeta GetInversed(this IEmbeddingRelationTypeModel type)
             => (type.Meta as EntityRelationMeta)?.Inversed;
 
         public static JObject Serialize(this IMeta meta) => JObject.FromObject(meta, CreateSerializer());

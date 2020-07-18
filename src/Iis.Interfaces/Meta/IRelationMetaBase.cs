@@ -8,9 +8,9 @@ namespace Iis.Interfaces.Meta
     {
         int? SortOrder { get; set; }
         string Title { get; set; }
-        IFormField FormField { get; set; }
-        IContainerMeta Container { get; set; }
+        IFormField FormField { get; }
+        IContainerMeta Container { get; }
         bool Multiple { get; set; }
-        IValidation Validation { get; set; }
+        IValidation Validation { get; }
     }
 }

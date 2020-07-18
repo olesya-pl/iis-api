@@ -4,7 +4,7 @@ using System;
 namespace Iis.Domain.Meta
 {
 
-    public class RelationMetaBase: IMeta
+    public class RelationMetaBase: IRelationMetaBase, IMeta
     {
         public int? SortOrder { get; set; }
         public string Title { get; set; }
@@ -12,15 +12,19 @@ namespace Iis.Domain.Meta
         public ContainerMeta Container { get; set; }
         public bool Multiple { get; set; }
         public Validation Validation { get; set; }
+        IFormField IRelationMetaBase.FormField => FormField;
+        IContainerMeta IRelationMetaBase.Container => Container;
+        IValidation IRelationMetaBase.Validation => Validation;
     }
 
     // Entity to entity relation
-    public class EntityRelationMeta : RelationMetaBase
+    public class EntityRelationMeta : RelationMetaBase, IEntityRelationMeta
     {
         public EntityOperation[] AcceptsEntityOperations { get; set; } // remake to flags
         public string Type { get; set; }
         public InversedRelationMeta Inversed { get; set; }
         public string[] TargetTypes { get; set; }
+        IInversedRelationMeta IEntityRelationMeta.Inversed => Inversed;
     }
 
     public class AttributeRelationMeta : RelationMetaBase
@@ -30,7 +34,7 @@ namespace Iis.Domain.Meta
     }
 
     // Describes virtual inversed relation
-    public class InversedRelationMeta : RelationMetaBase
+    public class InversedRelationMeta : RelationMetaBase, IInversedRelationMeta
     {
         public string Code { get; set; }
         public bool Editable { get; set; }

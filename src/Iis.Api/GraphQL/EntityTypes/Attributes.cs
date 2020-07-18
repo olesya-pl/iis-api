@@ -14,6 +14,7 @@ using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Meta;
+using AutoMapper;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -71,10 +72,19 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
             Source = source;
             MetaObject = Source.EmbeddingMeta;
-        }
 
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<IFormField, FormField>();
+                cfg.CreateMap<IContainerMeta, ContainerMeta>();
+                cfg.CreateMap<IValidation, Validation>();
+            });
+
+            _mapper = new Mapper(configuration);
+        }
+        protected IMapper _mapper;
         protected IEmbeddingRelationTypeModel Source { get; }
-        protected RelationMetaBase MetaObject { get; }
+        protected IRelationMetaBase MetaObject { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -95,17 +105,17 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.TargetType.IsObjectOfStudy;
 
         [GraphQLType(typeof(AnyType))]
-        public FormField FormField => MetaObject?.FormField;
+        public FormField FormField => _mapper.Map<FormField>(MetaObject?.FormField);
         
         [GraphQLType(typeof(AnyType))]
-        public ContainerMeta Container => MetaObject?.Container;
+        public ContainerMeta Container => _mapper.Map<ContainerMeta>(MetaObject?.Container);
 
         public int? SortOrder => MetaObject?.SortOrder;
 
         [GraphQLType(typeof(AnyType))]
         public Validation Validation {
             get {
-                var validation = MetaObject?.Validation;
+                var validation = _mapper.Map<Validation>(MetaObject?.Validation);
 
                 if (Source.EmbeddingOptions == EmbeddingOptions.Required)
                 {

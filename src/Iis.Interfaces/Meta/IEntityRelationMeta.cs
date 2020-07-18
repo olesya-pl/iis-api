@@ -8,7 +8,7 @@ namespace Iis.Interfaces.Meta
     {
         EntityOperation[] AcceptsEntityOperations { get; set; }
         string Type { get; set; }
-        IInversedRelationMeta Inversed { get; set; }
+        IInversedRelationMeta Inversed { get; }
         string[] TargetTypes { get; set; }
     }
 }

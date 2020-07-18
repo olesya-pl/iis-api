@@ -13,7 +13,7 @@ namespace Iis.OntologyModelWrapper
         public EmbeddingRelationTypeWrapper(INodeTypeLinked source) : base(source) { }
         public IEmbeddingRelationTypeModel DirectRelationType => throw new NotImplementedException();
 
-        public RelationMetaBase EmbeddingMeta => throw new NotImplementedException();
+        public IRelationMetaBase EmbeddingMeta => throw new NotImplementedException();
 
         public EmbeddingOptions EmbeddingOptions => throw new NotImplementedException();
 

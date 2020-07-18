@@ -139,14 +139,14 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             CheckFormFields(m.FormField, w.FormField);
             CheckContainers(m.Container, w.Container);
         }
-        private void CheckContainers(ContainerMeta m, IContainerMeta w)
+        private void CheckContainers(IContainerMeta m, IContainerMeta w)
         {
             if (m == null && w == null) return;
             Assert.Equal(m.Id, w.Id);
             Assert.Equal(m.Title, w.Title);
             Assert.Equal(m.Type, w.Type);
         }
-        private void CheckFormFields(FormField m, IFormField w)
+        private void CheckFormFields(IFormField m, IFormField w)
         {
             if (m == null && w == null) return;
             Assert.Equal(m.Type, w.Type);
@@ -158,7 +158,7 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             Assert.Equal(m.Layout, w.Layout);
             Assert.Equal(m.RadioType, w.RadioType);
         }
-        private void CheckInversedMeta(InversedRelationMeta m, IInversedRelationMeta w)
+        private void CheckInversedMeta(IInversedRelationMeta m, IInversedRelationMeta w)
         {
             if (m == null && w == null) return;
             Assert.Equal(m.Code, w.Code);

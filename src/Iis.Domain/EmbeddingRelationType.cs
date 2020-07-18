@@ -13,7 +13,7 @@ namespace Iis.Domain
 
         public override Type ClrType => typeof(Relation);
 
-        public RelationMetaBase EmbeddingMeta => (RelationMetaBase)base.Meta;
+        public IRelationMetaBase EmbeddingMeta => (IRelationMetaBase)base.Meta;
 
         public EmbeddingOptions EmbeddingOptions { get; }
 
