@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ namespace Iis.Domain
 {
     public interface INodeTypeModel
     {
+        INodeTypeLinked Source { get;  }
         Guid Id { get; }
         string Name { get; }
         string Title { get; set; }

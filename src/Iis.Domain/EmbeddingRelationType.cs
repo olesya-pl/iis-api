@@ -18,13 +18,13 @@ namespace Iis.Domain
         public EmbeddingOptions EmbeddingOptions { get; }
 
         // Embedding relation can have single attribute or single entity as a node
-        public IAttributeTypeModel IAttributeTypeModel => RelatedTypes.OfType<IAttributeTypeModel>().SingleOrDefault();
+        public IAttributeTypeModel AttributeType => RelatedTypes.OfType<IAttributeTypeModel>().SingleOrDefault();
         public IEntityTypeModel EntityType => RelatedTypes.OfType<IEntityTypeModel>().SingleOrDefault();
-        public INodeTypeModel TargetType => (INodeTypeModel)IAttributeTypeModel ?? EntityType;
+        public INodeTypeModel TargetType => (INodeTypeModel)AttributeType ?? EntityType;
         public IEnumerable<IRelationTypeModel> RelationTypes => RelatedTypes.OfType<IRelationTypeModel>();
         public bool IsAttributeType => RelatedTypes.OfType<IAttributeTypeModel>().Any();
         public bool IsEntityType => RelatedTypes.OfType<IEntityTypeModel>().Any();
-        public IEmbeddingRelationTypeModel DirectRelationType => RelatedTypes.OfType<IEmbeddingRelationTypeModel>().Single();
+        public IEmbeddingRelationTypeModel DirectRelationType => RelatedTypes.OfType<IEmbeddingRelationTypeModel>().SingleOrDefault();
 
         public EmbeddingRelationType(Guid id, string name, EmbeddingOptions embeddingOptions, bool isInversed = false)
             : base(id, name)

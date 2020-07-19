@@ -44,7 +44,7 @@ namespace Iis.Domain.Meta
         public static AttributeRelationMeta CreateAttributeRelationMeta(this IEmbeddingRelationTypeModel type)
         {
             if (!type.IsAttributeType) throw new ArgumentException(nameof(type));
-            var converter = new MetaConverter<AttributeRelationMeta>(type.IAttributeTypeModel.ScalarTypeEnum);
+            var converter = new MetaConverter<AttributeRelationMeta>(type.AttributeType.ScalarTypeEnum);
             return CreateMeta<AttributeRelationMeta>(type, converter);
         }
 

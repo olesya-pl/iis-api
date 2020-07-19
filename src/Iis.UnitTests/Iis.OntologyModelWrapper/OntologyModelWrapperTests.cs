@@ -190,6 +190,22 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         private void CheckEmbeddingRelationType(IEmbeddingRelationTypeModel m, IEmbeddingRelationTypeModel w)
         {
             CheckNodeType(m, w);
+            Assert.Equal(m.DirectRelationType?.Id, w.DirectRelationType?.Id);
+            CheckMeta(m.EmbeddingMeta, w.EmbeddingMeta);
+            Assert.Equal(m.EmbeddingOptions, w.EmbeddingOptions);
+            Assert.Equal(m.EntityType?.Id, w.EntityType?.Id);
+            Assert.Equal(m.AttributeType?.Id, w.AttributeType?.Id);
+            Assert.Equal(m.AttributeType?.ScalarTypeEnum, w.AttributeType?.ScalarTypeEnum);
+            Assert.Equal(m.IsAttributeType, w.IsAttributeType);
+            Assert.Equal(m.IsEntityType, w.IsEntityType);
+            Assert.Equal(m.IsInversed, w.IsInversed);
+            //Assert.Equal(
+            //    m.RelationTypes.Select(rt => rt.Id).OrderBy(id => id),
+            //    m.RelationTypes.Select(rt => rt.Id).OrderBy(id => id));
+            Assert.Equal(m.TargetType?.Id, w.TargetType?.Id);
+            Assert.Equal(m.AcceptsOperation(EntityOperation.Create), w.AcceptsOperation(EntityOperation.Create));
+            Assert.Equal(m.AcceptsOperation(EntityOperation.Delete), w.AcceptsOperation(EntityOperation.Delete));
+            Assert.Equal(m.AcceptsOperation(EntityOperation.Update), w.AcceptsOperation(EntityOperation.Update));
         }
     }
 }

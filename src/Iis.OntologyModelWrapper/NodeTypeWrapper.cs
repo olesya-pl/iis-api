@@ -13,6 +13,7 @@ namespace Iis.OntologyModelWrapper
     public class NodeTypeWrapper : INodeTypeModel
     {
         protected INodeTypeLinked _source;
+        public INodeTypeLinked Source => _source;
         public NodeTypeWrapper(INodeTypeLinked source)
         {
             _source = source;

@@ -108,7 +108,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         {
             var entity = new Entity(Guid.NewGuid(), type);
             var relation = new Relation(Guid.NewGuid(), relationType);
-            var attribute = new Attribute(Guid.NewGuid(), relationType.IAttributeTypeModel, value);
+            var attribute = new Attribute(Guid.NewGuid(), relationType.AttributeType, value);
             relation.AddNode(attribute);
             entity.AddNode(relation);
             await _ontologyService.SaveNodeAsync(entity);

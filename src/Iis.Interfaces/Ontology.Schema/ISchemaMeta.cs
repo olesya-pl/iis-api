@@ -2,7 +2,7 @@
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public interface ISchemaMeta: IMeta
+    public interface ISchemaMeta: IRelationMetaBase, IEntityMeta, IEntityRelationMeta, IAttributeRelationMeta
     {
         bool? ExposeOnApi { get; set; }
         bool? HasFewEntities { get; set; }
