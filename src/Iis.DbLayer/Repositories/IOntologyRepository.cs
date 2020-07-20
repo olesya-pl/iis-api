@@ -14,5 +14,12 @@ namespace Iis.DbLayer.Repositories
         /// </summary>
         /// <param name="nodeId"></param>
         Task<IEnumerable<Guid>> GetFeatureIdListRelatedToNodeIdAsync(Guid nodeId);
+        
+        /// <summary>
+        /// Returns list of pair Feature Id with appropriate NodeId for given list of FeatureId
+        /// </summary>
+        /// <param name="featureIdList">list of FeatureId</param>
+        /// <returns></returns>
+        Task<IEnumerable<(Guid FeatureId, Guid NodeId)>> GetNodeIdListRelatedToFeatureIdListAsync(IEnumerable<Guid> featureIdList);
     }
 }

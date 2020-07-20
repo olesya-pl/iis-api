@@ -42,5 +42,15 @@ namespace Iis.DbLayer.Repositories
                                 .ToArrayAsync();
             return result;
         }
+
+        public async Task<IEnumerable<(Guid FeatureId, Guid NodeId)>> GetNodeIdListRelatedToFeatureIdListAsync(IEnumerable<Guid> featureIdList)
+        {
+            var result = await _context.Relations
+                            .Where(e => featureIdList.Contains(e.TargetNodeId))
+                            .Select(e => new {FeatureNodeId = e.TargetNodeId, NodeId = e.SourceNodeId})
+                            .ToListAsync();
+
+            return result.Select(_ => (FeatureId: _.FeatureNodeId, NodeId: _.NodeId)).ToList();
+        }
     }
 }

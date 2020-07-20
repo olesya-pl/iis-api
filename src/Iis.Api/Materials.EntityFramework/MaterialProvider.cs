@@ -117,16 +117,16 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        public async Task<Material> GetMaterialAsync(Guid id)
-        {
-            var entity = await _materialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures);
-
-            return await MapAsync(entity);
-        }
-
         public async Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
         {
             return await _materialRepository.GetAllAsync();
+        }
+
+        public async Task<Material> GetMaterialAsync(Guid id)
+        {
+            var entity = await _materialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures);
+            
+            return await MapAsync(entity);
         }
 
         public IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName)
@@ -148,31 +148,6 @@ namespace IIS.Core.Materials.EntityFramework
             if (entity is null) return null;
 
             return _mapper.Map<MaterialSign>(entity);
-        }
-
-        public async Task<Material> MapAsync(MaterialEntity material)
-        {
-            if (material == null) return null;
-
-            var result = _mapper.Map<Material>(material);
-
-            result.Infos.AddRange(await MapInfos(material));
-
-            result.Children.AddRange(await MapChildren(material));
-
-            result.Assignee = _mapper.Map<User>(material.Assignee);
-
-            var nodes = result.Infos
-                                .SelectMany(p => p.Features.Select(x => x.Node))
-                                .ToList();
-
-            result.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
-
-            result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
-
-            result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
-
-            return result;
         }
 
         public async Task<List<MlProcessingResult>> GetMLProcessingResultsAsync(Guid materialId)
@@ -313,6 +288,30 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, materials.Count());
         }
 
+        private async Task<Material> MapAsync(MaterialEntity material)
+        {
+            if (material == null) return null;
+
+            var result = _mapper.Map<Material>(material);
+
+            result.Infos.AddRange(await MapInfos(material));
+
+            result.Children.AddRange(await MapChildren(material));
+
+            result.Assignee = _mapper.Map<User>(material.Assignee);
+
+            var nodes = result.Infos
+                                .SelectMany(p => p.Features.Select(x => x.Node))
+                                .ToList();
+
+            result.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
+
+            result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
+
+            result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
+
+            return result;
+        }
         private async Task<Material> GetSimplifiedMaterialAsync(Guid id)
         {
             var material = await _materialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren);
