@@ -85,12 +85,12 @@ namespace Iis.OntologyModelWrapper
 
         public IEmbeddingRelationTypeModel GetProperty(string typeName)
         {
-            throw new NotImplementedException();
+            return AllProperties.FirstOrDefault(p => p.Name == typeName);
         }
 
         public bool IsSubtypeOf(INodeTypeModel type)
         {
-            throw new NotImplementedException();
+            return Id == type.Id || _source.IsInheritedFrom(type.Name);
         }
     }
 }

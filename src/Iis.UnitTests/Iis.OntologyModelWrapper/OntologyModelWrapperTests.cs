@@ -43,6 +43,9 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             CheckEntityTypes(
                 model.EntityTypes.OrderBy(et => et.Name).ToList(), 
                 wrapper.EntityTypes.OrderBy(et => et.Name).ToList());
+            CheckIsSubtypeOf(
+                model.EntityTypes.OrderBy(et => et.Name).Select(t => (INodeTypeModel)t).ToList(),
+                wrapper.EntityTypes.OrderBy(et => et.Name).Select(t => (INodeTypeModel)t).ToList());
         }
         private void CheckEntityTypes(List<IEntityTypeModel> modelEntityTypes, List<IEntityTypeModel> wrapperEntityTypes)
         {
@@ -87,6 +90,7 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
                     m.AllProperties.OrderBy(et => et.Id).ToList(),
                     w.AllProperties.OrderBy(et => et.Id).ToList());
             }
+            CheckGetProperties(m, w);
         }
         private void CheckMeta(IMeta mMeta, IMeta wMeta)
         {
@@ -206,6 +210,24 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
             Assert.Equal(m.AcceptsOperation(EntityOperation.Create), w.AcceptsOperation(EntityOperation.Create));
             Assert.Equal(m.AcceptsOperation(EntityOperation.Delete), w.AcceptsOperation(EntityOperation.Delete));
             Assert.Equal(m.AcceptsOperation(EntityOperation.Update), w.AcceptsOperation(EntityOperation.Update));
+        }
+
+        private void CheckGetProperties(INodeTypeModel m, INodeTypeModel w)
+        {
+            foreach (var prop in m.AllProperties)
+            {
+                CheckEmbeddingRelationType(m.GetProperty(prop.Name), w.GetProperty(prop.Name));
+            }
+        }
+        private void CheckIsSubtypeOf(List<INodeTypeModel> m, List<INodeTypeModel> w)
+        {
+            for (int i = 0; i < m.Count; i++)
+            {
+                for (int j = 0; j < m.Count; j++)
+                {
+                    Assert.Equal(m[i].IsSubtypeOf(m[j]), w[i].IsSubtypeOf(w[j]));
+                }
+            }
         }
     }
 }
