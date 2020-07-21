@@ -15,11 +15,14 @@ using Iis.Domain.MachineLearning;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
+using IIS.Repository;
+using IIS.Repository.Factories;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
+using IIS.Repository.UnitOfWork;
 
 namespace IIS.Core.Materials.EntityFramework
 {
-    public class MaterialService : IMaterialService
+    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService where TUnitOfWork : IIISUnitOfWork
     {
         private readonly OntologyContext _context;
         private readonly IMapper _mapper;
@@ -30,14 +33,15 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMaterialRepository _materialRepository;
 
-        public MaterialService(OntologyContext context,
-            IFileService fileService,
+        public MaterialService(IFileService fileService,
+            OntologyContext context,
             IMapper mapper,
             IMaterialEventProducer eventProducer,
             IMaterialProvider materialProvider,
             IEnumerable<IMaterialProcessor> materialProcessors,
             IMLResponseRepository mLResponseRepository,
-            IMaterialRepository materialRepository)
+            IMaterialRepository materialRepository,
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _context = context;
             _fileService = fileService;
@@ -69,20 +73,12 @@ namespace IIS.Core.Materials.EntityFramework
 
             var materialEntity = _mapper.Map<MaterialEntity>(material);
 
-            _context.Add(materialEntity);
+            Run(unitOfWork => { unitOfWork.MaterialRepository.AddMaterialEntity(materialEntity); });
 
             foreach (var child in material.Children)
             {
-                await _context.Semaphore.WaitAsync();
-                try
-                {
-                    child.ParentId = material.Id;
-                    await SaveAsync(child);
-                }
-                finally
-                {
-                    _context.Semaphore.Release();
-                }
+                child.ParentId = material.Id;
+                await SaveAsync(child);
             }
 
             foreach (var info in material.Infos)
@@ -123,6 +119,8 @@ namespace IIS.Core.Materials.EntityFramework
                     new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
         }
 
+
+
         public async Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
         {
             var responseEntity = _mapper.Map<MLResponseEntity>(response);
@@ -136,7 +134,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)
         {
-            var material = _context.Materials.FirstOrDefault(p => p.Id == input.Id);
+            var material = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(input.Id));
 
             if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
             if (input.ImportanceId.HasValue) material.ImportanceSignId = input.ImportanceId.Value;
@@ -164,22 +162,14 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task UpdateMaterialAsync(MaterialEntity material)
         {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                _context.Update(material);
+            Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
+            //_context.Update(material);
 
-                await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
-                await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
+            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
 
-                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
-
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
         }
 
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
@@ -224,7 +214,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 if (!Guid.TryParse(featureId, out Guid featureGuid)) continue;
 
-                if(featureGuid.Equals(Guid.Empty)) continue;
+                if (featureGuid.Equals(Guid.Empty)) continue;
 
                 result.Add(featureGuid);
             }

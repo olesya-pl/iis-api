@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
+    <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
 

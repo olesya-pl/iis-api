@@ -21,7 +21,7 @@ namespace Iis.Interfaces.Ontology.Schema
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
         IAttributeInfoList GetAttributesInfo(string entityName);
-        public IAliases Aliases { get; }
+        IAliases Aliases { get; }
         void RemoveRelation(Guid relationId);
         void PutInOrder();
     }

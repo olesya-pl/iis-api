@@ -29,7 +29,7 @@ namespace Iis.Roles
         }
         public async Task<Guid> CreateUserAsync(User newUser)
         {
-            var entityExists= await _context.Users
+            var entityExists = await _context.Users
                                             .AnyAsync(u => u.Username == newUser.UserName);
             if (entityExists)
             {
@@ -45,21 +45,13 @@ namespace Iis.Roles
                                     .Select(role => CreateUserRole(userEntity.Id, role.Id))
                                     .ToList();
 
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                _context.Add(userEntity);
+            _context.Add(userEntity);
 
-                _context.AddRange(userRolesEntitiesList);
+            _context.AddRange(userRolesEntitiesList);
 
-                 await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-                return userEntity.Id;
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            return userEntity.Id;
         }
 
         private IQueryable<UserEntity> GetOperatorsQuery()
@@ -123,23 +115,15 @@ namespace Iis.Roles
             //TODO: temporaly solution
             userEntity.Name = $"{userEntity.LastName} {userEntity.FirstName} {userEntity.Patronymic}";
 
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                _context.RemoveRange(_context.UserRoles.Where(ur => ur.UserId == userEntity.Id));
+            _context.RemoveRange(_context.UserRoles.Where(ur => ur.UserId == userEntity.Id));
 
-                _context.Update(userEntity);
+            _context.Update(userEntity);
 
-                _context.UserRoles.AddRange(newUserRolesEntitiesList);
+            _context.UserRoles.AddRange(newUserRolesEntitiesList);
 
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-                return userEntity.Id;
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            return userEntity.Id;
         }
         public async Task<User> GetUserAsync(Guid userId)
         {
@@ -188,7 +172,7 @@ namespace Iis.Roles
         }
         private User Map(UserEntity entity)
         {
-            if(entity is null) return null;
+            if (entity is null) return null;
 
             var roleEntityList = entity.UserRoles
                                     .Select(ur => ur.Role);

@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.DbLayer.Repositories
 {
-    internal class NodeRepository : INodeRepository
+    public class NodeRepository : INodeRepository
     {
         private readonly IElasticManager _elasticManager;
         private readonly NodeFlattener _nodeFlattener;

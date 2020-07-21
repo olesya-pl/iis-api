@@ -60,18 +60,18 @@ namespace IIS.Core.Files.EntityFramework
                     storedFileBody = fileData.Contents;
                 }
                 else
-                if(_configuration.Storage == Storage.Folder)
+                if (_configuration.Storage == Storage.Folder)
                 {
                     var storedFilePath = Path.Combine(_configuration.Path, fileData.Id.ToString("D"));
 
                     var storedFileInfo = new System.IO.FileInfo(storedFilePath);
 
-                    if(storedFileInfo.Exists)
+                    if (storedFileInfo.Exists)
                     {
                         storedFileBody = await File.ReadAllBytesAsync(storedFileInfo.FullName);
                     }
                 }
-                
+
                 if (storedFileBody.Length != contents.Length)
                 {
                     continue;
@@ -103,7 +103,7 @@ namespace IIS.Core.Files.EntityFramework
             }
 
             _context.Add(file);
-            
+
             await _context.SaveChangesAsync();
 
             if (_configuration.Storage == Storage.Folder && !string.IsNullOrEmpty(_configuration.Path))
@@ -132,17 +132,9 @@ namespace IIS.Core.Files.EntityFramework
 
         public async Task<FileInfo> GetFileAsync(Guid id)
         {
-            await _context.Semaphore.WaitAsync();
             FileEntity file;
-            try
-            {
-                file = _context.Files.SingleOrDefault(f => f.Id == id);
-                if (file == null) return null;
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            file = _context.Files.SingleOrDefault(f => f.Id == id);
+            if (file == null) return null;
 
             byte[] contents;
 
