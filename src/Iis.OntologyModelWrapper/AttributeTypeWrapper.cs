@@ -13,7 +13,13 @@ namespace Iis.OntologyModelWrapper
 
         public bool AcceptsScalar(object value)
         {
-            throw new NotImplementedException();
+            return (value is int || value is long) && ScalarTypeEnum == ScalarType.Int
+                || value is bool && ScalarTypeEnum == ScalarType.Boolean
+                || value is decimal && ScalarTypeEnum == ScalarType.Decimal
+                || value is string && ScalarTypeEnum == ScalarType.String
+                || value is DateTime && ScalarTypeEnum == ScalarType.Date
+                || value is Dictionary<string, object> && ScalarTypeEnum == ScalarType.Geo
+                || value is Guid && ScalarTypeEnum == ScalarType.File;
         }
     }
 }
