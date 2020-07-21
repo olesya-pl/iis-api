@@ -1,4 +1,5 @@
 ﻿using Iis.DataModel.Cache;
+using Iis.DbLayer.Repositories;
 using Iis.Domain.Elastic;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
@@ -67,24 +68,30 @@ namespace Iis.DbLayer.Elastic
         {
             return new List<string>()
             {
-                nameof(Material.Source).ToLower(),
-                nameof(Material.Type).ToLower(),
-                nameof(Material.Content).ToLower(),
-                nameof(Material.CreatedDate).ToLower(),
-                nameof(Material.Importance).ToLower(),
-                nameof(Material.Reliability).ToLower(),
-                nameof(Material.Relevance).ToLower(),
-                nameof(Material.Completeness).ToLower(),
-                nameof(Material.SourceReliability).ToLower(),
-                nameof(Material.Id).ToLower(),
-                nameof(Material.Title).ToLower(),
-                nameof(Material.ProcessedStatus).ToLower(),
-                nameof(Material.SessionPriority).ToLower(),
-                "mlResponses.*",
-                $"{nameof(Material.Data)}.*",
-                $"{nameof(Material.LoadData)}.*",
-                $"{nameof(Material.Metadata)}.*",
-                $"{nameof(Material.Assignee)}.*"
+                nameof(MaterialDocument.Id),
+                nameof(MaterialDocument.FileId),
+                nameof(MaterialDocument.ParentId),
+                nameof(MaterialDocument.Source),
+                nameof(MaterialDocument.Type),
+                nameof(MaterialDocument.Content),
+                nameof(MaterialDocument.CreatedDate),
+                nameof(MaterialDocument.Importance),
+                nameof(MaterialDocument.Reliability),
+                nameof(MaterialDocument.Relevance),
+                nameof(MaterialDocument.Completeness),
+                nameof(MaterialDocument.SourceReliability),
+                nameof(MaterialDocument.Id),
+                nameof(MaterialDocument.ProcessedStatus),
+                nameof(MaterialDocument.SessionPriority),
+                nameof(MaterialDocument.MlHandlersCount),
+                nameof(MaterialDocument.ProcessedMlHandlersCount),
+                $"{nameof(MaterialDocument.MLResponses)}.*",
+                $"{nameof(MaterialDocument.Data)}.*",
+                $"{nameof(MaterialDocument.LoadData)}.*",
+                $"{nameof(MaterialDocument.Metadata)}.*",
+                $"{nameof(MaterialDocument.Transcriptions)}.*",
+                $"{nameof(MaterialDocument.Children)}.*",
+                $"{nameof(MaterialDocument.Assignee)}.*"
             };
         }
 

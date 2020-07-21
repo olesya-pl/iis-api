@@ -28,7 +28,7 @@ namespace Iis.Domain.Materials
         public Guid? ProcessedStatusSignId => ProcessedStatus?.Id;
         public MaterialSign SessionPriority { get; set; }
         public Guid? SessionPriorityId => SessionPriority?.Id;
-        public List<Material> Children { get; } = new List<Material>();
+        public List<Material> Children { get; set; } = new List<Material>();
         public FileInfo File { get; set; }
         public Guid? FileId => File?.Id;
         public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
@@ -40,8 +40,7 @@ namespace Iis.Domain.Materials
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public JObject ObjectsOfStudy { get; set; }
-        public IEnumerable<Node> Events { get; set; }
+        public IEnumerable<JObject> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
-        public IEnumerable<JObject> Events2 { get; set; }
     }
 }

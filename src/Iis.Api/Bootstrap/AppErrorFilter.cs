@@ -2,7 +2,7 @@ using System;
 using System.Security.Authentication;
 using HotChocolate;
 
-namespace Iis.Api.bo
+namespace Iis.Api.Bootstrap
 {
     internal class AppErrorFilter : IErrorFilter
     {

@@ -33,6 +33,7 @@ namespace Iis.UnitTests.Materials
 
         [Theory, RecursiveAutoData]
         public async Task GetMaterialsAsync_ReturnsOnlyParentMaterials(List<MaterialEntity> data,
+            MaterialSignEntity materialSign,
             Guid parentGuid)
         {
             //arrange
@@ -40,10 +41,12 @@ namespace Iis.UnitTests.Materials
             {
                 Id = parentGuid,
                 Source = "hf.voice",
-                Metadata = "{\"Type\": \"audio\", \"Source\": \"hf.voice\", \"Date\": null, \"Features\": null}"
+                Metadata = "{\"Type\": \"audio\", \"Source\": \"hf.voice\", \"Date\": null, \"Features\": null}",
+                ProcessedStatusSignId = materialSign.Id
             });
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            context.MaterialSigns.Add(materialSign);
             context.Materials.AddRange(data);
             context.SaveChanges();
 

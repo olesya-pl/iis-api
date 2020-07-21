@@ -53,7 +53,7 @@ namespace Iis.DataModel
 
         public DbSet<ThemeEntity> Themes { get; set; }
         public DbSet<ThemeTypeEntity> ThemeTypes { get; set; }
-        
+
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
         {

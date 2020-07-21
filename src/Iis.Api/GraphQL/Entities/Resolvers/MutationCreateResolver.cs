@@ -100,23 +100,23 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        public async Task<IEnumerable<Relation>> CreateMultipleProperties(IEmbeddingRelationTypeModel embed, object value)
+        public Task<Relation[]> CreateMultipleProperties(IEmbeddingRelationTypeModel embed, object value)
         {
             var values = (IEnumerable<object>) value;
-            var result = new List<Relation>();
+            var result = new List<Task<Relation>>();
             foreach (var v in values)
                 if (embed.IsEntityType)
                 {
-                    result.Add(await CreateSingleProperty(embed, v));
+                    result.Add(CreateSingleProperty(embed, v));
                 }
                 else
                 {
                     var dict = (Dictionary<string, object>) v;
                     var attrValue = dict["value"];
-                    result.Add(await CreateSingleProperty(embed, attrValue));
+                    result.Add(CreateSingleProperty(embed, attrValue));
                 }
 
-            return result;
+            return Task.WhenAll(result);
         }
 
         public async Task<Relation> CreateSingleProperty(IEmbeddingRelationTypeModel embed, object value)

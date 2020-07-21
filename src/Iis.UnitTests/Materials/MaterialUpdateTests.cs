@@ -11,16 +11,28 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using IIS.Core.Materials;
 using IIS.Core.GraphQL.Materials;
+using IIS.Core;
+using Microsoft.Extensions.Configuration;
+using Iis.DbLayer.Repositories;
+using Moq;
+using IIS.Core.Files;
+using System.Threading;
+using Iis.DbLayer.MaterialEnum;
 
 namespace Iis.UnitTests.Materials
 {
     public class MaterialUpdateTests : IDisposable
     {
-        private readonly ServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly Mock<IMaterialRepository> _materialRepositoryMock;
 
         public MaterialUpdateTests()
         {
-            _serviceProvider = Utils.GetServiceProvider();
+            _materialRepositoryMock = new Mock<IMaterialRepository>(MockBehavior.Strict);
+            _serviceProvider = Utils.GetServiceProviderWithCustomSetup(
+                serviceCollection => {
+                    serviceCollection.AddTransient(_ => _materialRepositoryMock.Object);
+                });
         }
         public void Dispose()
         {
@@ -30,8 +42,6 @@ namespace Iis.UnitTests.Materials
             context.MaterialSignTypes.RemoveRange(context.MaterialSignTypes);
 
             context.SaveChanges();
-
-            _serviceProvider.Dispose();
         }
 
         [Theory, RecursiveAutoData]
@@ -50,6 +60,15 @@ namespace Iis.UnitTests.Materials
             material.AssigneeId = assignee.Id;
             material.Assignee = null;
             material.File = null;
+
+            _materialRepositoryMock
+                .Setup(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _materialRepositoryMock
+                .Setup(m => m.GetByIdAsync(material.Id, It.IsAny<MaterialIncludeEnum[]>()))
+                .ReturnsAsync(material);
+
             //act
             var sut = _serviceProvider.GetRequiredService<IMaterialService>();
             await sut.UpdateMaterialAsync(new MaterialUpdateInput
@@ -68,6 +87,8 @@ namespace Iis.UnitTests.Materials
             //assert
             var res = context.Materials.First(p => p.Id == material.Id);
             Assert.Equal(assignee.Id, res.AssigneeId);
+            _materialRepositoryMock
+                .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
         }
 
         [Theory, RecursiveAutoData]
@@ -80,6 +101,14 @@ namespace Iis.UnitTests.Materials
             material.MaterialInfos = new List<MaterialInfoEntity>();
             context.SaveChanges();
 
+            _materialRepositoryMock
+                .Setup(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _materialRepositoryMock
+                .Setup(m => m.GetByIdAsync(material.Id, It.IsAny<MaterialIncludeEnum[]>()))
+                .ReturnsAsync(material);
+
             //act
             var sut = _serviceProvider.GetRequiredService<IMaterialService>();
             await sut.UpdateMaterialAsync(new MaterialUpdateInput {
@@ -91,6 +120,8 @@ namespace Iis.UnitTests.Materials
             var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
             var res = await provider.GetMaterialAsync(material.Id);
             Assert.Equal(material.Content, res.Content);
+            _materialRepositoryMock
+                .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
         }
 
         [Theory, RecursiveAutoData]
@@ -102,6 +133,15 @@ namespace Iis.UnitTests.Materials
             material.Data = material.Metadata = material.LoadData = null;
             material.MaterialInfos = new List<MaterialInfoEntity>();
             context.SaveChanges();
+
+            _materialRepositoryMock
+                .Setup(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            material.Content = string.Empty;
+            _materialRepositoryMock
+                .Setup(m => m.GetByIdAsync(material.Id, It.IsAny<MaterialIncludeEnum[]>()))
+                .ReturnsAsync(material);
 
             //act
             var sut = _serviceProvider.GetRequiredService<IMaterialService>();
@@ -116,6 +156,8 @@ namespace Iis.UnitTests.Materials
             var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
             var res = await provider.GetMaterialAsync(material.Id);
             Assert.Equal(string.Empty, res.Content);
+            _materialRepositoryMock
+                .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
         }
 
         [Theory, RecursiveAutoData]
@@ -155,6 +197,19 @@ namespace Iis.UnitTests.Materials
 
             await context.SaveChangesAsync();
 
+            _materialRepositoryMock
+                .Setup(m => m.PutMaterialToElasticSearchAsync(materialEntity.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            materialEntity.SessionPriority = new MaterialSignEntity
+            {
+                Id = important.Id,
+                MaterialSignTypeId = typeEntity.Id
+            };
+            _materialRepositoryMock
+                .Setup(m => m.GetByIdAsync(materialEntity.Id, It.IsAny<MaterialIncludeEnum[]>()))
+                .ReturnsAsync(materialEntity);
+
             //act
             var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
             var material = await materialService.UpdateMaterialAsync(new MaterialUpdateInput {
@@ -164,6 +219,8 @@ namespace Iis.UnitTests.Materials
 
             //assert
             Assert.Equal(important.Id, material.SessionPriority.Id);
+            _materialRepositoryMock
+                .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
         }
 
         [Theory(DisplayName = "Set status as Оброблено"), RecursiveAutoData]
@@ -229,13 +286,25 @@ namespace Iis.UnitTests.Materials
 
             var materialProvider = _serviceProvider.GetRequiredService<IMaterialProvider>();
             var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
+
+
+            _materialRepositoryMock
+                .Setup(m => m.PutMaterialToElasticSearchAsync(materialEntity.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            materialEntity.ProcessedStatus = new MaterialSignEntity
+            {
+                Id = processed.Id,
+                MaterialSignTypeId = typeEntity.Id
+            };
+            _materialRepositoryMock
+                .Setup(m => m.GetByIdAsync(materialEntity.Id, It.IsAny<MaterialIncludeEnum[]>()))
+                .ReturnsAsync(materialEntity);
             //arrange:end
 
             var material = await materialProvider.GetMaterialAsync(materialEntity.Id);
 
             //assert
-            Assert.Equal(notProcessed.Id, material.ProcessedStatusSignId.Value);
-
             await materialService.UpdateMaterialAsync(new MaterialUpdateInput
             {
                 AssigneeId = material.AssigneeId,
@@ -257,6 +326,8 @@ namespace Iis.UnitTests.Materials
 
             //assert
             Assert.Equal(processed.Id, material.ProcessedStatusSignId.Value);
+            _materialRepositoryMock
+                .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
         }
     }
 }
