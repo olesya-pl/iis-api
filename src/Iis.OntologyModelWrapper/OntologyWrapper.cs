@@ -19,10 +19,14 @@ namespace Iis.OntologyModelWrapper
         public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type)
         {
             var nodeType = _schema.GetNodeTypeById(type.Id);
-            var result = new List<INodeTypeModel> { type };
+            var result = new List<INodeTypeModel>();
             
-            result.AddRange(nodeType.GetAllDescendants().Select(nt => new NodeTypeWrapper(nt)));
-            return result;
+            result.AddRange(nodeType.GetAllDescendants().Distinct().Select(nt => new NodeTypeWrapper(nt)));
+            if (!result.Any(nt => nt.Id == type.Id))
+            {
+                result.Add(type);
+            }
+            return result.Distinct();
         }
 
 
