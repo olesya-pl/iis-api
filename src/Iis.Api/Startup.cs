@@ -117,8 +117,8 @@ namespace IIS.Core
                     ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
 
                     var ontologyProvider = new OntologyProvider(context);
-                    //ontology = ontologyProvider.GetOntology();
-                    ontology = new OntologyWrapper(ontologySchema);
+                    ontology = ontologyProvider.GetOntology();
+                    //ontology = new OntologyWrapper(ontologySchema);
 
                     iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                     iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
