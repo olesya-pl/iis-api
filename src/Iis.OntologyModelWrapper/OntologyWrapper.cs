@@ -37,7 +37,17 @@ namespace Iis.OntologyModelWrapper
 
         public INodeTypeModel GetType(Guid id)
         {
-            return new NodeTypeWrapper(_schema.GetNodeTypeById(id));
+            var nodeType = _schema.GetNodeTypeById(id);
+            switch (nodeType.Kind)
+            {
+                case Kind.Entity:
+                    return new EntityTypeWrapper(nodeType);
+                case Kind.Attribute:
+                    return new AttributeTypeWrapper(nodeType);
+                case Kind.Relation:
+                    return new EmbeddingRelationTypeWrapper(nodeType);
+            }
+            return null;
         }
 
         public IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeModel
