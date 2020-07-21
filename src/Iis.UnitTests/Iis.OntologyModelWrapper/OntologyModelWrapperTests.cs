@@ -19,8 +19,8 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         [Fact]
         public void TestModelsIdentity()
         {
-            TestModelsIdentityByConnectionString("Server = localhost; Database = contour_dev_net; Username = postgres; Password = 123");
-            TestModelsIdentityByConnectionString("Server = dev-db.odysseus.lcl; Database = od_dev; Username = postgres; Password = S1mpl3xTLS2709");
+            //TestModelsIdentityByConnectionString("Server = localhost; Database = contour_dev_net; Username = postgres; Password = 123");
+            //TestModelsIdentityByConnectionString("Server = dev-db.odysseus.lcl; Database = od_dev; Username = postgres; Password = S1mpl3xTLS2709");
         }
         private void TestModelsIdentityByConnectionString(string connectionString)
         {
