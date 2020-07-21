@@ -9,7 +9,6 @@ namespace Iis.Domain
         IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type);
         IEntityTypeModel GetEntityType(string name);
         INodeTypeModel GetType(Guid id);
-        T GetTypeOrNull<T>(string name) where T : INodeTypeModel;
         IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeModel;
     }
 }

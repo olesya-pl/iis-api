@@ -24,7 +24,7 @@ namespace Iis.Interfaces.Ontology.Schema
         bool HasInversed { get; }
         bool IsInversed { get; }
         void SetIsInversed();
-        ISchemaMeta MetaMeta { get; }
+        ISchemaMeta MetaObject { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
         IAttributeType AttributeType { get; }

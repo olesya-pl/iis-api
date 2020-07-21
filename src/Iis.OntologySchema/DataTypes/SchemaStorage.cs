@@ -85,7 +85,7 @@ namespace Iis.OntologySchema.DataTypes
         {
             var inversed = _mapper.Map<SchemaRelationType>(directRelationType);
             var nodeType = _mapper.Map<SchemaNodeType>(NodeTypes[directRelationType.Id]);
-            var inversedMeta = directRelationType.NodeType.MetaMeta.Inversed;
+            var inversedMeta = directRelationType.NodeType.MetaObject.Inversed;
             nodeType.Id = new Guid();
             nodeType.Name = inversedMeta.Code ?? directRelationType.SourceType.Name.ToLowerCamelcase();
             nodeType.Title = inversedMeta.Title ?? directRelationType.SourceType.Title ?? nodeType.Name;

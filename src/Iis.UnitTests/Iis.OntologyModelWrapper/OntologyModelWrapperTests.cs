@@ -40,12 +40,21 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
         }
         private void CheckIdentity(IOntologyModel model, IOntologyModel wrapper)
         {
-            CheckEntityTypes(
-                model.EntityTypes.OrderBy(et => et.Name).ToList(), 
-                wrapper.EntityTypes.OrderBy(et => et.Name).ToList());
+            var modelEntityTypes = model.EntityTypes.OrderBy(et => et.Name).ToList();
+            var wrapperEntityTypes = wrapper.EntityTypes.OrderBy(et => et.Name).ToList();
+
+            CheckEntityTypes(modelEntityTypes, wrapperEntityTypes);
+
             CheckIsSubtypeOf(
-                model.EntityTypes.OrderBy(et => et.Name).Select(t => (INodeTypeModel)t).ToList(),
-                wrapper.EntityTypes.OrderBy(et => et.Name).Select(t => (INodeTypeModel)t).ToList());
+                modelEntityTypes.Select(t => (INodeTypeModel)t).ToList(),
+                wrapperEntityTypes.Select(t => (INodeTypeModel)t).ToList());
+
+            CheckGetChildTypes(
+                modelEntityTypes.Select(t => (INodeTypeModel)t).ToList(),
+                wrapperEntityTypes.Select(t => (INodeTypeModel)t).ToList(),
+                model, wrapper);
+
+            CheckGetEntityType(modelEntityTypes, model, wrapper);
         }
         private void CheckEntityTypes(List<IEntityTypeModel> modelEntityTypes, List<IEntityTypeModel> wrapperEntityTypes)
         {
@@ -227,6 +236,28 @@ namespace Iis.UnitTests.Iis.OntologyModelWrapper
                 {
                     Assert.Equal(m[i].IsSubtypeOf(m[j]), w[i].IsSubtypeOf(w[j]));
                 }
+            }
+        }
+        private void CheckGetChildTypes(List<INodeTypeModel> m, List<INodeTypeModel> w, IOntologyModel model, IOntologyModel wrapper)
+        {
+            for (int i = 0; i < m.Count; i++)
+            {
+                var mChildIds = model.GetChildTypes(m[i]).Select(t => t.Id).OrderBy(t => t).ToList();
+                var wChildIds = wrapper.GetChildTypes(w[i]).Select(t => t.Id).OrderBy(t => t).ToList();
+
+                var l1 = mChildIds.Where(r => !wChildIds.Any(t => t == r)).ToList();
+                var l2 = wChildIds.Where(r => !mChildIds.Any(t => t == r)).ToList();
+
+                Assert.Equal(mChildIds, wChildIds);
+            }
+        }
+        private void CheckGetEntityType(IEnumerable<INodeTypeModel> entities, IOntologyModel model, IOntologyModel wrapper)
+        {
+            foreach (var entity in entities)
+            {
+                Assert.Equal(model.GetEntityType(entity.Name).Id, wrapper.GetEntityType(entity.Name).Id);
+                Assert.Equal(model.GetEntityType(entity.Name).Id, wrapper.GetEntityType(entity.Name).Id);
+                Assert.Equal(model.GetType(entity.Id).Name, wrapper.GetType(entity.Id).Name);
             }
         }
     }

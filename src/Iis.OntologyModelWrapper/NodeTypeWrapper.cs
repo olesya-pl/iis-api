@@ -58,7 +58,7 @@ namespace Iis.OntologyModelWrapper
         {
             get 
             {
-                return _source.MetaMeta; 
+                return _source.MetaObject; 
             }
             set { throw new NotImplementedException(); }
         }

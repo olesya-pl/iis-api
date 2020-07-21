@@ -16,7 +16,7 @@ namespace Iis.OntologyModelWrapper
                 null : 
                 new EmbeddingRelationTypeWrapper(_source.RelationType.DirectRelationType?.NodeType); 
 
-        public IRelationMetaBase EmbeddingMeta => _source.MetaMeta;
+        public IRelationMetaBase EmbeddingMeta => _source.MetaObject;
 
         public EmbeddingOptions EmbeddingOptions => _source.RelationType.EmbeddingOptions;
 

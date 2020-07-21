@@ -62,6 +62,7 @@ using Iis.DbLayer.Elastic;
 using Iis.ThemeManagement;
 using Iis.DbLayer.Repository;
 using Iis.Interfaces.Repository;
+using Iis.OntologyModelWrapper;
 
 namespace IIS.Core
 {
@@ -120,7 +121,8 @@ namespace IIS.Core
                     ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
 
                     var ontologyProvider = new OntologyProvider(context);
-                    ontology = ontologyProvider.GetOntology();
+                    //ontology = ontologyProvider.GetOntology();
+                    ontology = new OntologyWrapper(ontologySchema);
 
                     iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                     iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());

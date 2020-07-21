@@ -49,7 +49,7 @@ namespace Iis.OntologySchema.DataTypes
         }
         public bool HasUniqueValues => UniqueValueFieldName != null;
         private ISchemaMeta _metaMeta;
-        public ISchemaMeta MetaMeta => new SchemaMeta(GetMetaDeep());
+        public ISchemaMeta MetaObject => new SchemaMeta(GetMetaDeep());
         public string GetMetaDeep()
         {
             if (!string.IsNullOrEmpty(Meta)) return Meta;
@@ -223,7 +223,7 @@ namespace Iis.OntologySchema.DataTypes
 
             throw new ArgumentException($"IsIdentical met sad situation with item {GetStringCode()}");
         }
-        public bool HasInversed => MetaMeta.Inversed != null;
+        public bool HasInversed => MetaObject.Inversed != null;
         public bool IsInversed { get; private set; }
 
         public void SetIsInversed()

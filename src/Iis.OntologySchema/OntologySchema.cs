@@ -353,5 +353,9 @@ namespace Iis.OntologySchema
             _storage.RemoveRelationType(relationType.Id);
             relationType._sourceType.RemoveRelationType(relationType.Id);
         }
+        public IEnumerable<INodeTypeLinked> GetAllNodeTypes()
+        {
+            return _storage.NodeTypes.Values;
+        }
     }
 }
