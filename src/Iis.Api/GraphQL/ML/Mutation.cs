@@ -15,7 +15,7 @@ namespace IIS.Core.GraphQL.ML
             [Service] IMapper mapper,
             [GraphQLNonNullType] MachineLearningResponseInput input)
         {
-            var response = mapper.Map<MlResponse>(input);
+            var response = mapper.Map<MLResponse>(input);
 
             var result = await service.SaveMlHandlerResponseAsync(response);
 
@@ -28,6 +28,7 @@ namespace IIS.Core.GraphQL.ML
             [GraphQLNonNullType] MachineLearningHadnlersCountInput input)
         {
             await service.SetMachineLearningHadnlersCount(input.MaterialId, input.HandlersCount);
+            
             return mapper.Map<MachineLearningHadnlersCountResult>(input);
 
         }

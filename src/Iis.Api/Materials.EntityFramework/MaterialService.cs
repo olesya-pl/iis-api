@@ -123,7 +123,7 @@ namespace IIS.Core.Materials.EntityFramework
                     new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
         }
 
-        public async Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response)
+        public async Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response)
         {
             var responseEntity = _mapper.Map<MLResponseEntity>(response);
 
@@ -131,7 +131,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             await _materialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
-            return _mapper.Map<MlResponse>(responseEntity);
+            return _mapper.Map<MLResponse>(responseEntity);
         }
 
         public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)

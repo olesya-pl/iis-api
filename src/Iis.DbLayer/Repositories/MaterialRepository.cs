@@ -155,10 +155,10 @@ namespace Iis.DbLayer.Repositories
             {
                 var mlResponsesContainer = new JObject();
                 materialDocument.MLResponses = mlResponsesContainer;
-                var mlHandlers = mlResponses.GroupBy(_ => _.MLHandlerName).Select(_ => _.Key).ToArray();
+                var mlHandlers = mlResponses.GroupBy(_ => _.HandlerName).Select(_ => _.Key).ToArray();
                 foreach (var mlHandler in mlHandlers)
                 {
-                    var responses = mlResponses.Where(_ => _.MLHandlerName == mlHandler).ToArray();
+                    var responses = mlResponses.Where(_ => _.HandlerName == mlHandler).ToArray();
                     for (var i = 0; i < responses.Count(); i++)
                     {
                         var propertyName = $"{mlHandler}-{i + 1}";

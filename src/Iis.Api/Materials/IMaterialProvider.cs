@@ -27,7 +27,7 @@ namespace IIS.Core.Materials
         MaterialSign GetMaterialSign(string signValue);
         MaterialSign GetMaterialSign(Guid id);
         Task<Material> MapAsync(MaterialEntity material);
-        Task<List<MlProcessingResult>> GetMLProcessingResultsAsync(Guid materialId);
+        Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);

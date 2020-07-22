@@ -251,6 +251,12 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("HandlerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HandlerVersion")
+                        .HasColumnType("text");
+
                     b.Property<string>("MLHandlerName")
                         .HasColumnType("text");
 
@@ -259,6 +265,9 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<string>("OriginalResponse")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("ProcessingDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 

@@ -176,11 +176,11 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        public async Task<List<MlProcessingResult>> GetMLProcessingResultsAsync(Guid materialId)
+        public async Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId)
         {
             var entities = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
 
-            return _mapper.Map<List<MlProcessingResult>>(entities);
+            return _mapper.Map<List<MLResponse>>(entities);
         }
 
         public async Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId)
