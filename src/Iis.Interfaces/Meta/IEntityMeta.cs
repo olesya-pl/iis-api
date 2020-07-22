@@ -10,7 +10,7 @@ namespace Iis.Interfaces.Meta
         bool? ExposeOnApi { get; set; }
         bool? HasFewEntities { get; set; }
         EntityOperation[] AcceptsEmbeddedOperations { get; set; }
-        IFormField FormField { get; set; }
-        IContainerMeta Container { get; set; }
+        IFormField FormField { get; }
+        IContainerMeta Container { get; }
     }
 }

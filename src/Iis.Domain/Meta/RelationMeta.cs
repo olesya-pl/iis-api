@@ -27,7 +27,7 @@ namespace Iis.Domain.Meta
         IInversedRelationMeta IEntityRelationMeta.Inversed => Inversed;
     }
 
-    public class AttributeRelationMeta : RelationMetaBase
+    public class AttributeRelationMeta : RelationMetaBase, IAttributeRelationMeta
     {
         public string Formula { get; set; }
         public string Format { get; set; }
