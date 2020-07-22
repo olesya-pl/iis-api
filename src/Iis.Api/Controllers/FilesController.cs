@@ -56,8 +56,8 @@ namespace IIS.Core.Controllers
             inputMaterial.Reliability = _materialProvider.GetMaterialSign(material.ReliabilityText);
             inputMaterial.SourceReliability = _materialProvider.GetMaterialSign(material.SourceReliabilityText);
             inputMaterial.LoadData = _mapper.Map<Iis.Domain.Materials.MaterialLoadData>(material);
-            inputMaterial.Metadata = await _featureProcessorFactory
-                .GetInstance(inputMaterial.Source, inputMaterial.Type).ProcessMetadata(inputMaterial.Metadata);
+            // inputMaterial.Metadata = await _featureProcessorFactory
+            //     .GetInstance(inputMaterial.Source, inputMaterial.Type).ProcessMetadata(inputMaterial.Metadata);
             await _materialService.SaveAsync(inputMaterial);
 
             return new CreateMaterialResponse { Id = inputMaterial.Id, IsDublicate = false };
