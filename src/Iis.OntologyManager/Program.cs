@@ -30,7 +30,7 @@ namespace Iis.OntologyManager
 
         static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
         {
-            var i = 0;
+            
         }
     }
 }

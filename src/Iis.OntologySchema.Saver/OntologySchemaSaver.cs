@@ -31,12 +31,25 @@ namespace Iis.OntologySchema.Saver
             _context.SaveChanges();
         }
 
+        private void AddOrResurrectNodeType(NodeTypeEntity nodeTypeEntity)
+        {
+            var archivedNodeType = _context.NodeTypes.SingleOrDefault(nt => nt.Id == nodeTypeEntity.Id);
+            if (archivedNodeType == null)
+            {
+                _context.NodeTypes.Add(nodeTypeEntity);
+            }
+            else
+            {
+                _context.NodeTypes.Update(nodeTypeEntity);
+            }
+        }
+
         private void AddNodes(IReadOnlyList<INodeTypeLinked> nodeTypesToAdd)
         {
             foreach (var nodeType in nodeTypesToAdd)
             {
                 var nodeTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)nodeType);
-                _context.NodeTypes.Add(nodeTypeEntity);
+                AddOrResurrectNodeType(nodeTypeEntity);
 
                 if (nodeType.Kind == Kind.Relation)
                 {
@@ -46,14 +59,31 @@ namespace Iis.OntologySchema.Saver
                         if (!_context.NodeTypes.Local.Any(nt => nt.Id == targetType.Id))
                         {
                             var targetTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)targetType);
-                            _context.NodeTypes.Add(targetTypeEntity);
+                            AddOrResurrectNodeType(targetTypeEntity);
 
-                            var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.IAttributeTypeModel);
-                            _context.AttributeTypes.Add(attributeTypeEntity);
+                            var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.AttributeType);
+                            var existingAttributeType = _context.AttributeTypes.SingleOrDefault(at => at.Id == attributeTypeEntity.Id);
+                            if (existingAttributeType == null)
+                            {
+                                _context.AttributeTypes.Add(attributeTypeEntity);
+                            }
+                            else
+                            {
+                                _context.AttributeTypes.Update(attributeTypeEntity);
+                            }
                         }
                     }
                     var relationType = _mapper.Map<RelationTypeEntity>((IRelationType)nodeType.RelationType);
-                    _context.RelationTypes.Add(relationType);
+                    var existingRelationType = _context.RelationTypes.SingleOrDefault(rt => rt.Id == relationType.Id);
+                    if (existingRelationType == null)
+                    {
+                        _context.RelationTypes.Add(relationType);
+                    }
+                    else
+                    {
+                        _context.RelationTypes.Update(relationType);
+                    }
+                    
                 }
             }
         }
@@ -103,7 +133,7 @@ namespace Iis.OntologySchema.Saver
                     {
                         _context.NodeTypes.Update(attributeNodeType);
 
-                        var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.IAttributeTypeModel);
+                        var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.AttributeType);
                         attributeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
                         _context.AttributeTypes.Update(attributeType);
                         

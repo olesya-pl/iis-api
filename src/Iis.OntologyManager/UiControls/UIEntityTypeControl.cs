@@ -53,7 +53,10 @@ namespace Iis.OntologyManager.UiControls
             txtTitle.Text = nodeType.Title;
             txtAliases.Lines = aliases.ToArray();
             
-            var children = nodeType.GetAllChildren();
+            var children = nodeType.GetAllChildren()
+                .OrderBy(ch => ch.InheritedFrom)
+                .ThenBy(ch => ch.RelationName)
+                .ToList();
             gridChildren.DataSource = children;
             var attributesList = children
                 .Where(ch => ch.Kind == Kind.Attribute)
@@ -92,6 +95,13 @@ namespace Iis.OntologyManager.UiControls
                 BackColor = _style.BackgroundColor
             };
             _container.Add(cmbUniqueValueFieldName, "Unique Value Field Name");
+
+            btnSave = new Button { Text = "Save" };
+            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
+            _container.Add(btnSave);
+            _container.GoToNewColumn();
+
+            _container.Add(txtAliases = new RichTextBox(), "Aliases", true);
             _container.GoToNewColumn();
 
             gridInheritedFrom = GetRelationsGrid(nameof(gridInheritedFrom));
@@ -105,13 +115,6 @@ namespace Iis.OntologyManager.UiControls
             gridEmbeddence = GetRelationsGrid(nameof(gridEmbeddence));
             _container.Add(gridEmbeddence, "Embedded By:", true);
             _container.GoToNewColumn();
-
-            _container.Add(txtAliases = new RichTextBox(), "Aliases", true);
-            _container.GoToNewColumn();
-
-            btnSave = new Button { Text = "Save" };
-            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
-            _container.Add(btnSave);
 
             _container.GoToBottom();
             _container.StepDown();
@@ -149,7 +152,7 @@ namespace Iis.OntologyManager.UiControls
             return new NodeTypeUpdateParameter
             {
                 Id = isNew ? (Guid?)null : new Guid(txtId.Text),
-                Name = isNew ? txtName.Text : null,
+                Name = txtName.Text,
                 Title = txtTitle.Text,
                 ParentTypeId = null,
                 Aliases = txtAliases.Lines,

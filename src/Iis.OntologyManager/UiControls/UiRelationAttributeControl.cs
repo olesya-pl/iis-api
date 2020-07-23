@@ -56,7 +56,7 @@ namespace Iis.OntologyManager.UiControls
             txtTitle.Text = nodeType.Title;
             txtMeta.Text = nodeType.Meta;
             _uiControlsCreator.SetSelectedValue(cmbEmbedding, nodeType.RelationType.EmbeddingOptions.ToString());
-            _uiControlsCreator.SetSelectedValue(cmbScalarType, nodeType.RelationType.TargetType.IAttributeTypeModel.ScalarType.ToString());
+            _uiControlsCreator.SetSelectedValue(cmbScalarType, nodeType.RelationType.TargetType.AttributeType.ScalarType.ToString());
         }
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
@@ -65,7 +65,7 @@ namespace Iis.OntologyManager.UiControls
             return new NodeTypeUpdateParameter
             {
                 Id = isNew ? (Guid?)null : new Guid(txtId.Text),
-                Name = isNew ? txtName.Text : null,
+                Name = txtName.Text,
                 Title = txtTitle.Text,
                 Meta = txtMeta.Text,
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,

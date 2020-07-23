@@ -40,6 +40,7 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
+        const string VERSION = "1.8";
 
         private enum NodeViewType : byte
         {
@@ -64,6 +65,7 @@ namespace Iis.OntologyManager
             OntologySchemaService schemaService)
         {
             InitializeComponent();
+            this.Text = $"Ontology Manager ver.{VERSION}";
             _configuration = configuration;
             _style = style;
             _uiControlsCreator = uiControlsCreator;
@@ -338,14 +340,21 @@ namespace Iis.OntologyManager
         }
         private void OnNodeTypeSaveClick(INodeTypeUpdateParameter updateParameter)
         {
-            _schema.UpdateNodeType(updateParameter);
-            if (updateParameter.Id == null && updateParameter.ParentTypeId == null)
+            try
             {
-                ReloadTypes(_filterControl.GetModel());
+                _schema.UpdateNodeType(updateParameter);
+                if (updateParameter.Id == null && updateParameter.ParentTypeId == null)
+                {
+                    ReloadTypes(_filterControl.GetModel());
+                }
+                else
+                {
+                    GoBack();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                GoBack();
+                MessageBox.Show(ex.Message);
             }
         }
         #endregion
