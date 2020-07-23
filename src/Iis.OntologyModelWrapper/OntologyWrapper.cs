@@ -21,7 +21,7 @@ namespace Iis.OntologyModelWrapper
             var nodeType = _schema.GetNodeTypeById(type.Id);
             var result = new List<INodeTypeModel>();
             
-            result.AddRange(nodeType.GetAllDescendants().Distinct().Select(nt => new NodeTypeWrapper(nt)));
+            result.AddRange(nodeType.GetAllDescendants().Distinct().Select(nt => new EntityTypeWrapper(nt)));
             if (!result.Any(nt => nt.Id == type.Id))
             {
                 result.Add(type);

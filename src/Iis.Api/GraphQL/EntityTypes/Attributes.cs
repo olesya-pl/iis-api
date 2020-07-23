@@ -168,7 +168,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             var types = ontology.GetChildTypes(Source.EntityType)?.OfType<IEntityTypeModel>();
             if (types == null)
                 types = new[] {Source.EntityType };
-            else
+            else if (!types.Any(t => t.Id == Source.EntityType.Id))
                 types = types.Union(new[] {Source.EntityType });
 
             var metaTargetTypes = (Source.Meta as EntityRelationMeta)?.TargetTypes;
