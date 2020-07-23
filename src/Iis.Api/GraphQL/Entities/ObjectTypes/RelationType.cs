@@ -30,13 +30,13 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             {
                 return parent.CreatedAt;
             }
-
-            [GraphQLType(typeof(EmbeddingRelationTypeType))]
-            public IEmbeddingRelationTypeModel Type([Parent] Relation parent)
-            {
-                return parent.Type as IEmbeddingRelationTypeModel;
-            }
         }
+    }
+
+    public class Relation
+    {
+        public Guid Id { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 
     public class EmbeddingRelationTypeType : ObjectType<IEmbeddingRelationTypeModel>

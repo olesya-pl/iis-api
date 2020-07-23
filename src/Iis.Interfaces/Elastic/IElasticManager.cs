@@ -13,6 +13,9 @@ namespace Iis.Interfaces.Elastic
         Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName);
         Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames, string id, CancellationToken token = default);
+        Task<IElasticSearchResult> GetDocumentByIdsAsync(IReadOnlyCollection<string> indexNames,
+            string[] documentIds,
+            CancellationToken token = default);
         Task CreateIndexesAsync(IEnumerable<string> indexNames, JObject mappingConfiguration = null, CancellationToken token = default);
         Task<bool> DeleteIndexAsync(string indexName, CancellationToken cancellationToken = default);
         Task<bool> DeleteIndexesAsync(IEnumerable<string> indexNames, CancellationToken cancellationToken = default);

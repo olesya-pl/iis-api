@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
 using Iis.Domain;
+using Iis.Domain.Elastic;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
@@ -25,7 +27,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 {
                     var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter,IEnumerable<Guid>>>();
                     var service = ctx.Service<IOntologyService>();
-                    
+
                     if(matchList != null && matchList.Any())
                     {
                         var result = await service.GetNodesAsync(matchList);
@@ -38,16 +40,24 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 .Resolver(async ctx =>
                 {
                     var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>>();
-                    var service = ctx.Service<IOntologyService>();
-                    
-                    if(matchList != null && matchList.Any())
+                    var elasticManager = ctx.Service<IElasticManager>();
+                    var elasticService = ctx.Service<IElasticService>();
+
+                    if (matchList != null && matchList.Any())
                     {
-                        var result = await service.GetNodesAsync(matchList);
-                        return result.nodes.Cast<Entity>();
+                        return (await elasticManager.GetDocumentByIdsAsync(
+                            elasticService.OntologyIndexes.ToArray(),
+                            matchList.Select(p => p.ToString("N")).ToArray()))
+                        .Items.Select(p => p.SearchResult);
                     }
-                    
-                    var nodes = await service.GetNodesAsync(types, filter);
-                    return nodes.Cast<Entity>();
+
+                    return (await elasticManager.Search(new IisElasticSearchParams {
+                        BaseIndexNames = types.Select(p => p.Name).ToList(),
+                        From = filter.Offset,
+                        Size = filter.Limit,
+                        Query = filter.Suggestion ?? "*",
+                        ResultFields = new List<string> { }
+                    })).Items.Select(p => p.SearchResult);
                 });
         }
     }
