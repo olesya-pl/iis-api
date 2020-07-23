@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         {
             d.Name(GetName(_scalarName));
             d.Field("id").Type<NonNullType<IdType>>()
-                .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveId(ctx));
+                .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveMultipleId(ctx));
             d.Field("value").Type(new NonNullType(_outputType))
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveMultipleAttributeRelationTarget(ctx));
         }
