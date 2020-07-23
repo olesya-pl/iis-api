@@ -126,13 +126,21 @@ namespace Iis.DbLayer.Repositories.Helpers
 
         public async Task<FlattenNodeResult> FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {
-            var extNode = await GetExtNodeByIdAsync(id, new List<Guid>(), cancellationToken);
-            return new FlattenNodeResult
+            try
             {
-                SerializedNode = _elasticSerializer.GetJsonByExtNode(extNode),
-                Id = extNode.Id,
-                NodeTypeName = extNode.NodeTypeName
-            };
+                var extNode = await GetExtNodeByIdAsync(id, new List<Guid>(), cancellationToken);
+
+                return new FlattenNodeResult
+                {
+                    SerializedNode = _elasticSerializer.GetJsonByExtNode(extNode),
+                    Id = extNode.Id,
+                    NodeTypeName = extNode.NodeTypeName
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
     }
 

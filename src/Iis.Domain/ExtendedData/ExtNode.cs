@@ -28,7 +28,7 @@ namespace Iis.Domain.ExtendedData
             var geoNodes = GetAttributesRecursive(ScalarTypeEnum.Geo);
             if (geoNodes.Count == 0) return null;
 
-            return geoNodes.Select(gn => ExtractCoordinates(gn.AttributeValue.ToString())).ToList();
+            return geoNodes.Select(gn => ExtractCoordinates((Dictionary<string, object>)gn.AttributeValue)).ToList();
         }
         public List<IExtNode> GetAttributesRecursive(ScalarType scalarType)
         {
@@ -40,12 +40,11 @@ namespace Iis.Domain.ExtendedData
             return children.ToList();
         }
 
-        private IGeoCoordinates ExtractCoordinates(string json)
+        private IGeoCoordinates ExtractCoordinates(Dictionary<string, object> attribute)
         {
             try
             {
-                var jObject = JObject.Parse(json);
-                var coordinatesJson = (JArray)jObject["coordinates"];
+                var coordinatesJson = (JArray)attribute["coordinates"];
                 var lat = decimal.Parse(coordinatesJson[0].ToString());
                 var lang = decimal.Parse(coordinatesJson[1].ToString());
                 var geoCoordinates = new GeoCoordinates(lat, lang);
