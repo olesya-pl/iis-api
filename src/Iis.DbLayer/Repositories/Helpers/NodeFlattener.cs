@@ -8,6 +8,7 @@ using Iis.Domain.ExtendedData;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Iis.DbLayer.Repositories.Helpers
 {
@@ -76,8 +77,10 @@ namespace Iis.DbLayer.Repositories.Helpers
             {
                 case ScalarType.Int:
                     return Convert.ToInt32(value);
+                case ScalarType.Geo:
+                    return JsonConvert.DeserializeObject<Dictionary<string, object>>(value);
                 case ScalarType.Date:
-                //return Convert.ToDateTime(value);
+                    return Convert.ToDateTime(value);
                 default:
                     return value.ToString();
             }
