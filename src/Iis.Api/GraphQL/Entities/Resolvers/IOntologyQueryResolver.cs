@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using IIS.Core.Ontology;
 using Iis.Domain;
-using Newtonsoft.Json.Linq;
-using Relation = IIS.Core.GraphQL.Entities.ObjectTypes.Relation;
+using Attribute = Iis.Domain.Attribute;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -13,13 +13,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         ObjectType ResolveAbstractType(IResolverContext context, object resolverResult);
         Task<Guid> ResolveId(IResolverContext ctx);
-        Task<Guid> ResolveMultipleId(IResolverContext ctx);
-        Task<JObject> ResolveEntity(IResolverContext ctx, IEntityTypeModel type);
+        Task<Entity> ResolveEntity(IResolverContext ctx, IEntityTypeModel type);
         Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, IEntityTypeModel type);
-        object ResolveAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
-        object ResolveMultipleAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
-        object ResolveMultipleAttributeRelationTarget(IResolverContext ctx);
-        object ResolveEntityRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
+        Task<object> ResolveAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
+        Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
+        Task<object> ResolveMultipleAttributeRelationTarget(IResolverContext ctx);
+        Task<object> ResolveAttributeValue(IResolverContext ctx, Attribute attribute);
+        Task<object> ResolveEntityRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);

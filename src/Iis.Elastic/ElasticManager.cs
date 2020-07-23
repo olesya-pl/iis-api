@@ -111,31 +111,6 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(searchResponse);
         }
 
-        public async Task<IElasticSearchResult> GetDocumentByIdsAsync(IReadOnlyCollection<string> indexNames,
-            string[] documentIds,
-            CancellationToken token = default)
-        {
-            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(
-                GetRealIndexNames(indexNames),
-                PostData.Serializable(new
-                {
-                    query = new
-                    {
-                        ids = new
-                        {
-                            values = documentIds
-                        }
-                    },
-                }), null, token);
-
-            if (!searchResponse.Success)
-            {
-                return new ElasticSearchResult();
-            }
-
-            return _resultExtractor.GetFromResponse(searchResponse);
-        }
-
         public async Task CreateIndexesAsync(IEnumerable<string> indexNames, JObject mappingConfiguration = null, CancellationToken token = default)
         {
             foreach (string indexName in indexNames)
