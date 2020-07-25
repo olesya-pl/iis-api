@@ -14,6 +14,7 @@ namespace Iis.DbLayer.Repositories
     public interface IIISUnitOfWork : IUnitOfWork
     {
         IMaterialRepository MaterialRepository { get; }
+        IOntologyRepository OntologyRepository { get; }
     }
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
         where TContext : DbContext
@@ -24,7 +25,7 @@ namespace Iis.DbLayer.Repositories
 
         public IMaterialRepository MaterialRepository => ResolveRepository<IMaterialRepository>();
 
-        public IOntologyRepository OntologyRepository => ResolveRepository<OntologyRepository>();
+        public IOntologyRepository OntologyRepository => ResolveRepository<IOntologyRepository>();
         //public IDataRepository DataRepository => ResolveRepository<IDataRepository>();
         //public IDataFilesRepository DataFilesRepository => ResolveRepository<IDataFilesRepository>();
         //public IInvestorsRepository InvestorsRepository => ResolveRepository<IInvestorsRepository>();

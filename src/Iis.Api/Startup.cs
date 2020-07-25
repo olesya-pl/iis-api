@@ -110,16 +110,16 @@ namespace IIS.Core
                 //    (new FillDataForRoles(context)).Execute();
                 //    ontologyCache = new OntologyCache(context);
 
-                //    var schemaSource = new OntologySchemaSource
-                //    {
-                //        Title = "DB",
-                //        SourceKind = SchemaSourceKind.Database,
-                //        Data = dbConnectionString
-                //    };
-                //    ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
-
-                //    var ontologyProvider = new OntologyProvider(context);
-                //    ontology = ontologyProvider.GetOntology();
+                var schemaSource = new OntologySchemaSource
+                {
+                    Title = "DB",
+                    SourceKind = SchemaSourceKind.Database,
+                    Data = dbConnectionString
+                };
+                ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                using var context = OntologyContext.GetContext(dbConnectionString);
+                var ontologyProvider = new OntologyProvider(context);
+                ontology = ontologyProvider.GetOntology();
 
                 //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                 //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
@@ -133,16 +133,18 @@ namespace IIS.Core
                 //}
 
                 services.AddTransient<IOntologyCache, OntologyCache>();
-                services.AddTransient<IOntologySchema, OntologySchema>();
+                //services.AddTransient<IOntologySchema, OntologySchema>();
                 //services.AddTransient<IFieldToAliasMapper>(ontologySchema);
                 services.AddTransient<IFieldToAliasMapper, OntologySchema>();
-                services.AddTransient<IOntologyModel, OntologyModel>();
+                services.AddSingleton(ontologySchema);
+                services.AddSingleton(ontology);
                 services.AddTransient<INodeRepository, NodeRepository>();
                 services.AddTransient<ElasticConfiguration>();
             }
 
             services.AddHttpContextAccessor();
 
+            services.AddTransient<IOntologyRepository, OntologyRepository>();
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IGenericFactory, GenericFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
