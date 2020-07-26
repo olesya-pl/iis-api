@@ -201,15 +201,11 @@ namespace IIS.Core.Materials.EntityFramework
 
         public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
         {
-            return GetMaterialByNodeIdQuery(nodeId)
-                .GetParentMaterialsQuery()
-                .GroupBy(p => p.Type)
-                .Select(group => new MaterialsCountByType
-                {
-                    Count = group.Count(),
-                    Type = group.Key
-                })
-                .ToListAsync();
+            var nodeIdList = RunWithoutCommit((unitOfWork) =>
+                unitOfWork.MaterialRepository.GetFeatureIdListThatRelatesToObjectId(nodeId));
+
+            nodeIdList.Add(nodeId);
+            return RunWithoutCommitAsync(async(unitOfWork) =>await unitOfWork.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
@@ -217,12 +213,11 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Task<Material>> mappingTasks;
             IEnumerable<Material> materials;
 
-            IQueryable<MaterialEntity> materialsByNode = GetMaterialByNodeIdQuery(nodeId);
+            var materialsByNode = GetMaterialByNodeIdQuery(nodeId);
             //TODO: we need to add logic that provides list of NodeId 
             //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
 
-            mappingTasks = (await materialsByNode
-                                 .ToArrayAsync())
+            mappingTasks = materialsByNode
                                  .Select(async e => await MapAsync(await RunWithoutCommitAsync(async (unitOfWork) =>
                                      await unitOfWork.MaterialRepository.GetByIdAsync(e.Id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures))));
 
@@ -297,7 +292,7 @@ namespace IIS.Core.Materials.EntityFramework
             return materials;
         }
 
-        private IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
+        private List<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
         {
             var nodeIdList = RunWithoutCommit((unitOfWork) =>
                 unitOfWork.MaterialRepository.GetFeatureIdListThatRelatesToObjectId(nodeId));

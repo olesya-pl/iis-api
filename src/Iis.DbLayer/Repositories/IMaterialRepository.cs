@@ -5,6 +5,7 @@ using System.Linq;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using System.Threading;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 
 namespace Iis.DbLayer.Repositories
@@ -28,7 +29,8 @@ namespace Iis.DbLayer.Repositories
         Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         void AddMaterialEntity(MaterialEntity materialEntity);
         void EditMaterial(MaterialEntity materialEntity);
-        IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
-        IList<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
+        List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
+        Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds);
+        List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
     }
 }

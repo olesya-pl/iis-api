@@ -16,6 +16,7 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using Iis.Utility;
 using Iis.Domain.Elastic;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Schema;
 using IIS.Repository;
 
@@ -156,7 +157,7 @@ namespace Iis.DbLayer.Repositories
             Context.Materials.Update(materialEntity);
         }
 
-        public IList<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
+        public List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
         {
             var type = ontologySchema.GetEntityTypeByName("ObjectSign");
 
@@ -176,7 +177,7 @@ namespace Iis.DbLayer.Repositories
                 .ToList();
         }
 
-        public IQueryable<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds)
+        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds)
         {
             return Context.Materials
                 .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
@@ -184,7 +185,25 @@ namespace Iis.DbLayer.Repositories
                 .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
                     (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
                 .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
-                .Select(m => m.MaterialInfoJoined.Material);
+                .Select(m => m.MaterialInfoJoined.Material).ToList();
+        }
+
+        public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds)
+        {
+            return Context.Materials
+                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                    (Material, MaterialInfo) => new { Material, MaterialInfo })
+                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .Select(m => m.MaterialInfoJoined.Material).Where(_ => _.ParentId == null)
+                .GroupBy(p => p.Type)
+                .Select(group => new MaterialsCountByType
+                {
+                    Count = group.Count(),
+                    Type = group.Key
+                })
+                .ToListAsync();
         }
 
         private async Task PopulateMLResponses(Guid materialId, MaterialDocument materialDocument)

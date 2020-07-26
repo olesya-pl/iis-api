@@ -178,10 +178,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         RelationEntity MapRelation(Relation relation)
         {
-            Entity entity = (Entity)relation.Target;
+            //Entity entity = (Entity)relation.Target;
             var target = relation.Target is Attribute
                 ? MapAttribute((Attribute)relation.Target)
-                : RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(entity.Id));
+                : RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(relation.Id));
             return new RelationEntity
             {
                 Id = relation.Id,
@@ -240,11 +240,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             else
             {
                 var query = string.IsNullOrEmpty(filter.Suggestion)
-                    ? RunWithoutCommit(unitOfWork =>
-                    unitOfWork.OntologyRepository.GetNodesInternal(derivedTypes.Select(nt => nt.Id))) :
-                RunWithoutCommit(unitOfWork =>
-                    unitOfWork.OntologyRepository.GetNodesInternalWithSuggestion(derivedTypes.Select(nt => nt.Id), filter.Suggestion));
-                var nodes = await GetNodesAsync(query, filter, cancellationToken);
+                    ? await RunWithoutCommitAsync(async unitOfWork =>
+                    await unitOfWork.OntologyRepository.GetNodesAsync(derivedTypes.Select(nt => nt.Id), filter)) :
+                    await RunWithoutCommitAsync(async unitOfWork =>
+                    await unitOfWork.OntologyRepository.GetNodesWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter.Suggestion, filter));
+                var nodes = query.Select(MapNode);
                 return nodes;
             }
         }
@@ -268,13 +268,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else
             {
-                var query = string.IsNullOrEmpty(filter.Suggestion)
-                    ? RunWithoutCommit(unitOfWork =>
-                        unitOfWork.OntologyRepository.GetNodesInternal(derivedTypes.Select(nt => nt.Id))) :
-                    RunWithoutCommit(unitOfWork =>
-                        unitOfWork.OntologyRepository.GetNodesInternalWithSuggestion(derivedTypes.Select(nt => nt.Id), filter.Suggestion));
-                var count = await query.Distinct().CountAsync();
-                return count;
+                return string.IsNullOrEmpty(filter.Suggestion)
+                    ? await RunWithoutCommitAsync(async unitOfWork =>
+                        await unitOfWork.OntologyRepository.GetNodesCountAsync(derivedTypes.Select(nt => nt.Id))) :
+                    await RunWithoutCommitAsync(async unitOfWork =>
+                        await unitOfWork.OntologyRepository.GetNodesCountWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter.Suggestion));
+                //var count = await query.Distinct().CountAsync();
+                //return count;
             }
         }
 
@@ -317,14 +317,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
         {
 
-            var nodes = await RunWithoutCommitAsync((unitOfWork) =>
-                unitOfWork.OntologyRepository.GetNodeEntitiesByIdsAsync(nodeIds));
+            var nodes = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.OntologyRepository.GetNodeEntitiesByIdsAsync(nodeIds));
 
             if (relationTypes == null)
             {
-                var relations = await RunWithoutCommit((unitOfWork =>
-                    unitOfWork.OntologyRepository.GetDirectRelationsQuery(nodeIds, null)))
-                    .ToListAsync(cancellationToken);
+                var relations = await RunWithoutCommitAsync(async unitOfWork =>
+                    await unitOfWork.OntologyRepository.GetDirectRelationsQuery(nodeIds, null));
                 FillRelations(nodes, relations);
             }
             else
@@ -334,17 +333,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var relations = new List<RelationEntity>();
                 if (directIds.Length > 0)
                 {
-                    var result = await RunWithoutCommit((unitOfWork =>
-                        unitOfWork.OntologyRepository.GetDirectRelationsQuery(nodeIds, directIds)))
-                        .ToListAsync(cancellationToken);
+                    var result = await RunWithoutCommitAsync(async unitOfWork =>
+                        await unitOfWork.OntologyRepository.GetDirectRelationsQuery(nodeIds, directIds));
                     relations.AddRange(result);
                 }
 
                 if (inversedIds.Length > 0)
                 {
-                    var result = await RunWithoutCommit((unitOfWork =>
-                            unitOfWork.OntologyRepository.GetInversedRelationsQuery(nodeIds, inversedIds)))
-                        .ToListAsync(cancellationToken);
+                    var result = await RunWithoutCommit(async unitOfWork =>
+                            await unitOfWork.OntologyRepository.GetInversedRelationsQuery(nodeIds, inversedIds));
                     var map = relationTypes.Where(r => r.IsInversed).ToDictionary(r => r.DirectRelationType.Id, r => r.Id);
                     foreach (var rel in result)
                     {

@@ -20,13 +20,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         void AddNode(NodeEntity nodeEntity);
         void AddNodes(IEnumerable<NodeEntity> nodeEntities);
         void UpdateNodes(IEnumerable<NodeEntity> nodeEntities);
-        IQueryable<RelationEntity> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds);
-        IQueryable<RelationEntity> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds);
+        Task<List<RelationEntity>> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds);
+        Task<List<RelationEntity>> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds);
         Task<Dictionary<Guid, NodeEntity>> GetExistingNodes(CancellationToken cancellationToken);
-        IQueryable<NodeEntity> GetNodesInternal(IEnumerable<Guid> derived);
-        IQueryable<NodeEntity> GetNodesInternalWithSuggestion(IEnumerable<Guid> derived, string suggestion);
+        Task<int> GetNodesCountAsync(IEnumerable<Guid> derived);
+        Task<int> GetNodesCountWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion);
         Task<List<RelationEntity>> GetAllRelationsAsync(Guid nodeId);
         Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
+        Task<List<NodeEntity>> GetNodesAsync(IEnumerable<Guid> derived, ElasticFilter filter);
+        Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion, ElasticFilter filter);
 
         Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName,
             int limit);
@@ -76,7 +78,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             Context.Nodes.UpdateRange(nodeEntities);
         }
 
-        public IQueryable<RelationEntity> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
+        public Task<List<RelationEntity>> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
@@ -84,9 +86,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
             if (relationIds != null)
                 relationsQ = relationsQ.Where(e => relationIds.Contains(e.Node.NodeTypeId));
-            return relationsQ;
+            return relationsQ.ToListAsync();
         }
-        public IQueryable<RelationEntity> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
+        public Task<List<RelationEntity>> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds)
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
@@ -94,7 +96,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(e => nodeIds.Contains(e.TargetNodeId) && !e.Node.IsArchived);
             if (relationIds != null)
                 relationsQ = relationsQ.Where(e => relationIds.Contains(e.Node.NodeTypeId));
-            return relationsQ;
+            return relationsQ.ToListAsync();
         }
 
         public async Task<Dictionary<Guid, NodeEntity>> GetExistingNodes(CancellationToken cancellationToken)
@@ -116,12 +118,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return Context.Attributes.SingleOrDefault(_ => _.Id == id);
         }
 
-        public IQueryable<NodeEntity> GetNodesInternal(IEnumerable<Guid> derived)
-        {
-            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived);
-        }
-
-        public IQueryable<NodeEntity> GetNodesInternalWithSuggestion(IEnumerable<Guid> derived, string suggestion)
+        public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion, ElasticFilter filter)
         {
             var relationsQ = Context.Relations
                 .Include(e => e.SourceNode)
@@ -129,7 +126,29 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (suggestion != null)
                 relationsQ = relationsQ.Where(e =>
                     EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
-            return relationsQ.Select(e => e.SourceNode);
+            return relationsQ.Select(e => e.SourceNode).Skip(filter.Offset).Take(filter.Limit).ToListAsync();
+        }
+
+        public Task<List<NodeEntity>> GetNodesAsync(IEnumerable<Guid> derived, ElasticFilter filter)
+        {
+            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
+                .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
+        }
+
+        public Task<int> GetNodesCountAsync(IEnumerable<Guid> derived)
+        {
+            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived).Distinct().CountAsync();
+        }
+
+        public Task<int> GetNodesCountWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion)
+        {
+            var relationsQ = Context.Relations
+                .Include(e => e.SourceNode)
+                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
+            if (suggestion != null)
+                relationsQ = relationsQ.Where(e =>
+                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
+            return relationsQ.Select(e => e.SourceNode).Distinct().CountAsync();
         }
         public Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
         {
