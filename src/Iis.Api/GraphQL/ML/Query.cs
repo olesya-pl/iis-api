@@ -10,14 +10,14 @@ namespace IIS.Core.GraphQL.ML
 {
     public class Query
     {
-        public async Task<List<MlProcessingResult>> GetMlProcessingResults(
+        public async Task<List<MachineLearningResult>> GetMlProcessingResults(
             [Service] IMaterialProvider materialProvider, 
             [Service] IMapper mapper,
             Guid materialId)
         {
             var mlResults = await materialProvider.GetMLProcessingResultsAsync(materialId);
             
-            return mlResults.Select(p => mapper.Map<MlProcessingResult>(p)).ToList();
+            return mlResults.Select(p => mapper.Map<MachineLearningResult>(p)).ToList();
         } 
     }
 }

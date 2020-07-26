@@ -59,6 +59,7 @@ using Iis.DbLayer.OntologySchema;
 using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.ThemeManagement;
 using Iis.OntologySchema;
+using Iis.OntologyModelWrapper;
 using IIS.Repository.Factories;
 using IIS.Repository.UnitOfWork;
 
@@ -119,7 +120,8 @@ namespace IIS.Core
                 ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
                 using var context = OntologyContext.GetContext(dbConnectionString);
                 var ontologyProvider = new OntologyProvider(context);
-                ontology = ontologyProvider.GetOntology();
+                    //ontology = ontologyProvider.GetOntology();
+                    ontology = new OntologyWrapper(ontologySchema);
 
                 //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                 //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
@@ -157,7 +159,6 @@ namespace IIS.Core
             services.AddTransient<MutationUpdateResolver>();
             services.AddTransient<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
-            services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();

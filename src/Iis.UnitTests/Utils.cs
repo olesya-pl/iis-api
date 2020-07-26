@@ -114,13 +114,13 @@ namespace Iis.UnitTests
             };
         }
 
-        public static IOntologySchema GetOntologySchemaFromDb()
+        public static IOntologySchema GetOntologySchemaFromDb(string connectionString)
         {
             var schemaSource = new OntologySchemaSource
             {
                 Title = "DB",
                 SourceKind = SchemaSourceKind.Database,
-                Data = Utils.GetConnectionString()
+                Data = connectionString
             };
             return (new OntologySchemaService()).GetOntologySchema(schemaSource);
         }
@@ -133,6 +133,14 @@ namespace Iis.UnitTests
                 Data = string.Empty
             };
             return (new OntologySchemaService()).GetOntologySchema(schemaSource);
+        }
+        public static OntologyContext GetContext()
+        {
+            return Instance.ServiceProvider.GetService<OntologyContext>();
+        }
+        public static OntologyContext GetRealDbContext()
+        {
+            return OntologyContext.GetContext(GetConnectionString());
         }
     }
 }

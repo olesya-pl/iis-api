@@ -18,25 +18,9 @@ namespace Iis.Domain
         public IEntityTypeModel GetEntityType(string name)
         {
             // TODO: this method is redundant and can be removed
-            return GetType<IEntityTypeModel>(name);
+            return Types.OfType<IEntityTypeModel>().SingleOrDefault(type => type.Name == name);
         }
 
-        public T GetType<T>(string name) where T : INodeTypeModel
-        {
-            var type = GetTypeOrNull<T>(name);
-
-            if (type == null)
-            {
-                throw new ArgumentException($"Type '{name}' does not exist");
-            }
-
-            return type;
-        }
-
-        public T GetTypeOrNull<T>(string name) where T : INodeTypeModel
-        {
-            return Types.OfType<T>().SingleOrDefault(type => type.Name == name);
-        }
 
         public IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeModel
         {

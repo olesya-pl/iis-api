@@ -10,7 +10,7 @@ namespace Iis.Domain
 {
     public abstract class NodeType : INodeTypeModel
     {
-        private readonly List<INodeTypeModel> _relatedTypes;
+        private readonly List<INodeTypeModel> _relatedTypes = new List<INodeTypeModel>();
 
         public IEnumerable<INodeTypeModel> RelatedTypes => _relatedTypes;
 
@@ -46,6 +46,8 @@ namespace Iis.Domain
         public bool IsObjectOfStudy =>
             AllParents.Any(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
+        public INodeTypeLinked Source => throw new NotImplementedException();
+
         protected NodeType(Guid id, string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -71,7 +73,10 @@ namespace Iis.Domain
 
         public void AddType(INodeTypeModel type)
         {
-            _relatedTypes.Add(type);
+            if (this.Name == "aaa")
+                _relatedTypes.Add(type);
+            else
+                _relatedTypes.Add(type);
         }
 
         public IEmbeddingRelationTypeModel GetProperty(string typeName) =>

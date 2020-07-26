@@ -23,6 +23,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IAttributeInfoList GetAttributesInfo(string entityName);
         IAliases Aliases { get; }
         void RemoveRelation(Guid relationId);
+        IEnumerable<INodeTypeLinked> GetAllNodeTypes();
         void PutInOrder();
     }
 }

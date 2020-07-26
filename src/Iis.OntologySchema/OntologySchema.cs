@@ -347,7 +347,7 @@ namespace Iis.OntologySchema
                 if (nodeType.Kind != Kind.Attribute) continue;
                 var aliases = GetAlias(key)?.Split(',') ?? null;
                 var shortDotName = key.Substring(key.IndexOf('.') + 1);
-                var item = new AttributeInfoItem(shortDotName, nodeType.IAttributeTypeModel.ScalarType, aliases);
+                var item = new AttributeInfoItem(shortDotName, nodeType.AttributeType.ScalarType, aliases);
                 items.Add(item);
             }
             return new AttributeInfo(entityName, items);
@@ -363,6 +363,10 @@ namespace Iis.OntologySchema
             _storage.RemoveNodeType(relationType.Id);
             _storage.RemoveRelationType(relationType.Id);
             relationType._sourceType.RemoveRelationType(relationType.Id);
+        }
+        public IEnumerable<INodeTypeLinked> GetAllNodeTypes()
+        {
+            return _storage.NodeTypes.Values;
         }
         public void PutInOrder()
         {

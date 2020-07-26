@@ -10,7 +10,7 @@ namespace IIS.Core.Materials
     public interface IMaterialService
     {
         Task SaveAsync(Material material);
-        Task<MlResponse> SaveMlHandlerResponseAsync(MlResponse response);
+        Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response);
         Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input);
         Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);

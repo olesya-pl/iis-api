@@ -7,9 +7,4 @@ namespace Iis.Domain.Meta
         public IValidation Validation { get; set; }
         public SearchType? Kind { get; set; }
     }
-    
-    public enum SearchType : byte
-    {
-        Keyword
-    }
 }

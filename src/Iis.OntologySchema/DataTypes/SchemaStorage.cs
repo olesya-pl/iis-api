@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,17 +37,7 @@ namespace Iis.OntologySchema.DataTypes
                     continue;
                 }
                 
-                var nodeType = NodeTypes[relationType.Id];
-                relationType.SetNodeType(nodeType);
-                nodeType.SetRelationType(relationType);
-                
-                var sourceType = NodeTypes[relationType.SourceTypeId];
-                relationType.SetSourceType(sourceType);
-                sourceType.AddOutgoingRelation(relationType);
-                
-                var targetType = NodeTypes[relationType.TargetTypeId];
-                relationType.SetTargetType(targetType);
-                targetType.AddIncomingRelation(relationType);
+                AddRelation(relationType);
             }
 
             foreach (var attributeId in AttributeTypes.Keys)
@@ -62,12 +53,53 @@ namespace Iis.OntologySchema.DataTypes
             }
             SetDotNameTypes();
         }
+        private void AddRelation(SchemaRelationType relationType)
+        {
+            var nodeType = NodeTypes[relationType.Id];
+            relationType.SetNodeType(nodeType);
+            nodeType.SetRelationType(relationType);
 
+            var sourceType = NodeTypes[relationType.SourceTypeId];
+            relationType.SetSourceType(sourceType);
+            sourceType.AddOutgoingRelation(relationType);
+
+            var targetType = NodeTypes[relationType.TargetTypeId];
+            relationType.SetTargetType(targetType);
+            targetType.AddIncomingRelation(relationType);
+
+            if (nodeType.HasInversed)
+            {
+                AddInversedRelation(relationType);
+            }
+        }
+        private SchemaRelationType AddInversedRelation(SchemaRelationType directRelationType)
+        {
+            var inversed = _mapper.Map<SchemaRelationType>(directRelationType);
+            var nodeType = _mapper.Map<SchemaNodeType>(NodeTypes[directRelationType.Id]);
+            var inversedMeta = directRelationType.NodeType.MetaObject.Inversed;
+            nodeType.Id = new Guid();
+            nodeType.Name = inversedMeta.Code ?? directRelationType.SourceType.Name.ToLowerCamelcase();
+            nodeType.Title = inversedMeta.Title ?? directRelationType.SourceType.Title ?? nodeType.Name;
+            inversed.EmbeddingOptions = inversedMeta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
+            nodeType.SetIsInversed();
+            inversed.SetNodeType(nodeType);
+            inversed._directRelationType = directRelationType;
+            nodeType.SetRelationType(inversed);
+
+            var sourceType = NodeTypes[inversed.TargetTypeId];
+            inversed.SetSourceType(sourceType);
+            sourceType.AddOutgoingRelation(inversed);
+
+            var targetType = NodeTypes[inversed.SourceTypeId];
+            inversed.SetTargetType(targetType);
+            targetType.AddIncomingRelation(inversed);
+
+            return inversed;
+        }
         public IEnumerable<SchemaNodeTypeRaw> GetNodeTypesRaw()
         {
             return NodeTypes.Values.Select(nt => _mapper.Map<SchemaNodeTypeRaw>(nt));
         }
-
         public IEnumerable<SchemaRelationTypeRaw> GetRelationTypesRaw()
         {
             return RelationTypes.Values.Select(r => _mapper.Map<SchemaRelationTypeRaw>(r));

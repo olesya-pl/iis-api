@@ -5,7 +5,9 @@ namespace Iis.DataModel.Materials
     public class MLResponseEntity : BaseEntity
     {
         public Guid MaterialId { get; set; }
-        public String MLHandlerName { get; set; }
-        public String OriginalResponse { get; set; }
+        public string HandlerName { get; set; }
+        public string HandlerVersion { get; set; }
+        public DateTime ProcessingDate { get; set; }
+        public string OriginalResponse { get; set; }
     }
 }

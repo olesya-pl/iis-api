@@ -20,7 +20,6 @@ using Iis.Interfaces.Roles;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Ontology;
-using System.Security.Cryptography;
 
 namespace Iis.Api
 {
@@ -102,22 +101,16 @@ namespace Iis.Api
 
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
 
-            CreateMap<Iis.Domain.MachineLearning.MlProcessingResult, IIS.Core.GraphQL.ML.MlProcessingResult>();
+            CreateMap<IIS.Core.GraphQL.ML.MachineLearningResponseInput,Iis.Domain.MachineLearning.MLResponse>()
+                .ForMember(dest => dest.ProcessingDate, opts => opts.MapFrom(src => DateTime.Now));
 
-            CreateMap<MLResponseEntity, Iis.Domain.MachineLearning.MlProcessingResult>()
-                .ForMember(dest => dest.MlHandlerName, opts => opts.MapFrom(src => src.MLHandlerName))
-                .ForMember(dest => dest.ResponseText, opts => opts.MapFrom(src => src.OriginalResponse));
+            CreateMap<Iis.Domain.MachineLearning.MLResponse, Iis.DataModel.Materials.MLResponseEntity>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(o => Guid.NewGuid()));
 
-            CreateMap<IIS.Core.GraphQL.ML.MachineLearningResponseInput,Iis.Domain.MachineLearning.MlResponse>();
+            CreateMap<Iis.DataModel.Materials.MLResponseEntity, Iis.Domain.MachineLearning.MLResponse>();
 
-            CreateMap<Iis.Domain.MachineLearning.MlResponse, Iis.DataModel.Materials.MLResponseEntity>()
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(o => Guid.NewGuid()))
-                .ForMember(dest => dest.MLHandlerName, opts => opts.MapFrom(src => src.HandlerName));
-
-            CreateMap<Iis.DataModel.Materials.MLResponseEntity, Iis.Domain.MachineLearning.MlResponse>()
-                .ForMember(dest => dest.HandlerName, opts => opts.MapFrom(src => src.MLHandlerName));
-
-            CreateMap<Iis.Domain.MachineLearning.MlResponse, IIS.Core.GraphQL.ML.MachineLearningResult>();
+            CreateMap<Iis.Domain.MachineLearning.MLResponse, IIS.Core.GraphQL.ML.MachineLearningResult>()
+                .ForMember(dest => dest.ProcessingDateTime, opts => opts.MapFrom(src => src.ProcessingDate.ToString("MM/dd/yyyy HH:mm:ss")));
 
             CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
 
