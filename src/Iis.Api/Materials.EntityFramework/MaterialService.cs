@@ -24,7 +24,6 @@ namespace IIS.Core.Materials.EntityFramework
 {
     public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService where TUnitOfWork : IIISUnitOfWork
     {
-        private readonly OntologyContext _context;
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
         private readonly IMaterialEventProducer _eventProducer;
@@ -34,7 +33,6 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialRepository _materialRepository;
 
         public MaterialService(IFileService fileService,
-            OntologyContext context,
             IMapper mapper,
             IMaterialEventProducer eventProducer,
             IMaterialProvider materialProvider,
@@ -43,7 +41,6 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialRepository materialRepository,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
-            _context = context;
             _fileService = fileService;
             _mapper = mapper;
             _eventProducer = eventProducer;
@@ -80,13 +77,11 @@ namespace IIS.Core.Materials.EntityFramework
                 child.ParentId = material.Id;
                 await SaveAsync(child);
             }
-
-            foreach (var info in material.Infos)
-                _context.Add(Map(info, material.Id));
-
+            var materialInfoEntities = material.Infos.Select(info => Map(info, material.Id)).ToList();
+            var materialFeatures = new List<MaterialFeatureEntity>();
             foreach (var featureId in GetNodeIdentitiesFromFeatures(material.Metadata))
             {
-                _context.MaterialFeatures.Add(new MaterialFeatureEntity
+                materialFeatures.Add(new MaterialFeatureEntity
                 {
                     NodeId = featureId,
                     MaterialInfo = new MaterialInfoEntity
@@ -96,7 +91,11 @@ namespace IIS.Core.Materials.EntityFramework
                 });
             }
 
-            await _context.SaveChangesAsync();
+            Run(unitOfWork =>
+            {
+                unitOfWork.MaterialRepository.AddMaterialInfos(materialInfoEntities);
+                unitOfWork.MaterialRepository.AddMaterialFeatures(materialFeatures);
+            });
 
             await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
 
@@ -174,19 +173,21 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
         {
-            var material = _context.Materials.FirstOrDefault(p => p.Id == materialId);
+            var material = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
             if (material == null)
             {
                 return;
             }
             material.AssigneeId = assigneeId;
-            await _context.SaveChangesAsync();
+            Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
             await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
         }
 
         public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
         {
-            var material = await _context.Materials.FirstOrDefaultAsync(p => p.Id == materialId);
+            var material = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
 
             if (material == null)
             {
@@ -194,7 +195,7 @@ namespace IIS.Core.Materials.EntityFramework
             }
 
             material.MlHandlersCount += handlersCount;
-            await _context.SaveChangesAsync();
+            Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
             await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
         }
 

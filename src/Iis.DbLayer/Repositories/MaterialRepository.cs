@@ -149,6 +149,16 @@ namespace Iis.DbLayer.Repositories
             Context.Materials.Add(materialEntity);
         }
 
+        public void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntity)
+        {
+            Context.MaterialInfos.AddRange(materialEntity);
+        }
+
+        public void AddMaterialFeatures(IEnumerable<MaterialFeatureEntity> materialFeatureEntities)
+        {
+            Context.MaterialFeatures.AddRange(materialFeatureEntities);
+        }
+
         public void EditMaterial(MaterialEntity materialEntity)
         {
             Context.Materials.Update(materialEntity);
