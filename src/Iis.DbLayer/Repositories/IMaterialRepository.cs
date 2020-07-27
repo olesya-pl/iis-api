@@ -25,12 +25,20 @@ namespace Iis.DbLayer.Repositories
         Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
+        
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default);
+        
         Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        
         void AddMaterialEntity(MaterialEntity materialEntity);
+        
         void EditMaterial(MaterialEntity materialEntity);
+        
         List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
+        
         Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds);
+        
         List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
+        //Task AddFeatures(Guid materialId, IEnumerable<Guid> featureIdList)
     }
 }

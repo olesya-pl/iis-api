@@ -12,8 +12,9 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Newtonsoft.Json.Linq;
 
-using Iis.DbLayer.Repositories;
 using Iis.Api.Configuration;
+using Iis.DbLayer.Repositories;
+using IIS.Repository.Factories;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
 
@@ -28,6 +29,7 @@ namespace IIS.Core.Materials.Handlers
         private readonly ILogger<FeatureHandler> _logger;
         private readonly FeatureHandlerConfig _сonfig;
         private readonly IServiceProvider _provider;
+        private readonly IUnitOfWorkFactory<IIISUnitOfWork> _unitOfWorkFactory;
         private IConnection _connection;
         private IModel _channel;
         private readonly JsonSerializerOptions options;
@@ -39,6 +41,8 @@ namespace IIS.Core.Materials.Handlers
             _logger = logger;
             _сonfig = configuration;
             _provider = provider;
+
+            _unitOfWorkFactory = _provider.GetService<IUnitOfWorkFactory<IIISUnitOfWork>>();
 
             while (true)
             {
@@ -94,13 +98,40 @@ namespace IIS.Core.Materials.Handlers
 
             if(processor.IsDummy) return;
 
-            var materialRepo = _provider.GetService<IMaterialRepository>();
-
-            var material = await materialRepo.GetByIdAsync(message.Id);
+            var material = await RunAsync(uow => uow.MaterialRepository.GetByIdAsync(message.Id)); 
             
             JObject metadata = JObject.Parse(material.Metadata);
 
             metadata = await processor.ProcessMetadataAsync(metadata);
+            
+            material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
+
+            RunWithCommit(uow => uow.MaterialRepository.EditMaterial(material));
+
+        }
+        private async Task<T> RunAsync<T>(Func<IIISUnitOfWork, Task<T>> action)
+        {
+            using (var unitOfWork = _unitOfWorkFactory.Create())
+            {
+                return await action(unitOfWork);
+            }
+        }
+
+        private async Task RunWithCommitAsync(Func<IIISUnitOfWork, Task> action)
+        {
+            using (var unitOfWork = _unitOfWorkFactory.Create())
+            {
+                await action(unitOfWork);
+                await unitOfWork.CommitAsync();
+            }
+        }
+        private void RunWithCommit(Action<IIISUnitOfWork> action)
+        {
+            using (var unitOfWork = _unitOfWorkFactory.Create())
+            {
+                action(unitOfWork);
+                unitOfWork.Commit();
+            }
         }
 
         private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialEventMessage, Task> handler)
