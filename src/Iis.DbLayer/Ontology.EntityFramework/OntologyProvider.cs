@@ -46,8 +46,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
                 // Query primary source and update the cache
                 var types = _context.NodeTypes.Where(e => !e.IsArchived && e.Kind != Kind.Relation)
-                    .Include(e => e.IncomingRelations).ThenInclude(e => e.INodeTypeModel)
-                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.INodeTypeModel)
+                    .Include(e => e.IncomingRelations).ThenInclude(e => e.NodeType)
+                    .Include(e => e.OutgoingRelations).ThenInclude(e => e.NodeType)
                     .Include(e => e.IAttributeTypeModel)
                     .ToArray();
                 var result = types.Select(e => MapType(e)).ToList();
@@ -105,11 +105,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     _types.Add(type.Id, entity);
                     FillProperties(type, entity);
                     // Process relation inheritance first
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance && !r.INodeTypeModel.IsArchived))
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind == RelationKind.Inheritance && !r.NodeType.IsArchived))
                         entity.AddType(mapRelation(outgoingRelation));
                     entity.Meta = entity.CreateMeta(); // todo: refactor. Creates meta with all parent types meta
-                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance && !r.INodeTypeModel.IsArchived))
-                        entity.AddType(mapRelation(outgoingRelation));
+                    foreach (var outgoingRelation in type.OutgoingRelations.Where(r => r.Kind != RelationKind.Inheritance && !r.NodeType.IsArchived))
+                        entity.AddType(mapRelation(outgoingRelation));             
                     return entity;
                 }
                 throw new Exception("Unsupported type.");
@@ -120,7 +120,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 if (_types.ContainsKey(relationType.Id))
                     return _types[relationType.Id];
 
-                var type = relationType.INodeTypeModel;
+                var type = relationType.NodeType;
                 IRelationTypeModel relation = null;
                 if (relationType.Kind == RelationKind.Embedding)
                 {
@@ -162,7 +162,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             inversedRelation.AddType(sourceType);
             inversedRelation.AddType(relationType);
-            relationType.TargetType.AddType(inversedRelation);
+            relationType.TargetType.AddType (inversedRelation);
 
             if (inversedRelation != null)
                 _types.Add(inversedRelation.Id, inversedRelation);

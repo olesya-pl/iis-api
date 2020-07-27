@@ -17,7 +17,7 @@ namespace Iis.DataModel
                 .HasForeignKey<AttributeTypeEntity>(p => p.Id);
             builder
                 .HasOne(p => p.RelationType)
-                .WithOne(p => p.INodeTypeModel)
+                .WithOne(p => p.NodeType)
                 .HasForeignKey<RelationTypeEntity>(p => p.Id);
 
             builder

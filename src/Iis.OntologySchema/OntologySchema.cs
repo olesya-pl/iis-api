@@ -339,7 +339,18 @@ namespace Iis.OntologySchema
         }
         public string GetAlias(string fieldDotName)
         {
-            return _storage.Aliases.GetItem(fieldDotName)?.Value;
+            var value = _storage.Aliases.GetItem(fieldDotName)?.Value;
+            if (value != null) return value;
+            var entityTypeName = fieldDotName.Substring(0, fieldDotName.IndexOf('.'));
+            var entity = GetEntityTypeByName(entityTypeName);
+            var parents = entity.GetDirectAncestors();
+            foreach (var parent in parents)
+            {
+                var newDotName = parent.Name + fieldDotName.Substring(fieldDotName.IndexOf('.'));
+                value = GetAlias(newDotName);
+                if (value != null) return value;
+            }
+            return null;
         }
 
         public IAttributeInfoList GetAttributesInfo(string entityName)
@@ -349,7 +360,7 @@ namespace Iis.OntologySchema
             {
                 var nodeType = _storage.DotNameTypes[key];
                 if (nodeType.Kind != Kind.Attribute) continue;
-                var aliases = _storage.Aliases.GetItem(key)?.Value?.Split(',') ?? null;
+                var aliases = GetAlias(key)?.Split(',') ?? null;
                 var shortDotName = key.Substring(key.IndexOf('.') + 1);
                 var item = new AttributeInfoItem(shortDotName, nodeType.AttributeType.ScalarType, aliases);
                 items.Add(item);
@@ -367,6 +378,14 @@ namespace Iis.OntologySchema
             _storage.RemoveNodeType(relationType.Id);
             _storage.RemoveRelationType(relationType.Id);
             relationType._sourceType.RemoveRelationType(relationType.Id);
+        }
+        public IEnumerable<INodeTypeLinked> GetAllNodeTypes()
+        {
+            return _storage.NodeTypes.Values;
+        }
+        public void PutInOrder()
+        {
+            _storage.SetDotNameTypes();
         }
     }
 }

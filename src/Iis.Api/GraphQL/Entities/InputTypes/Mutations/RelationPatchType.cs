@@ -5,6 +5,7 @@ using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {
@@ -22,8 +23,8 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             _typeName = GetName(relationType);
             if (relationType.IsAttributeType)
             {
-                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.IAttributeTypeModel);
-                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.IAttributeTypeModel);
+                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeType);
+                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.AttributeType);
             }
             else if (relationType.IsEntityType)
             {
@@ -39,7 +40,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         public static string GetName(IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsAttributeType)
-                return relationType.IAttributeTypeModel.ScalarTypeEnum.ToString();
+                return relationType.AttributeType.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
                 var ops = relationType.GetOperations();

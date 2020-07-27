@@ -26,7 +26,7 @@
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.62" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.62" />
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -54,6 +54,7 @@
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Roles\Iis.Roles.csproj" />

@@ -12,6 +12,7 @@ using HotChocolate.Execution.Batching;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.Language;
 using HotChocolate.Types.Relay;
+using IIS.Core.Tools;
 using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
@@ -21,6 +22,8 @@ using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
+using IIS.Core.NodeMaterialRelation;
+using IIS.Core.Analytics.EntityFramework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -28,40 +31,37 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
-using IIS.Core.Analytics.EntityFramework;
-using IIS.Core.Tools;
-using Iis.DataModel;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using Serilog;
-using Iis.Elastic;
-using Iis.Api;
-using Iis.Api.Modules;
-using Iis.Api.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using AutoMapper;
-using Iis.Api.bo;
-using Iis.Api.Bootstrap;
+using Iis.Api;
 using Iis.Api.Export;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
-using IIS.Domain;
-using Iis.Domain;
-using Iis.DbLayer.Ontology.EntityFramework;
-using Iis.DataModel.Cache;
-using Iis.DbLayer.OntologySchema;
-using Iis.DataModel.Roles;
-using Iis.Roles;
+using Iis.Api.Modules;
+using Iis.Api.Bootstrap;
+using Iis.Api.Configuration;
 using Iis.Api.GraphQL.Access;
 using Iis.Interfaces.Roles;
-using IIS.Core.NodeMaterialRelation;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.DataModel;
+using Iis.DataModel.Cache;
+using Iis.DataModel.Roles;
+using Iis.Roles;
+using Iis.Domain;
+using Iis.Elastic;
 using Iis.DbLayer.Elastic;
+using Iis.DbLayer.Repositories;
+using Iis.DbLayer.OntologySchema;
+using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.ThemeManagement;
-using Iis.DbLayer.Repository;
-using Iis.Interfaces.Repository;
+using Iis.OntologySchema;
+using Iis.OntologyModelWrapper;
+using IIS.Repository.Factories;
+using IIS.Repository.UnitOfWork;
 
 namespace IIS.Core
 {
@@ -91,71 +91,80 @@ namespace IIS.Core
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
-
+            services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
                 services.AddDbContext<OntologyContext>(
                     options => options.UseNpgsql(dbConnectionString),
                     contextLifetime: ServiceLifetime.Transient,
-                    optionsLifetime: ServiceLifetime.Singleton);
-                using var context = OntologyContext.GetContext(dbConnectionString);
+                    optionsLifetime: ServiceLifetime.Transient);
+                //using var context = OntologyContext.GetContext(dbConnectionString);
 
                 IOntologySchema ontologySchema;
                 IOntologyCache ontologyCache;
                 IOntologyModel ontology;
                 IisElasticConfiguration iisElasticConfiguration;
 
-                if (Program.IsStartedFromMain)
+                //if (Program.IsStartedFromMain)
+                //{
+                //    context.Database.Migrate();
+                //    (new FillDataForRoles(context)).Execute();
+                //    ontologyCache = new OntologyCache(context);
+
+                var schemaSource = new OntologySchemaSource
                 {
-                    context.Database.Migrate();
-                    (new FillDataForRoles(context)).Execute();
-                    ontologyCache = new OntologyCache(context);
+                    Title = "DB",
+                    SourceKind = SchemaSourceKind.Database,
+                    Data = dbConnectionString
+                };
+                ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                using var context = OntologyContext.GetContext(dbConnectionString);
+                var ontologyProvider = new OntologyProvider(context);
+                //ontology = ontologyProvider.GetOntology();
+                ontology = new OntologyWrapper(ontologySchema);
 
-                    var schemaSource = new OntologySchemaSource
-                    {
-                        Title = "DB",
-                        SourceKind = SchemaSourceKind.Database,
-                        Data = dbConnectionString
-                    };
-                    ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
+                //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
+                //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
+                //}
+                //else
+                //{
+                //    ontologyCache = new OntologyCache(null);
+                //    ontologySchema = (new OntologySchemaService()).GetOntologySchema(null);
+                //    iisElasticConfiguration = new IisElasticConfiguration(null, null);
+                //    ontology = new OntologyModel(new List<Iis.Domain.INodeTypeModel>());
+                //}
 
-                    var ontologyProvider = new OntologyProvider(context);
-                    ontology = ontologyProvider.GetOntology();
-
-                    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
-                    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
-                }
-                else
-                {
-                    ontologyCache = new OntologyCache(null);
-                    ontologySchema = (new OntologySchemaService()).GetOntologySchema(null);
-                    iisElasticConfiguration = new IisElasticConfiguration(null, null);
-                    ontology = new OntologyModel(new List<Iis.Domain.INodeTypeModel>());
-                }
-
-                services.AddSingleton<IOntologyCache>(ontologyCache);
+                services.AddTransient<IOntologyCache, OntologyCache>();
+                //services.AddTransient<IOntologySchema, OntologySchema>();
+                //services.AddTransient<IFieldToAliasMapper>(ontologySchema);
+                services.AddTransient<IFieldToAliasMapper>(provider => ontologySchema);
                 services.AddSingleton(ontologySchema);
-                services.AddSingleton<IFieldToAliasMapper>(ontologySchema);
-                services.AddSingleton<IOntologyModel>(ontology);
-                services.AddSingleton<IElasticConfiguration>(iisElasticConfiguration);
+                services.AddSingleton(ontology);
+                services.AddTransient<INodeRepository, NodeRepository>();
+                services.AddTransient<ElasticConfiguration>();
             }
 
             services.AddHttpContextAccessor();
-            services.AddTransient<IOntologyService, OntologyService>();
-            services.AddSingleton<MutationCreateResolver>();
-            services.AddSingleton<MutationUpdateResolver>();
-            services.AddSingleton<MutationDeleteResolver>();
+
+            services.AddTransient<IOntologyRepository, OntologyRepository>();
+            services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
+            services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
+            services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
+            services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
+
+            services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
+            services.AddTransient<MutationCreateResolver>();
+            services.AddTransient<IOntologySchemaSource, OntologySchemaSource>();
+            services.AddTransient<MutationUpdateResolver>();
+            services.AddTransient<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
-            services.AddTransient<OntologyTypeSaver>();
             services.AddTransient<IFileService, FileService>();
-            services.AddTransient<IMaterialProvider, MaterialProvider>();
-            services.AddTransient<IMaterialService, MaterialService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<OntologySchemaService>();
-            services.AddSingleton<RunTimeSettings>();
-            services.AddScoped<ExportService>();
-            services.AddScoped<ExportToJsonService>();
+            services.AddTransient<RunTimeSettings>();
+            services.AddTransient<ExportService>();
+            services.AddTransient<ExportToJsonService>();
             services.AddTransient<RoleService>();
             services.AddTransient<UserService>();
             services.AddTransient<ThemeService>();
@@ -168,7 +177,8 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
             services.AddTransient<Ontology.Seeding.Seeder>();
-            services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
+            services.AddSingleton<FilesConfiguration>();
+            //services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
@@ -215,8 +225,8 @@ namespace IIS.Core
 
             services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions { IncludeExceptionDetails = true });
             services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
-                .AddSingleton<IBatchQueryExecutor, BatchQueryExecutor>()
-                .AddSingleton<IIdSerializer, IdSerializer>()
+                .AddTransient<IBatchQueryExecutor, BatchQueryExecutor>()
+                .AddTransient<IIdSerializer, IdSerializer>()
                 .AddJsonQueryResultSerializer()
                 .AddJsonArrayResponseStreamSerializer()
                 .AddGraphQLSubscriptions();
@@ -238,17 +248,17 @@ namespace IIS.Core
                 .AddElasticsearch(elasticConfiguration.Uri);
 
 
-            services.AddSingleton<IElasticManager, ElasticManager>();
-            services.AddSingleton<IElasticSerializer, ElasticSerializer>();
+            services.AddTransient<IElasticManager, ElasticManager>();
+            services.AddTransient<IElasticSerializer, ElasticSerializer>();
             services.AddTransient<SearchResultExtractor>();
             services.AddSingleton(elasticConfiguration);
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
-            services.AddSingleton<GraphQLAccessList>();
+            services.AddTransient<GraphQLAccessList>();
 
-            services.AddTransient<INodeRepository, NodeRepository>();
+            services.RegisterRepositories();
         }
 
 
@@ -367,7 +377,8 @@ namespace IIS.Core
                 {
                     version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
                     availability = r.Entries.Select(e =>
-                        new {
+                        new
+                        {
                             description = e.Key,
                             status = e.Value.Status.ToString(),
                             responseTime = e.Value.Duration.TotalMilliseconds

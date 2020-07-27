@@ -251,6 +251,12 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("HandlerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HandlerVersion")
+                        .HasColumnType("text");
+
                     b.Property<string>("MLHandlerName")
                         .HasColumnType("text");
 
@@ -259,6 +265,9 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<string>("OriginalResponse")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("ProcessingDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -310,7 +319,10 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ProcessedStatusSignId")
-                        .HasColumnType("uuid");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValue(new Guid("0a641312-abb7-4b40-a766-0781308eb077"));
 
                     b.Property<Guid?>("RelevanceSignId")
                         .HasColumnType("uuid");
@@ -1173,7 +1185,9 @@ namespace Iis.DataModel.Migrations
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "ProcessedStatus")
                         .WithMany()
-                        .HasForeignKey("ProcessedStatusSignId");
+                        .HasForeignKey("ProcessedStatusSignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Relevance")
                         .WithMany()

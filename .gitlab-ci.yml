@@ -65,6 +65,7 @@ unit_test:
     - develop
     - /^rc-*/
     - /^release-*/
+    - /^hotfix*/
 
 .deploy_contour_dev:
   extends: .deploy

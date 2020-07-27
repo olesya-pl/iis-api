@@ -57,7 +57,7 @@ namespace Iis.Elastic
 
         private JObject RemoveFieldsDuplicatedByAlias(JToken highlight, string nodeTypeName)
         {
-            if (highlight == null) return null;
+            if (highlight == null || string.IsNullOrEmpty(nodeTypeName)) return null;
 
             var result = new JObject();
             foreach (JProperty child in highlight.Children())

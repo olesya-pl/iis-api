@@ -9,6 +9,7 @@ using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.Meta;
 
 namespace IIS.Core.GraphQL
 {
@@ -64,9 +65,9 @@ namespace IIS.Core.GraphQL
         public static EntityOperation[] GetOperations(this IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsAttributeType) throw new ArgumentException("Can not check attribute relations for EntityOperations");
-            return ((EntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations // check relation meta
-                   ?? ((EntityMeta) relationType.TargetType.Meta)?.AcceptsEmbeddedOperations // check target meta
-                   ?? relationType.TargetType.AllParents.Reverse().Select(t => t.Meta as EntityMeta) // check target parents meta
+            return ((IEntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations // check relation meta
+                   ?? ((IEntityMeta) relationType.TargetType.Meta)?.AcceptsEmbeddedOperations // check target meta
+                   ?? relationType.TargetType.AllParents.Reverse().Select(t => t.Meta as IEntityMeta) // check target parents meta
                        .FirstOrDefault()?.AcceptsEmbeddedOperations;
         }
 
@@ -79,17 +80,6 @@ namespace IIS.Core.GraphQL
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d)
         {
             return d.Resolver(_ => throw new NotImplementedException());
-        }
-
-        public static IObjectFieldDescriptor FieldNotImplemented(this IObjectTypeDescriptor d, string name)
-        {
-            return d.Field(name).Type<NotImplementedType>().ResolverNotImplemented();
-        }
-
-        public static IEnumerable<INodeTypeModel> GetInheritors(this INodeTypeModel type, IEnumerable<INodeTypeModel> ontology)
-        {
-            return ontology.Where(t =>
-                t.RelatedTypes.OfType<IInheritanceRelationTypeModel>().Any(r => r.ParentType.Name == type.Name));
         }
 
         public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)

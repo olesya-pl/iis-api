@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.Comparison;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,48 @@ namespace Iis.OntologySchema.DataTypes
         internal List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
 
+
         internal SchemaAttributeType _attributeType;
         public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
+        public Type ClrType
+        {
+            get
+            {
+                if (AttributeType == null) return null;
+
+                switch (AttributeType.ScalarType)
+                {
+                    case ScalarType.String:
+                        return typeof(string);
+                    case ScalarType.Int:
+                        return typeof(int);
+                    case ScalarType.Decimal:
+                        return typeof(decimal);
+                    case ScalarType.Boolean:
+                        return typeof(bool);
+                    case ScalarType.Date:
+                        return typeof(DateTime);
+                    case ScalarType.Geo:
+                        return typeof(Dictionary<string, object>);
+                    case ScalarType.File:
+                        return typeof(Guid);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+        public bool HasUniqueValues => UniqueValueFieldName != null;
+        private ISchemaMeta _metaMeta;
+        public ISchemaMeta MetaObject => new SchemaMeta(GetMetaDeep());
+        public string GetMetaDeep()
+        {
+            if (!string.IsNullOrEmpty(Meta)) return Meta;
+            var parent = GetDirectAncestors().FirstOrDefault();
+            return parent?.GetMetaDeep();
+        }
+
         internal void AddIncomingRelation(SchemaRelationType relationType)
         {
             _incomingRelations.Add(relationType);
@@ -42,10 +81,10 @@ namespace Iis.OntologySchema.DataTypes
                     Name = r.TargetType.Name,
                     Title = r.TargetType.Title,
                     Kind = r.TargetType.Kind,
-                    RelationId = r.INodeTypeModel.Id,
-                    RelationName = r.INodeTypeModel.Name,
-                    RelationTitle = r.INodeTypeModel.Title,
-                    RelationMeta = r.INodeTypeModel.Meta,
+                    RelationId = r.NodeType.Id,
+                    RelationName = r.NodeType.Name,
+                    RelationTitle = r.NodeType.Title,
+                    RelationMeta = r.NodeType.Meta,
                     ScalarType = r.TargetType.AttributeType?.ScalarType,
                     EmbeddingOptions = r.EmbeddingOptions,
                     InheritedFrom = setInheritedFrom ? this.Name : string.Empty,
@@ -83,7 +122,28 @@ namespace Iis.OntologySchema.DataTypes
 
             return result;
         }
-
+        public IEnumerable<INodeTypeLinked> GetDirectProperties()
+        {
+            return IsInversed ? 
+                new List<INodeTypeLinked> { RelationType.DirectRelationType.NodeType } :
+                OutgoingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(rt => rt.NodeType);
+        }
+        public IEnumerable<INodeTypeLinked> GetAllProperties()
+        {
+            var result = GetDirectProperties().ToList();
+            var ancestors = GetAllAncestors();
+            foreach (var ancestor in ancestors)
+            {
+                foreach (var property in ancestor.GetDirectProperties())
+                {
+                    if (!result.Any(p => p.Name == property.Name))
+                    {
+                        result.Add(property);
+                    }
+                }
+            }
+            return result;
+        }
         public IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded()
         {
             return IncomingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(r => r.SourceType).ToList();
@@ -104,7 +164,7 @@ namespace Iis.OntologySchema.DataTypes
                 result.AddRange(directAncestor.GetAllAncestors());
             }
 
-            return result;
+            return result.Distinct().ToList();
         }
 
         public bool IsInheritedFrom(string nodeTypeName)
@@ -134,11 +194,11 @@ namespace Iis.OntologySchema.DataTypes
                     }
                     else if (RelationType.TargetType.Kind == Kind.Entity)
                     {
-                        return $"{RelationType.SourceType.Name}->{RelationType.INodeTypeModel.Name}";
+                        return $"{RelationType.SourceType.Name}->{RelationType.NodeType.Name}";
                     }
                     else
                     {
-                        return $"{RelationType.SourceType.Name}.{RelationType.INodeTypeModel.Name}";
+                        return $"{RelationType.SourceType.Name}.{RelationType.NodeType.Name}";
                     }
             }
 
@@ -163,7 +223,13 @@ namespace Iis.OntologySchema.DataTypes
 
             throw new ArgumentException($"IsIdentical met sad situation with item {GetStringCode()}");
         }
+        public bool HasInversed => MetaObject.Inversed != null;
+        public bool IsInversed { get; private set; }
 
+        public void SetIsInversed()
+        {
+            IsInversed = true;
+        }
         private bool IsIdenticalBase(INodeTypeLinked nodeType)
         {
             var scalarTypesAreEqual = Kind == Kind.Attribute ?
@@ -238,7 +304,7 @@ namespace Iis.OntologySchema.DataTypes
             {
                 if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
 
-                var relationTypeName = $"{dotName}.{relationType.INodeTypeModel.Name}";
+                var relationTypeName = $"{dotName}.{relationType.NodeType.Name}";
                 var relationAttributes = relationType._targetType.GetNodeTypesRecursive(relationTypeName);
                 result.AddRange(relationAttributes);
             }
@@ -254,7 +320,6 @@ namespace Iis.OntologySchema.DataTypes
             }
             return result;
         }
-
         public List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)
         {
             const int MaxRecursionLevel = 4;
@@ -277,7 +342,7 @@ namespace Iis.OntologySchema.DataTypes
             foreach (var relation in OutgoingRelations)
             {
                 string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity
-                    ? relation.INodeTypeModel.Name
+                    ? relation.NodeType.Name
                     : null;
                 result.AddRange(relation.TargetType.GetAttributeDotNamesRecursiveWithLimit(relationName, recursionLevel + 1));
             }
@@ -288,7 +353,7 @@ namespace Iis.OntologySchema.DataTypes
         internal SchemaRelationType GetRelationByName(string relationName)
         {
             return _outgoingRelations
-                .Where(r => r.INodeTypeModel.Name == relationName)
+                .Where(r => r.NodeType.Name == relationName)
                 .SingleOrDefault();
         }
 
@@ -296,7 +361,7 @@ namespace Iis.OntologySchema.DataTypes
         {
             var nodeType = OutgoingRelations
                 .Where(r => r.Kind == RelationKind.Embedding
-                    && r.INodeTypeModel.Name == dotNameParts[0])
+                    && r.NodeType.Name == dotNameParts[0])
                 .Select(r => r.TargetType)
                 .Single();
 

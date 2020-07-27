@@ -100,23 +100,23 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        public async Task<IEnumerable<Relation>> CreateMultipleProperties(IEmbeddingRelationTypeModel embed, object value)
+        public Task<Relation[]> CreateMultipleProperties(IEmbeddingRelationTypeModel embed, object value)
         {
             var values = (IEnumerable<object>) value;
-            var result = new List<Relation>();
+            var result = new List<Task<Relation>>();
             foreach (var v in values)
                 if (embed.IsEntityType)
                 {
-                    result.Add(await CreateSingleProperty(embed, v));
+                    result.Add(CreateSingleProperty(embed, v));
                 }
                 else
                 {
                     var dict = (Dictionary<string, object>) v;
                     var attrValue = dict["value"];
-                    result.Add(await CreateSingleProperty(embed, attrValue));
+                    result.Add(CreateSingleProperty(embed, attrValue));
                 }
 
-            return result;
+            return Task.WhenAll(result);
         }
 
         public async Task<Relation> CreateSingleProperty(IEmbeddingRelationTypeModel embed, object value)
@@ -131,14 +131,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (embed.IsAttributeType)
             {
-                if (embed.IAttributeTypeModel.ScalarTypeEnum == ScalarType.File)
+                if (embed.AttributeType.ScalarTypeEnum == ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.IAttributeTypeModel.ScalarTypeEnum == ScalarType.Geo)
+                else if (embed.AttributeType.ScalarTypeEnum == ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
-                    value = AttributeType.ParseValue(value.ToString(), embed.IAttributeTypeModel.ScalarTypeEnum);
-                return new Attribute(Guid.NewGuid(), embed.IAttributeTypeModel, value);
+                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum);
+                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
             }
 
             if (embed.IsEntityType)

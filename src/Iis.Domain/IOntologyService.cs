@@ -19,7 +19,7 @@ namespace Iis.Domain
         Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default);
         Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
-        Task CreateRelation(Guid sourceNodeId, Guid targetNodeId);
+        //Task CreateRelation(Guid sourceNodeId, Guid targetNodeId);
         Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
         Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
     }

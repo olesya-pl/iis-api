@@ -7,9 +7,11 @@ using Newtonsoft.Json.Linq;
 namespace IIS.Core.GraphQL.Materials
 {
     public static class Extensions
-    {        
+    {
         public static Files.FileInfo ToView(this FileInfo fileInfo)
         {
+            if (fileInfo == default)
+                return null;
             return new Files.FileInfo
             {
                 Id = fileInfo.Id,

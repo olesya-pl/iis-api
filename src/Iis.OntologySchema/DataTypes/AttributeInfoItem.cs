@@ -16,5 +16,9 @@ namespace Iis.OntologySchema.DataTypes
             ScalarType = scalarType;
             AliasesList = aliasesList ?? new List<string>();
         }
+        public override string ToString()
+        {
+            return DotName;
+        }
     }
 }

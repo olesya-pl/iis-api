@@ -65,6 +65,28 @@ namespace Iis.UnitTests
             return Instance.Startup.Configuration.GetConnectionString("DB");
         }
 
+        public static IServiceProvider GetServiceProviderWithCustomSetup(Action<ServiceCollection> setup)
+        {
+            var startup = new Startup(new ConfigurationBuilder()
+                            .AddJsonFile("appsettings.json", optional: true)
+                            .Build());
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddDbContext<OntologyContext>(
+                options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()),
+                ServiceLifetime.Transient);
+            startup.RegisterServices(serviceCollection, false);
+            serviceCollection.AddSingleton<IOntologyCache, OntologyCache>();
+            serviceCollection.AddSingleton(new Mock<IOntologySchema>().Object);
+            serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
+            serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
+            serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
+            serviceCollection.AddTransient<IOntologyProvider>(factory => new Mock<IOntologyProvider>().Object);
+            serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
+            serviceCollection.AddSingleton<IOntologyModel>(factory => new Mock<IOntologyModel>().Object);
+            setup(serviceCollection);
+            return serviceCollection.BuildServiceProvider();
+        }
+
         private static Utils CreateInstance()
         {
             var startup = new Startup(new ConfigurationBuilder()
@@ -92,13 +114,13 @@ namespace Iis.UnitTests
             };
         }
 
-        public static IOntologySchema GetOntologySchemaFromDb()
+        public static IOntologySchema GetOntologySchemaFromDb(string connectionString)
         {
             var schemaSource = new OntologySchemaSource
             {
                 Title = "DB",
                 SourceKind = SchemaSourceKind.Database,
-                Data = Utils.GetConnectionString()
+                Data = connectionString
             };
             return (new OntologySchemaService()).GetOntologySchema(schemaSource);
         }
@@ -111,6 +133,14 @@ namespace Iis.UnitTests
                 Data = string.Empty
             };
             return (new OntologySchemaService()).GetOntologySchema(schemaSource);
+        }
+        public static OntologyContext GetContext()
+        {
+            return Instance.ServiceProvider.GetService<OntologyContext>();
+        }
+        public static OntologyContext GetRealDbContext()
+        {
+            return OntologyContext.GetContext(GetConnectionString());
         }
     }
 }

@@ -13,7 +13,7 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
 
         [GraphQLNonNullType]
-        public async Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
+        public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
             EntityTypesFilter filter = null)
         {
             IEnumerable<INodeTypeModel> types;
@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             {
                 types = ontology.EntityTypes;
             }
-            return new EntityTypeCollection(types, ontology);
+            return Task.FromResult(new EntityTypeCollection(types, ontology));
         }
 
         public Task<EntityType> GetEntityType([Service]IOntologyModel ontology,

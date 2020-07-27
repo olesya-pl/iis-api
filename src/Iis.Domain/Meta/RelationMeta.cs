@@ -1,48 +1,48 @@
 using Iis.Interfaces.Meta;
+using System;
 
 namespace Iis.Domain.Meta
 {
 
-    public class RelationMetaBase : IMeta
+    public class RelationMetaBase: IRelationMetaBase, IMeta
     {
         public int? SortOrder { get; set; }
         public string Title { get; set; }
         public FormField FormField { get; set; }
         public ContainerMeta Container { get; set; }
         public bool Multiple { get; set; }
-        public IValidation Validation { get; set; }
+        public Validation Validation { get; set; }
+        IFormField IRelationMetaBase.FormField => FormField;
+        IContainerMeta IRelationMetaBase.Container => Container;
+        IValidation IRelationMetaBase.Validation => Validation;
     }
 
     // Entity to entity relation
-    public class EntityRelationMeta : RelationMetaBase
+    public class EntityRelationMeta : RelationMetaBase, IEntityRelationMeta
     {
         public EntityOperation[] AcceptsEntityOperations { get; set; } // remake to flags
         public string Type { get; set; }
         public InversedRelationMeta Inversed { get; set; }
         public string[] TargetTypes { get; set; }
+        IInversedRelationMeta IEntityRelationMeta.Inversed => Inversed;
     }
 
-    public class AttributeRelationMeta : RelationMetaBase
+    public class AttributeRelationMeta : RelationMetaBase, IAttributeRelationMeta
     {
         public string Formula { get; set; }
         public string Format { get; set; }
     }
 
     // Describes virtual inversed relation
-    public class InversedRelationMeta : RelationMetaBase
+    public class InversedRelationMeta : RelationMetaBase, IInversedRelationMeta
     {
         public string Code { get; set; }
         public bool Editable { get; set; }
     }
 
-    public enum EntityOperation : byte
-    {
-        Create, Update, Delete
-    }
-
     // TODO: this should be an anonymous object, something like JObject
     //       different clients will have different UI components and their configuration cannot be statically described in code!
-    public class FormField
+    public class FormField : IFormField
     {
         public string Type { get; set; }
         public int? Lines { get; set; }

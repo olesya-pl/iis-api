@@ -11,16 +11,49 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using IIS.Core.Materials;
 using IIS.Core.GraphQL.Materials;
+using IIS.Core;
+using Microsoft.Extensions.Configuration;
+using Iis.DbLayer.Repositories;
+using Moq;
+using IIS.Core.Files;
+using System.Threading;
+using AutoFixture.Xunit2;
+using IIS.Core.Materials.EntityFramework;
+using Iis.DbLayer.MaterialEnum;
+using Iis.Domain;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.UnitTests.Materials
 {
     public class MaterialUpdateTests : IDisposable
     {
-        private readonly ServiceProvider _serviceProvider;
+        private readonly MaterialProvider<IIISUnitOfWork> materialProvider;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly Mock<IMaterialRepository> materialRepositoryMock;
+        private readonly Mock<IIISUnitOfWork> unitOfWorkMock;
+        private readonly Mock<IIISUnitOfWorkFactory> unitOfWorkFactoryMock;
 
         public MaterialUpdateTests()
         {
-            _serviceProvider = Utils.GetServiceProvider();
+            materialRepositoryMock = new Mock<IMaterialRepository>(MockBehavior.Strict);
+            _serviceProvider = Utils.GetServiceProviderWithCustomSetup(
+                serviceCollection =>
+                {
+                    serviceCollection.AddTransient(_ => materialRepositoryMock.Object);
+                });
+
+            unitOfWorkMock = new Mock<IIISUnitOfWork>();
+            unitOfWorkFactoryMock = new Mock<IIISUnitOfWorkFactory>();
+
+            unitOfWorkFactoryMock.Setup(x => x.Create()).Returns(unitOfWorkMock.Object);
+            unitOfWorkMock.Setup(x => x.MaterialRepository).Returns(materialRepositoryMock.Object);
+            materialProvider = new MaterialProvider<IIISUnitOfWork>(new Mock<IOntologyService>().Object,
+                new Mock<IOntologySchema>().Object, new Mock<IElasticService>().Object,
+                new Mock<IMLResponseRepository>().Object,
+                new Mock<IMaterialSignRepository>().Object,
+                new Mock<IMapper>().Object,
+                unitOfWorkFactoryMock.Object);
         }
         public void Dispose()
         {
@@ -30,233 +63,302 @@ namespace Iis.UnitTests.Materials
             context.MaterialSignTypes.RemoveRange(context.MaterialSignTypes);
 
             context.SaveChanges();
-
-            _serviceProvider.Dispose();
         }
+
 
         [Theory, RecursiveAutoData]
-        public async Task UpdateAssigneeId(
-            MaterialEntity material,
-            UserEntity assignee)
+        public async Task GetMaterialEntitiesAsync_returns_list_of_material_entities(
+            [Frozen]List<MaterialEntity> materialEntities)
         {
-            //arrange
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            context.Add(assignee);
-            context.Add(material);
-            material.Data = material.Metadata = material.LoadData = null;
-            material.MaterialInfos = new List<MaterialInfoEntity>();
-            context.SaveChanges();
-
-            material.AssigneeId = assignee.Id;
-            material.Assignee = null;
-            material.File = null;
-            //act
-            var sut = _serviceProvider.GetRequiredService<IMaterialService>();
-            await sut.UpdateMaterialAsync(new MaterialUpdateInput
-            {
-                AssigneeId = material.AssigneeId,
-                CompletenessId = material.CompletenessSignId,
-                Id = material.Id,
-                ImportanceId = material.ImportanceSignId,
-                RelevanceId = material.RelevanceSignId,
-                ReliabilityId = material.ReliabilitySignId,
-                SessionPriorityId = material.SessionPriorityId,
-                SourceReliabilityId = material.SourceReliabilitySignId,
-                Title = material.Title
-            });
-
-            //assert
-            var res = context.Materials.First(p => p.Id == material.Id);
-            Assert.Equal(assignee.Id, res.AssigneeId);
+            materialRepositoryMock.Setup(_ => _.GetAllAsync()).ReturnsAsync(materialEntities);
+            var result = await materialProvider.GetMaterialEntitiesAsync();
+            Assert.Equal(materialEntities, result);
         }
 
-        [Theory, RecursiveAutoData]
-        public async Task Update_ContentIsNull_DoesNotUpdate(MaterialEntity material)
-        {
-            //arrange
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            context.Add(material);
-            material.Data = material.Metadata = material.LoadData = null;
-            material.MaterialInfos = new List<MaterialInfoEntity>();
-            context.SaveChanges();
+        //[Theory, RecursiveAutoData]
+        //public async Task UpdateAssigneeId(
+        //    MaterialEntity material,
+        //    UserEntity assignee)
+        //{
+        //    //arrange
+        //    var context = _serviceProvider.GetRequiredService<OntologyContext>();
+        //    context.Add(assignee);
+        //    context.Add(material);
+        //    material.Data = material.Metadata = material.LoadData = null;
+        //    material.MaterialInfos = new List<MaterialInfoEntity>();
+        //    context.SaveChanges();
 
-            //act
-            var sut = _serviceProvider.GetRequiredService<IMaterialService>();
-            await sut.UpdateMaterialAsync(new MaterialUpdateInput {
-                Id = material.Id,
-                Title = "UpdatedTitle"
-            });
+        //    material.AssigneeId = assignee.Id;
+        //    material.Assignee = null;
+        //    material.File = null;
 
-            //assert
-            var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
-            var res = await provider.GetMaterialAsync(material.Id);
-            Assert.Equal(material.Content, res.Content);
-        }
+        //    materialRepositoryMock
+        //        .Setup(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(true);
 
-        [Theory, RecursiveAutoData]
-        public async Task Update_IsEmptyString_Updated(MaterialEntity material)
-        {
-            //arrange
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            context.Add(material);
-            material.Data = material.Metadata = material.LoadData = null;
-            material.MaterialInfos = new List<MaterialInfoEntity>();
-            context.SaveChanges();
+        //    materialRepositoryMock
+        //        .Setup(m => m.GetByIdAsync(material.Id, It.IsAny<MaterialIncludeEnum[]>()))
+        //        .ReturnsAsync(material);
 
-            //act
-            var sut = _serviceProvider.GetRequiredService<IMaterialService>();
-            await sut.UpdateMaterialAsync(new MaterialUpdateInput
-            {
-                Id = material.Id,
-                Title = "UpdatedTitle",
-                Content = string.Empty
-            });
+        //    //act
+        //    var sut = _serviceProvider.GetRequiredService<IMaterialService>();
+        //    await sut.UpdateMaterialAsync(new MaterialUpdateInput
+        //    {
+        //        AssigneeId = material.AssigneeId,
+        //        CompletenessId = material.CompletenessSignId,
+        //        Id = material.Id,
+        //        ImportanceId = material.ImportanceSignId,
+        //        RelevanceId = material.RelevanceSignId,
+        //        ReliabilityId = material.ReliabilitySignId,
+        //        SessionPriorityId = material.SessionPriorityId,
+        //        SourceReliabilityId = material.SourceReliabilitySignId,
+        //        Title = material.Title
+        //    });
 
-            //assert
-            var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
-            var res = await provider.GetMaterialAsync(material.Id);
-            Assert.Equal(string.Empty, res.Content);
-        }
+        //    //assert
+        //    var res = context.Materials.First(p => p.Id == material.Id);
+        //    Assert.Equal(assignee.Id, res.AssigneeId);
+        //    materialRepositoryMock
+        //        .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
+        //}
 
-        [Theory, RecursiveAutoData]
-        public async Task UpdateSessionPriority_ReturnsSessionPriorityBack(
-            MaterialEntity materialEntity,
-            MaterialSignTypeEntity typeEntity,
-            MaterialSignEntity important
-            )
-        {
-            //arrange
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+        //[Theory, RecursiveAutoData]
+        //public async Task Update_ContentIsNull_DoesNotUpdate(MaterialEntity material)
+        //{
+        //    //arrange
+        //    var context = _serviceProvider.GetRequiredService<OntologyContext>();
+        //    context.Add(material);
+        //    material.Data = material.Metadata = material.LoadData = null;
+        //    material.MaterialInfos = new List<MaterialInfoEntity>();
+        //    context.SaveChanges();
 
-            typeEntity.Name = "Session Priority";
-            typeEntity.Title = "Пріоритет сесії";
-            typeEntity.MaterialSigns = null;
+        //    materialRepositoryMock
+        //        .Setup(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(true);
 
-            important.MaterialSignType = null;
-            important.MaterialSignTypeId = typeEntity.Id;
-            important.OrderNumber = 1;
-            important.ShortTitle = "1";
-            important.Title = "Перша категорія";
+        //    materialRepositoryMock
+        //        .Setup(m => m.GetByIdAsync(material.Id, It.IsAny<MaterialIncludeEnum[]>()))
+        //        .ReturnsAsync(material);
 
-            materialEntity.File = null;
-            materialEntity.FileId = null;
+        //    //act
+        //    var sut = _serviceProvider.GetRequiredService<IMaterialService>();
+        //    await sut.UpdateMaterialAsync(new MaterialUpdateInput {
+        //        Id = material.Id,
+        //        Title = "UpdatedTitle"
+        //    });
 
-            materialEntity.Data = null;
-            materialEntity.Metadata = null;
-            materialEntity.LoadData = null;
-            materialEntity.MaterialInfos = null;
+        //    //assert
+        //    var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
+        //    var res = await provider.GetMaterialAsync(material.Id);
+        //    Assert.Equal(material.Content, res.Content);
+        //    materialRepositoryMock
+        //        .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
+        //}
 
-            materialEntity.SessionPriority = null;
-            materialEntity.SessionPriority = null;
+        //[Theory, RecursiveAutoData]
+        //public async Task Update_IsEmptyString_Updated(MaterialEntity material)
+        //{
+        //    //arrange
+        //    var context = _serviceProvider.GetRequiredService<OntologyContext>();
+        //    context.Add(material);
+        //    material.Data = material.Metadata = material.LoadData = null;
+        //    material.MaterialInfos = new List<MaterialInfoEntity>();
+        //    context.SaveChanges();
 
-            context.MaterialSignTypes.Add(typeEntity);
-            context.MaterialSigns.Add(important);
-            context.Materials.Add(materialEntity);
+        //    materialRepositoryMock
+        //        .Setup(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(true);
 
-            await context.SaveChangesAsync();
+        //    material.Content = string.Empty;
+        //    materialRepositoryMock
+        //        .Setup(m => m.GetByIdAsync(material.Id, It.IsAny<MaterialIncludeEnum[]>()))
+        //        .ReturnsAsync(material);
 
-            //act
-            var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
-            var material = await materialService.UpdateMaterialAsync(new MaterialUpdateInput {
-                Id = materialEntity.Id,
-                SessionPriorityId = important.Id
-            });
+        //    //act
+        //    var sut = _serviceProvider.GetRequiredService<IMaterialService>();
+        //    await sut.UpdateMaterialAsync(new MaterialUpdateInput
+        //    {
+        //        Id = material.Id,
+        //        Title = "UpdatedTitle",
+        //        Content = string.Empty
+        //    });
 
-            //assert
-            Assert.Equal(important.Id, material.SessionPriority.Id);
-        }
+        //    //assert
+        //    var provider = _serviceProvider.GetRequiredService<IMaterialProvider>();
+        //    var res = await provider.GetMaterialAsync(material.Id);
+        //    Assert.Equal(string.Empty, res.Content);
+        //    materialRepositoryMock
+        //        .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
+        //}
 
-        [Theory(DisplayName = "Set status as Оброблено"), RecursiveAutoData]
-        public async Task SetProcessStatusAsProcessed(MaterialSignTypeEntity typeEntity,
-            MaterialSignEntity processed,
-            MaterialSignEntity notProcessed,
-            MaterialEntity materialEntity)
-        {
-            //arrange:begin
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+        //[Theory, RecursiveAutoData]
+        //public async Task UpdateSessionPriority_ReturnsSessionPriorityBack(
+        //    MaterialEntity materialEntity,
+        //    MaterialSignTypeEntity typeEntity,
+        //    MaterialSignEntity important
+        //    )
+        //{
+        //    //arrange
+        //    var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
-            typeEntity.Name = "ProcessedStatus";
-            typeEntity.Title = "Обробка";
-            typeEntity.MaterialSigns = null;
+        //    typeEntity.Name = "Session Priority";
+        //    typeEntity.Title = "Пріоритет сесії";
+        //    typeEntity.MaterialSigns = null;
 
-            processed.MaterialSignType = null;
-            processed.MaterialSignTypeId = typeEntity.Id;
-            processed.OrderNumber = 1;
-            processed.ShortTitle = "1";
-            processed.Title = "Оброблено";
+        //    important.MaterialSignType = null;
+        //    important.MaterialSignTypeId = typeEntity.Id;
+        //    important.OrderNumber = 1;
+        //    important.ShortTitle = "1";
+        //    important.Title = "Перша категорія";
 
-            notProcessed.MaterialSignType = null;
-            notProcessed.MaterialSignTypeId = typeEntity.Id;
-            notProcessed.OrderNumber = 2;
-            notProcessed.ShortTitle = "2";
-            notProcessed.Title = "Не оброблено";
+        //    materialEntity.File = null;
+        //    materialEntity.FileId = null;
 
-            materialEntity.File = null;
-            materialEntity.FileId = null;
+        //    materialEntity.Data = null;
+        //    materialEntity.Metadata = null;
+        //    materialEntity.LoadData = null;
+        //    materialEntity.MaterialInfos = null;
 
-            materialEntity.Data = null;
-            materialEntity.Metadata = null;
-            materialEntity.LoadData = null;
-            materialEntity.MaterialInfos = null;
+        //    materialEntity.SessionPriority = null;
+        //    materialEntity.SessionPriority = null;
 
-            materialEntity.Completeness = null;
-            materialEntity.CompletenessSignId = null;
+        //    context.MaterialSignTypes.Add(typeEntity);
+        //    context.MaterialSigns.Add(important);
+        //    context.Materials.Add(materialEntity);
 
-            materialEntity.Importance = null;
-            materialEntity.ImportanceSignId = null;
+        //    await context.SaveChangesAsync();
 
-            materialEntity.Relevance = null;
-            materialEntity.RelevanceSignId = null;
+        //    materialRepositoryMock
+        //        .Setup(m => m.PutMaterialToElasticSearchAsync(materialEntity.Id, It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(true);
 
-            materialEntity.Reliability = null;
-            materialEntity.ReliabilitySignId = null;
+        //    materialEntity.SessionPriority = new MaterialSignEntity
+        //    {
+        //        Id = important.Id,
+        //        MaterialSignTypeId = typeEntity.Id
+        //    };
+        //    materialRepositoryMock
+        //        .Setup(m => m.GetByIdAsync(materialEntity.Id, It.IsAny<MaterialIncludeEnum[]>()))
+        //        .ReturnsAsync(materialEntity);
 
-            materialEntity.Parent = null;
-            materialEntity.ParentId = null;
+        //    //act
+        //    var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
+        //    var material = await materialService.UpdateMaterialAsync(new MaterialUpdateInput {
+        //        Id = materialEntity.Id,
+        //        SessionPriorityId = important.Id
+        //    });
 
-            materialEntity.SourceReliability = null;
-            materialEntity.SourceReliabilitySignId = null;
+        //    //assert
+        //    Assert.Equal(important.Id, material.SessionPriority.Id);
+        //    materialRepositoryMock
+        //        .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
+        //}
 
-            materialEntity.ProcessedStatus = null;
-            materialEntity.ProcessedStatusSignId = notProcessed.Id;
+        //[Theory(DisplayName = "Set status as Оброблено"), RecursiveAutoData]
+        //public async Task SetProcessStatusAsProcessed(MaterialSignTypeEntity typeEntity,
+        //    MaterialSignEntity processed,
+        //    MaterialSignEntity notProcessed,
+        //    MaterialEntity materialEntity)
+        //{
+        //    //arrange:begin
+        //    var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
-            context.MaterialSignTypes.Add(typeEntity);
-            context.MaterialSigns.Add(processed);
-            context.MaterialSigns.Add(notProcessed);
-            context.Materials.Add(materialEntity);
+        //    typeEntity.Name = "ProcessedStatus";
+        //    typeEntity.Title = "Обробка";
+        //    typeEntity.MaterialSigns = null;
 
-            await context.SaveChangesAsync();
+        //    processed.MaterialSignType = null;
+        //    processed.MaterialSignTypeId = typeEntity.Id;
+        //    processed.OrderNumber = 1;
+        //    processed.ShortTitle = "1";
+        //    processed.Title = "Оброблено";
 
-            var materialProvider = _serviceProvider.GetRequiredService<IMaterialProvider>();
-            var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
-            //arrange:end
+        //    notProcessed.MaterialSignType = null;
+        //    notProcessed.MaterialSignTypeId = typeEntity.Id;
+        //    notProcessed.OrderNumber = 2;
+        //    notProcessed.ShortTitle = "2";
+        //    notProcessed.Title = "Не оброблено";
 
-            var material = await materialProvider.GetMaterialAsync(materialEntity.Id);
+        //    materialEntity.File = null;
+        //    materialEntity.FileId = null;
 
-            //assert
-            Assert.Equal(notProcessed.Id, material.ProcessedStatusSignId.Value);
+        //    materialEntity.Data = null;
+        //    materialEntity.Metadata = null;
+        //    materialEntity.LoadData = null;
+        //    materialEntity.MaterialInfos = null;
 
-            await materialService.UpdateMaterialAsync(new MaterialUpdateInput
-            {
-                AssigneeId = material.AssigneeId,
-                CompletenessId = material.CompletenessSignId,
-                Id = material.Id,
-                ImportanceId = material.ImportanceSignId,
-                Objects = material.LoadData.Objects,
-                ProcessedStatusId = processed.Id,
-                RelevanceId = material.RelevanceSignId,
-                ReliabilityId = material.ReliabilitySignId,
-                SessionPriorityId = material.SessionPriorityId,
-                SourceReliabilityId = material.SourceReliabilitySignId,
-                States = material.LoadData.States,
-                Tags = material.LoadData.Tags,
-                Title = material.Title
-            });
+        //    materialEntity.Completeness = null;
+        //    materialEntity.CompletenessSignId = null;
 
-            material = await materialProvider.GetMaterialAsync(materialEntity.Id);
+        //    materialEntity.Importance = null;
+        //    materialEntity.ImportanceSignId = null;
 
-            //assert
-            Assert.Equal(processed.Id, material.ProcessedStatusSignId.Value);
-        }
+        //    materialEntity.Relevance = null;
+        //    materialEntity.RelevanceSignId = null;
+
+        //    materialEntity.Reliability = null;
+        //    materialEntity.ReliabilitySignId = null;
+
+        //    materialEntity.Parent = null;
+        //    materialEntity.ParentId = null;
+
+        //    materialEntity.SourceReliability = null;
+        //    materialEntity.SourceReliabilitySignId = null;
+
+        //    materialEntity.ProcessedStatus = null;
+        //    materialEntity.ProcessedStatusSignId = notProcessed.Id;
+
+        //    context.MaterialSignTypes.Add(typeEntity);
+        //    context.MaterialSigns.Add(processed);
+        //    context.MaterialSigns.Add(notProcessed);
+        //    context.Materials.Add(materialEntity);
+
+        //    await context.SaveChangesAsync();
+
+        //    var materialProvider = _serviceProvider.GetRequiredService<IMaterialProvider>();
+        //    var materialService = _serviceProvider.GetRequiredService<IMaterialService>();
+
+
+        //    materialRepositoryMock
+        //        .Setup(m => m.PutMaterialToElasticSearchAsync(materialEntity.Id, It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(true);
+
+        //    materialEntity.ProcessedStatus = new MaterialSignEntity
+        //    {
+        //        Id = processed.Id,
+        //        MaterialSignTypeId = typeEntity.Id
+        //    };
+        //    materialRepositoryMock
+        //        .Setup(m => m.GetByIdAsync(materialEntity.Id, It.IsAny<MaterialIncludeEnum[]>()))
+        //        .ReturnsAsync(materialEntity);
+        //    //arrange:end
+
+        //    var material = await materialProvider.GetMaterialAsync(materialEntity.Id);
+
+        //    //assert
+        //    await materialService.UpdateMaterialAsync(new MaterialUpdateInput
+        //    {
+        //        AssigneeId = material.AssigneeId,
+        //        CompletenessId = material.CompletenessSignId,
+        //        Id = material.Id,
+        //        ImportanceId = material.ImportanceSignId,
+        //        Objects = material.LoadData.Objects,
+        //        ProcessedStatusId = processed.Id,
+        //        RelevanceId = material.RelevanceSignId,
+        //        ReliabilityId = material.ReliabilitySignId,
+        //        SessionPriorityId = material.SessionPriorityId,
+        //        SourceReliabilityId = material.SourceReliabilitySignId,
+        //        States = material.LoadData.States,
+        //        Tags = material.LoadData.Tags,
+        //        Title = material.Title
+        //    });
+
+        //    material = await materialProvider.GetMaterialAsync(materialEntity.Id);
+
+        //    //assert
+        //    Assert.Equal(processed.Id, material.ProcessedStatusSignId.Value);
+        //    materialRepositoryMock
+        //        .Verify(m => m.PutMaterialToElasticSearchAsync(material.Id, It.IsAny<CancellationToken>()));
+        //}
     }
 }

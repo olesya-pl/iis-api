@@ -1,27 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
+using Iis.DbLayer.Repositories;
+using Newtonsoft.Json;
 
 namespace Iis.Api.Export
 {
     public class ExportToJsonService
     {
-        private readonly IExtNodeService _nodeService;
-        private readonly IElasticSerializer _elasticSerializer;
+        private readonly INodeRepository _nodeRepository;
 
         public ExportToJsonService(
-            IExtNodeService nodeService,
-            IElasticSerializer elasticSerializer)
+            INodeRepository nodeRepository)
         {
-            _nodeService = nodeService;
-            _elasticSerializer = elasticSerializer;
+            _nodeRepository = nodeRepository;
         }
 
         public async Task<string> ExportNodeAsync(Guid id)
         {
-            var extNode = await _nodeService.GetExtNodeByIdAsync(id);
-            return _elasticSerializer.GetJsonByExtNode(extNode);
+            return (await _nodeRepository.GetJsonNodeByIdAsync(id))?.ToString(Formatting.Indented);
         }
     }
 }

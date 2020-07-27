@@ -28,7 +28,6 @@ namespace IIS.Core.Tools
     {
         private readonly ILogger<ActionTools> _logger;
         private readonly IConfiguration _configuration;
-        private readonly OntologyTypeSaver _ontologyTypeSaver;
         private readonly Seeder _seeder;
         private readonly OntologyContext _ontologyContext;
         private readonly RunTimeSettings _runtimeSettings;
@@ -37,7 +36,6 @@ namespace IIS.Core.Tools
         public ActionTools(
             ILogger<ActionTools> logger,
             IConfiguration configuration,
-            OntologyTypeSaver ontologyTypeSaver,
             Seeder seeder,
             OntologyContext ontologyContext,
             RunTimeSettings runTimeSettings,
@@ -45,7 +43,6 @@ namespace IIS.Core.Tools
         {
             _logger = logger;
             _configuration = configuration;
-            _ontologyTypeSaver = ontologyTypeSaver;
             _seeder = seeder;
             _ontologyContext = ontologyContext;
             _runtimeSettings = runTimeSettings;

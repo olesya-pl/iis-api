@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture;
-using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
 using Iis.Api.Export;
-using Iis.Elastic;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
+using Iis.DbLayer.Repositories;
 using Moq;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Iis.UnitTests.Export
@@ -16,18 +13,16 @@ namespace Iis.UnitTests.Export
     public class ExportToJsonServiceTests
     {
         [Theory, AutoMoqData]
-        public async Task ExportNode_SuccessPath(Guid nodeId, IExtNode node, string output,
-            [Frozen] Mock<IExtNodeService> nodeServiceMock,
-            [Frozen] Mock<IElasticSerializer> serializerMock,
+        public async Task ExportNode_SuccessPath(Guid nodeId, JObject output,
+            [Frozen] Mock<INodeRepository> nodeServiceMock,
             ExportToJsonService sut)
         {
-            nodeServiceMock.Setup(p => p.GetExtNodeByIdAsync(nodeId, default(CancellationToken)))
-                    .ReturnsAsync(node);
-            serializerMock.Setup(p => p.GetJsonByExtNode(node)).Returns(output);
+            nodeServiceMock.Setup(p => p.GetJsonNodeByIdAsync(nodeId, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(output);
 
             var res = await sut.ExportNodeAsync(nodeId);
 
-            Assert.Equal(output, res);
+            Assert.Equal(output.ToString(), res);
         }
     }
 }

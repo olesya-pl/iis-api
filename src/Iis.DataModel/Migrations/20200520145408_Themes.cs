@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+using Iis.DataModel.Themes;
+
 namespace IIS.Core.Migrations
 {
     public partial class Themes : Migration
@@ -53,9 +55,9 @@ namespace IIS.Core.Migrations
                 columns: new[] { "Id", "EntityTypeName", "ShortTitle", "Title" },
                 values: new object[,]
                 {
-                    { new Guid("2b8fd109-cf4a-4f76-8136-de761da53d20"), "EntityMaterial", "М", "Матеріал" },
-                    { new Guid("043ae699-e070-4336-8513-e90c87555c58"), "EntityObject", "О", "Об'єкт" },
-                    { new Guid("42f61965-8baa-4026-ab33-0378be8a6c3e"), "EntityEvent", "П", "Подія" }
+                    { ThemeTypeEntity.EntityMaterialId, "EntityMaterial", "М", "Матеріал" },
+                    { ThemeTypeEntity.EntityObjectId, "EntityObject", "О", "Об'єкт" },
+                    { ThemeTypeEntity.EntityEventId, "EntityEvent", "П", "Подія" }
                 });
 
             migrationBuilder.CreateIndex(

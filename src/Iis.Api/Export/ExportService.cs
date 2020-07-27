@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Iis.Interfaces.Repository;
+using Iis.DbLayer.Repositories;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
@@ -38,7 +37,7 @@ namespace Iis.Api.Export
         {
             try
             {
-                var node = await _nodeRepository.GetNodeById(id);
+                var node = await _nodeRepository.GetJsonNodeByIdAsync(id);
                 await using var memoryStream = new MemoryStream();
                 using (var doc = WordprocessingDocument.Create(memoryStream, WordprocessingDocumentType.Document, true))
                 {

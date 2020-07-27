@@ -1,3 +1,4 @@
+using Iis.Interfaces.Meta;
 using System;
 
 namespace Iis.Domain.Meta
@@ -28,6 +29,4 @@ namespace Iis.Domain.Meta
         public DateTime Min { get; set; }
         public DateTime Max { get; set; }
     }
-
-    
 }

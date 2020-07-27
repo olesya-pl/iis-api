@@ -15,6 +15,7 @@ namespace Iis.Elastic
     {
         private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
         private const string RemoveSymbolsPattern = "№";
+        public const string NullValue = "NULL";
         ElasticLowLevelClient _lowLevelClient;
         ElasticConfiguration _configuration;
         SearchResultExtractor _resultExtractor;
@@ -85,7 +86,8 @@ namespace Iis.Elastic
         }
 
         public async Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames,
-            string documentId)
+            string documentId,
+            CancellationToken token = default)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(
                 GetRealIndexNames(indexNames),
@@ -99,7 +101,7 @@ namespace Iis.Elastic
                         }
                     },
                     _source = "*"
-                }));
+                }), null, token);
 
             if (!searchResponse.Success)
             {

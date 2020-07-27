@@ -113,7 +113,7 @@ namespace Iis.ThemeManagement
                                     .ToListAsync();
 
             var searchTasks = entities.Select(e => {
-                return ExecuteThemeQuery(e.Id, e.Type.ShortTitle, e.Query, _ontology);
+                return ExecuteThemeQuery(e.Id, e.Type.Id, e.Query, _ontology);
             });
 
             var searchResults = await Task.WhenAll(searchTasks);
@@ -156,12 +156,8 @@ namespace Iis.ThemeManagement
                     .AsNoTracking();
         }
 
-        private async Task<(Guid Id, int Count)> ExecuteThemeQuery(Guid id, string typeKey, string query, IOntologyModel ontology)
+        private async Task<(Guid Id, int Count)> ExecuteThemeQuery(Guid id, Guid typeId, string query, IOntologyModel ontology)
         {
-            const string Object = "О";
-            const string Material = "М";
-            const string Event = "П";
-
             var filter = new ElasticFilter
             {
                 Limit = 1000,
@@ -169,47 +165,37 @@ namespace Iis.ThemeManagement
                 Suggestion = query
             };
 
-            var indexes = typeKey switch
+            var indexes = typeId switch
             {
-                Material => _elasticService.MaterialIndexes,
-                Object => GetOntologyIndexes(ontology, "ObjectOfStudy"),
-                Event => GetOntologyIndexes(ontology, "Event"),
+                _ when typeId == ThemeTypeEntity.EntityMaterialId  => _elasticService.MaterialIndexes,
+                _ when typeId == ThemeTypeEntity.EntityObjectId => GetOntologyIndexes(ontology, "ObjectOfStudy"),
+                _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(ontology, "Event"),
                 _   => (IEnumerable<string>) null
             };
 
             if(indexes is null) return (Id: id, Count: 0);
 
-            if(typeKey == Event)
+            if(typeId == ThemeTypeEntity.EntityEventId)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(indexes,filter);
                 return (Id: id, Count: searchResult.count);
 
             }
-            else if (typeKey == Material)
+            else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes, filter);
-                int count = await GetCountOfParentMaterials(searchResult);
-                return (Id: id, Count: count);
+                var searchResult = await _elasticService.SearchMaterialsByConfiguredFieldsAsync(filter);
+                return (Id: id, Count: searchResult.Count);
             }
             else
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes,filter);
-                return (Id: id, Count: searchResult.Count);
-            }
-        }
+                if(typeId == ThemeTypeEntity.EntityMapId)
+                {
+                    filter.Suggestion = "__coordinates:* && " + filter.Suggestion; 
+                }
 
-        private async Task<int> GetCountOfParentMaterials(SearchByConfiguredFieldsResult searchResult)
-        {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                var foundMaterialIds = searchResult.Items.Keys.ToArray();
-                var count = await _context.Materials.CountAsync(p => p.ParentId == null && foundMaterialIds.Contains(p.Id));
-                return count;
-            }
-            finally
-            {
-                _context.Semaphore.Release();
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes,filter);
+
+                return (Id: id, Count: searchResult.Count);
             }
         }
 

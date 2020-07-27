@@ -13,6 +13,7 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System.Net.Http;
 using System.Net;
+using IIS.Core.Files;
 using Iis.DataModel.Materials;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -28,27 +29,30 @@ namespace IIS.Core.Materials
         private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        private readonly FileServiceFactory _fileServiceFactory;
+        //private readonly FileServiceFactory _fileServiceFactory;
         private readonly OntologyContext _context;
         private readonly IGsmTranscriber _gsmTranscriber;
         private readonly IConfiguration _config;
+        private readonly IFileService fileService;
 
 
         public MaterialEventConsumer(
             ILogger<MaterialEventConsumer> logger,
             IConnectionFactory connectionFactory,
-            FileServiceFactory fileServiceFactory,
+            //FileServiceFactory fileServiceFactory,
             OntologyContext context,
             IGsmTranscriber gsmTranscriber,
-            IConfiguration config
+            IConfiguration config,
+            IFileService fileService
         )
         {
             _logger = logger;
             _connectionFactory = connectionFactory;
-            _fileServiceFactory = fileServiceFactory;
+            //_fileServiceFactory = fileServiceFactory;
             _context = context;
             _gsmTranscriber = gsmTranscriber;
             _config = config;
+            this.fileService = fileService;
 
             while (true)
             {
@@ -105,7 +109,7 @@ namespace IIS.Core.Materials
                 }
 
                 _logger.LogInformation("***************** MESSAGE RECEIVED ********************" + message);
-                var fileService = _fileServiceFactory.CreateService();
+                //var fileService = _fileServiceFactory.CreateService();
                 var file = await fileService.GetFileAsync(eventData.FileId);
                 var mlResponse = await _gsmTranscriber.TranscribeAsync(file);
                 if (mlResponse["status"].Value<string>() != "OK")

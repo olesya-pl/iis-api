@@ -13,12 +13,15 @@
     <Compile Remove="Migrations\20200310141751_MaterialSigns.Designer.cs" />
     <Compile Remove="Migrations\20200310142737_MaterialSigns.cs" />
     <Compile Remove="Migrations\20200310142737_MaterialSigns.Designer.cs" />
+    <Compile Remove="Migrations\20200721120237_MachineLearning_AddNewFields_Version_and_ProcessingDate.cs" />
+    <Compile Remove="Migrations\20200721120237_MachineLearning_AddNewFields_Version_and_ProcessingDate.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
   </ItemGroup>

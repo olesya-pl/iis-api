@@ -10,12 +10,14 @@ namespace Iis.OntologySchema.DataTypes
         internal SchemaNodeType _nodeType;
         internal SchemaNodeType _sourceType;
         internal SchemaNodeType _targetType;
-        public INodeTypeLinked INodeTypeModel => _nodeType;
+        internal SchemaRelationType _directRelationType;
+        public INodeTypeLinked NodeType => _nodeType;
         public INodeTypeLinked SourceType => _sourceType;
         public INodeTypeLinked TargetType => _targetType;
+        public IRelationTypeLinked DirectRelationType => _directRelationType;
         public override string ToString()
         {
-            return $"{SourceType.Name}.{INodeTypeModel.Name}";
+            return $"{SourceType.Name}.{NodeType.Name}";
         }
         public bool IsIdentical(IRelationTypeLinked relationType, bool includeTargetType)
         {

@@ -8,24 +8,23 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Iis.Api;
-using Iis.Domain;
 using Iis.Domain.Elastic;
 using Iis.DataModel;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
     public class ElasticService : IElasticService
     {
-        private IElasticManager _elasticManager;
-        private IElasticSerializer _elasticSerializer;
-        private IExtNodeService _extNodeService;
-        private IElasticConfiguration _elasticConfiguration;
-        private IOntologySchema _ontologySchema;
-        private RunTimeSettings _runTimeSettings;
+        private readonly IElasticManager _elasticManager;
+        private readonly IElasticConfiguration _elasticConfiguration;
+        private readonly IOntologySchema _ontologySchema;
+        private readonly RunTimeSettings _runTimeSettings;
         private readonly OntologyContext _context;
+        private readonly INodeRepository _nodeRepository;
+        private readonly IMaterialRepository _materialRepository;
         private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
 
         public IEnumerable<string> MaterialIndexes { get; }
@@ -37,20 +36,20 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public ElasticService(
             IElasticManager elasticManager,
-            IElasticSerializer elasticSerializer,
-            IExtNodeService extNodeService,
             IElasticConfiguration elasticConfiguration,
             IOntologySchema ontologySchema,
+            INodeRepository nodeRepository,
+            IMaterialRepository materialRepository,
             RunTimeSettings runTimeSettings,
             OntologyContext context)
         {
             _elasticManager = elasticManager;
-            _elasticSerializer = elasticSerializer;
-            _extNodeService = extNodeService;
             _ontologySchema = ontologySchema;
             _runTimeSettings = runTimeSettings;
             _elasticConfiguration = elasticConfiguration;
             _context = context;
+            _nodeRepository = nodeRepository;
+            _materialRepository = materialRepository;
 
             var objectOfStudyType = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
             if (objectOfStudyType != null)
@@ -121,33 +120,21 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
-        public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
+        public Task<SearchByConfiguredFieldsResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return true;
+            if (!UseElastic)
+            {
+                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
+            }
 
-            var extNode = await _extNodeService.GetExtNodeByIdAsync(id, cancellationToken);
-
-            return await PutNodeAsync(extNode, cancellationToken);
+            return _materialRepository.SearchMaterials(filter, cancellationToken);
         }
 
-        public async Task<bool> PutNodeAsync(IExtNode extNode, CancellationToken cancellationToken = default)
+        public Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            if (!UseElastic || !OntologyIndexIsSupported(extNode.NodeTypeName)) return true;
+            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
 
-            var json = _elasticSerializer.GetJsonByExtNode(extNode);
-
-            return await _elasticManager.PutDocumentAsync(extNode.NodeTypeName, extNode.Id, json, cancellationToken);
-        }
-
-        public async Task<bool> PutMaterialAsync(Guid materialId, JObject materialDocument, CancellationToken cancellation = default)
-        {
-            if (!UseElastic) return true;
-
-            if (!_runTimeSettings.PutSavedToElastic) return false;
-
-            if (materialDocument is null) return false;
-
-            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(), materialId.ToString("N"), materialDocument.ToString(Formatting.None));
+            return _nodeRepository.PutNodeAsync(id, cancellationToken);
         }
 
         public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
@@ -174,43 +161,6 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             if (!UseElastic) return false;
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
-        }
-
-        private async Task UpdateElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
-        {
-            ElasticCompareResult compareResult = await CompareWithElasticAsync(nodeTypeId, indexName, cancellationToken);
-
-            foreach (Guid id in compareResult.NeedToDelete)
-            {
-                await _elasticManager.DeleteDocumentAsync(indexName, id.ToString("N"));
-            }
-
-            foreach (Guid id in compareResult.NeedToUpdate)
-            {
-                await PutNodeAsync(id, cancellationToken);
-            }
-        }
-
-        private async Task<ElasticCompareResult> CompareWithElasticAsync(Guid nodeTypeId, string indexName, CancellationToken cancellationToken = default)
-        {
-            IEnumerable<string> list = (await _elasticManager.GetDocumentIdListFromIndexAsync(indexName))
-                .Items.Select(p => p.Identifier);
-            var elasticIds = list.Select(x => Guid.ParseExact(x, "N"));
-
-            var query =
-                from n in _context.Nodes
-                where !n.IsArchived && n.NodeTypeId == nodeTypeId
-                select n.Id;
-            List<Guid> dbIds = await query.ToListAsync(cancellationToken);
-
-            var toDelete = elasticIds.ToHashSet();
-            toDelete.ExceptWith(dbIds);
-
-            return new ElasticCompareResult
-            {
-                NeedToDelete = toDelete.ToList(),
-                NeedToUpdate = dbIds
-            };
         }
     }
 }
