@@ -120,6 +120,7 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnCreateRelationEntity += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationEntity, parentTypeId);
             _uiEntityTypeControl.OnDeleteRelationEntity += DeleteChildNode;
             _uiEntityTypeControl.OnSetInheritance += SetInheritance;
+            _uiEntityTypeControl.OnRemoveInheritance += RemoveInheritance;
             _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
@@ -438,6 +439,11 @@ namespace Iis.OntologyManager
             var newTargetType = ChooseEntityTypeFromCombo();
             if (newTargetType == null) return;
             _schema.SetInheritance(_currentNodeType.Id, newTargetType.Id);
+            SetNodeTypeView(_currentNodeType, false);
+        }
+        private void RemoveInheritance(Guid ancestorId)
+        {
+            _schema.RemoveInheritance(_currentNodeType.Id, ancestorId);
             SetNodeTypeView(_currentNodeType, false);
         }
         private void SetNodeTypeViewVisibility(NodeViewType nodeViewType)

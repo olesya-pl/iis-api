@@ -32,6 +32,7 @@ namespace Iis.OntologyManager.UiControls
         public event Action<Guid> OnCreateRelationEntity;
         public event Action<IChildNodeType> OnDeleteRelationEntity;
         public event Action OnSetInheritance;
+        public event Action<Guid> OnRemoveInheritance;
 
         public IChildNodeType SelectedChild
         {
@@ -39,6 +40,14 @@ namespace Iis.OntologyManager.UiControls
             {
                 var selectedRow = gridChildren.SelectedRows.Count > 0 ? gridChildren.SelectedRows[0] : null;
                 return selectedRow == null ? null : (IChildNodeType)selectedRow.DataBoundItem;
+            }
+        }
+        private INodeTypeLinked SelectedAncestor
+        {
+            get
+            {
+                var selectedRow = gridInheritedFrom.SelectedRows.Count > 0 ? gridInheritedFrom.SelectedRows[0] : null;
+                return (INodeTypeLinked)selectedRow?.DataBoundItem;
             }
         }
 
@@ -123,6 +132,8 @@ namespace Iis.OntologyManager.UiControls
             var menuInheritance = new ContextMenuStrip();
             menuInheritance.Items.Add("Set Inheritance");
             menuInheritance.Items[0].Click += (sender, e) => { OnSetInheritance?.Invoke(); };
+            menuInheritance.Items.Add("Remove Inheritance");
+            menuInheritance.Items[1].Click += removeInheritance_Click;
             gridInheritedFrom.ContextMenuStrip = menuInheritance;
 
             menuChildren = new ContextMenuStrip();
@@ -171,11 +182,17 @@ namespace Iis.OntologyManager.UiControls
         private void gridInheritance_DoubleClick(object sender, EventArgs e)
         {
             if (OnShowEntityType == null) return;
-            var grid = (DataGridView)sender;
-            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            if (selectedRow == null) return;
-            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
-            OnShowEntityType(nodeType);
+            if (SelectedAncestor != null)
+            {
+                OnShowEntityType(SelectedAncestor);
+            }
+        }
+        private void removeInheritance_Click(object sender, EventArgs e)
+        {
+            if (SelectedAncestor != null)
+            {
+                OnRemoveInheritance?.Invoke(SelectedAncestor.Id);
+            }
         }
         private void gridChildrenEvent(Action<IChildNodeType> action)
         {

@@ -337,6 +337,15 @@ namespace Iis.OntologySchema
                 _storage.AddRelationType(relationType);
             }
         }
+        public void RemoveInheritance(Guid sourceTypeId, Guid targetTypeId)
+        {
+            var sourceNodeType = _storage.GetNodeTypeById(sourceTypeId);
+            var relation = sourceNodeType._outgoingRelations.SingleOrDefault(r => r.TargetTypeId == targetTypeId && r.Kind == RelationKind.Inheritance);
+            if (relation == null) return;
+            sourceNodeType._outgoingRelations.Remove(relation);
+            _storage.RemoveNodeType(relation.Id);
+            _storage.RemoveRelationType(relation.Id);
+        }
         public string GetAlias(string fieldDotName)
         {
             var value = _storage.Aliases.GetItem(fieldDotName)?.Value;
