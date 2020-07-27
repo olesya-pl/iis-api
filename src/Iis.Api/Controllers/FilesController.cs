@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -39,7 +40,22 @@ namespace IIS.Core.Controllers
 
         [HttpPost]
         [DisableRequestSizeLimit]
-        public async Task<CreateMaterialResponse> Post([FromForm] string input,
+        public async Task<object> Post([Required] IFormFile file, CancellationToken token)
+        {
+            FileId fileId = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
+            var url = Url.Action("Get", "Files", new { Id = fileId.Id }, Request.Scheme);
+            return new
+            {
+                fileId.Id,
+                Url = url,
+                fileId.IsDuplicate
+            };
+        }
+
+
+        [HttpPost(nameof(CreateMaterial))]
+        [DisableRequestSizeLimit]
+        public async Task<CreateMaterialResponse> CreateMaterial([FromForm] string input,
             [FromForm] IFormFile file,
             CancellationToken token)
         {
