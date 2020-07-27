@@ -19,6 +19,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using IIS.Repository.UnitOfWork;
+using System.Threading;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -234,6 +235,12 @@ namespace IIS.Core.Materials.EntityFramework
                 SourceType = info.SourceType,
                 SourceVersion = info.SourceVersion,
             };
+        }
+
+        public Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken)
+        {
+            return RunWithoutCommitAsync(async (unitOfWork)
+                => await unitOfWork.MaterialRepository.PutAllMaterialsToElasticSearchAsync(cancellationToken));
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Iis.DbLayer.Repositories
         Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
+        Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken = default);
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default);
         Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         void AddMaterialEntity(MaterialEntity materialEntity);

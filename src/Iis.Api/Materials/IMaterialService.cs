@@ -4,6 +4,7 @@ using Iis.Domain.MachineLearning;
 using Material = Iis.Domain.Materials.Material;
 using Iis.Interfaces.Materials;
 using System;
+using System.Threading;
 
 namespace IIS.Core.Materials
 {
@@ -14,5 +15,6 @@ namespace IIS.Core.Materials
         Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input);
         Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);
+        Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);
     }
 }
