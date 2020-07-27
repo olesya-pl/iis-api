@@ -47,6 +47,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MergeNullValueHandling = MergeNullValueHandling.Ignore
         };
 
+        public bool IsDummy => false; 
         public GSMFeatureProcessor(IElasticService elasticService,
             IOntologyModel ontology,
             MutationCreateResolver createResolver,
@@ -58,7 +59,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _updateResolver = updateResolver;
         }
 
-        public async Task<JObject> ProcessMetadata(JObject metadata)
+        public async Task<JObject> ProcessMetadataAsync(JObject metadata)
         {
             if (!FeaturesSectionExists(metadata)) return metadata;
 

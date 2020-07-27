@@ -6,7 +6,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
     public class DummyFeatureProcessor : IFeatureProcessor
     {
-        public Task<JObject> ProcessMetadata(JObject metadata)
+        public bool IsDummy => true;
+        public Task<JObject> ProcessMetadataAsync(JObject metadata)
         {
             return Task.FromResult(metadata);
         }

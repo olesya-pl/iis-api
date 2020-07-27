@@ -4,15 +4,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using System.Text.Json;
-//using System.Text.Json.Serialization;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
+using Newtonsoft.Json.Linq;
 
+using Iis.DbLayer.Repositories;
 using Iis.Api.Configuration;
-//using IIS.Core.Materials;
+using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
 
 namespace IIS.Core.Materials.Handlers
@@ -25,15 +27,18 @@ namespace IIS.Core.Materials.Handlers
         private const int ReConnectTimeoutSec = 5;
         private readonly ILogger<FeatureHandler> _logger;
         private readonly FeatureHandlerConfig _сonfig;
+        private readonly IServiceProvider _provider;
         private IConnection _connection;
         private IModel _channel;
         private readonly JsonSerializerOptions options;
         public FeatureHandler(ILogger<FeatureHandler> logger,
             IConnectionFactory connectionFactory,
-            FeatureHandlerConfig configuration)
+            FeatureHandlerConfig configuration,
+            IServiceProvider provider)
         {
             _logger = logger;
             _сonfig = configuration;
+            _provider = provider;
 
             while (true)
             {
@@ -83,9 +88,19 @@ namespace IIS.Core.Materials.Handlers
             base.Dispose();
         }
 
-        private Task ProcessMessage(MaterialEventMessage message)
+        private async Task ProcessMessage(MaterialEventMessage message)
         {
-            return Task.CompletedTask;
+            var processor = _provider.GetService<IFeatureProcessorFactory>().GetInstance(message.Source, message.Type);
+
+            if(processor.IsDummy) return;
+
+            var materialRepo = _provider.GetService<IMaterialRepository>();
+
+            var material = await materialRepo.GetByIdAsync(message.Id);
+            
+            JObject metadata = JObject.Parse(material.Metadata);
+
+            metadata = await processor.ProcessMetadataAsync(metadata);
         }
 
         private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialEventMessage, Task> handler)
