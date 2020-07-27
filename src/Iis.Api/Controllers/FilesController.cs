@@ -2,9 +2,15 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using IIS.Core.Files;
+using IIS.Core.GraphQL.Materials;
+using IIS.Core.Materials;
+using IIS.Core.Materials.FeatureProcessors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Controllers
 {
@@ -14,10 +20,22 @@ namespace IIS.Core.Controllers
     public class FilesController : Controller
     {
         private IFileService _fileService;
+        private readonly IMapper _mapper;
+        private readonly IMaterialProvider _materialProvider;
+        private readonly IMaterialService _materialService;
+        private readonly IFeatureProcessorFactory _featureProcessorFactory;
 
-        public FilesController(IFileService fileService)
+        public FilesController(IFileService fileService,
+            IMapper mapper,
+            IMaterialProvider materialProvider,
+            IMaterialService materialService,
+            IFeatureProcessorFactory featureProcessorFactory)
         {
             _fileService = fileService;
+            _mapper = mapper;
+            _materialProvider = materialProvider;
+            _materialService = materialService;
+            _featureProcessorFactory = featureProcessorFactory;
         }
 
         [HttpPost]
@@ -25,13 +43,40 @@ namespace IIS.Core.Controllers
         public async Task<object> Post([Required] IFormFile file, CancellationToken token)
         {
             FileId fileId = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
-            var url = Url.Action("Get", "Files", new {Id = fileId.Id}, Request.Scheme);
+            var url = Url.Action("Get", "Files", new { Id = fileId.Id }, Request.Scheme);
             return new
             {
                 fileId.Id,
                 Url = url,
                 fileId.IsDuplicate
             };
+        }
+
+
+        [HttpPost(nameof(CreateMaterial))]
+        [DisableRequestSizeLimit]
+        public async Task<CreateMaterialResponse> CreateMaterial([FromForm] string input,
+            [FromForm] IFormFile file,
+            CancellationToken token)
+        {
+            var material = JsonConvert.DeserializeObject<MaterialInput>(input);
+            FileId fileSaveResult = await _fileService
+                .SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
+            material.FileId = fileSaveResult.Id;
+            if (fileSaveResult.IsDuplicate)
+            {
+                return new CreateMaterialResponse() { IsDublicate = true };
+            }
+
+            Iis.Domain.Materials.Material inputMaterial = _mapper.Map<Iis.Domain.Materials.Material>(material);
+            inputMaterial.Reliability = _materialProvider.GetMaterialSign(material.ReliabilityText);
+            inputMaterial.SourceReliability = _materialProvider.GetMaterialSign(material.SourceReliabilityText);
+            inputMaterial.LoadData = _mapper.Map<Iis.Domain.Materials.MaterialLoadData>(material);
+            // inputMaterial.Metadata = await _featureProcessorFactory
+            //     .GetInstance(inputMaterial.Source, inputMaterial.Type).ProcessMetadata(inputMaterial.Metadata);
+            await _materialService.SaveAsync(inputMaterial);
+
+            return new CreateMaterialResponse { Id = inputMaterial.Id, IsDublicate = false };
         }
 
         [HttpGet("{id}")]
