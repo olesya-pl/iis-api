@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using IIS.Repository.Factories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IIS.Repository.UnitOfWork
 {
@@ -11,10 +12,10 @@ namespace IIS.Repository.UnitOfWork
         protected readonly TContext context;
         protected readonly IServiceProvider serviceProvider;
 
-        public UnitOfWork(IGenericFactory factory, DbContextOptions dbContextOptions, IServiceProvider serviceProvider)
+        public UnitOfWork(DbContextOptions dbContextOptions, IServiceProvider serviceProvider)
         {
-            this.context = factory.Create<TContext, DbContextOptions>(dbContextOptions);
             this.serviceProvider = serviceProvider;
+            context = serviceProvider.GetService<TContext>();
         }
 
         public virtual async Task CommitAsync()
@@ -45,7 +46,7 @@ namespace IIS.Repository.UnitOfWork
             {
                 baseRepository.SetContext(context);
             }
-            
+
             return repository;
         }
     }

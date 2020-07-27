@@ -12,12 +12,12 @@ namespace Iis.DbLayer.Repositories
     public interface IIISUnitOfWorkFactory : IUnitOfWorkFactory<IIISUnitOfWork> { }
     public class IISUnitOfWorkFactory : UnitOfWorkFactory<IIISUnitOfWork>, IIISUnitOfWorkFactory
     {
-        public IISUnitOfWorkFactory(IGenericFactory factory, DbContextOptions dbContextOptions, IServiceProvider serviceProvider) : base(factory, dbContextOptions, serviceProvider)
+        public IISUnitOfWorkFactory(DbContextOptions dbContextOptions, IServiceProvider serviceProvider) : base(dbContextOptions, serviceProvider)
         {
         }
         public override IIISUnitOfWork Create()
         {
-            return new IISUnitOfWork<OntologyContext>(factory, dbContextOptions, serviceProvider);
+            return new IISUnitOfWork<OntologyContext>(dbContextOptions, serviceProvider);
         }
     }
 }

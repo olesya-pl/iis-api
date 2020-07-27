@@ -19,18 +19,13 @@ namespace Iis.DbLayer.Repositories
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
         where TContext : DbContext
     {
-        public IISUnitOfWork(IGenericFactory factory, DbContextOptions dbContextOptions, IServiceProvider serviceProvider) : base(factory, dbContextOptions, serviceProvider)
+        public IISUnitOfWork(DbContextOptions dbContextOptions, IServiceProvider serviceProvider) : base(dbContextOptions, serviceProvider)
         {
         }
 
         public IMaterialRepository MaterialRepository => ResolveRepository<IMaterialRepository>();
 
         public IOntologyRepository OntologyRepository => ResolveRepository<IOntologyRepository>();
-        //public IDataRepository DataRepository => ResolveRepository<IDataRepository>();
-        //public IDataFilesRepository DataFilesRepository => ResolveRepository<IDataFilesRepository>();
-        //public IInvestorsRepository InvestorsRepository => ResolveRepository<IInvestorsRepository>();
-        //public ISettingsRepository SettingsRepository => ResolveRepository<ISettingsRepository>();
-        //public ICompaniesRepository CompaniesRepository => ResolveRepository<ICompaniesRepository>();
 
         protected override T ResolveRepository<T>()
         {

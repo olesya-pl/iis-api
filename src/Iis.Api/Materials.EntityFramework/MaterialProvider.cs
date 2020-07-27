@@ -29,13 +29,11 @@ namespace IIS.Core.Materials.EntityFramework
     public class MaterialProvider<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialProvider where TUnitOfWork : IIISUnitOfWork
     {
         private const int MaxResultWindow = 10000;
-        //private readonly OntologyContext _context;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly IElasticService _elasticService;
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
-        //private readonly IMaterialRepository _materialRepository;
         private readonly IMaterialSignRepository _materialSignRepository;
 
         public MaterialProvider(OntologyContext context,
@@ -43,18 +41,15 @@ namespace IIS.Core.Materials.EntityFramework
             IOntologySchema ontologySchema,
             IElasticService elasticService,
             IMLResponseRepository mLResponseRepository,
-            //IMaterialRepository materialRepository,
             IMaterialSignRepository materialSignRepository,
             IMapper mapper,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
-            //_context = context;
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
             _elasticService = elasticService;
 
             _mLResponseRepository = mLResponseRepository;
-            //_materialRepository = materialRepository;
             _materialSignRepository = materialSignRepository;
             _mapper = mapper;
         }

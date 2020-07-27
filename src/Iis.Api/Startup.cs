@@ -148,7 +148,6 @@ namespace IIS.Core
 
             services.AddTransient<IOntologyRepository, OntologyRepository>();
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
-            services.AddTransient<IGenericFactory, GenericFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
