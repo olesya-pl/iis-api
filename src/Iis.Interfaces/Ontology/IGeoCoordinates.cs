@@ -7,6 +7,6 @@ namespace Iis.Interfaces.Ontology
     public interface IGeoCoordinates
     {
         decimal Latitude { get; }
-        decimal Langitude { get; }
+        decimal Longitude { get; }
     }
 }
