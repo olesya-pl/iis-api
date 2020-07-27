@@ -36,16 +36,9 @@ namespace IIS.Core.Materials.EntityFramework.Workers
 
         public async Task ExtractInfoAsync(Material material)
         {
-            await _context.Semaphore.WaitAsync();
-            try
-            {
-                _context.Add(ToDal(material.Metadata, material.Id));
-                await _context.SaveChangesAsync();
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            _context.Add(ToDal(material.Metadata, material.Id));
+            await _context.SaveChangesAsync();
+
             await ExtractFeatures(material.Id); // todo: to separate service
         }
 
@@ -64,28 +57,20 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         {
             var view = info.Data.ToObject<Metadata>();
             var features = new List<MaterialFeature>();
-            await _context.Semaphore.WaitAsync();
-            try
+            foreach (var node in view.Features.Nodes)
             {
-                foreach (var node in view.Features.Nodes)
-                {
-                    var type = _ontology.GetEntityType(node.Type)
-                               ?? throw new ArgumentException($"IEntityTypeModel {node.Type} does not exist");
-                    // TODO: should work with any entity type. Currently works only with entities which has value
-                    var relationType = type.GetProperty("value");
-                    MaterialFeature feat = ToDomain(node);
-                    feat = await MapToNodeDirect(feat, type, relationType);
-                    features.Add(feat);
-                    _context.Add(ToDal(feat, info.Id));
-                }
+                var type = _ontology.GetEntityType(node.Type)
+                           ?? throw new ArgumentException($"IEntityTypeModel {node.Type} does not exist");
+                // TODO: should work with any entity type. Currently works only with entities which has value
+                var relationType = type.GetProperty("value");
+                MaterialFeature feat = ToDomain(node);
+                feat = await MapToNodeDirect(feat, type, relationType);
+                features.Add(feat);
+                _context.Add(ToDal(feat, info.Id));
+            }
 
-                await CreateRelations(features);
-                await _context.SaveChangesAsync();
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            await CreateRelations(features);
+            await _context.SaveChangesAsync();
         }
 
         // uses hardcoded IEntityTypeModel and RelationType
@@ -146,13 +131,19 @@ namespace IIS.Core.Materials.EntityFramework.Workers
             var rt = new EmbeddingRelationType(Guid.NewGuid(), name, EmbeddingOptions.Multiple);
             var ctxType = new NodeTypeEntity
             {
-                Id = rt.Id, Kind = Kind.Relation, Name = name, Meta = "{}", Title = name,
+                Id = rt.Id,
+                Kind = Kind.Relation,
+                Name = name,
+                Meta = "{}",
+                Title = name,
             };
             ctxType.RelationType = new RelationTypeEntity
             {
-                Id = rt.Id, Kind = RelationKind.Embedding,
+                Id = rt.Id,
+                Kind = RelationKind.Embedding,
                 EmbeddingOptions = Iis.Interfaces.Ontology.Schema.EmbeddingOptions.Multiple,
-                SourceTypeId = sourceTypeId, TargetTypeId = targetTypeId,
+                SourceTypeId = sourceTypeId,
+                TargetTypeId = targetTypeId,
             };
             _context.Add(ctxType);
             await _context.SaveChangesAsync();
@@ -163,11 +154,16 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         {
             var node = new Iis.DataModel.NodeEntity
             {
-                Id = Guid.NewGuid(), NodeTypeId = rtype.Id, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow,
+                Id = Guid.NewGuid(),
+                NodeTypeId = rtype.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
             };
             node.Relation = new RelationEntity
             {
-                Id = node.Id, SourceNodeId = node1.Id, TargetNodeId = node2.Id
+                Id = node.Id,
+                SourceNodeId = node1.Id,
+                TargetNodeId = node2.Id
             };
             _context.Add(node);
             await _context.SaveChangesAsync();
@@ -177,8 +173,12 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         {
             return new Iis.DataModel.Materials.MaterialInfoEntity
             {
-                Id = Guid.NewGuid(), Data = metadata.ToString(), MaterialId = materialId,
-                Source = nameof(MetadataExtractor), SourceType = "InnerWorker", SourceVersion = "0.0"
+                Id = Guid.NewGuid(),
+                Data = metadata.ToString(),
+                MaterialId = materialId,
+                Source = nameof(MetadataExtractor),
+                SourceType = "InnerWorker",
+                SourceVersion = "0.0"
             };
         }
 
@@ -186,8 +186,11 @@ namespace IIS.Core.Materials.EntityFramework.Workers
         {
             return new Iis.DataModel.Materials.MaterialFeatureEntity
             {
-                MaterialInfoId = materialInfoId, Id = feature.Id,
-                Relation = feature.Relation, Value = feature.Value, NodeId = feature.Node.Id
+                MaterialInfoId = materialInfoId,
+                Id = feature.Id,
+                Relation = feature.Relation,
+                Value = feature.Value,
+                NodeId = feature.Node.Id
             };
         }
 

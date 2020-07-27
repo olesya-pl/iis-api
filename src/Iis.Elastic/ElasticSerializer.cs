@@ -38,7 +38,7 @@ namespace Iis.Elastic
                 {
                     var item = new JObject();
                     item["lat"] = coord.Latitude;
-                    item["lang"] = coord.Langitude;
+                    item["long"] = coord.Longitude;
                     coords.Add(item);
                 }
                 json["__coordinates"] = coords;
@@ -98,7 +98,7 @@ namespace Iis.Elastic
             {
                 return JToken.FromObject(extNode.AttributeValue);
             }
-            
+
             return GetJsonObjectByExtNode(extNode, false);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Iis.DbLayer.Repositories.Helpers;
+using Iis.Domain.Materials;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Iis.DbLayer.Repositories

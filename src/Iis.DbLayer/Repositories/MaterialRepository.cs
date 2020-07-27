@@ -16,10 +16,13 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using Iis.Utility;
 using Iis.Domain.Elastic;
+using Iis.Domain.Materials;
+using Iis.Interfaces.Ontology.Schema;
+using IIS.Repository;
 
 namespace Iis.DbLayer.Repositories
 {
-    internal class MaterialRepository : IMaterialRepository
+    internal class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
@@ -27,25 +30,24 @@ namespace Iis.DbLayer.Repositories
             MaterialIncludeEnum.WithFeatures
         };
 
-        private readonly OntologyContext _context;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IElasticManager _elasticManager;
         private readonly IElasticConfiguration _elasticConfiguration;
         private readonly IMapper _mapper;
+        private readonly IOntologySchema ontologySchema;
 
         public string[] MaterialIndexes { get; }
 
-        public MaterialRepository(OntologyContext context,
-            IMLResponseRepository mLResponseRepository,
+        public MaterialRepository(IMLResponseRepository mLResponseRepository,
             IElasticManager elasticManager,
             IElasticConfiguration elasticConfiguration,
-            IMapper mapper)
+            IMapper mapper, IOntologySchema ontologySchema)
         {
-            _context = context;
             _mLResponseRepository = mLResponseRepository;
             _elasticManager = elasticManager;
             _elasticConfiguration = elasticConfiguration;
             _mapper = mapper;
+            this.ontologySchema = ontologySchema;
 
             MaterialIndexes = new[] { "Materials" };
         }
@@ -64,7 +66,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
-            var materialIdList =  await GetOnlyMaterialsForNodeIdListQuery(nodeIdList)
+            var materialIdList = await GetOnlyMaterialsForNodeIdListQuery(nodeIdList)
                                 .Select(e => e.Id)
                                 .ToArrayAsync();
 
@@ -98,32 +100,26 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
-            try
-            {
-                await _context.Semaphore.WaitAsync();
-                var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-                .SingleOrDefaultAsync(p => p.Id == materialId);
 
-                var materialDocument = _mapper.Map<MaterialDocument>(material);
+            var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+            .SingleOrDefaultAsync(p => p.Id == materialId);
 
-                materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
+            var materialDocument = _mapper.Map<MaterialDocument>(material);
 
-                materialDocument.NodeIds = material.MaterialInfos
-                    .SelectMany(p => p.MaterialFeatures)
-                    .Select(p => p.NodeId)
-                    .ToArray();
+            materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
-                await PopulateMLResponses(materialId, materialDocument);
+            materialDocument.NodeIds = material.MaterialInfos
+                .SelectMany(p => p.MaterialFeatures)
+                .Select(p => p.NodeId)
+                .ToArray();
 
-                return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                    materialId.ToString("N"),
-                    JsonConvert.SerializeObject(materialDocument),
-                    token);
-            }
-            finally
-            {
-                _context.Semaphore.Release();
-            }
+            await PopulateMLResponses(materialId, materialDocument);
+
+            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
+                materialId.ToString("N"),
+                JsonConvert.SerializeObject(materialDocument),
+                token);
+
 
         }
 
@@ -146,6 +142,65 @@ namespace Iis.DbLayer.Repositories
                     .ToDictionary(k => new Guid(k.Identifier),
                     v => new SearchByConfiguredFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
+        }
+
+        public void AddMaterialEntity(MaterialEntity materialEntity)
+        {
+            Context.Materials.Add(materialEntity);
+        }
+
+        public void EditMaterial(MaterialEntity materialEntity)
+        {
+            Context.Materials.Update(materialEntity);
+        }
+
+        public List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
+        {
+            var type = ontologySchema.GetEntityTypeByName("ObjectSign");
+
+            var typeIdList = new List<Guid>();
+
+            if (type != null)
+            {
+                typeIdList = type.IncomingRelations
+                    .Select(p => p.SourceTypeId)
+                    .ToList();
+            }
+            return Context.Nodes
+                .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
+                .Where(e => (!typeIdList.Any() || typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
+                .AsNoTracking()
+                .Select(e => e.Node.Id)
+                .ToList();
+        }
+
+        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds)
+        {
+            return Context.Materials
+                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                    (Material, MaterialInfo) => new { Material, MaterialInfo })
+                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .Select(m => m.MaterialInfoJoined.Material).ToList();
+        }
+
+        public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds)
+        {
+            return Context.Materials
+                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                    (Material, MaterialInfo) => new { Material, MaterialInfo })
+                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .Select(m => m.MaterialInfoJoined.Material).Where(_ => _.ParentId == null)
+                .GroupBy(p => p.Type)
+                .Select(group => new MaterialsCountByType
+                {
+                    Count = group.Count(),
+                    Type = group.Key
+                })
+                .ToListAsync();
         }
 
         private async Task PopulateMLResponses(Guid materialId, MaterialDocument materialDocument)
@@ -183,7 +238,7 @@ namespace Iis.DbLayer.Repositories
 
             var materialCountQuery = materialQuery;
 
-            if(limit == 0)
+            if (limit == 0)
             {
                 materialQuery = materialQuery
                                     .ApplySorting(sortColumnName, sortOrder);
@@ -207,7 +262,7 @@ namespace Iis.DbLayer.Repositories
 
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
-            return _context.Materials
+            return Context.Materials
                     .Include(m => m.Importance)
                     .Include(m => m.Reliability)
                     .Include(m => m.Relevance)
@@ -221,10 +276,10 @@ namespace Iis.DbLayer.Repositories
 
         private IQueryable<MaterialEntity> GetOnlyMaterialsForNodeIdListQuery(IEnumerable<Guid> nodeIdList)
         {
-            return _context.Materials
-                        .Join(_context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+            return Context.Materials
+                        .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
                             (Material, MaterialInfo) => new { Material, MaterialInfo })
-                        .Join(_context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                        .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
                             (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
                         .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
                         .Select(m => m.MaterialInfoJoined.Material);
@@ -232,7 +287,7 @@ namespace Iis.DbLayer.Repositories
 
         private IQueryable<MaterialEntity> GetMaterialsQuery(params MaterialIncludeEnum[] includes)
         {
-            if(!includes.Any()) return GetSimplifiedMaterialsQuery();
+            if (!includes.Any()) return GetSimplifiedMaterialsQuery();
 
             includes = includes.Distinct()
                                 .ToArray();

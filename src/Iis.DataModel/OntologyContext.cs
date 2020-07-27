@@ -8,12 +8,13 @@ using Iis.DataModel.Reports;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Themes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Iis.DataModel
 {
     public class OntologyContext : DbContext
     {
-        public SemaphoreSlim Semaphore = new SemaphoreSlim(1, int.MaxValue);
+        //public SemaphoreSlim Semaphore = new SemaphoreSlim(1, int.MaxValue);
 
         public DbSet<NodeTypeEntity> NodeTypes { get; set; }
         public DbSet<RelationTypeEntity> RelationTypes { get; set; }
@@ -58,6 +59,16 @@ namespace Iis.DataModel
             : base(options)
         {
         }
+        //private readonly string connectionString;
+
+        //public OntologyContext(IConfiguration configuration) : base()
+        //{
+        //    connectionString = configuration.GetConnectionString("db");
+        //}
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //    => optionsBuilder.UseNpgsql(connectionString);
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

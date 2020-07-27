@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DbLayer.Repositories.Helpers
 {
-    internal class NodeFlattener
+    public class NodeFlattener
     {
         private readonly OntologyContext _context;
         private readonly IElasticSerializer _elasticSerializer;
@@ -133,7 +133,7 @@ namespace Iis.DbLayer.Repositories.Helpers
         }
     }
 
-    internal class FlattenNodeResult
+    public class FlattenNodeResult
     {
         public string SerializedNode { get; set; }
         public string Id { get; internal set; }
