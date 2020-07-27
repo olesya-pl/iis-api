@@ -30,7 +30,6 @@ namespace Iis.DbLayer.Repositories
             MaterialIncludeEnum.WithFeatures
         };
 
-        //private readonly OntologyContext _context;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IElasticManager _elasticManager;
         private readonly IElasticConfiguration _elasticConfiguration;
@@ -39,13 +38,11 @@ namespace Iis.DbLayer.Repositories
 
         public string[] MaterialIndexes { get; }
 
-        public MaterialRepository(OntologyContext context,
-            IMLResponseRepository mLResponseRepository,
+        public MaterialRepository(IMLResponseRepository mLResponseRepository,
             IElasticManager elasticManager,
             IElasticConfiguration elasticConfiguration,
             IMapper mapper, IOntologySchema ontologySchema)
         {
-            //_context = context;
             _mLResponseRepository = mLResponseRepository;
             _elasticManager = elasticManager;
             _elasticConfiguration = elasticConfiguration;

@@ -36,8 +36,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMaterialSignRepository _materialSignRepository;
 
-        public MaterialProvider(OntologyContext context,
-            IOntologyService ontologyService,
+        public MaterialProvider(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
             IElasticService elasticService,
             IMLResponseRepository mLResponseRepository,
@@ -72,7 +71,6 @@ namespace IIS.Core.Materials.EntityFramework
                 var filter = new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery };
                 var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(_elasticService.MaterialIndexes, filter);
                 var matchedIdList = searchResult.Items.Keys.ToList();
-                //materialResult = await _materialRepository.GetAllAsync(matchedIdList, limit, offset, sortColumnName, sortOrder);
                 materialResult = await RunWithoutCommitAsync(async (unitOfWork) =>
                       await unitOfWork.MaterialRepository.GetAllAsync(matchedIdList, limit, offset, sortColumnName, sortOrder));
                 var materialTasks = searchResult.Items.Values
