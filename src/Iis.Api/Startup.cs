@@ -120,8 +120,8 @@ namespace IIS.Core
                 ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
                 using var context = OntologyContext.GetContext(dbConnectionString);
                 var ontologyProvider = new OntologyProvider(context);
-                    //ontology = ontologyProvider.GetOntology();
-                    ontology = new OntologyWrapper(ontologySchema);
+                //ontology = ontologyProvider.GetOntology();
+                ontology = new OntologyWrapper(ontologySchema);
 
                 //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                 //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
@@ -137,7 +137,7 @@ namespace IIS.Core
                 services.AddTransient<IOntologyCache, OntologyCache>();
                 //services.AddTransient<IOntologySchema, OntologySchema>();
                 //services.AddTransient<IFieldToAliasMapper>(ontologySchema);
-                services.AddTransient<IFieldToAliasMapper, OntologySchema>();
+                services.AddTransient<IFieldToAliasMapper>(provider => ontologySchema);
                 services.AddSingleton(ontologySchema);
                 services.AddSingleton(ontology);
                 services.AddTransient<INodeRepository, NodeRepository>();

@@ -21,13 +21,13 @@ namespace Iis.Api.Controllers
         IExtNodeService _extNodeService;
         IElasticManager _elasticManager;
         IElasticService _elasticService;
-        IMaterialProvider _materialProvider;
         IOntologySchema _ontologySchema;
         INodeRepository _nodeRepository;
         IMaterialRepository _materialRepository;
+        IMaterialService _materialService;
         public AdminController(
             IExtNodeService extNodeService,
-            IMaterialProvider materialProvider,
+            IMaterialService materialService,
             IElasticService elasticService,
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
@@ -37,7 +37,7 @@ namespace Iis.Api.Controllers
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
             _elasticService = elasticService;
-            _materialProvider = materialProvider;
+            _materialService = materialService;
             _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
             _materialRepository = materialRepository;
@@ -90,8 +90,6 @@ namespace Iis.Api.Controllers
         [HttpGet("RecreateElasticMaterialIndexes/{indexNames}")]
         public async Task<IActionResult> RecreateElasticMaterialIndexes(CancellationToken cancellationToken)
         {
-            var materialEntities = await _materialProvider.GetMaterialEntitiesAsync();
-
             var materialIndex = _elasticService.MaterialIndexes.First();
 
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
@@ -109,15 +107,8 @@ namespace Iis.Api.Controllers
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
-            var entityTasks =
-                materialEntities
-                    .Select(async entity =>
-                    {
-                        return await _materialRepository.PutMaterialToElasticSearchAsync(entity.Id, cancellationToken);
-                    });
-
-            await Task.WhenAll(entityTasks);
-            return Content($"{materialEntities.Count()} materials completed");
+            var materialsCount = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
+            return Content($"{materialsCount} materials completed");
         }
 
         [HttpGet("GetElasticJson/{id}")]

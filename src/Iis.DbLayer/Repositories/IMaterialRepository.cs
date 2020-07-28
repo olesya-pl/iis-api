@@ -26,14 +26,19 @@ namespace Iis.DbLayer.Repositories
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
         
+        Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken = default);
+
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default);
         
         Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         
         void AddMaterialEntity(MaterialEntity materialEntity);
-        
+
+        void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntities);
+
+        void AddMaterialFeatures(IEnumerable<MaterialFeatureEntity> materialFeatureEntities);
+
         void EditMaterial(MaterialEntity materialEntity);
-        
         List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
         
         Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds);
