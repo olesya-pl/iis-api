@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ using Iis.DbLayer.Repositories;
 using IIS.Repository.Factories;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 
 namespace IIS.Core.Materials.Handlers
 {
@@ -67,6 +69,7 @@ namespace IIS.Core.Materials.Handlers
             };
 
         }
+        
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             ConfigureExchange(_channel, _сonfig.SourceChannel);
@@ -106,9 +109,39 @@ namespace IIS.Core.Materials.Handlers
             
             material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 
-            RunWithCommit(uow => uow.MaterialRepository.EditMaterial(material));
+            var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
+
+            RunWithCommit(uow => {
+                uow.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
+                uow.MaterialRepository.EditMaterial(material);
+            });
 
         }
+
+        private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
+        {
+            var result = new List<Guid>();
+
+            var features = metadata.SelectToken(FeatureFields.FeaturesSection);
+
+            if (features is null) return result;
+
+            foreach (JObject feature in features)
+            {
+                var featureId = feature.GetValue(FeatureFields.featureId)?.Value<string>();
+
+                if (string.IsNullOrWhiteSpace(featureId)) continue;
+
+                if (!Guid.TryParse(featureId, out Guid featureGuid)) continue;
+
+                if (featureGuid.Equals(Guid.Empty)) continue;
+
+                result.Add(featureGuid);
+            }
+
+            return result;
+        }
+
         private async Task<T> RunAsync<T>(Func<IIISUnitOfWork, Task<T>> action)
         {
             using (var unitOfWork = _unitOfWorkFactory.Create())
@@ -125,6 +158,7 @@ namespace IIS.Core.Materials.Handlers
                 await unitOfWork.CommitAsync();
             }
         }
+        
         private void RunWithCommit(Action<IIISUnitOfWork> action)
         {
             using (var unitOfWork = _unitOfWorkFactory.Create())
@@ -169,6 +203,7 @@ namespace IIS.Core.Materials.Handlers
             
             channel.BasicConsume(queue: config.QueueName, false, consumer: channelConsumer);
         }
+        
         private static void ConfigureExchange(IModel channel, ChannelConfig config)
         {
             if (channel is null || config is null) return;
@@ -193,7 +228,7 @@ namespace IIS.Core.Materials.Handlers
                 channel.QueueBind(config.QueueName, config.ExchangeName, routingKey);
             }
         }
-
+        
         private static T BodyToObject<T>(byte[] jsonBytes, JsonSerializerOptions deserializationOptions = null)
         {
             var json = Encoding.UTF8.GetString(jsonBytes);

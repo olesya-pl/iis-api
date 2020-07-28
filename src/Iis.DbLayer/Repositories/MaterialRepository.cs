@@ -203,6 +203,21 @@ namespace Iis.DbLayer.Repositories
                 .ToListAsync();
         }
 
+        public void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList)
+        {
+            foreach (var featureId in featureIdList)
+            {
+                Context.MaterialFeatures.Add(new MaterialFeatureEntity
+                {
+                    NodeId = featureId,
+                    MaterialInfo = new MaterialInfoEntity
+                    {
+                        MaterialId = materialId
+                    }
+                });
+            }
+        }
+        
         private async Task PopulateMLResponses(Guid materialId, MaterialDocument materialDocument)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
@@ -224,7 +239,6 @@ namespace Iis.DbLayer.Repositories
                 }
             }
         }
-
 
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
         {
