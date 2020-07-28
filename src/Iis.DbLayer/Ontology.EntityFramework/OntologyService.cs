@@ -356,7 +356,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         r.Node = new NodeEntity
                         {
                             Id = rel.Id,
-                            NodeTypeId = map[rel.Node.NodeTypeId],
+                            NodeTypeId = rel.Node.NodeTypeId,
                             Relation = r
                         };
                         relations.Add(r);
