@@ -340,7 +340,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
                 if (inversedIds.Length > 0)
                 {
-                    var result = await RunWithoutCommit(async unitOfWork =>
+                    var result = await RunWithoutCommitAsync(async unitOfWork =>
                             await unitOfWork.OntologyRepository.GetInversedRelationsQuery(nodeIds, inversedIds));
                     var map = relationTypes.Where(r => r.IsInversed).ToDictionary(r => r.DirectRelationType.Id, r => r.Id);
                     foreach (var rel in result)
