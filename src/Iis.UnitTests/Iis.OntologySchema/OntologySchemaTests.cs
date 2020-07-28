@@ -102,6 +102,82 @@ namespace Iis.UnitTests.Iis.OntologySchema
             Assert.Equal(ScalarType.Date, item.ScalarType);
             Assert.Equal(new string[] { "Col3Alias1", "Col3Alias2" }, item.AliasesList);
         }
+        [Fact]
+        public void RemoveEntity_Attribute()
+        {
+            var schema = Utils.GetEmptyOntologySchema();
+            var updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = "Entity"
+            };
+            
+            var entity = schema.UpdateNodeType(updateParameter);
+            updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = "Column1",
+                EmbeddingOptions = EmbeddingOptions.Optional,
+                ScalarType = ScalarType.String,
+                ParentTypeId = entity.Id
+            };
+            schema.UpdateNodeType(updateParameter);
+            Assert.Equal(new List<string> { "Entity", "Entity.Column1" }, schema.GetStringCodes().Keys.OrderBy(key => key));
+            Assert.Null(schema.ValidateRemoveEntity(entity.Id));
+            schema.RemoveEntity(entity.Id);
+            Assert.Empty(schema.GetStringCodes().Keys);
+        }
+        [Fact]
+        public void RemoveEntity_Relation()
+        {
+            var schema = Utils.GetEmptyOntologySchema();
+            var updateParameter = new NodeTypeUpdateParameter { Name = "Entity" };
+            var entity = schema.UpdateNodeType(updateParameter);
+            updateParameter = new NodeTypeUpdateParameter { Name = "OtherEntity" };
+            var otherEntity = schema.UpdateNodeType(updateParameter);
+
+            updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = "Column1",
+                EmbeddingOptions = EmbeddingOptions.Optional,
+                ParentTypeId = entity.Id,
+                TargetTypeId = otherEntity.Id
+            };
+            schema.UpdateNodeType(updateParameter);
+            Assert.Equal(new List<string> { "Entity", "Entity->Column1", "OtherEntity" }, schema.GetStringCodes().Keys.OrderBy(key => key));
+            Assert.Null(schema.ValidateRemoveEntity(entity.Id));
+            schema.RemoveEntity(entity.Id);
+            Assert.Equal(new List<string> { "OtherEntity" }, schema.GetStringCodes().Keys.OrderBy(key => key));
+        }
+        [Fact]
+        public void ValidateRemoveEntity_Inheritance()
+        {
+            var schema = Utils.GetEmptyOntologySchema();
+            var updateParameter = new NodeTypeUpdateParameter { Name = "Entity" };
+            var entity = schema.UpdateNodeType(updateParameter);
+            updateParameter = new NodeTypeUpdateParameter { Name = "OtherEntity" };
+            var otherEntity = schema.UpdateNodeType(updateParameter);
+            schema.SetInheritance(otherEntity.Id, entity.Id);
+
+            Assert.Equal("Ця сутність не може бути знищена бо вона є предком для OtherEntity", schema.ValidateRemoveEntity(entity.Id));
+        }
+        [Fact]
+        public void ValidateRemoveEntity_Embedding()
+        {
+            var schema = Utils.GetEmptyOntologySchema();
+            var updateParameter = new NodeTypeUpdateParameter { Name = "Entity" };
+            var entity = schema.UpdateNodeType(updateParameter);
+            updateParameter = new NodeTypeUpdateParameter { Name = "OtherEntity" };
+            var otherEntity = schema.UpdateNodeType(updateParameter);
+            updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = "Column1",
+                EmbeddingOptions = EmbeddingOptions.Optional,
+                ParentTypeId = otherEntity.Id,
+                TargetTypeId = entity.Id
+            };
+            schema.UpdateNodeType(updateParameter);
+
+            Assert.Equal("Ця сутність не може бути знищена бо вона є полем для OtherEntity", schema.ValidateRemoveEntity(entity.Id));
+        }
 
         private void CreateEntities_Aliases(IOntologySchema schema)
         {

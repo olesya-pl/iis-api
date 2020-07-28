@@ -173,6 +173,21 @@ namespace Iis.OntologySchema.DataTypes
         {
             AttributeTypes.Remove(id);
         }
+        public void RemoveEntity(Guid id)
+        {
+            var nodeType = GetNodeTypeById(id);
+            foreach (var relationType in nodeType._outgoingRelations)
+            {
+                RelationTypes.Remove(relationType.Id);
+                NodeTypes.Remove(relationType.Id);
+                if (relationType.TargetType.Kind == Kind.Attribute)
+                {
+                    AttributeTypes.Remove(relationType.TargetType.Id);
+                    NodeTypes.Remove(relationType.TargetType.Id);
+                }
+            }
+            NodeTypes.Remove(id);
+        }
         public void SetDotNameTypes()
         {
             DotNameTypes.Clear();

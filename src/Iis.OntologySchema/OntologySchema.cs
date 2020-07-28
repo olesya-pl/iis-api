@@ -15,6 +15,8 @@ namespace Iis.OntologySchema
         SchemaStorage _storage;
         public IOntologySchemaSource SchemaSource { get; private set; }
         public IAliases Aliases => _storage.Aliases;
+        public const string MSG_REMOVE_ENTITY_IS_ANCESTOR = "Ця сутність не може бути знищена бо вона є предком для {0}";
+        public const string MSG_REMOVE_ENTITY_IS_EMBEDDED = "Ця сутність не може бути знищена бо вона є полем для {0}";
         public OntologySchema(IOntologySchemaSource schemaSource)
         {
             SchemaSource = schemaSource;
@@ -395,6 +397,25 @@ namespace Iis.OntologySchema
         public void PutInOrder()
         {
             _storage.SetDotNameTypes();
+        }
+        public string ValidateRemoveEntity(Guid id)
+        {
+            var nodeType = GetNodeTypeById(id);
+            var descendants = nodeType.GetDirectDescendants();
+            if (descendants.Count > 0)
+            {
+                return string.Format(MSG_REMOVE_ENTITY_IS_ANCESTOR, descendants.First().Name);
+            }
+            var embedding = nodeType.GetNodeTypesThatEmbedded();
+            if (embedding.Count > 0)
+            {
+                return string.Format(MSG_REMOVE_ENTITY_IS_EMBEDDED, embedding.First().Name);
+            }
+            return null;
+        }
+        public void RemoveEntity(Guid id)
+        {
+            _storage.RemoveEntity(id);
         }
     }
 }

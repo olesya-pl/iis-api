@@ -26,5 +26,7 @@ namespace Iis.Interfaces.Ontology.Schema
         void RemoveRelation(Guid relationId);
         IEnumerable<INodeTypeLinked> GetAllNodeTypes();
         void PutInOrder();
+        void RemoveEntity(Guid id);
+        string ValidateRemoveEntity(Guid id);
     }
 }
