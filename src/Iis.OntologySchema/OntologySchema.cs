@@ -367,7 +367,7 @@ namespace Iis.OntologySchema
         public IAttributeInfoList GetAttributesInfo(string entityName)
         {
             var items = new List<AttributeInfoItem>();
-            foreach (var key in _storage.DotNameTypes.Keys.Where(key => key.StartsWith(entityName)))
+            foreach (var key in _storage.DotNameTypes.Keys.Where(key => key.StartsWith(entityName + ".")))
             {
                 var nodeType = _storage.DotNameTypes[key];
                 if (nodeType.Kind != Kind.Attribute) continue;

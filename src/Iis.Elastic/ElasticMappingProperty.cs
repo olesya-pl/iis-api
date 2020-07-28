@@ -70,6 +70,8 @@ namespace Iis.Elastic
             }
             return result;
         }
+
+        public override string ToString() => Name;
     }
 
 
