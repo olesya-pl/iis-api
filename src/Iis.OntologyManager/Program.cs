@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,7 +31,8 @@ namespace Iis.OntologyManager
 
         static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
         {
-            
+            var ex = (Exception)e.ExceptionObject;
+            File.AppendAllText("!errors.log", $"{ex.Message}\n{ex.InnerException?.Message}\n{ex.StackTrace}");
         }
     }
 }
