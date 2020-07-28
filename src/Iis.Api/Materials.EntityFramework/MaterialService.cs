@@ -31,7 +31,6 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialProvider _materialProvider;
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
         private readonly IMLResponseRepository _mLResponseRepository;
-        private readonly IMaterialRepository _materialRepository;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -39,7 +38,6 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialProvider materialProvider,
             IEnumerable<IMaterialProcessor> materialProcessors,
             IMLResponseRepository mLResponseRepository,
-            IMaterialRepository materialRepository,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
@@ -48,7 +46,6 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
             _mLResponseRepository = mLResponseRepository;
-            _materialRepository = materialRepository;
         }
 
         public async Task SaveAsync(Material material)
@@ -98,7 +95,8 @@ namespace IIS.Core.Materials.EntityFramework
                 unitOfWork.MaterialRepository.AddMaterialFeatures(materialFeatures);
             });
 
-            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
+            await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
 
             if (material.ParentId == null)
             {
@@ -127,7 +125,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             responseEntity = await _mLResponseRepository.SaveAsync(responseEntity);
 
-            await _materialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
+            await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
 
             return _mapper.Map<MLResponse>(responseEntity);
         }
@@ -163,11 +162,9 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task UpdateMaterialAsync(MaterialEntity material)
         {
             Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
-            //_context.Update(material);
 
-            //await _context.SaveChangesAsync();
-
-            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
+            await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
 
             _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
         }
@@ -182,7 +179,8 @@ namespace IIS.Core.Materials.EntityFramework
             }
             material.AssigneeId = assigneeId;
             Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
-            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
+            await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
         }
 
         public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
@@ -197,7 +195,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             material.MlHandlersCount += handlersCount;
             Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
-            await _materialRepository.PutMaterialToElasticSearchAsync(material.Id);
+            await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
         }
 
         private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
