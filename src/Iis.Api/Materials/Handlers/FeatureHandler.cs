@@ -38,13 +38,13 @@ namespace IIS.Core.Materials.Handlers
         public FeatureHandler(ILogger<FeatureHandler> logger,
             IConnectionFactory connectionFactory,
             FeatureHandlerConfig configuration,
-            IServiceProvider provider)
+            IServiceProvider provider,
+            IUnitOfWorkFactory<IIISUnitOfWork> unitOfWorkFactory)
         {
             _logger = logger;
             _сonfig = configuration;
             _provider = provider;
-
-            _unitOfWorkFactory = _provider.GetService<IUnitOfWorkFactory<IIISUnitOfWork>>();
+            _unitOfWorkFactory = unitOfWorkFactory;
 
             while (true)
             {
