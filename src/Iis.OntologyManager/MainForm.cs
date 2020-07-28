@@ -40,6 +40,7 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
+        const string VERSION = "1.9";
 
         private enum NodeViewType : byte
         {
@@ -64,6 +65,7 @@ namespace Iis.OntologyManager
             OntologySchemaService schemaService)
         {
             InitializeComponent();
+            this.Text = $"Володар Онтології {VERSION}";
             _configuration = configuration;
             _style = style;
             _uiControlsCreator = uiControlsCreator;
@@ -118,6 +120,7 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnCreateRelationEntity += (parentTypeId) => CreateNewNodeType(NodeViewType.RelationEntity, parentTypeId);
             _uiEntityTypeControl.OnDeleteRelationEntity += DeleteChildNode;
             _uiEntityTypeControl.OnSetInheritance += SetInheritance;
+            _uiEntityTypeControl.OnRemoveInheritance += RemoveInheritance;
             _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
@@ -143,8 +146,10 @@ namespace Iis.OntologyManager
         private void AddGridTypesMenu()
         {
             var menu = new ContextMenuStrip();
-            menu.Items.Add("Add New Entity Type");
+            menu.Items.Add("Створити нову сутність");
             menu.Items[0].Click += (sender, e) => { CreateNewNodeType(NodeViewType.Entity, null); };
+            menu.Items.Add("Знищити сутність");
+            menu.Items[1].Click += (sender, e) => { RemoveNodeType(SelectedNodeType); };
             gridTypes.ContextMenuStrip = menu;
         }
 
@@ -338,14 +343,21 @@ namespace Iis.OntologyManager
         }
         private void OnNodeTypeSaveClick(INodeTypeUpdateParameter updateParameter)
         {
-            _schema.UpdateNodeType(updateParameter);
-            if (updateParameter.Id == null && updateParameter.ParentTypeId == null)
+            try
             {
-                ReloadTypes(_filterControl.GetModel());
+                _schema.UpdateNodeType(updateParameter);
+                if (updateParameter.Id == null && updateParameter.ParentTypeId == null)
+                {
+                    ReloadTypes(_filterControl.GetModel());
+                }
+                else
+                {
+                    GoBack();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                GoBack();
+                MessageBox.Show(ex.Message);
             }
         }
         #endregion
@@ -431,6 +443,11 @@ namespace Iis.OntologyManager
             _schema.SetInheritance(_currentNodeType.Id, newTargetType.Id);
             SetNodeTypeView(_currentNodeType, false);
         }
+        private void RemoveInheritance(Guid ancestorId)
+        {
+            _schema.RemoveInheritance(_currentNodeType.Id, ancestorId);
+            SetNodeTypeView(_currentNodeType, false);
+        }
         private void SetNodeTypeViewVisibility(NodeViewType nodeViewType)
         {
             foreach (var key in _nodeTypeControls.Keys)
@@ -444,6 +461,21 @@ namespace Iis.OntologyManager
             _nodeTypeControls[nodeViewType].SetParentTypeId(parentTypeId);
             _nodeTypeControls[nodeViewType].CreateNew();
             _history.Add(_currentNodeType);
+        }
+        private void RemoveNodeType(INodeTypeLinked nodeType)
+        {
+            if (nodeType == null) return;
+            var msg = _schema.ValidateRemoveEntity(nodeType.Id);
+            const string header = "Знищення сутності";
+            if (!string.IsNullOrEmpty(msg))
+            {
+                MessageBox.Show(msg, header);
+            }
+            if (MessageBox.Show($"Ви правда хочете знищити сутність {nodeType.Name}?", header, MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                _schema.RemoveEntity(nodeType.Id);
+                ReloadTypes(_filterControl.GetModel());
+            }
         }
         private void DeleteChildNode(IChildNodeType childNodeType)
         {

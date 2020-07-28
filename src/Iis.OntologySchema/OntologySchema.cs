@@ -5,6 +5,7 @@ using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Iis.OntologySchema
 {
@@ -14,6 +15,8 @@ namespace Iis.OntologySchema
         SchemaStorage _storage;
         public IOntologySchemaSource SchemaSource { get; private set; }
         public IAliases Aliases => _storage.Aliases;
+        public const string MSG_REMOVE_ENTITY_IS_ANCESTOR = "Ця сутність не може бути знищена бо вона є предком для {0}";
+        public const string MSG_REMOVE_ENTITY_IS_EMBEDDED = "Ця сутність не може бути знищена бо вона є полем для {0}";
         public OntologySchema(IOntologySchemaSource schemaSource)
         {
             SchemaSource = schemaSource;
@@ -275,6 +278,7 @@ namespace Iis.OntologySchema
         }
         public INodeTypeLinked UpdateNodeType(INodeTypeUpdateParameter updateParameter)
         {
+            ValidateNodeTypeUpdateParameter(updateParameter);
             if (updateParameter.Id == null)
             {
                 return CreateNodeType(updateParameter);
@@ -291,6 +295,19 @@ namespace Iis.OntologySchema
                     return UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
             }
             return null;
+        }
+        private void ValidateNodeTypeUpdateParameter(INodeTypeUpdateParameter updateParameter)
+        {
+            var regex = new Regex("^[A-Za-z0-9_]+$");
+            if (!regex.IsMatch(updateParameter.Name))
+            {
+                throw new Exception("Имя должно состоять из букв, цифр и символа подчеркивания");
+            }
+            if (updateParameter.Id == null && updateParameter.ParentTypeId != null 
+                && GetNodeTypeById((Guid)updateParameter.ParentTypeId).GetAllChildren().Any(ch => ch.Name == updateParameter.Name))
+            {
+                throw new Exception("Поле с таким именем у данного объекта уже существует");
+            }
         }
 
         public void UpdateTargetType(Guid relationTypeId, Guid targetTypeId)
@@ -321,6 +338,15 @@ namespace Iis.OntologySchema
                 };
                 _storage.AddRelationType(relationType);
             }
+        }
+        public void RemoveInheritance(Guid sourceTypeId, Guid targetTypeId)
+        {
+            var sourceNodeType = _storage.GetNodeTypeById(sourceTypeId);
+            var relation = sourceNodeType._outgoingRelations.SingleOrDefault(r => r.TargetTypeId == targetTypeId && r.Kind == RelationKind.Inheritance);
+            if (relation == null) return;
+            sourceNodeType._outgoingRelations.Remove(relation);
+            _storage.RemoveNodeType(relation.Id);
+            _storage.RemoveRelationType(relation.Id);
         }
         public string GetAlias(string fieldDotName)
         {
@@ -371,6 +397,25 @@ namespace Iis.OntologySchema
         public void PutInOrder()
         {
             _storage.SetDotNameTypes();
+        }
+        public string ValidateRemoveEntity(Guid id)
+        {
+            var nodeType = GetNodeTypeById(id);
+            var descendants = nodeType.GetDirectDescendants();
+            if (descendants.Count > 0)
+            {
+                return string.Format(MSG_REMOVE_ENTITY_IS_ANCESTOR, descendants.First().Name);
+            }
+            var embedding = nodeType.GetNodeTypesThatEmbedded();
+            if (embedding.Count > 0)
+            {
+                return string.Format(MSG_REMOVE_ENTITY_IS_EMBEDDED, embedding.First().Name);
+            }
+            return null;
+        }
+        public void RemoveEntity(Guid id)
+        {
+            _storage.RemoveEntity(id);
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Iis.OntologyManager.UiControls
         public event Action<Guid> OnCreateRelationEntity;
         public event Action<IChildNodeType> OnDeleteRelationEntity;
         public event Action OnSetInheritance;
+        public event Action<Guid> OnRemoveInheritance;
 
         public IChildNodeType SelectedChild
         {
@@ -39,6 +40,14 @@ namespace Iis.OntologyManager.UiControls
             {
                 var selectedRow = gridChildren.SelectedRows.Count > 0 ? gridChildren.SelectedRows[0] : null;
                 return selectedRow == null ? null : (IChildNodeType)selectedRow.DataBoundItem;
+            }
+        }
+        private INodeTypeLinked SelectedAncestor
+        {
+            get
+            {
+                var selectedRow = gridInheritedFrom.SelectedRows.Count > 0 ? gridInheritedFrom.SelectedRows[0] : null;
+                return (INodeTypeLinked)selectedRow?.DataBoundItem;
             }
         }
 
@@ -53,7 +62,10 @@ namespace Iis.OntologyManager.UiControls
             txtTitle.Text = nodeType.Title;
             txtAliases.Lines = aliases.ToArray();
             
-            var children = nodeType.GetAllChildren();
+            var children = nodeType.GetAllChildren()
+                .OrderBy(ch => ch.InheritedFrom)
+                .ThenBy(ch => ch.RelationName)
+                .ToList();
             gridChildren.DataSource = children;
             var attributesList = children
                 .Where(ch => ch.Kind == Kind.Attribute)
@@ -92,6 +104,13 @@ namespace Iis.OntologyManager.UiControls
                 BackColor = _style.BackgroundColor
             };
             _container.Add(cmbUniqueValueFieldName, "Unique Value Field Name");
+
+            btnSave = new Button { Text = "Save" };
+            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
+            _container.Add(btnSave);
+            _container.GoToNewColumn();
+
+            _container.Add(txtAliases = new RichTextBox(), "Aliases", true);
             _container.GoToNewColumn();
 
             gridInheritedFrom = GetRelationsGrid(nameof(gridInheritedFrom));
@@ -106,13 +125,6 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(gridEmbeddence, "Embedded By:", true);
             _container.GoToNewColumn();
 
-            _container.Add(txtAliases = new RichTextBox(), "Aliases", true);
-            _container.GoToNewColumn();
-
-            btnSave = new Button { Text = "Save" };
-            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
-            _container.Add(btnSave);
-
             _container.GoToBottom();
             _container.StepDown();
             _container.SetFullWidthColumn();
@@ -120,6 +132,8 @@ namespace Iis.OntologyManager.UiControls
             var menuInheritance = new ContextMenuStrip();
             menuInheritance.Items.Add("Set Inheritance");
             menuInheritance.Items[0].Click += (sender, e) => { OnSetInheritance?.Invoke(); };
+            menuInheritance.Items.Add("Remove Inheritance");
+            menuInheritance.Items[1].Click += removeInheritance_Click;
             gridInheritedFrom.ContextMenuStrip = menuInheritance;
 
             menuChildren = new ContextMenuStrip();
@@ -149,7 +163,7 @@ namespace Iis.OntologyManager.UiControls
             return new NodeTypeUpdateParameter
             {
                 Id = isNew ? (Guid?)null : new Guid(txtId.Text),
-                Name = isNew ? txtName.Text : null,
+                Name = txtName.Text,
                 Title = txtTitle.Text,
                 ParentTypeId = null,
                 Aliases = txtAliases.Lines,
@@ -168,11 +182,17 @@ namespace Iis.OntologyManager.UiControls
         private void gridInheritance_DoubleClick(object sender, EventArgs e)
         {
             if (OnShowEntityType == null) return;
-            var grid = (DataGridView)sender;
-            var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-            if (selectedRow == null) return;
-            var nodeType = (INodeTypeLinked)selectedRow.DataBoundItem;
-            OnShowEntityType(nodeType);
+            if (SelectedAncestor != null)
+            {
+                OnShowEntityType(SelectedAncestor);
+            }
+        }
+        private void removeInheritance_Click(object sender, EventArgs e)
+        {
+            if (SelectedAncestor != null)
+            {
+                OnRemoveInheritance?.Invoke(SelectedAncestor.Id);
+            }
         }
         private void gridChildrenEvent(Action<IChildNodeType> action)
         {

@@ -20,10 +20,13 @@ namespace Iis.Interfaces.Ontology.Schema
         INodeTypeLinked UpdateNodeType(INodeTypeUpdateParameter updateParameter);
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
+        void RemoveInheritance(Guid sourceTypeId, Guid targetTypeId);
         IAttributeInfoList GetAttributesInfo(string entityName);
         IAliases Aliases { get; }
         void RemoveRelation(Guid relationId);
         IEnumerable<INodeTypeLinked> GetAllNodeTypes();
         void PutInOrder();
+        void RemoveEntity(Guid id);
+        string ValidateRemoveEntity(Guid id);
     }
 }

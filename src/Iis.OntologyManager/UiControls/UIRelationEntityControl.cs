@@ -72,7 +72,7 @@ namespace Iis.OntologyManager.UiControls
             return new NodeTypeUpdateParameter
             {
                 Id = isNew ? (Guid?)null : new Guid(txtId.Text),
-                Name = isNew ? txtName.Text : null,
+                Name = txtName.Text,
                 Title = txtTitle.Text,
                 Meta = txtMeta.Text,
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,

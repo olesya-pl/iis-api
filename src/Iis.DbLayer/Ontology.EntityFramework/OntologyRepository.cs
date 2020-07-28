@@ -68,6 +68,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
+                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Include(e => e.SourceNode).ThenInclude(e => e.Attribute)
                 .Where(e => nodeIds.Contains(e.TargetNodeId) && !e.Node.IsArchived);
             if (relationIds != null)
