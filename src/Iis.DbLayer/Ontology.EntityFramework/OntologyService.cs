@@ -89,7 +89,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
-                    Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type == relationType);
+                    Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type.Id == relationType.Id);
                     RelationEntity existingRelation = existing.OutgoingRelations
                         .SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id && !e.Node.IsArchived);
                     ApplyChanges(existing, sourceRelation, existingRelation);
