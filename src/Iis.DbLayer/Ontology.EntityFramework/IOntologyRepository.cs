@@ -10,6 +10,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public interface IOntologyRepository
     {
         NodeEntity GetNodeEntityById(Guid id);
+        Task<NodeEntity> GetNodeEntityByIdAsync(Guid id);
         AttributeEntity GetAttributeEntityById(Guid id);
         Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids);
         Task<List<RelationEntity>> GetSourceRelationByIdAsync(Guid id, CancellationToken cancellationToken);
@@ -30,5 +31,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             int limit);
 
         Task<List<NodeEntity>> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
+        Task<NodeEntity> UpdateNodeAsync(Guid id, Action<NodeEntity> action);
     }
 }
