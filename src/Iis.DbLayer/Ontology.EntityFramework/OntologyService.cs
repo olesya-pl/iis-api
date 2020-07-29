@@ -283,8 +283,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(string typeName, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var types = _ontology.EntityTypes.Where(p => p.Name == typeName);
-            var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
-                .Concat(types).Distinct().ToArray();
+            var derivedTypes = types
+                .SelectMany(e => _ontology.GetChildTypes(e))
+                .Concat(types)
+                .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
+                .ToArray();
 
             var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
@@ -369,7 +372,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return nodes.Select(n => MapNode(n)).ToList();
         }
-
 
 
         private void FillRelations(List<NodeEntity> nodes, List<RelationEntity> relations)
