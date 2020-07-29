@@ -283,16 +283,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(string typeName, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var types = _ontology.EntityTypes.Where(p => p.Name == typeName);
-            var derivedTypes = types
+            var derivedTypeNames = types
                 .SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types)
                 .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
+                .Select(e => e.Name)
                 .ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypeNames, filter);
                 return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
             }
             else
