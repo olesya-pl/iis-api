@@ -17,6 +17,7 @@ namespace Iis.DbLayer.Repositories
         /// <param name="materialId">given Material Id</param>
         Task<IEnumerable<MLResponseEntity>> GetAllForMaterialAsync(Guid materialId);
         
+        Task<IEnumerable<MLResponseEntity>> GetAllForMaterialListAsync(IEnumerable<Guid> materialIdList);
         /// <summary>
         /// Returns all the Machine Learning Results for given Materials
         /// </summary>

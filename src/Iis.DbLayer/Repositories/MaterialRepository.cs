@@ -126,7 +126,6 @@ namespace Iis.DbLayer.Repositories
             return materialEntities.Count();
         }
 
-
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
 
@@ -138,19 +137,6 @@ namespace Iis.DbLayer.Repositories
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 token);
-        }
-
-        private MaterialDocument MapEntityToDocument(MaterialEntity material)
-        {
-            var materialDocument = _mapper.Map<MaterialDocument>(material);
-
-            materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
-
-            materialDocument.NodeIds = material.MaterialInfos
-                .SelectMany(p => p.MaterialFeatures)
-                .Select(p => p.NodeId)
-                .ToArray();
-            return materialDocument;
         }
 
         public async Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
@@ -258,6 +244,27 @@ namespace Iis.DbLayer.Repositories
             }
         }
         
+        public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)
+        {
+            return await GetMaterialsQuery(MaterialIncludeEnum.WithChildren)
+            .Where(e => e.ParentId == materialId)
+            .Select(e => e.Id)
+            .ToArrayAsync();
+        }
+
+        private MaterialDocument MapEntityToDocument(MaterialEntity material)
+        {
+            var materialDocument = _mapper.Map<MaterialDocument>(material);
+
+            materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
+
+            materialDocument.NodeIds = material.MaterialInfos
+                .SelectMany(p => p.MaterialFeatures)
+                .Select(p => p.NodeId)
+                .ToArray();
+            return materialDocument;
+        }
+
         private async Task<JObject> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);

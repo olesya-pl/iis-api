@@ -177,7 +177,13 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId)
         {
-            var entities = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
+            var materialIdList = new List<Guid>{materialId};
+            
+            var childList = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetChildIdListForMaterialAsync(materialId));
+            
+            materialIdList.AddRange(childList);
+
+            var entities = await _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
 
             return _mapper.Map<List<MLResponse>>(entities);
         }

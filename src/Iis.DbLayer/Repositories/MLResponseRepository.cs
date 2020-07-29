@@ -21,7 +21,15 @@ namespace Iis.DbLayer.Repositories
         public async Task<IEnumerable<MLResponseEntity>> GetAllForMaterialAsync(Guid materialId)
         {
             return await _context.MLResponses
-                            .Where(p => p.MaterialId == materialId)
+                            .Where(e => e.MaterialId == materialId)
+                            .AsNoTracking()
+                            .ToArrayAsync();
+        }
+        
+        public async Task<IEnumerable<MLResponseEntity>> GetAllForMaterialListAsync(IEnumerable<Guid> materialIdList)
+        {
+            return await _context.MLResponses
+                            .Where(e => materialIdList.Contains(e.MaterialId))
                             .AsNoTracking()
                             .ToArrayAsync();
         }

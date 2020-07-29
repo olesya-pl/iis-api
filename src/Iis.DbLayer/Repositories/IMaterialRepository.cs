@@ -46,5 +46,7 @@ namespace Iis.DbLayer.Repositories
         List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
 
         void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
+        
+        Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId);
     }
 }
