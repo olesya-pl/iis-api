@@ -70,15 +70,6 @@ namespace IIS.Core.Tools
 
             switch (actionName)
             {
-                case "seed-contour-data":
-                    await tools.SeedContourDataAsync();
-                    break;
-                case "seed-odysseus-data":
-                    await tools.SeedOdysseusDataAsync();
-                    break;
-                case "seed-developer-data":
-                    await tools.SeedDeveloperDataAsync();
-                    break;
                 case "apply-ef-migrations":
                     tools.ApplyEfMigrations();
                     break;

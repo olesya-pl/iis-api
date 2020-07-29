@@ -18,6 +18,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return Context.Nodes.FirstOrDefault(_ => _.Id == id);
         }
 
+        public async Task<NodeEntity> GetNodeEntityByIdAsync(Guid id)
+        {
+            return await Context.Nodes.FirstOrDefaultAsync(_ => _.Id == id);
+        }
+
         public Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids)
         {
             return Context.Nodes.Where(node => !node.IsArchived && ids.Contains(node.Id)).ToListAsync();
@@ -164,6 +169,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                        && nt.Name == valueTypeName
                        && (a.Value == value || value == null)
                  select n).ToListAsync();
+        }
+        public async Task<NodeEntity> UpdateNodeAsync(Guid id, Action<NodeEntity> action)
+        {
+            var nodeEntity = await Context.Nodes.Where(n => n.Id == id)
+                .Include(n => n.OutgoingRelations)
+                .ThenInclude(r => r.Node)
+                .Include(n => n.OutgoingRelations)
+                .ThenInclude(r => r.TargetNode)
+                .SingleOrDefaultAsync();
+
+            if (nodeEntity == null) return null;
+
+            action(nodeEntity);
+
+            Context.Nodes.Update(nodeEntity);
+            return nodeEntity;
         }
     }
 }

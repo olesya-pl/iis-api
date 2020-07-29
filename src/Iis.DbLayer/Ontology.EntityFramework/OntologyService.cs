@@ -35,52 +35,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
-            NodeEntity nodeEntity = RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(source.Id));
+            var nodeEntity = await RunAsync((unitOfWork) => unitOfWork.OntologyRepository.UpdateNodeAsync(source.Id, 
+                n => SaveRelations(source, n)));
+            
+            if (nodeEntity != null) return;
 
-            if (nodeEntity is null)
+            nodeEntity = new NodeEntity
             {
-                nodeEntity = new NodeEntity
-                {
-                    Id = source.Id,
-                    NodeTypeId = source.Type.Id,
-                    CreatedAt = source.CreatedAt,
-                    UpdatedAt = source.UpdatedAt
-                };
-            }
+                Id = source.Id,
+                NodeTypeId = source.Type.Id,
+                CreatedAt = source.CreatedAt,
+                UpdatedAt = source.UpdatedAt
+            };
             SaveRelations(source, nodeEntity);
             Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
-
             await _elasticService.PutNodeAsync(source.Id);
-        }
-
-        public async Task SaveNodesAsync(IEnumerable<Node> nodes, CancellationToken cancellationToken = default)
-        {
-            var existingNodes = await RunWithoutCommitAsync(async (unitOfWork) =>
-                await unitOfWork.OntologyRepository.GetExistingNodes(cancellationToken));
-            var newNodes = new List<NodeEntity>();
-            foreach (Node source in nodes)
-            {
-                if (!existingNodes.TryGetValue(source.Id, out NodeEntity existing))
-                {
-                    existing = new NodeEntity
-                    {
-                        Id = source.Id,
-                        NodeTypeId = source.Type.Id,
-                        CreatedAt = source.CreatedAt,
-                        UpdatedAt = source.UpdatedAt
-                    };
-                    newNodes.Add(existing);
-                }
-
-                SaveRelations(source, existing);
-            }
-
-            Run((unitOfWork) => unitOfWork.OntologyRepository.AddNodes(newNodes));
-
-            foreach (Node source in nodes)
-            {
-                await _elasticService.PutNodeAsync(source.Id);
-            }
         }
 
         private void SaveRelations(Node source, NodeEntity existing)
@@ -122,29 +91,27 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             else if (sourceRelation != null && existingRelation == null)
             {
                 var relation = MapRelation(sourceRelation, existing);
+                relation.TargetNodeId = sourceRelation.Target.Id;
                 existing.OutgoingRelations.Add(relation);
             }
             // Change target
             else
             {
                 Guid existingId = existingRelation.TargetNodeId;
-                Guid sourceId = sourceRelation.Target.Id;
-                if (existingId != sourceId)
+                Guid targetId = sourceRelation.Target.Id;
+                if (existingId != targetId)
                 {
                     Archive(existingRelation.Node);
 
                     RelationEntity relation = MapRelation(sourceRelation, existing);
                     relation.Id = Guid.NewGuid();
                     relation.Node.Id = relation.Id;
+                    relation.SourceNodeId = existing.Id;
                     // set tracked target
-                    if (sourceRelation.Target is Attribute)
-                    {
-                        //
-                    }
-                    else
-                    {
+                    if (!(sourceRelation.Target is Attribute))
+                    { 
                         relation.TargetNode = null;
-                        relation.TargetNodeId = sourceId;
+                        relation.TargetNodeId = targetId;
                     }
                     existing.OutgoingRelations.Add(relation);
 
@@ -180,7 +147,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var target = relation.Target is Attribute
                 ? MapAttribute((Attribute)relation.Target)
-                : RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(relation.Target.Id));
+                : null;
             return new RelationEntity
             {
                 Id = relation.Id,
@@ -191,10 +158,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     UpdatedAt = relation.UpdatedAt,
                     NodeTypeId = relation.Type.Id
                 },
-                TargetNode = relation.Target is Attribute ? target : null,
-                TargetNodeId = target.Id,
-                SourceNodeId = existing.Id,
-                SourceNode = existing
+                TargetNode = target,
+                TargetNodeId = relation.Target.Id
             };
         }
 
