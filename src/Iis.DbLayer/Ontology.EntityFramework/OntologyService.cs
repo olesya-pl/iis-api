@@ -96,7 +96,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 }
                 else
                 {
-                    IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
+                    IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type.Id == relationType.Id);
                     IEnumerable<RelationEntity> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
                     var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
                     foreach (var pair in pairs)
@@ -121,19 +121,19 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             // New relation
             else if (sourceRelation != null && existingRelation == null)
             {
-                var relation = MapRelation(sourceRelation);
+                var relation = MapRelation(sourceRelation, existing);
                 existing.OutgoingRelations.Add(relation);
             }
             // Change target
             else
             {
-                Guid existingId = existingRelation.TargetNode.Id;
+                Guid existingId = existingRelation.TargetNodeId;
                 Guid sourceId = sourceRelation.Target.Id;
                 if (existingId != sourceId)
                 {
                     Archive(existingRelation.Node);
 
-                    RelationEntity relation = MapRelation(sourceRelation);
+                    RelationEntity relation = MapRelation(sourceRelation, existing);
                     relation.Id = Guid.NewGuid();
                     relation.Node.Id = relation.Id;
                     // set tracked target
@@ -176,12 +176,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(entity.Id));
         }
 
-        RelationEntity MapRelation(Relation relation)
+        RelationEntity MapRelation(Relation relation, NodeEntity existing)
         {
-            //Entity entity = (Entity)relation.Target;
             var target = relation.Target is Attribute
                 ? MapAttribute((Attribute)relation.Target)
-                : RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(relation.Id));
+                : RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(relation.Target.Id));
             return new RelationEntity
             {
                 Id = relation.Id,
@@ -192,7 +191,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     UpdatedAt = relation.UpdatedAt,
                     NodeTypeId = relation.Type.Id
                 },
-                TargetNode = target
+                TargetNode = relation.Target is Attribute ? target : null,
+                TargetNodeId = target.Id,
+                SourceNodeId = existing.Id,
+                SourceNode = existing
             };
         }
 
@@ -281,13 +283,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(string typeName, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var types = _ontology.EntityTypes.Where(p => p.Name == typeName);
-            var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
-                .Concat(types).Distinct().ToArray();
+            var derivedTypeNames = types
+                .SelectMany(e => _ontology.GetChildTypes(e))
+                .Concat(types)
+                .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
+                .Select(e => e.Name)
+                .ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypeNames, filter);
                 return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
             }
             else
@@ -367,7 +373,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return nodes.Select(n => MapNode(n)).ToList();
         }
-
 
 
         private void FillRelations(List<NodeEntity> nodes, List<RelationEntity> relations)
