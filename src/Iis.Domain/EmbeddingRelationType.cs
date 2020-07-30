@@ -40,7 +40,7 @@ namespace Iis.Domain
 
         public bool AcceptsOperation(EntityOperation create)
         {
-            return false;
+            return true;
         }
     }
 }
