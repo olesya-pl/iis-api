@@ -247,9 +247,9 @@ namespace Iis.DbLayer.Repositories
         public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)
         {
             return await GetMaterialsQuery(MaterialIncludeEnum.WithChildren)
-            .Where(e => e.ParentId == materialId)
-            .Select(e => e.Id)
-            .ToArrayAsync();
+                    .Where(e => e.ParentId == materialId)
+                    .Select(e => e.Id)
+                    .ToArrayAsync();
         }
 
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
