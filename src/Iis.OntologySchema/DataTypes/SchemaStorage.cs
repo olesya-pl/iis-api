@@ -36,7 +36,7 @@ namespace Iis.OntologySchema.DataTypes
                     RelationTypes.Remove(relationId);
                     continue;
                 }
-                
+
                 AddRelation(relationType);
             }
 
@@ -77,7 +77,7 @@ namespace Iis.OntologySchema.DataTypes
             var inversed = _mapper.Map<SchemaRelationType>(directRelationType);
             var nodeType = _mapper.Map<SchemaNodeType>(NodeTypes[directRelationType.Id]);
             var inversedMeta = directRelationType.NodeType.MetaObject.Inversed;
-            nodeType.Id = new Guid();
+            nodeType.Id = Guid.NewGuid();
             nodeType.Name = inversedMeta.Code ?? directRelationType.SourceType.Name.ToLowerCamelcase();
             nodeType.Title = inversedMeta.Title ?? directRelationType.SourceType.Title ?? nodeType.Name;
             inversed.EmbeddingOptions = inversedMeta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
@@ -205,8 +205,8 @@ namespace Iis.OntologySchema.DataTypes
 
         private bool IsArchived(SchemaRelationType relationType)
         {
-            return !NodeTypeExists(relationType.Id) 
-                || !NodeTypeExists(relationType.SourceTypeId) 
+            return !NodeTypeExists(relationType.Id)
+                || !NodeTypeExists(relationType.SourceTypeId)
                 || !NodeTypeExists(relationType.TargetTypeId);
         }
     }
