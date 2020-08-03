@@ -327,7 +327,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         r.Node = new NodeEntity
                         {
                             Id = rel.Id,
-                            NodeTypeId = rel.Node.NodeTypeId,
+                            NodeTypeId = map[rel.Node.NodeTypeId],
                             Relation = r
                         };
                         relations.Add(r);
@@ -387,6 +387,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived))
             {
+                var relatedType = _ontology.GetType(relatedNode.Node.NodeTypeId);
                 var mapped = MapNode(relatedNode.Node, mappedNodes);
                 node.AddNode(mapped);
             }
