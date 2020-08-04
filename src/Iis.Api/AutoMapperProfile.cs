@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using AutoMapper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -25,6 +26,7 @@ namespace Iis.Api
 {
     public class AutoMapperProfile: Profile
     {
+        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss.fffK";
         public AutoMapperProfile()
         {
             CreateMap<IMaterialSignType, MaterialSignTypeEntity>();
@@ -180,6 +182,7 @@ namespace Iis.Api
             CreateMap<UserEntity, DbLayer.Repositories.Assignee>();
             CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
             CreateMap<MaterialEntity, DbLayer.Repositories.MaterialDocument>()
+                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Importance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Importance)))
@@ -204,6 +207,7 @@ namespace Iis.Api
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null: JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
