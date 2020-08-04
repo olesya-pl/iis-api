@@ -5,19 +5,18 @@ using System.Linq;
 
 namespace Iis.Elastic
 {
-    public enum ElasticMappingPropertyType : byte
-    {
-        Text,
-        Integer,
-        Date,
-        Nested,
-        Alias,
-        Keyword
-    }
     public class ElasticMappingProperty
     {
+        public string Name { get; set; }
+        public ElasticMappingPropertyType Type { get; set; }
+        public List<string> Formats { get; } = new List<string>();
+        public string Path { get; set; }
+        public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
+        public bool SupportsNullValue { get; }
+
         public ElasticMappingProperty() { }
-        public ElasticMappingProperty(string dotName, ElasticMappingPropertyType type, bool supportsNullValue = false)
+
+        public ElasticMappingProperty(string dotName, ElasticMappingPropertyType type, bool supportsNullValue = false, IEnumerable<string> formats = null)
         {
             var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
             Name = splitted[0];
@@ -34,13 +33,10 @@ namespace Iis.Elastic
                 };
             }
             SupportsNullValue = supportsNullValue;
-        }
 
-        public string Name { get; set; }
-        public ElasticMappingPropertyType Type { get; set; }
-        public string Path { get; set; }
-        public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
-        public bool SupportsNullValue { get; }
+            if(formats != null && formats.Any())
+            Formats.AddRange(formats);
+        }
 
         public JObject ToJObject()
         {
