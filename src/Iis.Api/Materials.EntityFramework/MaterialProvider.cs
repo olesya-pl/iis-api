@@ -29,7 +29,7 @@ namespace IIS.Core.Materials.EntityFramework
     public class MaterialProvider<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialProvider where TUnitOfWork : IIISUnitOfWork
     {
         private const int MaxResultWindow = 10000;
-        private static readonly JsonSerializerSettings _js = new JsonSerializerSettings
+        private static readonly JsonSerializerSettings _materialDocSerializeSettings = new JsonSerializerSettings
         {
             DateParseHandling = DateParseHandling.None
         };
@@ -79,7 +79,7 @@ namespace IIS.Core.Materials.EntityFramework
                 materialResult = await RunWithoutCommitAsync(async (unitOfWork) =>
                       await unitOfWork.MaterialRepository.GetAllAsync(matchedIdList, limit, offset, sortColumnName, sortOrder));
                 var materialTasks = searchResult.Items.Values
-                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _js))
+                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
                     .Select(p => MapMaterialDocumentAsync(p));
 
                 materials = await Task.WhenAll(materialTasks);
