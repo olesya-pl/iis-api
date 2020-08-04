@@ -102,6 +102,11 @@ namespace Iis.OntologySchema
             return _storage.GetStringCodes();
         }
 
+        public Dictionary<string, INodeTypeLinked> GetFullHierarchyNodes()
+        {
+            return _storage.DotNameTypes.ToDictionary(x => x.Key, x => (INodeTypeLinked) x.Value);
+        }
+
         public INodeTypeLinked GetEntityTypeByName(string entityTypeName)
         {
             return _storage.NodeTypes.Values

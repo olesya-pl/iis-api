@@ -62,6 +62,7 @@ using Iis.OntologySchema;
 using Iis.OntologyModelWrapper;
 using IIS.Repository.Factories;
 using IIS.Repository.UnitOfWork;
+using Iis.Services;
 
 namespace IIS.Core
 {
@@ -253,6 +254,8 @@ namespace IIS.Core
             services.AddTransient<SearchResultExtractor>();
             services.AddSingleton(elasticConfiguration);
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
+
+            services.AddTransient<IAutocompleteService, AutocompleteService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));

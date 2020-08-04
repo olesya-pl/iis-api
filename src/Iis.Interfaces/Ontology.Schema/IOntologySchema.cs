@@ -1,7 +1,6 @@
 ﻿using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
@@ -10,6 +9,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IOntologySchemaSource SchemaSource { get; }
         void Initialize(IOntologyRawData ontologyRawData);
         IEnumerable<INodeTypeLinked> GetTypes(IGetTypesFilter filter);
+        Dictionary<string, INodeTypeLinked> GetFullHierarchyNodes();
         IEnumerable<INodeTypeLinked> GetEntityTypes();
         INodeTypeLinked GetNodeTypeById(Guid id);
         IOntologyRawData GetRawData();
