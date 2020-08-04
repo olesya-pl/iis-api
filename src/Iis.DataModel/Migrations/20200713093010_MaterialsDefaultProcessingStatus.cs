@@ -8,10 +8,9 @@ namespace IIS.Core.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            return;
-            migrationBuilder.Sql($@"update public.""Materials""
-                                    set ""ProcessedStatusSignId"" = '{MaterialEntity.ProcessingStatusNotProcessedSignId}'
-                                    where ""ProcessedStatusSignId"" is null");
+            //migrationBuilder.Sql($@"update public.""Materials""
+            //                        set ""ProcessedStatusSignId"" = '{MaterialEntity.ProcessingStatusNotProcessedSignId}'
+            //                        where ""ProcessedStatusSignId"" is null");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Materials_MaterialSigns_ProcessedStatusSignId",
@@ -37,7 +36,6 @@ namespace IIS.Core.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            return;
             migrationBuilder.DropForeignKey(
                 name: "FK_Materials_MaterialSigns_ProcessedStatusSignId",
                 table: "Materials");
