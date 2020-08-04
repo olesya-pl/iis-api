@@ -26,7 +26,7 @@ namespace Iis.Api
 {
     public class AutoMapperProfile: Profile
     {
-        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss.fffK";
+        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         public AutoMapperProfile()
         {
             CreateMap<IMaterialSignType, MaterialSignTypeEntity>();
