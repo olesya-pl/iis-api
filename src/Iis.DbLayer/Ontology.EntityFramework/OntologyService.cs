@@ -37,18 +37,20 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var nodeEntity = await RunAsync((unitOfWork) => unitOfWork.OntologyRepository.UpdateNodeAsync(source.Id, 
                 n => SaveRelations(source, n)));
-            
-            if (nodeEntity != null) return;
 
-            nodeEntity = new NodeEntity
+            if (nodeEntity == null)
             {
-                Id = source.Id,
-                NodeTypeId = source.Type.Id,
-                CreatedAt = source.CreatedAt,
-                UpdatedAt = source.UpdatedAt
-            };
-            SaveRelations(source, nodeEntity);
-            Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
+
+                nodeEntity = new NodeEntity
+                {
+                    Id = source.Id,
+                    NodeTypeId = source.Type.Id,
+                    CreatedAt = source.CreatedAt,
+                    UpdatedAt = source.UpdatedAt
+                };
+                SaveRelations(source, nodeEntity);
+                Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
+            }
             await _elasticService.PutNodeAsync(source.Id);
         }
 
