@@ -63,6 +63,7 @@ namespace IIS.Core.GraphQL
                 d.Include<ElasticConfig.Query>();
                 d.Include<ChangeHistory.Query>();
                 d.Include<Themes.Query>();
+                d.Include<Autocomplete.Query>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
