@@ -35,10 +35,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
-            NodeEntity nodeEntity = RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(source.Id));
+            var nodeEntity = await RunAsync((unitOfWork) => unitOfWork.OntologyRepository.UpdateNodeAsync(source.Id, 
+                n => SaveRelations(source, n)));
 
-            if (nodeEntity is null)
+            if (nodeEntity == null)
             {
+
                 nodeEntity = new NodeEntity
                 {
                     Id = source.Id,
@@ -46,41 +48,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     CreatedAt = source.CreatedAt,
                     UpdatedAt = source.UpdatedAt
                 };
+                SaveRelations(source, nodeEntity);
+                Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
             }
-            SaveRelations(source, nodeEntity);
-            Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
-
             await _elasticService.PutNodeAsync(source.Id);
-        }
-
-        public async Task SaveNodesAsync(IEnumerable<Node> nodes, CancellationToken cancellationToken = default)
-        {
-            var existingNodes = await RunWithoutCommitAsync(async (unitOfWork) =>
-                await unitOfWork.OntologyRepository.GetExistingNodes(cancellationToken));
-            var newNodes = new List<NodeEntity>();
-            foreach (Node source in nodes)
-            {
-                if (!existingNodes.TryGetValue(source.Id, out NodeEntity existing))
-                {
-                    existing = new NodeEntity
-                    {
-                        Id = source.Id,
-                        NodeTypeId = source.Type.Id,
-                        CreatedAt = source.CreatedAt,
-                        UpdatedAt = source.UpdatedAt
-                    };
-                    newNodes.Add(existing);
-                }
-
-                SaveRelations(source, existing);
-            }
-
-            Run((unitOfWork) => unitOfWork.OntologyRepository.AddNodes(newNodes));
-
-            foreach (Node source in nodes)
-            {
-                await _elasticService.PutNodeAsync(source.Id);
-            }
         }
 
         private void SaveRelations(Node source, NodeEntity existing)
@@ -96,7 +67,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 }
                 else
                 {
-                    IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type == relationType);
+                    IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type.Id == relationType.Id);
                     IEnumerable<RelationEntity> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
                     var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
                     foreach (var pair in pairs)
@@ -121,30 +92,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             // New relation
             else if (sourceRelation != null && existingRelation == null)
             {
-                var relation = MapRelation(sourceRelation);
+                var relation = MapRelation(sourceRelation, existing);
+                relation.TargetNodeId = sourceRelation.Target.Id;
                 existing.OutgoingRelations.Add(relation);
             }
             // Change target
             else
             {
-                Guid existingId = existingRelation.TargetNode.Id;
-                Guid sourceId = sourceRelation.Target.Id;
-                if (existingId != sourceId)
+                Guid existingId = existingRelation.TargetNodeId;
+                Guid targetId = sourceRelation.Target.Id;
+                if (existingId != targetId)
                 {
                     Archive(existingRelation.Node);
 
-                    RelationEntity relation = MapRelation(sourceRelation);
+                    RelationEntity relation = MapRelation(sourceRelation, existing);
                     relation.Id = Guid.NewGuid();
                     relation.Node.Id = relation.Id;
+                    relation.SourceNodeId = existing.Id;
                     // set tracked target
-                    if (sourceRelation.Target is Attribute)
-                    {
-                        //
-                    }
-                    else
-                    {
+                    if (!(sourceRelation.Target is Attribute))
+                    { 
                         relation.TargetNode = null;
-                        relation.TargetNodeId = sourceId;
+                        relation.TargetNodeId = targetId;
                     }
                     existing.OutgoingRelations.Add(relation);
 
@@ -176,12 +145,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(entity.Id));
         }
 
-        RelationEntity MapRelation(Relation relation)
+        RelationEntity MapRelation(Relation relation, NodeEntity existing)
         {
-            //Entity entity = (Entity)relation.Target;
             var target = relation.Target is Attribute
                 ? MapAttribute((Attribute)relation.Target)
-                : RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(relation.Id));
+                : null;
             return new RelationEntity
             {
                 Id = relation.Id,
@@ -192,7 +160,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     UpdatedAt = relation.UpdatedAt,
                     NodeTypeId = relation.Type.Id
                 },
-                TargetNode = target
+                TargetNode = target,
+                TargetNodeId = relation.Target.Id
             };
         }
 
@@ -281,13 +250,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(string typeName, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var types = _ontology.EntityTypes.Where(p => p.Name == typeName);
-            var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
-                .Concat(types).Distinct().ToArray();
+            var derivedTypeNames = types
+                .SelectMany(e => _ontology.GetChildTypes(e))
+                .Concat(types)
+                .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
+                .Select(e => e.Name)
+                .ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypeNames, filter);
                 return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
             }
             else
@@ -356,7 +329,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         r.Node = new NodeEntity
                         {
                             Id = rel.Id,
-                            NodeTypeId = rel.Node.NodeTypeId,
+                            NodeTypeId = map[rel.Node.NodeTypeId],
                             Relation = r
                         };
                         relations.Add(r);
@@ -367,7 +340,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return nodes.Select(n => MapNode(n)).ToList();
         }
-
 
 
         private void FillRelations(List<NodeEntity> nodes, List<RelationEntity> relations)

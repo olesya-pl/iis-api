@@ -68,7 +68,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             MaterialIndexes = new[] { "Materials" };
 
-            FeatureIndexes = new[] {"Features"};
+            FeatureIndexes = new[] { "Features" };
         }
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
