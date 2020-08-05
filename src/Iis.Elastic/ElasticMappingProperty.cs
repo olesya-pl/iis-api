@@ -35,16 +35,20 @@ namespace Iis.Elastic
             SupportsNullValue = supportsNullValue;
 
             if(formats != null && formats.Any())
-            Formats.AddRange(formats);
+            {
+                Formats.AddRange(formats);
+            }
         }
 
         public JObject ToJObject()
         {
             var result = new JObject();
+
             if (this.Type != ElasticMappingPropertyType.Nested)
             {
                 result["type"] = this.Type.ToString().ToLower();
             }
+
             if (SupportsNullValue)
             {
                 result["null_value"] = ElasticManager.NullValue;
@@ -53,6 +57,11 @@ namespace Iis.Elastic
             if (this.Type == ElasticMappingPropertyType.Alias)
             {
                 result["path"] = this.Path;
+            }
+            
+            if(Type == ElasticMappingPropertyType.Date && Formats.Any())
+            {
+                result["format"] = string.Join("||", Formats);
             }
 
             if (Properties.Count > 0)

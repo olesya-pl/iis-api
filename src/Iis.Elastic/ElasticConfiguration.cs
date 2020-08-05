@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Iis.Elastic
 {
@@ -9,5 +9,7 @@ namespace Iis.Elastic
         public const string DEFAULT_URI = @"http://localhost:9200";
         public string Uri { get; set; } = DEFAULT_URI;
         public string IndexPreffix { get; set; }
+
+        public static IEnumerable<string> DefaultDateFormats { get; } = new [] {"date_optional_time", "dd.MM.yyyy", "dd,MM,yyyy", "yyyy.MM.dd", "yyyy,MM,dd"};
     }
 }
