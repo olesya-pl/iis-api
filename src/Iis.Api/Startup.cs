@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -34,7 +34,6 @@ using RabbitMQ.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AutoMapper;
 using Iis.Api;
@@ -49,7 +48,6 @@ using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
-using Iis.DataModel.Roles;
 using Iis.Roles;
 using Iis.Domain;
 using Iis.Elastic;
@@ -58,10 +56,9 @@ using Iis.DbLayer.Repositories;
 using Iis.DbLayer.OntologySchema;
 using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.ThemeManagement;
-using Iis.OntologySchema;
 using Iis.OntologyModelWrapper;
 using IIS.Repository.Factories;
-using IIS.Repository.UnitOfWork;
+using Iis.Services;
 
 namespace IIS.Core
 {
@@ -252,6 +249,8 @@ namespace IIS.Core
             services.AddSingleton(elasticConfiguration);
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
+            services.AddTransient<IAutocompleteService, AutocompleteService>();
+
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
             services.AddTransient<GraphQLAccessList>();
@@ -306,6 +305,7 @@ namespace IIS.Core
             }
             UpdateDatabase(app);
             PopulateEntityFieldsCache(app);
+            app.UpdateMilitaryAmmountCodes();
 
             app.UseCors(builder =>
                 builder

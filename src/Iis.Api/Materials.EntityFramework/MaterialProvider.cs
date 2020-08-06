@@ -11,8 +11,6 @@ using Iis.Roles;
 using Iis.Domain;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
-using Iis.DataModel;
-using Iis.DataModel.Cache;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
 using Iis.DbLayer.MaterialEnum;
@@ -20,7 +18,6 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 using Newtonsoft.Json;
-using DocumentFormat.OpenXml.Math;
 using IIS.Repository;
 using IIS.Repository.Factories;
 
@@ -28,7 +25,10 @@ namespace IIS.Core.Materials.EntityFramework
 {
     public class MaterialProvider<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialProvider where TUnitOfWork : IIISUnitOfWork
     {
-        private const int MaxResultWindow = 10000;
+        private static readonly JsonSerializerSettings _materialDocSerializeSettings = new JsonSerializerSettings
+        {
+            DateParseHandling = DateParseHandling.None
+        };
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly IElasticService _elasticService;
@@ -64,23 +64,15 @@ namespace IIS.Core.Materials.EntityFramework
 
             if (!string.IsNullOrWhiteSpace(filterQuery))
             {
-                if (!_elasticService.UseElastic)
-                {
-                    return (new List<Material>(), 0, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
-                }
-                var filter = new ElasticFilter { Limit = MaxResultWindow, Offset = 0, Suggestion = filterQuery };
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(_elasticService.MaterialIndexes, filter);
-                var matchedIdList = searchResult.Items.Keys.ToList();
-                materialResult = await RunWithoutCommitAsync(async (unitOfWork) =>
-                      await unitOfWork.MaterialRepository.GetAllAsync(matchedIdList, limit, offset, sortColumnName, sortOrder));
+                var searchResult = await _elasticService.SearchMaterialsByConfiguredFieldsAsync(
+                    new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery });
+
                 var materialTasks = searchResult.Items.Values
-                    .Select(p => p.SearchResult.ToObject<MaterialDocument>())
+                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
                     .Select(p => MapMaterialDocumentAsync(p));
 
-
                 materials = await Task.WhenAll(materialTasks);
-
-                return (materials, materialResult.TotalCount, searchResult.Items);
+                return (materials, searchResult.Count, searchResult.Items);
             }
 
             if (types != null)
@@ -177,10 +169,10 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId)
         {
-            var materialIdList = new List<Guid>{materialId};
-            
+            var materialIdList = new List<Guid> { materialId };
+
             var childList = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetChildIdListForMaterialAsync(materialId));
-            
+
             materialIdList.AddRange(childList);
 
             var entities = await _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
@@ -204,7 +196,7 @@ namespace IIS.Core.Materials.EntityFramework
                 unitOfWork.MaterialRepository.GetFeatureIdListThatRelatesToObjectId(nodeId));
 
             nodeIdList.Add(nodeId);
-            return RunWithoutCommitAsync(async(unitOfWork) =>await unitOfWork.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
+            return RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
@@ -213,7 +205,7 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Material> materials;
 
             var materialsByNode = GetMaterialByNodeIdQuery(nodeId);
-            //TODO: we need to add logic that provides list of NodeId 
+            //TODO: we need to add logic that provides list of NodeId
             //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
 
             mappingTasks = materialsByNode
@@ -234,6 +226,8 @@ namespace IIS.Core.Materials.EntityFramework
 
         private bool IsObjectOfStudy(Node node)
         {
+            if (node is null) return false;
+
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 
             return nodeType.IsObjectOfStudy;

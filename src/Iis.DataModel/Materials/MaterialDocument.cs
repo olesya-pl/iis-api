@@ -30,6 +30,7 @@ namespace Iis.DbLayer.Repositories
         public Guid[] NodeIds { get; set; }
         public Assignee Assignee { get; set; }
         public JObject MLResponses { get; set; }
+        public string Title { get; set; }
     }
 
     public class MaterialSign

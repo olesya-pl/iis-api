@@ -68,8 +68,13 @@ namespace Iis.OntologySchema
 
         public INodeTypeLinked GetNodeTypeById(Guid id)
         {
-            return _storage.NodeTypes.Values
+            var nodeType = _storage.NodeTypes.Values
                 .Where(nt => nt.Id == id)
+                .SingleOrDefault();
+
+            return nodeType ?? _storage.InversedRelationTypes.Values
+                .Where(rt => rt.Id == id)
+                .Select(rt => rt.NodeType)
                 .SingleOrDefault();
         }
 
@@ -100,6 +105,11 @@ namespace Iis.OntologySchema
         public Dictionary<string, INodeTypeLinked> GetStringCodes()
         {
             return _storage.GetStringCodes();
+        }
+
+        public Dictionary<string, INodeTypeLinked> GetFullHierarchyNodes()
+        {
+            return _storage.DotNameTypes.ToDictionary(x => x.Key, x => (INodeTypeLinked) x.Value);
         }
 
         public INodeTypeLinked GetEntityTypeByName(string entityTypeName)

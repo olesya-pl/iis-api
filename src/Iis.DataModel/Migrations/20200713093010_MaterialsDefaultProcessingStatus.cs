@@ -8,9 +8,9 @@ namespace IIS.Core.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql($@"update public.""Materials""
-                                    set ""ProcessedStatusSignId"" = '{MaterialEntity.ProcessingStatusNotProcessedSignId}'
-                                    where ""ProcessedStatusSignId"" is null");
+            //migrationBuilder.Sql($@"update public.""Materials""
+            //                        set ""ProcessedStatusSignId"" = '{MaterialEntity.ProcessingStatusNotProcessedSignId}'
+            //                        where ""ProcessedStatusSignId"" is null");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Materials_MaterialSigns_ProcessedStatusSignId",
