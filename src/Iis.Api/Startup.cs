@@ -250,6 +250,7 @@ namespace IIS.Core
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
+            services.AddTransient<ISanitizeService, SanitizeService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
