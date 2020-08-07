@@ -10,6 +10,6 @@ namespace Iis.Elastic
         public string Uri { get; set; } = DEFAULT_URI;
         public string IndexPreffix { get; set; }
 
-        public static IEnumerable<string> DefaultDateFormats { get; } = new [] {"date_optional_time", "dd.MM.yyyy", "dd,MM,yyyy", "yyyy.MM.dd", "yyyy,MM,dd"};
+        public static IEnumerable<string> DefaultDateFormats { get; } = new [] {"date_optional_time", "dd.MM.yyyy, HH:mm:ss", "dd.MM.yyyy", "dd,MM,yyyy", "yyyy.MM.dd", "yyyy,MM,dd"};
     }
 }
