@@ -208,6 +208,7 @@ namespace Iis.Api
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileInfo(src.FileId.Value): null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null: JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
