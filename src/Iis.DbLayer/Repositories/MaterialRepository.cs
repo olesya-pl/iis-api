@@ -105,9 +105,11 @@ namespace Iis.DbLayer.Repositories
 
             var mlResponsesList = await Context.MLResponses.AsNoTracking()
                 .ToListAsync();
+
             var mlResponses = mlResponsesList
                 .GroupBy(p => p.MaterialId)
                 .ToDictionary(k => k.Key, p => p.ToList());
+
             var putTasks = materialEntities
                 .Select(p => MapEntityToDocument(p))
                 .Select(p => {
@@ -122,7 +124,9 @@ namespace Iis.DbLayer.Repositories
                     p.Id.ToString("N"),
                     JsonConvert.SerializeObject(p),
                     token));
+
             await Task.WhenAll(putTasks);
+
             return materialEntities.Count();
         }
 
@@ -329,6 +333,7 @@ namespace Iis.DbLayer.Repositories
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
             return Context.Materials
+                    .Include(m => m.File)
                     .Include(m => m.Importance)
                     .Include(m => m.Reliability)
                     .Include(m => m.Relevance)

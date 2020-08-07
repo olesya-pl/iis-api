@@ -99,11 +99,15 @@ namespace IIS.Core.Materials.EntityFramework
         private async Task<Material> MapMaterialDocumentAsync(MaterialDocument p)
         {
             var res = _mapper.Map<Material>(p);
+            
             res.Children = p.Children.Select(c => _mapper.Map<Material>(c)).ToList();
+            
             var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x, null)));
+            
             res.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
             res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
             res.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes.ToList());
+            
             return res;
         }
 
