@@ -66,9 +66,7 @@ namespace IIS.Core.Materials.Handlers
             options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
-                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-
         }
         
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
