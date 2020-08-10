@@ -6,9 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic
 {
-    public class SearchResultExtractor
+    internal class SearchResultExtractor
     {
-        IFieldToAliasMapper _fieldToAliasMapper;
+        private readonly IFieldToAliasMapper _fieldToAliasMapper;
         public SearchResultExtractor(IFieldToAliasMapper fieldToAliasMapper)
         {
             _fieldToAliasMapper = fieldToAliasMapper;
