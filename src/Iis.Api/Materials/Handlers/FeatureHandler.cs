@@ -118,7 +118,6 @@ namespace IIS.Core.Materials.Handlers
                 uow.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
                 uow.MaterialRepository.EditMaterial(material);
             });
-
         }
 
         private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
@@ -223,6 +222,8 @@ namespace IIS.Core.Materials.Handlers
                 durable: durableQueue,
                 exclusiveQueue,
                 autoDeleteQueue).QueueName;
+
+            channel.BasicQos(0, config.PrefetchCount, global:false);
 
             if (string.IsNullOrWhiteSpace(config.ExchangeName) || !config.RoutingKeys.Any()) return;
 

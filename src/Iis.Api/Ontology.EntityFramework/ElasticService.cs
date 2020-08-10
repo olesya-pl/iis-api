@@ -66,7 +66,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             UseElastic = _context.NodeTypes.Any(nt => nt.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
-            MaterialIndexes = new[] { "Materials" };
+            MaterialIndexes = _materialRepository.MaterialIndexes;
 
             FeatureIndexes = new[] { "Features" };
         }

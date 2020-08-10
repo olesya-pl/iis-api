@@ -29,7 +29,7 @@ namespace Iis.Elastic
                 Type = ElasticMappingPropertyType.Nested;
                 Properties = new List<ElasticMappingProperty>
                 {
-                    new ElasticMappingProperty(string.Join('.', splitted.Skip(1)), type)
+                    new ElasticMappingProperty(string.Join('.', splitted.Skip(1)), type, formats:formats)
                 };
             }
             SupportsNullValue = supportsNullValue;

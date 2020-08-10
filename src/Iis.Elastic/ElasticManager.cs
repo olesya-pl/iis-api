@@ -8,20 +8,26 @@ using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
+using Microsoft.Extensions.Logging;
+using Iis.Utility;
 
 namespace Iis.Elastic
 {
-    public class ElasticManager: IElasticManager
+    internal class ElasticManager: IElasticManager
     {
         private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
         private const string RemoveSymbolsPattern = "№";
         public const string NullValue = "NULL";
-        ElasticLowLevelClient _lowLevelClient;
-        ElasticConfiguration _configuration;
-        SearchResultExtractor _resultExtractor;
+        private readonly ElasticLowLevelClient _lowLevelClient;
+        private readonly ElasticConfiguration _configuration;
+        private readonly SearchResultExtractor _resultExtractor;
+        private readonly ILogger<ElasticManager> _logger;
+        private readonly ElasticLogUtils _responseLogUtils;
 
         public ElasticManager(ElasticConfiguration configuration,
-            SearchResultExtractor resultExtractor)
+            SearchResultExtractor resultExtractor,
+            ILogger<ElasticManager> logger,
+            ElasticLogUtils responseLogUtils)
         {
             _configuration = configuration;
 
@@ -31,6 +37,8 @@ namespace Iis.Elastic
 
             _lowLevelClient = new ElasticLowLevelClient(config);
             _resultExtractor = resultExtractor;
+            _logger = logger;
+            _responseLogUtils = responseLogUtils;
         }
 
         public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
@@ -43,6 +51,14 @@ namespace Iis.Elastic
 
             var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, indexUrl, cancellationToken, postData);
 
+            return response.Success;
+        }
+
+        public async Task<bool> PutsDocumentsAsync(string indexName, string materialDocuments, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(indexName)) return false;
+            var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
+            var response = await PostAsync(indexUrl, materialDocuments, token);
             return response.Success;
         }
 
@@ -345,9 +361,14 @@ namespace Iis.Elastic
         }
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
         {
-            PostData postData = data;
-
-            return await _lowLevelClient.DoRequestAsync<StringResponse>(httpMethod, path, cancellationToken, postData);
+            using (DurationMeter.Measure($"Elastic request {httpMethod} {path}", _logger))
+            {
+                PostData postData = data;
+                var response = await _lowLevelClient.DoRequestAsync<StringResponse>(httpMethod, path, cancellationToken, postData);
+                var log = _responseLogUtils.PrepareLog(response);
+                _logger.Log(log.LogLevel, log.Message);
+                return response;
+            }
         }
 
         private async Task<StringResponse> PutAsync(string path, string data, CancellationToken cancellationToken)

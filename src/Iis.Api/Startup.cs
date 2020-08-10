@@ -59,6 +59,7 @@ using Iis.ThemeManagement;
 using Iis.OntologyModelWrapper;
 using IIS.Repository.Factories;
 using Iis.Services;
+using Iis.Utility;
 
 namespace IIS.Core
 {
@@ -242,10 +243,7 @@ namespace IIS.Core
                 .AddRabbitMQ(mqConnectionString, (SslOption)null)
                 .AddElasticsearch(elasticConfiguration.Uri);
 
-
-            services.AddTransient<IElasticManager, ElasticManager>();
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
-            services.AddTransient<SearchResultExtractor>();
             services.AddSingleton(elasticConfiguration);
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
@@ -256,6 +254,7 @@ namespace IIS.Core
             services.AddTransient<GraphQLAccessList>();
 
             services.RegisterRepositories();
+            services.RegisterElasticModules();
         }
 
 
