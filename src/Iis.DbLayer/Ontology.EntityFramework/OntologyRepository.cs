@@ -100,26 +100,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return Context.Attributes.SingleOrDefault(_ => _.Id == id);
         }
 
-        public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion, ElasticFilter filter)
+        public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter)
         {
             var relationsQ = Context.Relations
                 .Include(e => e.SourceNode)
                 .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
+            var suggestion = filter.Suggestion;
             if (suggestion != null)
                 relationsQ = relationsQ.Where(e =>
                     EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
             return relationsQ.Select(e => e.SourceNode).Skip(filter.Offset).Take(filter.Limit).ToListAsync();
-        }
-
-        public Task<List<NodeEntity>> GetNodesAsync(IEnumerable<Guid> derived, ElasticFilter filter)
-        {
-            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
-                .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
-        }
-
-        public Task<int> GetNodesCountAsync(IEnumerable<Guid> derived)
-        {
-            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived).Distinct().CountAsync();
         }
 
         public Task<int> GetNodesCountWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion)
