@@ -65,7 +65,8 @@ namespace IIS.Core.Materials.Handlers
             
             options = new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNameCaseInsensitive = true
+                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
         }
@@ -102,6 +103,8 @@ namespace IIS.Core.Materials.Handlers
             if(processor.IsDummy) return;
 
             var material = await RunAsync(uow => uow.MaterialRepository.GetByIdAsync(message.Id)); 
+
+            if(material is null) return;
             
             JObject metadata = JObject.Parse(material.Metadata);
 
