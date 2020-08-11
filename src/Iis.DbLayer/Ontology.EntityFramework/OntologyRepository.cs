@@ -102,8 +102,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter)
         {
-            var suggestion = filter.Suggestion;
-            if (suggestion == null)
+            if (string.IsNullOrWhiteSpace(filter.Suggestion))
             {
                 return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
                     .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
@@ -113,7 +112,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Include(e => e.SourceNode)
                 .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
                 .Where(e =>
-                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
+                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"));
             return relationsQ
                 .Select(e => e.SourceNode)
                 .Distinct()
