@@ -81,20 +81,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return relationsQ.ToListAsync();
         }
 
-        public async Task<Dictionary<Guid, NodeEntity>> GetExistingNodes(CancellationToken cancellationToken)
-        {
-            IQueryable<NodeEntity> query =
-                from node in Context.Nodes
-                    .Include(x => x.Relation)
-                    .Include(x => x.Attribute)
-                    .Include(x => x.OutgoingRelations)
-                    .ThenInclude(x => x.Node)
-                select node;
-            Dictionary<Guid, NodeEntity>
-                existingNodes = await query.ToDictionaryAsync(x => x.Id, cancellationToken);
-            return existingNodes;
-        }
-
         public AttributeEntity GetAttributeEntityById(Guid id)
         {
             return Context.Attributes.SingleOrDefault(_ => _.Id == id);
@@ -115,7 +101,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"));
             return relationsQ
                 .Select(e => e.SourceNode)
-                .Distinct()
                 .Skip(filter.Offset)
                 .Take(filter.Limit)
                 .ToListAsync();
