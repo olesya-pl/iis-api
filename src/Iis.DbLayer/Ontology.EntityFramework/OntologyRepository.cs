@@ -32,6 +32,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             return Context.Relations.Where(e => e.SourceNodeId == id && !e.Node.IsArchived)
                 .Include(e => e.Node)
+                .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .ToListAsync(cancellationToken);
@@ -81,54 +82,42 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return relationsQ.ToListAsync();
         }
 
-        public async Task<Dictionary<Guid, NodeEntity>> GetExistingNodes(CancellationToken cancellationToken)
-        {
-            IQueryable<NodeEntity> query =
-                from node in Context.Nodes
-                    .Include(x => x.Relation)
-                    .Include(x => x.Attribute)
-                    .Include(x => x.OutgoingRelations)
-                    .ThenInclude(x => x.Node)
-                select node;
-            Dictionary<Guid, NodeEntity>
-                existingNodes = await query.ToDictionaryAsync(x => x.Id, cancellationToken);
-            return existingNodes;
-        }
-
         public AttributeEntity GetAttributeEntityById(Guid id)
         {
             return Context.Attributes.SingleOrDefault(_ => _.Id == id);
         }
 
-        public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion, ElasticFilter filter)
+        public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter)
         {
+            if (string.IsNullOrWhiteSpace(filter.Suggestion))
+            {
+                return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
+                    .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
+
+            }
             var relationsQ = Context.Relations
                 .Include(e => e.SourceNode)
-                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
-            if (suggestion != null)
-                relationsQ = relationsQ.Where(e =>
-                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
-            return relationsQ.Select(e => e.SourceNode).Skip(filter.Offset).Take(filter.Limit).ToListAsync();
-        }
-
-        public Task<List<NodeEntity>> GetNodesAsync(IEnumerable<Guid> derived, ElasticFilter filter)
-        {
-            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
-                .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
-        }
-
-        public Task<int> GetNodesCountAsync(IEnumerable<Guid> derived)
-        {
-            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived).Distinct().CountAsync();
+                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
+                .Where(e =>
+                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"));
+            return relationsQ
+                .Select(e => e.SourceNode)
+                .Skip(filter.Offset)
+                .Take(filter.Limit)
+                .ToListAsync();
         }
 
         public Task<int> GetNodesCountWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion)
         {
+            if (suggestion == null)
+            {
+                return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived).Distinct().CountAsync();
+            }
+
             var relationsQ = Context.Relations
                 .Include(e => e.SourceNode)
-                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
-            if (suggestion != null)
-                relationsQ = relationsQ.Where(e =>
+                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
+                .Where(e =>
                     EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
             return relationsQ.Select(e => e.SourceNode).Distinct().CountAsync();
         }

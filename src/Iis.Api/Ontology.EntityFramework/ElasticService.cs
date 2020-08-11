@@ -22,7 +22,6 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly IElasticConfiguration _elasticConfiguration;
         private readonly IOntologySchema _ontologySchema;
         private readonly RunTimeSettings _runTimeSettings;
-        private readonly OntologyContext _context;
         private readonly INodeRepository _nodeRepository;
         private readonly IMaterialRepository _materialRepository;
         private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
@@ -40,14 +39,12 @@ namespace IIS.Core.Ontology.EntityFramework
             IOntologySchema ontologySchema,
             INodeRepository nodeRepository,
             IMaterialRepository materialRepository,
-            RunTimeSettings runTimeSettings,
-            OntologyContext context)
+            RunTimeSettings runTimeSettings)
         {
             _elasticManager = elasticManager;
             _ontologySchema = ontologySchema;
             _runTimeSettings = runTimeSettings;
             _elasticConfiguration = elasticConfiguration;
-            _context = context;
             _nodeRepository = nodeRepository;
             _materialRepository = materialRepository;
 
@@ -58,13 +55,13 @@ namespace IIS.Core.Ontology.EntityFramework
                     .Where(nt => !nt.IsAbstract)
                     .Select(nt => nt.Name)
                     .ToList();
+
+                UseElastic = true;
             }
 
             EventIndexes = new[]{
                 "Event"
             };
-
-            UseElastic = _context.NodeTypes.Any(nt => nt.Name == EntityTypeNames.ObjectOfStudy.ToString());
 
             MaterialIndexes = _materialRepository.MaterialIndexes;
 
@@ -154,7 +151,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private bool OntologyIndexIsSupported(string indexName)
         {
-            return OntologyIndexes.Any(index => index.Equals(indexName)) || EventIndexes.Any(index => indexName.Equals(indexName));
+            return OntologyIndexes.Any(index => index.Equals(indexName)) || EventIndexes.Any(index => index.Equals(indexName));
         }
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
