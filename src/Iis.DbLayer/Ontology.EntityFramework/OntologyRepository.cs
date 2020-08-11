@@ -32,6 +32,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             return Context.Relations.Where(e => e.SourceNodeId == id && !e.Node.IsArchived)
                 .Include(e => e.Node)
+                .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .ToListAsync(cancellationToken);
