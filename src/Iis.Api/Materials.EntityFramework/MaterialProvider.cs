@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using AutoMapper;
 
 using Iis.Utility;
-using Iis.Roles;
 using Iis.Domain;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
@@ -20,6 +19,7 @@ using MaterialSign = Iis.Domain.Materials.MaterialSign;
 using Newtonsoft.Json;
 using IIS.Repository;
 using IIS.Repository.Factories;
+using Iis.Services.Contracts;
 
 namespace IIS.Core.Materials.EntityFramework
 {

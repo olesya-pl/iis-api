@@ -1,7 +1,9 @@
-﻿using System;
-using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.Services
 {

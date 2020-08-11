@@ -1,18 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-
 using Iis.DataModel;
-using Iis.DataModel.Roles;
 using Iis.DataModel.Materials;
-using Microsoft.Extensions.Configuration;
+using Iis.DataModel.Roles;
+using Iis.Services.Contracts;
+using Microsoft.EntityFrameworkCore;
 
-namespace Iis.Roles
+namespace Iis.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly OntologyContext _context;
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
@@ -27,6 +26,7 @@ namespace Iis.Roles
             _maxMaterialsConfig = maxMaterialsConfig;
             _mapper = mapper;
         }
+
         public async Task<Guid> CreateUserAsync(User newUser)
         {
             var entityExists = await _context.Users
@@ -45,7 +45,7 @@ namespace Iis.Roles
                                     .Select(role => CreateUserRole(userEntity.Id, role.Id))
                                     .ToList();
 
-            _context.Add(userEntity);
+            _context.Add((object)userEntity);
 
             _context.AddRange(userRolesEntitiesList);
 
@@ -125,6 +125,7 @@ namespace Iis.Roles
 
             return userEntity.Id;
         }
+
         public async Task<User> GetUserAsync(Guid userId)
         {
             var userEntity = await GetUsersQuery()
@@ -137,10 +138,12 @@ namespace Iis.Roles
 
             return Map(userEntity);
         }
+
         public User GetUser(Guid userId)
         {
             return GetUserAsync(userId).GetAwaiter().GetResult();
         }
+
         public User GetUser(string userName, string passwordHash)
         {
             var userEntity = GetUsersQuery()
@@ -148,6 +151,7 @@ namespace Iis.Roles
 
             return Map(userEntity);
         }
+
         public async Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(int offset, int pageSize)
         {
             var userEntities = await GetUsersQuery()
@@ -161,6 +165,7 @@ namespace Iis.Roles
 
             return (userEntities.Select(e => Map(e)).ToList(), userEntitiesCount);
         }
+
         private IQueryable<UserEntity> GetUsersQuery()
         {
             return _context.Users
@@ -170,6 +175,7 @@ namespace Iis.Roles
                 .ThenInclude(ra => ra.AccessObject)
                 .AsNoTracking();
         }
+
         private User Map(UserEntity entity)
         {
             if (entity is null) return null;
@@ -191,6 +197,7 @@ namespace Iis.Roles
 
             return user;
         }
+
         private UserRoleEntity CreateUserRole(Guid userId, Guid roleId)
         {
             return new UserRoleEntity

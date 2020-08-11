@@ -936,6 +936,25 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("RoleAccess");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.Roles.RoleActiveDirectoryGroupEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleGroups");
+                });
+
             modelBuilder.Entity("Iis.DataModel.Roles.RoleEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1315,6 +1334,15 @@ namespace Iis.DataModel.Migrations
 
                     b.HasOne("Iis.DataModel.Roles.RoleEntity", "Role")
                         .WithMany("RoleAccessEntities")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Roles.RoleActiveDirectoryGroupEntity", b =>
+                {
+                    b.HasOne("Iis.DataModel.Roles.RoleEntity", "Role")
+                        .WithMany("RoleGroups")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

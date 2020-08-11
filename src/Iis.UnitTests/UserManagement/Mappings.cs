@@ -3,8 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using AutoMapper;
-
-using DomainRoles = Iis.Roles;
+using Iis.Services.Contracts;
 using GraphUsers = IIS.Core.GraphQL.Users;
 
 namespace Iis.UnitTests.UserManagement
@@ -27,7 +26,7 @@ namespace Iis.UnitTests.UserManagement
         [RecursiveAutoData]
         public void MapUserCreateInputToUser(GraphUsers.UserCreateInput input)
         {
-            var user = _mapper.Map<DomainRoles.User>(input);
+            var user = _mapper.Map<User>(input);
 
             Assert.NotEqual(user.Id, Guid.Empty);
             Assert.Equal(input.LastName, user.LastName);
@@ -44,7 +43,7 @@ namespace Iis.UnitTests.UserManagement
         [RecursiveAutoData]
         public void MapUserUpdateInputToUser(GraphUsers.UserUpdateInput input)
         {
-            var user = _mapper.Map<DomainRoles.User>(input);
+            var user = _mapper.Map<User>(input);
 
             Assert.Equal(input.Id, user.Id);
             Assert.Equal(input.LastName, user.LastName);
@@ -60,7 +59,7 @@ namespace Iis.UnitTests.UserManagement
 
         [Theory(DisplayName = "Checks Automapper mapping: Domail User -> GraphQL User")]
         [RecursiveAutoData]
-        public void MapUserToUserOutput(DomainRoles.User domainUser)
+        public void MapUserToUserOutput(User domainUser)
         {
             var graphQlUser = _mapper.Map<GraphUsers.User>(domainUser);
 

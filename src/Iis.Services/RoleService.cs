@@ -1,15 +1,16 @@
-﻿using AutoMapper;
-using Iis.DataModel;
-using Iis.DataModel.Roles;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Iis.DataModel;
+using Iis.DataModel.Roles;
+using Iis.Services.Contracts;
+using Microsoft.EntityFrameworkCore;
 
-namespace Iis.Roles
+namespace Iis.Services
 {
-    public class RoleService
+    public class RoleService : IRoleService
     {
         OntologyContext _context;
         IMapper _mapper;
@@ -19,11 +20,13 @@ namespace Iis.Roles
             _context = context;
             _mapper = mapper;
             _defaultAccessGrantedList = _context.AccessObjects
-                .Select(ag => new AccessGranted { 
-                    Id = ag.Id, 
-                    Kind = ag.Kind, 
-                    Category = ag.Category, 
-                    Title = ag.Title })
+                .Select(ag => new AccessGranted
+                {
+                    Id = ag.Id,
+                    Kind = ag.Kind,
+                    Category = ag.Category,
+                    Title = ag.Title
+                })
                 .ToList();
         }
 
@@ -46,9 +49,11 @@ namespace Iis.Roles
         {
             var roleEntity = await _context.Roles
                 .Where(r => r.Id == id)
+                .Include(r => r.RoleGroups)
                 .Include(r => r.RoleAccessEntities)
                 .ThenInclude(ra => ra.AccessObject)
                 .SingleOrDefaultAsync();
+
             var role = _mapper.Map<Role>(roleEntity);
             role.AccessGrantedItems.Merge(_defaultAccessGrantedList);
             return role;

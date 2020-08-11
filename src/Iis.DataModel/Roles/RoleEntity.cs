@@ -17,5 +17,6 @@ namespace Iis.DataModel.Roles
 
         public List<RoleAccessEntity> RoleAccessEntities { get; set; }
         public List<UserRoleEntity> UserRoles { get; set; }
+        public List<RoleActiveDirectoryGroupEntity> RoleGroups { get; set; }
     }
 }

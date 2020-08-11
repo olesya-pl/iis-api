@@ -1,6 +1,5 @@
+using Iis.Services.Contracts;
 using System;
-
-using Iis.Roles;
 
 namespace Iis.ThemeManagement.Models
 {

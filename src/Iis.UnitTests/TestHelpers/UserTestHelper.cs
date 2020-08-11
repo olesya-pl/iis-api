@@ -1,5 +1,5 @@
 ﻿using Iis.DataModel;
-using Iis.Roles;
+using Iis.Services.Contracts;
 using Xunit;
 
 namespace Iis.UnitTests.TestHelpers

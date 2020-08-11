@@ -9,6 +9,8 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Iis.Services;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.Api.Bootstrap
 {

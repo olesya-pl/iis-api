@@ -48,7 +48,6 @@ using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
-using Iis.Roles;
 using Iis.Domain;
 using Iis.Elastic;
 using Iis.DbLayer.Elastic;
@@ -60,6 +59,8 @@ using Iis.OntologyModelWrapper;
 using IIS.Repository.Factories;
 using Iis.Services;
 using Iis.Utility;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core
 {
@@ -249,6 +250,11 @@ namespace IIS.Core
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<ISanitizeService, SanitizeService>();
+            services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ => 
+                new ActiveDirectoryClient(
+                    Configuration["activeDirectory:domain"], 
+                    Configuration["activeDirectory:login"], 
+                    Configuration["activeDirectory:password"]));
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));

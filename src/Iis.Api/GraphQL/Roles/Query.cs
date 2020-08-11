@@ -2,11 +2,11 @@
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Interfaces.Roles;
-using Iis.Roles;
 using IIS.Core.GraphQL.Common;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Iis.Services;
 
 namespace IIS.Core.GraphQL.Roles
 {

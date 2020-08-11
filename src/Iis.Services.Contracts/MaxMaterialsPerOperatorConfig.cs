@@ -1,4 +1,4 @@
-﻿namespace Iis.Roles
+﻿namespace Iis.Services.Contracts
 {
     public class MaxMaterialsPerOperatorConfig
     {

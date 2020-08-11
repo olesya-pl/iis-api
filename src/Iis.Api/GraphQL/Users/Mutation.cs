@@ -3,14 +3,11 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Configuration;
 using AutoMapper;
-using Iis.Roles;
 using HotChocolate;
 using HotChocolate.Types;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-
-using Iis.Roles;
 using Iis.DataModel;
-using DomainRoles = Iis.Roles;
+using Iis.Services;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -29,7 +26,7 @@ namespace IIS.Core.GraphQL.Users
         {
             Validator.ValidateObject(user, new ValidationContext(user), true);
 
-            var domainUser = mapper.Map<DomainRoles.User>(user);
+            var domainUser = mapper.Map<Iis.Services.Contracts.User>(user);
 
             domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
 
@@ -46,7 +43,7 @@ namespace IIS.Core.GraphQL.Users
         {
             Validator.ValidateObject(user, new ValidationContext(user), true);
 
-            var domainUser = mapper.Map<DomainRoles.User>(user);
+            var domainUser = mapper.Map<Iis.Services.Contracts.User>(user);
 
             if (!string.IsNullOrWhiteSpace(user.Password)) 
             {
