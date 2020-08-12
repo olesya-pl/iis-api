@@ -20,7 +20,7 @@ namespace Iis.Domain
         Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         //Task CreateRelation(Guid sourceNodeId, Guid targetNodeId);
-        Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
+        Task<List<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
         Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
     }
 }

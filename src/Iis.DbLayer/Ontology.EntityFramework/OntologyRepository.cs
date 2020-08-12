@@ -132,7 +132,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public async Task<List<AttributeEntity>> GetAttributesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             return await
                 (from n in Context.Nodes
@@ -148,7 +148,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         }
 
-        public async Task<List<NodeEntity>> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        public async Task<List<NodeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             return await
                 (from n in Context.Nodes
