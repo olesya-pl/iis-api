@@ -405,6 +405,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             Run(unitOfWork => unitOfWork.OntologyRepository.UpdateNodes(updatedNodeEntities));
         }
 
+        public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        {
+            var nodeEntities = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName));
+
+            return nodeEntities
+                .Select(n => (Entity)MapNode(n))
+                .ToList();
+        }
+
         public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodeEntities = await RunWithoutCommitAsync(async unitOfWork =>
