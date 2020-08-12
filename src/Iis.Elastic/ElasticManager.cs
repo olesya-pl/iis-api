@@ -343,6 +343,7 @@ namespace Iis.Elastic
             }
             return builder.ToString();
         }
+        
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
         {
             PostData postData = data;
