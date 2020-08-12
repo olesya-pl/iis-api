@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 using Iis.DataModel;
@@ -255,7 +256,16 @@ namespace Iis.DbLayer.Repositories
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
+            
+            var originalContent = materialDocument.Data.FirstOrDefault(e => e.Type == "originalContent");
 
+            if(originalContent != null)
+            {
+                originalContent.Text = RemoveImagesFromContent(originalContent.Text);
+            }
+            
+            materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
+            
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
             materialDocument.NodeIds = material.MaterialInfos
@@ -290,6 +300,10 @@ namespace Iis.DbLayer.Repositories
                 }
             }
             return mlResponsesContainer;
+        }
+        private string RemoveImagesFromContent(string content)
+        {
+            return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
         }
 
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
