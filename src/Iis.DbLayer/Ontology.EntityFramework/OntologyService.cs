@@ -379,7 +379,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else throw new Exception($"Node mapping does not support ontology type {type.GetType()}.");
 
-            foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived && !e.Node.NodeType.IsArchived))
+            foreach (var relatedNode in ctxNode.OutgoingRelations
+                .Where(e => !e.Node.IsArchived && (e.Node.NodeType == null || !e.Node.NodeType.IsArchived)))
             {
                 var mapped = MapNode(relatedNode.Node, mappedNodes);
                 node.AddNode(mapped);
