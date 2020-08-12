@@ -46,10 +46,15 @@ namespace Iis.Api
 
                     foreach (var militaryAmount in militaryAmounts)
                     {
-                        var amount = ontologyService.GetNodeByUniqueValue(amountType.Id, militaryAmount.Name, "name").GetAwaiter().GetResult() as Entity;
-                        amount.SetProperty("code", militaryAmount.Code);
-                        amount.SetProperty("name", militaryAmount.Name);
-                        ontologyService.SaveNodeAsync(amount).GetAwaiter().GetResult();
+                        var nodes = ontologyService.GetEntitiesByUniqueValue(amountType.Id, militaryAmount.Name, "name")
+                            .GetAwaiter().GetResult();
+                        nodes.Select(amount => {
+                                amount.SetProperty("code", militaryAmount.Code);
+                                amount.SetProperty("name", militaryAmount.Name);
+                                ontologyService.SaveNodeAsync(amount).GetAwaiter().GetResult();
+                                return amount;
+                            });
+
                     }
                 }
             }
