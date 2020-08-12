@@ -72,6 +72,7 @@ namespace IIS.Core.Materials.EntityFramework
                     .Select(p => MapMaterialDocumentAsync(p));
 
                 materials = await Task.WhenAll(materialTasks);
+
                 return (materials, searchResult.Count, searchResult.Items);
             }
 

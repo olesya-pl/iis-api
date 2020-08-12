@@ -125,7 +125,9 @@ namespace Iis.DbLayer.Repositories
                         {
                             return p;
                         }
-                        p.MLResponses = MapMlResponseEntities(mlResponses[p.Id]);
+                        var responses = mlResponses[p.Id];
+                        p.MLResponses = MapMlResponseEntities(responses);
+                        p.ProcessedMlHandlersCount = responses.Count();
                         return p;
                     })
                     .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
@@ -143,7 +145,12 @@ namespace Iis.DbLayer.Repositories
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .SingleOrDefaultAsync(p => p.Id == materialId);
             var materialDocument = MapEntityToDocument(material);
-            materialDocument.MLResponses = await PopulateMLResponses(materialId);
+            
+            var responseResult = await PopulateMLResponses(materialId);
+
+            materialDocument.MLResponses = responseResult.responses;
+            materialDocument.ProcessedMlHandlersCount = responseResult.responsesCount;
+
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
@@ -276,10 +283,11 @@ namespace Iis.DbLayer.Repositories
             return materialDocument;
         }
 
-        private async Task<JObject> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject responses, int responsesCount)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
-            return MapMlResponseEntities(mlResponses);
+
+            return (MapMlResponseEntities(mlResponses), mlResponses.Count());
         }
 
         private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)
