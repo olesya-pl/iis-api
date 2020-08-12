@@ -408,17 +408,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodeEntities = await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.OntologyRepository.GetNodeByUniqueValue(nodeTypeId, value, valueTypeName));
+                await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName));
 
             return nodeEntities
                 .Select(n => (Entity)MapNode(n))
                 .FirstOrDefault();
         }
 
-        public Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public Task<List<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             return RunWithoutCommitAsync(async unitOfWork =>
-                   await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
+                   await unitOfWork.OntologyRepository.GetAttributesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
 
         }
         //public async Task CreateRelation(Guid sourceNodeId, Guid targetNodeId)
