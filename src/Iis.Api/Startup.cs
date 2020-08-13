@@ -61,12 +61,14 @@ using Iis.Services;
 using Iis.Utility;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace IIS.Core
 {
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
 
         public Startup(IConfiguration configuration)
         {
@@ -94,7 +96,9 @@ namespace IIS.Core
             if (enableContext)
             {
                 services.AddDbContext<OntologyContext>(
-                    options => options.UseNpgsql(dbConnectionString),
+                    options => options
+                        .UseNpgsql(dbConnectionString),
+                        //.UseLoggerFactory(MyLoggerFactory), // if uncomment this then sql query will be shown in console 
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
                 //using var context = OntologyContext.GetContext(dbConnectionString);

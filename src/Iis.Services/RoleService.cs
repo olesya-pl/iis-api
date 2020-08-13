@@ -19,6 +19,7 @@ namespace Iis.Services
         {
             _context = context;
             _mapper = mapper;
+            //TODO: should we get AccessObjects from db each time we use RoleService(RoleService is registered in DI as transient)
             _defaultAccessGrantedList = _context.AccessObjects
                 .Select(ag => new AccessGranted
                 {
@@ -33,50 +34,95 @@ namespace Iis.Services
         public async Task<List<Role>> GetRolesAsync()
         {
             var roleEntities = await _context.Roles
+                .Include(r => r.RoleGroups)
                 .Include(r => r.RoleAccessEntities)
                 .ThenInclude(ra => ra.AccessObject)
                 .ToListAsync();
 
-            var roles = roleEntities.Select(r => _mapper.Map<Role>(r)).ToList();
-            foreach (var role in roles)
-            {
-                role.AccessGrantedItems.Merge(_defaultAccessGrantedList);
-            }
-            return roles;
+            return roleEntities.Select(ToRole).ToList();
         }
 
         public async Task<Role> GetRoleAsync(Guid id)
         {
             var roleEntity = await _context.Roles
-                .Where(r => r.Id == id)
                 .Include(r => r.RoleGroups)
                 .Include(r => r.RoleAccessEntities)
                 .ThenInclude(ra => ra.AccessObject)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(r => r.Id == id);
 
-            var role = _mapper.Map<Role>(roleEntity);
-            role.AccessGrantedItems.Merge(_defaultAccessGrantedList);
-            return role;
+           return ToRole(roleEntity);
         }
 
         public async Task<Role> CreateRoleAsync(Role role)
         {
             var roleEntity = _mapper.Map<RoleEntity>(role);
+            roleEntity.RoleGroups = role.ActiveDirectoryGroupIds.Select(g => new RoleActiveDirectoryGroupEntity()
+            {
+                GroupId = g,
+                RoleId = role.Id
+            }).ToList();
+
             _context.Roles.Add(roleEntity);
             await SaveRoleAccesses(role.Id, role.AccessGrantedItems);
-            return await GetRoleAsync(roleEntity.Id);
+            return ToRole(roleEntity);
         }
 
         public async Task<Role> UpdateRoleAsync(Role role)
         {
-            var roleEntity = _mapper.Map<RoleEntity>(role);
-            var roleAccessEntities = _mapper.Map<List<RoleAccessEntity>>(role.AccessGrantedItems);
+            var updatedRoleEntity = _mapper.Map<RoleEntity>(role);
+            var roleEntity = await _context.Roles
+                .Include(r => r.RoleGroups)
+                .Include(r => r.RoleAccessEntities)
+                .ThenInclude(ra => ra.AccessObject)
+                .SingleOrDefaultAsync(x => x.Id == role.Id);
+            
+            _context.Entry(roleEntity).CurrentValues.SetValues(updatedRoleEntity);
+            UpdateActiveDirectoryGroups(roleEntity, role.ActiveDirectoryGroupIds);
+            UpdateRoleAccesses(roleEntity, role.AccessGrantedItems);
 
-            _context.Roles.Update(roleEntity);
-            _context.RoleAccess.RemoveRange(_context.RoleAccess.Where(p => p.RoleId == roleEntity.Id));
             await _context.SaveChangesAsync();
-            await SaveRoleAccesses(role.Id, role.AccessGrantedItems);
-            return await GetRoleAsync(roleEntity.Id);
+            return ToRole(roleEntity);
+        }
+
+        private void UpdateRoleAccesses(RoleEntity entity, AccessGrantedList accesses)
+        {
+            if (accesses == null || !accesses.Any())
+                return;
+
+            var updatedAccessEntities = accesses.Select(a =>
+            {
+                var access = _mapper.Map<RoleAccessEntity>(a);
+                access.RoleId = entity.Id;
+                return access;
+            });
+
+            foreach (var accessEntity in entity.RoleAccessEntities)
+            {
+                var updatedAccessEntity = updatedAccessEntities.Single(a => a.AccessObjectId == accessEntity.AccessObjectId);
+                updatedAccessEntity.Id = accessEntity.Id;
+
+                _context.Entry(accessEntity).CurrentValues.SetValues(updatedAccessEntity);
+            }
+        }
+
+        private void UpdateActiveDirectoryGroups(RoleEntity roleEntity, List<Guid> activeDirectoryGroupIds)
+        {
+            if (activeDirectoryGroupIds == null)
+                return;
+
+            foreach (var groupId in activeDirectoryGroupIds.Where(groupId => roleEntity.RoleGroups.All(x => x.GroupId != groupId)))
+            {
+                roleEntity.RoleGroups.Add(new RoleActiveDirectoryGroupEntity()
+                {
+                    GroupId = groupId
+                });
+            }
+
+            var groups = roleEntity.RoleGroups.ToArray();
+            foreach (var roleGroup in groups.Where(roleGroup => activeDirectoryGroupIds.All(x => x != roleGroup.GroupId)))
+            {
+                roleEntity.RoleGroups.Remove(roleGroup);
+            }
         }
 
         private async Task SaveRoleAccesses(Guid roleId, AccessGrantedList accesses)
@@ -90,6 +136,14 @@ namespace Iis.Services
             }
             _context.RoleAccess.AddRange(roleAccessEntities);
             await _context.SaveChangesAsync();
+        }
+
+        private Role ToRole(RoleEntity entity)
+        {
+            var role = _mapper.Map<Role>(entity);
+            role.AccessGrantedItems.Merge(_defaultAccessGrantedList);
+
+            return role;
         }
     }
 }

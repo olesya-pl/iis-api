@@ -31,6 +31,9 @@ namespace Iis.Services
 
         public List<ActiveDirectoryGroupDto> GetGroupsByIds(params Guid[] ids)
         {
+            if(!ids.Any())
+                return new List<ActiveDirectoryGroupDto>();
+            
             var ldapQueries = ids.Select(BuildLdapQueryById);
             var searcher = new DirectorySearcher(_directoryEntry)
             {

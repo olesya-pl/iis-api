@@ -960,10 +960,6 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AdGroup")
-                        .HasColumnType("character varying(1024)")
-                        .HasMaxLength(1024);
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
 

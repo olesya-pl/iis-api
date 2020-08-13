@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Iis.Services.Contracts.Dtos;
 using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
 
@@ -94,15 +95,18 @@ namespace Iis.Api
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.UpdateAccessName)))
                 .ForMember(dest => dest.DeleteGranted, opts => opts
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.DeleteAccessName)));
+            CreateMap<ActiveDirectoryGroupDto, Group>();
 
             CreateMap<Role, IIS.Core.GraphQL.Roles.Role>();
             CreateMap<CreateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
             CreateMap<UpdateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
-                .ForMember(dest => dest.Entities, opts => opts.Ignore());
+                .ForMember(dest => dest.Entities, opts => opts.Ignore())
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
 
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
 
