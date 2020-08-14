@@ -16,7 +16,7 @@ namespace Iis.DataModel.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.4")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Iis.DataModel.AliasEntity", b =>
@@ -251,13 +251,13 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("HandlerCode")
+                        .HasColumnType("text");
+
                     b.Property<string>("HandlerName")
                         .HasColumnType("text");
 
                     b.Property<string>("HandlerVersion")
-                        .HasColumnType("text");
-
-                    b.Property<string>("MLHandlerName")
                         .HasColumnType("text");
 
                     b.Property<Guid>("MaterialId")
@@ -1154,8 +1154,8 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.AttributeTypeEntity", b =>
                 {
-                    b.HasOne("Iis.DataModel.NodeTypeEntity", "NodeType")
-                        .WithOne("AttributeType")
+                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
+                        .WithOne("IAttributeTypeModel")
                         .HasForeignKey("Iis.DataModel.AttributeTypeEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -100,7 +100,8 @@ namespace Iis.Api.Controllers
                 new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date),
                 new ElasticMappingProperty("Data.Text", ElasticMappingPropertyType.Text),
                 new ElasticMappingProperty("Children.Data.Text", ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true)
+                new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
+                new ElasticMappingProperty("ImageVector", ElasticMappingPropertyType.DenseVector, dimensions:MaterialDocument.ImageVectorDimensionsCount)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
@@ -108,7 +109,7 @@ namespace Iis.Api.Controllers
                 cancellationToken);
 
             var materialsCount = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
-            
+
             return Content($"{materialsCount} materials completed");
         }
 
