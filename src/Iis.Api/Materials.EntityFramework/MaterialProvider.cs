@@ -53,7 +53,7 @@ namespace IIS.Core.Materials.EntityFramework
             _mapper = mapper;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)>
+        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchResultItem> Highlights)>
             GetMaterialsAsync(int limit, int offset, string filterQuery,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null,
             string sortColumnName = null, string sortOrder = null)
@@ -93,7 +93,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             materials = await UpdateProcessedMLHandlersCount(materials);
 
-            return (materials, materialResult.TotalCount, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
+            return (materials, materialResult.TotalCount, new Dictionary<Guid, SearchResultItem>());
         }
 
         private async Task<Material> MapMaterialDocumentAsync(MaterialDocument p)
@@ -217,9 +217,21 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, materials.Count());
         }
         
-        public async Task<(List<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId)
         {
-            return await Task.FromResult<(List<Material> materials, int totalCout)>((null, 0));
+            var entity = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
+            
+            if(entity is null || string.IsNullOrWhiteSpace(entity.Content)) return (new List<Material>(), 0);
+
+            var searchResult = await _elasticService.SearchMoreLikeThisAsync(materialId);
+
+            var materialTasks = searchResult.Items.Values
+                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                    .Select(p => MapMaterialDocumentAsync(p));
+
+            var materials = await Task.WhenAll(materialTasks);
+
+            return (materials, searchResult.Count);
         }
         
         private bool IsEvent(Node node)

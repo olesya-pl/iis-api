@@ -87,7 +87,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return (searchResult.Items.Select(p => new Guid(p.Identifier)).ToList(), searchResult.Count);
         }
 
-        public async Task<SearchByConfiguredFieldsResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             if (!UseElastic)
             {
@@ -108,16 +108,16 @@ namespace IIS.Core.Ontology.EntityFramework
                 SearchFields = ontologyFields.Union(materialFields).ToList()
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
-            return new SearchByConfiguredFieldsResult
+            return new SearchResult
             {
                 Count = searchResult.Count,
                 Items = searchResult.Items
                     .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchByConfiguredFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
 
-        public Task<SearchByConfiguredFieldsResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             if (!UseElastic)
             {
@@ -125,6 +125,16 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             return _materialRepository.SearchMaterials(filter, cancellationToken);
+        }
+
+        public Task<SearchResult> SearchMoreLikeThisAsync(Guid materialId, CancellationToken cancellationToken = default)
+        {
+            var result = new SearchResult
+            {
+                Count = 0,
+                Items = new Dictionary<Guid, SearchResultItem>()
+            };
+            return Task.FromResult(result);
         }
 
         public Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
@@ -144,6 +154,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             return await _elasticManager.PutDocumentAsync(FeatureIndexes.FirstOrDefault(), featureId.ToString("N"), featureDocument.ToString(Formatting.None));
         }
+        
         public bool TypesAreSupported(IEnumerable<string> typeNames)
         {
             return OntologyIndexesAreSupported(typeNames);

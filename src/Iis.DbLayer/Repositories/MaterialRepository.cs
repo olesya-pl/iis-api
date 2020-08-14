@@ -140,7 +140,7 @@ namespace Iis.DbLayer.Repositories
                 token);
         }
 
-        public async Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
             var searchParams = new IisElasticSearchParams
@@ -152,12 +152,12 @@ namespace Iis.DbLayer.Repositories
                 SearchFields = materialFields
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
-            return new SearchByConfiguredFieldsResult
+            return new SearchResult
             {
                 Count = searchResult.Count,
                 Items = searchResult.Items
                     .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchByConfiguredFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
 

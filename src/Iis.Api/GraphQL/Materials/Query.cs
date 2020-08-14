@@ -37,7 +37,7 @@ namespace IIS.Core.GraphQL.Materials
             return (materials, materialsResult.Count);
         }
 
-        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchByConfiguredFieldsResultItem> materialsResult)
+        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchResultItem> materialsResult)
         {
             foreach (var material in materials)
             {

@@ -30,7 +30,7 @@ namespace Iis.DbLayer.Repositories
 
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default);
         
-        Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         
         void AddMaterialEntity(MaterialEntity materialEntity);
 
