@@ -1,28 +1,27 @@
 ﻿using AcceptanceTests.Steps;
-using OpenQA.Selenium;
 using System;
-using System.Threading;
+using OpenQA.Selenium;
+using AcceptanceTests.Steps;
 using TechTalk.SpecFlow;
 using Xunit;
+using TechTalk.SpecFlow.Assist.ValueRetrievers;
+using OpenQA.Selenium.Support.UI;
 
 namespace AcceptanceTests.Contour.UISteps
 {
 	public class AuthorizationUI : InitiateWebDriver
 	{
-		private readonly ScenarioContext context;
+		private readonly IWebDriver driver;
 
-		public AuthorizationUI(ScenarioContext injectedContext)
+		public AuthorizationUI(ScenarioContext injectedContext): base(injectedContext)
 		{
-			context = injectedContext;
-
+			driver = context.GetDriver();
 		}
 
 		[Given(@"I want to sign in with the user (.*) and password (.*) in the Contour")]
 		public void IWantToAuthorizeInTheContour(string login, string password)
 		{
-			driver.Navigate().GoToUrl(homeUrl);
-
-			Thread.Sleep(TimeSpan.FromSeconds(5));
+			driver.WithTimeout(5).Navigate().GoToUrl(homeUrl);
 
 			IWebElement loginField =
 				driver.FindElement(By.CssSelector("div[name='username'] input"));
@@ -38,15 +37,15 @@ namespace AcceptanceTests.Contour.UISteps
 				driver.FindElement(By.ClassName("login-button"));
 
 			submitButton.Click();
-            Thread.Sleep(TimeSpan.FromSeconds(15));
 
-			context.SetDriver(driver);
+			driver.WaitFor(15);
 		}
 
 		[Then(@"I see object page")]
 		public void ThenISeeObjectPage()
 		{
 			Assert.Equal(objectsUrl, driver.Url);
+
 			driver.Quit();
 		}
 	}

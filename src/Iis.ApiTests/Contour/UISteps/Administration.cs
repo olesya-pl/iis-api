@@ -5,18 +5,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using TechTalk.SpecFlow;
+using AcceptanceTests.Steps;
 
 namespace AcceptanceTests.Contour.UISteps
 {
 	[Binding]
 	public sealed class Administration : AuthorizationUI
 	{
-		private readonly ScenarioContext context;
+		private readonly IWebDriver driver;
 
 		public Administration(ScenarioContext injectedContext) : base (injectedContext)
 		{
-			context = injectedContext;
-
+			driver = context.GetDriver();
 		}
 
 		[Given(@"I click (.*) button")]
