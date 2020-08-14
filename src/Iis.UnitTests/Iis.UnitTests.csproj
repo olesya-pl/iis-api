@@ -16,14 +16,12 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
     <PackageReference Include="JunitXml.TestLogger" Version="2.1.32" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="FluentAssertions.Json" Version="5.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Api\Iis.Api.csproj" />
-    <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />
-    <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
-    <ProjectReference Include="..\Iis.Roles\Iis.Roles.csproj" />
-    <ProjectReference Include="..\Iis.ThemeManagement\Iis.ThemeManagement.csproj" />
   </ItemGroup>
 
   <ItemGroup>

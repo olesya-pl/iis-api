@@ -65,9 +65,8 @@ namespace IIS.Core.Materials.Handlers
             
             options = new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNameCaseInsensitive = true
             };
-
         }
         
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -102,6 +101,8 @@ namespace IIS.Core.Materials.Handlers
             if(processor.IsDummy) return;
 
             var material = await RunAsync(uow => uow.MaterialRepository.GetByIdAsync(message.Id)); 
+
+            if(material is null) return;
             
             JObject metadata = JObject.Parse(material.Metadata);
 
@@ -115,7 +116,6 @@ namespace IIS.Core.Materials.Handlers
                 uow.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
                 uow.MaterialRepository.EditMaterial(material);
             });
-
         }
 
         private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
@@ -220,6 +220,8 @@ namespace IIS.Core.Materials.Handlers
                 durable: durableQueue,
                 exclusiveQueue,
                 autoDeleteQueue).QueueName;
+
+            channel.BasicQos(0, config.PrefetchCount, global:false);
 
             if (string.IsNullOrWhiteSpace(config.ExchangeName) || !config.RoutingKeys.Any()) return;
 

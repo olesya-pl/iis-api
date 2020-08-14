@@ -4,17 +4,18 @@ using Iis.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
     internal class SchemaStorage
     {
         IMapper _mapper;
+
         public SchemaStorage(IMapper mapper)
         {
             _mapper = mapper;
         }
+        
         public Dictionary<Guid, SchemaNodeType> NodeTypes { get; private set; }
         public Dictionary<Guid, SchemaRelationType> RelationTypes { get; private set; }
         public Dictionary<Guid, SchemaRelationType> InversedRelationTypes { get; private set; } = new Dictionary<Guid, SchemaRelationType>();
@@ -22,7 +23,6 @@ namespace Iis.OntologySchema.DataTypes
         public SchemaAliases Aliases { get; private set; }
         public Dictionary<string, SchemaNodeType> DotNameTypes { get; private set; } = new Dictionary<string, SchemaNodeType>();
         public IEnumerable<SchemaNodeType> Entities => NodeTypes.Values.Where(nt => !nt.IsArchived && nt.Kind == Kind.Entity);
-
         public void Initialize(IOntologyRawData ontologyRawData)
         {
             NodeTypes = ontologyRawData.NodeTypes.Where(nt => !nt.IsArchived).ToDictionary(nt => nt.Id, nt => _mapper.Map<SchemaNodeType>(nt));
@@ -107,22 +107,18 @@ namespace Iis.OntologySchema.DataTypes
         {
             return RelationTypes.Values.Select(r => _mapper.Map<SchemaRelationTypeRaw>(r));
         }
-
         public IEnumerable<SchemaAttributeTypeRaw> GetAttributeTypesRaw()
         {
             return AttributeTypes.Values.Select(at => _mapper.Map<SchemaAttributeTypeRaw>(at));
         }
-
         public IEnumerable<IAlias> GetAliases()
         {
             return Aliases.Items;
         }
-
         public Dictionary<string, INodeTypeLinked> GetStringCodes()
         {
             return NodeTypes.Values.Where(nt => nt.GetStringCode() != null).ToDictionary(nt => nt.GetStringCode(), nt => (INodeTypeLinked)nt);
         }
-
         public SchemaNodeType GetNodeTypeById(Guid id)
         {
             return NodeTypes[id];
@@ -205,7 +201,6 @@ namespace Iis.OntologySchema.DataTypes
             }
         }
         private bool NodeTypeExists(Guid id) => NodeTypes.ContainsKey(id);
-
         private bool IsArchived(SchemaRelationType relationType)
         {
             return !NodeTypeExists(relationType.Id)

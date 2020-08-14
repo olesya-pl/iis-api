@@ -25,13 +25,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids)
         {
-            return Context.Nodes.Where(node => !node.IsArchived && ids.Contains(node.Id)).ToListAsync();
+            return Context.Nodes
+                .Where(node => !node.IsArchived && ids.Contains(node.Id)).ToListAsync();
         }
 
         public Task<List<RelationEntity>> GetSourceRelationByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return Context.Relations.Where(e => e.SourceNodeId == id && !e.Node.IsArchived)
                 .Include(e => e.Node)
+                .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .ToListAsync(cancellationToken);
@@ -63,6 +65,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
+                .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
             if (relationIds != null)
@@ -73,6 +76,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
+                .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Include(e => e.SourceNode).ThenInclude(e => e.Attribute)
                 .Where(e => nodeIds.Contains(e.TargetNodeId) && !e.Node.IsArchived);
@@ -81,54 +85,42 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return relationsQ.ToListAsync();
         }
 
-        public async Task<Dictionary<Guid, NodeEntity>> GetExistingNodes(CancellationToken cancellationToken)
-        {
-            IQueryable<NodeEntity> query =
-                from node in Context.Nodes
-                    .Include(x => x.Relation)
-                    .Include(x => x.Attribute)
-                    .Include(x => x.OutgoingRelations)
-                    .ThenInclude(x => x.Node)
-                select node;
-            Dictionary<Guid, NodeEntity>
-                existingNodes = await query.ToDictionaryAsync(x => x.Id, cancellationToken);
-            return existingNodes;
-        }
-
         public AttributeEntity GetAttributeEntityById(Guid id)
         {
             return Context.Attributes.SingleOrDefault(_ => _.Id == id);
         }
 
-        public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion, ElasticFilter filter)
+        public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter)
         {
+            if (string.IsNullOrWhiteSpace(filter.Suggestion))
+            {
+                return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
+                    .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
+
+            }
             var relationsQ = Context.Relations
                 .Include(e => e.SourceNode)
-                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
-            if (suggestion != null)
-                relationsQ = relationsQ.Where(e =>
-                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
-            return relationsQ.Select(e => e.SourceNode).Skip(filter.Offset).Take(filter.Limit).ToListAsync();
-        }
-
-        public Task<List<NodeEntity>> GetNodesAsync(IEnumerable<Guid> derived, ElasticFilter filter)
-        {
-            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
-                .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
-        }
-
-        public Task<int> GetNodesCountAsync(IEnumerable<Guid> derived)
-        {
-            return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived).Distinct().CountAsync();
+                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
+                .Where(e =>
+                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"));
+            return relationsQ
+                .Select(e => e.SourceNode)
+                .Skip(filter.Offset)
+                .Take(filter.Limit)
+                .ToListAsync();
         }
 
         public Task<int> GetNodesCountWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion)
         {
+            if (suggestion == null)
+            {
+                return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived).Distinct().CountAsync();
+            }
+
             var relationsQ = Context.Relations
                 .Include(e => e.SourceNode)
-                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived);
-            if (suggestion != null)
-                relationsQ = relationsQ.Where(e =>
+                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
+                .Where(e =>
                     EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{suggestion}%"));
             return relationsQ.Select(e => e.SourceNode).Distinct().CountAsync();
         }
@@ -140,7 +132,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public async Task<List<AttributeEntity>> GetAttributesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             return await
                 (from n in Context.Nodes
@@ -156,7 +148,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         }
 
-        public async Task<List<NodeEntity>> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        public async Task<List<NodeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             return await
                 (from n in Context.Nodes

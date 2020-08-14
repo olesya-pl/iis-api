@@ -35,7 +35,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
         {
-            var nodeEntity = await RunAsync((unitOfWork) => unitOfWork.OntologyRepository.UpdateNodeAsync(source.Id, 
+            var nodeEntity = await RunAsync((unitOfWork) => unitOfWork.OntologyRepository.UpdateNodeAsync(source.Id,
                 n => SaveRelations(source, n)));
 
             if (nodeEntity == null)
@@ -111,7 +111,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     relation.SourceNodeId = existing.Id;
                     // set tracked target
                     if (!(sourceRelation.Target is Attribute))
-                    { 
+                    {
                         relation.TargetNode = null;
                         relation.TargetNodeId = targetId;
                     }
@@ -208,11 +208,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else
             {
-                var query = string.IsNullOrEmpty(filter.Suggestion)
-                    ? await RunWithoutCommitAsync(async unitOfWork =>
-                    await unitOfWork.OntologyRepository.GetNodesAsync(derivedTypes.Select(nt => nt.Id), filter)) :
-                    await RunWithoutCommitAsync(async unitOfWork =>
-                    await unitOfWork.OntologyRepository.GetNodesWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter.Suggestion, filter));
+                var query = await RunWithoutCommitAsync(async unitOfWork =>
+                    await unitOfWork.OntologyRepository.GetNodesWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter));
                 var nodes = query.Select(MapNode);
                 return nodes;
             }
@@ -237,13 +234,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else
             {
-                return string.IsNullOrEmpty(filter.Suggestion)
-                    ? await RunWithoutCommitAsync(async unitOfWork =>
-                        await unitOfWork.OntologyRepository.GetNodesCountAsync(derivedTypes.Select(nt => nt.Id))) :
-                    await RunWithoutCommitAsync(async unitOfWork =>
+                return await RunWithoutCommitAsync(async unitOfWork =>
                         await unitOfWork.OntologyRepository.GetNodesCountWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter.Suggestion));
-                //var count = await query.Distinct().CountAsync();
-                //return count;
             }
         }
 
@@ -387,7 +379,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else throw new Exception($"Node mapping does not support ontology type {type.GetType()}.");
 
-            foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived))
+            foreach (var relatedNode in ctxNode.OutgoingRelations
+                .Where(e => !e.Node.IsArchived && (e.Node.NodeType == null || !e.Node.NodeType.IsArchived)))
             {
                 var mapped = MapNode(relatedNode.Node, mappedNodes);
                 node.AddNode(mapped);
@@ -413,20 +406,30 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             Run(unitOfWork => unitOfWork.OntologyRepository.UpdateNodes(updatedNodeEntities));
         }
 
+        public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        {
+            var nodeEntities = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName));
+
+            return nodeEntities
+                .Select(n => (Entity)MapNode(n))
+                .ToList();
+        }
+
         public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodeEntities = await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.OntologyRepository.GetNodeByUniqueValue(nodeTypeId, value, valueTypeName));
+                await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName));
 
             return nodeEntities
                 .Select(n => (Entity)MapNode(n))
                 .FirstOrDefault();
         }
 
-        public Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public Task<List<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             return RunWithoutCommitAsync(async unitOfWork =>
-                   await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
+                   await unitOfWork.OntologyRepository.GetAttributesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
 
         }
         //public async Task CreateRelation(Guid sourceNodeId, Guid targetNodeId)

@@ -17,4 +17,11 @@
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Iis.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+
 </Project>

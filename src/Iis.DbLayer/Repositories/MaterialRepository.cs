@@ -100,39 +100,57 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default)
         {
-            var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-                .ToListAsync();
+            const int batchSize = 50000;
 
-            var mlResponsesList = await Context.MLResponses.AsNoTracking()
-                .ToListAsync();
-            var mlResponses = mlResponsesList
-                .GroupBy(p => p.MaterialId)
-                .ToDictionary(k => k.Key, p => p.ToList());
-            var putTasks = materialEntities
-                .Select(p => MapEntityToDocument(p))
-                .Select(p => {
-                    if (!mlResponses.ContainsKey(p.Id))
-                    {
+            var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                .CountAsync();
+
+            for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
+            {
+                var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                    .OrderBy(p => p.Id)
+                    .Skip(i*batchSize)
+                    .Take(batchSize)
+                    .ToListAsync();
+
+                var mlResponsesList = await Context.MLResponses.AsNoTracking()
+                    .ToListAsync();
+                var mlResponses = mlResponsesList
+                    .GroupBy(p => p.MaterialId)
+                    .ToDictionary(k => k.Key, p => p.ToList());
+                var materialDocuments = materialEntities
+                    .Select(p => MapEntityToDocument(p))
+                    .Select(p => {
+                        if (!mlResponses.ContainsKey(p.Id))
+                        {
+                            return p;
+                        }
+                        var responses = mlResponses[p.Id];
+                        p.MLResponses = MapMlResponseEntities(responses);
+                        p.ProcessedMlHandlersCount = responses.Count();
                         return p;
-                    }
-                    p.MLResponses = MapMlResponseEntities(mlResponses[p.Id]);
-                    return p;
-                })
-                .Select(p => _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                    p.Id.ToString("N"),
-                    JsonConvert.SerializeObject(p),
-                    token));
-            await Task.WhenAll(putTasks);
-            return materialEntities.Count();
+                    })
+                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
+                await _elasticManager.PutsDocumentsAsync(MaterialIndexes.FirstOrDefault(),
+                        materialDocuments,
+                        token);
+            }
+
+
+            return materialsCount;
         }
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
-
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .SingleOrDefaultAsync(p => p.Id == materialId);
             var materialDocument = MapEntityToDocument(material);
-            materialDocument.MLResponses = await PopulateMLResponses(materialId);
+            
+            var responseResult = await PopulateMLResponses(materialId);
+
+            materialDocument.MLResponses = responseResult.responses;
+            materialDocument.ProcessedMlHandlersCount = responseResult.responsesCount;
+
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
@@ -243,7 +261,7 @@ namespace Iis.DbLayer.Repositories
                 });
             }
         }
-        
+
         public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)
         {
             return await GetMaterialsQuery(MaterialIncludeEnum.WithChildren)
@@ -265,10 +283,11 @@ namespace Iis.DbLayer.Repositories
             return materialDocument;
         }
 
-        private async Task<JObject> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject responses, int responsesCount)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
-            return MapMlResponseEntities(mlResponses);
+
+            return (MapMlResponseEntities(mlResponses), mlResponses.Count());
         }
 
         private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)
@@ -329,6 +348,7 @@ namespace Iis.DbLayer.Repositories
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
             return Context.Materials
+                    .Include(m => m.File)
                     .Include(m => m.Importance)
                     .Include(m => m.Reliability)
                     .Include(m => m.Relevance)

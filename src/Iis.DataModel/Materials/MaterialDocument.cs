@@ -14,7 +14,8 @@ namespace Iis.DbLayer.Repositories
         public string Source { get; set; }
         public string CreatedDate { get; set; }
         public string Content { get; set; }
-        public MaterialLoadData  LoadData { get; set; }
+        public string FileName { get; set; }
+        public MaterialLoadData LoadData { get; set; }
         public MaterialSign Importance { get; set; }
         public MaterialSign Reliability { get; set; }
         public MaterialSign Relevance { get; set; }
@@ -30,6 +31,7 @@ namespace Iis.DbLayer.Repositories
         public Guid[] NodeIds { get; set; }
         public Assignee Assignee { get; set; }
         public JObject MLResponses { get; set; }
+        public string Title { get; set; }
     }
 
     public class MaterialSign
