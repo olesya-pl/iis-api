@@ -124,5 +124,16 @@ namespace IIS.Core.GraphQL.Materials
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             return (materials, materialsResult.Count);
         }
+
+        public async Task<(IEnumerable<Material> materials, int totalCout)> GetMaterialsLikeThis([Service] IMaterialProvider materialProvider, [Service] IMapper mapper, Guid materialId)
+        {
+            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId);
+
+            var materials = materialsResult.Materials
+                                .Select(m => mapper.Map<Material>(m))
+                                .ToList();
+
+            return (materials, materialsResult.Count);
+        }
     }
 }

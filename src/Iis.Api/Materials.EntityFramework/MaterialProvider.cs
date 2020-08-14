@@ -216,7 +216,12 @@ namespace IIS.Core.Materials.EntityFramework
 
             return (materials, materials.Count());
         }
-
+        
+        public async Task<(List<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId)
+        {
+            return await Task.FromResult<(List<Material> materials, int totalCout)>((null, 0));
+        }
+        
         private bool IsEvent(Node node)
         {
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
