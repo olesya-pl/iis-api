@@ -45,7 +45,7 @@ namespace Iis.Services
                                     .Select(role => CreateUserRole(userEntity.Id, role.Id))
                                     .ToList();
 
-            _context.Add((object)userEntity);
+            _context.Add(userEntity);
 
             _context.AddRange(userRolesEntitiesList);
 
