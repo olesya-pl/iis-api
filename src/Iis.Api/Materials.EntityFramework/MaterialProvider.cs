@@ -1,25 +1,24 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using AutoMapper;
-
-using Iis.Utility;
-using Iis.Domain;
-using Iis.Domain.Materials;
-using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
-using Iis.DbLayer.Repositories;
 using Iis.DbLayer.MaterialEnum;
+using Iis.DbLayer.Repositories;
+using Iis.Domain;
+using Iis.Domain.MachineLearning;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
-using MaterialSign = Iis.Domain.Materials.MaterialSign;
-using Newtonsoft.Json;
+using Iis.Services.Contracts;
+using Iis.Utility;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using Iis.Services.Contracts;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MaterialSign = Iis.Domain.Materials.MaterialSign;
 
 namespace IIS.Core.Materials.EntityFramework
 {
