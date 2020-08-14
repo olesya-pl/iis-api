@@ -25,7 +25,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids)
         {
-            return Context.Nodes.Where(node => !node.IsArchived && ids.Contains(node.Id)).ToListAsync();
+            return Context.Nodes
+                .Where(node => !node.IsArchived && ids.Contains(node.Id)).ToListAsync();
         }
 
         public Task<List<RelationEntity>> GetSourceRelationByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -64,6 +65,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
+                .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
             if (relationIds != null)
@@ -74,6 +76,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
+                .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Include(e => e.SourceNode).ThenInclude(e => e.Attribute)
                 .Where(e => nodeIds.Contains(e.TargetNodeId) && !e.Node.IsArchived);

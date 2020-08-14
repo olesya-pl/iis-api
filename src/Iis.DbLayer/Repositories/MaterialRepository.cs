@@ -102,22 +102,32 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default)
         {
-            var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-                .ToListAsync();
+            const int batchSize = 50000;
 
-            var mlResponsesList = await Context.MLResponses.AsNoTracking()
-                .ToListAsync();
-            var mlResponses = mlResponsesList
-                .GroupBy(p => p.MaterialId)
-                .ToDictionary(k => k.Key, p => p.ToList());
-            var putTasks = materialEntities
-                .Select(p => MapEntityToDocument(p))
+            var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                .CountAsync();
+
+            for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
+            {
+                var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                    .OrderBy(p => p.Id)
+                    .Skip(i*batchSize)
+                    .Take(batchSize)
+                    .ToListAsync();
+
+                var mlResponsesList = await Context.MLResponses.AsNoTracking()
+                    .ToListAsync();
+                var mlResponses = mlResponsesList
+                    .GroupBy(p => p.MaterialId)
+                    .ToDictionary(k => k.Key, p => p.ToList());
+                var materialDocuments = materialEntities
+                    .Select(p => MapEntityToDocument(p))
                 .Select(p =>
                 {
-                    if (!mlResponses.ContainsKey(p.Id))
-                    {
-                        return p;
-                    }
+                        if (!mlResponses.ContainsKey(p.Id))
+                        {
+                            return p;
+                        }
                     var mlResponsesByEntity = mlResponses[p.Id];
                     p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
                     string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
@@ -125,14 +135,16 @@ namespace Iis.DbLayer.Repositories
                     {
                         p.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
                     }
-                    return p;
-                })
-                .Select(p => _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                    p.Id.ToString("N"),
-                    JsonConvert.SerializeObject(p),
-                    token));
-            await Task.WhenAll(putTasks);
-            return materialEntities.Count();
+                        return p;
+                    })
+                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
+                await _elasticManager.PutsDocumentsAsync(MaterialIndexes.FirstOrDefault(),
+                        materialDocuments,
+                        token);
+            }
+
+
+            return materialsCount;
         }
 
         private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
@@ -145,7 +157,6 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
-
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .SingleOrDefaultAsync(p => p.Id == materialId);
             var materialDocument = MapEntityToDocument(material);
@@ -352,6 +363,7 @@ namespace Iis.DbLayer.Repositories
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
             return Context.Materials
+                    .Include(m => m.File)
                     .Include(m => m.Importance)
                     .Include(m => m.Reliability)
                     .Include(m => m.Relevance)

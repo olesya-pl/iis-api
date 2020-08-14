@@ -96,10 +96,11 @@ namespace Iis.Api.Controllers
 
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
                 new ElasticMappingProperty("Metadata.features.PhoneNumber", ElasticMappingPropertyType.Keyword),
+                new ElasticMappingProperty("Metadata.RegTime", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("CreatedDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
-                new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date),
+                new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("Data.Text", ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty("Children.Data.Text", ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
                 new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
                 new ElasticMappingProperty("ImageVector", ElasticMappingPropertyType.DenseVector, dimensions:MaterialDocument.ImageVectorDimensionsCount)
             });

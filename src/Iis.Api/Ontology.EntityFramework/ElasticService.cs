@@ -63,7 +63,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 "Event"
             };
 
-            MaterialIndexes = new[] { "Materials" };
+            MaterialIndexes = _materialRepository.MaterialIndexes;
 
             FeatureIndexes = new[] { "Features" };
         }
