@@ -11,6 +11,14 @@ namespace AcceptanceTests.Contour.UISteps
 	[Binding]
 	public sealed class Administration : AuthorizationUI
 	{
+		private readonly ScenarioContext context;
+
+		public Administration(ScenarioContext injectedContext) : base (injectedContext)
+		{
+			context = injectedContext;
+
+		}
+
 		[Given(@"I click (.*) button")]
 		public void GivenIClickAdministrationMenuItem(string menuItem)
 		{
@@ -33,7 +41,7 @@ namespace AcceptanceTests.Contour.UISteps
 		public void GivenIChooseElementFromDropdownMenu()
 		{
 			 driver.FindElement(By.CssSelector("div[class='el-select'] input")).Click();
-			Thread.Sleep(1000);
+			 Thread.Sleep(1000);
 			 driver.FindElement(By.XPath("/html/body/div[3]/div[1]/div[1]/ul/li[1]/span")).Click();
 	    }
 	}

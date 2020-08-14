@@ -1,4 +1,5 @@
-﻿using TechTalk.SpecFlow;
+﻿using OpenQA.Selenium;
+using TechTalk.SpecFlow;
 
 namespace AcceptanceTests.Steps
 {
@@ -22,6 +23,15 @@ namespace AcceptanceTests.Steps
         public static void SetResponse<T>(this ScenarioContext scenarioContext, string key, T value)
         {
             scenarioContext.Add(key, value);
+        }
+
+        public static void SetDriver(this ScenarioContext scenarioContext, IWebDriver driver)
+        {
+            scenarioContext.Add("webDriver", driver);
+        }
+        public static IWebDriver GetDriver(this ScenarioContext scenarioContext)
+        {
+            return scenarioContext.Get<IWebDriver>("webDriver");
         }
     }
 }
