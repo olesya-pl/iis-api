@@ -19,16 +19,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         void UpdateNodes(IEnumerable<NodeEntity> nodeEntities);
         Task<List<RelationEntity>> GetDirectRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds);
         Task<List<RelationEntity>> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds);
-        Task<Dictionary<Guid, NodeEntity>> GetExistingNodes(CancellationToken cancellationToken);
         Task<int> GetNodesCountWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion);
         Task<List<RelationEntity>> GetAllRelationsAsync(Guid nodeId);
         Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
         Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter);
 
-        Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName,
+        Task<List<AttributeEntity>> GetAttributesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName,
             int limit);
 
-        Task<List<NodeEntity>> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
+        Task<List<NodeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task<NodeEntity> UpdateNodeAsync(Guid id, Action<NodeEntity> action);
     }
 }

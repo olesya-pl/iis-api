@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Iis.Utility;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,15 @@ namespace Iis.Elastic
         public string Path { get; set; }
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
         public bool SupportsNullValue { get; }
+        public int? Dimensions { get; }
 
         public ElasticMappingProperty() { }
 
-        public ElasticMappingProperty(string dotName, ElasticMappingPropertyType type, bool supportsNullValue = false, IEnumerable<string> formats = null)
+        public ElasticMappingProperty(string dotName,
+            ElasticMappingPropertyType type,
+            bool supportsNullValue = false,
+            IEnumerable<string> formats = null,
+            int? dimensions = null)
         {
             var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
             Name = splitted[0];
@@ -29,7 +35,7 @@ namespace Iis.Elastic
                 Type = ElasticMappingPropertyType.Nested;
                 Properties = new List<ElasticMappingProperty>
                 {
-                    new ElasticMappingProperty(string.Join('.', splitted.Skip(1)), type)
+                    new ElasticMappingProperty(string.Join('.', splitted.Skip(1)), type, formats:formats)
                 };
             }
             SupportsNullValue = supportsNullValue;
@@ -38,6 +44,7 @@ namespace Iis.Elastic
             {
                 Formats.AddRange(formats);
             }
+            Dimensions = dimensions;
         }
 
         public JObject ToJObject()
@@ -46,7 +53,11 @@ namespace Iis.Elastic
 
             if (this.Type != ElasticMappingPropertyType.Nested)
             {
-                result["type"] = this.Type.ToString().ToLower();
+                result["type"] = this.Type.ToString().ToUnderscore();
+                if (Dimensions.HasValue)
+                {
+                    result["dims"] = Dimensions;
+                }
             }
 
             if (SupportsNullValue)
@@ -58,7 +69,7 @@ namespace Iis.Elastic
             {
                 result["path"] = this.Path;
             }
-            
+
             if(Type == ElasticMappingPropertyType.Date && Formats.Any())
             {
                 result["format"] = string.Join("||", Formats);

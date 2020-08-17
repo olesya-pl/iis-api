@@ -379,7 +379,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else throw new Exception($"Node mapping does not support ontology type {type.GetType()}.");
 
-            foreach (var relatedNode in ctxNode.OutgoingRelations.Where(e => !e.Node.IsArchived))
+            foreach (var relatedNode in ctxNode.OutgoingRelations
+                .Where(e => !e.Node.IsArchived && (e.Node.NodeType == null || !e.Node.NodeType.IsArchived)))
             {
                 var mapped = MapNode(relatedNode.Node, mappedNodes);
                 node.AddNode(mapped);
@@ -405,20 +406,30 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             Run(unitOfWork => unitOfWork.OntologyRepository.UpdateNodes(updatedNodeEntities));
         }
 
+        public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        {
+            var nodeEntities = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName));
+
+            return nodeEntities
+                .Select(n => (Entity)MapNode(n))
+                .ToList();
+        }
+
         public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodeEntities = await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.OntologyRepository.GetNodeByUniqueValue(nodeTypeId, value, valueTypeName));
+                await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName));
 
             return nodeEntities
                 .Select(n => (Entity)MapNode(n))
                 .FirstOrDefault();
         }
 
-        public Task<IEnumerable<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public Task<List<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             return RunWithoutCommitAsync(async unitOfWork =>
-                   await unitOfWork.OntologyRepository.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
+                   await unitOfWork.OntologyRepository.GetAttributesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
 
         }
         //public async Task CreateRelation(Guid sourceNodeId, Guid targetNodeId)

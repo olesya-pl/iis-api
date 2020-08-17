@@ -11,3 +11,4 @@ Scenario: Invalid password
 	Given I want to authenticate with the user olya111 and password 123456789 in the Contour
 	When I send login request to the Contour
 	Then The result should not contain authorization token from the Contour
+

@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Iis.DataModel.Analytics;
 using Iis.DataModel.ChangeHistory;
 using Iis.DataModel.Elastic;
@@ -8,7 +6,6 @@ using Iis.DataModel.Reports;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Themes;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Iis.DataModel
 {
@@ -47,6 +44,8 @@ namespace Iis.DataModel
         public DbSet<RoleAccessEntity> RoleAccess { get; set; }
         public DbSet<AccessObjectEntity> AccessObjects { get; set; }
         public DbSet<UserRoleEntity> UserRoles { get; set; }
+
+        public DbSet<RoleActiveDirectoryGroupEntity> RoleGroups { get; set; }
 
         public DbSet<MLResponseEntity> MLResponses { get; set; }
         public DbSet<ElasticFieldEntity> ElasticFields { get; set; }
@@ -97,6 +96,7 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new OntologyMigrationsConfiguration());
 
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleActiveDirectoryGroupConfiguration());
 
             modelBuilder.ApplyConfiguration(new MLResponseConfiguration());
             modelBuilder.ApplyConfiguration(new ElasticFieldConfiguration());

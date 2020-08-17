@@ -8,10 +8,9 @@ using Xunit;
 
 using Iis.DataModel;
 using Iis.DataModel.Themes;
-
+using Iis.Services.Contracts;
 using Iis.ThemeManagement;
 using Iis.ThemeManagement.Models;
-using Iis.Roles;
 
 namespace Iis.UnitTests.ThemeManagement
 {

@@ -6,6 +6,8 @@ namespace Iis.DbLayer.Repositories
 {
     public class MaterialDocument
     {
+        public const int ImageVectorDimensionsCount = 128;
+
         public Guid Id { get; set; }
         public Guid? FileId { get; set; }
         public Guid? ParentId { get; set; }
@@ -14,7 +16,8 @@ namespace Iis.DbLayer.Repositories
         public string Source { get; set; }
         public string CreatedDate { get; set; }
         public string Content { get; set; }
-        public MaterialLoadData  LoadData { get; set; }
+        public string FileName { get; set; }
+        public MaterialLoadData LoadData { get; set; }
         public MaterialSign Importance { get; set; }
         public MaterialSign Reliability { get; set; }
         public MaterialSign Relevance { get; set; }
@@ -31,6 +34,7 @@ namespace Iis.DbLayer.Repositories
         public Assignee Assignee { get; set; }
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
+        public decimal[] ImageVector { get; set; } = new decimal[ImageVectorDimensionsCount];
     }
 
     public class MaterialSign

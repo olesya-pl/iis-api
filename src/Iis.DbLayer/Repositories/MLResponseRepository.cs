@@ -18,14 +18,14 @@ namespace Iis.DbLayer.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<MLResponseEntity>> GetAllForMaterialAsync(Guid materialId)
+        public async Task<List<MLResponseEntity>> GetAllForMaterialAsync(Guid materialId)
         {
             return await _context.MLResponses
                             .Where(e => e.MaterialId == materialId)
                             .AsNoTracking()
-                            .ToArrayAsync();
+                            .ToListAsync();
         }
-        
+
         public async Task<IEnumerable<MLResponseEntity>> GetAllForMaterialListAsync(IEnumerable<Guid> materialIdList)
         {
             return await _context.MLResponses
@@ -33,7 +33,7 @@ namespace Iis.DbLayer.Repositories
                             .AsNoTracking()
                             .ToArrayAsync();
         }
-        
+
         public async Task<IEnumerable<(Guid MaterialId, int Count)>> GetAllForMaterialsAsync(IReadOnlyCollection<Guid> materialIdList)
         {
             if(materialIdList is null || !materialIdList.Any()) return new List<(Guid MaterialId, int Count)>();
@@ -49,7 +49,7 @@ namespace Iis.DbLayer.Repositories
                     .Select(e => (MaterialId:e.MaterialId, Count: e.Count))
                     .ToArray();
         }
- 
+
 
         public async Task<MLResponseEntity> SaveAsync(MLResponseEntity entity)
         {

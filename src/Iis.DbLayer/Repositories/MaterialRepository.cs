@@ -25,6 +25,8 @@ namespace Iis.DbLayer.Repositories
 {
     internal class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
+        private const string ImageVectorMlHandlerCode = "imageVector";
+
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -101,39 +103,70 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default)
         {
-            var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-                .ToListAsync();
+            const int batchSize = 50000;
 
-            var mlResponsesList = await Context.MLResponses.AsNoTracking()
-                .ToListAsync();
-            var mlResponses = mlResponsesList
-                .GroupBy(p => p.MaterialId)
-                .ToDictionary(k => k.Key, p => p.ToList());
-            var putTasks = materialEntities
-                .Select(p => MapEntityToDocument(p))
-                .Select(p => {
-                    if (!mlResponses.ContainsKey(p.Id))
+            var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                .CountAsync();
+
+            for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
+            {
+                var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                    .OrderBy(p => p.Id)
+                    .Skip(i*batchSize)
+                    .Take(batchSize)
+                    .ToListAsync();
+
+                var mlResponsesList = await Context.MLResponses.AsNoTracking()
+                    .ToListAsync();
+                var mlResponses = mlResponsesList
+                    .GroupBy(p => p.MaterialId)
+                    .ToDictionary(k => k.Key, p => p.ToList());
+                var materialDocuments = materialEntities
+                    .Select(p => MapEntityToDocument(p))
+                .Select(p =>
+                {
+                        if (!mlResponses.ContainsKey(p.Id))
+                        {
+                            return p;
+                        }
+                    var mlResponsesByEntity = mlResponses[p.Id];
+                    p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
+                    string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
+                    if (!string.IsNullOrEmpty(imageVector))
                     {
-                        return p;
+                        p.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
                     }
-                    p.MLResponses = MapMlResponseEntities(mlResponses[p.Id]);
-                    return p;
-                })
-                .Select(p => _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                    p.Id.ToString("N"),
-                    JsonConvert.SerializeObject(p),
-                    token));
-            await Task.WhenAll(putTasks);
-            return materialEntities.Count();
+                        return p;
+                    })
+                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
+                await _elasticManager.PutsDocumentsAsync(MaterialIndexes.FirstOrDefault(),
+                        materialDocuments,
+                        token);
+            }
+
+
+            return materialsCount;
+        }
+
+        private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        {
+            return mlResponsesByEntity
+                                    .OrderByDescending(e => e.ProcessingDate)
+                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
+                                    .OriginalResponse;
         }
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
-
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .SingleOrDefaultAsync(p => p.Id == materialId);
             var materialDocument = MapEntityToDocument(material);
-            materialDocument.MLResponses = await PopulateMLResponses(materialId);
+            var (mlResponses, imageVector) = await PopulateMLResponses(materialId);
+            materialDocument.MLResponses = mlResponses;
+            if (!string.IsNullOrEmpty(imageVector))
+            {
+                materialDocument.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
+            }
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
@@ -244,7 +277,7 @@ namespace Iis.DbLayer.Repositories
                 });
             }
         }
-        
+
         public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)
         {
             return await GetMaterialsQuery(MaterialIncludeEnum.WithChildren)
@@ -275,10 +308,11 @@ namespace Iis.DbLayer.Repositories
             return materialDocument;
         }
 
-        private async Task<JObject> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject mlResponses, string imageVector)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
-            return MapMlResponseEntities(mlResponses);
+            var imageVector = ExtractLatestImageVector(mlResponses);
+            return (MapMlResponseEntities(mlResponses), imageVector);
         }
 
         private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)
@@ -343,6 +377,7 @@ namespace Iis.DbLayer.Repositories
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
         {
             return Context.Materials
+                    .Include(m => m.File)
                     .Include(m => m.Importance)
                     .Include(m => m.Reliability)
                     .Include(m => m.Relevance)

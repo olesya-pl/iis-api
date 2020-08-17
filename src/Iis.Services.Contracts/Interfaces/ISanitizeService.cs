@@ -1,4 +1,4 @@
-﻿namespace Iis.Services
+﻿namespace Iis.Services.Contracts.Interfaces
 {
     public interface ISanitizeService
     {

@@ -1,25 +1,24 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using AutoMapper;
-
-using Iis.Utility;
-using Iis.Roles;
-using Iis.Domain;
-using Iis.Domain.Materials;
-using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
-using Iis.DbLayer.Repositories;
 using Iis.DbLayer.MaterialEnum;
+using Iis.DbLayer.Repositories;
+using Iis.Domain;
+using Iis.Domain.MachineLearning;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
-using MaterialSign = Iis.Domain.Materials.MaterialSign;
-using Newtonsoft.Json;
+using Iis.Services.Contracts;
+using Iis.Utility;
 using IIS.Repository;
 using IIS.Repository.Factories;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MaterialSign = Iis.Domain.Materials.MaterialSign;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -72,6 +71,7 @@ namespace IIS.Core.Materials.EntityFramework
                     .Select(p => MapMaterialDocumentAsync(p));
 
                 materials = await Task.WhenAll(materialTasks);
+
                 return (materials, searchResult.Count, searchResult.Items);
             }
 
@@ -99,11 +99,15 @@ namespace IIS.Core.Materials.EntityFramework
         private async Task<Material> MapMaterialDocumentAsync(MaterialDocument p)
         {
             var res = _mapper.Map<Material>(p);
+            
             res.Children = p.Children.Select(c => _mapper.Map<Material>(c)).ToList();
+            
             var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x, null)));
+            
             res.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
             res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
             res.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes.ToList());
+            
             return res;
         }
 

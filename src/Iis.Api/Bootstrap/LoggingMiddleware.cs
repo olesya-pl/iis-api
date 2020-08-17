@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Iis.Services.Contracts.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Mime;
-using System.Text;
 using System.Threading.Tasks;
-using Iis.Services;
 
 namespace Iis.Api.Bootstrap
 {

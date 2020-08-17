@@ -6,11 +6,13 @@ namespace IIS.Core.GraphQL.ML
 {
     public class MachineLearningResponseInput
     {
-        [GraphQLType(typeof(NonNullType<IdType>))] 
+        [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid MaterialId { get; set; }
 
         [GraphQLNonNullType]
         public string HandlerName { get; set; }
+        [GraphQLNonNullType]
+        public string HandlerCode { get; set; }
         [GraphQLNonNullType]
         public string HandlerVersion { get; set; }
         [GraphQLNonNullType]

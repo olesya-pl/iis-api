@@ -48,7 +48,6 @@ using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
-using Iis.Roles;
 using Iis.Domain;
 using Iis.Elastic;
 using Iis.DbLayer.Elastic;
@@ -59,12 +58,20 @@ using Iis.ThemeManagement;
 using Iis.OntologyModelWrapper;
 using IIS.Repository.Factories;
 using Iis.Services;
+using Iis.Utility;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace IIS.Core
 {
     public class Startup
     {
         public IConfiguration Configuration { get; }
+
+#if DEBUG
+        public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+#endif
 
         public Startup(IConfiguration configuration)
         {
@@ -91,10 +98,21 @@ namespace IIS.Core
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
+#if DEBUG
                 services.AddDbContext<OntologyContext>(
-                    options => options.UseNpgsql(dbConnectionString),
+                    options => options
+                        .UseNpgsql(dbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
+#else
+                services.AddDbContext<OntologyContext>(
+                                    options => options
+                                        .UseNpgsql(dbConnectionString),
+                                    contextLifetime: ServiceLifetime.Transient,
+                                    optionsLifetime: ServiceLifetime.Transient);
+#endif
+
                 //using var context = OntologyContext.GetContext(dbConnectionString);
 
                 IOntologySchema ontologySchema;
@@ -242,21 +260,24 @@ namespace IIS.Core
                 .AddRabbitMQ(mqConnectionString, (SslOption)null)
                 .AddElasticsearch(elasticConfiguration.Uri);
 
-
-            services.AddTransient<IElasticManager, ElasticManager>();
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
-            services.AddTransient<SearchResultExtractor>();
             services.AddSingleton(elasticConfiguration);
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<ISanitizeService, SanitizeService>();
+            services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ => 
+                new ActiveDirectoryClient(
+                    Configuration["activeDirectory:domain"], 
+                    Configuration["activeDirectory:login"], 
+                    Configuration["activeDirectory:password"]));
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
             services.AddTransient<GraphQLAccessList>();
 
             services.RegisterRepositories();
+            services.RegisterElasticModules();
         }
 
 
