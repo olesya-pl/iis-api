@@ -28,6 +28,14 @@ namespace AcceptanceTests.Contour.UISteps
 			textForm.SendKeys($"{text}_{DateTime.Now}");		
 		}
 
+		[Given(@"I input (.*) in the (.*) text field")]
+		public void GivenIInputInTheTextField(string text, string textField)
+		{
+			IWebElement textForm = driver.FindElement(By.CssSelector(textField));
+
+			textForm.SendKeys(text);
+		}
+
 
 
 	}

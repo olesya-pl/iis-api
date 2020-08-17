@@ -93,12 +93,15 @@ namespace AcceptanceTests.Contour.Features
         [Xunit.TraitAttribute("FeatureTitle", "MilitaryOrganizationCreationUI")]
         [Xunit.TraitAttribute("Description", "Create a new military organization")]
         [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "ignore")]
         public virtual void CreateANewMilitaryOrganization()
         {
             string[] tagsOfScenario = new string[] {
-                    "smoke"};
+                    "smoke",
+                    "ignore"};
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a new military organization", null, new string[] {
-                        "smoke"});
+                        "smoke",
+                        "ignore"});
 #line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -126,20 +129,27 @@ this.FeatureBackground();
  testRunner.And("I select an element .el-tree-node:nth-child(2) in the .quick-filters__actions .ad" +
                         "d-button pop up", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
- testRunner.And("I enter очікує розгляду in the div[name=\'affiliation\'] .el-input__inner text fiel" +
-                        "d and add current date to the input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 11
+ testRunner.And("I input очікує розгляду in the div[name=\'affiliation\'] .el-input__inner text fiel" +
+                        "d", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 14
+#line 12
  testRunner.And("I press Down button plus Enter button on the div[name=\'affiliation\'] .el-input__i" +
                         "nner item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 13
+ testRunner.And("I input ігнорувати in the div[name=\'importance\'] .el-input__inner text field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 14
+ testRunner.And("I press Down button plus Enter button on the div[name=\'importance\'] .el-input__in" +
+                        "ner item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 15
  testRunner.And("I click div[name=\'6b1997fc9d954ccf9c55ebf104b42986\'] > div[role=\'button\'] button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 16
- testRunner.And("I enter Тестовий військовий підрозділ in the textarea[name=\'RealNameFull\'] text f" +
-                        "ield and add current date to the input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I enter e2e_Військовий підрозділ in the textarea[name=\'RealNameFull\'] text field " +
+                        "and add current date to the input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 17
  testRunner.And("I click button[name=\'btn-save\'] > span button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
