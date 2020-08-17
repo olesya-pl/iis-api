@@ -68,7 +68,10 @@ namespace IIS.Core
     public class Startup
     {
         public IConfiguration Configuration { get; }
+
+#if DEBUG
         public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+#endif
 
         public Startup(IConfiguration configuration)
         {
@@ -95,12 +98,21 @@ namespace IIS.Core
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
+#if DEBUG
                 services.AddDbContext<OntologyContext>(
                     options => options
-                        .UseNpgsql(dbConnectionString),
-                        //.UseLoggerFactory(MyLoggerFactory), // if uncomment this then sql query will be shown in console 
+                        .UseNpgsql(dbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
+#else
+                services.AddDbContext<OntologyContext>(
+                                    options => options
+                                        .UseNpgsql(dbConnectionString),
+                                    contextLifetime: ServiceLifetime.Transient,
+                                    optionsLifetime: ServiceLifetime.Transient);
+#endif
+
                 //using var context = OntologyContext.GetContext(dbConnectionString);
 
                 IOntologySchema ontologySchema;
