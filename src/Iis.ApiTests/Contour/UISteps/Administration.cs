@@ -14,15 +14,9 @@ namespace AcceptanceTests.Contour.UISteps
 	{
 		private readonly IWebDriver driver;
 
-		public Administration(ScenarioContext injectedContext) : base (injectedContext)
+		public Administration(ScenarioContext injectedContext) : base(injectedContext)
 		{
 			driver = context.GetDriver();
-		}
-
-		[Given(@"I click (.*) button")]
-		public void GivenIClickAdministrationMenuItem(string menuItem)
-		{
-			driver.FindElement(By.CssSelector(menuItem)).Click();
 		}
 
 		[Given(@"I complete the userform with (.*), (.*), (.*), (.*), (.*) and (.*)")]
@@ -40,9 +34,10 @@ namespace AcceptanceTests.Contour.UISteps
 		[Given(@"I choose element from dropdown menu")]
 		public void GivenIChooseElementFromDropdownMenu()
 		{
-			 driver.FindElement(By.CssSelector("div[class='el-select'] input")).Click();
-			 Thread.Sleep(1000);
-			 driver.FindElement(By.XPath("/html/body/div[3]/div[1]/div[1]/ul/li[1]/span")).Click();
-	    }
+			driver.FindElement(By.CssSelector("div[class='el-select'] input")).Click();
+			Thread.Sleep(1000);
+			driver.FindElement(By.XPath("/html/body/div[3]/div[1]/div[1]/ul/li[1]/span")).Click();
+
+		}
 	}
 }

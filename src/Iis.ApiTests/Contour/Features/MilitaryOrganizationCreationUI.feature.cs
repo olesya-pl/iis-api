@@ -77,9 +77,9 @@ namespace AcceptanceTests.Contour.Features
         
         public virtual void FeatureBackground()
         {
-#line 4
-#line hidden
 #line 5
+#line hidden
+#line 6
  testRunner.Given("I want to sign in with the user olya and password hammer69 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -99,7 +99,7 @@ namespace AcceptanceTests.Contour.Features
                     "smoke"};
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a new military organization", null, new string[] {
                         "smoke"});
-#line 8
+#line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -119,12 +119,36 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 4
+#line 5
 this.FeatureBackground();
 #line hidden
-#line 9
+#line 10
  testRunner.And("I select an element .el-tree-node:nth-child(2) in the .quick-filters__actions .ad" +
                         "d-button pop up", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 13
+ testRunner.And("I enter очікує розгляду in the div[name=\'affiliation\'] .el-input__inner text fiel" +
+                        "d and add current date to the input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 14
+ testRunner.And("I press Down button plus Enter button on the div[name=\'affiliation\'] .el-input__i" +
+                        "nner item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 15
+ testRunner.And("I click div[name=\'6b1997fc9d954ccf9c55ebf104b42986\'] > div[role=\'button\'] button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 16
+ testRunner.And("I enter Тестовий військовий підрозділ in the textarea[name=\'RealNameFull\'] text f" +
+                        "ield and add current date to the input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 17
+ testRunner.And("I click button[name=\'btn-save\'] > span button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 18
+ testRunner.When("I press Enter button on the .el-button--default.el-button--primary span button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 19
+ testRunner.Then("I must see the button[name=\'btn-edit\'] img button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

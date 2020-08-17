@@ -23,8 +23,16 @@ namespace AcceptanceTests.Contour.UISteps
 		[When(@"I selected an element (.*) in the (.*) pop up")]
 		public void GivenISelectAnElementInThePopUp(string element, string popup)
 		{
-			driver.FindElement(By.CssSelector(popup)).FindElement(By.CssSelector(element)).Click();
+			driver.FindElement(By.CssSelector(popup)).Click();
+			driver.FindElement(By.CssSelector(element)).Click();
 		}
 
+		[Given(@"I choose an element (.*) by XPath in the (.*) pop up")]
+		[When(@"I chose an element (.*) by XPath in the (.*) pop up")]
+		public void GivenISelectAnElementByXpathInThePopUp(string element, string popup)
+		{
+			driver.FindElement(By.CssSelector(popup)).Click();
+			driver.FindElement(By.XPath(element)).Click();
+		}
 	}
 }

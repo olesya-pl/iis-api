@@ -83,17 +83,14 @@ namespace AcceptanceTests.Contour.Features
         [Xunit.SkippableFactAttribute(DisplayName="Authorize by using valid credentials")]
         [Xunit.TraitAttribute("FeatureTitle", "Authorization UI")]
         [Xunit.TraitAttribute("Description", "Authorize by using valid credentials")]
-        [Xunit.TraitAttribute("Category", "UITests")]
-        [Xunit.TraitAttribute("Category", "Authorization")]
+        [Xunit.TraitAttribute("Category", "smoke")]
         public virtual void AuthorizeByUsingValidCredentials()
         {
             string[] tagsOfScenario = new string[] {
-                    "UITests",
-                    "Authorization"};
+                    "smoke"};
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Authorize by using valid credentials", null, new string[] {
-                        "UITests",
-                        "Authorization"});
-#line 9
+                        "smoke"});
+#line 7
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -113,11 +110,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 10
+#line 8
  testRunner.Given("I want to sign in with the user olya and password hammer69 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 11
- testRunner.Then("I see object page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 9
+ testRunner.Then("I see the http://qa.contour.net/objects/?page=1 link in the browser navigation ba" +
+                        "r", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -40,13 +40,5 @@ namespace AcceptanceTests.Contour.UISteps
 
 			driver.WaitFor(15);
 		}
-
-		[Then(@"I see object page")]
-		public void ThenISeeObjectPage()
-		{
-			Assert.Equal(objectsUrl, driver.Url);
-
-			driver.Quit();
-		}
 	}
 }

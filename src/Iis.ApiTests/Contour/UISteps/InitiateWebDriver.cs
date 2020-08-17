@@ -12,7 +12,6 @@ namespace AcceptanceTests.Contour.UISteps
 	{
 		protected readonly ScenarioContext context;
 		protected readonly string homeUrl;
-		protected readonly string objectsUrl;
 		protected readonly string pageTitle;
 
 		public InitiateWebDriver(ScenarioContext injectedContext)
@@ -20,10 +19,7 @@ namespace AcceptanceTests.Contour.UISteps
 			context = injectedContext;
 
 			var driver = new ChromeDriver();
-			//driver.Manage().Timeouts().ImplicitWait.Add(TimeSpan.FromSeconds(20));
-			//driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(30);
 			homeUrl = "http://qa.contour.net/";
-			objectsUrl = "http://qa.contour.net/objects/?page=1";
 			pageTitle = "Контур";
 			driver.Manage().Window.Maximize();
 			
