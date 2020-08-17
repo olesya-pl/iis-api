@@ -127,14 +127,27 @@ namespace IIS.Core.Ontology.EntityFramework
             return _materialRepository.SearchMaterials(filter, cancellationToken);
         }
 
-        public Task<SearchResult> SearchMoreLikeThisAsync(Guid materialId, CancellationToken cancellationToken = default)
+        public async Task<SearchResult> SearchMoreLikeThisAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            var result = new SearchResult
+            var outputFieldList = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
+
+            var searchParameters = new IisElasticSearchParams
             {
-                Count = 0,
-                Items = new Dictionary<Guid, SearchResultItem>()
+                BaseIndexNames = MaterialIndexes.ToList(),
+                Query = filter.Suggestion,
+                From = filter.Offset,
+                Size = filter.Limit
             };
-            return Task.FromResult(result);
+
+            var searchResult = await _elasticManager.SearchMoreLikeThisAsync(searchParameters, cancellationToken);       
+
+            return new SearchResult
+            {
+                Count = searchResult.Count,
+                Items = searchResult.Items
+                    .ToDictionary(k => new Guid(k.Identifier),
+                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+            };
         }
 
         public Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)

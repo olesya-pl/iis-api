@@ -64,6 +64,47 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(response);
         }
 
+        public async Task<IElasticSearchResult> SearchMoreLikeThisAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var json = JObject.Parse(
+                @"{
+                    '_source': ['_id'],
+                    'from':0,
+                    'size':10,
+                    'query':{
+                        'bool':{
+                            'must':[
+                                {'term': {'ParentId':'NULL'}},
+                                {'more_like_this': {
+                                        'fields': [ 'Content' ],
+                                        'like' : [ { '_id': '' } ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }"
+            );
+
+            json["_source"] = new JArray(searchParams.ResultFields);
+
+            json["from"] = searchParams.From;
+            
+            json["size"] = searchParams.Size;
+            
+            json["query"]["bool"]["must"][1]["more_like_this"]["like"][0]["_id"] = searchParams.Query;
+            
+            var query = json.ToString(Newtonsoft.Json.Formatting.None);
+            
+            var path = searchParams.BaseIndexNames.Count == 0 ?
+                "_search" :
+                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
+
+            var response = await GetAsync(path, query, cancellationToken);
+
+            return _resultExtractor.GetFromResponse(response);
+        }
+
         public async Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName)
         {
             if (indexName == null) throw new ArgumentNullException(nameof(indexName));

@@ -217,13 +217,20 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, materials.Count());
         }
         
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset)
         {
             var entity = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
             
             if(entity is null || string.IsNullOrWhiteSpace(entity.Content)) return (new List<Material>(), 0);
-
-            var searchResult = await _elasticService.SearchMoreLikeThisAsync(materialId);
+            
+            var filter = new ElasticFilter
+            {
+                Suggestion = materialId.ToString("N"),
+                Limit = limit,
+                Offset = offset
+            };
+            
+            var searchResult = await _elasticService.SearchMoreLikeThisAsync(filter);
 
             var materialTasks = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))

@@ -125,9 +125,13 @@ namespace IIS.Core.GraphQL.Materials
             return (materials, materialsResult.Count);
         }
 
-        public async Task<(IEnumerable<Material> materials, int totalCout)> GetMaterialsLikeThis([Service] IMaterialProvider materialProvider, [Service] IMapper mapper, Guid materialId)
+        public async Task<(IEnumerable<Material> materials, int totalCout)> GetMaterialsLikeThis(
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] Guid materialId,
+            [GraphQLNonNullType] PaginationInput pagination)
         {
-            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId);
+            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId, pagination.PageSize, pagination.Offset());
 
             var materials = materialsResult.Materials
                                 .Select(m => mapper.Map<Material>(m))
