@@ -129,8 +129,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchResult> SearchMoreLikeThisAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            var outputFieldList = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
-
             var searchParameters = new IisElasticSearchParams
             {
                 BaseIndexNames = MaterialIndexes.ToList(),
