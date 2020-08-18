@@ -22,10 +22,19 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLNonNullType] PaginationInput pagination,
             FilterInput filter,
             SortingInput sorting,
+            SearchByImageInput searchByImageInput,
             IEnumerable<Guid> nodeIds = null,
             IEnumerable<string> types = null)
         {
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
+
+            if (searchByImageInput != null)
+            {
+                var result = await materialProvider
+                    .GetMaterialsByImageAsync(pagination.PageSize, pagination.Offset(), searchByImageInput.Name, searchByImageInput.Content.ToArray());
+                var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+                return (mapped, result.Count);
+            }
 
             var materialsResult = await materialProvider
                 .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types,

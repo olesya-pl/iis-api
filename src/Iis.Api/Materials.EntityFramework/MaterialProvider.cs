@@ -12,11 +12,14 @@ using Iis.Utility;
 using IIS.Repository;
 using IIS.Repository.Factories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 
@@ -34,6 +37,8 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMaterialSignRepository _materialSignRepository;
+        private readonly string _imageVectorizerUrl;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public MaterialProvider(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
@@ -41,7 +46,9 @@ namespace IIS.Core.Materials.EntityFramework
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            IConfiguration configuration,
+            IHttpClientFactory httpClientFactory) : base(unitOfWorkFactory)
         {
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
@@ -50,6 +57,8 @@ namespace IIS.Core.Materials.EntityFramework
             _mLResponseRepository = mLResponseRepository;
             _materialSignRepository = materialSignRepository;
             _mapper = mapper;
+            _imageVectorizerUrl = configuration.GetValue<string>("imageVectorizerUrl");
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)>
@@ -99,15 +108,15 @@ namespace IIS.Core.Materials.EntityFramework
         private async Task<Material> MapMaterialDocumentAsync(MaterialDocument p)
         {
             var res = _mapper.Map<Material>(p);
-            
+
             res.Children = p.Children.Select(c => _mapper.Map<Material>(c)).ToList();
-            
+
             var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x, null)));
-            
+
             res.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
             res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
             res.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes.ToList());
-            
+
             return res;
         }
 
@@ -219,6 +228,40 @@ namespace IIS.Core.Materials.EntityFramework
             materials = await Task.WhenAll(mappingTasks);
 
             return (materials, materials.Count());
+        }
+
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string fileName, byte[] content)
+        {
+            decimal[] resp;
+            try
+            {
+                resp = await VectorizeImage(content, fileName);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed to vectorize image", e);
+            }
+            var searchResult = await _elasticService.SearchByImageVector(resp, offset, pageSize, CancellationToken.None);
+            var materialTasks = searchResult.Items.Values
+                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                    .Select(p => MapMaterialDocumentAsync(p));
+
+            var materials = await Task.WhenAll(materialTasks);
+
+            return (materials, searchResult.Count);
+        }
+
+        public async Task<decimal[]> VectorizeImage(byte[] fileContent, string fileName)
+        {
+            using var form = new MultipartFormDataContent();
+            using var content = new ByteArrayContent(fileContent);
+
+            form.Add(content, "file", fileName);
+            using var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.PostAsync(_imageVectorizerUrl, form);
+            response.EnsureSuccessStatusCode();
+            var contentJson = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<decimal[]>(contentJson);
         }
 
         private bool IsEvent(Node node)
@@ -360,5 +403,7 @@ namespace IIS.Core.Materials.EntityFramework
             result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
             return result;
         }
+
+
     }
 }

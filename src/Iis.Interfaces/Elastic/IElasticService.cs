@@ -17,6 +17,7 @@ namespace Iis.Interfaces.Elastic
         Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchByConfiguredFieldsResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchByConfiguredFieldsResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        Task<SearchByConfiguredFieldsResult> SearchByImageVector(decimal[] imageVector, int page, int pageSize, CancellationToken token);
         bool TypesAreSupported(IEnumerable<string> typeNames);
         bool UseElastic { get; }
     }
