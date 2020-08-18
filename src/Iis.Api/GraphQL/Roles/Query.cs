@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Api.GraphQL.Roles;
 using Iis.Interfaces.Roles;
-using Iis.Roles;
+using Iis.Services;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Common;
 using System;
 using System.Linq;
@@ -38,6 +40,13 @@ namespace IIS.Core.GraphQL.Roles
                     .Where(p => p.Category == AccessCategory.Tab)
                     .Select(p => mapper.Map<AccessTab>(p))
             };
+        }
+
+       
+        public GraphQLCollection<Group> GetActiveDirectoryGroups([Service] IActiveDirectoryClient client, [Service] IMapper mapper)
+        {
+            var groups = client.GetAllGroups();
+            return new GraphQLCollection<Group>(groups.Select(mapper.Map<Group>).ToList(), groups.Count);
         }
     }
 }

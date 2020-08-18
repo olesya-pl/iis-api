@@ -1,20 +1,15 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-
-using Newtonsoft.Json.Linq;
-
-using Iis.Domain;
-using IIS.Domain;
 using Iis.DataModel;
 using Iis.DataModel.Themes;
+using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.ThemeManagement.Models;
-using Iis.Roles;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Iis.Services.Contracts;
 
 namespace Iis.ThemeManagement
 {

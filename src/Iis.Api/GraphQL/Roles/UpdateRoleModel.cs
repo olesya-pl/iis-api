@@ -16,5 +16,6 @@ namespace Iis.Api.GraphQL.Roles
         public string AdGroup { get; set; }
         public IEnumerable<AccessEntity> Entities { get; set; }
         public IEnumerable<AccessTab> Tabs { get; set; }
+        public IEnumerable<Group> ActiveDirectoryGroups { get; set; }
     }
 }

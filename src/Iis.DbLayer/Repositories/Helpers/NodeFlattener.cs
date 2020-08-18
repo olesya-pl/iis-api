@@ -89,7 +89,8 @@ namespace Iis.DbLayer.Repositories.Helpers
             CancellationToken cancellationToken = default)
         {
             var result = new List<ExtNode>();
-            foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.TargetNode.IsArchived))
+            foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.Node.NodeType.IsArchived
+                && !r.TargetNode.IsArchived && !r.TargetNode.NodeType.IsArchived))
             {
                 if (!visitedRelationIds.Contains(relation.Id))
                 {
@@ -118,6 +119,7 @@ namespace Iis.DbLayer.Repositories.Helpers
                 .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode)
+                .ThenInclude(tn => tn.NodeType)
                 .Where(n => !n.IsArchived);
         }
 

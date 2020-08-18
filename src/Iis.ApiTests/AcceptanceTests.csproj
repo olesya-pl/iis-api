@@ -12,10 +12,24 @@
     <RootNamespace>AcceptanceTests</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants></DefineConstants>
+  </PropertyGroup>
+
+<PropertyGroup>
+  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+</PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="chromedriver.exe" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="GraphQL.Client" Version="3.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="3.1.0" />
+    <PackageReference Include="Selenium.Support" Version="3.141.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="84.0.4147.3001" />
     <PackageReference Include="SpecFlow" Version="3.1.97" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.97" />
     <PackageReference Include="SpecFlow.xUnit" Version="3.1.97" />

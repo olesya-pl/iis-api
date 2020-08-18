@@ -146,6 +146,8 @@ namespace Iis.OntologyManager.UiControls
             menuChildren.Items.Add("Delete");
             menuChildren.Items[3].Click += (sender, e) => { if (Id != null) gridChildrenEvent(OnDeleteRelationEntity); };
 
+            menuChildren.Opening += (sender, e) => { menuChildren.Items[0].Visible = SelectedChild?.TargetType?.Kind == Kind.Entity; };
+
             gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
             gridChildren.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;

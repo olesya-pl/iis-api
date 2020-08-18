@@ -9,7 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using Iis.Roles;
+using Iis.Services;
 
 namespace IIS.Core.GraphQL.Users
 {

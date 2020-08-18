@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Iis.DataModel;
+using Iis.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 
-namespace Iis.Roles
+namespace Iis.Services
 {
-    public class AccessObjectService
+    public class AccessObjectService : IAccessObjectService
     {
         OntologyContext _context;
 

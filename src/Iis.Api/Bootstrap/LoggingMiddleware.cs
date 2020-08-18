@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Iis.Services.Contracts.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Mime;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Iis.Api.Bootstrap
@@ -16,10 +15,12 @@ namespace Iis.Api.Bootstrap
         readonly RequestDelegate _next;
         private static ILogger<LogHeaderMiddleware> logger;
         private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
+        private readonly ISanitizeService _sanitizeService;
 
-        public LoggingMiddleware(RequestDelegate next)
+        public LoggingMiddleware(RequestDelegate next, ISanitizeService sanitizeService)
         {
             _next = next;
+            _sanitizeService = sanitizeService;
             _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
         }
 
@@ -68,7 +69,7 @@ namespace Iis.Api.Bootstrap
             {
                 await using var requestStream = _recyclableMemoryStreamManager.GetStream();
                 await request.Body.CopyToAsync(requestStream);
-                requestBodyString = ReadStreamInChunks(requestStream);
+                requestBodyString = _sanitizeService.SanitizeBody(ReadStreamInChunks(requestStream));
                 request.Body.Position = 0;
             }
             var dump = $"Request: {request.Scheme} {request.Host}{request.Path} {request.QueryString} {requestBodyString}";
@@ -80,7 +81,7 @@ namespace Iis.Api.Bootstrap
             response.Body.Seek(0, SeekOrigin.Begin);
             var text = await new StreamReader(response.Body).ReadToEndAsync();
             response.Body.Seek(0, SeekOrigin.Begin);
-            return $"Response: {response.StatusCode}: {text} Elapsed(ms): {sw.ElapsedMilliseconds}";
+            return $"Response: {response.StatusCode}: {_sanitizeService.SanitizeBody(text)} Elapsed(ms): {sw.ElapsedMilliseconds}";
         }
 
         static bool LogException(Stopwatch sw, Exception ex)

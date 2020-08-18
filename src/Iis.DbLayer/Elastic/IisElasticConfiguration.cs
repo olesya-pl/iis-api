@@ -80,7 +80,7 @@ namespace Iis.DbLayer.Elastic
                 nameof(MaterialDocument.Relevance),
                 nameof(MaterialDocument.Completeness),
                 nameof(MaterialDocument.SourceReliability),
-                nameof(MaterialDocument.Id),
+                nameof(MaterialDocument.Title),
                 nameof(MaterialDocument.ProcessedStatus),
                 nameof(MaterialDocument.SessionPriority),
                 nameof(MaterialDocument.MlHandlersCount),

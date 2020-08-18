@@ -9,8 +9,8 @@ namespace Iis.Api.GraphQL.Roles
         [GraphQLNonNullType]
         public string Name { get; set; }
         public string Description { get; set; }
-        public string AdGroup { get; set; }
         public IEnumerable<AccessEntity> Entities { get; set; }
         public IEnumerable<AccessTab> Tabs { get; set; }
+        public IEnumerable<Group> ActiveDirectoryGroups { get; set; } 
     }
 }

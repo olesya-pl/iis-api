@@ -20,14 +20,17 @@ namespace Iis.OntologySchema.Saver
             _mapper = GetMapper();
         }
 
-        public void SaveToDatabase(ISchemaCompareResult compareResult, IOntologySchema schemaTo)
+        public void SaveToDatabase(ISchemaCompareResult compareResult, IOntologySchema schemaTo, ISchemaSaveParameters parameters = null)
         {
-            AddNodes(compareResult.ItemsToAdd);
-            DeleteNodes(compareResult.ItemsToDelete);
-            UpdateNodes(compareResult.ItemsToUpdate, schemaTo);
-            AddAliases(compareResult.AliasesToAdd);
-            UpdateAliases(compareResult.AliasesToUpdate);
-            DeleteAliases(compareResult.AliasesToDelete);
+            if (parameters?.Create ?? true) AddNodes(compareResult.ItemsToAdd);
+            if (parameters?.Delete ?? true) DeleteNodes(compareResult.ItemsToDelete);
+            if (parameters?.Update ?? true) UpdateNodes(compareResult.ItemsToUpdate, schemaTo);
+            if (parameters?.Aliases ?? true)
+            {
+                AddAliases(compareResult.AliasesToAdd);
+                UpdateAliases(compareResult.AliasesToUpdate);
+                DeleteAliases(compareResult.AliasesToDelete);
+            }
             _context.SaveChanges();
         }
 

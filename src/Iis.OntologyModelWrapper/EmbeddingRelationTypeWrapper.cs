@@ -41,7 +41,7 @@ namespace Iis.OntologyModelWrapper
                 null :
                 new AttributeTypeWrapper(_source.RelationType.TargetType);
 
-        public bool AcceptsOperation(EntityOperation create) => false;
+        public bool AcceptsOperation(EntityOperation create) => true;
 
         public override string ToString() => Name;
     }

@@ -16,7 +16,7 @@ namespace Iis.DataModel.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.4")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Iis.DataModel.AliasEntity", b =>
@@ -251,13 +251,13 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("HandlerCode")
+                        .HasColumnType("text");
+
                     b.Property<string>("HandlerName")
                         .HasColumnType("text");
 
                     b.Property<string>("HandlerVersion")
-                        .HasColumnType("text");
-
-                    b.Property<string>("MLHandlerName")
                         .HasColumnType("text");
 
                     b.Property<Guid>("MaterialId")
@@ -936,14 +936,29 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("RoleAccess");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.Roles.RoleActiveDirectoryGroupEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleGroups");
+                });
+
             modelBuilder.Entity("Iis.DataModel.Roles.RoleEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("AdGroup")
-                        .HasColumnType("character varying(1024)")
-                        .HasMaxLength(1024);
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -1154,8 +1169,8 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.AttributeTypeEntity", b =>
                 {
-                    b.HasOne("Iis.DataModel.NodeTypeEntity", "NodeType")
-                        .WithOne("AttributeType")
+                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
+                        .WithOne("IAttributeTypeModel")
                         .HasForeignKey("Iis.DataModel.AttributeTypeEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1315,6 +1330,15 @@ namespace Iis.DataModel.Migrations
 
                     b.HasOne("Iis.DataModel.Roles.RoleEntity", "Role")
                         .WithMany("RoleAccessEntities")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Roles.RoleActiveDirectoryGroupEntity", b =>
+                {
+                    b.HasOne("Iis.DataModel.Roles.RoleEntity", "Role")
+                        .WithMany("RoleGroups")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
