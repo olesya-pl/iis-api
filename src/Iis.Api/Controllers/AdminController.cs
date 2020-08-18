@@ -95,6 +95,7 @@ namespace Iis.Api.Controllers
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+                new ElasticMappingProperty("Content", ElasticMappingPropertyType.Text, termVector: ElasticConfiguration.DefaultTermVector),
                 new ElasticMappingProperty("Metadata.features.PhoneNumber", ElasticMappingPropertyType.Keyword),
                 new ElasticMappingProperty("Metadata.RegTime", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("CreatedDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
