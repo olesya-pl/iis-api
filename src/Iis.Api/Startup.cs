@@ -270,8 +270,8 @@ namespace IIS.Core
             services.AddTransient<ISanitizeService, SanitizeService>();
             services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(
-                    Configuration["activeDirectory:domain"],
-                    Configuration["activeDirectory:login"],
+                    Configuration["activeDirectory:server"], 
+                    Configuration["activeDirectory:login"], 
                     Configuration["activeDirectory:password"]));
 
             services.AddControllers();

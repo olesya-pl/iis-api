@@ -1,32 +1,32 @@
-﻿using Iis.Services.Contracts;
+﻿using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
+using System.DirectoryServices.Protocols;
 using System.Linq;
-using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Interfaces;
+using SearchScope = System.DirectoryServices.Protocols.SearchScope;
 
 namespace Iis.Services
 {
     public class ActiveDirectoryClient : IActiveDirectoryClient
     {
-        private readonly DirectoryEntry _directoryEntry;
+        private const string DistinguishedName = "DC=pogliad,DC=net";
+        private static readonly string[] IncludedFields = new string[] { "name", "objectGUID" };
+        private readonly string _server;
+        private readonly string _login;
+        private readonly string _password;
 
-
-        public ActiveDirectoryClient(string activeDirectoryDomain, string login, string password)
+        public ActiveDirectoryClient(string server, string login, string password)
         {
-            _directoryEntry = new DirectoryEntry(activeDirectoryDomain, login, password);
+            _server = server;
+            _login = login;
+            _password = password;
         }
 
         public List<ActiveDirectoryGroupDto> GetAllGroups()
         {
-            var searcher = new DirectorySearcher(_directoryEntry)
-            {
-                Filter = "(&(objectCategory=Group))"
-            };
-
-            IncludeProperties(searcher);
-            return ToDtos(searcher.FindAll());
+            var response = MakeRequest("(&(objectCategory=Group))");
+            return ToDtos(response);
         }
 
         public List<ActiveDirectoryGroupDto> GetGroupsByIds(params Guid[] ids)
@@ -35,30 +35,47 @@ namespace Iis.Services
                 return new List<ActiveDirectoryGroupDto>();
             
             var ldapQueries = ids.Select(BuildLdapQueryById);
-            var searcher = new DirectorySearcher(_directoryEntry)
-            {
-                Filter = $"(|{string.Join("", ldapQueries)})"
-            };
-
-            IncludeProperties(searcher);
-            return ToDtos(searcher.FindAll());
+            var response = MakeRequest($"(|{string.Join("", ldapQueries)})");
+            
+            return ToDtos(response);
         }
 
-        private List<ActiveDirectoryGroupDto> ToDtos(SearchResultCollection result)
+        private LdapConnection CreateConnection()
+        {
+            return new LdapConnection(
+               new LdapDirectoryIdentifier(_server),
+               new System.Net.NetworkCredential(_login, _password));
+        }
+
+        private SearchRequest CreateSearchRequest(string filter)
+        {
+            return new SearchRequest(
+                DistinguishedName,
+                filter,
+                SearchScope.Subtree,
+                IncludedFields);
+        }
+
+        private SearchResponse MakeRequest(string filter) 
+        {
+            using (var client = CreateConnection())
+            {
+                var request = CreateSearchRequest(filter);
+                var result = (SearchResponse)client.SendRequest(request);
+
+                return result;
+            }
+        }
+
+        private List<ActiveDirectoryGroupDto> ToDtos(SearchResponse response)
         {
             return (
-                from SearchResult searchResult in result
+                from SearchResultEntry item in response.Entries
                 select new ActiveDirectoryGroupDto()
                 {
-                    Id = new Guid((byte[])searchResult.Properties["objectGUID"][0]),
-                    Name = searchResult.Properties["name"][0].ToString()
+                    Id = new Guid((byte[])item.Attributes["objectGUID"][0]),
+                    Name = item.Attributes["name"][0].ToString()
                 }).ToList();
-        }
-
-        private void IncludeProperties(DirectorySearcher searcher)
-        {
-            searcher.PropertiesToLoad.Add("name");
-            searcher.PropertiesToLoad.Add("objectGUID");
         }
 
         private string BuildLdapQueryById(Guid id)
