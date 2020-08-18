@@ -171,6 +171,22 @@ namespace IIS.Core.Ontology.EntityFramework
             return OntologyIndexesAreSupported(typeNames);
         }
 
+        public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, int offset, int size, CancellationToken token)
+        {
+            var searchResult = await _elasticManager.SearchByImageVector(imageVector, new IisElasticSearchParams {
+                BaseIndexNames = MaterialIndexes.ToList(),
+                From = offset,
+                Size = size
+            }, token);
+            return new SearchResult
+            {
+                Count = searchResult.Count,
+                Items = searchResult.Items
+                    .ToDictionary(k => new Guid(k.Identifier),
+                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+            };
+        }
+
         private bool OntologyIndexIsSupported(string indexName)
         {
             return OntologyIndexes.Any(index => index.Equals(indexName)) || EventIndexes.Any(index => index.Equals(indexName));
