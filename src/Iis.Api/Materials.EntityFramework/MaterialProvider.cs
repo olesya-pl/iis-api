@@ -223,9 +223,9 @@ namespace IIS.Core.Materials.EntityFramework
         
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset)
         {
-            var entity = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
+            var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
             
-            if(entity is null || string.IsNullOrWhiteSpace(entity.Content)) return (new List<Material>(), 0);
+            if(!isEligible) return (new List<Material>(), 0);
             
             var filter = new ElasticFilter
             {

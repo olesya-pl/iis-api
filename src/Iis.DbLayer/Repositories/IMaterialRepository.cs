@@ -48,5 +48,7 @@ namespace Iis.DbLayer.Repositories
         void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
 
         Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId);
+
+        Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
     }
 }

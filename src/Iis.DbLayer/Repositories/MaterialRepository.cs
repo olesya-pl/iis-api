@@ -148,13 +148,6 @@ namespace Iis.DbLayer.Repositories
             return materialsCount;
         }
 
-        private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
-        {
-            return mlResponsesByEntity
-                                    .OrderByDescending(e => e.ProcessingDate)
-                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
-                                    .OriginalResponse;
-        }
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
@@ -285,7 +278,11 @@ namespace Iis.DbLayer.Repositories
                     .Select(e => e.Id)
                     .ToArrayAsync();
         }
-
+        public Task<bool> CheckMaterialExistsAndHasContent(Guid materialId)
+        {
+            return GetMaterialsQuery()
+                        .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
+        }
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
@@ -335,6 +332,7 @@ namespace Iis.DbLayer.Repositories
             }
             return mlResponsesContainer;
         }
+
         private string RemoveImagesFromContent(string content)
         {
             return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
@@ -421,6 +419,14 @@ namespace Iis.DbLayer.Repositories
             }
 
             return resultQuery;
+        }
+ 
+        private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        {
+            return mlResponsesByEntity
+                                    .OrderByDescending(e => e.ProcessingDate)
+                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
+                                    .OriginalResponse;
         }
     }
 }
