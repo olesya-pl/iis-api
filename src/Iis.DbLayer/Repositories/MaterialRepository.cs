@@ -286,14 +286,7 @@ namespace Iis.DbLayer.Repositories
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
-            
-            var originalContent = materialDocument.Data.FirstOrDefault(e => e.Type == "originalContent");
-
-            if(originalContent != null)
-            {
-                originalContent.Text = RemoveImagesFromContent(originalContent.Text);
-            }
-            
+                        
             materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
             
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();

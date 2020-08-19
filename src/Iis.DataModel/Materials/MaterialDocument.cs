@@ -26,7 +26,6 @@ namespace Iis.DbLayer.Repositories
         public MaterialSign SourceReliability { get; set; }
         public MaterialSign ProcessedStatus { get; set; }
         public MaterialSign SessionPriority { get; set; }
-        public Data[] Data { get; set; }
         public JObject[] Transcriptions { get; set; }
         public MaterialDocument[] Children { get; set; }
         public int MlHandlersCount { get; set; }
@@ -42,12 +41,6 @@ namespace Iis.DbLayer.Repositories
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
-    }
-
-    public class Data
-    {
-        public string Type { get; set; }
-        public string Text { get; set; }
     }
 
     public class Assignee
