@@ -30,8 +30,9 @@ namespace IIS.Core.GraphQL.Materials
 
             if (searchByImageInput != null)
             {
+                var content = Convert.FromBase64String(searchByImageInput.Content);
                 var result = await materialProvider
-                    .GetMaterialsByImageAsync(pagination.PageSize, pagination.Offset(), searchByImageInput.Name, searchByImageInput.Content.ToArray());
+                    .GetMaterialsByImageAsync(pagination.PageSize, pagination.Offset(), searchByImageInput.Name, content.ToArray());
                 var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
                 return (mapped, result.Count);
             }

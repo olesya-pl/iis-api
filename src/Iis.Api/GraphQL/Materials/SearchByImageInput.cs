@@ -5,6 +5,6 @@ namespace IIS.Core.GraphQL.Materials
     public class SearchByImageInput
     {
         public string Name { get; set; }
-        public IEnumerable<byte> Content { get; set; }
+        public string Content { get; set; }
     }
 }
