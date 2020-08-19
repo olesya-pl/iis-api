@@ -93,7 +93,8 @@ namespace Iis.Elastic
                                 {'term': {'ParentId':'NULL'}},
                                 {'more_like_this': {
                                         'fields': [ 'Content' ],
-                                        'like' : [ { '_id': '' } ]
+                                        'like' : [ { '_id': '' } ],
+                                        'min_term_freq' : 1
                                     }
                                 }
                             ]
@@ -370,7 +371,7 @@ namespace Iis.Elastic
         {
             json["highlight"] = new JObject();
             json["highlight"]["fields"] = new JObject();
-            json["highlight"]["fields"]["*"] = JObject.Parse("{\"type\" : \"plain\"}");
+            json["highlight"]["fields"]["*"] = JObject.Parse("{\"type\" : \"unified\"}");
         }
 
         private string GetRealIndexName(string baseIndexName)
