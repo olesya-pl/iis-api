@@ -84,8 +84,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                                 throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
                     await UpdateRelations(node, embed, value,
                         string.IsNullOrEmpty(dotName) ? key : dotName + "." + key, requestId);
-                    await _ontologyService.SaveNodeAsync(node);
                 }
+                await _ontologyService.SaveNodeAsync(node);
             }
 
             return node;
