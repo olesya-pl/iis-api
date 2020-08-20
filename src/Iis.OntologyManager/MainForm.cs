@@ -41,7 +41,7 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.11";
+        const string VERSION = "1.13";
         CheckBox cbComparisonCreate;
         CheckBox cbComparisonUpdate;
         CheckBox cbComparisonDelete;
