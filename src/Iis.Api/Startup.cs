@@ -192,8 +192,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
-            services.AddSingleton<FilesConfiguration>();
-            //services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
@@ -270,8 +268,8 @@ namespace IIS.Core
             services.AddTransient<ISanitizeService, SanitizeService>();
             services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(
-                    Configuration["activeDirectory:server"], 
-                    Configuration["activeDirectory:login"], 
+                    Configuration["activeDirectory:server"],
+                    Configuration["activeDirectory:login"],
                     Configuration["activeDirectory:password"]));
 
             services.AddControllers();
