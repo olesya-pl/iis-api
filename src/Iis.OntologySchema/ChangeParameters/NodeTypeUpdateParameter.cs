@@ -11,6 +11,7 @@ namespace Iis.OntologySchema.ChangeParameters
         public string Name { get; set; }
         public string Title { get; set; }
         public string Meta { get; set; }
+        public bool? IsAbstract { get; set; }
         public IEnumerable<string> Aliases { get; set; }
         public EmbeddingOptions? EmbeddingOptions { get; set; }
         public ScalarType? ScalarType { get; set; }
