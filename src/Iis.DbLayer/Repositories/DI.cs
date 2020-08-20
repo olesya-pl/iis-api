@@ -13,6 +13,7 @@ namespace Iis.DbLayer.Repositories
             services.AddTransient<IMLResponseRepository, MLResponseRepository>();
             services.AddTransient<IMaterialRepository, MaterialRepository>();
             services.AddTransient<IMaterialSignRepository, MaterialSignRepository>();
+            services.AddTransient<IAnnotationsRepository, AnnotationsRepository>();
         }
     }
 }

@@ -2,12 +2,14 @@ using System;
 using System.Threading.Tasks;
 using HotChocolate;
 using Newtonsoft.Json.Linq;
+using IIS.Core.Materials;
 
 namespace IIS.Core.GraphQL.Annotations
 {
     public class Query
     {
-        public Task<Annotation> GetAnnotation(
+        public async Task<Annotation> GetAnnotation(
+            [Service] IMaterialProvider materialProvider,
             [GraphQLNonNullType] Guid annotationId
         )
         {
@@ -16,7 +18,7 @@ namespace IIS.Core.GraphQL.Annotations
                 Id = annotationId,
                 Content = JObject.Parse("{'type':'text', 'text': 'awesome json'}")
             };
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
     }
 }
