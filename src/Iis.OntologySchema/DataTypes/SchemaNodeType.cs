@@ -15,7 +15,6 @@ namespace Iis.OntologySchema.DataTypes
         internal List<SchemaRelationType> _outgoingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> OutgoingRelations => _outgoingRelations;
 
-
         internal SchemaAttributeType _attributeType;
         public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
@@ -48,7 +47,6 @@ namespace Iis.OntologySchema.DataTypes
             }
         }
         public bool HasUniqueValues => UniqueValueFieldName != null;
-        private ISchemaMeta _metaMeta;
         public ISchemaMeta MetaObject => new SchemaMeta(GetMetaDeep());
         public string GetMetaDeep()
         {
@@ -102,6 +100,20 @@ namespace Iis.OntologySchema.DataTypes
                 result.AddRange(ancestor.GetDirectChildren(true));
             }
 
+            return result;
+        }
+
+        public IRelationTypeLinked GetRelationTypeByName(string name)
+        {
+            var result = OutgoingRelations.FirstOrDefault(r => r.NodeType.Name == name);
+            if (result == null)
+            {
+                foreach (var ancestor in GetAllAncestors())
+                {
+                    result = ancestor.OutgoingRelations.FirstOrDefault(r => r.NodeType.Name == name);
+                    if (result != null) break;
+                }
+            }
             return result;
         }
 
@@ -173,11 +185,14 @@ namespace Iis.OntologySchema.DataTypes
             return ancestors.Any(nt => nt.Name == nodeTypeName);
         }
 
-        public bool IsObjectOfStudy => IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
+        public bool IsObjectOfStudy => Name == EntityTypeNames.ObjectOfStudy.ToString() || IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
 
         public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
 
-        public bool IsObjectSign => IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
+        public bool IsObjectSign => Name == EntityTypeNames.ObjectSign.ToString() || IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
+        public bool IsEnum => Name == EntityTypeNames.Enum.ToString() || IsInheritedFrom(EntityTypeNames.Enum.ToString());
+
+        public bool IsSeparateObject => IsObjectOfStudy || IsObjectSign || IsEnum;
 
         public string GetStringCode()
         {

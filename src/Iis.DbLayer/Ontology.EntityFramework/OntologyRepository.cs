@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using Iis.DataModel;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Data;
 using IIS.Repository;
 using Microsoft.EntityFrameworkCore;
 

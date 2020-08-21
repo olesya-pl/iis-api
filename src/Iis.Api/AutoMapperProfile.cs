@@ -24,6 +24,7 @@ using System.Linq;
 using Iis.Services.Contracts.Dtos;
 using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
+using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.Api
 {
@@ -281,6 +282,10 @@ namespace Iis.Api
             CreateMap<Iis.ThemeManagement.Models.ThemeType, ThemeType>();
 
             CreateMap<IIS.Core.GraphQL.ML.MachineLearningHadnlersCountInput, IIS.Core.GraphQL.ML.MachineLearningHadnlersCountResult>();
+
+            CreateMap<INodeBase, NodeEntity>();
+            CreateMap<IRelationBase, RelationEntity>();
+            CreateMap<IAttributeBase, AttributeEntity>();
         }
     }
 }
