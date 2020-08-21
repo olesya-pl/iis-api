@@ -54,7 +54,7 @@ namespace Iis.OntologyManager
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(0, 0);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(800, 110);
+            this.panelTop.Size = new System.Drawing.Size(1000, 110);
             this.panelTop.TabIndex = 0;
             // 
             // panelMain
@@ -65,7 +65,7 @@ namespace Iis.OntologyManager
             this.panelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelMain.Location = new System.Drawing.Point(0, 100);
             this.panelMain.Name = "panelMain";
-            this.panelMain.Size = new System.Drawing.Size(800, 350);
+            this.panelMain.Size = new System.Drawing.Size(1000, 350);
             this.panelMain.TabIndex = 1;
             // 
             // panelRight
@@ -76,7 +76,7 @@ namespace Iis.OntologyManager
             this.panelRight.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelRight.Location = new System.Drawing.Point(259, 0);
             this.panelRight.Name = "panelRight";
-            this.panelRight.Size = new System.Drawing.Size(539, 348);
+            this.panelRight.Size = new System.Drawing.Size(539, 548);
             this.panelRight.TabIndex = 1;
             //
             // panelMeta
@@ -93,7 +93,7 @@ namespace Iis.OntologyManager
             this.panelLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelLeft.Location = new System.Drawing.Point(0, 0);
             this.panelLeft.Name = "panelLeft";
-            this.panelLeft.Size = new System.Drawing.Size(259, 348);
+            this.panelLeft.Size = new System.Drawing.Size(259, 548);
             this.panelLeft.TabIndex = 0;
             // 
             // gridTypes
@@ -105,7 +105,7 @@ namespace Iis.OntologyManager
             this.gridTypes.Location = new System.Drawing.Point(0, 0);
             this.gridTypes.Name = "gridTypes";
             this.gridTypes.RowHeadersVisible = false;
-            this.gridTypes.Size = new System.Drawing.Size(257, 346);
+            this.gridTypes.Size = new System.Drawing.Size(257, 546);
             this.gridTypes.TabIndex = 0;
             this.gridTypes.ReadOnly = true;
             this.gridTypes.SelectionChanged += new System.EventHandler(this.gridTypes_SelectionChanged);
@@ -114,7 +114,7 @@ namespace Iis.OntologyManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1000, 450);
             this.Controls.Add(this.panelMain);
             this.Controls.Add(this.panelTop);
             this.Name = "MainForm";
