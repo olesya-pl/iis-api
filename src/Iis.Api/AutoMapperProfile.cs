@@ -101,12 +101,11 @@ namespace Iis.Api
             CreateMap<CreateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+
             CreateMap<UpdateRoleModel, Role>()
-                .ForMember(dest => dest.Tabs, opts => opts.Ignore())
-                .ForMember(dest => dest.Entities, opts => opts.Ignore())
-                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
+            .ForMember(dest => dest.Tabs, opts => opts.Ignore())
+            .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
 
