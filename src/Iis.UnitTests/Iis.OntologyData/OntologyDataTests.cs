@@ -33,21 +33,21 @@ namespace Iis.UnitTests.Iis.OntologyData
             var mapper = serviceProvider.GetRequiredService<IMapper>();
             var ontologyPatchSaver = new OntologyPatchSaver(context, mapper);
 
-            //var militaryBaseMigration = new MigrationEntity
-            //{
-            //    SourceEntityName = "MilitaryBase",
-            //    TargetEntityName = "MilitaryOrganization",
-            //    Items = new List<MigrationItem>
-            //    {
-            //        new MigrationItem("baseCode", "commonInfo.OpenName"),
-            //        new MigrationItem("title", "commonInfo.RealNameFull"),
-            //        new MigrationItem("shortName", "commonInfo.RealNameShort"),
-            //        new MigrationItem("relatesToCountry", "country"),
-            //    }
-            //};
-            //ontologyData.Migrate(militaryBaseMigration);
-            //await ontologyPatchSaver.SavePatch(ontologyData.Patch);
-            //ontologyData.ClearPatch();
+            var militaryBaseMigration = new MigrationEntity
+            {
+                SourceEntityName = "MilitaryBase",
+                TargetEntityName = "MilitaryOrganization",
+                Items = new List<MigrationItem>
+                {
+                    new MigrationItem("baseCode", "commonInfo.OpenName"),
+                    new MigrationItem("title", "commonInfo.RealNameFull"),
+                    new MigrationItem("shortName", "commonInfo.RealNameShort"),
+                    new MigrationItem("relatesToCountry", "country"),
+                }
+            };
+            ontologyData.Migrate(militaryBaseMigration);
+            await ontologyPatchSaver.SavePatch(ontologyData.Patch);
+            ontologyData.ClearPatch();
 
             var subdivisionMigration = new MigrationEntity
             {
@@ -60,7 +60,8 @@ namespace Iis.UnitTests.Iis.OntologyData
                     new MigrationItem("dislocation", "mainDislocation.coords",
                         new MigrationItemOptions { IgnoreIfFieldsAreNotEmpty = "headquartersDislocation"}),
                     new MigrationItem("subtype", null, new MigrationItemOptions { Ignore = true }),
-                    new MigrationItem("militaryBase", null, new MigrationItemOptions { Ignore = true }),
+                    new MigrationItem("militaryBase", "militaryBaseShortName",
+                        new MigrationItemOptions { TakeValueFrom = "shortName" }),
                     new MigrationItem("corpsType", "classifiers.corps"),
                     new MigrationItem("name", "commonInfo.RealNameFull"),
                     new MigrationItem("description", "additionalInfo"),
@@ -70,8 +71,10 @@ namespace Iis.UnitTests.Iis.OntologyData
                         new MigrationItemOptions { IgnoreIfFieldsAreNotEmpty = "placeOfHeadquartersDislocation"}),
                     new MigrationItem("relatesToCountry", "country"),
                     new MigrationItem("sidcTitle", "classifiers.sidc"),
-                    new MigrationItem("superior", null, new MigrationItemOptions { Ignore = true }),
-                    new MigrationItem("bePartOf", null, new MigrationItemOptions { Ignore = true }),
+                    new MigrationItem("superior", "parent",
+                        new MigrationItemOptions { IsHierarchical = true }),
+                    new MigrationItem("bePartOf", "bePartOf",
+                        new MigrationItemOptions { IsHierarchical = true }),
                     new MigrationItem("amountOfPersonnel", "staffInfo.currentAmount.total"),
                 }
             };

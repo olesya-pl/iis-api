@@ -8,5 +8,7 @@ namespace Iis.Interfaces.Ontology.Data
     {
         string IgnoreIfFieldsAreNotEmpty { get; }
         bool Ignore { get; }
+        string TakeValueFrom { get; }
+        bool IsHierarchical { get; }
     }
 }

@@ -24,5 +24,9 @@ namespace Iis.OntologyData.DataTypes
         {
             return dotNames.Any(s => Contains(s));
         }
+        public string GetValue(string dotName)
+        {
+            return _items.SingleOrDefault(i => i.DotName == dotName)?.Value;
+        }
     }
 }

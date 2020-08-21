@@ -24,6 +24,13 @@ namespace Iis.DbLayer.OntologyData
             _context.Nodes.AddRange(nodes);
             _context.Relations.AddRange(patch.Create.Relations.Select(r => _mapper.Map<RelationEntity>(r)));
             _context.Attributes.AddRange(patch.Create.Attributes.Select(n => _mapper.Map<AttributeEntity>(n)));
+
+            foreach (var node in patch.Update.Nodes)
+            {
+                var nodeEntity = _context.Nodes.SingleOrDefault(n => n.Id == node.Id);
+                _mapper.Map(node, nodeEntity);
+                _context.Nodes.Update(nodeEntity);
+            }
             await _context.SaveChangesAsync();
         }
 
