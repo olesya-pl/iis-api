@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿ using System.Linq;
 using AutoMapper;
 using AutoFixture;
 using AutoFixture.AutoMoq;

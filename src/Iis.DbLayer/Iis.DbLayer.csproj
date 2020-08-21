@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />

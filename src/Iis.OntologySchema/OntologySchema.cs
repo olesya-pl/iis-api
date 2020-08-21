@@ -322,7 +322,7 @@ namespace Iis.OntologySchema
         private void ValidateNodeTypeUpdateParameter(INodeTypeUpdateParameter updateParameter)
         {
             var regex = new Regex("^[A-Za-z0-9_]+$");
-            if (!regex.IsMatch(updateParameter.Name))
+            if (!string.IsNullOrEmpty(updateParameter.Name) && !regex.IsMatch(updateParameter.Name))
             {
                 throw new Exception("Имя должно состоять из букв, цифр и символа подчеркивания");
             }

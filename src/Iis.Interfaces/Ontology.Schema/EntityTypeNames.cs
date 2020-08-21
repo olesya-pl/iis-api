@@ -5,6 +5,7 @@
         ObjectOfStudy,
         FuzzyDate,
         ObjectSign,
-        Event
+        Event, 
+        Enum
     }
 }
