@@ -9,5 +9,7 @@ namespace Iis.OntologyData.DataTypes
     {
         public string IgnoreIfFieldsAreNotEmpty { get; set; }
         public bool Ignore { get; set; }
+        public string TakeValueFrom { get; set; }
+        public bool IsHierarchical { get; set; }
     }
 }

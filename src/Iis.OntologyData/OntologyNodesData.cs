@@ -40,20 +40,30 @@ namespace Iis.OntologyData
             var sourceNodes = _storage.Nodes.Values
                 .Where(n => n.NodeType.Kind == Kind.Entity
                     && n.NodeType.Name == migrationEntity.SourceEntityName).ToList();
+            
+            var targetType = _schema.GetEntityTypeByName(migrationEntity.TargetEntityName);
+            var hierarchyMapper = new Dictionary<Guid, Guid>();
 
             foreach (var node in sourceNodes)
             {
-                Migrate(node, migrationEntity);
-                break;
+                var entity = _storage.CreateNode(targetType.Id, Guid.NewGuid());
+                hierarchyMapper[node.Id] = entity.Id;
+            }
+
+            foreach (var node in sourceNodes)
+            {
+                Migrate(node, migrationEntity, hierarchyMapper);
+                //_storage.SetNodeIsArchived(node.Id);
             }
         }
-        private void Migrate(NodeData sourceNode, IMigrationEntity migrationEntity)
+        private void Migrate(NodeData sourceNode, IMigrationEntity migrationEntity, 
+            Dictionary<Guid, Guid> hierarchyMapper)
         {
             var dotNameValues = sourceNode.GetDotNameValues();
-            var targetType = _schema.GetEntityTypeByName(migrationEntity.TargetEntityName);
-            var entity = _storage.CreateNode(targetType.Id);
+            var entity = _storage.Nodes[hierarchyMapper[sourceNode.Id]];
             foreach (var dotNameValue in dotNameValues.Items)
             {
+                var value = dotNameValue.Value;
                 var migrationItem = migrationEntity.GetItem(dotNameValue.DotName);
                 var targetDotName = migrationItem?.TargetDotName ?? dotNameValue.DotName;
                 var options = migrationItem?.Options;
@@ -66,8 +76,25 @@ namespace Iis.OntologyData
                     {
                         continue;
                     }
+
+                    if (!string.IsNullOrEmpty(options.TakeValueFrom))
+                    {
+                        var id = Guid.Parse(dotNameValue.Value);
+                        var node = _storage.Nodes[id];
+                        value = node.GetDotNameValues().GetValue(options.TakeValueFrom);
+                    }
+
+                    if (options.IsHierarchical)
+                    {
+                        var selfId = Guid.Parse(dotNameValue.Value);
+                        value = hierarchyMapper.ContainsKey(selfId) ? hierarchyMapper[selfId].ToString() : null;
+                    }
                 }
-                AddValueByDotName(entity, dotNameValue.Value, targetDotName.Split('.'));
+
+                if (!string.IsNullOrEmpty(value))
+                {
+                    AddValueByDotName(entity, value, targetDotName.Split('.'));
+                }
             }
         }
         private void AddValueByDotName(NodeData entity, string value, string[] dotNameParts)

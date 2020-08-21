@@ -165,5 +165,11 @@ namespace Iis.OntologyData
         {
             _patch = new OntologyPatch();
         }
+        public void SetNodeIsArchived(Guid id)
+        {
+            var node = Nodes[id];
+            node.IsArchived = true;
+            _patch._update._nodes.Add(Nodes[id]);
+        }
     }
 }

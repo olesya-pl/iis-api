@@ -53,7 +53,7 @@ namespace Iis.OntologyData.DataTypes
                             $"{NodeType.Name}.{item.DotName}", item.Value));
                     }
                 }
-            }                
+            }
             return new DotNameValues(list);
         }
     }
