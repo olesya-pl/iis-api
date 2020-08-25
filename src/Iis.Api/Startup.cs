@@ -184,6 +184,7 @@ namespace IIS.Core
             services.AddTransient<RoleService>();
             services.AddTransient<UserService>();
             services.AddTransient<ThemeService>();
+            services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
