@@ -9,5 +9,6 @@ namespace Iis.DbLayer.Repositories
     {
         Task<JObject> GetJsonNodeByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<bool> PutHistoricalNodesAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }

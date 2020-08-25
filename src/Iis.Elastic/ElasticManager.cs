@@ -50,6 +50,10 @@ namespace Iis.Elastic
             PostData postData = jsonDocument;
 
             var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, indexUrl, cancellationToken, postData);
+            if (!response.Success) 
+            {
+            
+            }
 
             return response.Success;
         }

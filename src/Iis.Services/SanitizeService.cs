@@ -7,6 +7,7 @@ using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.Services
 {
+
     public class SanitizeService : ISanitizeService
     {
         private readonly List<(Func<string, bool> IsSuitable, Func<string, string> Sanitizer)> _sanitizers;

@@ -3,6 +3,7 @@ using Iis.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -41,6 +42,37 @@ namespace Iis.Api.Controllers
             _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
             _materialRepository = materialRepository;
+        }
+
+        [HttpPost("CreateHistoricalIndexes")]
+        public async Task<IActionResult> CreateHistoricalIndexes(CancellationToken ct) 
+        {
+            //var ontologyIndexes = _elasticService.OntologyIndexes;
+            var ontologyIndexes = new List<string> {"Person" };
+            var historicalIndexesByTypeName = ontologyIndexes.ToDictionary(x => x, x => $"historical_{x}");
+
+            await _elasticManager.DeleteIndexesAsync(historicalIndexesByTypeName.Values, ct);
+
+            foreach (var index in ontologyIndexes)
+            {
+                var type = _ontologySchema.GetEntityTypeByName(index);
+                var attributesInfo = _ontologySchema.GetAttributesInfo(index);
+                
+                var properties = attributesInfo.Items.ToList();
+                properties.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null));
+                
+                var updateAttributesInfo = new AttributeInfo(historicalIndexesByTypeName[index], properties.Select(x => (AttributeInfoItem)x));
+
+                var result = await _elasticManager.CreateMapping(updateAttributesInfo);
+            }
+
+            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, ct);
+            foreach (var extNode in extNodes)
+            {
+                await _elasticService.PutHistoricalNodesAsync(extNode, ct);
+            }
+
+            return Ok();
         }
 
         [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]

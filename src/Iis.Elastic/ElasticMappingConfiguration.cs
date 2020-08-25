@@ -50,6 +50,8 @@ namespace Iis.Elastic
                     return ElasticMappingPropertyType.Integer;
                 case ScalarType.Date:
                     return ElasticMappingPropertyType.Date;
+                case ScalarType.DateRange:
+                    return ElasticMappingPropertyType.DateRange;
                 default:
                     return ElasticMappingPropertyType.Text;
             }

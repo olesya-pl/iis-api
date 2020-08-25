@@ -155,6 +155,13 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutNodeAsync(id, cancellationToken);
         }
 
+        public Task<bool> PutHistoricalNodesAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
+
+            return _nodeRepository.PutHistoricalNodesAsync(id, cancellationToken);
+        }
+
         public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
         {
             if (!UseElastic) return true;

@@ -80,7 +80,8 @@ namespace Iis.Elastic
                 result["term_vector"] = TermVector;
             }
 
-            if (Type == ElasticMappingPropertyType.Date && Formats.Any())
+            if ((Type == ElasticMappingPropertyType.Date || Type == ElasticMappingPropertyType.DateRange) 
+                && Formats.Any())
             {
                 result["format"] = string.Join("||", Formats);
             }

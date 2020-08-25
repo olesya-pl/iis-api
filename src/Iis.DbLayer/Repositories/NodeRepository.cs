@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.DbLayer.Repositories.Helpers;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.DbLayer.Repositories
@@ -14,13 +16,15 @@ namespace Iis.DbLayer.Repositories
     {
         private readonly IElasticManager _elasticManager;
         private readonly NodeFlattener<IIISUnitOfWork> _nodeFlattener;
+        private readonly IChangeHistoryService _changeHistoryService;
 
         public NodeRepository(IElasticManager elasticManager,
             NodeFlattener<IIISUnitOfWork> nodeFlattener,
-            IOntologySchema ontologySchema)
+            IOntologySchema ontologySchema, IChangeHistoryService changeHistoryService)
         {
             _elasticManager = elasticManager;
             _nodeFlattener = nodeFlattener;
+            _changeHistoryService = changeHistoryService;
 
             var objectOfStudyType = ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
             if (objectOfStudyType != null)
@@ -47,6 +51,47 @@ namespace Iis.DbLayer.Repositories
                 result.NodeTypeName,
                 result.Id,
                 result.SerializedNode, cancellationToken);
+        }
+
+        public async Task<bool> PutHistoricalNodesAsync(Guid id, CancellationToken ct = default) 
+        {
+            var getNodeChanges = _changeHistoryService.GetChangeHistory(id, null);
+            var getActualNode = _nodeFlattener.FlattenNode(id, ct);
+
+            await Task.WhenAll(getActualNode, getNodeChanges);
+
+            
+            var changes = getNodeChanges.Result
+                .GroupBy(x => x.RequestId)
+                .Where(x => x.Count() > 0)
+                .OrderByDescending(x => x.First().Date)
+                .ToList();
+
+            var actualNode = getActualNode.Result;
+            var nodes = new List<FlattenNodeResult>();
+            foreach (var changePack in changes)
+            {
+                var olderNode = new FlattenNodeResult
+                {
+                    Id = actualNode.Id,
+                    NodeTypeName = actualNode.NodeTypeName,
+                    SerializedNode = actualNode.SerializedNode.ReplaceOrAddValues(changePack.Select(x => (x.PropertyName, x.OldValue)).ToArray())
+                };
+                nodes.Add(olderNode);
+                actualNode = olderNode;
+            }
+
+            foreach (var item in nodes)
+            {
+                var result = await _elasticManager.PutDocumentAsync(
+                $"historical_{item.NodeTypeName}",
+                Guid.NewGuid().ToString(),
+                item.SerializedNode, ct);
+            }
+
+            return true;
+
+            //return await _elasticManager.PutsDocumentsAsync($"historical_{actualNode.NodeTypeName}", string.Join("", nodes.Select(x => x.SerializedNode)), ct);
         }
     }
 }
