@@ -98,7 +98,7 @@ namespace Iis.Api
             CreateMap<ActiveDirectoryGroupDto, Group>();
 
             CreateMap<Role, IIS.Core.GraphQL.Roles.Role>()
-                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroupIds.Select(g => g.ToString())));
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroupIds.Select(g => g.ToString("N"))));
             CreateMap<CreateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
