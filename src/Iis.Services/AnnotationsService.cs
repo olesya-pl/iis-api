@@ -29,7 +29,7 @@ namespace Iis.Services
 
         public async Task<Annotation> SetAnnotationAsync(Annotation annotation)
         {
-            Func<IIISUnitOfWork, Task> action = null;;
+            Action<IIISUnitOfWork> action = null;
 
             var entity = _mapper.Map<AnnotationEntity>(annotation);
             
@@ -37,16 +37,16 @@ namespace Iis.Services
 
             if(existingEntity is null)
             {
-                action = uow => uow.AnnotationsRepository.AddAsync(entity);
+                action = uow => uow.AnnotationsRepository.Add(entity);
             }
             else
             {
                 existingEntity.Content = entity.Content;
                 
-                action = uow => uow.AnnotationsRepository.UpdateAsync(existingEntity);
+                action = uow => uow.AnnotationsRepository.Update(existingEntity);
             }
 
-            await RunAsync(action);
+            Run(action);
 
             return _mapper.Map<Annotation>(entity);
         }

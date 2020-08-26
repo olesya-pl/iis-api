@@ -7,7 +7,7 @@ namespace Iis.DbLayer.Repositories
     public interface IAnnotationsRepository
     {
         Task<AnnotationEntity> GetByIdAsync(Guid id);
-        Task AddAsync(AnnotationEntity entity);
-        Task UpdateAsync(AnnotationEntity entity);
+        void Add(AnnotationEntity entity);
+        void Update(AnnotationEntity entity);
     }
 }

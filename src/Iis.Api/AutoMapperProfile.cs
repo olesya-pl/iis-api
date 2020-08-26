@@ -25,7 +25,7 @@ using System.Linq;
 using Iis.Services.Contracts.Dtos;
 using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
-
+using Contracts = Iis.Services.Contracts;
 namespace Iis.Api
 {
     public class AutoMapperProfile: Profile
@@ -281,14 +281,17 @@ namespace Iis.Api
             CreateMap<IIS.Core.GraphQL.ML.MachineLearningHadnlersCountInput, IIS.Core.GraphQL.ML.MachineLearningHadnlersCountResult>();
 
             //annotations: graph ql input -> domain
-            CreateMap<IIS.Core.GraphQL.Annotations.AnnotationInput, Iis.Services.Contracts.Annotations.Annotation>();
+            CreateMap<IIS.Core.GraphQL.Annotations.AnnotationInput, Contracts.Annotations.Annotation>();
 
             //annotations: domain -> graph ql
-            CreateMap<Iis.Services.Contracts.Annotations.Annotation, IIS.Core.GraphQL.Annotations.Annotation>()
+            CreateMap<Contracts.Annotations.Annotation, IIS.Core.GraphQL.Annotations.Annotation>()
                 .ForMember(dest => dest.Content, opts => opts.MapFrom(src => string.IsNullOrWhiteSpace(src.Content) ? null : JObject.Parse(src.Content)));
             
             //annotations: domain -> entity
-            CreateMap<Iis.Services.Contracts.Annotations.Annotation, AnnotationEntity>();
+            CreateMap<Contracts.Annotations.Annotation, AnnotationEntity>();
+            
+            //annotations: entity -> domain
+            CreateMap<AnnotationEntity, Contracts.Annotations.Annotation>();
         }
     }
 }

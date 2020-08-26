@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 using Iis.DataModel;
 using Iis.DataModel.Annotations;
 using IIS.Repository;
+
 
 namespace Iis.DbLayer.Repositories
 {
@@ -11,33 +13,19 @@ namespace Iis.DbLayer.Repositories
     {
         public Task<AnnotationEntity> GetByIdAsync(Guid id)
         {
-            var result = new AnnotationEntity
-            {
-                Id = Guid.NewGuid(),
-                Content = "{'type':'text', 'text': 'awesome json'}"
-            };
-
-            return Task.FromResult(result);
+            return Context.Annotations
+                        .AsNoTracking()
+                        .SingleOrDefaultAsync(e => e.Id == id);
         }
 
-        public Task AddAsync(AnnotationEntity entity)
+        public void Add(AnnotationEntity entity)
         {
-            var result = new AnnotationEntity
-            {
-                Id = entity.Id,
-                Content = entity.Content
-            };
-            return Task.CompletedTask;
+            Context.Annotations.Add(entity);
         }
 
-        public Task UpdateAsync(AnnotationEntity entity)
+        public void Update(AnnotationEntity entity)
         {
-            var result = new AnnotationEntity
-            {
-                Id = entity.Id,
-                Content = entity.Content
-            };
-            return Task.CompletedTask;
+            Context.Annotations.Update(entity);
         }
     }
 }
