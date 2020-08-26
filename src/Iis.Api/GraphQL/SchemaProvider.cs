@@ -101,8 +101,7 @@ namespace IIS.Core.GraphQL
         {
             schemaBuilder // TODO: Find a better way to register interface implementation types
                 .AddType<EntityTypes.EntityAttributePrimitive>()
-                .AddType<EntityTypes.EntityAttributeRelation>()
-                .AddType<Roles.RoleType>();
+                .AddType<EntityTypes.EntityAttributeRelation>();
         }
 
         public void TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder)
