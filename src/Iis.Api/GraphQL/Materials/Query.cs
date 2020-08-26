@@ -22,10 +22,20 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLNonNullType] PaginationInput pagination,
             FilterInput filter,
             SortingInput sorting,
+            SearchByImageInput searchByImageInput,
             IEnumerable<Guid> nodeIds = null,
             IEnumerable<string> types = null)
         {
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
+
+            if (searchByImageInput != null)
+            {
+                var content = Convert.FromBase64String(searchByImageInput.Content);
+                var result = await materialProvider
+                    .GetMaterialsByImageAsync(pagination.PageSize, pagination.Offset(), searchByImageInput.Name, content.ToArray());
+                var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+                return (mapped, result.Count);
+            }
 
             var materialsResult = await materialProvider
                 .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, nodeIds, types,
@@ -37,7 +47,7 @@ namespace IIS.Core.GraphQL.Materials
             return (materials, materialsResult.Count);
         }
 
-        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchByConfiguredFieldsResultItem> materialsResult)
+        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchResultItem> materialsResult)
         {
             foreach (var material in materials)
             {
@@ -122,6 +132,21 @@ namespace IIS.Core.GraphQL.Materials
             var materialsResult = await materialProvider.GetMaterialsByAssigneeIdAsync(assigneeId);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+            return (materials, materialsResult.Count);
+        }
+
+        public async Task<(IEnumerable<Material> materials, int totalCout)> GetMaterialsLikeThis(
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] Guid materialId,
+            [GraphQLNonNullType] PaginationInput pagination)
+        {
+            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId, pagination.PageSize, pagination.Offset());
+
+            var materials = materialsResult.Materials
+                                .Select(m => mapper.Map<Material>(m))
+                                .ToList();
+
             return (materials, materialsResult.Count);
         }
     }

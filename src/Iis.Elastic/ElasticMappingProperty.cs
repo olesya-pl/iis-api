@@ -15,6 +15,7 @@ namespace Iis.Elastic
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
         public bool SupportsNullValue { get; }
         public int? Dimensions { get; }
+        public string TermVector { get; }
 
         public ElasticMappingProperty() { }
 
@@ -22,7 +23,8 @@ namespace Iis.Elastic
             ElasticMappingPropertyType type,
             bool supportsNullValue = false,
             IEnumerable<string> formats = null,
-            int? dimensions = null)
+            int? dimensions = null,
+            string termVector = null)
         {
             var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
             Name = splitted[0];
@@ -40,20 +42,23 @@ namespace Iis.Elastic
             }
             SupportsNullValue = supportsNullValue;
 
-            if(formats != null && formats.Any())
+            if (formats != null && formats.Any())
             {
                 Formats.AddRange(formats);
             }
             Dimensions = dimensions;
+
+            TermVector = termVector;
         }
 
         public JObject ToJObject()
         {
             var result = new JObject();
 
-            if (this.Type != ElasticMappingPropertyType.Nested)
+            if (Type != ElasticMappingPropertyType.Nested)
             {
-                result["type"] = this.Type.ToString().ToUnderscore();
+                result["type"] = Type.ToString().ToUnderscore();
+
                 if (Dimensions.HasValue)
                 {
                     result["dims"] = Dimensions;
@@ -65,12 +70,17 @@ namespace Iis.Elastic
                 result["null_value"] = ElasticManager.NullValue;
             }
 
-            if (this.Type == ElasticMappingPropertyType.Alias)
+            if (Type == ElasticMappingPropertyType.Alias)
             {
-                result["path"] = this.Path;
+                result["path"] = Path;
             }
 
-            if(Type == ElasticMappingPropertyType.Date && Formats.Any())
+            if (Type is ElasticMappingPropertyType.Text && !string.IsNullOrWhiteSpace(TermVector))
+            {
+                result["term_vector"] = TermVector;
+            }
+
+            if (Type == ElasticMappingPropertyType.Date && Formats.Any())
             {
                 result["format"] = string.Join("||", Formats);
             }

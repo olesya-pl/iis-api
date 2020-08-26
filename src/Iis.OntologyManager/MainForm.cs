@@ -1,23 +1,18 @@
 ﻿using Iis.DataModel;
 using Iis.DbLayer.OntologySchema;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyManager.Parameters;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
-using Iis.OntologySchema;
-using Iis.OntologySchema.ChangeParameters;
-using Iis.OntologySchema.DataTypes;
 using Iis.OntologySchema.Saver;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Iis.OntologyManager
@@ -40,7 +35,11 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.9";
+        const string VERSION = "1.13";
+        CheckBox cbComparisonCreate;
+        CheckBox cbComparisonUpdate;
+        CheckBox cbComparisonDelete;
+        CheckBox cbComparisonAliases;
 
         private enum NodeViewType : byte
         {
@@ -71,7 +70,7 @@ namespace Iis.OntologyManager
             _uiControlsCreator = uiControlsCreator;
             _schemaService = schemaService;
             _schemaSources = GetSchemaSources();
-            
+
             SuspendLayout();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
@@ -100,7 +99,7 @@ namespace Iis.OntologyManager
         {
             var pnlTop = new Panel();
             pnlTop.Location = new Point(0, 0);
-            pnlTop.Size = new Size(rootPanel.Width, 50);
+            pnlTop.Size = new Size(rootPanel.Width, _style.ButtonHeightDefault*2);
             pnlTop.BorderStyle = BorderStyle.FixedSingle;
             pnlTop.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -156,11 +155,15 @@ namespace Iis.OntologyManager
         private void SetTypeViewHeader(Panel rootPanel)
         {
             rootPanel.SuspendLayout();
-            
+
             btnTypeBack = new Button
             {
                 Location = new Point(_style.MarginHor, _style.MarginVer),
-                Width = 60,
+                MinimumSize = new Size
+                {
+                    Height = _style.ButtonHeightDefault,
+                    Width = _style.ButtonWidthDefault
+                },
                 Text = "Back"
             };
             btnTypeBack.Click += (sender, e) => { GoBack(); };
@@ -193,7 +196,7 @@ namespace Iis.OntologyManager
                 Visible = false
             };
             panelComparison.SuspendLayout();
-            var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 100, 10);
+            var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 200, 10);
             var container = new UiContainerManager(panels.panelTop, _style);
 
             var btnComparisonClose = new Button
@@ -218,9 +221,15 @@ namespace Iis.OntologyManager
             cmbSchemaSourcesCompare.SelectedIndexChanged += (sender, e) => { CompareSchemas(); };
             container.Add(cmbSchemaSourcesCompare);
 
-            var btnComparisonUpdate = new Button { Text = "Update database" };
+            var btnComparisonUpdate = new Button { Text = "Update database", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
             container.Add(btnComparisonUpdate);
+
+            container.GoToNewColumn();
+            container.Add(cbComparisonCreate = new CheckBox { Text = "Create", Checked = true });
+            container.Add(cbComparisonUpdate = new CheckBox { Text = "Update", Checked = true });
+            container.Add(cbComparisonDelete = new CheckBox { Text = "Delete" });
+            container.Add(cbComparisonAliases = new CheckBox { Text = "Aliases" });
 
             txtComparison = new RichTextBox { Dock = DockStyle.Fill, BackColor = panelComparison.BackColor };
             panels.panelBottom.Controls.Add(txtComparison);
@@ -249,9 +258,9 @@ namespace Iis.OntologyManager
             cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
             container.Add(cmbSchemaSources);
 
-            btnSaveSchema = new Button { Text = "Save" };
+            btnSaveSchema = new Button { Text = "Save", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnSaveSchema.Click += btnSave_Click;
-            btnCompare = new Button { Text = "Compare" };
+            btnCompare = new Button { Text = "Compare", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
 
@@ -417,7 +426,15 @@ namespace Iis.OntologyManager
             using var context = OntologyContext.GetContext(_compareResult.SchemaSource.Data);
             var schema = _schemaService.GetOntologySchema(_compareResult.SchemaSource);
             var schemaSaver = new OntologySchemaSaver(context);
-            schemaSaver.SaveToDatabase(_compareResult, schema);
+            var parameters = new SchemaSaveParameters
+            {
+                Create = cbComparisonCreate.Checked,
+                Update = cbComparisonUpdate.Checked,
+                Delete = cbComparisonDelete.Checked,
+                Aliases = cbComparisonAliases.Checked
+            };
+
+            schemaSaver.SaveToDatabase(_compareResult, schema, parameters);
             CompareSchemas();
         }
         #endregion

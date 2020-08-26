@@ -13,6 +13,7 @@ namespace Iis.OntologyManager.Style
         public int MarginVerSmall { get; set; }
         public int MarginHor { get; set; }
         public int ControlWidthDefault { get; set; }
+        public int ButtonHeightDefault { get; private set; }
         public int ButtonWidthDefault { get; set; }
         public Color BackgroundColor { get; set; }
         public Color ComparisonBackColor { get; set; }
@@ -26,11 +27,12 @@ namespace Iis.OntologyManager.Style
         {
             return new OntologyManagerStyle
             {
-                MarginVer = 4,
-                MarginVerSmall = 2,
-                MarginHor = 10,
-                ControlWidthDefault = 210,
-                ButtonWidthDefault = 100,
+                MarginVer = 16,
+                MarginVerSmall = 8,
+                MarginHor = 40,
+                ControlWidthDefault = 410,
+                ButtonHeightDefault = 50,
+                ButtonWidthDefault = 200,
                 BackgroundColor = Color.LightYellow,
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using HotChocolate;
+﻿using HotChocolate;
 using HotChocolate.Types;
-using Iis.Api.GraphQL.Roles;
-using Iis.Services.Contracts.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace IIS.Core.GraphQL.Roles
 {
@@ -20,7 +18,6 @@ namespace IIS.Core.GraphQL.Roles
         public bool IsAdmin { get; set; }
         public IEnumerable<AccessEntity> Entities { get; set; }
         public IEnumerable<AccessTab> Tabs { get; set; }
-        public IEnumerable<Group> ActiveDirectoryGroups { get; set; }
-        public List<Guid> ActiveDirectoryGroupIds { get; set; }
+        public IEnumerable<string> ActiveDirectoryGroupIds { get; set; }
     }
 }

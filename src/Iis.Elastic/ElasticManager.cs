@@ -80,6 +80,48 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(response);
         }
 
+        public async Task<IElasticSearchResult> SearchMoreLikeThisAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var json = JObject.Parse(
+                @"{
+                    '_source': ['_id'],
+                    'from':0,
+                    'size':10,
+                    'query':{
+                        'bool':{
+                            'must':[
+                                {'term': {'ParentId':'NULL'}},
+                                {'more_like_this': {
+                                        'fields': [ 'Content' ],
+                                        'like' : [ { '_id': '' } ],
+                                        'min_term_freq' : 1
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }"
+            );
+
+            json["_source"] = new JArray(searchParams.ResultFields);
+
+            json["from"] = searchParams.From;
+            
+            json["size"] = searchParams.Size;
+            
+            json["query"]["bool"]["must"][1]["more_like_this"]["like"][0]["_id"] = searchParams.Query;
+            
+            var query = json.ToString(Newtonsoft.Json.Formatting.None);
+            
+            var path = searchParams.BaseIndexNames.Count == 0 ?
+                "_search" :
+                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
+
+            var response = await GetAsync(path, query, cancellationToken);
+
+            return _resultExtractor.GetFromResponse(response);
+        }
+
         public async Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName)
         {
             if (indexName == null) throw new ArgumentNullException(nameof(indexName));
@@ -189,6 +231,31 @@ namespace Iis.Elastic
                         ""russian_stemmer""
                 ]}}}}";
             createRequest["settings"] = JObject.Parse(analyzerSettings);
+        }
+
+        public async Task<IElasticSearchResult> SearchByImageVector(decimal[] imageVector, IIisElasticSearchParams searchParams, CancellationToken token)
+        {
+            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(index:GetRealIndexNames(searchParams.BaseIndexNames), PostData.Serializable(new
+            {
+                from = searchParams.From,
+                size = searchParams.Size,
+                min_score = 0.1,
+                query = new {
+                    script_score = new {
+                    query = new {
+                        match_all = new { }
+                    },
+                    script = new {
+                        source = "1 / (l2norm(params.queryVector, doc['ImageVector']) + 1)",
+                        @params = new {
+                            queryVector =  imageVector
+                        }
+                    }
+                }
+             }
+            }),
+            ctx: token);
+            return _resultExtractor.GetFromResponse(searchResponse);
         }
 
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
@@ -304,7 +371,7 @@ namespace Iis.Elastic
         {
             json["highlight"] = new JObject();
             json["highlight"]["fields"] = new JObject();
-            json["highlight"]["fields"]["*"] = JObject.Parse("{\"type\" : \"plain\"}");
+            json["highlight"]["fields"]["*"] = JObject.Parse("{\"type\" : \"unified\"}");
         }
 
         private string GetRealIndexName(string baseIndexName)
@@ -359,6 +426,7 @@ namespace Iis.Elastic
             }
             return builder.ToString();
         }
+        
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
         {
             using (DurationMeter.Measure($"Elastic request {httpMethod} {path}", _logger))

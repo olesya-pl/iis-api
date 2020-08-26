@@ -97,16 +97,16 @@ namespace Iis.Api
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.DeleteAccessName)));
             CreateMap<ActiveDirectoryGroupDto, Group>();
 
-            CreateMap<Role, IIS.Core.GraphQL.Roles.Role>();
+            CreateMap<Role, IIS.Core.GraphQL.Roles.Role>()
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroupIds.Select(g => g.ToString("N"))));
             CreateMap<CreateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
+
             CreateMap<UpdateRoleModel, Role>()
-                .ForMember(dest => dest.Tabs, opts => opts.Ignore())
-                .ForMember(dest => dest.Entities, opts => opts.Ignore())
-                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
+            .ForMember(dest => dest.Tabs, opts => opts.Ignore())
+            .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
 
@@ -207,9 +207,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SessionPriority)))
                 .ForMember(dest => dest.LoadData, opts =>
-                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)))
-                .ForMember(dest => dest.Data, opts =>
-                    opts.MapFrom(src => src.Data == null ? null : JsonConvert.DeserializeObject<Iis.DbLayer.Repositories.Data[]>(src.Data)));
+                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)));
 
             CreateMap<DbLayer.Repositories.Assignee, Services.Contracts.User>();                
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
@@ -217,7 +215,6 @@ namespace Iis.Api
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileInfo(src.FileId.Value): null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
-                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null: JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
 

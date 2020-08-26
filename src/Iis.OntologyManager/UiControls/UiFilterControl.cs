@@ -2,6 +2,7 @@
 using Iis.OntologyManager.Style;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -11,7 +12,7 @@ namespace Iis.OntologyManager.UiControls
     public class UiFilterControl: UIBaseControl
     {
         IGetTypesFilter _model;
-        
+
         CheckBox cbFilterEntities;
         CheckBox cbFilterAttributes;
         CheckBox cbFilterRelations;
@@ -26,9 +27,19 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             _container.SetColWidth(_style.ButtonWidthDefault);
-            _container.Add(cbFilterEntities = new CheckBox { Text = "Entities", Checked = true });
-            _container.Add(cbFilterAttributes = new CheckBox { Text = "Attributes" });
-            _container.Add(cbFilterRelations = new CheckBox { Text = "Relations" });
+            _container.Add(cbFilterEntities = new CheckBox {
+                Text = "Entities",
+                Checked = true,
+                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
+            });
+            _container.Add(cbFilterAttributes = new CheckBox {
+                Text = "Attributes",
+                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
+            });
+            _container.Add(cbFilterRelations = new CheckBox {
+                Text = "Relations",
+                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
+            });
 
             cbFilterEntities.CheckedChanged += OnUserInput;
             cbFilterAttributes.CheckedChanged += OnUserInput;

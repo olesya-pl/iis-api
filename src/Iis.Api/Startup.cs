@@ -166,6 +166,7 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
+            services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
             services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -191,7 +192,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
-            //services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
@@ -266,10 +266,10 @@ namespace IIS.Core
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<ISanitizeService, SanitizeService>();
-            services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ => 
+            services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(
-                    Configuration["activeDirectory:domain"], 
-                    Configuration["activeDirectory:login"], 
+                    Configuration["activeDirectory:server"],
+                    Configuration["activeDirectory:login"],
                     Configuration["activeDirectory:password"]));
 
             services.AddControllers();
