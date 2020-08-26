@@ -5,6 +5,7 @@ using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Themes;
+using Iis.DataModel.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DataModel
@@ -41,18 +42,26 @@ namespace Iis.DataModel
         public DbSet<OntologyMigrationsEntity> OntologyMigrations { get; set; }
 
         public DbSet<RoleEntity> Roles { get; set; }
+        
         public DbSet<RoleAccessEntity> RoleAccess { get; set; }
+        
         public DbSet<AccessObjectEntity> AccessObjects { get; set; }
+        
         public DbSet<UserRoleEntity> UserRoles { get; set; }
 
         public DbSet<RoleActiveDirectoryGroupEntity> RoleGroups { get; set; }
 
         public DbSet<MLResponseEntity> MLResponses { get; set; }
+        
         public DbSet<ElasticFieldEntity> ElasticFields { get; set; }
+        
         public DbSet<ChangeHistoryEntity> ChangeHistory { get; set; }
 
         public DbSet<ThemeEntity> Themes { get; set; }
+        
         public DbSet<ThemeTypeEntity> ThemeTypes { get; set; }
+
+        public DbSet<AnnotationEntity> Annotations { get; set; }
 
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
@@ -104,6 +113,7 @@ namespace Iis.DataModel
             modelBuilder.ApplyConfiguration(new ThemeConfiguration());
             modelBuilder.ApplyConfiguration(new ThemeTypeConfiguration());
             modelBuilder.ApplyConfiguration(new AliasConfiguration());
+            modelBuilder.ApplyConfiguration(new AnnotationConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

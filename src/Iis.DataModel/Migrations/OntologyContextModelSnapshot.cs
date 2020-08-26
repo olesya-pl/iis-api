@@ -125,6 +125,20 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("AnalyticQueryIndicators");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.Annotations.AnnotationEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Annotations");
+                });
+
             modelBuilder.Entity("Iis.DataModel.AttributeEntity", b =>
                 {
                     b.Property<Guid>("Id")
