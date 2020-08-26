@@ -1,8 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using HotChocolate;
+using AutoMapper;
 using Newtonsoft.Json.Linq;
-using IIS.Core.Materials;
+
 using Iis.Services;
 namespace IIS.Core.GraphQL.Annotations
 {
@@ -10,17 +11,13 @@ namespace IIS.Core.GraphQL.Annotations
     {
         public async Task<Annotation> GetAnnotation(
             [Service] IAnnotationsService annotationsService,
+            [Service] IMapper _mapper,
             [GraphQLNonNullType] Guid annotationId
         )
         {
-            var s = await annotationsService.GetAnnotationAsync(annotationId);
-
-            var result = new Annotation
-            {
-                Id = annotationId,
-                Content = JObject.Parse("{'type':'text', 'text': 'awesome json'}")
-            };
-            return await Task.FromResult(result);
+            var annotation = await annotationsService.GetAnnotationAsync(annotationId);
+            
+            return _mapper.Map<Annotation>(annotation);
         }
     }
 }

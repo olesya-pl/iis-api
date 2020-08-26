@@ -14,21 +14,30 @@ namespace Iis.DbLayer.Repositories
             var result = new AnnotationEntity
             {
                 Id = Guid.NewGuid(),
-                Content = "{'type':'text'}"
+                Content = "{'type':'text', 'text': 'awesome json'}"
             };
 
             return Task.FromResult(result);
         }
 
-        public Task<AnnotationEntity> SaveAsync(AnnotationEntity entity)
+        public Task AddAsync(AnnotationEntity entity)
         {
             var result = new AnnotationEntity
             {
-                Id = Guid.NewGuid(),
-                Content = "{'type':'text'}"
+                Id = entity.Id,
+                Content = entity.Content
             };
-            
-            return Task.FromResult(result);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateAsync(AnnotationEntity entity)
+        {
+            var result = new AnnotationEntity
+            {
+                Id = entity.Id,
+                Content = entity.Content
+            };
+            return Task.CompletedTask;
         }
     }
 }

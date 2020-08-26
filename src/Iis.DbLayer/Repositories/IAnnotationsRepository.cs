@@ -7,6 +7,7 @@ namespace Iis.DbLayer.Repositories
     public interface IAnnotationsRepository
     {
         Task<AnnotationEntity> GetByIdAsync(Guid id);
-        Task<AnnotationEntity> SaveAsync(AnnotationEntity entity);
+        Task AddAsync(AnnotationEntity entity);
+        Task UpdateAsync(AnnotationEntity entity);
     }
 }

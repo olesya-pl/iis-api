@@ -5,6 +5,7 @@ using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Themes;
+using Iis.DataModel.Annotations;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
@@ -278,6 +279,16 @@ namespace Iis.Api
             CreateMap<Iis.ThemeManagement.Models.ThemeType, ThemeType>();
 
             CreateMap<IIS.Core.GraphQL.ML.MachineLearningHadnlersCountInput, IIS.Core.GraphQL.ML.MachineLearningHadnlersCountResult>();
+
+            //annotations: graph ql input -> domain
+            CreateMap<IIS.Core.GraphQL.Annotations.AnnotationInput, Iis.Services.Contracts.Annotations.Annotation>();
+
+            //annotations: domain -> graph ql
+            CreateMap<Iis.Services.Contracts.Annotations.Annotation, IIS.Core.GraphQL.Annotations.Annotation>()
+                .ForMember(dest => dest.Content, opts => opts.MapFrom(src => string.IsNullOrWhiteSpace(src.Content) ? null : JObject.Parse(src.Content)));
+            
+            //annotations: domain -> entity
+            CreateMap<Iis.Services.Contracts.Annotations.Annotation, AnnotationEntity>();
         }
     }
 }
