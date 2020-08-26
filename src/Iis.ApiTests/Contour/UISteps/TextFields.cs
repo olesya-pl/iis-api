@@ -24,8 +24,10 @@ namespace AcceptanceTests.Contour.UISteps
 		public void GivenIEnterSomethingInTheTextField(string text, string textField)
 		{
 			IWebElement textForm = driver.FindElement(By.CssSelector(textField));
-
-			textForm.SendKeys($"{text}_{DateTime.Now}");		
+			driver.WaitFor(5);
+			driver.SwitchTo().ActiveElement().SendKeys($"{text}_{DateTime.Now}");
+			driver.SwitchTo().DefaultContent();
+			///textForm.SendKeys($"{text}_{DateTime.Now}");		
 		}
 
 		[Given(@"I input (.*) in the (.*) text field")]

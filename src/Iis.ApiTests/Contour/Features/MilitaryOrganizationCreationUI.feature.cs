@@ -93,15 +93,12 @@ namespace AcceptanceTests.Contour.Features
         [Xunit.TraitAttribute("FeatureTitle", "MilitaryOrganizationCreationUI")]
         [Xunit.TraitAttribute("Description", "Create a new military organization")]
         [Xunit.TraitAttribute("Category", "smoke")]
-        [Xunit.TraitAttribute("Category", "ignore")]
         public virtual void CreateANewMilitaryOrganization()
         {
             string[] tagsOfScenario = new string[] {
-                    "smoke",
-                    "ignore"};
+                    "smoke"};
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a new military organization", null, new string[] {
-                        "smoke",
-                        "ignore"});
+                        "smoke"});
 #line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -152,12 +149,16 @@ this.FeatureBackground();
                         "and add current date to the input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 17
- testRunner.And("I click button[name=\'btn-save\'] > span button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I enter e2e_Військовий підрозділ in the textarea[name=\'title\'] text field and add" +
+                        " current date to the input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 18
- testRunner.When("I press Enter button on the .el-button--default.el-button--primary span button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.And("I click button[name=\'btn-save\'] > span button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 19
+ testRunner.When("I press the active .el-button--default.el-button--primary span button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 20
  testRunner.Then("I must see the button[name=\'btn-edit\'] img button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
