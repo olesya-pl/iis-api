@@ -97,6 +97,21 @@ namespace Iis.Elastic
             return result;
         }
 
+        public void AddFormat(string format)
+        {
+            if(string.IsNullOrWhiteSpace(format))
+            {
+                Formats.Add(format);
+            }
+        }
+        public void AddFormats(IEnumerable<string> format)
+        {
+            if(format != null && format.Any())
+            {
+                Formats.AddRange(format);
+            }
+        }
+
         public override string ToString() => Name;
     }
 
