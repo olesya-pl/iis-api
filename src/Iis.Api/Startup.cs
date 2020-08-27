@@ -329,12 +329,12 @@ namespace IIS.Core
             PopulateEntityFieldsCache(app);
             app.UpdateMilitaryAmmountCodes();
 
-            app.UseCors(builder =>
-                builder
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-            );
+            //app.UseCors(builder =>
+            //    builder
+            //        .AllowAnyOrigin()
+            //        .AllowAnyHeader()
+            //        .AllowAnyMethod()
+            //);
 
             app.UseMiddleware<LogHeaderMiddleware>();
 
