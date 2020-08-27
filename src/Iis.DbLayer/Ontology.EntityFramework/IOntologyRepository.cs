@@ -11,6 +11,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         NodeEntity GetNodeEntityById(Guid id);
         Task<NodeEntity> GetNodeEntityByIdAsync(Guid id);
+        Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id);
         AttributeEntity GetAttributeEntityById(Guid id);
         Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids);
         Task<List<RelationEntity>> GetSourceRelationByIdAsync(Guid id, CancellationToken cancellationToken);

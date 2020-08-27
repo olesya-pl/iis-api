@@ -8,7 +8,7 @@ namespace Iis.DbLayer.Repositories
     {
         public static void RegisterRepositories(this IServiceCollection services)
         {
-            services.AddTransient<NodeFlattener>();
+            services.AddTransient<NodeFlattener<IIISUnitOfWork>>();
             services.AddTransient<INodeRepository, NodeRepository>();
             services.AddTransient<IMLResponseRepository, MLResponseRepository>();
             services.AddTransient<IMaterialRepository, MaterialRepository>();

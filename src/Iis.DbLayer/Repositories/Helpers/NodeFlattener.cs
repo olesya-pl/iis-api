@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Iis.DataModel;
 using Iis.Domain.ExtendedData;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
-using Microsoft.EntityFrameworkCore;
+
+using IIS.Repository;
+using IIS.Repository.Factories;
 
 namespace Iis.DbLayer.Repositories.Helpers
 {
-    public class NodeFlattener
+    public class NodeFlattener<TUnitOfWork> : BaseService<TUnitOfWork> where TUnitOfWork : IIISUnitOfWork
     {
-        private readonly OntologyContext _context;
         private readonly IElasticSerializer _elasticSerializer;
 
-        public NodeFlattener(OntologyContext context,
-            IElasticSerializer elasticSerializer)
+        public NodeFlattener(IElasticSerializer elasticSerializer,
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
-            _context = context;
             _elasticSerializer = elasticSerializer;
         }
 
@@ -28,9 +29,7 @@ namespace Iis.DbLayer.Repositories.Helpers
             List<Guid> visitedRelationIds,
             CancellationToken cancellationToken = default)
         {
-            var nodeEntity = await GetNodeQuery()
-                .Where(n => n.Id == id)
-                .SingleOrDefaultAsync();
+            var nodeEntity = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(id));
 
             if (nodeEntity == null) return null;
 
@@ -95,7 +94,7 @@ namespace Iis.DbLayer.Repositories.Helpers
                 if (!visitedRelationIds.Contains(relation.Id))
                 {
                     visitedRelationIds.Add(relation.Id);
-                    var node = await GetNodeQuery().Where(node => node.Id == relation.TargetNodeId).SingleOrDefaultAsync();
+                    var node = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(relation.TargetNodeId));
                     var extNode = await MapExtNodeAsync(
                         node,
                         relation.Node.NodeType.Name,
@@ -108,20 +107,7 @@ namespace Iis.DbLayer.Repositories.Helpers
             return result;
         }
 
-        private IQueryable<NodeEntity> GetNodeQuery()
-        {
-            return _context.Nodes
-                .Include(n => n.Attribute)
-                .Include(n => n.NodeType)
-                .ThenInclude(nt => nt.IAttributeTypeModel)
-                .Include(n => n.OutgoingRelations)
-                .ThenInclude(r => r.Node)
-                .ThenInclude(rn => rn.NodeType)
-                .Include(n => n.OutgoingRelations)
-                .ThenInclude(r => r.TargetNode)
-                .ThenInclude(tn => tn.NodeType)
-                .Where(n => !n.IsArchived);
-        }
+        
 
         public async Task<FlattenNodeResult> FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {
