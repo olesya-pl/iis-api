@@ -97,7 +97,7 @@ namespace Iis.Elastic
             return result;
         }
 
-        public void AddFormat(string format)
+        public void AddFormats(string format)
         {
             if(string.IsNullOrWhiteSpace(format))
             {
