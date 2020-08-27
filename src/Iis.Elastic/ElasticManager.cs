@@ -10,6 +10,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.Extensions.Logging;
 using Iis.Utility;
+using Iis.Domain.Elastic;
 
 namespace Iis.Elastic
 {
@@ -74,6 +75,17 @@ namespace Iis.Elastic
         }
 
         public async Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetSearchJson(searchParams);
+            var path = searchParams.BaseIndexNames.Count == 0 ?
+                "_search" :
+                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
+
+            var response = await GetAsync(path, jsonString, cancellationToken);
+            return _resultExtractor.GetFromResponse(response);
+        }
+
+        public async Task<IElasticSearchResult> Search(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetSearchJson(searchParams);
             var path = searchParams.BaseIndexNames.Count == 0 ?
@@ -297,6 +309,41 @@ namespace Iis.Elastic
             request.Merge(mappingConfiguration);
         }
 
+        private string GetSearchJson(IMultiElasticSearchParams searchParams)
+        {
+            var json = new JObject();
+            json["_source"] = new JArray(searchParams.ResultFields);
+            json["from"] = searchParams.From;
+            json["size"] = searchParams.Size;
+            json["query"] = new JObject();
+            json["query"]["bool"] = new JObject();
+
+            PrepareHighlights(json);
+
+            var shouldSections = new JArray();
+            foreach (var searchItem in searchParams.SearchParams)
+            {
+                if (IsExactQuery(searchItem.Query))
+                {
+                    var shouldSection = CreateExactShouldSection(searchItem.Query, searchParams.IsLenient);
+                    shouldSections.Merge(shouldSection);
+                }
+                else if (searchItem.Fields?.Any() == true)
+                {
+                    var shouldSection = CreateMultiFieldShouldSection(searchItem.Query, searchItem.Fields, searchParams.IsLenient);
+                    shouldSections.Merge(shouldSection);
+                }
+                else
+                {
+                    var shouldSection = CreateFallbackShouldSectin(searchItem.Query, searchParams.IsLenient);
+                    shouldSections.Merge(shouldSection);
+                }
+            }
+
+            json["query"]["bool"]["should"] = shouldSections;
+            return json.ToString();
+        }
+
         private string GetSearchJson(IIisElasticSearchParams searchParams)
         {
             var json = new JObject();
@@ -338,6 +385,17 @@ namespace Iis.Elastic
             json["query"]["query_string"] = queryString;
         }
 
+        private JObject CreateExactShouldSection(string query, bool isLenient) 
+        {
+            var result = new JObject();
+            var queryString = new JObject();
+            queryString["query"] = query;
+            queryString["lenient"] = isLenient;
+            result["query"]["query_string"] = queryString;
+
+            return result;
+        }
+
         private void PopulateFieldsIntoQuery(IIisElasticSearchParams searchParams, JObject json)
         {
             json["query"]["bool"] = new JObject();
@@ -361,6 +419,29 @@ namespace Iis.Elastic
             }
         }
 
+        private JArray CreateMultiFieldShouldSection(string query, List<IIisElasticField> searchFields, bool isLenient) 
+        {
+            var shouldSections = new JArray();
+
+            foreach (var searchFieldGroup in searchFields.GroupBy(p => new { p.Fuzziness, p.Boost }))
+            {
+                var querySection = new JObject();
+                var queryString = new JObject();
+                queryString["query"] = ApplyFuzzinessOperator(
+                    EscapeElasticSpecificSymbols(RemoveSymbols(query, RemoveSymbolsPattern), 
+                    EscapeSymbolsPattern));
+                queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
+                queryString["boost"] = searchFieldGroup.Key.Boost;
+                queryString["lenient"] = isLenient;
+                queryString["fields"] = new JArray(searchFieldGroup.Select(p => p.Name));
+                
+                querySection["query_string"] = queryString;
+                shouldSections.Add(querySection);
+            }
+
+            return shouldSections;
+        }
+
         private void PrepareFallbackQuery(IIisElasticSearchParams searchParams, JObject json)
         {
             var queryString = new JObject();
@@ -369,6 +450,19 @@ namespace Iis.Elastic
             queryString["fields"] = new JArray("*");
             queryString["lenient"] = searchParams.IsLenient;
             json["query"]["query_string"] = queryString;
+        }
+
+        private JObject CreateFallbackShouldSectin(string query, bool isLenient) 
+        {
+            var shouldSection = new JObject();
+            var queryString = new JObject();
+            queryString["query"] = EscapeElasticSpecificSymbols(
+                RemoveSymbols(query, RemoveSymbolsPattern), EscapeSymbolsPattern);
+            queryString["fields"] = new JArray("*");
+            queryString["lenient"] = isLenient;
+            shouldSection["query_string"] = queryString;
+
+            return queryString;
         }
 
         private static void PrepareHighlights(JObject json)

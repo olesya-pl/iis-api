@@ -248,7 +248,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypeNames, filter);
+                //var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypeNames, filter);
+                var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
                 return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
             }
             else

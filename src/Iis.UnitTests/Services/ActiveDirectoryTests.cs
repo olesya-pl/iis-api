@@ -1,4 +1,5 @@
 ﻿using Iis.Services;
+using Newtonsoft.Json.Linq;
 using System;
 using Xunit;
 using Xunit.Abstractions;
@@ -12,6 +13,15 @@ namespace Iis.UnitTests.Services
         public ActiveDirectoryTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
+        }
+
+        [Fact]
+        public void test() 
+        {
+            var json = "{user:{name:\"Taras\"}}";
+
+            var jObject = JObject.Parse(json);
+            var s = jObject["user"]?["acto"]?["qwe"];
         }
 
         [Fact(Skip = "only for debug")]

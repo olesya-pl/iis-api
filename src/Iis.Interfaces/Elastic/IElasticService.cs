@@ -17,6 +17,7 @@ namespace Iis.Interfaces.Elastic
         Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default);
         Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        Task<SearchResult> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchResult> SearchMoreLikeThisAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchResult> SearchByImageVector(decimal[] imageVector, int page, int pageSize, CancellationToken token);

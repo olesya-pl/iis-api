@@ -117,6 +117,95 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
+        public async Task<SearchResult> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        {
+            if (!UseElastic)
+            {
+                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
+            }
+            var searchFields = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => OntologyIndexes.Contains(p))).ToList();
+            var searchByHistoryParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = typeNames.Select(GetHistoricalIndex).ToList(),
+                Query = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}",
+                From = filter.Offset,
+                Size = filter.Limit,
+                SearchFields = searchFields,
+                ResultFields = new List<string> { "Id" }
+            };
+
+            var searchByHistoryResult = await _elasticManager.Search(searchByHistoryParams, cancellationToken);
+            var entityIds = searchByHistoryResult.Items.Select(x => x.SearchResult["Id"].Value<string>()).Distinct();
+            var highlightsById = searchByHistoryResult.Items.ToDictionary(k => k.SearchResult["Id"].Value<string>(), v => v.Higlight);
+
+            var multiSearchParams = new MultiElasticSearchParams 
+            {
+                BaseIndexNames = typeNames.ToList(),
+                From = filter.Offset,
+                Size = filter.Limit,
+                SearchParams = new List<(string Query, List<IIisElasticField> Fields)> 
+                {
+                    (string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}", searchFields),
+                    (string.Join(" ", entityIds), new List<IIisElasticField>
+                    {
+                        new IisElasticField
+                        {
+                            Name = "Id",
+                            Boost = 0.5m
+                        }
+                    })
+                }
+               
+            };
+
+            /*
+            {
+                "militaryRank": [
+                "<em>чмо</em> <em>болотне</em>"
+                ]
+            }
+
+            {
+              "Id": [
+                "<em>dcdce839defa4cbd92d506210291f299</em>"
+              ]
+            }
+             */
+
+            var searchResult = await _elasticManager.Search(multiSearchParams, cancellationToken);
+            return new SearchResult
+            {
+                Count = searchResult.Count,
+                Items = searchResult.Items.ToDictionary(
+                    k => new Guid(k.Identifier),
+                    v => new SearchResultItem { Highlight = CombineHighlights(highlightsById[v.Identifier], v.Higlight, v.Identifier), SearchResult = v.SearchResult })
+            };
+        }
+
+        private JToken CombineHighlights(JToken historicalHighlights, JToken actualHighlights, string entityId) 
+        {
+            if (historicalHighlights == null)
+                return actualHighlights;
+
+            var result = (JObject)historicalHighlights.DeepClone();
+            foreach (var item in ((JObject)actualHighlights).Children<JProperty>())
+            {
+                if (item.Name == "Id" && item.Value.Contains(entityId))
+                    continue;
+
+                
+                result.Add(item);
+            }
+
+            return result;
+
+        }
+
+        private string GetHistoricalIndex(string typeName) 
+        {
+            return $"historical_{typeName}";
+        }
+
         public Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             if (!UseElastic)
