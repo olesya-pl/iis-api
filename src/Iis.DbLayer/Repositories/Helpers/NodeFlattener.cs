@@ -13,6 +13,7 @@ namespace Iis.DbLayer.Repositories.Helpers
 {
     public class NodeFlattener
     {
+        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly OntologyContext _context;
         private readonly IElasticSerializer _elasticSerializer;
 
@@ -77,9 +78,18 @@ namespace Iis.DbLayer.Repositories.Helpers
                 case ScalarType.Int:
                     return Convert.ToInt32(value);
                 case ScalarType.Date:
-                //return Convert.ToDateTime(value);
+                {
+                    if(DateTime.TryParse(value, out DateTime dateTimeValue))
+                    {
+                        return dateTimeValue.ToString(Iso8601DateFormat);
+                    }
+                    else
+                    {
+                        return value;
+                    }
+                }
                 default:
-                    return value.ToString();
+                    return value;
             }
         }
 
