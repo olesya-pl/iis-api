@@ -78,10 +78,11 @@ namespace Iis.Api.Bootstrap
 
         private async Task<string> FormatResponse(HttpContext context, Stopwatch sw)
         {
-            if(context.Request.Path.Value.ToLower().Contains("files"))
+            context.Response.Body.Seek(0, SeekOrigin.Begin);
+
+            if (context.Request.Path.Value.ToLower().Contains("files"))
                 return $"Response: {context.Response.StatusCode}: file_response Elapsed(ms): {sw.ElapsedMilliseconds}";
 
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
             var text = await new StreamReader(context.Response.Body).ReadToEndAsync();
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             return $"Response: {context.Response.StatusCode}: {_sanitizeService.SanitizeBody(text)} Elapsed(ms): {sw.ElapsedMilliseconds}";
