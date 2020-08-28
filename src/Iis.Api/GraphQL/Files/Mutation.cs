@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -13,27 +15,49 @@ namespace IIS.Core.GraphQL.Files
 {
     public class Mutation
     {
-        public async Task<UploadResult> Upload([Service] UploadConfiguration uploadConfiguration,
+        public async Task<IEnumerable<UploadResult>> Upload([Service] UploadConfiguration uploadConfiguration,
             [Service] IFileService fileService,
             [Service] IMaterialService materialService,
-            UploadInput input)
+            IEnumerable<UploadInput> inputs)
         {
-            if (input.Name.EndsWith(".docx"))
+            var uploadTasks = new List<Task<UploadResult>>();
+            foreach (var file in inputs)
             {
-                return UploadDocx(uploadConfiguration, input);
+                uploadTasks.Add(UploadSingleFile(uploadConfiguration, fileService, materialService, file));
             }
-            else if (input.Name.EndsWith(".png"))
+            return await Task.WhenAll(uploadTasks);
+        }
+
+        private static async Task<UploadResult> UploadSingleFile(UploadConfiguration uploadConfiguration, IFileService fileService, IMaterialService materialService, UploadInput input)
+        {
+            try
             {
-                return await UploadPng(fileService, materialService, input);
+                if (input.Name.EndsWith(".docx"))
+                {
+                    return UploadDocx(uploadConfiguration, input);
+                }
+                else if (input.Name.EndsWith(".png"))
+                {
+                    return await UploadPng(fileService, materialService, input);
+                }
+                else
+                {
+                    return new UploadResult
+                    {
+                        Success = false,
+                        Message = "File not supported"
+                    };
+                }
             }
-            else
+            catch (Exception e)
             {
                 return new UploadResult
                 {
                     Success = false,
-                    Message = "File not supported"
+                    Message = e.Message
                 };
             }
+
         }
 
         private static async Task<UploadResult> UploadPng(IFileService fileService, IMaterialService materialService, UploadInput input)
