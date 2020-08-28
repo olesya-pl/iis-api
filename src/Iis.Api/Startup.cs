@@ -338,8 +338,8 @@ namespace IIS.Core
                         .AllowAnyMethod()
                 );
             }
-
-
+            
+            app.UseHttpsRedirection();
             app.UseMiddleware<LogHeaderMiddleware>();
 
 #if !DEBUG

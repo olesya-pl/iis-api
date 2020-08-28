@@ -17,9 +17,7 @@ namespace IIS.Core.GraphQL.Files
         {
             var request = contextAccessor.HttpContext.Request;
             
-            var scheme = request.IsHttps ? $"{request.Scheme}s" : request.Scheme; 
-
-            return $"{scheme}://{request.Host.Value}/api/files/{Id}"; // todo: change hardcoded files api
+            return $"{request.Scheme}://{request.Host.Value}/api/files/{Id}"; // todo: change hardcoded files api
         }
     }
 }
