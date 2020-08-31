@@ -3,32 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Iis.DataModel;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
-using IIS.Domain;
+
 using IIS.Repository;
 using IIS.Repository.Factories;
+
 using Microsoft.EntityFrameworkCore;
+
 using Newtonsoft.Json.Linq;
+
 using Attribute = Iis.Domain.Attribute;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class OntologyService<TUnitOfWork> : BaseService<TUnitOfWork>, IOntologyService where TUnitOfWork : IIISUnitOfWork
     {
-        //private readonly OntologyContext _context;
         private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
 
-        public OntologyService(OntologyContext context, IOntologyModel ontology,
+        public OntologyService(IOntologyModel ontology,
             IElasticService elasticService,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
-            //_context = context;
             _elasticService = elasticService;
             _ontology = ontology;
         }
@@ -40,7 +42,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (nodeEntity == null)
             {
-
                 nodeEntity = new NodeEntity
                 {
                     Id = source.Id,
@@ -138,11 +139,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     Value = AttributeType.ValueToString(attribute.Value, ((IAttributeTypeModel)attribute.Type).ScalarTypeEnum)
                 }
             };
-        }
-
-        NodeEntity MapEntity(Entity entity)
-        {
-            return RunWithoutCommit((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityById(entity.Id));
         }
 
         RelationEntity MapRelation(Relation relation, NodeEntity existing)
@@ -449,6 +445,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.OntologyRepository.GetNodeIdListByFeatureIdListAsync(featureIdList));
 
+        }
+
+        public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
+        {
+            var eventType = _ontology.EntityTypes.FirstOrDefault(p => p.Name == "Event");
+
+            var propertyId = eventType.GetProperty("associatedWithEvent")?.Id;
+
+            var nodeIds = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.OntologyRepository.GetSourceNodeIdByTargetNodeId(propertyId, entityId));
+            return await LoadNodesAsync(nodeIds, null);
         }
     }
 }

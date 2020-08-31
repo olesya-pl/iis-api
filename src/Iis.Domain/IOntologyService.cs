@@ -11,6 +11,7 @@ namespace Iis.Domain
     {
         Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId);
         Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);

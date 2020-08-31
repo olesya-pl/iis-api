@@ -64,6 +64,7 @@ using Iis.Services.Contracts.Interfaces;
 using Microsoft.Extensions.Logging;
 using Iis.Interfaces.Ontology.Data;
 using Iis.DbLayer.OntologyData;
+using Iis.Api.Ontology;
 
 namespace IIS.Core
 {
@@ -186,10 +187,12 @@ namespace IIS.Core
             services.AddTransient<RoleService>();
             services.AddTransient<UserService>();
             services.AddTransient<ThemeService>();
+            services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
+            services.AddTransient<NodeToJObjectMapper>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();

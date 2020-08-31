@@ -5,6 +5,7 @@ using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Themes;
+using Iis.DataModel.Annotations;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
@@ -25,6 +26,7 @@ using Iis.Services.Contracts.Dtos;
 using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
 using Iis.Interfaces.Ontology.Data;
+using Contracts = Iis.Services.Contracts;
 
 namespace Iis.Api
 {
@@ -98,7 +100,8 @@ namespace Iis.Api
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.DeleteAccessName)));
             CreateMap<ActiveDirectoryGroupDto, Group>();
 
-            CreateMap<Role, IIS.Core.GraphQL.Roles.Role>();
+            CreateMap<Role, IIS.Core.GraphQL.Roles.Role>()
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroupIds.Select(g => g.ToString("N"))));
             CreateMap<CreateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
@@ -282,6 +285,18 @@ namespace Iis.Api
             CreateMap<INodeBase, NodeEntity>();
             CreateMap<IRelationBase, RelationEntity>();
             CreateMap<IAttributeBase, AttributeEntity>();
+            //annotations: graph ql input -> domain
+            CreateMap<IIS.Core.GraphQL.Annotations.AnnotationInput, Contracts.Annotations.Annotation>();
+
+            //annotations: domain -> graph ql
+            CreateMap<Contracts.Annotations.Annotation, IIS.Core.GraphQL.Annotations.Annotation>()
+                .ForMember(dest => dest.Content, opts => opts.MapFrom(src => string.IsNullOrWhiteSpace(src.Content) ? null : JObject.Parse(src.Content)));
+            
+            //annotations: domain -> entity
+            CreateMap<Contracts.Annotations.Annotation, AnnotationEntity>();
+            
+            //annotations: entity -> domain
+            CreateMap<AnnotationEntity, Contracts.Annotations.Annotation>();
         }
     }
 }

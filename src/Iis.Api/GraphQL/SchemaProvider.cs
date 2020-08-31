@@ -11,6 +11,7 @@ using IIS.Core.GraphQL.Export;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
 using IIS.Domain;
+using Iis.Api.Ontology;
 
 namespace IIS.Core.GraphQL
 {
@@ -65,6 +66,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Themes.Query>();
                 d.Include<Autocomplete.Query>();
                 d.Include<Annotations.Query>();
+                d.Include<AssociatedEventsQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
@@ -85,6 +87,7 @@ namespace IIS.Core.GraphQL
                 d.Include<NodeMaterialRelation.Mutation>();
                 d.Include<ElasticConfig.Mutation>();
                 d.Include<Themes.Mutation>();
+                d.Include<Files.Mutation>();
                 d.Include<Annotations.Mutation>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
@@ -101,8 +104,7 @@ namespace IIS.Core.GraphQL
         {
             schemaBuilder // TODO: Find a better way to register interface implementation types
                 .AddType<EntityTypes.EntityAttributePrimitive>()
-                .AddType<EntityTypes.EntityAttributeRelation>()
-                .AddType<Roles.RoleType>();
+                .AddType<EntityTypes.EntityAttributeRelation>();
         }
 
         public void TryRegisterOntologyTypes(ISchemaBuilder schemaBuilder)

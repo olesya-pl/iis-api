@@ -20,14 +20,6 @@ namespace AcceptanceTests.Contour.UISteps
 			driver = context.GetDriver();
 		}
 
-		[When(@"I press Enter button on the (.*) button")]
-		public void WhenIPressEnterButtonOnTheButton(string button)
-		{
-			IWebElement buttonToPress = driver.FindElement(By.CssSelector(button));
-
-			buttonToPress.SendKeys(Keys.Enter);
-		}
-
 		[Given(@"I press Down button plus Enter button on the (.*) item")]
 		public void WhenIPressDownButtonPlusEnterButtonOnTheItem(string item)
 		{

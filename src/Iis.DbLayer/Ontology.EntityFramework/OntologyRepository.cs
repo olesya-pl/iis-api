@@ -25,6 +25,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return await Context.Nodes.FirstOrDefaultAsync(_ => _.Id == id);
         }
 
+        public Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id)
+        {
+            return Context.Nodes
+                .Include(n => n.Attribute)
+                .Include(n => n.NodeType)
+                .ThenInclude(nt => nt.IAttributeTypeModel)
+                .Include(n => n.OutgoingRelations)
+                .ThenInclude(r => r.Node)
+                .ThenInclude(rn => rn.NodeType)
+                .Include(n => n.OutgoingRelations)
+                .ThenInclude(r => r.TargetNode)
+                .ThenInclude(tn => tn.NodeType)
+                .SingleOrDefaultAsync(n => !n.IsArchived && n.Id == id);
+        }
+
         public Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids)
         {
             return Context.Nodes
@@ -180,6 +195,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             Context.Nodes.Update(nodeEntity);
             return nodeEntity;
+        }
+
+        public Task<List<Guid>> GetSourceNodeIdByTargetNodeId(Guid? propertyId, Guid targetNodeId)
+        {
+            return Context.Relations
+                .Include(p => p.Node)
+                .Where(p => p.TargetNodeId == targetNodeId && p.Node.NodeTypeId == propertyId)
+                .Select(p => p.SourceNodeId)
+                .ToListAsync();
         }
     }
 }

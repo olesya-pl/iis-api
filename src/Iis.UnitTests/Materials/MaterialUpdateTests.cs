@@ -59,7 +59,8 @@ namespace Iis.UnitTests.Materials
                 new Mock<IMapper>().Object,
                 unitOfWorkFactoryMock.Object,
                 configurationMock.Object,
-                new Mock<IHttpClientFactory>().Object);
+                new Mock<IHttpClientFactory>().Object,
+                new Api.Ontology.NodeToJObjectMapper());
         }
         public void Dispose()
         {

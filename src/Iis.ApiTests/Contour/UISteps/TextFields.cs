@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TechTalk.SpecFlow;
+using Xunit;
 
 namespace AcceptanceTests.Contour.UISteps
 {
@@ -24,7 +25,8 @@ namespace AcceptanceTests.Contour.UISteps
 		public void GivenIEnterSomethingInTheTextField(string text, string textField)
 		{
 			IWebElement textForm = driver.FindElement(By.CssSelector(textField));
-
+			///driver.SwitchTo().ActiveElement().SendKeys($"{text}_{DateTime.Now}");
+			///driver.SwitchTo().DefaultContent();
 			textForm.SendKeys($"{text}_{DateTime.Now}");		
 		}
 
@@ -34,6 +36,17 @@ namespace AcceptanceTests.Contour.UISteps
 			IWebElement textForm = driver.FindElement(By.CssSelector(textField));
 
 			textForm.SendKeys(text);
+		}
+
+
+		[Then(@"the text field (.*) and text field (.*) must be highlighted with red color")]
+		public void ThenTheFieldAndFieldMustBeHighlightedWithRedColor(string loginField, string passwordField)
+		{
+			IWebElement expectedLoginField = driver.FindElement(By.CssSelector(loginField));
+			IWebElement expectedPasswordField = driver.FindElement(By.CssSelector(passwordField));
+
+			Assert.True(expectedLoginField.Displayed);
+			Assert.True(expectedPasswordField.Displayed);
 		}
 
 
