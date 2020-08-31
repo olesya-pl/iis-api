@@ -194,5 +194,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             Context.Nodes.Update(nodeEntity);
             return nodeEntity;
         }
+
+        public Task<List<Guid>> GetSourceNodeIdByTargetNodeId(Guid? propertyId, Guid targetNodeId)
+        {
+            return Context.Relations
+                .Include(p => p.Node)
+                .Where(p => p.TargetNodeId == targetNodeId && p.Node.NodeTypeId == propertyId)
+                .Select(p => p.SourceNodeId)
+                .ToListAsync();
+        }
     }
 }

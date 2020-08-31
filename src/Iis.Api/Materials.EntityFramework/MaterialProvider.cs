@@ -1,4 +1,5 @@
 using AutoMapper;
+using Iis.Api.Ontology;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories;
@@ -39,6 +40,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly string _imageVectorizerUrl;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly NodeToJObjectMapper _nodeToJObjectMapper;
 
         public MaterialProvider(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
@@ -48,7 +50,8 @@ namespace IIS.Core.Materials.EntityFramework
             IMapper mapper,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IConfiguration configuration,
-            IHttpClientFactory httpClientFactory) : base(unitOfWorkFactory)
+            IHttpClientFactory httpClientFactory,
+            NodeToJObjectMapper nodeToJObjectMapper) : base(unitOfWorkFactory)
         {
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
@@ -59,6 +62,7 @@ namespace IIS.Core.Materials.EntityFramework
             _mapper = mapper;
             _imageVectorizerUrl = configuration.GetValue<string>("imageVectorizerUrl");
             _httpClientFactory = httpClientFactory;
+            _nodeToJObjectMapper = nodeToJObjectMapper;
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchResultItem> Highlights)>
@@ -113,8 +117,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x, null)));
 
-            res.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
-            res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
+            res.Events = nodes.Where(x => IsEvent(x)).Select(x => _nodeToJObjectMapper.EventToJObject(x));
+            res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => _nodeToJObjectMapper.NodeToJObject(x));
             res.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes.ToList());
 
             return res;
@@ -171,9 +175,9 @@ namespace IIS.Core.Materials.EntityFramework
                                 .SelectMany(p => p.Features.Select(x => x.Node))
                                 .ToList();
 
-            result.Events = nodes.Where(x => IsEvent(x)).Select(x => EventToJObject(x));
+            result.Events = nodes.Where(x => IsEvent(x)).Select(x => _nodeToJObjectMapper.EventToJObject(x));
 
-            result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => NodeToJObject(x));
+            result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => _nodeToJObjectMapper.NodeToJObject(x));
 
             result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
 
@@ -229,20 +233,20 @@ namespace IIS.Core.Materials.EntityFramework
 
             return (materials, materials.Count());
         }
-        
+
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset)
         {
             var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
-            
+
             if(!isEligible) return (new List<Material>(), 0);
-            
+
             var filter = new ElasticFilter
             {
                 Suggestion = materialId.ToString("N"),
                 Limit = limit,
                 Offset = offset
             };
-            
+
             var searchResult = await _elasticService.SearchMoreLikeThisAsync(filter);
             var materialTasks = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -265,7 +269,7 @@ namespace IIS.Core.Materials.EntityFramework
                 throw new Exception("Failed to vectorize image", e);
             }
             var searchResult = await _elasticService.SearchByImageVector(resp, offset, pageSize, CancellationToken.None);
-            
+
             var materialTasks = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
                     .Select(p => MapMaterialDocumentAsync(p));
@@ -274,7 +278,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             return (materials, searchResult.Count);
         }
-        
+
         public async Task<decimal[]> VectorizeImage(byte[] fileContent, string fileName)
         {
             using var form = new MultipartFormDataContent();
@@ -309,32 +313,6 @@ namespace IIS.Core.Materials.EntityFramework
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 
             return nodeType.IsObjectSign;
-        }
-
-        private JObject NodeToJObject(Node node)
-        {
-            var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
-
-            foreach (var attribute in node.GetChildAttributes())
-            {
-                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
-            }
-
-            return result;
-        }
-
-        private JObject EventToJObject(Node node)
-        {
-            var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
-
-            var attributies = node.GetChildAttributes().Where(a => a.dotName == "name" || a.dotName == "description");
-
-            foreach (var attribute in attributies)
-            {
-                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
-            }
-
-            return result;
         }
 
         private async Task<IEnumerable<Material>> UpdateProcessedMLHandlersCount(IEnumerable<Material> materials)

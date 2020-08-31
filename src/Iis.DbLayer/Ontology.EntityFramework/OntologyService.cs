@@ -446,5 +446,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 await unitOfWork.OntologyRepository.GetNodeIdListByFeatureIdListAsync(featureIdList));
 
         }
+
+        public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
+        {
+            var eventType = _ontology.EntityTypes.FirstOrDefault(p => p.Name == "Event");
+
+            var propertyId = eventType.GetProperty("associatedWithEvent")?.Id;
+
+            var nodeIds = await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.OntologyRepository.GetSourceNodeIdByTargetNodeId(propertyId, entityId));
+            return await LoadNodesAsync(nodeIds, null);
+        }
     }
 }

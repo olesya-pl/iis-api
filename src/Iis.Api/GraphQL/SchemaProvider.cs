@@ -11,6 +11,7 @@ using IIS.Core.GraphQL.Export;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
 using IIS.Domain;
+using Iis.Api.Ontology;
 
 namespace IIS.Core.GraphQL
 {
@@ -65,6 +66,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Themes.Query>();
                 d.Include<Autocomplete.Query>();
                 d.Include<Annotations.Query>();
+                d.Include<AssociatedEventsQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {

@@ -62,6 +62,7 @@ using Iis.Utility;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.Extensions.Logging;
+using Iis.Api.Ontology;
 
 namespace IIS.Core
 {
@@ -188,6 +189,7 @@ namespace IIS.Core
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
+            services.AddTransient<NodeToJObjectMapper>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
