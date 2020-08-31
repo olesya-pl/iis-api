@@ -39,7 +39,7 @@ namespace Iis.Utility
             {
                 return jObject.SelectToken(path, false) ?? jObject.SelectToken($"['{path}']", false);
             }
-            catch (JsonException) //because ChangeHistory tables contains not valid PropertyName values
+            catch (JsonException)
             {
                 return null;
             }

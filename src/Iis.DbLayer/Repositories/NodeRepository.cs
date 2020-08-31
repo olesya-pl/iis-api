@@ -53,14 +53,15 @@ namespace Iis.DbLayer.Repositories
                 result.SerializedNode, cancellationToken);
         }
 
-        public async Task<bool> PutHistoricalNodesAsync(Guid id, CancellationToken ct = default) 
+        public async Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default) 
         {
-            var getNodeChanges = _changeHistoryService.GetChangeHistory(id, null);
             var getActualNode = _nodeFlattener.FlattenNode(id, ct);
-
+            var getNodeChanges = requestId.HasValue ? 
+                _changeHistoryService.GetChangeHistoryByRequest(requestId.Value) : 
+                _changeHistoryService.GetChangeHistory(id, null);
+            
             await Task.WhenAll(getActualNode, getNodeChanges);
 
-            
             var changes = getNodeChanges.Result
                 .GroupBy(x => x.RequestId)
                 .Where(x => x.Count() > 0)
@@ -80,7 +81,8 @@ namespace Iis.DbLayer.Repositories
                 nodes.Add(olderNode);
                 actualNode = olderNode;
             }
-
+            
+            //TODO: should put all documents by one query
             foreach (var item in nodes)
             {
                 var result = await _elasticManager.PutDocumentAsync(

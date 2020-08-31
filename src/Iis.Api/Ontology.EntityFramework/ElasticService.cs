@@ -125,7 +125,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
             var searchFields = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => OntologyIndexes.Contains(p))).ToList();
-            
+
             IElasticSearchResult searchByHistoryResult = null;
             if (useHistoricalSearch)
             {
@@ -141,7 +141,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
                 searchByHistoryResult = await _elasticManager.Search(searchByHistoryParams, cancellationToken);
             }
-            
+
             var multiSearchParams = new MultiElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
@@ -156,7 +156,7 @@ namespace IIS.Core.Ontology.EntityFramework
             if (useHistoricalSearch)
             {
                 var entityIds = searchByHistoryResult.Items.Select(x => x.SearchResult["Id"].Value<string>()).Distinct();
-                multiSearchParams.SearchParams.Add((string.Join(" ", entityIds), 
+                multiSearchParams.SearchParams.Add((string.Join(" ", entityIds),
                     new List<IIisElasticField>
                     {
                         new IisElasticField
@@ -170,17 +170,17 @@ namespace IIS.Core.Ontology.EntityFramework
 
             var searchResult = await _elasticManager.Search(multiSearchParams, cancellationToken);
 
-            if (useHistoricalSearch) 
+            if (useHistoricalSearch)
             {
                 var highlightsById = searchByHistoryResult.Items
                     .GroupBy(x => x.SearchResult["Id"].Value<string>())
                     .ToDictionary(k => k.Key, v => v.First().Higlight);
-                
+
                 foreach (var item in searchResult.Items)
                 {
                     item.SearchResult["highlight"] = CombineHighlights(
-                        highlightsById.GetValueOrDefault(item.Identifier), 
-                        item.Higlight, 
+                        highlightsById.GetValueOrDefault(item.Identifier),
+                        item.Higlight,
                         item.Identifier);
                 }
             }
@@ -249,11 +249,11 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutNodeAsync(id, cancellationToken);
         }
 
-        public Task<bool> PutHistoricalNodesAsync(Guid id, CancellationToken cancellationToken = default)
+        public Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default)
         {
             if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
 
-            return _nodeRepository.PutHistoricalNodesAsync(id, cancellationToken);
+            return _nodeRepository.PutHistoricalNodesAsync(id, requestId, cancellationToken);
         }
 
         public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)

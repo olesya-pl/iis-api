@@ -69,7 +69,7 @@ namespace Iis.Api.Controllers
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, ct);
             foreach (var extNode in extNodes)
             {
-                await _elasticService.PutHistoricalNodesAsync(extNode, ct);
+                await _elasticService.PutHistoricalNodesAsync(extNode, null, ct);
             }
 
             return Ok();
