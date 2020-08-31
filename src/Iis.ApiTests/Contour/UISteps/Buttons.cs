@@ -45,7 +45,6 @@ namespace AcceptanceTests.Contour.UISteps
 		public void ThenIMustSeeTheButton(string button)
 		{
 			IWebElement buttonElement = driver.FindElement(By.CssSelector(button));
-
 			Assert.True(buttonElement.Displayed);
 		}
 		#endregion

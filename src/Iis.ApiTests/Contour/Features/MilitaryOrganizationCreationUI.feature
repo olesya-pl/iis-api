@@ -14,7 +14,9 @@ Scenario: Create a new military organization
 	And I press Down button plus Enter button on the div[name='importance'] .el-input__inner item
 	And I click div[name='6b1997fc9d954ccf9c55ebf104b42986'] > div[role='button'] button
 	And I enter e2e_Військовий підрозділ in the textarea[name='RealNameFull'] text field and add current date to the input
+	And I click div[name='8923183b19ae4941a2fbe39ac128c762'] > div[role='button'] button
+	And I click div[name='8923183b19ae4941a2fbe39ac128c762'] > div[role='button'] button
 	And I enter e2e_Військовий підрозділ in the textarea[name='title'] text field and add current date to the input
 	And I click button[name='btn-save'] > span button
 	When I press the active .el-button--default.el-button--primary span button
-	Then I must see the button[name='btn-edit'] img button
+	Then I must see the ul[role='menubar'] > li:nth-of-type(2) button
