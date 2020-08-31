@@ -10,6 +10,4 @@ namespace Iis.Elastic
         Keyword,
         DenseVector
     }
-
-
 }

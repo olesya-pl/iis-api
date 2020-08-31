@@ -10,6 +10,7 @@ namespace Iis.OntologyManager.Style
         Color BackgroundColor { get; }
         Color ComparisonBackColor { get; set; }
         int ControlWidthDefault { get; }
+        int ButtonHeightDefault { get; }
         int ButtonWidthDefault { get; }
         Color EntityTypeBackColor { get; }
         int MarginHor { get; }

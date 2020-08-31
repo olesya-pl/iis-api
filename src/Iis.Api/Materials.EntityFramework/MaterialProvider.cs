@@ -61,7 +61,7 @@ namespace IIS.Core.Materials.EntityFramework
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)>
+        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchResultItem> Highlights)>
             GetMaterialsAsync(int limit, int offset, string filterQuery,
             IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null,
             string sortColumnName = null, string sortOrder = null)
@@ -102,7 +102,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             materials = await UpdateProcessedMLHandlersCount(materials);
 
-            return (materials, materialResult.TotalCount, new Dictionary<Guid, SearchByConfiguredFieldsResultItem>());
+            return (materials, materialResult.TotalCount, new Dictionary<Guid, SearchResultItem>());
         }
 
         private async Task<Material> MapMaterialDocumentAsync(MaterialDocument p)
@@ -229,6 +229,29 @@ namespace IIS.Core.Materials.EntityFramework
 
             return (materials, materials.Count());
         }
+        
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset)
+        {
+            var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
+            
+            if(!isEligible) return (new List<Material>(), 0);
+            
+            var filter = new ElasticFilter
+            {
+                Suggestion = materialId.ToString("N"),
+                Limit = limit,
+                Offset = offset
+            };
+            
+            var searchResult = await _elasticService.SearchMoreLikeThisAsync(filter);
+            var materialTasks = searchResult.Items.Values
+                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                    .Select(p => MapMaterialDocumentAsync(p));
+
+            var materials = await Task.WhenAll(materialTasks);
+
+            return (materials, searchResult.Count);
+        }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string fileName, byte[] content)
         {
@@ -242,6 +265,7 @@ namespace IIS.Core.Materials.EntityFramework
                 throw new Exception("Failed to vectorize image", e);
             }
             var searchResult = await _elasticService.SearchByImageVector(resp, offset, pageSize, CancellationToken.None);
+            
             var materialTasks = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
                     .Select(p => MapMaterialDocumentAsync(p));
@@ -250,7 +274,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             return (materials, searchResult.Count);
         }
-
+        
         public async Task<decimal[]> VectorizeImage(byte[] fileContent, string fileName)
         {
             using var form = new MultipartFormDataContent();

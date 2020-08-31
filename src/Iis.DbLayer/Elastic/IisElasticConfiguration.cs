@@ -86,7 +86,6 @@ namespace Iis.DbLayer.Elastic
                 nameof(MaterialDocument.MlHandlersCount),
                 nameof(MaterialDocument.ProcessedMlHandlersCount),
                 $"{nameof(MaterialDocument.MLResponses)}.*",
-                $"{nameof(MaterialDocument.Data)}.*",
                 $"{nameof(MaterialDocument.LoadData)}.*",
                 $"{nameof(MaterialDocument.Metadata)}.*",
                 $"{nameof(MaterialDocument.Transcriptions)}.*",

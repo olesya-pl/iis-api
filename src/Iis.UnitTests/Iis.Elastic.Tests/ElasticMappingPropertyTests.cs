@@ -4,6 +4,7 @@ using FluentAssertions;
 using FluentAssertions.Json;
 using Iis.Elastic;
 using Xunit;
+using Newtonsoft.Json.Bson;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests
 {
@@ -62,6 +63,33 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = new JObject(
                 new JProperty("type", dateType.ToString().ToLower())
+            );
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        
+        [Theory]
+        [InlineData("propertyName", ElasticMappingPropertyType.Text, "with_positions_offsets")]
+        public void TextType_ShouldHaveTermVector(string propertyName, ElasticMappingPropertyType propertyType, string termVector)
+        {
+            var actual = new ElasticMappingProperty(propertyName, propertyType, termVector: termVector).ToJObject();
+
+            var expected = new JObject(
+                new JProperty("type", ElasticMappingPropertyType.Text.ToString().ToLower()),
+                new JProperty("term_vector", "with_positions_offsets")
+            );
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Theory]
+        [InlineData("propertyName", ElasticMappingPropertyType.Text)]
+        public void TextType_ShouldNotHaveTermVector(string propertyName, ElasticMappingPropertyType propertyType)
+        {
+            var actual = new ElasticMappingProperty(propertyName, propertyType).ToJObject();
+
+            var expected = new JObject(
+                new JProperty("type", ElasticMappingPropertyType.Text.ToString().ToLower())
             );
 
             actual.Should().BeEquivalentTo(expected);

@@ -169,6 +169,16 @@ namespace Iis.OntologySchema
                 nodeType.Title = updateParameter.Title;
             }
 
+            if (!string.IsNullOrEmpty(updateParameter.Name))
+            {
+                nodeType.Name = updateParameter.Name;
+            }
+
+            if (updateParameter.IsAbstract != null)
+            {
+                nodeType.IsAbstract = (bool)updateParameter.IsAbstract;
+            }
+
             if (nodeType.Kind == Kind.Relation && !string.IsNullOrEmpty(updateParameter.Meta))
             {
                 nodeType.Meta = updateParameter.Meta;
@@ -199,7 +209,10 @@ namespace Iis.OntologySchema
                 nodeType._relationType._targetType = _storage.NodeTypes[(Guid)updateParameter.TargetTypeId];
             }
 
-            UpdateNodeType(nodeType._relationType._targetType, updateParameter);
+            if (nodeType._relationType._targetType.Kind == Kind.Attribute)
+            {
+                UpdateNodeType(nodeType._relationType._targetType, updateParameter);
+            }
             return nodeType;
         }
         private INodeTypeLinked CreateEntityNodeType(INodeTypeUpdateParameter updateParameter)

@@ -52,13 +52,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (type.HasUniqueValues)
             {
                 node = await GetUniqueValueEntity(type, properties);
-            }
-            else
-            {
-                node = new Entity(Guid.NewGuid(), type);
-                await CreateProperties(node, properties);
+                if (node != null) return node;
             }
 
+            node = new Entity(Guid.NewGuid(), type);
+            await CreateProperties(node, properties);
             await _ontologyService.SaveNodeAsync(node);
             return node;
         }
@@ -77,13 +75,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
         private async Task<Entity> GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
         {
-            if (!properties.ContainsKey(type.UniqueValueFieldName))
+            if (properties.ContainsKey(type.UniqueValueFieldName))
             {
-                return await CreateProperties(new Entity(Guid.NewGuid(), type), properties);
+                var value = properties[type.UniqueValueFieldName].ToString();
+                return (Entity)await _ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName);
             }
-            var value = properties[type.UniqueValueFieldName].ToString();
-            var existing = (Entity)await _ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName);
-            return existing ?? await CreateProperties(new Entity(Guid.NewGuid(), type), properties);
+            return null;
         }
 
         public async Task<IEnumerable<Relation>> CreateRelations(IEmbeddingRelationTypeModel embed, object value)

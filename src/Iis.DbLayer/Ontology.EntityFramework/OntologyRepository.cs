@@ -137,14 +137,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<List<AttributeEntity>> GetAttributesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             return await
-                (from n in Context.Nodes
-                 join r in Context.Relations on n.Id equals r.SourceNodeId
-                 join n2 in Context.Nodes on r.TargetNodeId equals n2.Id
-                 join a in Context.Attributes on n2.Id equals a.Id
-                 join nt in Context.NodeTypes on n2.NodeTypeId equals nt.Id
-                 where n.NodeTypeId == nodeTypeId
-                       && !n.IsArchived && !n2.IsArchived
-                       && nt.Name == valueTypeName
+                (from ns in Context.Nodes
+                 join r in Context.Relations on ns.Id equals r.SourceNodeId
+                 join n in Context.Nodes on r.Id equals n.Id
+                 join nt in Context.Nodes on r.TargetNodeId equals nt.Id
+                 join a in Context.Attributes on nt.Id equals a.Id
+                 join ntt in Context.NodeTypes on nt.NodeTypeId equals ntt.Id
+                 where ns.NodeTypeId == nodeTypeId
+                       && !ns.IsArchived && !nt.IsArchived && !n.IsArchived
+                       && ntt.Name == valueTypeName
                        && (a.Value.StartsWith(value))
                  select a).Take(limit).ToListAsync();
 

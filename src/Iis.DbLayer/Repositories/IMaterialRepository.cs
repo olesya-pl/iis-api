@@ -29,9 +29,9 @@ namespace Iis.DbLayer.Repositories
         Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken = default);
 
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default);
-
-        Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
-
+        
+        Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        
         void AddMaterialEntity(MaterialEntity materialEntity);
 
         void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntities);
@@ -48,5 +48,7 @@ namespace Iis.DbLayer.Repositories
         void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
 
         Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId);
+
+        Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
     }
 }

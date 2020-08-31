@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 using Iis.DataModel;
@@ -147,13 +148,6 @@ namespace Iis.DbLayer.Repositories
             return materialsCount;
         }
 
-        private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
-        {
-            return mlResponsesByEntity
-                                    .OrderByDescending(e => e.ProcessingDate)
-                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
-                                    .OriginalResponse;
-        }
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
@@ -172,7 +166,7 @@ namespace Iis.DbLayer.Repositories
                 token);
         }
 
-        public async Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
             var searchParams = new IisElasticSearchParams
@@ -184,12 +178,12 @@ namespace Iis.DbLayer.Repositories
                 SearchFields = materialFields
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
-            return new SearchByConfiguredFieldsResult
+            return new SearchResult
             {
                 Count = searchResult.Count,
                 Items = searchResult.Items
                     .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchByConfiguredFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
 
@@ -284,11 +278,17 @@ namespace Iis.DbLayer.Repositories
                     .Select(e => e.Id)
                     .ToArrayAsync();
         }
-
+        public Task<bool> CheckMaterialExistsAndHasContent(Guid materialId)
+        {
+            return GetMaterialsQuery()
+                        .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
+        }
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
-
+                        
+            materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
+            
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
             materialDocument.NodeIds = material.MaterialInfos
@@ -324,6 +324,11 @@ namespace Iis.DbLayer.Repositories
                 }
             }
             return mlResponsesContainer;
+        }
+
+        private string RemoveImagesFromContent(string content)
+        {
+            return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
         }
 
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
@@ -407,6 +412,14 @@ namespace Iis.DbLayer.Repositories
             }
 
             return resultQuery;
+        }
+ 
+        private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        {
+            return mlResponsesByEntity
+                                    .OrderByDescending(e => e.ProcessingDate)
+                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
+                                    .OriginalResponse;
         }
     }
 }
