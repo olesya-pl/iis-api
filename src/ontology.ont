@@ -13117,30 +13117,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "379fa1a5-c051-455d-b6fe-04afe74f234d",
-      "Name": "measurementOfBearings",
-      "Title": "Середньоквадратична похибка вимірювання пеленгів на джерело випромінювання, град.",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "b2db3394-38bc-4af1-9382-7b4e606d792d",
-      "Name": "measurementOfBearings",
-      "Title": "Середньоквадратична похибка вимірювання пеленгів на джерело випромінювання, град.",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "9b9f3b37-4772-40b1-b007-72b10c028e17",
       "Name": "CountOffrequenciesForReb",
       "Title": "Кількість частот, що одночасно подавлюються, од.",
@@ -13312,30 +13288,6 @@
       "Id": "f9afa250-6bcd-4507-a1ea-6d55b506995c",
       "Name": "temp",
       "Title": "Діапазон робочих температур, град.",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "5b142cc2-dfa4-4600-b2b5-3d8812c0e6cc",
-      "Name": "time",
-      "Title": "Час розгортання/згортання, год.",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "88ab8484-c130-4a15-a211-0881910d9b42",
-      "Name": "time",
-      "Title": "Час розгортання/згортання, год.",
       "Meta": null,
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
@@ -18131,6 +18083,54 @@
       "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
+    },
+    {
+      "Id": "379fa1a5-c051-455d-b6fe-04afe74f234d",
+      "Name": "measurementOfBearings",
+      "Title": "Середньоквадратична похибка вимірювання пеленгів на джерело випромінювання, град.",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "5b142cc2-dfa4-4600-b2b5-3d8812c0e6cc",
+      "Name": "time",
+      "Title": "Час розгортання/згортання, год.",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "88ab8484-c130-4a15-a211-0881910d9b42",
+      "Name": "time",
+      "Title": "Час розгортання/згортання, год.",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b2db3394-38bc-4af1-9382-7b4e606d792d",
+      "Name": "measurementOfBearings",
+      "Title": "Середньоквадратична похибка вимірювання пеленгів на джерело випромінювання, град.",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
     }
   ],
   "RelationTypes": [
@@ -22153,13 +22153,6 @@
       "TargetTypeId": "afd65e75-fa8a-4ede-8121-b10519353401"
     },
     {
-      "Id": "379fa1a5-c051-455d-b6fe-04afe74f234d",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "f0b3ac0a-0ca4-4ef4-923d-d1d2bde38689",
-      "TargetTypeId": "b2db3394-38bc-4af1-9382-7b4e606d792d"
-    },
-    {
       "Id": "4d780192-6b28-44e5-bb94-290c2868b2fc",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -22209,18 +22202,18 @@
       "TargetTypeId": "d99a08b3-3f29-40b1-898f-149ffd7aad97"
     },
     {
-      "Id": "88ab8484-c130-4a15-a211-0881910d9b42",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "f0b3ac0a-0ca4-4ef4-923d-d1d2bde38689",
-      "TargetTypeId": "5b142cc2-dfa4-4600-b2b5-3d8812c0e6cc"
-    },
-    {
       "Id": "49d5a8ac-a181-4d9f-ae86-489bed62e9f2",
       "Kind": 0,
       "EmbeddingOptions": 1,
       "SourceTypeId": "4f8d1eab-bed8-437f-a089-8f500bff6207",
       "TargetTypeId": "c394197a-cd72-4c77-977e-6366c4fbd702"
+    },
+    {
+      "Id": "379fa1a5-c051-455d-b6fe-04afe74f234d",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "f0b3ac0a-0ca4-4ef4-923d-d1d2bde38689",
+      "TargetTypeId": "b2db3394-38bc-4af1-9382-7b4e606d792d"
     },
     {
       "Id": "f9afa250-6bcd-4507-a1ea-6d55b506995c",
@@ -23719,6 +23712,13 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
       "TargetTypeId": "895f2e83-337b-4fa6-ae36-514f54e75169"
+    },
+    {
+      "Id": "88ab8484-c130-4a15-a211-0881910d9b42",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "f0b3ac0a-0ca4-4ef4-923d-d1d2bde38689",
+      "TargetTypeId": "5b142cc2-dfa4-4600-b2b5-3d8812c0e6cc"
     }
   ],
   "AttributeTypes": [
@@ -24823,8 +24823,16 @@
       "ScalarType": 2
     },
     {
+      "Id": "5b142cc2-dfa4-4600-b2b5-3d8812c0e6cc",
+      "ScalarType": 2
+    },
+    {
       "Id": "6ca61d6c-7461-46ba-84bb-5b9c65c02eea",
       "ScalarType": 1
+    },
+    {
+      "Id": "b2db3394-38bc-4af1-9382-7b4e606d792d",
+      "ScalarType": 2
     },
     {
       "Id": "70b7eafc-dcea-4a91-8d23-826b4a14cf2e",
@@ -24864,7 +24872,7 @@
     },
     {
       "Id": "ba02a4ff-0959-434d-a43c-b4f3855d24f0",
-      "ScalarType": 1
+      "ScalarType": 2
     },
     {
       "Id": "ac1fe950-d89a-4a5c-9a4b-4adea9b00823",
@@ -24872,7 +24880,7 @@
     },
     {
       "Id": "347f3a1a-cb71-4abd-a42d-ce43fdf683ee",
-      "ScalarType": 1
+      "ScalarType": 2
     },
     {
       "Id": "085cfafa-b352-4e11-ace1-de8ab70a9304",
@@ -24888,7 +24896,7 @@
     },
     {
       "Id": "e826f886-0019-47c4-b176-f8771cb9aa49",
-      "ScalarType": 1
+      "ScalarType": 2
     },
     {
       "Id": "517a2354-6f68-4b63-9752-79f472f40ba6",
@@ -25131,10 +25139,6 @@
       "ScalarType": 1
     },
     {
-      "Id": "b2db3394-38bc-4af1-9382-7b4e606d792d",
-      "ScalarType": 2
-    },
-    {
       "Id": "76c3672f-28be-4359-af0a-5499d908a08f",
       "ScalarType": 1
     },
@@ -25165,10 +25169,6 @@
     {
       "Id": "0e7fe318-678a-4b8c-9327-722fe89f132b",
       "ScalarType": 1
-    },
-    {
-      "Id": "5b142cc2-dfa4-4600-b2b5-3d8812c0e6cc",
-      "ScalarType": 2
     },
     {
       "Id": "bd75b598-c1ab-4579-9d6f-7a21a1f72870",
