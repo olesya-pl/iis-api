@@ -6,6 +6,7 @@ using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
 using Iis.OntologySchema.Saver;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -40,6 +41,7 @@ namespace Iis.OntologyManager
         CheckBox cbComparisonUpdate;
         CheckBox cbComparisonDelete;
         CheckBox cbComparisonAliases;
+        ILogger _logger;
 
         private enum NodeViewType : byte
         {
@@ -59,15 +61,15 @@ namespace Iis.OntologyManager
             }
         }
         public MainForm(IConfiguration configuration,
-            IOntologyManagerStyle style,
-            UiControlsCreator uiControlsCreator,
-            OntologySchemaService schemaService)
+            OntologySchemaService schemaService,
+            ILogger logger)
         {
             InitializeComponent();
             this.Text = $"Володар Онтології {VERSION}";
             _configuration = configuration;
-            _style = style;
-            _uiControlsCreator = uiControlsCreator;
+            _style = OntologyManagerStyle.GetDefaultStyle(this);
+            _uiControlsCreator = new UiControlsCreator(_style);
+            _logger = logger;
             _schemaService = schemaService;
             _schemaSources = GetSchemaSources();
 
@@ -77,6 +79,7 @@ namespace Iis.OntologyManager
             gridTypes.CellFormatting += _style.GridTypes_CellFormatting;
             AddGridTypesMenu();
             SetControlsTabMain(panelRight);
+            
             SetControlsTopPanel();
             CreateComparisonPanel();
             LoadCurrentSchema();
@@ -111,7 +114,7 @@ namespace Iis.OntologyManager
             SetTypeViewHeader(pnlTop);
             var pnlEntityType = _uiControlsCreator.GetFillPanel(pnlBottom, false);
             _uiEntityTypeControl = new UiEntityTypeControl(_uiControlsCreator);
-            _uiEntityTypeControl.Initialize(_style, pnlEntityType);
+            _uiEntityTypeControl.Initialize("EntityTypeControl", pnlEntityType);
             _uiEntityTypeControl.OnShowRelationType += ChildrenShowRelation;
             _uiEntityTypeControl.OnShowTargetType += (childNodeType) => SetNodeTypeView(childNodeType.TargetType, true);
             _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
@@ -124,12 +127,12 @@ namespace Iis.OntologyManager
 
             var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiRelationAttributeControl = new UiRelationAttributeControl(_uiControlsCreator);
-            _uiRelationAttributeControl.Initialize(_style, pnlRelationAttribute);
+            _uiRelationAttributeControl.Initialize("RelationAttributeControl", pnlRelationAttribute);
             _uiRelationAttributeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator, GetAllEntities);
-            _uiRelationEntityControl.Initialize(_style, pnlRelationEntity);
+            _uiRelationEntityControl.Initialize("RelationEntityControl", pnlRelationEntity);
             _uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
 
             _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
@@ -196,8 +199,8 @@ namespace Iis.OntologyManager
                 Visible = false
             };
             panelComparison.SuspendLayout();
-            var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 200, 10);
-            var container = new UiContainerManager(panels.panelTop, _style);
+            var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 100, 10);
+            var container = new UiContainerManager("Comparison", panels.panelTop);
 
             var btnComparisonClose = new Button
             {
@@ -234,6 +237,7 @@ namespace Iis.OntologyManager
             txtComparison = new RichTextBox { Dock = DockStyle.Fill, BackColor = panelComparison.BackColor };
             panels.panelBottom.Controls.Add(txtComparison);
 
+            panelComparison.Height = 600;
             panelComparison.ResumeLayout();
             this.Controls.Add(panelComparison);
             panelComparison.BringToFront();
@@ -241,12 +245,12 @@ namespace Iis.OntologyManager
         private void SetControlsTopPanel()
         {
             panelTop.SuspendLayout();
-            var container = new UiContainerManager(panelTop, _style);
+            var container = new UiContainerManager("PanelTop", panelTop);
             _filterControl = new UiFilterControl();
-            _filterControl.Initialize(_style, null);
+            _filterControl.Initialize("FilterControl", null);
             _filterControl.OnChange += ReloadTypes;
             container.AddPanel(_filterControl.MainPanel);
-
+            
             cmbSchemaSources = new ComboBox
             {
                 Name = "cmbSchemaSources",
@@ -530,18 +534,6 @@ namespace Iis.OntologyManager
             var relationType = _schema.GetNodeTypeById(childNodeType.RelationId);
             if (relationType == null) return;
             SetNodeTypeView(relationType, true);
-        }
-        private void ChildrenChangeTargetType(IChildNodeType childNodeType)
-        {
-            if (childNodeType.TargetType.Kind != Kind.Entity)
-            {
-                MessageBox.Show("Only properties of Entity type can be changed");
-                return;
-            }
-            var newTargetType = ChooseEntityTypeFromCombo();
-            if (newTargetType == null) return;
-            _schema.UpdateTargetType(childNodeType.RelationId, newTargetType.Id);
-            SetNodeTypeView(_currentNodeType, false);
         }
         #endregion
     }

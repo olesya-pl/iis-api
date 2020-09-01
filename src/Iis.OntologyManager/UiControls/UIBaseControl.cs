@@ -1,6 +1,7 @@
 ﻿using Iis.OntologyManager.Style;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -11,21 +12,24 @@ namespace Iis.OntologyManager.UiControls
         protected UiContainerManager _container;
         protected IOntologyManagerStyle _style;
         public Panel MainPanel { get; private set; }
+        public string Name { get; private set; }
         public bool Visible
         {
             get { return MainPanel.Visible; }
             set { MainPanel.Visible = value; }
         }
-        public Panel Initialize(IOntologyManagerStyle style, Panel mainPanel)
+        public Panel Initialize(string name, Panel mainPanel)
         {
-            _style = style;
+            Name = name;
+            
             MainPanel = mainPanel ?? new Panel
             {
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor = _style.BackgroundColor
             };
+            _style = OntologyManagerStyle.GetDefaultStyle(MainPanel);
 
-            _container = new UiContainerManager(MainPanel, style);
+            _container = new UiContainerManager(name, MainPanel);
+            MainPanel.BackColor = _style.BackgroundColor;
 
             MainPanel.SuspendLayout();
             CreateControls();

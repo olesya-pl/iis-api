@@ -7,6 +7,7 @@ using Iis.OntologyManager.UiControls;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,12 +23,16 @@ namespace Iis.OntologyManager
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.File("!log.txt")
+                .MinimumLevel.Verbose()
+                .CreateLogger();
+            Log.Information("Started...");
+            services.AddSingleton(Log.Logger);
             services.AddSingleton<IConfiguration>(configuration);
             services.AddTransient<IOntologySchema, Iis.OntologySchema.OntologySchema>();
             services.AddTransient<MainForm>();
-            services.AddTransient<UiControlsCreator>();
             services.AddTransient<OntologySchemaService>();
-            services.AddSingleton<IOntologyManagerStyle>(OntologyManagerStyle.GetDefaultStyle());
             services.AddAutoMapper(typeof(Startup));
         }
 

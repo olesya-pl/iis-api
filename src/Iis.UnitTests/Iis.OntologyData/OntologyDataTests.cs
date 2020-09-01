@@ -6,6 +6,7 @@ using Iis.OntologyData;
 using Iis.OntologyData.DataTypes;
 using Iis.OntologyData.Migration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -45,9 +46,10 @@ namespace Iis.UnitTests.Iis.OntologyData
                     new MigrationItem("relatesToCountry", "country"),
                 }
             };
-            ontologyData.Migrate(militaryBaseMigration);
-            await ontologyPatchSaver.SavePatch(ontologyData.Patch);
-            ontologyData.ClearPatch();
+            var json1 = JsonConvert.SerializeObject(militaryBaseMigration);
+            //ontologyData.Migrate(militaryBaseMigration);
+            //await ontologyPatchSaver.SavePatch(ontologyData.Patch);
+            //ontologyData.ClearPatch();
 
             var subdivisionMigration = new MigrationEntity
             {
@@ -78,6 +80,8 @@ namespace Iis.UnitTests.Iis.OntologyData
                     new MigrationItem("amountOfPersonnel", "staffInfo.currentAmount.total"),
                 }
             };
+            var json2 = JsonConvert.SerializeObject(subdivisionMigration);
+
             ontologyData.Migrate(subdivisionMigration);
             await ontologyPatchSaver.SavePatch(ontologyData.Patch);
             ontologyData.ClearPatch();
