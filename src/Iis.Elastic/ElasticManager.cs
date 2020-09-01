@@ -310,6 +310,7 @@ namespace Iis.Elastic
             else if (searchParams.SearchFields?.Any() == true)
             {
                 PopulateFieldsIntoQuery(searchParams, json);
+                PopulateQueryForExactMatch(searchParams, json);
             }
             else
             {
@@ -317,6 +318,23 @@ namespace Iis.Elastic
             }
 
             return json.ToString();
+        }
+
+        /*
+          дефолтне значення поля default_operator OR 
+          тому при пошуку по декільком словам між ними неявно ставиться OR, що може понижати релевантність точно співпадіння
+        */
+        private void PopulateQueryForExactMatch(IIisElasticSearchParams searchParams, JObject json) 
+        {
+            if (searchParams.Query.Split(" ").Count() <= 1)
+                return;
+
+            var existedShouldArray = (JArray)json["query"]["bool"]["should"];
+            foreach (var shouldItem in existedShouldArray.DeepClone())
+            {
+                shouldItem["query_string"]["default_operator"] = "AND";
+                existedShouldArray.Add(shouldItem);
+            }
         }
 
         private bool IsExactQuery(string query)

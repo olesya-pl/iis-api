@@ -101,7 +101,6 @@ namespace Iis.Api.Controllers
                 new ElasticMappingProperty("CreatedDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
-                new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
                 new ElasticMappingProperty("ImageVector", ElasticMappingPropertyType.DenseVector, dimensions:MaterialDocument.ImageVectorDimensionsCount)
             });
 
