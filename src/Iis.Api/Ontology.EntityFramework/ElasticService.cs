@@ -133,7 +133,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 {
                     BaseIndexNames = typeNames.Select(GetHistoricalIndex).ToList(),
                     Query = $"{filter.Suggestion}",
-                    From = filter.Offset,
+                    From = 0,
                     Size = filter.Limit,
                     SearchFields = searchFields,
                     ResultFields = new List<string> { "Id" }
@@ -203,7 +203,6 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             return result;
-
         }
 
         private string GetHistoricalIndex(string typeName)

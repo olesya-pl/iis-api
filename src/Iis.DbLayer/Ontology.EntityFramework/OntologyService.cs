@@ -61,6 +61,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             if (wasUpdated && requestId.HasValue) 
             {
+                //todo: should be called using Task.WhenAll but now elasticService uses one db context
                 await _elasticService.PutNodeAsync(source.Id);
                 await _elasticService.PutHistoricalNodesAsync(source.Id, requestId);
             }
