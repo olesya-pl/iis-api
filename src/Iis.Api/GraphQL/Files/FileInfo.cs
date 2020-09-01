@@ -16,6 +16,7 @@ namespace IIS.Core.GraphQL.Files
         public string GetUrl([Service] IHttpContextAccessor contextAccessor)
         {
             var request = contextAccessor.HttpContext.Request;
+            
             return $"{request.Scheme}://{request.Host.Value}/api/files/{Id}"; // todo: change hardcoded files api
         }
     }

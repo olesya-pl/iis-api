@@ -5,9 +5,10 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
-using Iis.Roles;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.Services;
+using Iis.Services.Contracts;
 
 namespace Iis.UnitTests.UserManagement
 {

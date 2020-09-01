@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Iis.Utility;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,17 @@ namespace Iis.Elastic
         public string Path { get; set; }
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
         public bool SupportsNullValue { get; }
+        public int? Dimensions { get; }
+        public string TermVector { get; }
 
         public ElasticMappingProperty() { }
 
-        public ElasticMappingProperty(string dotName, ElasticMappingPropertyType type, bool supportsNullValue = false, IEnumerable<string> formats = null)
+        public ElasticMappingProperty(string dotName,
+            ElasticMappingPropertyType type,
+            bool supportsNullValue = false,
+            IEnumerable<string> formats = null,
+            int? dimensions = null,
+            string termVector = null)
         {
             var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
             Name = splitted[0];
@@ -34,19 +42,27 @@ namespace Iis.Elastic
             }
             SupportsNullValue = supportsNullValue;
 
-            if(formats != null && formats.Any())
+            if (formats != null && formats.Any())
             {
                 Formats.AddRange(formats);
             }
+            Dimensions = dimensions;
+
+            TermVector = termVector;
         }
 
         public JObject ToJObject()
         {
             var result = new JObject();
 
-            if (this.Type != ElasticMappingPropertyType.Nested)
+            if (Type != ElasticMappingPropertyType.Nested)
             {
-                result["type"] = this.Type.ToString().ToLower();
+                result["type"] = Type.ToString().ToUnderscore();
+
+                if (Dimensions.HasValue)
+                {
+                    result["dims"] = Dimensions;
+                }
             }
 
             if (SupportsNullValue)
@@ -54,12 +70,17 @@ namespace Iis.Elastic
                 result["null_value"] = ElasticManager.NullValue;
             }
 
-            if (this.Type == ElasticMappingPropertyType.Alias)
+            if (Type == ElasticMappingPropertyType.Alias)
             {
-                result["path"] = this.Path;
+                result["path"] = Path;
             }
-            
-            if(Type == ElasticMappingPropertyType.Date && Formats.Any())
+
+            if (Type is ElasticMappingPropertyType.Text && !string.IsNullOrWhiteSpace(TermVector))
+            {
+                result["term_vector"] = TermVector;
+            }
+
+            if (Type == ElasticMappingPropertyType.Date && Formats.Any())
             {
                 result["format"] = string.Join("||", Formats);
             }
@@ -74,6 +95,21 @@ namespace Iis.Elastic
                 result["properties"] = jProperties;
             }
             return result;
+        }
+
+        public void AddFormats(string format)
+        {
+            if(string.IsNullOrWhiteSpace(format))
+            {
+                Formats.Add(format);
+            }
+        }
+        public void AddFormats(IEnumerable<string> format)
+        {
+            if(format != null && format.Any())
+            {
+                Formats.AddRange(format);
+            }
         }
 
         public override string ToString() => Name;

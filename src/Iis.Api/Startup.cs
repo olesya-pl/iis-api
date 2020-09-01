@@ -48,7 +48,6 @@ using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
-using Iis.Roles;
 using Iis.Domain;
 using Iis.Elastic;
 using Iis.DbLayer.Elastic;
@@ -60,12 +59,19 @@ using Iis.OntologyModelWrapper;
 using IIS.Repository.Factories;
 using Iis.Services;
 using Iis.Utility;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace IIS.Core
 {
     public class Startup
     {
         public IConfiguration Configuration { get; }
+
+#if DEBUG
+        public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+#endif
 
         public Startup(IConfiguration configuration)
         {
@@ -92,10 +98,21 @@ namespace IIS.Core
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
+#if DEBUG
                 services.AddDbContext<OntologyContext>(
-                    options => options.UseNpgsql(dbConnectionString),
+                    options => options
+                        .UseNpgsql(dbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
+#else
+                services.AddDbContext<OntologyContext>(
+                                    options => options
+                                        .UseNpgsql(dbConnectionString),
+                                    contextLifetime: ServiceLifetime.Transient,
+                                    optionsLifetime: ServiceLifetime.Transient);
+#endif
+
                 //using var context = OntologyContext.GetContext(dbConnectionString);
 
                 IOntologySchema ontologySchema;
@@ -149,6 +166,7 @@ namespace IIS.Core
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
+            services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
             services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -174,7 +192,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
 
-            //services.AddTransient(e => new FileServiceFactory(dbConnectionString, e.GetService<FilesConfiguration>(), e.GetService<ILogger<FileService>>()));
             services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
@@ -249,6 +266,11 @@ namespace IIS.Core
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<ISanitizeService, SanitizeService>();
+            services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
+                new ActiveDirectoryClient(
+                    Configuration["activeDirectory:server"],
+                    Configuration["activeDirectory:login"],
+                    Configuration["activeDirectory:password"]));
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
@@ -307,13 +329,16 @@ namespace IIS.Core
             PopulateEntityFieldsCache(app);
             app.UpdateMilitaryAmmountCodes();
 
-            app.UseCors(builder =>
-                builder
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-            );
-
+            if (!Configuration.GetValue<bool>("disableCORS", false))
+            {
+                app.UseCors(builder =>
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                );
+            }
+            
             app.UseMiddleware<LogHeaderMiddleware>();
 
 #if !DEBUG

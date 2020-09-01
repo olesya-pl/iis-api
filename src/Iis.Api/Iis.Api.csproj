@@ -37,6 +37,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.3.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="protobuf-net" Version="2.4.4" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
@@ -57,7 +58,6 @@
     <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
-    <ProjectReference Include="..\Iis.Roles\Iis.Roles.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
     <ProjectReference Include="..\Iis.ThemeManagement\Iis.ThemeManagement.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />

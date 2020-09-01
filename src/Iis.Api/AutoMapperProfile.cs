@@ -1,26 +1,29 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Globalization;
-using AutoMapper;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
+﻿using AutoMapper;
 using Iis.Api.GraphQL.Roles;
-using IIS.Core.GraphQL.Roles;
-using IIS.Core.GraphQL.Users;
-using IIS.Core.GraphQL.Materials;
-using IIS.Core.GraphQL.Themes;
 using Iis.DataModel;
 using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DataModel.Themes;
 using Iis.Domain.Materials;
-using Iis.Interfaces.Roles;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Roles;
+using Iis.Services.Contracts;
+using IIS.Core.GraphQL.Materials;
+using IIS.Core.GraphQL.Roles;
+using IIS.Core.GraphQL.Themes;
+using IIS.Core.GraphQL.Users;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Iis.Services.Contracts.Dtos;
+using Role = Iis.Services.Contracts.Role;
+using User = IIS.Core.GraphQL.Users.User;
 
 namespace Iis.Api
 {
@@ -62,44 +65,48 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToString()))
                 .ForMember(dest => dest.MaterialFeatures, opts => opts.MapFrom(src => src.Features));
 
-            CreateMap<RoleAccessEntity, Iis.Roles.AccessGranted>()
+            CreateMap<RoleAccessEntity, AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
                 .ForMember(dest => dest.Category, opts => opts.MapFrom(src => src.AccessObject.Category))
                 .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.AccessObject.Title))
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.AccessObjectId));
-            CreateMap<Iis.Roles.AccessGranted, RoleAccessEntity>()
+            CreateMap<AccessGranted, RoleAccessEntity>()
                 .ForMember(dest => dest.AccessObjectId, opts => opts.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
-            CreateMap<Iis.Roles.AccessGranted, AccessObjectEntity>();
-            CreateMap<RoleEntity, Iis.Roles.Role>()
-                .ForMember(dest => dest.AccessGrantedItems, opts => opts.MapFrom(src => src.RoleAccessEntities));
-            CreateMap<Roles.Role, RoleEntity>()
+            CreateMap<AccessGranted, AccessObjectEntity>();
+            CreateMap<RoleEntity, Role>()
+                .ForMember(dest => dest.AccessGrantedItems, opts => opts.MapFrom(src => src.RoleAccessEntities))
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.RoleGroups.Select(r => r.GroupId)));
+            CreateMap<Role, RoleEntity>()
                 .ForMember(dest => dest.RoleAccessEntities, opts => opts.MapFrom(src => new List<RoleAccessEntity>()));
-            CreateMap<Roles.AccessGranted, AccessTab>()
+            CreateMap<AccessGranted, AccessTab>()
                 .ForMember(dest => dest.Visible, opts => opts.MapFrom(src => src.ReadGranted));
-            CreateMap<AccessTab, Roles.AccessGranted>()
+            CreateMap<AccessTab, AccessGranted>()
                 .ForMember(dest => dest.ReadGranted, opts => opts.MapFrom(src => src.Visible))
                 .ForMember(dest => dest.Category, opts => opts.MapFrom(src => AccessCategory.Tab));
-            CreateMap<Roles.AccessGranted, AccessEntity>();
-            CreateMap<AccessEntity, Roles.AccessGranted>()
+            CreateMap<AccessGranted, AccessEntity>();
+            CreateMap<AccessEntity, AccessGranted>()
                 .ForMember(dest => dest.Category, opts => opts.MapFrom(src => AccessCategory.Entity))
                 .ForMember(dest => dest.ReadGranted, opts => opts
-                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.ReadAccessName)))
+                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.ReadAccessName)))
                 .ForMember(dest => dest.CreateGranted, opts => opts
-                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.CreateAccessName)))
+                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.CreateAccessName)))
                 .ForMember(dest => dest.UpdateGranted, opts => opts
-                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.UpdateAccessName)))
+                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.UpdateAccessName)))
                 .ForMember(dest => dest.DeleteGranted, opts => opts
-                    .MapFrom(src => src.AllowedOperations.Contains(Roles.AccessGranted.DeleteAccessName)));
+                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.DeleteAccessName)));
+            CreateMap<ActiveDirectoryGroupDto, Group>();
 
-            CreateMap<Roles.Role, IIS.Core.GraphQL.Roles.Role>();
-            CreateMap<CreateRoleModel, Roles.Role>()
+            CreateMap<Role, IIS.Core.GraphQL.Roles.Role>();
+            CreateMap<CreateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
                 .ForMember(dest => dest.Entities, opts => opts.Ignore())
-                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
-            CreateMap<UpdateRoleModel, Roles.Role>()
+                .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
+            CreateMap<UpdateRoleModel, Role>()
                 .ForMember(dest => dest.Tabs, opts => opts.Ignore())
-                .ForMember(dest => dest.Entities, opts => opts.Ignore());
+                .ForMember(dest => dest.Entities, opts => opts.Ignore())
+                .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroups.Select(g => g.Id)));
 
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
 
@@ -200,17 +207,14 @@ namespace Iis.Api
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SessionPriority)))
                 .ForMember(dest => dest.LoadData, opts =>
-                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)))
-                .ForMember(dest => dest.Data, opts =>
-                    opts.MapFrom(src => src.Data == null ? null : JsonConvert.DeserializeObject<Iis.DbLayer.Repositories.Data[]>(src.Data)));
+                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)));
 
-            CreateMap<DbLayer.Repositories.Assignee, Iis.Roles.User>();                
+            CreateMap<DbLayer.Repositories.Assignee, Services.Contracts.User>();                
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileInfo(src.FileId.Value): null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
-                .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null: JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
 
@@ -218,25 +222,25 @@ namespace Iis.Api
             CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
 
             //mapping: GraphQl.UserInput -> Roles.User
-            CreateMap<BaseUserInput, Iis.Roles.User>()
-                .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Iis.Roles.Role{ Id = id})));
-            CreateMap<UserCreateInput, Iis.Roles.User>()
-                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+            CreateMap<BaseUserInput, Services.Contracts.User>()
+                .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Role{ Id = id})));
+            CreateMap<UserCreateInput, Services.Contracts.User>()
+                .IncludeBase<BaseUserInput, Services.Contracts.User>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
-            CreateMap<UserUpdateInput, Iis.Roles.User>()
-                .IncludeBase<BaseUserInput, Iis.Roles.User>()
+            CreateMap<UserUpdateInput, Services.Contracts.User>()
+                .IncludeBase<BaseUserInput, Services.Contracts.User>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserName, opts => opts.Ignore());
 
             //mapping: Roles.User -> GraphQl.User
-            CreateMap<Iis.Roles.User, User>();
+            CreateMap<Services.Contracts.User, User>();
 
             //mappring: UserEntity -> Roles.User
-            CreateMap<UserEntity, Roles.User>()
+            CreateMap<UserEntity, Services.Contracts.User>()
                 .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
 
             //mapping: Roles.User -> UserEntity
-            CreateMap<Roles.User, UserEntity>();
+            CreateMap<Services.Contracts.User, UserEntity>();
 
             CreateMap<UserEntity, UserEntity>()
                 .ForMember(dest => dest.Username, opts => opts.Ignore())
@@ -247,11 +251,11 @@ namespace Iis.Api
             //theme: graphQl input -> domain
             CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, Iis.ThemeManagement.Models.Theme>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Roles.User{ Id = src.UserId.Value }));
+                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Services.Contracts.User{ Id = src.UserId.Value }));
 
             CreateMap<IIS.Core.GraphQL.Themes.UpdateThemeInput, Iis.ThemeManagement.Models.Theme>()
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src =>
-                    src.UserId.HasValue ? new Iis.Roles.User { Id = src.UserId.Value } : null));
+                    src.UserId.HasValue ? new Services.Contracts.User { Id = src.UserId.Value } : null));
 
             // theme: domain -> entity
             CreateMap<Iis.ThemeManagement.Models.Theme, ThemeEntity>()

@@ -11,11 +11,6 @@ namespace Iis.DataModel.Roles
                 .Property(p => p.Id)
                 .ValueGeneratedNever();
 
-            builder
-                .Property(p => p.AdGroup)
-                .IsRequired(false)
-                .HasMaxLength(1024);
-
             builder.HasMany(r => r.RoleAccessEntities)
                 .WithOne(ra => ra.Role)
                 .HasForeignKey(ra => ra.RoleId);

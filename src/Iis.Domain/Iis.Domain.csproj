@@ -9,8 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
-    <ProjectReference Include="..\Iis.Roles\Iis.Roles.csproj" />
+    <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

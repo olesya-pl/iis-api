@@ -72,6 +72,11 @@ namespace Iis.Elastic
                 else
                 {
                     mappingProperty.Type = propertyType;
+
+                    if(propertyType == ElasticMappingPropertyType.Date)
+                    {
+                        mappingProperty.AddFormats(ElasticConfiguration.DefaultDateFormats);
+                    }
                 }
                 properties.Add(mappingProperty);
             }

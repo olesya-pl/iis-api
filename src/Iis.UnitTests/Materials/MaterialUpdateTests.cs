@@ -23,6 +23,7 @@ using Iis.DbLayer.MaterialEnum;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
+using System.Net.Http;
 
 namespace Iis.UnitTests.Materials
 {
@@ -46,6 +47,9 @@ namespace Iis.UnitTests.Materials
             unitOfWorkMock = new Mock<IIISUnitOfWork>();
             unitOfWorkFactoryMock = new Mock<IIISUnitOfWorkFactory>();
 
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(c => c.GetSection(It.IsAny<String>())).Returns(new Mock<IConfigurationSection>().Object);
+
             unitOfWorkFactoryMock.Setup(x => x.Create()).Returns(unitOfWorkMock.Object);
             unitOfWorkMock.Setup(x => x.MaterialRepository).Returns(materialRepositoryMock.Object);
             materialProvider = new MaterialProvider<IIISUnitOfWork>(new Mock<IOntologyService>().Object,
@@ -53,7 +57,9 @@ namespace Iis.UnitTests.Materials
                 new Mock<IMLResponseRepository>().Object,
                 new Mock<IMaterialSignRepository>().Object,
                 new Mock<IMapper>().Object,
-                unitOfWorkFactoryMock.Object);
+                unitOfWorkFactoryMock.Object,
+                configurationMock.Object,
+                new Mock<IHttpClientFactory>().Object);
         }
         public void Dispose()
         {

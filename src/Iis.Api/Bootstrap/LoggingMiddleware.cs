@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Iis.Services.Contracts.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Mime;
-using System.Text;
 using System.Threading.Tasks;
-using Iis.Services;
 
 namespace Iis.Api.Bootstrap
 {
@@ -43,7 +41,7 @@ namespace Iis.Api.Bootstrap
                 context.Response.Body = responseBody;
                 await _next(context);
 
-                var response = await FormatResponse(context.Response, sw);
+                var response = await FormatResponse(context, sw);
 
                 logger.LogInformation(response);
                 await responseBody.CopyToAsync(originalBodyStream);
@@ -78,12 +76,16 @@ namespace Iis.Api.Bootstrap
             return dump;
         }
 
-        private async Task<string> FormatResponse(HttpResponse response, Stopwatch sw)
+        private async Task<string> FormatResponse(HttpContext context, Stopwatch sw)
         {
-            response.Body.Seek(0, SeekOrigin.Begin);
-            var text = await new StreamReader(response.Body).ReadToEndAsync();
-            response.Body.Seek(0, SeekOrigin.Begin);
-            return $"Response: {response.StatusCode}: {_sanitizeService.SanitizeBody(text)} Elapsed(ms): {sw.ElapsedMilliseconds}";
+            context.Response.Body.Seek(0, SeekOrigin.Begin);
+
+            if (context.Request.Path.Value.ToLower().Contains("files"))
+                return $"Response: {context.Response.StatusCode}: file_response Elapsed(ms): {sw.ElapsedMilliseconds}";
+
+            var text = await new StreamReader(context.Response.Body).ReadToEndAsync();
+            context.Response.Body.Seek(0, SeekOrigin.Begin);
+            return $"Response: {context.Response.StatusCode}: {_sanitizeService.SanitizeBody(text)} Elapsed(ms): {sw.ElapsedMilliseconds}";
         }
 
         static bool LogException(Stopwatch sw, Exception ex)

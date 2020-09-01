@@ -15,7 +15,7 @@ namespace IIS.Core.Materials
 
         Task<(IEnumerable<Material> Materials,
             int Count,
-            Dictionary<Guid, SearchByConfiguredFieldsResultItem> Highlights)> GetMaterialsAsync(int limit,
+            Dictionary<Guid, SearchResultItem> Highlights)> GetMaterialsAsync(int limit,
             int offset,
             string filterQuery,
             IEnumerable<Guid> nodeIds = null,
@@ -28,8 +28,10 @@ namespace IIS.Core.Materials
         MaterialSign GetMaterialSign(Guid id);
         Task<Material> MapAsync(MaterialEntity material);
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string name, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset);
     }
 }

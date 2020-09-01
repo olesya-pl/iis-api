@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 using Iis.DataModel;
@@ -24,6 +25,8 @@ namespace Iis.DbLayer.Repositories
 {
     internal class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
+        private const string ImageVectorMlHandlerCode = "imageVector";
+
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -120,14 +123,19 @@ namespace Iis.DbLayer.Repositories
                     .ToDictionary(k => k.Key, p => p.ToList());
                 var materialDocuments = materialEntities
                     .Select(p => MapEntityToDocument(p))
-                    .Select(p => {
+                .Select(p =>
+                {
                         if (!mlResponses.ContainsKey(p.Id))
                         {
                             return p;
                         }
-                        var responses = mlResponses[p.Id];
-                        p.MLResponses = MapMlResponseEntities(responses);
-                        p.ProcessedMlHandlersCount = responses.Count();
+                    var mlResponsesByEntity = mlResponses[p.Id];
+                    p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
+                    string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
+                    if (!string.IsNullOrEmpty(imageVector))
+                    {
+                        p.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
+                    }
                         return p;
                     })
                     .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
@@ -140,24 +148,25 @@ namespace Iis.DbLayer.Repositories
             return materialsCount;
         }
 
+
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
         {
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .SingleOrDefaultAsync(p => p.Id == materialId);
             var materialDocument = MapEntityToDocument(material);
-            
-            var responseResult = await PopulateMLResponses(materialId);
-
-            materialDocument.MLResponses = responseResult.responses;
-            materialDocument.ProcessedMlHandlersCount = responseResult.responsesCount;
-
+            var (mlResponses, imageVector) = await PopulateMLResponses(materialId);
+            materialDocument.MLResponses = mlResponses;
+            if (!string.IsNullOrEmpty(imageVector))
+            {
+                materialDocument.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
+            }
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 token);
         }
 
-        public async Task<SearchByConfiguredFieldsResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
             var searchParams = new IisElasticSearchParams
@@ -169,12 +178,12 @@ namespace Iis.DbLayer.Repositories
                 SearchFields = materialFields
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
-            return new SearchByConfiguredFieldsResult
+            return new SearchResult
             {
                 Count = searchResult.Count,
                 Items = searchResult.Items
                     .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchByConfiguredFieldsResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
 
@@ -269,11 +278,17 @@ namespace Iis.DbLayer.Repositories
                     .Select(e => e.Id)
                     .ToArrayAsync();
         }
-
+        public Task<bool> CheckMaterialExistsAndHasContent(Guid materialId)
+        {
+            return GetMaterialsQuery()
+                        .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
+        }
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
-
+                        
+            materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
+            
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
             materialDocument.NodeIds = material.MaterialInfos
@@ -283,11 +298,11 @@ namespace Iis.DbLayer.Repositories
             return materialDocument;
         }
 
-        private async Task<(JObject responses, int responsesCount)> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject mlResponses, string imageVector)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
-
-            return (MapMlResponseEntities(mlResponses), mlResponses.Count());
+            var imageVector = ExtractLatestImageVector(mlResponses);
+            return (MapMlResponseEntities(mlResponses), imageVector);
         }
 
         private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)
@@ -309,6 +324,11 @@ namespace Iis.DbLayer.Repositories
                 }
             }
             return mlResponsesContainer;
+        }
+
+        private string RemoveImagesFromContent(string content)
+        {
+            return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
         }
 
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
@@ -392,6 +412,14 @@ namespace Iis.DbLayer.Repositories
             }
 
             return resultQuery;
+        }
+ 
+        private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        {
+            return mlResponsesByEntity
+                                    .OrderByDescending(e => e.ProcessingDate)
+                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
+                                    .OriginalResponse;
         }
     }
 }

@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
-
-using Iis.Roles;
 using IIS.Core.GraphQL.Common;
+using Iis.Services;
 
 namespace IIS.Core.GraphQL.Users
 {
