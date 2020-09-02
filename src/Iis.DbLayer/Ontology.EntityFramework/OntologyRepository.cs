@@ -176,7 +176,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                        && !n.IsArchived && !n2.IsArchived
                        && nt.Name == valueTypeName
                        && (a.Value == value || value == null)
-                 select n).ToListAsync();
+                 select n).Distinct().ToListAsync();
         }
         public async Task<NodeEntity> UpdateNodeAsync(Guid id, Action<NodeEntity> action)
         {

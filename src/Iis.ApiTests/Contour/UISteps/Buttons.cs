@@ -47,6 +47,14 @@ namespace AcceptanceTests.Contour.UISteps
 			IWebElement buttonElement = driver.FindElement(By.CssSelector(button));
 			Assert.True(buttonElement.Displayed);
 		}
+
+		[Then(@"the button (.*) must be active")]
+		public void ThenITheButtonIsActive(string button)
+		{
+			IWebElement buttonElement = driver.FindElement(By.CssSelector(button));
+			Assert.True(buttonElement.Enabled);
+		}
+
 		#endregion
 
 
