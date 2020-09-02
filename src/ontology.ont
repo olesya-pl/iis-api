@@ -24852,7 +24852,7 @@
     },
     {
       "Id": "ebbcb481-e601-4dc3-9a2b-e6fd21e9a579",
-      "ScalarType": 1
+      "ScalarType": 2
     },
     {
       "Id": "aa9c0d6e-6a43-42d5-b045-73ee41bf8b94",
@@ -24864,7 +24864,7 @@
     },
     {
       "Id": "ba02a4ff-0959-434d-a43c-b4f3855d24f0",
-      "ScalarType": 1
+      "ScalarType": 2
     },
     {
       "Id": "ac1fe950-d89a-4a5c-9a4b-4adea9b00823",
@@ -24872,7 +24872,7 @@
     },
     {
       "Id": "347f3a1a-cb71-4abd-a42d-ce43fdf683ee",
-      "ScalarType": 1
+      "ScalarType": 2
     },
     {
       "Id": "085cfafa-b352-4e11-ace1-de8ab70a9304",
@@ -24888,7 +24888,7 @@
     },
     {
       "Id": "e826f886-0019-47c4-b176-f8771cb9aa49",
-      "ScalarType": 1
+      "ScalarType": 2
     },
     {
       "Id": "517a2354-6f68-4b63-9752-79f472f40ba6",
@@ -25871,5 +25871,27 @@
       "ScalarType": 0
     }
   ],
-  "Aliases": []
+  "Aliases": [
+    {
+      "DotName": "MilitaryOrganization.lastConfirmedAt",
+      "Value": "Останнє_підтвердження",
+      "Values": [
+        "Останнє_підтвердження"
+      ]
+    },
+    {
+      "DotName": "Person.deathCircumstances",
+      "Value": "Как_дуба_дал",
+      "Values": [
+        "Как_дуба_дал"
+      ]
+    },
+    {
+      "DotName": "RlsOFIntelligenceAndSurveilance.serialNumber",
+      "Value": "Серийный_номер",
+      "Values": [
+        "Серийный_номер"
+      ]
+    }
+  ]
 }
