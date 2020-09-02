@@ -428,17 +428,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                    await unitOfWork.OntologyRepository.GetAttributesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
 
         }
-        //public async Task CreateRelation(Guid sourceNodeId, Guid targetNodeId)
-        //{
-        //    var relationEntity = new RelationEntity
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        SourceNodeId = sourceNodeId,
-        //        TargetNodeId = targetNodeId
-        //    };
-        //    _context.Relations.Add(relationEntity);
-        //    await _context.SaveChangesAsync();
-        //}
+
 
         public Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
         {
@@ -456,6 +446,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var nodeIds = await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.OntologyRepository.GetSourceNodeIdByTargetNodeId(propertyId, entityId));
             return await LoadNodesAsync(nodeIds, null);
+        }
+
+        public async Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId)
+        {
+            var relations = await RunWithoutCommitAsync(async unitOfWork =>
+                   await unitOfWork.OntologyRepository.GetIncomingRelations(entityId));
+
+            return relations
+                .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
+                .Select(p => new IncomingRelation
+            {
+                RelationTypeName = p.Node.NodeType.Name,
+                RelationTypeTitle = p.Node.NodeType.Title,
+                EntityId = p.SourceNodeId,
+                EntityTypeName = p.SourceNode.NodeType.Name
+            }).ToList();
         }
     }
 }
