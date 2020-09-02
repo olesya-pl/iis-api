@@ -46,8 +46,8 @@ namespace Iis.Domain.ExtendedData
             {
                 var jObject = JObject.Parse(json);
                 var coordinatesJson = (JArray)jObject["coordinates"];
-                var lat = decimal.Parse(coordinatesJson[1].ToString());
-                var lang = decimal.Parse(coordinatesJson[0].ToString());
+                var lat = decimal.Parse(coordinatesJson[0].ToString());
+                var lang = decimal.Parse(coordinatesJson[1].ToString());
                 var geoCoordinates = new GeoCoordinates(lat, lang);
                 return geoCoordinates;
             }
