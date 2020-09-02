@@ -106,13 +106,13 @@ namespace Iis.Elastic
             json["_source"] = new JArray(searchParams.ResultFields);
 
             json["from"] = searchParams.From;
-            
+
             json["size"] = searchParams.Size;
-            
+
             json["query"]["bool"]["must"][1]["more_like_this"]["like"][0]["_id"] = searchParams.Query;
-            
+
             var query = json.ToString(Newtonsoft.Json.Formatting.None);
-            
+
             var path = searchParams.BaseIndexNames.Count == 0 ?
                 "_search" :
                 $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
@@ -310,7 +310,6 @@ namespace Iis.Elastic
             else if (searchParams.SearchFields?.Any() == true)
             {
                 PopulateFieldsIntoQuery(searchParams, json);
-                PopulateQueryForExactMatch(searchParams, json);
             }
             else
             {
@@ -318,23 +317,6 @@ namespace Iis.Elastic
             }
 
             return json.ToString();
-        }
-
-        /*
-          дефолтне значення поля default_operator OR 
-          тому при пошуку по декільком словам між ними неявно ставиться OR, що може понижати релевантність точно співпадіння
-        */
-        private void PopulateQueryForExactMatch(IIisElasticSearchParams searchParams, JObject json) 
-        {
-            if (searchParams.Query.Split(" ").Count() <= 1)
-                return;
-
-            var existedShouldArray = (JArray)json["query"]["bool"]["should"];
-            foreach (var shouldItem in existedShouldArray.DeepClone())
-            {
-                shouldItem["query_string"]["default_operator"] = "AND";
-                existedShouldArray.Add(shouldItem);
-            }
         }
 
         private bool IsExactQuery(string query)
@@ -404,7 +386,17 @@ namespace Iis.Elastic
 
         private string ApplyFuzzinessOperator(string input)
         {
-            return $"{input} OR {input}~";
+            if (IsWildCard(input))
+            {
+                return input;
+            }
+
+            return $"\"{input}\" OR \"{input}\"~";
+        }
+
+        private static bool IsWildCard(string input)
+        {
+            return input.Contains('*');
         }
 
         private string EscapeElasticSpecificSymbols(string input, string escapePattern)
@@ -444,7 +436,7 @@ namespace Iis.Elastic
             }
             return builder.ToString();
         }
-        
+
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
         {
             using (DurationMeter.Measure($"Elastic request {httpMethod} {path}", _logger))
