@@ -10,11 +10,11 @@ namespace Iis.UnitTests.Utility
         {
             //Arrange
             var json = "{ data: {user: { name: \"Pavlo\" } }}";
+            
             //Act
             var updatedJson = json.ReplaceValue("data.user.name", "Vova");
 
             //Assert
-
             Assert.Contains("Vova", updatedJson);
         }
     }

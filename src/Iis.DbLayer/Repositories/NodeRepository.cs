@@ -92,8 +92,6 @@ namespace Iis.DbLayer.Repositories
             }
 
             return true;
-
-            //return await _elasticManager.PutsDocumentsAsync($"historical_{actualNode.NodeTypeName}", string.Join("", nodes.Select(x => x.SerializedNode)), ct);
         }
     }
 }

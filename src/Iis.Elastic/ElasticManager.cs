@@ -51,11 +51,6 @@ namespace Iis.Elastic
             PostData postData = jsonDocument;
 
             var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, indexUrl, cancellationToken, postData);
-            if (!response.Success) 
-            {
-            
-            }
-
             return response.Success;
         }
 
@@ -335,7 +330,7 @@ namespace Iis.Elastic
                 }
                 else
                 {
-                    var shouldSection = CreateFallbackShouldSectin(searchItem.Query, searchParams.IsLenient);
+                    var shouldSection = CreateFallbackShouldSection(searchItem.Query, searchParams.IsLenient);
                     shouldSections.Merge(shouldSection);
                 }
             }
@@ -452,7 +447,7 @@ namespace Iis.Elastic
             json["query"]["query_string"] = queryString;
         }
 
-        private JObject CreateFallbackShouldSectin(string query, bool isLenient) 
+        private JObject CreateFallbackShouldSection(string query, bool isLenient) 
         {
             var shouldSection = new JObject();
             var queryString = new JObject();
