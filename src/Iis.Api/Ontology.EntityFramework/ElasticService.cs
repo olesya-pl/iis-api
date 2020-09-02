@@ -118,11 +118,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<(int Count, List<JObject> Entities)> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!UseElastic)
-            {
-                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
-            }
-
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
             var searchFields = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => OntologyIndexes.Contains(p))).ToList();
 
