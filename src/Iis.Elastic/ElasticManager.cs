@@ -391,7 +391,7 @@ namespace Iis.Elastic
                 return input;
             }
 
-            return $"\"{input}\" OR \"{input}\"~";
+            return $"\"{input}\" OR {input}~";
         }
 
         private static bool IsWildCard(string input)
