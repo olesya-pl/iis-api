@@ -27,6 +27,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public IEnumerable<string> MaterialIndexes { get; }
         public IEnumerable<string> OntologyIndexes { get; }
+        public IDictionary<string, string> HistoricalOntologyIndexes => OntologyIndexes.ToDictionary(k => k, GetHistoricalIndex);
         public IEnumerable<string> EventIndexes { get; }
         public IEnumerable<string> FeatureIndexes { get; }
 

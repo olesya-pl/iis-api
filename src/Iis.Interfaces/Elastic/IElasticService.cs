@@ -10,6 +10,7 @@ namespace Iis.Interfaces.Elastic
     {
         IEnumerable<string> MaterialIndexes { get; }
         IEnumerable<string> OntologyIndexes { get; }
+        IDictionary<string, string> HistoricalOntologyIndexes { get; }
         IEnumerable<string> EventIndexes { get; }
         IEnumerable<string> FeatureIndexes { get; }
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);

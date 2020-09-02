@@ -42,7 +42,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default)
         {
-            var wasUpdated = true;
             var nodeEntity = await RunAsync((unitOfWork) => unitOfWork.OntologyRepository.UpdateNodeAsync(source.Id,
                 n => SaveRelations(source, n)));
 
@@ -57,9 +56,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 };
                 SaveRelations(source, nodeEntity);
                 Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
-                wasUpdated = false;
             }
-            if (wasUpdated && requestId.HasValue) 
+            if (requestId.HasValue) 
             {
                 await Task.WhenAll(_elasticService.PutNodeAsync(source.Id), _elasticService.PutHistoricalNodesAsync(source.Id, requestId));
             }
