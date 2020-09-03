@@ -85,7 +85,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     await UpdateRelations(node, embed, value,
                         string.IsNullOrEmpty(dotName) ? key : dotName + "." + key, requestId);
                 }
-                await _ontologyService.SaveNodeAsync(node);
+                await _ontologyService.SaveNodeAsync(node, requestId);
             }
 
             return node;

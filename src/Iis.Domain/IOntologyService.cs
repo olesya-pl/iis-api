@@ -11,10 +11,12 @@ namespace Iis.Domain
     {
         Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
+        Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId);
         Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId);
         Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
+        Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default);
         Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default);
         Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default);

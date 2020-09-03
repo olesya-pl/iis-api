@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Iis.Api;
+using Iis.DbLayer.Repositories;
+using Iis.Domain.Elastic;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using Iis.Api;
-using Iis.Domain.Elastic;
-using Iis.DataModel;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -25,9 +23,11 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly INodeRepository _nodeRepository;
         private readonly IMaterialRepository _materialRepository;
         private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
+        private const decimal HistoricalSearchBoost = 0.5m;
 
         public IEnumerable<string> MaterialIndexes { get; }
         public IEnumerable<string> OntologyIndexes { get; }
+        public IDictionary<string, string> HistoricalOntologyIndexes => OntologyIndexes.ToDictionary(k => k, GetHistoricalIndex);
         public IEnumerable<string> EventIndexes { get; }
         public IEnumerable<string> FeatureIndexes { get; }
 
@@ -117,6 +117,94 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
+        public async Task<(int Count, List<JObject> Entities)> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        {
+            var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
+            var searchFields = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => OntologyIndexes.Contains(p))).ToList();
+
+            IElasticSearchResult searchByHistoryResult = null;
+            if (useHistoricalSearch)
+            {
+                var searchByHistoryParams = new IisElasticSearchParams
+                {
+                    BaseIndexNames = typeNames.Select(GetHistoricalIndex).ToList(),
+                    Query = $"{filter.Suggestion}",
+                    From = 0,
+                    Size = filter.Limit,
+                    SearchFields = searchFields,
+                    ResultFields = new List<string> { "Id" }
+                };
+
+                searchByHistoryResult = await _elasticManager.Search(searchByHistoryParams, cancellationToken);
+            }
+
+            var multiSearchParams = new MultiElasticSearchParams
+            {
+                BaseIndexNames = typeNames.ToList(),
+                From = filter.Offset,
+                Size = filter.Limit,
+                SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
+                {
+                    (string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}", searchFields)
+                }
+            };
+            
+            if (useHistoricalSearch && searchByHistoryResult.Count > 0)
+            {
+                var entityIds = searchByHistoryResult.Items.Select(x => x.SearchResult["Id"].Value<string>()).Distinct();
+                multiSearchParams.SearchParams.Add((string.Join(" ", entityIds),
+                    new List<IIisElasticField>
+                    {
+                        new IisElasticField
+                        {
+                            Name = "Id",
+                            Boost = HistoricalSearchBoost
+                        }
+                    }));
+            }
+
+            var searchResult = await _elasticManager.Search(multiSearchParams, cancellationToken);
+
+            if (useHistoricalSearch && searchByHistoryResult.Count > 0)
+            {
+                var highlightsById = searchByHistoryResult.Items
+                    .GroupBy(x => x.SearchResult["Id"].Value<string>())
+                    .ToDictionary(k => k.Key, v => v.First().Higlight);
+
+                foreach (var item in searchResult.Items)
+                {
+                    item.SearchResult["highlight"] = CombineHighlights(
+                        highlightsById.GetValueOrDefault(item.Identifier),
+                        item.Higlight,
+                        item.Identifier);
+                }
+            }
+
+            return (searchResult.Count, searchResult.Items.Select(x => x.SearchResult).ToList());
+        }
+
+        private JToken CombineHighlights(JToken historicalHighlights, JToken actualHighlights, string entityId)
+        {
+            if (historicalHighlights == null)
+                return actualHighlights;
+
+            var result = (JObject)historicalHighlights.DeepClone();
+            foreach (var item in ((JObject)actualHighlights).Children<JProperty>())
+            {
+                if (item.Name == "Id" && item.Value[0].Value<string>().Contains(entityId))
+                    continue;
+
+                result.TryAdd(item.Name, item.Value);
+            }
+
+            return result;
+        }
+
+        private string GetHistoricalIndex(string typeName)
+        {
+            return $"historical_{typeName}";
+        }
+
         public Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
             if (!UseElastic)
@@ -137,7 +225,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = filter.Limit
             };
 
-            var searchResult = await _elasticManager.SearchMoreLikeThisAsync(searchParameters, cancellationToken);       
+            var searchResult = await _elasticManager.SearchMoreLikeThisAsync(searchParameters, cancellationToken);
 
             return new SearchResult
             {
@@ -155,6 +243,13 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutNodeAsync(id, cancellationToken);
         }
 
+        public Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default)
+        {
+            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
+
+            return _nodeRepository.PutHistoricalNodesAsync(id, requestId, cancellationToken);
+        }
+
         public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
         {
             if (!UseElastic) return true;
@@ -165,7 +260,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             return await _elasticManager.PutDocumentAsync(FeatureIndexes.FirstOrDefault(), featureId.ToString("N"), featureDocument.ToString(Formatting.None));
         }
-        
+
         public bool TypesAreSupported(IEnumerable<string> typeNames)
         {
             return OntologyIndexesAreSupported(typeNames);
@@ -173,7 +268,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, int offset, int size, CancellationToken token)
         {
-            var searchResult = await _elasticManager.SearchByImageVector(imageVector, new IisElasticSearchParams {
+            var searchResult = await _elasticManager.SearchByImageVector(imageVector, new IisElasticSearchParams
+            {
                 BaseIndexNames = MaterialIndexes.ToList(),
                 From = offset,
                 Size = size

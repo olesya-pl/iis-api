@@ -117,7 +117,6 @@ namespace Iis.DbLayer.Repositories.Helpers
             return result;
         }
 
-        
 
         public async Task<FlattenNodeResult> FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {

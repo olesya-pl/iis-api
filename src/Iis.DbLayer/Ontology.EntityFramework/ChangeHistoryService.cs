@@ -1,7 +1,6 @@
 ﻿using Iis.DataModel;
 using Iis.DataModel.ChangeHistory;
 using Iis.Interfaces.Ontology;
-using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -49,6 +48,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 query = query.Where(ch => ch.PropertyName == propertyName);
             }
             return await query.OrderByDescending(ch => ch.Date).ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistoryByRequest(Guid requestId) 
+        {
+            return await _context.ChangeHistory.AsNoTracking().Where(ch => ch.RequestId == requestId).ToListAsync();
         }
     }
 }
