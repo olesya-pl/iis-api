@@ -41,6 +41,8 @@ namespace Iis.DbLayer.Repositories
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
+        public string ShortTitle { get; set; }
+
     }
 
     public class Assignee
