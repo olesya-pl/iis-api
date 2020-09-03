@@ -382,7 +382,11 @@ namespace Iis.Elastic
 
         private JObject CreateExactShouldSection(string query, bool isLenient) 
         {
-            var result = new JObject();
+            var result = new JObject
+            {
+                ["query"] = new JObject()
+            };
+
             var queryString = new JObject();
             queryString["query"] = query;
             queryString["lenient"] = isLenient;

@@ -66,7 +66,7 @@ namespace Iis.Api.Controllers
 
             foreach (var index in ontologyIndexes)
             {
-                var attributesInfo = _ontologySchema.GetHistoricalAttributesInfo(index);
+                var attributesInfo = _ontologySchema.GetHistoricalAttributesInfo(index, historicalIndexesByTypeName[index]);
                 await _elasticManager.CreateMapping(attributesInfo);
             }
 

@@ -148,8 +148,8 @@ namespace IIS.Core.Ontology.EntityFramework
                     (string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}", searchFields)
                 }
             };
-
-            if (useHistoricalSearch)
+            
+            if (useHistoricalSearch && searchByHistoryResult.Count > 0)
             {
                 var entityIds = searchByHistoryResult.Items.Select(x => x.SearchResult["Id"].Value<string>()).Distinct();
                 multiSearchParams.SearchParams.Add((string.Join(" ", entityIds),
@@ -163,10 +163,9 @@ namespace IIS.Core.Ontology.EntityFramework
                     }));
             }
 
-
             var searchResult = await _elasticManager.Search(multiSearchParams, cancellationToken);
 
-            if (useHistoricalSearch)
+            if (useHistoricalSearch && searchByHistoryResult.Count > 0)
             {
                 var highlightsById = searchByHistoryResult.Items
                     .GroupBy(x => x.SearchResult["Id"].Value<string>())

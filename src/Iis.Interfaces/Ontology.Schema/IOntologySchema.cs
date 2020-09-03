@@ -22,7 +22,7 @@ namespace Iis.Interfaces.Ontology.Schema
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
         void RemoveInheritance(Guid sourceTypeId, Guid targetTypeId);
         IAttributeInfoList GetAttributesInfo(string entityName);
-        IAttributeInfoList GetHistoricalAttributesInfo(string entityName);
+        IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName);
         IAliases Aliases { get; }
         void RemoveRelation(Guid relationId);
         IEnumerable<INodeTypeLinked> GetAllNodeTypes();

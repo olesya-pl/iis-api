@@ -392,12 +392,12 @@ namespace Iis.OntologySchema
             return new AttributeInfo(entityName, BuildAttributesBasedOnEntityFileds(entityName));
         }
 
-        public IAttributeInfoList GetHistoricalAttributesInfo(string entityName)
+        public IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName)
         {
             var items = BuildAttributesBasedOnEntityFileds(entityName);
             items.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null));
 
-            return new AttributeInfo(entityName, items);
+            return new AttributeInfo(historicalEntityName, items);
         }
 
         private List<AttributeInfoItem> BuildAttributesBasedOnEntityFileds(string entityName) 
