@@ -369,7 +369,8 @@ namespace Iis.Elastic
         {
             return query.Contains(":")
                 || query.Contains(" AND ")
-                || query.Contains(" OR ");
+                || query.Contains(" OR ")
+                || query.Contains("\"");
         }
 
         private void PopulateExactQuery(IIisElasticSearchParams searchParams, JObject json)
