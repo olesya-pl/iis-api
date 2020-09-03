@@ -18,7 +18,7 @@ namespace Iis.DbLayer.OntologyData
             _context = context;
             _mapper = mapper;
         }
-        public async Task SavePatch(IOntologyPatch patch)
+        private void ApplyPatch(IOntologyPatch patch)
         {
             var nodes = patch.Create.Nodes.Select(n => _mapper.Map<NodeEntity>(n));
             _context.Nodes.AddRange(nodes);
@@ -31,8 +31,16 @@ namespace Iis.DbLayer.OntologyData
                 _mapper.Map(node, nodeEntity);
                 _context.Nodes.Update(nodeEntity);
             }
+        }
+        public async Task SavePatchAsync(IOntologyPatch patch)
+        {
+            ApplyPatch(patch);
             await _context.SaveChangesAsync();
         }
-
+        public void SavePatch(IOntologyPatch patch)
+        {
+            ApplyPatch(patch);
+            _context.SaveChanges();
+        }
     }
 }

@@ -131,7 +131,7 @@ namespace Iis.OntologyManager.UiControls
             return form.ShowDialog() == DialogResult.OK ? (T)comboBox.SelectedItem : null;
         }
 
-        public Panel GetFillPanel(Panel parent, bool visible = true)
+        public Panel GetFillPanel(Control parent, bool visible = true)
         {
             var panel = new Panel { Dock = DockStyle.Fill, Visible = visible };
             parent.Controls.Add(panel);

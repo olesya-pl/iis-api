@@ -1,6 +1,10 @@
-﻿using Iis.DataModel;
+﻿using AutoMapper;
+using Iis.DataModel;
+using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.OntologySchema;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyData;
 using Iis.OntologyManager.Parameters;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
@@ -14,6 +18,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Iis.OntologyManager
@@ -25,6 +30,7 @@ namespace Iis.OntologyManager
         IConfiguration _configuration;
         IOntologySchema _schema;
         IOntologyManagerStyle _style;
+        IMapper _mapper;
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
         OntologySchemaService _schemaService;
@@ -32,6 +38,7 @@ namespace Iis.OntologyManager
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         ISchemaCompareResult _compareResult;
         UiFilterControl _filterControl;
+        UiMigrationControl _migrationControl;
         UiEntityTypeControl _uiEntityTypeControl;
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
@@ -41,6 +48,7 @@ namespace Iis.OntologyManager
         CheckBox cbComparisonUpdate;
         CheckBox cbComparisonDelete;
         CheckBox cbComparisonAliases;
+        Button btnMigrate;
         ILogger _logger;
 
         private enum NodeViewType : byte
@@ -62,7 +70,8 @@ namespace Iis.OntologyManager
         }
         public MainForm(IConfiguration configuration,
             OntologySchemaService schemaService,
-            ILogger logger)
+            ILogger logger, 
+            IMapper mapper)
         {
             InitializeComponent();
             this.Text = $"Володар Онтології {VERSION}";
@@ -71,6 +80,7 @@ namespace Iis.OntologyManager
             _uiControlsCreator = new UiControlsCreator(_style);
             _logger = logger;
             _schemaService = schemaService;
+            _mapper = mapper;
             _schemaSources = GetSchemaSources();
 
             SuspendLayout();
@@ -234,10 +244,14 @@ namespace Iis.OntologyManager
             container.Add(cbComparisonDelete = new CheckBox { Text = "Delete" });
             container.Add(cbComparisonAliases = new CheckBox { Text = "Aliases" });
 
-            txtComparison = new RichTextBox { Dock = DockStyle.Fill, BackColor = panelComparison.BackColor };
+            txtComparison = new RichTextBox 
+            {
+                ReadOnly = true,
+                Dock = DockStyle.Fill, 
+                BackColor = panelComparison.BackColor 
+            };
             panels.panelBottom.Controls.Add(txtComparison);
 
-            panelComparison.Height = 600;
             panelComparison.ResumeLayout();
             this.Controls.Add(panelComparison);
             panelComparison.BringToFront();
@@ -262,11 +276,14 @@ namespace Iis.OntologyManager
             cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
             container.Add(cmbSchemaSources);
 
-            btnSaveSchema = new Button { Text = "Save", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnSaveSchema = new Button { Text = "Save To File", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnSaveSchema.Click += btnSave_Click;
             btnCompare = new Button { Text = "Compare", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
+            btnMigrate = new Button { Text = "Migrate", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnMigrate.Click += btnMigrate_Click;
+            container.Add(btnMigrate);
 
             panelTop.ResumeLayout();
         }
@@ -289,6 +306,7 @@ namespace Iis.OntologyManager
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 _schemaService.SaveToFile(_schema, dialog.FileName);
@@ -299,6 +317,44 @@ namespace Iis.OntologyManager
         {
             CompareSchemas();
             panelComparison.Visible = true;
+        }
+        private void btnMigrate_Click(object sender, EventArgs e)
+        {
+            var form = new Form() 
+            { 
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Width = this.Width - 20,
+                Height = this.Height - 20,
+                StartPosition = FormStartPosition.CenterParent
+            };
+            var rootPanel = _uiControlsCreator.GetFillPanel(form);
+            _migrationControl = new UiMigrationControl();
+            _migrationControl.Initialize("MigrationControl", rootPanel);
+            _migrationControl.OnRun += Migrate;
+            //_filterControl.OnChange += ReloadTypes;
+
+            form.ShowDialog();
+            form.Close();
+        }
+        private Dictionary<Guid,Guid> Migrate(IMigrationEntity migration)
+        {
+            var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
+                (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
+            if (currentSchemaSource == null || currentSchemaSource.SourceKind != SchemaSourceKind.Database)
+            {
+                return null;
+            }
+
+            using var context = OntologyContext.GetContext(currentSchemaSource.Data);
+            var schema = _schemaService.GetOntologySchema(currentSchemaSource);
+
+            var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
+            var ontologyData = new OntologyNodesData(rawData, schema);
+            var result = ontologyData.Migrate(migration);
+
+            var ontologyPatchSaver = new OntologyPatchSaver(context, _mapper);
+            ontologyPatchSaver.SavePatch(ontologyData.Patch); 
+            return result;
         }
 
         private void gridTypes_SelectionChanged(object sender, EventArgs e)

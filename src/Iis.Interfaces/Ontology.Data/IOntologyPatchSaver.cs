@@ -4,6 +4,6 @@ namespace Iis.Interfaces.Ontology.Data
 {
     public interface IOntologyPatchSaver
     {
-        Task SavePatch(IOntologyPatch patch);
+        Task SavePatchAsync(IOntologyPatch patch);
     }
 }

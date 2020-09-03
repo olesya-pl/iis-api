@@ -11,6 +11,7 @@ namespace Iis.OntologyManager.UiControls
     {
         protected UiContainerManager _container;
         protected IOntologyManagerStyle _style;
+        protected UiControlsCreator _uiControlsCreator;
         public Panel MainPanel { get; private set; }
         public string Name { get; private set; }
         public bool Visible
@@ -27,6 +28,7 @@ namespace Iis.OntologyManager.UiControls
                 BorderStyle = BorderStyle.FixedSingle,
             };
             _style = OntologyManagerStyle.GetDefaultStyle(MainPanel);
+            _uiControlsCreator = new UiControlsCreator(_style);
 
             _container = new UiContainerManager(name, MainPanel);
             MainPanel.BackColor = _style.BackgroundColor;

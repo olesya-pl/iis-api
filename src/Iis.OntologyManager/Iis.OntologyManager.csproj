@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
+    <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
   </ItemGroup>

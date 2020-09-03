@@ -35,7 +35,7 @@ namespace Iis.OntologyData
             return new Mapper(configuration);
         }
 
-        public void Migrate(IMigrationEntity migrationEntity)
+        public Dictionary<Guid,Guid> Migrate(IMigrationEntity migrationEntity)
         {
             var sourceNodes = _storage.Nodes.Values
                 .Where(n => n.NodeType.Kind == Kind.Entity
@@ -55,6 +55,8 @@ namespace Iis.OntologyData
                 Migrate(node, migrationEntity, hierarchyMapper);
                 //_storage.SetNodeIsArchived(node.Id);
             }
+
+            return hierarchyMapper;
         }
         private void Migrate(NodeData sourceNode, IMigrationEntity migrationEntity, 
             Dictionary<Guid, Guid> hierarchyMapper)

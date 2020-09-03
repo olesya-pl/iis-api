@@ -186,13 +186,12 @@ namespace Iis.OntologySchema.DataTypes
         }
 
         public bool IsObjectOfStudy => Name == EntityTypeNames.ObjectOfStudy.ToString() || IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
-
         public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
-
         public bool IsObjectSign => Name == EntityTypeNames.ObjectSign.ToString() || IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
         public bool IsEnum => Name == EntityTypeNames.Enum.ToString() || IsInheritedFrom(EntityTypeNames.Enum.ToString());
-
-        public bool IsSeparateObject => IsObjectOfStudy || IsObjectSign || IsEnum;
+        public bool IsAncestorOfObjectOfStudy => IsAbstract && 
+            GetAllDescendants().All(nt => nt.IsAbstract || nt.IsObjectOfStudy);
+        public bool IsSeparateObject => IsObjectOfStudy || IsObjectSign || IsEnum || IsAncestorOfObjectOfStudy;
 
         public string GetStringCode()
         {

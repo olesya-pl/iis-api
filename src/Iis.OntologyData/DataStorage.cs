@@ -106,18 +106,10 @@ namespace Iis.OntologyData
             foreach (var relation in node._outgoingRelations)
             {
                 relation._node.IsArchived = true;
-                switch (relation.TargetKind)
+                if (relation.TargetNode.NodeType != null && !relation.IsLinkToSeparateObject && !relation.TargetNode.IsArchived)
                 {
-                    case Kind.Attribute:
-                        relation._targetNode.IsArchived = true;
-                        break;
-                    case Kind.Entity:
-                        if (!relation.IsLinkToSeparateObject && !relation.TargetNode.IsArchived)
-                        {
-                            relation._targetNode.IsArchived = true;
-                            MarkLinkedAsArchived(relation._targetNode);
-                        }
-                        break;
+                    relation._targetNode.IsArchived = true;
+                    MarkLinkedAsArchived(relation._targetNode);
                 }
             }
 

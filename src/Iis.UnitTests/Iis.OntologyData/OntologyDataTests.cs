@@ -83,7 +83,7 @@ namespace Iis.UnitTests.Iis.OntologyData
             var json2 = JsonConvert.SerializeObject(subdivisionMigration);
 
             ontologyData.Migrate(subdivisionMigration);
-            await ontologyPatchSaver.SavePatch(ontologyData.Patch);
+            await ontologyPatchSaver.SavePatchAsync(ontologyData.Patch);
             ontologyData.ClearPatch();
         }
     }
