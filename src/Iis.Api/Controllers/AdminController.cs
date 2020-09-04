@@ -23,7 +23,6 @@ namespace Iis.Api.Controllers
         IElasticService _elasticService;
         IOntologySchema _ontologySchema;
         INodeRepository _nodeRepository;
-        IMaterialRepository _materialRepository;
         IMaterialService _materialService;
         public AdminController(
             IExtNodeService extNodeService,
@@ -31,8 +30,7 @@ namespace Iis.Api.Controllers
             IElasticService elasticService,
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
-            INodeRepository nodeRepository,
-            IMaterialRepository materialRepository)
+            INodeRepository nodeRepository)
         {
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
@@ -40,8 +38,48 @@ namespace Iis.Api.Controllers
             _materialService = materialService;
             _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
-            _materialRepository = materialRepository;
         }
+
+        [HttpPost("CreateHistoricalIndexes/{indexNames}")]
+        public async Task<IActionResult> CreateHistoricalIndexes(string indexNames,CancellationToken ct) 
+        {
+            IEnumerable<string> ontologyIndexes;
+            IDictionary<string, string> historicalIndexesByTypeName;
+            var log = new StringBuilder();
+            if (indexNames == "all") 
+            {
+                ontologyIndexes = _elasticService.OntologyIndexes;
+                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes;
+            }
+            else 
+            {
+                ontologyIndexes = indexNames.Split(",");
+                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes
+                    .Where(x => ontologyIndexes.Contains(x.Key))
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+                if(!IsIndexesValid(ontologyIndexes, log))
+                    return Content(log.ToString());
+            }
+
+            await _elasticManager.DeleteIndexesAsync(historicalIndexesByTypeName.Values, ct);
+
+            foreach (var index in ontologyIndexes)
+            {
+                var attributesInfo = _ontologySchema.GetHistoricalAttributesInfo(index, historicalIndexesByTypeName[index]);
+                await _elasticManager.CreateMapping(attributesInfo);
+            }
+
+            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, ct);
+            foreach (var extNode in extNodes)
+            {
+                await _elasticService.PutHistoricalNodesAsync(extNode, null, ct);
+            }
+
+            log.AppendLine($"{extNodes.Count} nodes added");
+            return Content(log.ToString());
+        }
+
 
         [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
         public async Task<IActionResult> RecreateElasticOntologyIndexes(string indexNames, CancellationToken cancellationToken)
@@ -56,16 +94,8 @@ namespace Iis.Api.Controllers
             {
                 ontologyIndexes = indexNames.Split(',');
 
-                var notValidNames = ontologyIndexes
-                    .Where(name => !_elasticService.OntologyIndexes.Contains(name))
-                    .ToList();
-
-                if (notValidNames.Count > 0)
-                {
-                    sb.AppendLine("There are not valid index names in list:");
-                    notValidNames.ForEach(name => sb.AppendLine(name));
+                if (!IsIndexesValid(ontologyIndexes, sb))
                     return Content(sb.ToString());
-                }
             }
 
             await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
@@ -101,7 +131,6 @@ namespace Iis.Api.Controllers
                 new ElasticMappingProperty("CreatedDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
-                new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
                 new ElasticMappingProperty("ImageVector", ElasticMappingPropertyType.DenseVector, dimensions:MaterialDocument.ImageVectorDimensionsCount)
             });
 
@@ -125,6 +154,22 @@ namespace Iis.Api.Controllers
             }
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
+        }
+
+        private bool IsIndexesValid(IEnumerable<string> indexes, StringBuilder log)
+        {
+            var notValidNames = indexes
+                       .Where(name => !_elasticService.OntologyIndexes.Contains(name))
+                       .ToList();
+
+            if (notValidNames.Count > 0)
+            {
+                log.AppendLine("There are not valid index names in list:");
+                notValidNames.ForEach(name => log.AppendLine(name));
+                return false;
+            }
+
+            return true;
         }
     }
 }

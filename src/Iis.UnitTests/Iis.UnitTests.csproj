@@ -29,6 +29,7 @@
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
     <ProjectReference Include="..\Iis.ThemeManagement\Iis.ThemeManagement.csproj" />
+    <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
 
   <ItemGroup>

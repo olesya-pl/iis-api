@@ -212,7 +212,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.LoadData, opts =>
                     opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)));
 
-            CreateMap<DbLayer.Repositories.Assignee, Services.Contracts.User>();                
+            CreateMap<DbLayer.Repositories.Assignee, Services.Contracts.User>();
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
@@ -291,12 +291,14 @@ namespace Iis.Api
             //annotations: domain -> graph ql
             CreateMap<Contracts.Annotations.Annotation, IIS.Core.GraphQL.Annotations.Annotation>()
                 .ForMember(dest => dest.Content, opts => opts.MapFrom(src => string.IsNullOrWhiteSpace(src.Content) ? null : JObject.Parse(src.Content)));
-            
+
             //annotations: domain -> entity
             CreateMap<Contracts.Annotations.Annotation, AnnotationEntity>();
-            
+
             //annotations: entity -> domain
             CreateMap<AnnotationEntity, Contracts.Annotations.Annotation>();
+
+            CreateMap<Iis.Domain.IncomingRelation, Iis.Api.Ontology.IncomingRelation>();
         }
     }
 }

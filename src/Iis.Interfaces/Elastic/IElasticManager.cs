@@ -11,6 +11,7 @@ namespace Iis.Interfaces.Elastic
         Task<bool> PutDocumentAsync(string indexName, string id, string jsonDocument, CancellationToken cancellationToken = default);
         Task<bool> DeleteDocumentAsync(string indexName, string documentId);
         Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<IElasticSearchResult> Search(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<IElasticSearchResult> SearchMoreLikeThisAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName);
         Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames, string id, CancellationToken token = default);

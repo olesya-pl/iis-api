@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using Iis.Domain;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.Api.Ontology
 {
     public class AssociatedEventsQuery
     {
-        public async Task<IEnumerable<EventsAssociatedWithEntityResponse>> GetEventsAssociatedWithEntity(
+        public async Task<IEnumerable<EventAssociatedWithEntity>> GetEventsAssociatedWithEntity(
             [Service] IOntologyService ontologyService,
             [Service] NodeToJObjectMapper nodeToJObjectMapper,
             [GraphQLNonNullType] Guid entityId
@@ -17,9 +18,7 @@ namespace Iis.Api.Ontology
         {
             var entities = await ontologyService.GetEventsAssociatedWithEntity(entityId);
 
-            return entities.Select(p => new EventsAssociatedWithEntityResponse {
-                Event = nodeToJObjectMapper.EventToJObject(p)
-            });
+            return await Task.WhenAll(entities.Select(p => nodeToJObjectMapper.EventToAssociatedWithEntity(p)));
         }
     }
 }

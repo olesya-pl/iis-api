@@ -31,5 +31,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         Task<List<NodeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task<NodeEntity> UpdateNodeAsync(Guid id, Action<NodeEntity> action);
         Task<List<Guid>> GetSourceNodeIdByTargetNodeId(Guid? propertyId, Guid entityId);
+        Task<List<RelationEntity>> GetIncomingRelations(Guid entityId);
     }
 }

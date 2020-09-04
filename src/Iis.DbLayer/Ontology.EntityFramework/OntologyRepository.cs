@@ -178,7 +178,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                        && !n.IsArchived && !n2.IsArchived
                        && nt.Name == valueTypeName
                        && (a.Value == value || value == null)
-                 select n).ToListAsync();
+                 select n).Distinct().ToListAsync();
         }
         public async Task<NodeEntity> UpdateNodeAsync(Guid id, Action<NodeEntity> action)
         {
@@ -200,9 +200,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public Task<List<Guid>> GetSourceNodeIdByTargetNodeId(Guid? propertyId, Guid targetNodeId)
         {
             return Context.Relations
+                .AsNoTracking()
                 .Include(p => p.Node)
                 .Where(p => p.TargetNodeId == targetNodeId && p.Node.NodeTypeId == propertyId)
                 .Select(p => p.SourceNodeId)
+                .ToListAsync();
+        }
+
+        public Task<List<RelationEntity>> GetIncomingRelations(Guid entityId)
+        {
+            return Context.Relations
+                .AsNoTracking()
+                .Include(p => p.Node)
+                .ThenInclude(p => p.NodeType)
+                .Include(p => p.SourceNode)
+                .ThenInclude(p => p.NodeType)
+                .Where(p => p.TargetNodeId == entityId)
                 .ToListAsync();
         }
     }

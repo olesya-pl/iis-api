@@ -389,6 +389,19 @@ namespace Iis.OntologySchema
 
         public IAttributeInfoList GetAttributesInfo(string entityName)
         {
+            return new AttributeInfo(entityName, BuildAttributesBasedOnEntityFileds(entityName));
+        }
+
+        public IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName)
+        {
+            var items = BuildAttributesBasedOnEntityFileds(entityName);
+            items.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null));
+
+            return new AttributeInfo(historicalEntityName, items);
+        }
+
+        private List<AttributeInfoItem> BuildAttributesBasedOnEntityFileds(string entityName) 
+        {
             var items = new List<AttributeInfoItem>();
             foreach (var key in _storage.DotNameTypes.Keys.Where(key => key.StartsWith(entityName + ".")))
             {
@@ -399,8 +412,10 @@ namespace Iis.OntologySchema
                 var item = new AttributeInfoItem(shortDotName, nodeType.AttributeType.ScalarType, aliases);
                 items.Add(item);
             }
-            return new AttributeInfo(entityName, items);
+
+            return items;
         }
+
         public void RemoveRelation(Guid relationId)
         {
             var relationType = _storage.RelationTypes[relationId];

@@ -35,7 +35,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _ontology = ontology;
         }
 
-        public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
+        public Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
+        {
+            return SaveNodeAsync(source, null, cancellationToken);
+        }
+
+        public async Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default)
         {
             var nodeEntity = await RunAsync((unitOfWork) => unitOfWork.OntologyRepository.UpdateNodeAsync(source.Id,
                 n => SaveRelations(source, n)));
@@ -52,7 +57,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 SaveRelations(source, nodeEntity);
                 Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
             }
-            await _elasticService.PutNodeAsync(source.Id);
+            if (requestId.HasValue) 
+            {
+                await Task.WhenAll(_elasticService.PutNodeAsync(source.Id), _elasticService.PutHistoricalNodesAsync(source.Id, requestId));
+            }
+            else
+                await _elasticService.PutNodeAsync(source.Id);
         }
 
         private void SaveRelations(Node source, NodeEntity existing)
@@ -248,8 +258,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypeNames, filter);
-                return (searchResult.Items.Values.Select(p => p.SearchResult), searchResult.Count);
+                var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
+                return (searchResult.Entities, searchResult.Count);
             }
             else
             {
@@ -428,17 +438,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                    await unitOfWork.OntologyRepository.GetAttributesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
 
         }
-        //public async Task CreateRelation(Guid sourceNodeId, Guid targetNodeId)
-        //{
-        //    var relationEntity = new RelationEntity
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        SourceNodeId = sourceNodeId,
-        //        TargetNodeId = targetNodeId
-        //    };
-        //    _context.Relations.Add(relationEntity);
-        //    await _context.SaveChangesAsync();
-        //}
+
 
         public Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
         {
@@ -456,6 +456,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var nodeIds = await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.OntologyRepository.GetSourceNodeIdByTargetNodeId(propertyId, entityId));
             return await LoadNodesAsync(nodeIds, null);
+        }
+
+        public async Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId)
+        {
+            var relations = await RunWithoutCommitAsync(async unitOfWork =>
+                   await unitOfWork.OntologyRepository.GetIncomingRelations(entityId));
+
+            return relations
+                .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
+                .Select(p => new IncomingRelation
+            {
+                RelationTypeName = p.Node.NodeType.Name,
+                RelationTypeTitle = p.Node.NodeType.Title,
+                EntityId = p.SourceNodeId,
+                EntityTypeName = p.SourceNode.NodeType.Name
+            }).ToList();
         }
     }
 }

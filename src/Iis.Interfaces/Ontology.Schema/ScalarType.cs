@@ -9,6 +9,7 @@ namespace Iis.Interfaces.Ontology.Schema
         Boolean = 4,
         Geo = 5,
         File = 6,
-        Json = 7
+        Json = 7,
+        DateRange = 8
     }
 }

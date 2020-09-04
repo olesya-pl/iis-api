@@ -16,6 +16,7 @@ namespace Iis.DbLayer.Repositories.Helpers
 {
     public class NodeFlattener<TUnitOfWork> : BaseService<TUnitOfWork> where TUnitOfWork : IIISUnitOfWork
     {
+        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly IElasticSerializer _elasticSerializer;
 
         public NodeFlattener(IElasticSerializer elasticSerializer,
@@ -76,9 +77,18 @@ namespace Iis.DbLayer.Repositories.Helpers
                 case ScalarType.Int:
                     return Convert.ToInt32(value);
                 case ScalarType.Date:
-                //return Convert.ToDateTime(value);
+                {
+                    if(DateTime.TryParse(value, out DateTime dateTimeValue))
+                    {
+                        return dateTimeValue.ToString(Iso8601DateFormat);
+                    }
+                    else
+                    {
+                        return value;
+                    }
+                }
                 default:
-                    return value.ToString();
+                    return value;
             }
         }
 
@@ -107,7 +117,6 @@ namespace Iis.DbLayer.Repositories.Helpers
             return result;
         }
 
-        
 
         public async Task<FlattenNodeResult> FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {

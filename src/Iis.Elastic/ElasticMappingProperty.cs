@@ -80,7 +80,8 @@ namespace Iis.Elastic
                 result["term_vector"] = TermVector;
             }
 
-            if (Type == ElasticMappingPropertyType.Date && Formats.Any())
+            if ((Type == ElasticMappingPropertyType.Date || Type == ElasticMappingPropertyType.DateRange) 
+                && Formats.Any())
             {
                 result["format"] = string.Join("||", Formats);
             }
@@ -95,6 +96,21 @@ namespace Iis.Elastic
                 result["properties"] = jProperties;
             }
             return result;
+        }
+
+        public void AddFormats(string format)
+        {
+            if(string.IsNullOrWhiteSpace(format))
+            {
+                Formats.Add(format);
+            }
+        }
+        public void AddFormats(IEnumerable<string> format)
+        {
+            if(format != null && format.Any())
+            {
+                Formats.AddRange(format);
+            }
         }
 
         public override string ToString() => Name;

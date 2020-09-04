@@ -8,6 +8,7 @@ namespace Iis.Elastic
         Nested,
         Alias,
         Keyword,
-        DenseVector
+        DenseVector,
+        DateRange
     }
 }
