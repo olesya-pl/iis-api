@@ -33,6 +33,7 @@ namespace Iis.UnitTests.Iis.OntologyData
             var serviceProvider = Utils.GetServiceProvider();
             var mapper = serviceProvider.GetRequiredService<IMapper>();
             var ontologyPatchSaver = new OntologyPatchSaver(context, mapper);
+            var ontologyMigrator = new OntologyMigrator(ontologyData, schema);
 
             var militaryBaseMigration = new MigrationEntity
             {
@@ -82,7 +83,7 @@ namespace Iis.UnitTests.Iis.OntologyData
             };
             var json2 = JsonConvert.SerializeObject(subdivisionMigration);
 
-            ontologyData.Migrate(subdivisionMigration);
+            ontologyMigrator.Migrate(subdivisionMigration);
             await ontologyPatchSaver.SavePatchAsync(ontologyData.Patch);
             ontologyData.ClearPatch();
         }

@@ -10,6 +10,7 @@ namespace Iis.OntologyData.Migration
     {
         public string SourceEntityName { get; set; }
         public string TargetEntityName { get; set; }
+        public List<string> LinkedEntities { get; set; }
         public IReadOnlyList<MigrationItem> Items { get; set; }
         public string GetTargetDotName(string sourceDotName)
         {

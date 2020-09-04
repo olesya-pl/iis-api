@@ -13,6 +13,7 @@ namespace Iis.OntologyData.Migration
 
         public MigrationItemOptions _options = new MigrationItemOptions();
         public IMigrationItemOptions Options => _options;
+        public List<string> OtherTargetDotNames { get; set; }
 
         public MigrationItem() { }
         public MigrationItem(string sourceDotName, string targetDotName, MigrationItemOptions options = null)

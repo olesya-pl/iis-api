@@ -5,6 +5,7 @@ using Iis.DbLayer.OntologySchema;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
+using Iis.OntologyData.Migration;
 using Iis.OntologyManager.Parameters;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
@@ -336,7 +337,7 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
-        private Dictionary<Guid,Guid> Migrate(IMigrationEntity migration)
+        private IMigrationResult Migrate(IMigration migration)
         {
             var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
                 (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
@@ -350,7 +351,8 @@ namespace Iis.OntologyManager
 
             var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
             var ontologyData = new OntologyNodesData(rawData, schema);
-            var result = ontologyData.Migrate(migration);
+            var migrator = new OntologyMigrator(ontologyData, schema, migration);
+            var result = migrator.Migrate();
 
             var ontologyPatchSaver = new OntologyPatchSaver(context, _mapper);
             ontologyPatchSaver.SavePatch(ontologyData.Patch); 

@@ -19,9 +19,9 @@ namespace Iis.OntologyManager.UiControls
         CheckBox _cbDelete;
         RichTextBox _txtLog;
 
-        public event Func<IMigrationEntity, Dictionary<Guid, Guid>> OnRun;
+        public event Func<IMigration, IMigrationResult> OnRun;
 
-        public IMigrationEntity _migration;
+        public IMigration _migration;
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
@@ -58,24 +58,15 @@ namespace Iis.OntologyManager.UiControls
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var json = File.ReadAllText(dialog.FileName);
-                _migration = JsonConvert.DeserializeObject<MigrationEntity>(json);
-                _lblTitle.Text = $"{_migration.SourceEntityName} => {_migration.TargetEntityName}";
+                _migration = JsonConvert.DeserializeObject<Migration>(json);
+                _lblTitle.Text = $"{_migration.Title}";
                 _btnRun.Enabled = true;
             }
         }
         private void btnRun_Click(object sender, EventArgs e)
         {
-            var idMapping = OnRun(_migration);
-            var sb = new StringBuilder();
-            sb.AppendLine($"Миграція з {_migration.SourceEntityName} у {_migration.TargetEntityName}");
-            sb.AppendLine($"Всього {idMapping.Keys.Count} об'єктів");
-            foreach (var key in idMapping.Keys)
-            {
-                sb.AppendLine();
-                sb.AppendLine($"Entity{_migration.SourceEntityName}.{key}/view");
-                sb.AppendLine($"Entity{_migration.TargetEntityName}.{idMapping[key]}/view");
-            }
-            _txtLog.Text = sb.ToString();
+            var migrationResult = OnRun(_migration);
+            _txtLog.Text = migrationResult.Log;
         }
     }
 }

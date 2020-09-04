@@ -34,72 +34,28 @@ namespace Iis.OntologyData
 
             return new Mapper(configuration);
         }
-
-        public Dictionary<Guid,Guid> Migrate(IMigrationEntity migrationEntity)
+        public IReadOnlyList<INode> GetEntitiesByTypeName(string typeName)
         {
-            var sourceNodes = _storage.Nodes.Values
+            return _storage.Nodes.Values
                 .Where(n => n.NodeType.Kind == Kind.Entity
-                    && n.NodeType.Name == migrationEntity.SourceEntityName).ToList();
-            
-            var targetType = _schema.GetEntityTypeByName(migrationEntity.TargetEntityName);
-            var hierarchyMapper = new Dictionary<Guid, Guid>();
-
-            foreach (var node in sourceNodes)
-            {
-                var entity = _storage.CreateNode(targetType.Id, Guid.NewGuid());
-                hierarchyMapper[node.Id] = entity.Id;
-            }
-
-            foreach (var node in sourceNodes)
-            {
-                Migrate(node, migrationEntity, hierarchyMapper);
-                //_storage.SetNodeIsArchived(node.Id);
-            }
-
-            return hierarchyMapper;
+                    && n.NodeType.Name == typeName)
+                .ToList();
         }
-        private void Migrate(NodeData sourceNode, IMigrationEntity migrationEntity, 
-            Dictionary<Guid, Guid> hierarchyMapper)
+        internal NodeData CreateNode(Guid nodeTypeId, Guid? id = null) =>
+            _storage.CreateNode(nodeTypeId, id);
+
+        internal RelationData CreateRelation(Guid id, Guid sourceNodeId, Guid targetNodeId) =>
+            _storage.CreateRelation(id, sourceNodeId, targetNodeId);
+
+        internal AttributeData CreateAttribute(Guid id, string value) =>
+            _storage.CreateAttribute(id, value);
+
+        internal NodeData GetNode(Guid id)
         {
-            var dotNameValues = sourceNode.GetDotNameValues();
-            var entity = _storage.Nodes[hierarchyMapper[sourceNode.Id]];
-            foreach (var dotNameValue in dotNameValues.Items)
-            {
-                var value = dotNameValue.Value;
-                var migrationItem = migrationEntity.GetItem(dotNameValue.DotName);
-                var targetDotName = migrationItem?.TargetDotName ?? dotNameValue.DotName;
-                var options = migrationItem?.Options;
-                if (options != null)
-                {
-                    if (options.Ignore) continue;
-
-                    if (!string.IsNullOrEmpty(options.IgnoreIfFieldsAreNotEmpty) &&
-                        dotNameValues.ContainsOneOf(options.IgnoreIfFieldsAreNotEmpty.Split(',')))
-                    {
-                        continue;
-                    }
-
-                    if (!string.IsNullOrEmpty(options.TakeValueFrom))
-                    {
-                        var id = Guid.Parse(dotNameValue.Value);
-                        var node = _storage.Nodes[id];
-                        value = node.GetDotNameValues().GetValue(options.TakeValueFrom);
-                    }
-
-                    if (options.IsHierarchical)
-                    {
-                        var selfId = Guid.Parse(dotNameValue.Value);
-                        value = hierarchyMapper.ContainsKey(selfId) ? hierarchyMapper[selfId].ToString() : null;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(value))
-                {
-                    AddValueByDotName(entity, value, targetDotName.Split('.'));
-                }
-            }
+            return _storage.Nodes[id];
         }
-        private void AddValueByDotName(NodeData entity, string value, string[] dotNameParts)
+
+        internal void AddValueByDotName(NodeData entity, string value, string[] dotNameParts)
         {
             var node = entity;
             for (int i = 0; i < dotNameParts.Length; i++)
