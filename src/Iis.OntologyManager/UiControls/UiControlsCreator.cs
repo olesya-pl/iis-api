@@ -133,7 +133,19 @@ namespace Iis.OntologyManager.UiControls
 
         public Panel GetFillPanel(Control parent, bool visible = true)
         {
-            var panel = new Panel { Dock = DockStyle.Fill, Visible = visible };
+            var marginVer = 20;
+            var panel = new Panel
+            {
+                Parent = parent,
+                Top = marginVer,
+                Left = 0,
+                Width = parent.Width,
+                Height = parent.Height - marginVer,
+                Dock = DockStyle.None,
+                BackColor = Color.OrangeRed,
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom,
+                Visible = visible
+            };
             parent.Controls.Add(panel);
             return panel;
         }
@@ -161,6 +173,16 @@ namespace Iis.OntologyManager.UiControls
                     return;
                 }
             }
+        }
+        public Form GetModalForm(Form parent)
+        {
+            return new Form()
+            {
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Width = parent.Width - 20,
+                Height = parent.Height - 20,
+                StartPosition = FormStartPosition.CenterParent
+            };
         }
     };
 }

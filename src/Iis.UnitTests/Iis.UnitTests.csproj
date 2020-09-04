@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Iis.Ontology.OntologyEnum\" />
+    <Folder Include="Iis.OntologyData\" />
   </ItemGroup>
 
 </Project>

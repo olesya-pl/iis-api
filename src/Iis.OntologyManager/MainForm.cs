@@ -37,18 +37,14 @@ namespace Iis.OntologyManager
         OntologySchemaService _schemaService;
         List<IOntologySchemaSource> _schemaSources;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
-        ISchemaCompareResult _compareResult;
+        
         UiFilterControl _filterControl;
         UiMigrationControl _migrationControl;
         UiEntityTypeControl _uiEntityTypeControl;
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.13";
-        CheckBox cbComparisonCreate;
-        CheckBox cbComparisonUpdate;
-        CheckBox cbComparisonDelete;
-        CheckBox cbComparisonAliases;
+        const string VERSION = "1.14";
         Button btnMigrate;
         ILogger _logger;
 
@@ -92,7 +88,6 @@ namespace Iis.OntologyManager
             SetControlsTabMain(panelRight);
             
             SetControlsTopPanel();
-            CreateComparisonPanel();
             LoadCurrentSchema();
             ResumeLayout();
             ReloadTypes(_filterControl.GetModel());
@@ -195,68 +190,6 @@ namespace Iis.OntologyManager
             rootPanel.Controls.Add(lblTypeHeaderName);
             rootPanel.ResumeLayout();
         }
-        public void CreateComparisonPanel()
-        {
-            const int ComparisonMargin = 30;
-            const int BtnCloseSize = 20;
-            const int BtnCloseMargin = 5;
-            panelComparison = new Panel {
-                Name = "panelComparison",
-                Location = new Point(ComparisonMargin, ComparisonMargin),
-                Size = new Size(this.ClientSize.Width - ComparisonMargin * 2, this.ClientSize.Height - ComparisonMargin * 2),
-                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = _style.ComparisonBackColor,
-                Visible = false
-            };
-            panelComparison.SuspendLayout();
-            var panels = _uiControlsCreator.GetTopBottomPanels(panelComparison, 100, 10);
-            var container = new UiContainerManager("Comparison", panels.panelTop);
-
-            var btnComparisonClose = new Button
-            {
-                Location = new Point(panels.panelTop.Width - BtnCloseSize - BtnCloseMargin*2, BtnCloseMargin),
-                Anchor = Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                Size = new Size(BtnCloseSize, BtnCloseSize),
-                Text = "X"
-            };
-            btnComparisonClose.Click += (sender, e) => { panelComparison.Visible = false; };
-            panels.panelTop.Controls.Add(btnComparisonClose);
-
-            cmbSchemaSourcesCompare = new ComboBox
-            {
-                Name = "cmbSchemaSourcesCompare",
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                DisplayMember = "Title",
-                BackColor = panelTop.BackColor
-            };
-            var src = new List<IOntologySchemaSource>(_schemaSources);
-            cmbSchemaSourcesCompare.DataSource = src;
-            cmbSchemaSourcesCompare.SelectedIndexChanged += (sender, e) => { CompareSchemas(); };
-            container.Add(cmbSchemaSourcesCompare);
-
-            var btnComparisonUpdate = new Button { Text = "Update database", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
-            btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
-            container.Add(btnComparisonUpdate);
-
-            container.GoToNewColumn();
-            container.Add(cbComparisonCreate = new CheckBox { Text = "Create", Checked = true });
-            container.Add(cbComparisonUpdate = new CheckBox { Text = "Update", Checked = true });
-            container.Add(cbComparisonDelete = new CheckBox { Text = "Delete" });
-            container.Add(cbComparisonAliases = new CheckBox { Text = "Aliases" });
-
-            txtComparison = new RichTextBox 
-            {
-                ReadOnly = true,
-                Dock = DockStyle.Fill, 
-                BackColor = panelComparison.BackColor 
-            };
-            panels.panelBottom.Controls.Add(txtComparison);
-
-            panelComparison.ResumeLayout();
-            this.Controls.Add(panelComparison);
-            panelComparison.BringToFront();
-        }
         private void SetControlsTopPanel()
         {
             panelTop.SuspendLayout();
@@ -316,23 +249,21 @@ namespace Iis.OntologyManager
         }
         private void btnCompare_Click(object sender, EventArgs e)
         {
-            CompareSchemas();
-            panelComparison.Visible = true;
+            var form = _uiControlsCreator.GetModalForm(this);
+            var rootPanel = _uiControlsCreator.GetFillPanel(form);
+            var control = new UiComparisonControl(_schemaSources, _schemaService, _schema);
+            control.Initialize("MigrationControl", rootPanel);
+
+            form.ShowDialog();
+            form.Close();
         }
         private void btnMigrate_Click(object sender, EventArgs e)
         {
-            var form = new Form() 
-            { 
-                FormBorderStyle = FormBorderStyle.FixedDialog,
-                Width = this.Width - 20,
-                Height = this.Height - 20,
-                StartPosition = FormStartPosition.CenterParent
-            };
+            var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             _migrationControl = new UiMigrationControl();
             _migrationControl.Initialize("MigrationControl", rootPanel);
             _migrationControl.OnRun += Migrate;
-            //_filterControl.OnChange += ReloadTypes;
 
             form.ShowDialog();
             form.Close();
@@ -382,7 +313,6 @@ namespace Iis.OntologyManager
             _schemaSources = GetSchemaSources();
             _uiControlsCreator.UpdateComboSource(cmbSchemaSources, _schemaSources);
             var src = new List<IOntologySchemaSource>(_schemaSources);
-            _uiControlsCreator.UpdateComboSource(cmbSchemaSourcesCompare, src);
         }
         private List<IOntologySchemaSource> GetSchemaSources()
         {
@@ -430,74 +360,6 @@ namespace Iis.OntologyManager
             {
                 MessageBox.Show(ex.Message);
             }
-        }
-        #endregion
-
-        #region Compare Logic
-        private void CompareSchemas()
-        {
-            var selectedSource = cmbSchemaSourcesCompare.SelectedItem;
-            if (selectedSource == null) return;
-            var schema = _schemaService.GetOntologySchema((IOntologySchemaSource)selectedSource);
-            _compareResult = _schema.CompareTo(schema);
-            txtComparison.Text = GetCompareText(_compareResult);
-        }
-        private string GetCompareText(string title, IEnumerable<string> lines)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("===============");
-            sb.AppendLine(title);
-            sb.AppendLine("===============");
-            foreach (var line in lines)
-            {
-                sb.AppendLine(line);
-            }
-
-            return sb.ToString();
-        }
-        private string GetCompareText(ISchemaCompareResult compareResult)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd.Select(item => item.GetStringCode())));
-            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete.Select(item => item.GetStringCode())));
-            sb.AppendLine("===============");
-            sb.AppendLine("NODES TO UPDATE");
-            sb.AppendLine("===============");
-            foreach (var item in compareResult.ItemsToUpdate)
-            {
-                sb.AppendLine(item.NodeTypeFrom.GetStringCode());
-                var differences = item.NodeTypeFrom.GetDifference(item.NodeTypeTo);
-                foreach (var diff in differences)
-                {
-                    sb.AppendLine($"{diff.PropertyName}:\n{diff.OldValue}\n{diff.NewValue}");
-                }
-                sb.AppendLine();
-            }
-            sb.AppendLine(GetCompareText("ALIASES TO ADD", compareResult.AliasesToAdd.Select(item => item.ToString())));
-            sb.AppendLine(GetCompareText("ALIASES TO DELETE", compareResult.AliasesToDelete.Select(item => item.ToString())));
-            sb.AppendLine(GetCompareText("ALIASES TO UPDATE", compareResult.AliasesToUpdate.Select(item => item.ToString())));
-            return sb.ToString();
-        }
-        private void UpdateComparedDatabase()
-        {
-            if (_compareResult == null) return;
-            if (MessageBox.Show($"Are you sure you want to update database {_compareResult.SchemaSource.Title}?", "Update Database", MessageBoxButtons.YesNo) == DialogResult.No)
-            {
-                return;
-            }
-            using var context = OntologyContext.GetContext(_compareResult.SchemaSource.Data);
-            var schema = _schemaService.GetOntologySchema(_compareResult.SchemaSource);
-            var schemaSaver = new OntologySchemaSaver(context);
-            var parameters = new SchemaSaveParameters
-            {
-                Create = cbComparisonCreate.Checked,
-                Update = cbComparisonUpdate.Checked,
-                Delete = cbComparisonDelete.Checked,
-                Aliases = cbComparisonAliases.Checked
-            };
-
-            schemaSaver.SaveToDatabase(_compareResult, schema, parameters);
-            CompareSchemas();
         }
         #endregion
 

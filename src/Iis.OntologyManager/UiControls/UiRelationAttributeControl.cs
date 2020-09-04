@@ -17,7 +17,6 @@ namespace Iis.OntologyManager.UiControls
         private ComboBox cmbEmbedding;
         private ComboBox cmbScalarType;
         private Button btnSave;
-        private UiControlsCreator _uiControlsCreator;
 
         public event Action<INodeTypeUpdateParameter> OnSave;
         public UiRelationAttributeControl(UiControlsCreator uiControlsCreator)

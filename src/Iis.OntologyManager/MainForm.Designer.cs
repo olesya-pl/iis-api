@@ -138,7 +138,6 @@ namespace Iis.OntologyManager
         private System.Windows.Forms.DataGridView gridTypes;
         private System.Windows.Forms.Button btnCompare;
         private System.Windows.Forms.ComboBox cmbSchemaSources;
-        private System.Windows.Forms.ComboBox cmbSchemaSourcesCompare;
         private System.Windows.Forms.Panel panelMeta;
         private TextBox txtId;
         private TextBox txtName;

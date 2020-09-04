@@ -22,7 +22,6 @@ namespace Iis.OntologyManager.UiControls
         private ContextMenuStrip menuChildren;
         private DataGridView gridChildren;
         private Button btnSave;
-        private UiControlsCreator _uiControlsCreator;
         private CheckBox cbAbstract;
 
         public event Action<IChildNodeType> OnShowRelationType;
