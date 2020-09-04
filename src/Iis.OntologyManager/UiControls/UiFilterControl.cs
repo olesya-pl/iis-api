@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -18,15 +19,12 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbFilterRelations;
         TextBox txtFilterName;
 
-        public int Width => _container.Right + _style.MarginHor;
-        public int Height => _container.Bottom + _style.MarginVer * 2;
-
         public delegate void OnChangeHandler(IGetTypesFilter filter);
         public event OnChangeHandler OnChange;
 
         protected override void CreateControls()
         {
-            _container.SetColWidth(_style.ButtonWidthDefault);
+            _container.SetColWidth(_style.ButtonWidthDefault / 2);
             _container.Add(cbFilterEntities = new CheckBox {
                 Text = "Entities",
                 Checked = true,
@@ -48,6 +46,13 @@ namespace Iis.OntologyManager.UiControls
             _container.GoToNewColumn();
             _container.Add(txtFilterName = new TextBox(), "Name");
             txtFilterName.TextChanged += OnUserInput;
+
+            Log.Logger.Verbose("Filter controls:");
+            foreach (Control control in _container.RootControl.Controls)
+            {
+                Log.Logger.Verbose($"... {control.GetType()}");
+                Log.Logger.Verbose($"... ({control.Left},{control.Top},{control.Width},{control.Height})");
+            }
         }
         public void OnUserInput(object sender, EventArgs e)
         {

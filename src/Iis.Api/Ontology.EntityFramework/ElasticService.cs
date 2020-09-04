@@ -188,13 +188,24 @@ namespace IIS.Core.Ontology.EntityFramework
             if (historicalHighlights == null)
                 return actualHighlights;
 
-            var result = (JObject)historicalHighlights.DeepClone();
+            var result = DeepCloneWithNewPrefix(historicalHighlights, "historical");
             foreach (var item in ((JObject)actualHighlights).Children<JProperty>())
             {
                 if (item.Name == "Id" && item.Value[0].Value<string>().Contains(entityId))
                     continue;
 
                 result.TryAdd(item.Name, item.Value);
+            }
+
+            return result;
+        }
+
+        private JObject DeepCloneWithNewPrefix(JToken token, string prefix)
+        {
+            var result = new JObject();
+            foreach (var jProp in token.Children<JProperty>())
+            {
+                result.Add($"{prefix}.{jProp.Name}", jProp.Value);
             }
 
             return result;

@@ -11,7 +11,7 @@ namespace Iis.UnitTests.Iis.OntologySchema
 {
     public class OntologySchemaTests
     {
-        [Fact(Skip ="Should be fixed")]
+        [Fact]
         public void CreateEntityTest()
         {
             var schema = Utils.GetEmptyOntologySchema();

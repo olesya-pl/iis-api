@@ -25,7 +25,9 @@ using System.Linq;
 using Iis.Services.Contracts.Dtos;
 using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
+using Iis.Interfaces.Ontology.Data;
 using Contracts = Iis.Services.Contracts;
+
 namespace Iis.Api
 {
     public class AutoMapperProfile: Profile
@@ -280,6 +282,9 @@ namespace Iis.Api
 
             CreateMap<IIS.Core.GraphQL.ML.MachineLearningHadnlersCountInput, IIS.Core.GraphQL.ML.MachineLearningHadnlersCountResult>();
 
+            CreateMap<INodeBase, NodeEntity>();
+            CreateMap<IRelationBase, RelationEntity>();
+            CreateMap<IAttributeBase, AttributeEntity>();
             //annotations: graph ql input -> domain
             CreateMap<IIS.Core.GraphQL.Annotations.AnnotationInput, Contracts.Annotations.Annotation>();
 

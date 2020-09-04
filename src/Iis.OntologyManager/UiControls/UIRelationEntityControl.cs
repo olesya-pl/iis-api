@@ -18,7 +18,6 @@ namespace Iis.OntologyManager.UiControls
         private ComboBox cmbTargetType;
         private Button btnSave;
         Func<List<INodeTypeLinked>> _getAllEntities;
-        UiControlsCreator _uiControlsCreator;
         public event Action<INodeTypeUpdateParameter> OnSave;
         public UiRelationEntityControl(UiControlsCreator uiControlsCreator, Func<List<INodeTypeLinked>> getAllEntities)
         {

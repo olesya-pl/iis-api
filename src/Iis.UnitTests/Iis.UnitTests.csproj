@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.DirectoryServices.Protocols" Version="4.7.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
@@ -23,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Api\Iis.Api.csproj" />
+    <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
@@ -32,6 +34,7 @@
 
   <ItemGroup>
     <Folder Include="Iis.Ontology.OntologyEnum\" />
+    <Folder Include="Iis.OntologyData\" />
   </ItemGroup>
 
 </Project>

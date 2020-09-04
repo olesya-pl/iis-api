@@ -48,6 +48,9 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsObjectOfStudy { get; }
         bool IsEvent { get; }
         bool IsObjectSign { get; }
+        bool IsEnum { get; }
+        bool IsSeparateObject { get; }
         INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts);
+        IRelationTypeLinked GetRelationTypeByName(string name);
     }
 }
