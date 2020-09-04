@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using Iis.Domain;
-using Newtonsoft.Json.Linq;
+using IIS.Core.GraphQL.Common;
 
 namespace Iis.Api.Ontology
 {
     public class AssociatedEventsQuery
     {
-        public async Task<IEnumerable<EventAssociatedWithEntity>> GetEventsAssociatedWithEntity(
+        public async Task<GraphQLCollection<EventAssociatedWithEntity>> GetEventsAssociatedWithEntity(
             [Service] IOntologyService ontologyService,
             [Service] NodeToJObjectMapper nodeToJObjectMapper,
             [GraphQLNonNullType] Guid entityId
@@ -18,7 +17,8 @@ namespace Iis.Api.Ontology
         {
             var entities = await ontologyService.GetEventsAssociatedWithEntity(entityId);
 
-            return await Task.WhenAll(entities.Select(p => nodeToJObjectMapper.EventToAssociatedWithEntity(p)));
+            var res = await Task.WhenAll(entities.Select(p => nodeToJObjectMapper.EventToAssociatedWithEntity(p)));
+            return new GraphQLCollection<EventAssociatedWithEntity>(res, res.Count());
         }
     }
 }
