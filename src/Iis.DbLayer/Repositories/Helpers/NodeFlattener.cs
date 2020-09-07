@@ -58,7 +58,7 @@ namespace Iis.DbLayer.Repositories.Helpers
                 NodeTypeTitle = nodeTypeTitle,
                 EntityTypeName = nodeEntity.NodeType.Name,
                 AttributeValue = GetAttributeValue(nodeEntity),
-                ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType,
+                ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
                 Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedRelationIds, cancellationToken)
@@ -70,7 +70,7 @@ namespace Iis.DbLayer.Repositories.Helpers
         {
             if (nodeEntity.Attribute == null) return null;
 
-            var scalarType = nodeEntity.NodeType.IAttributeTypeModel.ScalarType;
+            var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
             switch (scalarType)
             {

@@ -30,7 +30,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return Context.Nodes
                 .Include(n => n.Attribute)
                 .Include(n => n.NodeType)
-                .ThenInclude(nt => nt.IAttributeTypeModel)
+                .ThenInclude(nt => nt.AttributeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.NodeType)
