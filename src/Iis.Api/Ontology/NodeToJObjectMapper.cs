@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Iis.Domain;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Api.Ontology
@@ -24,7 +25,7 @@ namespace Iis.Api.Ontology
 
             foreach (var attribute in node.GetChildAttributes())
             {
-                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
+                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value.ToString()));
             }
 
             return result;
