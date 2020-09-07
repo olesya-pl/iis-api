@@ -321,7 +321,7 @@ namespace Iis.Elastic
                 if (IsExactQuery(searchItem.Query))
                 {
                     var shouldSection = CreateExactShouldSection(searchItem.Query, searchParams.IsLenient);
-                    shouldSections.Merge(shouldSection);
+                    shouldSections.Add(shouldSection);
                 }
                 else if (searchItem.Fields?.Any() == true)
                 {
@@ -331,7 +331,7 @@ namespace Iis.Elastic
                 else
                 {
                     var shouldSection = CreateFallbackShouldSection(searchItem.Query, searchParams.IsLenient);
-                    shouldSections.Merge(shouldSection);
+                    shouldSections.Add(shouldSection);
                 }
             }
 
@@ -383,15 +383,12 @@ namespace Iis.Elastic
 
         private JObject CreateExactShouldSection(string query, bool isLenient) 
         {
-            var result = new JObject
-            {
-                ["query"] = new JObject()
-            };
+            var result = new JObject();
 
             var queryString = new JObject();
             queryString["query"] = query;
             queryString["lenient"] = isLenient;
-            result["query"]["query_string"] = queryString;
+            result["query_string"] = queryString;
 
             return result;
         }
