@@ -5,13 +5,6 @@ using System;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
-    //public class GeoCoordinatesResponse ObjectType<Relation>
-    //{
-    //    public TypeKind Kind => TypeKind.Object;
-
-    //    public decimal Latitude { get; set; }
-    //    public decimal Longitude { get; set; }
-    //}
     public class RelationType : ObjectType<Relation>
     {
         protected override void Configure(IObjectTypeDescriptor<Relation> descriptor)

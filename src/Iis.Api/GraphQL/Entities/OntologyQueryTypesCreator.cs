@@ -1,16 +1,12 @@
-using System;
-using System.Linq;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.Common;
+using Iis.Domain;
+using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
-using IIS.Core.Ontology;
-using Iis.Domain;
+using System;
+using System.Linq;
 using RelationType = IIS.Core.GraphQL.Entities.ObjectTypes.RelationType;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Interfaces.Ontology;
-using System.Collections.Generic;
-using Iis.Domain.ExtendedData;
 
 namespace IIS.Core.GraphQL.Entities
 {

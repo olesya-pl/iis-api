@@ -178,11 +178,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public async Task<List<IGeoCoordinates>> ResolveCoordinates(IResolverContext ctx) 
         {
-            var node = ctx.Parent<Node>();
+            var parentNode = ctx.Parent<Node>();
             var extNodeService = ctx.Service<IExtNodeService>();
 
-            var extNode = await extNodeService.GetExtNodeAsync(node.Id);
-
+            var extNode = await extNodeService.GetExtNodeAsync(parentNode.Id);
             return extNode.GetCoordinates();
         }
     }
