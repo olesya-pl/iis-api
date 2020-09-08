@@ -24,6 +24,9 @@ namespace IIS.Core.GraphQL.Reports
         public async Task<Report> GetReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
             var dbReport = await context.Reports.Include(r => r.ReportEvents).SingleOrDefaultAsync(r => r.Id == id);
+
+            if(dbReport is null) return null;
+            
             return new Report(dbReport);
         }
     }

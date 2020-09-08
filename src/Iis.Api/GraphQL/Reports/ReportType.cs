@@ -54,8 +54,12 @@ namespace IIS.Core.GraphQL.Reports
                 .Resolver(async ctx => {
 
                     var materialProvider = ctx.Service<IMaterialProvider>();
+                    
                     var mapper = ctx.Service<IMapper>();
+
                     var report = ctx.Parent<Report>();
+
+                    if(!report.EventIds.Any()) return new List<RelatedMaterialsItem>();
 
                     var tasks = report.EventIds.Select(async eventId => {
                             
