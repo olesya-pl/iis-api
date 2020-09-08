@@ -8,5 +8,6 @@ namespace Iis.Domain
         public string RelationTypeTitle { get; set; }
         public Guid EntityId { get; set; }
         public string EntityTypeName { get; set; }
+        public Node Entity { get; set; }
     }
 }

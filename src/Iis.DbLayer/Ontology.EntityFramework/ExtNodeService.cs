@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
-    public class ExtNodeService<TUnitOfWork> : BaseService<TUnitOfWork>, IExtNodeService where TUnitOfWork : IIISUnitOfWork 
+    public class ExtNodeService<TUnitOfWork> : BaseService<TUnitOfWork>, IExtNodeService where TUnitOfWork : IIISUnitOfWork
     {
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly OntologyContext _context;
 
-        public ExtNodeService(OntologyContext context, 
+        public ExtNodeService(OntologyContext context,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _context = context;
@@ -46,7 +46,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 nodeEntity,
                 nodeEntity.NodeType.Name,
                 nodeEntity.NodeType.Title,
-                new List<Guid>(),
+                id,
                 ct);
             return extNode;
         }
@@ -55,7 +55,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             NodeEntity nodeEntity,
             string nodeTypeName,
             string nodeTypeTitle,
-            List<Guid> visitedRelationIds,
+            Guid rootNodeId,
             CancellationToken cancellationToken = default)
         {
             var extNode = new ExtNode
@@ -69,7 +69,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
-                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedRelationIds, cancellationToken)
+                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, rootNodeId, cancellationToken)
             };
             return extNode;
         }
@@ -102,22 +102,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private async Task<List<ExtNode>> GetExtNodesByRelations(
             IEnumerable<RelationEntity> relations,
-            List<Guid> visitedRelationIds,
+            Guid rootNodeId,
             CancellationToken cancellationToken = default)
         {
             var result = new List<ExtNode>();
             foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.Node.NodeType.IsArchived
                 && !r.TargetNode.IsArchived && !r.TargetNode.NodeType.IsArchived))
             {
-                if (!visitedRelationIds.Contains(relation.Id))
+                var node = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(relation.TargetNodeId));
+                if (node.Id != rootNodeId)
                 {
-                    visitedRelationIds.Add(relation.Id);
-                    var node = await RunWithoutCommitAsync(uow => uow.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(relation.TargetNodeId));
                     var extNode = await MapExtNodeAsync(
                         node,
                         relation.Node.NodeType.Name,
                         relation.Node.NodeType.Title,
-                        visitedRelationIds,
+                        rootNodeId,
                         cancellationToken);
                     result.Add(extNode);
                 }

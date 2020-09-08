@@ -4,22 +4,19 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
 using Newtonsoft.Json.Linq;
-using Microsoft.EntityFrameworkCore;
 
 using IIS.Core.Files;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
-using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DbLayer.Repositories;
-using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
-using IIS.Repository.UnitOfWork;
 using System.Threading;
+using Iis.DbLayer.MaterialEnum;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -133,7 +130,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)
         {
-            var material = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(input.Id));
+            var material = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(input.Id, new[] { MaterialIncludeEnum.WithChildren }));
 
             if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
             if (input.ImportanceId.HasValue) material.ImportanceSignId = input.ImportanceId.Value;
@@ -155,8 +152,17 @@ namespace IIS.Core.Materials.EntityFramework
             material.LoadData = loadData.ToJson();
 
             await UpdateMaterialAsync(material);
+            QueueMaterialChildrenForMl(material);
 
             return await _materialProvider.GetMaterialAsync(input.Id);
+        }
+
+        private void QueueMaterialChildrenForMl(MaterialEntity material)
+        {
+            foreach (var child in material.Children)
+            {
+                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = child.Id, Source = child.Source, Type = child.Type });
+            }
         }
 
         public async Task UpdateMaterialAsync(MaterialEntity material)

@@ -322,15 +322,15 @@ namespace Iis.OntologySchema
         private void ValidateNodeTypeUpdateParameter(INodeTypeUpdateParameter updateParameter)
         {
             var regex = new Regex("^[A-Za-z0-9_]+$");
-            if (!regex.IsMatch(updateParameter.Name))
+            if (!string.IsNullOrEmpty(updateParameter.Name) && !regex.IsMatch(updateParameter.Name))
             {
                 throw new Exception("Имя должно состоять из букв, цифр и символа подчеркивания");
             }
-            if (updateParameter.Id == null && updateParameter.ParentTypeId != null 
-                && GetNodeTypeById((Guid)updateParameter.ParentTypeId).GetAllChildren().Any(ch => ch.Name == updateParameter.Name))
-            {
-                throw new Exception("Поле с таким именем у данного объекта уже существует");
-            }
+            //if (updateParameter.Id == null && updateParameter.ParentTypeId != null)
+            //    && GetNodeTypeById((Guid)updateParameter.ParentTypeId).GetAllChildren().Any(ch => ch.Name == updateParameter.Name))
+            //{
+            //    throw new Exception("Поле с таким именем у данного объекта уже существует");
+            //}
         }
 
         public void UpdateTargetType(Guid relationTypeId, Guid targetTypeId)

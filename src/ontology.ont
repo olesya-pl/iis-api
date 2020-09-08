@@ -2461,18 +2461,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "c732d9af-f716-49dc-95ed-43b871652aa1",
-      "Name": "amount",
-      "Title": "Чисельність",
-      "Meta": "{\n  \"SortOrder\": 8,\n  \"AcceptsEntityOperations\": [0,1,2],\n  \"Multiple\": false\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "cb2acbef-e7f3-42ad-953a-b0309016397f",
       "Name": "relatesToCountry",
       "Title": "Державна приналежність",
@@ -13993,18 +13981,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "2ab45cfd-4150-4159-904b-f37d231baeab",
-      "Name": "country",
-      "Title": "Країна",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "3c04be99-5f0a-4e41-a16b-4e52c0ea3a75",
       "Name": "Is",
       "Title": null,
@@ -17944,7 +17920,7 @@
       "Id": "0ee6dee5-fdac-4ba0-bda0-254bd33b2de6",
       "Name": "amount",
       "Title": "Чисельність",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [0,1,2],\n  \"FormField\": {\n    \"Type\": \"dropdown\"\n  }\n}",
+      "Meta": "{\n  \"FormField\": {\n    \"Type\": \"dropdown\",\n    \"HasIndexColumn\": false\n  },\n  \"Multiple\": false\n}",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -18141,6 +18117,42 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "8fa5ba4c-6580-4f6c-b39a-721dfe2e098c",
+      "Name": "temporaryDislocation",
+      "Title": "Пункт тимчасової дислокації (ПТД)",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [0,1,2],\n  \"FormField\": {\n    \"Type\": \"form\"\n  },\n  \"Container\": {\n    \"Title\": \"Тимчасова дислокація\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": false\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "bb28cea1-e2d8-43a9-b9d0-62cecfa08d13",
+      "Name": "country",
+      "Title": "Країна",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "c732d9af-f716-49dc-95ed-43b871652aa1",
+      "Name": "amount",
+      "Title": "Чисельність",
+      "Meta": "{\n  \"SortOrder\": 8,  \n  \"FormField\": {\n    \"Type\": \"dropdown\",\n    \"HasIndexColumn\": false\n  },\n  \"Multiple\": false,\n\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     }
@@ -18950,13 +18962,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "a67b70ba-5ea3-4171-b4fc-e8cd1e69d53b",
       "TargetTypeId": "f245afe7-8ac5-490b-be4e-7bf18a2dd895"
-    },
-    {
-      "Id": "c732d9af-f716-49dc-95ed-43b871652aa1",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "a67b70ba-5ea3-4171-b4fc-e8cd1e69d53b",
-      "TargetTypeId": "c0cbd1d5-231f-4ba5-a90e-3696be5df903"
     },
     {
       "Id": "cb2acbef-e7f3-42ad-953a-b0309016397f",
@@ -23656,13 +23661,6 @@
       "TargetTypeId": "874c728c-c959-4b1f-ae95-50d6ca1a4181"
     },
     {
-      "Id": "2ab45cfd-4150-4159-904b-f37d231baeab",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "12714279-135c-4e93-af46-43235f9f94b9",
-      "TargetTypeId": "819b5095-0730-4d2f-af44-1a1a66e3000e"
-    },
-    {
       "Id": "cdb96edf-f230-4609-9d90-5523d53355cf",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -23731,6 +23729,27 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
       "TargetTypeId": "e041782a-612c-4837-ac72-c2ebe3af5a5e"
+    },
+    {
+      "Id": "8fa5ba4c-6580-4f6c-b39a-721dfe2e098c",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
+      "TargetTypeId": "cd62d134-8c70-4ae6-8441-f62aeee8abd4"
+    },
+    {
+      "Id": "bb28cea1-e2d8-43a9-b9d0-62cecfa08d13",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
+      "TargetTypeId": "819b5095-0730-4d2f-af44-1a1a66e3000e"
+    },
+    {
+      "Id": "c732d9af-f716-49dc-95ed-43b871652aa1",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "a67b70ba-5ea3-4171-b4fc-e8cd1e69d53b",
+      "TargetTypeId": "c0cbd1d5-231f-4ba5-a90e-3696be5df903"
     }
   ],
   "AttributeTypes": [

@@ -57,7 +57,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 SaveRelations(source, nodeEntity);
                 Run((unitOfWork) => unitOfWork.OntologyRepository.AddNode(nodeEntity));
             }
-            if (requestId.HasValue) 
+            if (requestId.HasValue)
             {
                 await Task.WhenAll(_elasticService.PutNodeAsync(source.Id), _elasticService.PutHistoricalNodesAsync(source.Id, requestId));
             }
@@ -463,15 +463,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var relations = await RunWithoutCommitAsync(async unitOfWork =>
                    await unitOfWork.OntologyRepository.GetIncomingRelations(entityId));
 
-            return relations
+            var res = relations
                 .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
                 .Select(p => new IncomingRelation
+                {
+                    RelationTypeName = p.Node.NodeType.Name,
+                    RelationTypeTitle = p.Node.NodeType.Title,
+                    EntityId = p.SourceNodeId,
+                    EntityTypeName = p.SourceNode.NodeType.Name
+                }).ToList();
+
+            var resNodes = (await LoadNodesAsync(res.Select(p => p.EntityId), null)).ToDictionary(p => p.Id);
+
+            foreach (var item in res)
             {
-                RelationTypeName = p.Node.NodeType.Name,
-                RelationTypeTitle = p.Node.NodeType.Title,
-                EntityId = p.SourceNodeId,
-                EntityTypeName = p.SourceNode.NodeType.Name
-            }).ToList();
+                if (resNodes.ContainsKey(item.EntityId))
+                {
+                    item.Entity = resNodes[item.EntityId];
+                }
+
+            }
+
+            return res;
         }
     }
 }

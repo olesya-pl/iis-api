@@ -1,12 +1,17 @@
-using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
+using IIS.Core.GraphQL.Materials;
+using IIS.Core.GraphQL.Common;
 using IIS.Core.Ontology;
+using IIS.Core.Materials;
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Iis.Domain;
 using IIS.Domain;
+using AutoMapper;
 
 namespace IIS.Core.GraphQL.Reports
 {
@@ -43,6 +48,40 @@ namespace IIS.Core.GraphQL.Reports
                     var nodes = await service.LoadNodesAsync(report.EventIds, null);
                     return nodes.Cast<Entity>();
                 });
+            descriptor
+                .Field("relatedMaterials")
+                .Type(typeof(NonNullType<ListType<NonNullType<ObjectType<RelatedMaterialsItem>>>>))
+                .Resolver(async ctx => {
+
+                    var materialProvider = ctx.Service<IMaterialProvider>();
+                    
+                    var mapper = ctx.Service<IMapper>();
+
+                    var report = ctx.Parent<Report>();
+
+                    if(!report.EventIds.Any()) return new List<RelatedMaterialsItem>();
+
+                    var tasks = report.EventIds.Select(async eventId => {
+                            
+                            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(eventId);
+
+                            var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+
+                            return (Event:eventId, Materials: new GraphQLCollection<Material>(materials, materialsResult.Count));
+                        });
+
+                    var relatedMaterials = await Task.WhenAll(tasks);
+
+                    return relatedMaterials
+                    .Select(m => {
+                        return new RelatedMaterialsItem
+                        {
+                            EventId = m.Event,
+                            Materials = m.Materials
+                        };
+                    });
+                });
+            
         }
     }
 }

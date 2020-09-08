@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.DataModel
 {
-    public class NodeEntity : BaseEntity
+    public class NodeEntity : BaseEntity, INodeBase
     {
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
@@ -21,7 +23,6 @@ namespace Iis.DataModel
         public virtual RelationEntity Relation { get; set; }
 
         public List<MaterialFeatureEntity> MaterialFeatures { get; set; }
-
         public ICollection<ReportEventEntity> ReportEvents { get; internal set; }
     }
 }

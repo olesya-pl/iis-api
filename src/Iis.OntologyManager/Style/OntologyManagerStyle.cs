@@ -23,16 +23,27 @@ namespace Iis.OntologyManager.Style
         public Font DefaultFont { get; set; }
         public Font SelectedFont { get; set; }
         public Font TypeHeaderNameFont { get; set; }
-        public static IOntologyManagerStyle GetDefaultStyle()
+        //public float CharacterHeight { get; set; }
+        //public float CharacterWidth { get; set; }
+        public static IOntologyManagerStyle GetDefaultStyle(Control control)
         {
+            SizeF size;
+
+            using (var graphics = control.CreateGraphics())
+            {
+                size = graphics.MeasureString("abcdefghij", control.Font);
+            }
+            var charWidth = size.Width / 10;
+            var charHeight = size.Height;
+
             return new OntologyManagerStyle
             {
-                MarginVer = 16,
-                MarginVerSmall = 8,
-                MarginHor = 40,
-                ControlWidthDefault = 410,
-                ButtonHeightDefault = 50,
-                ButtonWidthDefault = 200,
+                MarginVer = (int)(charHeight / 8),
+                MarginVerSmall = (int)(charHeight / 16),
+                MarginHor = (int)(charWidth * 2),
+                ControlWidthDefault = (int)(charWidth * 34),
+                ButtonHeightDefault = (int)(charHeight * 2),
+                ButtonWidthDefault = (int)(charWidth * 34),
                 BackgroundColor = Color.LightYellow,
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,

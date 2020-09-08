@@ -61,6 +61,7 @@ namespace Iis.OntologyManager.UiControls
         {
             var panelTop = new Panel
             {
+                Name = $"{rootPanel.Name}_Top",
                 Location = new Point(margin, margin),
                 Size = new Size(rootPanel.Width - margin * 2, topPanelWidth),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
@@ -70,6 +71,7 @@ namespace Iis.OntologyManager.UiControls
 
             var panelBottom = new Panel
             {
+                Name = $"{rootPanel.Name}_Bottom",
                 Location = new Point(margin, panelTop.Bottom + margin),
                 Size = new Size(rootPanel.Width - margin * 2, rootPanel.Height - panelTop.Bottom - margin * 2),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
@@ -111,7 +113,7 @@ namespace Iis.OntologyManager.UiControls
                 BackColor = _style.BackgroundColor
             };
             form.Controls.Add(rootPanel);
-            var container = new UiContainerManager(rootPanel, _style);
+            var container = new UiContainerManager("ModalComboBox", rootPanel);
             var comboBox = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
@@ -129,9 +131,21 @@ namespace Iis.OntologyManager.UiControls
             return form.ShowDialog() == DialogResult.OK ? (T)comboBox.SelectedItem : null;
         }
 
-        public Panel GetFillPanel(Panel parent, bool visible = true)
+        public Panel GetFillPanel(Control parent, bool visible = true)
         {
-            var panel = new Panel { Dock = DockStyle.Fill, Visible = visible };
+            var marginVer = 20;
+            var panel = new Panel
+            {
+                Parent = parent,
+                Top = marginVer,
+                Left = 0,
+                Width = parent.Width,
+                Height = parent.Height - marginVer,
+                Dock = DockStyle.None,
+                BackColor = Color.OrangeRed,
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom,
+                Visible = visible
+            };
             parent.Controls.Add(panel);
             return panel;
         }
@@ -159,6 +173,16 @@ namespace Iis.OntologyManager.UiControls
                     return;
                 }
             }
+        }
+        public Form GetModalForm(Form parent)
+        {
+            return new Form()
+            {
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Width = parent.Width - 20,
+                Height = parent.Height - 20,
+                StartPosition = FormStartPosition.CenterParent
+            };
         }
     };
 }

@@ -21,6 +21,7 @@ namespace Iis.DbLayer.Repositories.Helpers
         public async Task<FlattenNodeResult> FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {
             var extNode = await _extNodeService.GetExtNodeAsync(id, cancellationToken);
+
             return new FlattenNodeResult
             {
                 SerializedNode = _elasticSerializer.GetJsonByExtNode(extNode),

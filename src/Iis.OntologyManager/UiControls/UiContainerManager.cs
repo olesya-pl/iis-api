@@ -1,4 +1,5 @@
 ﻿using Iis.OntologyManager.Style;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -20,17 +21,21 @@ namespace Iis.OntologyManager.UiControls
 
         private int _left;
         private int _colWidth;
-        private int TopOfFirst => _rect.Top + _style.MarginVer * 2;
+        private int TopOfFirst => _rect.Top + _style.MarginVer;
         public bool AutoWidth { get; set; } = true;
+        public string Name { get; private set; }
+        public Control RootControl => _rootControl;
 
-        public UiContainerManager(Control rootControl, IOntologyManagerStyle style, Rectangle? rect = null)
+        public UiContainerManager(string name, Control rootControl, Rectangle? rect = null)
         {
+            Name = name;
             _rootControl = rootControl;
-            _style = style;
+            _style = OntologyManagerStyle.GetDefaultStyle(rootControl);
             _rect = rect ?? rootControl.ClientRectangle;
             Top = TopOfFirst;
             _left = _rect.Left + _style.MarginHor;
             _colWidth = _style.ControlWidthDefault;
+            Log.Logger.Verbose($"UiContainerManager {name} created on panel {rootControl.Name}");
         }
 
         public void AddToRoot(Control control)
@@ -42,6 +47,11 @@ namespace Iis.OntologyManager.UiControls
 
         public Label Add(Control control, string labelText = null, bool stretchToDown = false)
         {
+            Log.Logger.Verbose($"{Name} add...");
+            Log.Logger.Verbose($"... control type = {control.GetType()}");
+            Log.Logger.Verbose($"... labelText = {labelText}");
+            Log.Logger.Verbose($"... stretchToDown = {stretchToDown}");
+
             Label label = null;
             if (!string.IsNullOrEmpty(labelText))
             {
@@ -72,6 +82,9 @@ namespace Iis.OntologyManager.UiControls
             }
             Top = control.Bottom + _style.MarginVer;
             AddToRoot(control);
+            Log.Logger.Verbose($"<= Top = {Top}");
+            Log.Logger.Verbose($"<= Bottom = {_bottom}");
+            Log.Logger.Verbose($"<= Left = {_left}");
             return label;
         }
 
