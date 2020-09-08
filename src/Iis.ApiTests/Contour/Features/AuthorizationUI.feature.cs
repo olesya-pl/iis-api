@@ -166,9 +166,6 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I must see the specific text Пароль або імʼя користувача вказані невірно. in the " +
                         "text .error-message block on the page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 18
- testRunner.Then("I see the http://qa.contour.net/login link in the browser navigation bar", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
             }
             this.ScenarioCleanup();
         }

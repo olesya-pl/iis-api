@@ -91,10 +91,12 @@ namespace IIS.Core.GraphQL.Entities
             var objectType = _repository.GetOntologyType(type);
             var collectionType =
                 new CollectionType(OntologyObjectType.GetName(type), objectType); // TODO: new NonNullType() won't work
+            
             descriptor.Field($"entity{type.Name}")
                 .Type(objectType)
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntity(ctx, type));
+            
             var criteriaInput = new CriteriaInputType(type);
             descriptor.Field($"entity{type.Name}List")
                 .Type(collectionType)

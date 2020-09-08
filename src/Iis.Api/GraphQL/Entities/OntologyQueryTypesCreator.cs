@@ -8,6 +8,9 @@ using IIS.Core.Ontology;
 using Iis.Domain;
 using RelationType = IIS.Core.GraphQL.Entities.ObjectTypes.RelationType;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.Ontology;
+using System.Collections.Generic;
+using Iis.Domain.ExtendedData;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -33,6 +36,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedAt(ctx));
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveUpdatedAt(ctx));
             d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
+            d.Field("coordinates").Type<ListType<ObjectType<IGeoCoordinates>>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCoordinates(ctx));
         }
 
         protected void OnRelation(IEmbeddingRelationTypeModel relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
