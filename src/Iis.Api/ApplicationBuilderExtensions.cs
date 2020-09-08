@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Iis.DataModel;
 using Iis.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,7 @@ namespace Iis.Api
                     var serviceProvider = serviceScope.ServiceProvider;
                     var ontologyModel = serviceProvider.GetRequiredService<IOntologyModel>();
                     var ontologyService = serviceProvider.GetRequiredService<IOntologyService>();
+                    var context = serviceProvider.GetRequiredService<OntologyContext>();
 
                     var amountType = ontologyModel.EntityTypes.FirstOrDefault(p => p.Name == "MilitaryAmount");
 
@@ -48,13 +50,22 @@ namespace Iis.Api
                     {
                         var nodes = ontologyService.GetEntitiesByUniqueValue(amountType.Id, militaryAmount.Name, "name")
                             .GetAwaiter().GetResult();
-                        nodes.Select(amount => {
-                                amount.SetProperty("code", militaryAmount.Code);
-                                amount.SetProperty("name", militaryAmount.Name);
-                                ontologyService.SaveNodeAsync(amount).GetAwaiter().GetResult();
-                                return amount;
-                            });
+                        var amount = nodes.First();
+                        amount.SetProperty("code", militaryAmount.Code);
+                        amount.SetProperty("name", militaryAmount.Name);
+                        ontologyService.SaveNodeAsync(amount).GetAwaiter().GetResult();
 
+                        var redundantAmountIds = nodes.Skip(1).Select(p => p.Id).ToList();
+                        if (redundantAmountIds.Any())
+                        {
+                            var relationsToUpdate = context.Relations.Where(p => redundantAmountIds.Contains(p.TargetNodeId));
+                            foreach (var relation in relationsToUpdate)
+                            {
+                                relation.TargetNodeId = amount.Id;
+                            }
+                            context.Nodes.RemoveRange(context.Nodes.Where(p => redundantAmountIds.Contains(p.Id)));
+                            context.SaveChanges();
+                        }
                     }
                 }
             }
