@@ -79,21 +79,45 @@ namespace Iis.Domain
                 var children = relation.GetChildAttributes();
                 foreach (var child in children)
                 {
-                    var sb = new StringBuilder();
-                    if (this.Type is IRelationTypeModel)
-                    {
-                        sb.Append(this.Type.Name);
-                    }
+                    result.Add((child.attribute, GetDotName(child)));
+                }
+            }
+            return result;
+        }
 
-                    if (child.dotName != null)
-                    {
-                        if (sb.Length > 0)
-                        {
-                            sb.Append(".");
-                        }
-                        sb.Append(child.dotName);
-                    }
-                    result.Add((child.attribute, sb.ToString()));
+        private string GetDotName((Attribute attribute, string dotName) child)
+        {
+            var sb = new StringBuilder();
+            if (this.Type is IRelationTypeModel)
+            {
+                sb.Append(this.Type.Name);
+            }
+
+            if (child.dotName != null)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(".");
+                }
+                sb.Append(child.dotName);
+            }
+
+            return sb.ToString();
+        }
+
+        public List<(Attribute Attribute, string DotName)> GetChildAttributesExcludingNestedObjects()
+        {
+            var result = new List<(Attribute, string)>();
+            if (this is Attribute)
+            {
+                result.Add((this as Attribute, null));
+            }
+            foreach (var relation in Nodes.Where(n => !n.Type.IsObjectOfStudy))
+            {
+                var children = relation.GetChildAttributesExcludingNestedObjects();
+                foreach (var child in children)
+                {
+                    result.Add((child.Attribute, GetDotName(child)));
                 }
             }
             return result;
