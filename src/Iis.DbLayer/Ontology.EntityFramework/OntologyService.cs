@@ -467,6 +467,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
                 .Select(p => new IncomingRelation
                 {
+                    RelationId = p.Node.Id,
                     RelationTypeName = p.Node.NodeType.Name,
                     RelationTypeTitle = p.Node.NodeType.Title,
                     EntityId = p.SourceNodeId,

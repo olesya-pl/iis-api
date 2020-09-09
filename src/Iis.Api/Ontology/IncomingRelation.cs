@@ -8,6 +8,8 @@ namespace Iis.Api.Ontology
 {
     public class IncomingRelation
     {
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public Guid RelationId { get; set; }
         public string RelationTypeName { get; set; }
         public string RelationTypeTitle { get; set; }
         [GraphQLType(typeof(NonNullType<IdType>))]
