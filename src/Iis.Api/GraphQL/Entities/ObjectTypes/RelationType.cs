@@ -1,8 +1,7 @@
-using System;
 using HotChocolate;
 using HotChocolate.Types;
-using IIS.Core.Ontology;
 using Iis.Domain;
+using System;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
