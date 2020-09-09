@@ -21,11 +21,21 @@ namespace Iis.Api.Ontology
 
         public JObject NodeToJObject(Node node)
         {
+            if (node == null)
+                return null;
+
             var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
 
-            foreach (var attribute in node.GetChildAttributes())
+            foreach (var attribute in node.GetChildAttributesExcludingNestedObjects().GroupBy(p => p.DotName))
             {
-                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value.ToString()));
+                if (attribute.Count() == 1)
+                {
+                    result.Add(new JProperty(attribute.Key, attribute.FirstOrDefault().Attribute.Value.ToString()));
+                }
+                else
+                {
+                    result.Add(new JProperty(attribute.Key, attribute.Select(p => p.Attribute.Value.ToString()).ToList()));
+                }
             }
 
             return result;
