@@ -13,6 +13,7 @@ namespace Iis.Api.Ontology
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid EntityId { get; set; }
         public string EntityTypeName { get; set; }
+        public string __typeName => $"Entity{EntityTypeName}";
         [GraphQLType(typeof(JsonScalarType))]
         public JObject Entity { get; set; }
     }
