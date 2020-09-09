@@ -11,6 +11,7 @@ namespace Iis.OntologySchema
 {
     public class OntologySchema: IOntologySchema
     {
+        private readonly string FuzzyDateEntityTypeName = EntityTypeNames.FuzzyDate.ToString();
         IMapper _mapper;
         SchemaStorage _storage;
         public IOntologySchemaSource SchemaSource { get; private set; }
@@ -400,22 +401,6 @@ namespace Iis.OntologySchema
             return new AttributeInfo(historicalEntityName, items);
         }
 
-        private List<AttributeInfoItem> BuildAttributesBasedOnEntityFileds(string entityName) 
-        {
-            var items = new List<AttributeInfoItem>();
-            foreach (var key in _storage.DotNameTypes.Keys.Where(key => key.StartsWith(entityName + ".")))
-            {
-                var nodeType = _storage.DotNameTypes[key];
-                if (nodeType.Kind != Kind.Attribute) continue;
-                var aliases = GetAlias(key)?.Split(',') ?? null;
-                var shortDotName = key.Substring(key.IndexOf('.') + 1);
-                var item = new AttributeInfoItem(shortDotName, nodeType.AttributeType.ScalarType, aliases);
-                items.Add(item);
-            }
-
-            return items;
-        }
-
         public void RemoveRelation(Guid relationId)
         {
             var relationType = _storage.RelationTypes[relationId];
@@ -428,14 +413,17 @@ namespace Iis.OntologySchema
             _storage.RemoveRelationType(relationType.Id);
             relationType._sourceType.RemoveRelationType(relationType.Id);
         }
+        
         public IEnumerable<INodeTypeLinked> GetAllNodeTypes()
         {
             return _storage.NodeTypes.Values;
         }
+        
         public void PutInOrder()
         {
             _storage.SetDotNameTypes();
         }
+        
         public string ValidateRemoveEntity(Guid id)
         {
             var nodeType = GetNodeTypeById(id);
@@ -451,9 +439,45 @@ namespace Iis.OntologySchema
             }
             return null;
         }
+        
         public void RemoveEntity(Guid id)
         {
             _storage.RemoveEntity(id);
+        }
+
+        private List<AttributeInfoItem> BuildAttributesBasedOnEntityFileds(string entityName) 
+        {
+            var items = new List<AttributeInfoItem>();
+            foreach (var key in _storage.DotNameTypes.Keys.Where(key => key.StartsWith(entityName + ".")))
+            {
+                var nodeType = _storage.DotNameTypes[key];
+
+                var isFuzzyDateEntity = IsFuzzyDateEntity(nodeType);
+
+                if (nodeType.Kind != Kind.Attribute && !isFuzzyDateEntity) continue;
+
+                if (nodeType.Kind == Kind.Attribute && IsFuzzyDateEntityAttribute(nodeType)) continue;
+                
+                var aliases = GetAlias(key)?.Split(',') ?? null;
+                var shortDotName = key.Substring(key.IndexOf('.') + 1);
+                var scalarType = isFuzzyDateEntity ? ScalarType.Date : nodeType.AttributeType.ScalarType;
+
+                var item = new AttributeInfoItem(shortDotName, scalarType, aliases);
+
+                items.Add(item);
+            }
+
+            return items;
+        }
+
+        private bool IsFuzzyDateEntity(SchemaNodeType nodeType)
+        {
+            return nodeType.Kind == Kind.Entity && nodeType.Name == FuzzyDateEntityTypeName;
+        }
+
+        private bool IsFuzzyDateEntityAttribute(SchemaNodeType nodeType)
+        {
+            return nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Any(i => i.SourceType.Name == FuzzyDateEntityTypeName);
         }
     }
 }
