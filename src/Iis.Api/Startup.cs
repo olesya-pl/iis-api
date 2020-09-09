@@ -176,7 +176,7 @@ namespace IIS.Core
             services.AddTransient<IOntologySchemaSource, OntologySchemaSource>();
             services.AddTransient<MutationUpdateResolver>();
             services.AddTransient<MutationDeleteResolver>();
-            services.AddTransient<IExtNodeService, ExtNodeService>();
+            services.AddTransient<IExtNodeService, ExtNodeService<IIISUnitOfWork>>();
             services.AddTransient<IFileService, FileService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();

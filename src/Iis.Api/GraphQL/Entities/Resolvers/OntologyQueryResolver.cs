@@ -1,28 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using HotChocolate.Types;
 using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Iis.Domain;
+using Iis.Domain.Meta;
+using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology.ComputedProperties;
-using IIS.Domain;
-using Iis.Domain;
-using Iis.Domain.Meta;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
-using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
     public class OntologyQueryResolver : IOntologyQueryResolver
     {
         private const string LastRelation = "LastRelation";
-
 
         public ObjectType ResolveAbstractType(IResolverContext context, object resolverResult)
         {
@@ -173,6 +174,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
 
             return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids));
+        }
+
+        public async Task<List<IGeoCoordinates>> ResolveCoordinates(IResolverContext ctx) 
+        {
+            var parentNode = ctx.Parent<Node>();
+            var extNodeService = ctx.Service<IExtNodeService>();
+
+            var extNode = await extNodeService.GetExtNodeAsync(parentNode.Id);
+            return extNode.GetCoordinates();
         }
     }
 }

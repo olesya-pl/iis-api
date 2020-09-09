@@ -15,11 +15,11 @@ namespace Iis.DbLayer.Repositories
     public class NodeRepository : INodeRepository
     {
         private readonly IElasticManager _elasticManager;
-        private readonly NodeFlattener<IIISUnitOfWork> _nodeFlattener;
+        private readonly NodeFlattener _nodeFlattener;
         private readonly IChangeHistoryService _changeHistoryService;
 
         public NodeRepository(IElasticManager elasticManager,
-            NodeFlattener<IIISUnitOfWork> nodeFlattener,
+            NodeFlattener nodeFlattener,
             IOntologySchema ontologySchema, IChangeHistoryService changeHistoryService)
         {
             _elasticManager = elasticManager;

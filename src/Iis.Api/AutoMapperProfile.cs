@@ -298,7 +298,8 @@ namespace Iis.Api
             //annotations: entity -> domain
             CreateMap<AnnotationEntity, Contracts.Annotations.Annotation>();
 
-            CreateMap<Iis.Domain.IncomingRelation, Iis.Api.Ontology.IncomingRelation>();
+            CreateMap<Iis.Domain.IncomingRelation, Iis.Api.Ontology.IncomingRelation>()
+                .ForMember(dest => dest.Entity, opts => opts.Ignore());
         }
     }
 }

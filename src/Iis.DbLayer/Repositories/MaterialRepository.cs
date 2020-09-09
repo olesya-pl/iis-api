@@ -286,9 +286,9 @@ namespace Iis.DbLayer.Repositories
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
-                        
+
             materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
-            
+
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
             materialDocument.NodeIds = material.MaterialInfos
@@ -310,20 +310,24 @@ namespace Iis.DbLayer.Repositories
             var mlResponsesContainer = new JObject();
             if (mlResponses.Any())
             {
-                var mlHandlers = mlResponses.GroupBy(_ => _.HandlerName).Select(_ => _.Key).ToArray();
+                var mlHandlers = mlResponses.GroupBy(_ => _.HandlerName).ToArray();
                 foreach (var mlHandler in mlHandlers)
                 {
-                    var responses = mlResponses.Where(_ => _.HandlerName == mlHandler).ToArray();
-                    for (var i = 0; i < responses.Count(); i++)
-                    {
-                        var propertyName = $"{mlHandler}-{i + 1}";
-
-                        mlResponsesContainer.Add(new JProperty(propertyName.ToLowerCamelCase().RemoveWhiteSpace(),
-                            responses[i].OriginalResponse));
-                    }
+                    string propertyName = GetMlHandlerName(mlHandler);
+                    mlResponsesContainer.Add(new JProperty(propertyName,
+                            mlHandler.Select(p => p.OriginalResponse).ToArray()));
                 }
             }
             return mlResponsesContainer;
+        }
+
+        private static string GetMlHandlerName(IGrouping<string, MLResponseEntity> mlHandler)
+        {
+            var code = mlHandler.FirstOrDefault()?.HandlerCode;
+            var propertyName = string.IsNullOrEmpty(code)
+                ? mlHandler.Key.ToLowerCamelCase().RemoveWhiteSpace()
+                : code;
+            return propertyName;
         }
 
         private string RemoveImagesFromContent(string content)
@@ -413,7 +417,7 @@ namespace Iis.DbLayer.Repositories
 
             return resultQuery;
         }
- 
+
         private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
         {
             return mlResponsesByEntity

@@ -1,13 +1,12 @@
-using System;
-using System.Linq;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.Common;
+using Iis.Domain;
+using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
-using IIS.Core.Ontology;
-using Iis.Domain;
+using System;
+using System.Linq;
 using RelationType = IIS.Core.GraphQL.Entities.ObjectTypes.RelationType;
-using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -33,6 +32,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedAt(ctx));
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveUpdatedAt(ctx));
             d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
+            d.Field("coordinates").Type<ListType<ObjectType<IGeoCoordinates>>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCoordinates(ctx));
         }
 
         protected void OnRelation(IEmbeddingRelationTypeModel relationType, IObjectTypeDescriptor objectTypeDescriptor = null)

@@ -1,10 +1,11 @@
+using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Iis.Domain;
+using Iis.Interfaces.Ontology;
+using IIS.Core.GraphQL.Entities.ObjectTypes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HotChocolate.Resolvers;
-using HotChocolate.Types;
-using IIS.Core.Ontology;
-using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
@@ -24,5 +25,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
         Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
+        Task<List<IGeoCoordinates>> ResolveCoordinates(IResolverContext ctx);
     }
 }
