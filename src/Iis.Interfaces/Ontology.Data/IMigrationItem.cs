@@ -9,6 +9,5 @@ namespace Iis.Interfaces.Ontology.Data
         string SourceDotName { get; }
         string TargetDotName { get; }
         IMigrationItemOptions Options { get; }
-        List<string> OtherTargetDotNames { get; }
     }
 }

@@ -19,7 +19,7 @@ namespace Iis.OntologyManager.UiControls
         CheckBox _cbDelete;
         RichTextBox _txtLog;
 
-        public event Func<IMigration, IMigrationResult> OnRun;
+        public event Func<IMigration, IMigrationOptions, IMigrationResult> OnRun;
 
         public IMigration _migration;
         protected override void CreateControls()
@@ -65,8 +65,14 @@ namespace Iis.OntologyManager.UiControls
         }
         private void btnRun_Click(object sender, EventArgs e)
         {
-            var migrationResult = OnRun(_migration);
+            var migrationResult = OnRun(_migration, GetMigrationOptions());
             _txtLog.Text = migrationResult.Log;
         }
+        private IMigrationOptions GetMigrationOptions() =>
+            new MigrationOptions
+            {
+                SaveNewObjects = _cbMigrate.Checked,
+                DeleteOldObjects = _cbDelete.Checked
+            };
     }
 }

@@ -11,9 +11,8 @@ namespace Iis.OntologyData.Migration
         public string SourceDotName { get; set; }
         public string TargetDotName { get; set; }
 
-        public MigrationItemOptions _options = new MigrationItemOptions();
+        private MigrationItemOptions _options = new MigrationItemOptions();
         public IMigrationItemOptions Options => _options;
-        public List<string> OtherTargetDotNames { get; set; }
 
         public MigrationItem() { }
         public MigrationItem(string sourceDotName, string targetDotName, MigrationItemOptions options = null)

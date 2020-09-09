@@ -27,19 +27,12 @@ namespace Iis.DbLayer.OntologyData
 
             var nodeIds = patch.Update.Nodes.Select(p => p.Id).ToList();
             var nodeEntities = _context.Nodes.Where(p => nodeIds.Contains(p.Id)).ToDictionary(p => p.Id);
-            foreach (var node in nodes)
+            foreach (var node in patch.Update.Nodes)
             {
                 var nodeEntity = nodeEntities[node.Id];
                 _mapper.Map(node, nodeEntity);
             }
             _context.Nodes.UpdateRange(nodeEntities.Values);
-
-            foreach (var node in patch.Update.Nodes)
-            {
-                var nodeEntity = _context.Nodes.SingleOrDefault(n => n.Id == node.Id);
-                _mapper.Map(node, nodeEntity);
-                _context.Nodes.Update(nodeEntity);
-            }
         }
         public async Task SavePatchAsync(IOntologyPatch patch)
         {

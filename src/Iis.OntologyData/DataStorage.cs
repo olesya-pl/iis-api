@@ -134,6 +134,12 @@ namespace Iis.OntologyData
                 }
                 Nodes.Remove(node.Id);
             }
+
+            foreach (var node in Nodes.Values)
+            {
+                node._outgoingRelations.RemoveAll(r => r.Node.IsArchived);
+                node._incomingRelations.RemoveAll(r => r.Node.IsArchived);
+            }
         }
         private void CompleteRelation(RelationData relation)
         {

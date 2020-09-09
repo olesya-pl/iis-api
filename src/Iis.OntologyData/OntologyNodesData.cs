@@ -100,7 +100,11 @@ namespace Iis.OntologyData
         }
         public void ClearPatch()
         {
-            _storage.ClearPatch(); 
+            _storage.ClearPatch();
+        }
+        public void SetNodeIsArchived(Guid nodeId)
+        {
+            _storage.SetNodeIsArchived(nodeId);
         }
     }
 }
