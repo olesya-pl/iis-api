@@ -39,7 +39,7 @@ namespace Iis.Services
             {
                 var aliases = _ontologySchema.Aliases.Items.Select(x => x.Value).ToList();
                 var fields = _ontologySchema.GetFullHierarchyNodes()
-                    .Where(x => x.Value.Kind == Kind.Attribute)
+                    .Where(x => IsEligibleNodeType(x.Value))
                     .Select(x => x.Key.Substring(x.Key.IndexOf('.') + 1))
                     .Distinct()
                     .ToList();
@@ -49,6 +49,15 @@ namespace Iis.Services
             }
 
             return KeyWords;
+        }
+
+        private bool IsEligibleNodeType(INodeTypeLinked nodeType)
+        {
+            if(nodeType.Kind == Kind.Attribute && !_ontologySchema.IsFuzzyDateEntityAttribute(nodeType)) return true;
+
+            if(_ontologySchema.IsFuzzyDateEntity(nodeType)) return true;
+
+            return false;
         }
     }
 }

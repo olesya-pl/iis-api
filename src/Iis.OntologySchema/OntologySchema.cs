@@ -456,7 +456,7 @@ namespace Iis.OntologySchema
 
                 if (nodeType.Kind != Kind.Attribute && !isFuzzyDateEntity) continue;
 
-                if (nodeType.Kind == Kind.Attribute && IsFuzzyDateEntityAttribute(nodeType)) continue;
+                if (IsFuzzyDateEntityAttribute(nodeType)) continue;
                 
                 var aliases = GetAlias(key)?.Split(',') ?? null;
                 var shortDotName = key.Substring(key.IndexOf('.') + 1);
@@ -470,12 +470,12 @@ namespace Iis.OntologySchema
             return items;
         }
 
-        private bool IsFuzzyDateEntity(SchemaNodeType nodeType)
+        public bool IsFuzzyDateEntity(INodeTypeLinked nodeType)
         {
             return nodeType.Kind == Kind.Entity && nodeType.Name == FuzzyDateEntityTypeName;
         }
 
-        private bool IsFuzzyDateEntityAttribute(SchemaNodeType nodeType)
+        public bool IsFuzzyDateEntityAttribute(INodeTypeLinked nodeType)
         {
             return nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Any(i => i.SourceType.Name == FuzzyDateEntityTypeName);
         }
