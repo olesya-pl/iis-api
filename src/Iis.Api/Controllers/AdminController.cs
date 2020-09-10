@@ -26,6 +26,7 @@ namespace Iis.Api.Controllers
         IOntologySchema _ontologySchema;
         INodeRepository _nodeRepository;
         private readonly OntologyNodesData ontologyNodesData;
+        private readonly IElasticSerializer elasticSerializer;
         IMaterialService _materialService;
         public AdminController(
             IExtNodeService extNodeService,
@@ -34,7 +35,8 @@ namespace Iis.Api.Controllers
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
             INodeRepository nodeRepository,
-            OntologyNodesData ontologyNodesData)
+            OntologyNodesData ontologyNodesData,
+            IElasticSerializer elasticSerializer)
         {
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
@@ -43,6 +45,7 @@ namespace Iis.Api.Controllers
             _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
             this.ontologyNodesData = ontologyNodesData;
+            this.elasticSerializer = elasticSerializer;
         }
 
         [HttpPost("CreateHistoricalIndexes/{indexNames}")]
@@ -113,18 +116,16 @@ namespace Iis.Api.Controllers
             }
 
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
-            //foreach (var extNode in extNodes)
-            //{
-            //    await _elasticService.PutNodeAsync(extNode, cancellationToken);
-            //}
-            await Task.WhenAll(extNodes.AsParallel().WithDegreeOfParallelism(10)
-                .Select(async nodeId => await _elasticService.PutNodeAsync(nodeId, cancellationToken)).ToList());
+            foreach (var extNode in extNodes)
+            {
+                await _elasticService.PutNodeAsync(extNode, cancellationToken);
+            }
 
             sb.AppendLine($"{extNodes.Count} nodes added");
             return Content(sb.ToString());
         }
 
-        [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
+        [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
         public async Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken cancellationToken)
         {
             IEnumerable<string> ontologyIndexes;
@@ -142,23 +143,18 @@ namespace Iis.Api.Controllers
             }
 
             await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
-            
+            var nodesCount = 0;
             foreach (var ontologyIndex in ontologyIndexes)
             {
                 var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
                 var attributesInfo = _ontologySchema.GetAttributesInfo(ontologyIndex);
                 await _elasticManager.CreateMapping(attributesInfo);
+                var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
+                //TODO: add mapping nodeData to extNode and put it into elasticsearch
+                nodesCount += entities.Count;
             }
-
-            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
-            //foreach (var extNode in extNodes)
-            //{
-            //    await _elasticService.PutNodeAsync(extNode, cancellationToken);
-            //}
-            await Task.WhenAll(extNodes.AsParallel().WithDegreeOfParallelism(10)
-                .Select(async nodeId => await _elasticService.PutNodeAsync(nodeId, cancellationToken)).ToList());
-
-            sb.AppendLine($"{extNodes.Count} nodes added");
+            
+            sb.AppendLine($"{nodesCount} entities added");
             return Content(sb.ToString());
         }
 
