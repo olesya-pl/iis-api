@@ -24,6 +24,7 @@ using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using System.Net.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace Iis.UnitTests.Materials
 {
@@ -60,7 +61,7 @@ namespace Iis.UnitTests.Materials
                 unitOfWorkFactoryMock.Object,
                 configurationMock.Object,
                 new Mock<IHttpClientFactory>().Object,
-                new Api.Ontology.NodeToJObjectMapper(new Mock<IOntologyService>().Object));
+                new Api.Ontology.NodeToJObjectMapper(new Mock<IOntologyService>().Object, new Mock<IHttpContextAccessor>().Object));
         }
         public void Dispose()
         {
