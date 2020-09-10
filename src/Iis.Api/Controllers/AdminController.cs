@@ -11,6 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.OntologyData;
+using Nest;
 
 namespace Iis.Api.Controllers
 {
@@ -23,6 +25,7 @@ namespace Iis.Api.Controllers
         IElasticService _elasticService;
         IOntologySchema _ontologySchema;
         INodeRepository _nodeRepository;
+        private readonly OntologyNodesData ontologyNodesData;
         IMaterialService _materialService;
         public AdminController(
             IExtNodeService extNodeService,
@@ -30,7 +33,8 @@ namespace Iis.Api.Controllers
             IElasticService elasticService,
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
-            INodeRepository nodeRepository)
+            INodeRepository nodeRepository,
+            OntologyNodesData ontologyNodesData)
         {
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
@@ -38,27 +42,28 @@ namespace Iis.Api.Controllers
             _materialService = materialService;
             _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
+            this.ontologyNodesData = ontologyNodesData;
         }
 
         [HttpPost("CreateHistoricalIndexes/{indexNames}")]
-        public async Task<IActionResult> CreateHistoricalIndexes(string indexNames,CancellationToken ct) 
+        public async Task<IActionResult> CreateHistoricalIndexes(string indexNames, CancellationToken ct)
         {
             IEnumerable<string> ontologyIndexes;
             IDictionary<string, string> historicalIndexesByTypeName;
             var log = new StringBuilder();
-            if (indexNames == "all") 
+            if (indexNames == "all")
             {
                 ontologyIndexes = _elasticService.OntologyIndexes;
                 historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes;
             }
-            else 
+            else
             {
                 ontologyIndexes = indexNames.Split(",");
                 historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes
                     .Where(x => ontologyIndexes.Contains(x.Key))
                     .ToDictionary(x => x.Key, x => x.Value);
 
-                if(!IsIndexesValid(ontologyIndexes, log))
+                if (!IsIndexesValid(ontologyIndexes, log))
                     return Content(log.ToString());
             }
 
@@ -108,14 +113,56 @@ namespace Iis.Api.Controllers
             }
 
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
-            foreach (var extNode in extNodes)
-            {
-                await _elasticService.PutNodeAsync(extNode, cancellationToken);
-            }
+            //foreach (var extNode in extNodes)
+            //{
+            //    await _elasticService.PutNodeAsync(extNode, cancellationToken);
+            //}
+            await Task.WhenAll(extNodes.AsParallel().WithDegreeOfParallelism(10)
+                .Select(async nodeId => await _elasticService.PutNodeAsync(nodeId, cancellationToken)).ToList());
 
             sb.AppendLine($"{extNodes.Count} nodes added");
             return Content(sb.ToString());
         }
+
+        [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
+        public async Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken cancellationToken)
+        {
+            IEnumerable<string> ontologyIndexes;
+            var sb = new StringBuilder();
+            if (indexNames == "all")
+            {
+                ontologyIndexes = _elasticService.OntologyIndexes.ToList();
+            }
+            else
+            {
+                ontologyIndexes = indexNames.Split(',');
+
+                if (!IsIndexesValid(ontologyIndexes, sb))
+                    return Content(sb.ToString());
+            }
+
+            await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
+            
+            foreach (var ontologyIndex in ontologyIndexes)
+            {
+                var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
+                var attributesInfo = _ontologySchema.GetAttributesInfo(ontologyIndex);
+                await _elasticManager.CreateMapping(attributesInfo);
+            }
+
+            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
+            //foreach (var extNode in extNodes)
+            //{
+            //    await _elasticService.PutNodeAsync(extNode, cancellationToken);
+            //}
+            await Task.WhenAll(extNodes.AsParallel().WithDegreeOfParallelism(10)
+                .Select(async nodeId => await _elasticService.PutNodeAsync(nodeId, cancellationToken)).ToList());
+
+            sb.AppendLine($"{extNodes.Count} nodes added");
+            return Content(sb.ToString());
+        }
+
+
 
         [HttpGet("RecreateElasticMaterialIndexes/{indexNames}")]
         public async Task<IActionResult> RecreateElasticMaterialIndexes(CancellationToken cancellationToken)
