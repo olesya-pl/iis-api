@@ -1,22 +1,30 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Iis.Domain;
-using Newtonsoft.Json;
+
+using Microsoft.AspNetCore.Http;
+
 using Newtonsoft.Json.Linq;
+
+using Node = Iis.Domain.Node;
 
 namespace Iis.Api.Ontology
 {
     public class NodeToJObjectMapper
     {
         private readonly IOntologyService _ontologyService;
+        private readonly IHttpContextAccessor _contextAccessor;
 
         private readonly string[] EventDotNames = new[] {
             "name", "description", "updatedAt", "startsAt", "endsAt" };
 
-        public NodeToJObjectMapper(IOntologyService ontologyService)
+        public NodeToJObjectMapper(IOntologyService ontologyService,
+            IHttpContextAccessor contextAccessor)
         {
             _ontologyService = ontologyService;
+            _contextAccessor = contextAccessor;
         }
 
         public JObject NodeToJObject(Node node)
@@ -28,7 +36,18 @@ namespace Iis.Api.Ontology
 
             foreach (var attribute in node.GetChildAttributesExcludingNestedObjects().GroupBy(p => p.DotName))
             {
-                if (attribute.Count() == 1)
+                if (attribute.Key == "attachment" || attribute.Key == "photo")
+                {
+                    result.Add(new JProperty(attribute.Key, attribute.Select(p =>
+                    {
+                        var res = new JObject();
+                        var request = _contextAccessor.HttpContext.Request;
+                        res.Add("id", p.Attribute.Value.ToString());
+                        res.Add("url", $"{request.Scheme}://{request.Host.Value}/api/files/{p.Attribute.Value}");
+                        return res;
+                    })));
+                }
+                else if (attribute.Count() == 1)
                 {
                     result.Add(new JProperty(attribute.Key, attribute.FirstOrDefault().Attribute.Value.ToString()));
                 }
