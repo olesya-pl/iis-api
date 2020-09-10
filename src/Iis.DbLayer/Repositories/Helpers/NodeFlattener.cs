@@ -1,6 +1,10 @@
 ﻿using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Data;
+
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +32,18 @@ namespace Iis.DbLayer.Repositories.Helpers
                 Id = extNode.Id,
                 NodeTypeName = extNode.NodeTypeName
             };
+        }
+
+        internal List<FlattenNodeResult> FlattenNodes(IReadOnlyCollection<INode> itemsToUpdate)
+        {
+            return _extNodeService.GetExtNodes(itemsToUpdate)
+                .Select(extNode => new FlattenNodeResult
+                {
+                    SerializedNode = _elasticSerializer.GetJsonByExtNode(extNode),
+                    Id = extNode.Id,
+                    NodeTypeName = extNode.NodeTypeName
+                })
+                .ToList();
         }
     }
 

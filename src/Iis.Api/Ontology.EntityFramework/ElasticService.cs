@@ -2,6 +2,7 @@
 using Iis.DbLayer.Repositories;
 using Iis.Domain.Elastic;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -303,6 +304,13 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             if (!UseElastic) return false;
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
+        }
+
+        public Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken)
+        {
+            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
+
+            return _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
         }
     }
 }

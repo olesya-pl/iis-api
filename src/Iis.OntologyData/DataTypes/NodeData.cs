@@ -23,13 +23,11 @@ namespace Iis.OntologyData.DataTypes
         internal List<RelationData> _outgoingRelations = new List<RelationData>();
         public IReadOnlyList<IRelation> OutgoingRelations => _outgoingRelations;
 
-        internal RelationData _relation;
-        public IRelation Relation { get; set; }
+        public IRelation Relation { get; internal set; }
 
-        internal AttributeData _attribute;
-        public IAttribute Attribute { get; set; }
+        public IAttribute Attribute { get; internal set; }
 
-        public string Value => _attribute?.Value;
+        public string Value => Attribute?.Value;
 
         public IDotNameValues GetDotNameValues()
         {

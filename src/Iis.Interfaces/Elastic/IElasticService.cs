@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.Interfaces.Elastic
 {
@@ -24,6 +25,8 @@ namespace Iis.Interfaces.Elastic
         Task<SearchResult> SearchByImageVector(decimal[] imageVector, int page, int pageSize, CancellationToken token);
         bool TypesAreSupported(IEnumerable<string> typeNames);
         bool UseElastic { get; }
+
+        Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken);
     }
 
     public class SearchResult

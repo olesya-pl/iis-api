@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.OntologyData;
 using Nest;
+using HotChocolate.Types.Relay;
 
 namespace Iis.Api.Controllers
 {
@@ -143,18 +144,17 @@ namespace Iis.Api.Controllers
             }
 
             await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
-            var nodesCount = 0;
+            var itemsToUpdate = new List<Interfaces.Ontology.Data.INode>();
             foreach (var ontologyIndex in ontologyIndexes)
             {
                 var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
                 var attributesInfo = _ontologySchema.GetAttributesInfo(ontologyIndex);
                 await _elasticManager.CreateMapping(attributesInfo);
                 var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
-                //TODO: add mapping nodeData to extNode and put it into elasticsearch
-                nodesCount += entities.Count;
+                itemsToUpdate.AddRange(entities);
             }
-            
-            sb.AppendLine($"{nodesCount} entities added");
+            await _elasticService.PutNodesAsync(itemsToUpdate, cancellationToken);
+            sb.AppendLine($"{itemsToUpdate.Count} entities added");
             return Content(sb.ToString());
         }
 
