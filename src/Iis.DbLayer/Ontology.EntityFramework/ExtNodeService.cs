@@ -1,5 +1,6 @@
 ﻿using Iis.DataModel;
 using Iis.DbLayer.Repositories;
+using Iis.Domain;
 using Iis.Domain.ExtendedData;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
@@ -18,11 +19,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly OntologyContext _context;
+        private readonly IOntologySchema _ontologySchema;
 
         public ExtNodeService(OntologyContext context,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            IOntologySchema ontologySchema) : base(unitOfWorkFactory)
         {
             _context = context;
+            _ontologySchema = ontologySchema;
         }
 
         public async Task<List<Guid>> GetExtNodesByTypeIdsAsync(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
@@ -38,7 +42,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<IExtNode> GetExtNodeAsync(Guid id, CancellationToken ct = default)
         {
-            var nodeEntity = await RunWithoutCommitAsync(uow => uow.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(id));
+            var nodeEntity = await RunWithoutCommitAsync(async uow => await uow.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(id));
 
             if (nodeEntity == null) return null;
 
@@ -46,7 +50,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 nodeEntity,
                 nodeEntity.NodeType.Name,
                 nodeEntity.NodeType.Title,
-                id,
+                new List<Guid> { id },
                 ct);
             return extNode;
         }
@@ -55,9 +59,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             NodeEntity nodeEntity,
             string nodeTypeName,
             string nodeTypeTitle,
-            Guid rootNodeId,
+            List<Guid> visitedEntityIds,
             CancellationToken cancellationToken = default)
         {
+            if (_ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId).IsObjectOfStudy) 
+            {
+                visitedEntityIds.Add(nodeEntity.Id);
+            }
             var extNode = new ExtNode
             {
                 Id = nodeEntity.Id.ToString("N"),
@@ -69,7 +77,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
                 UpdatedAt = nodeEntity.UpdatedAt,
-                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, rootNodeId, cancellationToken)
+                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds, cancellationToken)
             };
             return extNode;
         }
@@ -102,21 +110,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private async Task<List<ExtNode>> GetExtNodesByRelations(
             IEnumerable<RelationEntity> relations,
-            Guid rootNodeId,
+            List<Guid> visitedEntityIds,
             CancellationToken cancellationToken = default)
         {
             var result = new List<ExtNode>();
             foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.Node.NodeType.IsArchived
                 && !r.TargetNode.IsArchived && !r.TargetNode.NodeType.IsArchived))
             {
-                var node = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(relation.TargetNodeId));
-                if (node.Id != rootNodeId)
+                var node = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(relation.TargetNodeId));
+                if (!visitedEntityIds.Contains(node.Id))
                 {
                     var extNode = await MapExtNodeAsync(
                         node,
                         relation.Node.NodeType.Name,
                         relation.Node.NodeType.Title,
-                        rootNodeId,
+                        visitedEntityIds,
                         cancellationToken);
                     result.Add(extNode);
                 }
