@@ -68,5 +68,11 @@
     <None Update="data\contour\migrations\002\migration-002.ont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="data\scripts\script-find-rows-with-3-coordinaties.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="data\scripts\script-update-rows-with-3-coordinaties.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
