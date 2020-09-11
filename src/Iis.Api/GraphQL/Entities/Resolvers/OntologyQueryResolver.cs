@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public ObjectType ResolveAbstractType(IResolverContext context, object resolverResult)
         {
-            var node = (Node) resolverResult;
+            var node = (Node)resolverResult;
             var typeName = OntologyObjectType.GetName(node.Type);
             return context.Schema.GetType<ObjectType>(typeName);
         }
@@ -60,7 +60,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 ids = filter.MatchList;
             }
 
-            return Tuple.Create((IEnumerable<IEntityTypeModel>) new[] {type}, nf, ids);
+            return Tuple.Create((IEnumerable<IEntityTypeModel>)new[] { type }, nf, ids);
         }
 
         // ----- Relations to attributes ----- //
@@ -138,7 +138,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private static Relation GetRelationInfo(IResolverContext ctx, Entity entity)
         {
-            var dict = (Dictionary<Entity, Relation>) ctx.ScopedContextData.GetValueOrDefault(LastRelation);
+            var dict = (Dictionary<Entity, Relation>)ctx.ScopedContextData.GetValueOrDefault(LastRelation);
             return dict?.GetOrDefault(entity);
         }
 

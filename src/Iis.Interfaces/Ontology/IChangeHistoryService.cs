@@ -8,6 +8,7 @@ namespace Iis.Interfaces.Ontology
     {
         Task SaveChange(string attributeDotName, Guid targetId, string userName, string oldValue, string newValue, Guid requestId);
         Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistory(Guid targetId, string propertyName);
+        Task<IReadOnlyCollection<IChangeHistoryItem>> GetChangeHistory(IEnumerable<Guid> ids);
         Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistoryByRequest(Guid requestId);
     }
 }

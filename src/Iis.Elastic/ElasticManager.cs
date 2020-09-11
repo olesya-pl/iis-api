@@ -11,10 +11,11 @@ using Iis.Interfaces.Ontology.Schema;
 using Microsoft.Extensions.Logging;
 using Iis.Utility;
 using Iis.Domain.Elastic;
+using System.Net;
 
 namespace Iis.Elastic
 {
-    internal class ElasticManager: IElasticManager
+    internal class ElasticManager : IElasticManager
     {
         private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
         private const string RemoveSymbolsPattern = "№";
@@ -44,7 +45,7 @@ namespace Iis.Elastic
 
         public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
         {
-            if(string.IsNullOrWhiteSpace(indexName) || string.IsNullOrWhiteSpace(documentId) || string.IsNullOrWhiteSpace(jsonDocument)) return false;
+            if (string.IsNullOrWhiteSpace(indexName) || string.IsNullOrWhiteSpace(documentId) || string.IsNullOrWhiteSpace(jsonDocument)) return false;
 
             var indexUrl = $"{GetRealIndexName(indexName)}/_doc/{documentId}";
 
@@ -54,12 +55,52 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<bool> PutsDocumentsAsync(string indexName, string materialDocuments, CancellationToken token)
+        public async Task<List<ElasticBulkResponse>> PutsDocumentsAsync(string indexName, string documents, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(indexName)) return false;
+            if (string.IsNullOrWhiteSpace(indexName)) 
+                return null;
+            
             var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
-            var response = await PostAsync(indexUrl, materialDocuments, token);
-            return response.Success;
+            var response = await PostAsync(indexUrl, documents, token);
+
+            return ParseBody(response.Body);
+        }
+
+        private List<ElasticBulkResponse> ParseBody(string body)
+        {
+
+            var jBody = JObject.Parse(body);
+            var statusItems = jBody["items"];
+            var result = new List<ElasticBulkResponse>();
+            foreach (JObject item in statusItems)
+            {
+                if (IsErrorStatusCode(item["index"]["status"].Value<int>()))
+                {
+                    result.Add(new ElasticBulkResponse
+                    {
+                        Id = item["index"]["_id"].Value<string>(),
+                        IsSuccess = false,
+                        ErrorReason = item["index"]["error"]["reason"].Value<string>(),
+                        ErrorType = item["index"]["error"]["type"].Value<string>(),
+                    });
+                }
+                else
+                {
+                    result.Add(new ElasticBulkResponse
+                    {
+                        Id = item["index"]["_id"].Value<string>(),
+                        IsSuccess = true,
+                        SuccessOperation = item["index"]["result"].Value<string>()
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        private bool IsErrorStatusCode(int statusCode) 
+        {
+            return statusCode / 100 == 4;
         }
 
         public async Task<bool> DeleteDocumentAsync(string indexName, string documentId)
@@ -261,24 +302,29 @@ namespace Iis.Elastic
 
         public async Task<IElasticSearchResult> SearchByImageVector(decimal[] imageVector, IIisElasticSearchParams searchParams, CancellationToken token)
         {
-            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(index:GetRealIndexNames(searchParams.BaseIndexNames), PostData.Serializable(new
+            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(index: GetRealIndexNames(searchParams.BaseIndexNames), PostData.Serializable(new
             {
                 from = searchParams.From,
                 size = searchParams.Size,
                 min_score = 0.1,
-                query = new {
-                    script_score = new {
-                    query = new {
-                        match_all = new { }
-                    },
-                    script = new {
-                        source = "1 / (l2norm(params.queryVector, doc['ImageVector']) + 1)",
-                        @params = new {
-                            queryVector =  imageVector
+                query = new
+                {
+                    script_score = new
+                    {
+                        query = new
+                        {
+                            match_all = new { }
+                        },
+                        script = new
+                        {
+                            source = "1 / (l2norm(params.queryVector, doc['ImageVector']) + 1)",
+                            @params = new
+                            {
+                                queryVector = imageVector
+                            }
                         }
                     }
                 }
-             }
             }),
             ctx: token);
             return _resultExtractor.GetFromResponse(searchResponse);
@@ -295,7 +341,7 @@ namespace Iis.Elastic
                 },
                 stored_fields = Array.Empty<object>()
             }),
-            ctx:token);
+            ctx: token);
 
             return searchResponse.Success || searchResponse.HttpStatusCode != 404;
         }
@@ -396,7 +442,7 @@ namespace Iis.Elastic
             json["query"]["query_string"] = queryString;
         }
 
-        private JObject CreateExactShouldSection(string query, bool isLenient) 
+        private JObject CreateExactShouldSection(string query, bool isLenient)
         {
             var result = new JObject();
 
@@ -431,7 +477,7 @@ namespace Iis.Elastic
             }
         }
 
-        private JArray CreateMultiFieldShouldSection(string query, List<IIisElasticField> searchFields, bool isLenient) 
+        private JArray CreateMultiFieldShouldSection(string query, List<IIisElasticField> searchFields, bool isLenient)
         {
             var shouldSections = new JArray();
 
@@ -440,13 +486,13 @@ namespace Iis.Elastic
                 var querySection = new JObject();
                 var queryString = new JObject();
                 queryString["query"] = ApplyFuzzinessOperator(
-                    EscapeElasticSpecificSymbols(RemoveSymbols(query, RemoveSymbolsPattern), 
+                    EscapeElasticSpecificSymbols(RemoveSymbols(query, RemoveSymbolsPattern),
                     EscapeSymbolsPattern));
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = isLenient;
                 queryString["fields"] = new JArray(searchFieldGroup.Select(p => p.Name));
-                
+
                 querySection["query_string"] = queryString;
                 shouldSections.Add(querySection);
             }
@@ -464,7 +510,7 @@ namespace Iis.Elastic
             json["query"]["query_string"] = queryString;
         }
 
-        private JObject CreateFallbackShouldSection(string query, bool isLenient) 
+        private JObject CreateFallbackShouldSection(string query, bool isLenient)
         {
             var shouldSection = new JObject();
             var queryString = new JObject();
@@ -532,15 +578,15 @@ namespace Iis.Elastic
 
         private string RemoveSymbols(string input, string removeSymbols)
         {
-            if(string.IsNullOrWhiteSpace(input)) return input;
+            if (string.IsNullOrWhiteSpace(input)) return input;
 
-            if(string.IsNullOrWhiteSpace(removeSymbols)) throw new ArgumentNullException(nameof(removeSymbols));
+            if (string.IsNullOrWhiteSpace(removeSymbols)) throw new ArgumentNullException(nameof(removeSymbols));
 
             var builder = new StringBuilder();
 
             foreach (var ch in input)
             {
-                if(removeSymbols.Contains(ch)) continue;
+                if (removeSymbols.Contains(ch)) continue;
 
                 builder.Append(ch);
             }

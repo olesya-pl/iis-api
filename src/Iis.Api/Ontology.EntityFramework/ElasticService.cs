@@ -254,6 +254,14 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutNodeAsync(id, cancellationToken);
         }
 
+        public async Task<bool> PutNodesAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        {
+            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return true;
+
+            var result = await _nodeRepository.PutNodesAsync(ids, cancellationToken);
+            return result.All(x => x.IsSuccess);
+        }
+
         public Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default)
         {
             if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);

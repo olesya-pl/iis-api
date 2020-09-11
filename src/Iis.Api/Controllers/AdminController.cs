@@ -85,7 +85,7 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> RecreateElasticOntologyIndexes(string indexNames, CancellationToken cancellationToken)
         {
             IEnumerable<string> ontologyIndexes;
-            var sb = new StringBuilder();
+            var log = new StringBuilder();
             if (indexNames == "all")
             {
                 ontologyIndexes = _elasticService.OntologyIndexes.ToList();
@@ -94,28 +94,45 @@ namespace Iis.Api.Controllers
             {
                 ontologyIndexes = indexNames.Split(',');
 
-                if (!IsIndexesValid(ontologyIndexes, sb))
-                    return Content(sb.ToString());
+                if (!IsIndexesValid(ontologyIndexes, log))
+                    return Content(log.ToString());
             }
 
             await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
 
             foreach (var ontologyIndex in ontologyIndexes)
             {
-                var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
                 var attributesInfo = _ontologySchema.GetAttributesInfo(ontologyIndex);
                 await _elasticManager.CreateMapping(attributesInfo);
             }
 
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
-            foreach (var extNode in extNodes)
+            var result = await _nodeRepository.PutNodesAsync(extNodes, cancellationToken);
+
+            log.AppendLine($"nodes were found: {extNodes.Count}");
+            LogElasticResult(log, result);
+            return Content(log.ToString());
+        }
+
+        private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response) 
+        {
+            var responseBySuccess = response.GroupBy(x => new { x.IsSuccess, x.SuccessOperation });
+
+            foreach (var item in responseBySuccess.Where(x => x.Key.IsSuccess)) 
             {
-                await _elasticService.PutNodeAsync(extNode, cancellationToken);
+                log.AppendLine($"{item.Key.SuccessOperation}: {item.Count()}");
             }
 
-            sb.AppendLine($"{extNodes.Count} nodes added");
-            return Content(sb.ToString());
+            foreach (var item in responseBySuccess.Where(x => !x.Key.IsSuccess))
+            {
+                foreach (var error in item)
+                {
+                    log.AppendLine($"error occurred for Id:{error.Id}, errorType:{error.ErrorType}, error message:{error.ErrorReason}");
+                }
+                
+            }
         }
+
 
         [HttpGet("RecreateElasticMaterialIndexes/{indexNames}")]
         public async Task<IActionResult> RecreateElasticMaterialIndexes(CancellationToken cancellationToken)

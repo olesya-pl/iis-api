@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.Interfaces.Elastic;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.DbLayer.Repositories
@@ -9,6 +11,7 @@ namespace Iis.DbLayer.Repositories
     {
         Task<JObject> GetJsonNodeByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<List<ElasticBulkResponse>> PutNodesAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
         Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default);
     }
 }

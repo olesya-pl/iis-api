@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentAssertions;
 using Iis.Services;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Iis.UnitTests.Services
@@ -109,6 +110,20 @@ namespace Iis.UnitTests.Services
 
             //Assert
             result.Should().BeEquivalentTo("{\"operationName\":\"getMaterials\",\"variables\":{\"pagination\":{\"page\":1,\"pageSize\":50},\"filter\":{\"suggestion\":\"\"},\"sorting\":null,\"searchByImageInput\":{\"content\":\"base64image\",\"name\":\"немцев.png\"}},\"query\":\"query getMaterials($pagination: PaginationInput!, $filter: FilterInput, $sorting: SortingInput, $searchByImageInput: SearchByImageInput) {\\n  materials(pagination: $pagination, filter: $filter, sorting: $sorting, searchByImageInput: $searchByImageInput) {\\n    count\\n    items {\\n      ...MaterialInfo\\n      highlight\\n      createdDate\\n      from\\n      mlHandlersCount\\n      processedMlHandlersCount\\n      objectsOfStudy\\n      processedStatus {\\n        id\\n        __typename\\n      }\\n      sessionPriority {\\n        ...MaterialSignInfo\\n        __typename\\n      }\\n      importance {\\n        ...MaterialSignInfo\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\\nfragment MaterialInfo on Material {\\n  id\\n  data {\\n    type\\n    text\\n    __typename\\n  }\\n  title\\n  file {\\n    contentType\\n    id\\n    name\\n    url\\n    __typename\\n  }\\n  transcriptions\\n  coordinates\\n  content\\n  metadata\\n  __typename\\n}\\n\\nfragment MaterialSignInfo on MaterialSign {\\n  id\\n  shortTitle\\n  title\\n  __typename\\n}\\n\"}");
+        }
+
+        [Fact]
+        public void test() 
+        {
+            var successBody = "{\"took\":44,\"errors\":false,\"items\":[{\"index\":{\"_index\":\"ont_terrororganization\",\"_type\":\"_doc\",\"_id\":\"d207e3a56d0d49c9a04ef11cd504bccf\",\"_version\":3,\"result\":\"updated\",\"_shards\":{\"total\":2,\"successful\":1,\"failed\":0},\"_seq_no\":2,\"_primary_term\":1,\"status\":200}},{\"index\":{\"_index\":\"ont_terrororganization\",\"_type\":\"_doc\",\"_id\":\"d207e3a56d0d49c9a04ef11cd504bccf\",\"_version\":3,\"result\":\"updated\",\"_shards\":{\"total\":2,\"successful\":1,\"failed\":0},\"_seq_no\":2,\"_primary_term\":1,\"status\":200}}]}";
+            var errorBody = "{\"took\":39,\"errors\":true,\"items\":[{\"index\":{\"_index\":\"ont_infrastructure\",\"_type\":\"_doc\",\"_id\":\"2cccf46ec1f743cf85bacdc1cf9923e3\",\"status\":400,\"error\":{\"type\":\"mapper_parsing_exception\",\"reason\":\"failedtoparsefield[UpdatedAt]oftype[date]indocumentwithid'2cccf46ec1f743cf85bacdc1cf9923e3'.Previewoffield'svalue:'йцу'\",\"caused_by\":{\"type\":\"illegal_argument_exception\",\"reason\":\"failedtoparsedatefield[йцу]withformat[strict_date_optional_time||epoch_millis]\",\"caused_by\":{\"type\":\"date_time_parse_exception\",\"reason\":\"Failedtoparsewithallenclosedparsers\"}}}}}]}";
+
+            var jObject = JObject.Parse(successBody);
+
+            foreach (var item in jObject["items"])
+            {
+
+            } 
         }
     }
 }
