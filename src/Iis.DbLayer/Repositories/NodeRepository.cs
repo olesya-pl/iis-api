@@ -57,20 +57,14 @@ namespace Iis.DbLayer.Repositories
         {
             var flattenNodes = new List<FlattenNodeResult>(ids.Count());
             foreach (var id in ids)
-            {
                 flattenNodes.Add(await _nodeFlattener.FlattenNode(id, cancellationToken));
-            }
 
-            var documentsByIndex = flattenNodes.GroupBy(x => x.NodeTypeName).Select(x => new
-            {
-                Index = x.Key,
-                Documents = x.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{p.SerializedNode.RemoveWhiteSpace()}\n")
-            });
-
+            var bulkDataByNodeType = GenerateBulkData(flattenNodes);
+            
             var result = new List<ElasticBulkResponse>();
-            foreach (var item in documentsByIndex)
+            foreach (var item in bulkDataByNodeType)
             {
-                var response = await _elasticManager.PutsDocumentsAsync(item.Index, item.Documents, cancellationToken);
+                var response = await _elasticManager.PutsDocumentsAsync(item.NodeType, item.Documents, cancellationToken);
                 result.AddRange(response);
             }
 
@@ -86,39 +80,53 @@ namespace Iis.DbLayer.Repositories
 
             await Task.WhenAll(getActualNode, getNodeChanges);
 
-            var changes = getNodeChanges.Result
-                .GroupBy(x => x.RequestId)
-                .Where(x => x.Count() > 0)
-                .OrderByDescending(x => x.First().Date)
-                .ToList();
+            var historicalNodes = GetHistoricalNodes(getActualNode.Result, getNodeChanges.Result);
 
-            var actualNode = getActualNode.Result;
-            var nodes = new List<FlattenNodeResult>();
-            foreach (var changePack in changes)
+
+            var bulkDataByNodeType = GenerateBulkData(historicalNodes);
+
+            var result = new List<ElasticBulkResponse>();
+            foreach (var item in bulkDataByNodeType)
             {
-                var olderNode = new FlattenNodeResult
-                {
-                    Id = actualNode.Id,
-                    NodeTypeName = actualNode.NodeTypeName,
-                    SerializedNode = actualNode.SerializedNode.ReplaceOrAddValues(changePack.Select(x => (x.PropertyName, x.OldValue)).ToArray())
-                };
-                nodes.Add(olderNode);
-                actualNode = olderNode;
+                var response = await _elasticManager.PutsDocumentsAsync(ToHistoricalIndex(item.NodeType), item.Documents, ct);
+                result.AddRange(response);
             }
 
-            //TODO: should put all documents by one query
-            foreach (var item in nodes)
-            {
-                var result = await _elasticManager.PutDocumentAsync(
-                $"historical_{item.NodeTypeName}",
-                Guid.NewGuid().ToString(),
-                item.SerializedNode, ct);
-            }
-
-            return true;
+            return result.All(x => x.IsSuccess);
         }
 
-        private List<FlattenNodeResult> GetHistoricalNodes(FlattenNodeResult node, IEnumerable<IChangeHistoryItem> changes) 
+        public async Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        {
+            var actualNodes = new List<FlattenNodeResult>(ids.Count());
+            foreach (var id in ids)
+            {
+                actualNodes.Add(await _nodeFlattener.FlattenNode(id));
+            }
+
+            var changes = await _changeHistoryService.GetChangeHistory(ids);
+            var nodes = new List<FlattenNodeResult>();
+            foreach (var actualNode in actualNodes)
+            {
+                var nodeChanges = changes
+                    .Where(x => x.TargetId == Guid.Parse(actualNode.Id))
+                    .ToList();
+
+                nodes.AddRange(GetHistoricalNodes(actualNode, nodeChanges));
+            }
+
+            var bulkDataByNodeType = GenerateBulkData(nodes);
+
+            var result = new List<ElasticBulkResponse>();
+            foreach (var item in bulkDataByNodeType)
+            {
+                var response = await _elasticManager.PutsDocumentsAsync(ToHistoricalIndex(item.NodeType), item.Documents, ct);
+                result.AddRange(response);
+            }
+
+            return result;
+        }
+
+        private List<FlattenNodeResult> GetHistoricalNodes(FlattenNodeResult node, IEnumerable<IChangeHistoryItem> changes)
         {
             var changesByRequestId = changes
                     .GroupBy(x => x.RequestId)
@@ -128,7 +136,7 @@ namespace Iis.DbLayer.Repositories
 
             var chistoricalNodes = new List<FlattenNodeResult>(changes.Count());
             var actualNode = node;
-            foreach (var changePack in changesByRequestId) 
+            foreach (var changePack in changesByRequestId)
             {
                 var olderNode = new FlattenNodeResult
                 {
@@ -143,49 +151,18 @@ namespace Iis.DbLayer.Repositories
             return chistoricalNodes;
         }
 
-        public async Task<bool> PutHistoricalNodesAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        private IEnumerable<(string NodeType, string Documents)> GenerateBulkData(IEnumerable<FlattenNodeResult> nodes)
         {
-            var actualNodes = new List<FlattenNodeResult>(ids.Count());
-            foreach (var id in ids)
-            {
-                actualNodes.Add(await _nodeFlattener.FlattenNode(id));
-            }
+            return nodes.GroupBy(x => x.NodeTypeName).Select(x =>
+            (
+                x.Key,
+                x.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{p.SerializedNode.RemoveWhiteSpace()}\n")
+            ));
+        }
 
-            var nodeChanges = await _changeHistoryService.GetChangeHistory(ids);
-            var nodes = new List<FlattenNodeResult>();
-            foreach (var actualNode in actualNodes)
-            {
-                var changes = nodeChanges
-                    .Where(x => x.TargetId == Guid.Parse(actualNode.Id))
-                    .GroupBy(x => x.RequestId)
-                    .Where(x => x.Count() > 0)
-                    .OrderByDescending(x => x.First().Date)
-                    .ToList();
-
-                var currentNode = actualNode;
-                foreach (var changePack in changes)
-                {
-                    var olderNode = new FlattenNodeResult
-                    {
-                        Id = currentNode.Id,
-                        NodeTypeName = currentNode.NodeTypeName,
-                        SerializedNode = currentNode.SerializedNode.ReplaceOrAddValues(changePack.Select(x => (x.PropertyName, x.OldValue)).ToArray())
-                    };
-                    nodes.Add(olderNode);
-                    currentNode = olderNode;
-                }
-            }
-
-            //TODO: should put all documents by one query
-            foreach (var item in nodes)
-            {
-                var result = await _elasticManager.PutDocumentAsync(
-                $"historical_{item.NodeTypeName}",
-                Guid.NewGuid().ToString(),
-                item.SerializedNode, ct);
-            }
-
-            return true;
+        private string ToHistoricalIndex(string nodeTypeName) 
+        {
+            return $"historical_{nodeTypeName}";
         }
     }
 }

@@ -70,13 +70,11 @@ namespace Iis.Api.Controllers
                 await _elasticManager.CreateMapping(attributesInfo);
             }
 
-            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, ct);
-            foreach (var extNode in extNodes)
-            {
-                await _elasticService.PutHistoricalNodesAsync(extNode, null, ct);
-            }
+            var nodeIds = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, ct);
+            var result = await _nodeRepository.PutHistoricalNodesAsync(nodeIds, ct);
 
-            log.AppendLine($"{extNodes.Count} nodes added");
+            log.AppendLine($"nodes were found: {nodeIds.Count}");
+            LogElasticResult(log, result);
             return Content(log.ToString());
         }
 

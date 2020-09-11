@@ -13,5 +13,7 @@ namespace Iis.DbLayer.Repositories
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
         Task<List<ElasticBulkResponse>> PutNodesAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
         Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default);
+
+        Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     }
 }

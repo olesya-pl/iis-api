@@ -333,7 +333,7 @@ namespace IIS.Core
             }
             UpdateDatabase(app);
             PopulateEntityFieldsCache(app);
-            app.UpdateMilitaryAmmountCodes();
+            //app.UpdateMilitaryAmmountCodes();
 
             if (!Configuration.GetValue<bool>("disableCORS", false))
             {
