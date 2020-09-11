@@ -185,7 +185,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var extNode = await extNodeService.GetExtNodeAsync(parentNode.Id);
             return extNode.GetNodeCoordinates().Select(x => new GeoCoordinate
             {
-                Label = x.Node.NodeTypeName,
+                Label = x.Node.NodeTypeTitle,
                 Lat = x.Coordinates.Latitude,
                 Long = x.Coordinates.Longitude
             }).ToList();
