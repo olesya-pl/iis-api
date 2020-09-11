@@ -215,6 +215,7 @@ namespace Iis.Elastic
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
+            ApplyIndexMappingSettings(jObject);
             var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
             return response.Success;
         }
@@ -241,7 +242,21 @@ namespace Iis.Elastic
                         ""russian_stop"",
                         ""russian_stemmer""
                 ]}}}}";
+
             createRequest["settings"] = JObject.Parse(analyzerSettings);
+        }
+
+        private void ApplyIndexMappingSettings(JObject request)
+        {
+            var mappingSettigns = @"{
+                    'total_fields': {
+                        'limit': 4000
+                    }
+                }";
+
+            var settigns = request["settings"];
+
+            settigns["mapping"] = JObject.Parse(mappingSettigns);
         }
 
         public async Task<IElasticSearchResult> SearchByImageVector(decimal[] imageVector, IIisElasticSearchParams searchParams, CancellationToken token)

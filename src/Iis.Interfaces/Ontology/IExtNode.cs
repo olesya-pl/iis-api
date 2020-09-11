@@ -1,7 +1,6 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.Interfaces.Ontology
 {
@@ -19,6 +18,7 @@ namespace Iis.Interfaces.Ontology
         IReadOnlyList<IExtNode> Children { get; }
         bool IsAttribute { get; }
         List<IGeoCoordinates> GetCoordinates();
+        List<(IExtNode Node, IGeoCoordinates Coordinates)> GetNodeCoordinates();
         List<IExtNode> GetAttributesRecursive(ScalarType scalarType);
     }
 }

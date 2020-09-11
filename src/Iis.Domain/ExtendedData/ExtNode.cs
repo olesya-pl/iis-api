@@ -29,7 +29,18 @@ namespace Iis.Domain.ExtendedData
             if (geoNodes.Count == 0) return null;
 
             return geoNodes.Select(gn => ExtractCoordinates(gn.AttributeValue.ToString())).ToList();
+
         }
+
+        public List<(IExtNode Node, IGeoCoordinates Coordinates)> GetNodeCoordinates() 
+        {
+            var geoNodes = GetAttributesRecursive(ScalarTypeEnum.Geo);
+            if (geoNodes.Count == 0) 
+                return new List<(IExtNode Node, IGeoCoordinates Coordinates)>();
+
+            return geoNodes.Select(x => (x, ExtractCoordinates(x.AttributeValue.ToString()))).ToList();
+        }
+
         public List<IExtNode> GetAttributesRecursive(ScalarType scalarType)
         {
             if (IsAttribute && ScalarType == scalarType)
