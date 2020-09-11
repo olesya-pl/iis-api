@@ -130,7 +130,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                         break;
                     case "update":
                         foreach (var uv in list)
-                            await ApplyUpdate(node, embed, uv, dotName + "." + uv, requestId);
+                            await ApplyUpdate(node, embed, uv, dotName, requestId);
 
                         break;
                     case "delete":
