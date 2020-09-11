@@ -8,6 +8,7 @@ using Iis.DataModel;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 
@@ -177,20 +178,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             node.UpdatedAt = DateTime.UtcNow;
         }
 
-        private async Task<IEnumerable<Node>> GetNodesAsync(IQueryable<NodeEntity> relationsQ, ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            NodeEntity[] ctxNodes;
-            // workaround because of wrong generated query with distinct and order by
-            var workaroundQ = from a in relationsQ.Distinct()
-                              select new { Node = a, dummy = string.Empty };
-
-            ctxNodes = await workaroundQ
-                .Skip(filter.Offset)
-                .Take(filter.Limit)
-                .Select(r => r.Node)
-                .ToArrayAsync(cancellationToken);
-            return ctxNodes.Select(MapNode).ToArray();
-        }
         public async Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
         {
             var nodeEntities = await RunWithoutCommitAsync((unitOfWork) =>
@@ -444,7 +431,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             return RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.OntologyRepository.GetNodeIdListByFeatureIdListAsync(featureIdList));
-
         }
 
         public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)

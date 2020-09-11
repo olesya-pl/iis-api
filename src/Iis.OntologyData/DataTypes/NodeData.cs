@@ -56,5 +56,19 @@ namespace Iis.OntologyData.DataTypes
             }
             return new DotNameValues(list);
         }
+        public INode GetChildNode(string childTypeName)
+        {
+            return _outgoingRelations
+                .Where(r => r.Node.NodeType.Name == childTypeName)
+                .Select(r => r.TargetNode)
+                .SingleOrDefault();
+        }
+        public IReadOnlyList<INode> GetChildNodes(string childTypeName)
+        {
+            return _outgoingRelations
+                .Where(r => r.Node.NodeType.Name == childTypeName)
+                .Select(r => r.TargetNode)
+                .ToList();
+        }
     }
 }

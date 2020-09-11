@@ -12,6 +12,9 @@ namespace Iis.Interfaces.Ontology.Data
         INode TargetNode { get; }
 
         Kind TargetKind { get; }
+        RelationKind RelationKind { get; }
+        EmbeddingOptions EmbeddingOptions { get; }
+        string RelationTypeName { get; }
         bool IsLinkToSeparateObject { get; }
         string TypeName { get; }
     }

@@ -9,12 +9,17 @@ using System.Text;
 
 namespace Iis.OntologyData
 {
-    public class OntologyNodesData
+    public class OntologyNodesData : IOntologyNodesData
     {
         DataStorage _storage;
         IMapper _mapper;
         IOntologySchema _schema;
 
+        public IEnumerable<INode> Nodes => _storage.Nodes.Values;
+        public IEnumerable<IRelation> Relations => _storage.Relations.Values;
+        public IEnumerable<IAttribute> Attributes => _storage.Attributes.Values;
+
+        public IOntologySchema Schema => _schema;
         public IOntologyPatch Patch => _storage.Patch;
 
         public OntologyNodesData(INodesRawData rawData, IOntologySchema schema)
@@ -50,10 +55,15 @@ namespace Iis.OntologyData
         internal AttributeData CreateAttribute(Guid id, string value) =>
             _storage.CreateAttribute(id, value);
 
-        internal NodeData GetNode(Guid id)
+        internal NodeData GetNodeData(Guid id)
         {
             return _storage.Nodes[id];
         }
+        internal IReadOnlyList<NodeData> GetNodesData(IEnumerable<Guid> ids)
+        {
+            return ids.Select(id => _storage.Nodes[id]).ToList();
+        }
+
 
         internal void AddValueByDotName(NodeData entity, string value, string[] dotNameParts)
         {
@@ -100,7 +110,16 @@ namespace Iis.OntologyData
         }
         public void ClearPatch()
         {
-            _storage.ClearPatch(); 
+            _storage.ClearPatch();
         }
+        public IReadOnlyList<INode> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        {
+            return Nodes
+                .Where(r => r.NodeTypeId == nodeTypeId
+                    && r.GetChildNode(valueTypeName)?.Value == value)
+                .ToList();
+        }
+        public INode GetNode(Guid id) => GetNodeData(id);
+        public IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids) => GetNodesData(ids);
     }
 }
