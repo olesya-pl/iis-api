@@ -15,6 +15,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\scripts\script-find-wrongValue-PropertyName.sql" Link="data\scripts\script-find-wrongValue-PropertyName.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\scripts\script-update-wrongValue-PropertyName.sql" Link="data\scripts\script-update-wrongValue-PropertyName.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.4" />
