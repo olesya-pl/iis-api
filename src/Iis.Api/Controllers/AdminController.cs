@@ -12,8 +12,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.OntologyData;
-using Nest;
-using HotChocolate.Types.Relay;
 
 namespace Iis.Api.Controllers
 {
@@ -27,7 +25,6 @@ namespace Iis.Api.Controllers
         IOntologySchema _ontologySchema;
         INodeRepository _nodeRepository;
         private readonly OntologyNodesData ontologyNodesData;
-        private readonly IElasticSerializer elasticSerializer;
         IMaterialService _materialService;
         public AdminController(
             IExtNodeService extNodeService,
@@ -36,8 +33,7 @@ namespace Iis.Api.Controllers
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
             INodeRepository nodeRepository,
-            OntologyNodesData ontologyNodesData,
-            IElasticSerializer elasticSerializer)
+            OntologyNodesData ontologyNodesData)
         {
             _extNodeService = extNodeService;
             _elasticManager = elasticManager;
@@ -46,7 +42,6 @@ namespace Iis.Api.Controllers
             _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
             this.ontologyNodesData = ontologyNodesData;
-            this.elasticSerializer = elasticSerializer;
         }
 
         [HttpPost("CreateHistoricalIndexes/{indexNames}")]

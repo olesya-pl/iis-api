@@ -4,11 +4,15 @@ using Iis.Domain.ExtendedData;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 
 using IIS.Repository;
 using IIS.Repository.Factories;
 
 using Microsoft.EntityFrameworkCore;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
@@ -23,13 +27,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly OntologyContext _context;
         private readonly IOntologySchema _ontologySchema;
+        private readonly FileUrlGetter _fileUrlGetter;
 
         public ExtNodeService(OntologyContext context,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
-            IOntologySchema ontologySchema) : base(unitOfWorkFactory)
+            IOntologySchema ontologySchema,
+            FileUrlGetter fileUrlGetter) : base(unitOfWorkFactory)
         {
             _context = context;
             _ontologySchema = ontologySchema;
+            _fileUrlGetter = fileUrlGetter;
         }
 
         public async Task<List<Guid>> GetExtNodesByTypeIdsAsync(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
@@ -79,19 +86,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 visitedEntityIds.Add(nodeEntity.Id);
             }
-            var extNode = new ExtNode
-            {
-                Id = nodeEntity.Id.ToString("N"),
-                NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
-                NodeTypeName = nodeTypeName,
-                NodeTypeTitle = nodeTypeTitle,
-                EntityTypeName = nodeEntity.NodeType.Name,
-                AttributeValue = GetAttributeValue(nodeEntity),
-                ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType,
-                CreatedAt = nodeEntity.CreatedAt,
-                UpdatedAt = nodeEntity.UpdatedAt,
-                Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds, cancellationToken)
-            };
+            var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
+            extNode.EntityTypeName = nodeEntity.NodeType.Name;
+            extNode.AttributeValue = GetAttributeValue(nodeEntity);
+            extNode.ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType;
+            extNode.Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds, cancellationToken);
             return extNode;
         }
 
@@ -105,20 +104,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 visitedEntityIds.Add(nodeEntity.Id);
             }
-            var extNode = new ExtNode
+            var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
+            extNode.EntityTypeName = nodeEntity.NodeType.Name;
+            extNode.AttributeValue = GetAttributeValue(nodeEntity);
+            extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
+            extNode.Children = GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds);
+            return extNode;
+        }
+
+        private ExtNode MapExtNodeBase(
+            INodeBase nodeEntity,
+            string nodeTypeName,
+            string nodeTypeTitle)
+        {
+            return new ExtNode
             {
                 Id = nodeEntity.Id.ToString("N"),
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
                 NodeTypeName = nodeTypeName,
                 NodeTypeTitle = nodeTypeTitle,
-                EntityTypeName = nodeEntity.NodeType.Name,
-                AttributeValue = GetAttributeValue(nodeEntity),
-                ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType,
                 CreatedAt = nodeEntity.CreatedAt,
-                UpdatedAt = nodeEntity.UpdatedAt,
-                Children = GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds)
+                UpdatedAt = nodeEntity.UpdatedAt
             };
-            return extNode;
         }
 
         private object GetAttributeValue(NodeEntity nodeEntity)
@@ -130,7 +137,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return FormatValue(scalarType, value);
         }
 
-        private static object FormatValue(ScalarType scalarType, string value)
+        private object GetAttributeValue(INode nodeEntity)
+        {
+            if (nodeEntity.Attribute == null) return null;
+
+            var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
+            var value = nodeEntity.Attribute.Value;
+            return FormatValue(scalarType, value);
+        }
+
+        private object FormatValue(ScalarType scalarType, string value)
         {
             switch (scalarType)
             {
@@ -147,19 +163,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                             return value;
                         }
                     }
+                case ScalarType.File:
+                    return new
+                    {
+                        fileId = value,
+                        url = _fileUrlGetter.GetFileUrl(new Guid(value))
+                    };
                 default:
                     return value;
             }
-        }
-
-        private object GetAttributeValue(INode nodeEntity)
-        {
-            if (nodeEntity.Attribute == null) return null;
-
-            var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
-            var value = nodeEntity.Attribute.Value;
-            return FormatValue(scalarType, value);
-        }
+        }       
 
         private async Task<List<ExtNode>> GetExtNodesByRelations(
             IEnumerable<RelationEntity> relations,

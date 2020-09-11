@@ -198,6 +198,7 @@ namespace IIS.Core
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
             services.AddTransient<NodeToJObjectMapper>();
+            services.AddSingleton<FileUrlGetter>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
