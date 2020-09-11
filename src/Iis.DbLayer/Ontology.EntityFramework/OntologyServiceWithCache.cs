@@ -100,23 +100,23 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
-                .Concat(types).Distinct().ToArray();
+            throw new NotImplementedException();
+            //var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
+            //var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
 
-            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
-            if (isElasticSearch)
-            {
-                var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
-                var nodes = _data.GetNodes(searchResult.ids);
-                return nodes.Select(MapNode);
-            }
-            else
-            {
-                var query = await RunWithoutCommitAsync(async unitOfWork =>
-                    await unitOfWork.OntologyRepository.GetNodesWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter));
-                var nodes = query.Select(MapNode);
-                return nodes;
-            }
+            //if (isElasticSearch)
+            //{
+            //    var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
+            //    var nodes = _data.GetNodes(searchResult.ids);
+            //    return nodes.Select(MapNode);
+            //}
+            //else
+            //{
+            //    var query = await RunWithoutCommitAsync(async unitOfWork =>
+            //        await unitOfWork.OntologyRepository.GetNodesWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter));
+            //    var nodes = query.Select(MapNode);
+            //    return nodes;
+            //}
         }
 
         public Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)

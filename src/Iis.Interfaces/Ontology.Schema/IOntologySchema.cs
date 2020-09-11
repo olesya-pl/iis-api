@@ -31,5 +31,6 @@ namespace Iis.Interfaces.Ontology.Schema
         string ValidateRemoveEntity(Guid id);
         bool IsFuzzyDateEntity(INodeTypeLinked nodeType);
         bool IsFuzzyDateEntityAttribute(INodeTypeLinked nodeType);
+        IReadOnlyList<INodeTypeLinked> GetNodeTypes(IEnumerable<Guid> ids, bool includeChildren = false);
     }
 }

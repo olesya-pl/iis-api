@@ -479,5 +479,18 @@ namespace Iis.OntologySchema
         {
             return nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Any(i => i.SourceType.Name == FuzzyDateEntityTypeName);
         }
+        public IReadOnlyList<INodeTypeLinked> GetNodeTypes(IEnumerable<Guid> ids, bool includeChildren = false)
+        {
+            var nodeTypes = ids.Select(id => _storage.NodeTypes[id]);
+            var result = new List<INodeTypeLinked>(nodeTypes);
+            if (includeChildren)
+            {
+                foreach (var nodeType in nodeTypes)
+                {
+                    result.AddRange(nodeType.GetAllDescendants());
+                }
+            }
+            return result.Distinct().ToList();
+        }
     }
 }
