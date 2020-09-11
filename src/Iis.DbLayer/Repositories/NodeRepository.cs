@@ -82,7 +82,7 @@ namespace Iis.DbLayer.Repositories
                 nodes.Add(olderNode);
                 actualNode = olderNode;
             }
-            
+
             //TODO: should put all documents by one query
             foreach (var item in nodes)
             {
@@ -104,6 +104,47 @@ namespace Iis.DbLayer.Repositories
                 p.SerializedNode, cancellationToken));
             await Task.WhenAll(putDocumentTasks);
             return true;            
+        }
+
+        public async Task<bool> PutHistoricalNodesAsync(IReadOnlyCollection<INode> items, CancellationToken ct = default)
+        {
+            var nodes = _nodeFlattener.FlattenNodes(items);
+            var changes = await _changeHistoryService.GetChangeHistory(items.Select(x => x.Id).Distinct().ToList());
+
+            var nodesToIndex = new List<FlattenNodeResult>();
+            foreach (var node in nodes)
+            {
+                var currentNode = node;
+                var nodeChanges = changes
+                   .Where(x => x.TargetId.ToString("N") == node.Id)
+                   .GroupBy(x => x.RequestId)
+                   .Where(x => x.Count() > 0)
+                   .OrderByDescending(x => x.First().Date)
+                   .ToList();
+
+                foreach (var changePack in nodeChanges)
+                {
+                    var olderNode = new FlattenNodeResult
+                    {
+                        Id = currentNode.Id,
+                        NodeTypeName = currentNode.NodeTypeName,
+                        SerializedNode = currentNode.SerializedNode.ReplaceOrAddValues(changePack.Select(x => (x.PropertyName, x.OldValue)).ToArray())
+                    };
+                    nodesToIndex.Add(olderNode);
+                    currentNode = olderNode;
+                }
+            }
+
+            //TODO: should put all documents by one query
+            foreach (var item in nodesToIndex)
+            {
+                var result = await _elasticManager.PutDocumentAsync(
+                $"historical_{item.NodeTypeName}",
+                Guid.NewGuid().ToString(),
+                item.SerializedNode, ct);
+            }
+
+            return true;
         }
     }
 }
