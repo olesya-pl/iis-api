@@ -102,7 +102,12 @@ namespace Iis.Api.Controllers
                     return Content(sb.ToString());
             }
 
-            await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
+            var deleteTasks = new List<Task>();
+            foreach (var index in ontologyIndexes)
+            {
+                deleteTasks.Add(_elasticManager.DeleteIndexAsync(index, cancellationToken));
+            }
+            await Task.WhenAll(deleteTasks);
 
             foreach (var ontologyIndex in ontologyIndexes)
             {
@@ -137,8 +142,12 @@ namespace Iis.Api.Controllers
                 if (!IsIndexesValid(ontologyIndexes, sb))
                     return Content(sb.ToString());
             }
-
-            await _elasticManager.DeleteIndexesAsync(ontologyIndexes, cancellationToken);
+            var deleteTasks = new List<Task>();
+            foreach (var index in ontologyIndexes)
+            {
+                deleteTasks.Add(_elasticManager.DeleteIndexAsync(index, cancellationToken));
+            }
+            await Task.WhenAll(deleteTasks);
             var itemsToUpdate = new List<Interfaces.Ontology.Data.INode>();
             foreach (var ontologyIndex in ontologyIndexes)
             {
