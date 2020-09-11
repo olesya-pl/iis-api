@@ -2,6 +2,9 @@ using System;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
+
+using Iis.Utility;
+
 using IIS.Core.Files;
 using Microsoft.AspNetCore.Http;
 
@@ -47,8 +50,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             [GraphQLNonNullType]
             public string GetUrl([Parent] Guid fileId, [Service] IHttpContextAccessor contextAccessor)
             {
-                var request = contextAccessor.HttpContext.Request;
-                return $"{request.Scheme}://{request.Host.Value}/api/files/{fileId}"; // todo: change hardcoded files api
+                return FileUrlGetter.GetFileUrl(fileId, contextAccessor);
             }
         }
     }

@@ -134,13 +134,19 @@ namespace Iis.OntologyData
                 }
                 Nodes.Remove(node.Id);
             }
+
+            foreach (var node in Nodes.Values)
+            {
+                node._outgoingRelations.RemoveAll(r => r.Node.IsArchived);
+                node._incomingRelations.RemoveAll(r => r.Node.IsArchived);
+            }
         }
         private void CompleteRelation(RelationData relation)
         {
             relation._node = Nodes[relation.Id];
             relation._sourceNode = Nodes[relation.SourceNodeId];
             relation._targetNode = Nodes[relation.TargetNodeId];
-            relation._node._relation = relation;
+            relation._node.Relation = relation;
             relation._sourceNode._outgoingRelations.Add(relation);
             relation._targetNode._incomingRelations.Add(relation);
         }
@@ -151,7 +157,7 @@ namespace Iis.OntologyData
         private void CompleteAttribute(AttributeData attribute)
         {
             attribute._node = Nodes[attribute.Id];
-            attribute._node._attribute = attribute;
+            attribute._node.Attribute = attribute;
         }
         public void ClearPatch()
         {

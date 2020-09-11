@@ -86,7 +86,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             Assert.Equal(ElasticMappingPropertyType.Date, ElasticMappingConfiguration.ToMappingType(ScalarType.Date));
             Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.Boolean));
             Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.Geo));
-            Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.File));
+            Assert.Equal(ElasticMappingPropertyType.Nested, ElasticMappingConfiguration.ToMappingType(ScalarType.File));
             Assert.Equal(ElasticMappingPropertyType.Text, ElasticMappingConfiguration.ToMappingType(ScalarType.Json));
         }
 

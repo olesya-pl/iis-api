@@ -65,6 +65,7 @@ using Microsoft.Extensions.Logging;
 using Iis.Interfaces.Ontology.Data;
 using Iis.DbLayer.OntologyData;
 using Iis.Api.Ontology;
+using Iis.OntologyData;
 
 namespace IIS.Core
 {
@@ -141,6 +142,10 @@ namespace IIS.Core
                 //ontology = ontologyProvider.GetOntology();
                 ontology = new OntologyWrapper(ontologySchema);
 
+
+                var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
+                var ontologyData = new OntologyNodesData(rawData, ontologySchema);
+                services.AddSingleton(ontologyData);
                 //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                 //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
                 //}
@@ -193,6 +198,7 @@ namespace IIS.Core
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
             services.AddTransient<NodeToJObjectMapper>();
+            services.AddSingleton<FileUrlGetter>();
 
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();

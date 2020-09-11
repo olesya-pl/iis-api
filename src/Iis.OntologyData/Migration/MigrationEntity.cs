@@ -12,13 +12,9 @@ namespace Iis.OntologyData.Migration
         public string TargetEntityName { get; set; }
         public List<string> LinkedEntities { get; set; }
         public IReadOnlyList<MigrationItem> Items { get; set; }
-        public string GetTargetDotName(string sourceDotName)
+        public IReadOnlyList<IMigrationItem> GetItems(string sourceDotName)
         {
-            return GetItem(sourceDotName)?.TargetDotName;
-        }
-        public IMigrationItem GetItem(string sourceDotName)
-        {
-            return Items.SingleOrDefault(i => i.SourceDotName == sourceDotName);
+            return Items.Where(i => i.SourceDotName == sourceDotName).ToList();
         }
     }
 }

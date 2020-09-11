@@ -112,6 +112,10 @@ namespace Iis.OntologyData
         {
             _storage.ClearPatch();
         }
+        public void SetNodeIsArchived(Guid nodeId)
+        {
+            _storage.SetNodeIsArchived(nodeId);
+        }
         public IReadOnlyList<INode> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             return Nodes

@@ -21,17 +21,17 @@ namespace Iis.OntologyData.Migration
             _schema = schema;
             _migration = migration;
         }
-        public IMigrationResult Migrate()
+        public IMigrationResult Migrate(IMigrationOptions migrationOptions)
         {
             Log($"Міграція {_migration.Title}");
             foreach (var migrationEntity in _migration.GetItems())
             {
-                Migrate(migrationEntity);
+                Migrate(migrationEntity, migrationOptions);
             }
 
             return new MigrationResult { Log = _log.ToString() };
         }
-        public Dictionary<Guid, Guid> Migrate(IMigrationEntity migrationEntity)
+        public Dictionary<Guid, Guid> Migrate(IMigrationEntity migrationEntity, IMigrationOptions migrationOptions)
         {
             Log($"Міграція {migrationEntity.SourceEntityName} у {migrationEntity.TargetEntityName}");
             var sourceNodes = _data.GetEntitiesByTypeName(migrationEntity.SourceEntityName);
@@ -39,18 +39,27 @@ namespace Iis.OntologyData.Migration
 
             var targetType = _schema.GetEntityTypeByName(migrationEntity.TargetEntityName);
 
-            foreach (var node in sourceNodes)
+            if (migrationOptions.SaveNewObjects)
             {
-                var entity = _data.CreateNode(targetType.Id, Guid.NewGuid());
-                hierarchyMapper[node.Id] = entity.Id;
+                foreach (var node in sourceNodes)
+                {
+                    var entity = _data.CreateNode(targetType.Id, Guid.NewGuid());
+                    hierarchyMapper[node.Id] = entity.Id;
+                }
             }
 
             foreach (var node in sourceNodes)
             {
                 if (!_migratedIds.Contains(node.Id))
                 {
-                    Migrate(node, migrationEntity);
-                    //_storage.SetNodeIsArchived(node.Id);
+                    if (migrationOptions.SaveNewObjects)
+                    {
+                        Migrate(node, migrationEntity);
+                    }
+                    if (migrationOptions.DeleteOldObjects)
+                    {
+                        _data.SetNodeIsArchived(node.Id);
+                    }
                 }
             }
 
@@ -92,15 +101,15 @@ namespace Iis.OntologyData.Migration
 
             foreach (var dotNameValue in dotNameValues.Items)
             {
-                var migrationItem = migrationEntity.GetItem(dotNameValue.DotName);
-                var targetDotNames = new List<string> { migrationItem?.TargetDotName ?? dotNameValue.DotName };
-                if (migrationItem?.OtherTargetDotNames != null)
+                var migrationItems = new List<IMigrationItem>(migrationEntity.GetItems(dotNameValue.DotName));
+                if (migrationItems.Count == 0)
                 {
-                    targetDotNames.AddRange(migrationItem.OtherTargetDotNames);
+                    migrationItems.Add(new MigrationItem(dotNameValue.DotName, dotNameValue.DotName));
                 }
-                foreach (var targetDotName in targetDotNames)
+
+                foreach (var migrationItem in migrationItems)
                 {
-                    SetValue(dotNameValue, dotNameValues, migrationItem, targetDotName, entity);
+                    SetValue(dotNameValue, dotNameValues, migrationItem, migrationItem.TargetDotName, entity);
                 }
             }
         }

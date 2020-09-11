@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Iis.DbLayer.Repositories.Helpers;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
@@ -92,6 +93,17 @@ namespace Iis.DbLayer.Repositories
             }
 
             return true;
+        }
+
+        public async Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken)
+        {
+            var result = _nodeFlattener.FlattenNodes(itemsToUpdate);
+            var putDocumentTasks = result.Select(p => _elasticManager.PutDocumentAsync(
+                p.NodeTypeName,
+                p.Id,
+                p.SerializedNode, cancellationToken));
+            await Task.WhenAll(putDocumentTasks);
+            return true;            
         }
     }
 }

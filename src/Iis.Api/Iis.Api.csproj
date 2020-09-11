@@ -54,6 +54,8 @@
     <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
+    <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
@@ -65,6 +67,12 @@
   <ItemGroup>
     <None Update="data\contour\migrations\002\migration-002.ont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="data\scripts\script-find-rows-with-3-coordinaties.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="data\scripts\script-update-rows-with-3-coordinaties.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>

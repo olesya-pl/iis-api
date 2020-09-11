@@ -44,7 +44,7 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.14";
+        const string VERSION = "1.15";
         Button btnMigrate;
         ILogger _logger;
 
@@ -210,12 +210,12 @@ namespace Iis.OntologyManager
             cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
             container.Add(cmbSchemaSources);
 
-            btnSaveSchema = new Button { Text = "Save To File", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnSaveSchema = new Button { Text = "Зберегти", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnSaveSchema.Click += btnSave_Click;
-            btnCompare = new Button { Text = "Compare", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnCompare = new Button { Text = "Порівняти", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
-            btnMigrate = new Button { Text = "Migrate", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnMigrate = new Button { Text = "Міграція", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnMigrate.Click += btnMigrate_Click;
             container.Add(btnMigrate);
 
@@ -252,7 +252,7 @@ namespace Iis.OntologyManager
             var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             var control = new UiComparisonControl(_schemaSources, _schemaService, _schema);
-            control.Initialize("MigrationControl", rootPanel);
+            control.Initialize("ComparisonControl", rootPanel);
 
             form.ShowDialog();
             form.Close();
@@ -268,7 +268,7 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
-        private IMigrationResult Migrate(IMigration migration)
+        private IMigrationResult Migrate(IMigration migration, IMigrationOptions migrationOptions)
         {
             var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
                 (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
@@ -283,7 +283,7 @@ namespace Iis.OntologyManager
             var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
             var ontologyData = new OntologyNodesData(rawData, schema);
             var migrator = new OntologyMigrator(ontologyData, schema, migration);
-            var result = migrator.Migrate();
+            var result = migrator.Migrate(migrationOptions);
 
             var ontologyPatchSaver = new OntologyPatchSaver(context, _mapper);
             ontologyPatchSaver.SavePatch(ontologyData.Patch); 

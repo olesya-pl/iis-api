@@ -3,8 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Iis.Domain;
-
-using Microsoft.AspNetCore.Http;
+using Iis.Utility;
 
 using Newtonsoft.Json.Linq;
 
@@ -15,16 +14,15 @@ namespace Iis.Api.Ontology
     public class NodeToJObjectMapper
     {
         private readonly IOntologyService _ontologyService;
-        private readonly IHttpContextAccessor _contextAccessor;
-
+        private readonly FileUrlGetter _fileUrlGetter;
         private readonly string[] EventDotNames = new[] {
             "name", "description", "updatedAt", "startsAt", "endsAt" };
 
         public NodeToJObjectMapper(IOntologyService ontologyService,
-            IHttpContextAccessor contextAccessor)
+            FileUrlGetter fileUrlGetter)
         {
             _ontologyService = ontologyService;
-            _contextAccessor = contextAccessor;
+            _fileUrlGetter = fileUrlGetter;
         }
 
         public JObject NodeToJObject(Node node)
@@ -41,9 +39,9 @@ namespace Iis.Api.Ontology
                     result.Add(new JProperty(attribute.Key, attribute.Select(p =>
                     {
                         var res = new JObject();
-                        var request = _contextAccessor.HttpContext.Request;
+                        
                         res.Add("id", p.Attribute.Value.ToString());
-                        res.Add("url", $"{request.Scheme}://{request.Host.Value}/api/files/{p.Attribute.Value}");
+                        res.Add("url", _fileUrlGetter.GetFileUrl((Guid)p.Attribute.Value));
                         return res;
                     })));
                 }

@@ -9,7 +9,6 @@ namespace Iis.Interfaces.Ontology.Data
         string SourceEntityName { get; }
         string TargetEntityName { get; }
         List<string> LinkedEntities { get; }
-        string GetTargetDotName(string sourceDotName);
-        IMigrationItem GetItem(string sourceDotName);
+        IReadOnlyList<IMigrationItem> GetItems(string sourceDotName);
     }
 }
