@@ -1,5 +1,6 @@
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology;
@@ -176,13 +177,18 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids));
         }
 
-        public async Task<List<IGeoCoordinates>> ResolveCoordinates(IResolverContext ctx) 
+        public async Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {
             var parentNode = ctx.Parent<Node>();
             var extNodeService = ctx.Service<IExtNodeService>();
 
             var extNode = await extNodeService.GetExtNodeAsync(parentNode.Id);
-            return extNode.GetCoordinates();
+            return extNode.GetNodeCoordinates().Select(x => new GeoCoordinate
+            {
+                Label = x.Node.NodeTypeTitle,
+                Lat = x.Coordinates.Latitude,
+                Long = x.Coordinates.Longitude
+            }).ToList();
         }
     }
 }

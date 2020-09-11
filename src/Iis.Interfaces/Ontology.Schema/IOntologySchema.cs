@@ -29,5 +29,7 @@ namespace Iis.Interfaces.Ontology.Schema
         void PutInOrder();
         void RemoveEntity(Guid id);
         string ValidateRemoveEntity(Guid id);
+        bool IsFuzzyDateEntity(INodeTypeLinked nodeType);
+        bool IsFuzzyDateEntityAttribute(INodeTypeLinked nodeType);
     }
 }
