@@ -28,6 +28,37 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         }
 
         [Fact]
+        public void ConstructorFromAttributeInfo_Single_IsFile()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("name1", ScalarType.File, null),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Single(result.Properties);
+            var property = result.Properties[0];            
+            Assert.Equal("name1", property.Name);
+            Assert.Equal(ElasticMappingPropertyType.Nested, property.Type);
+            Assert.Empty(property.Properties);
+        }
+
+        [Fact]
+        public void ConstructorFromAttributeInfo_Single_IsFile_JsonConversion()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("name1", ScalarType.File, null),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Single(result.Properties);
+            var property = result.Properties[0];
+            var json = property.ToJObject();
+            Assert.Equal("nested", json["type"]);
+        }
+
+        [Fact]
         public void ConstructorFromAttributeInfo_Deep2()
         {
             var list = new List<AttributeInfoItem>

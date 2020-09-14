@@ -50,6 +50,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return await query.OrderByDescending(ch => ch.Date).ToListAsync();
         }
 
+        public async Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistory(IEnumerable<Guid> ids)
+        {
+            return await _context.ChangeHistory
+                .Where(x => ids.Contains(x.TargetId))
+                .ToListAsync();
+        }
+
         public async Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistoryByRequest(Guid requestId) 
         {
             return await _context.ChangeHistory.AsNoTracking().Where(ch => ch.RequestId == requestId).ToListAsync();

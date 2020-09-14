@@ -162,7 +162,52 @@ namespace Iis.Api.Controllers
             return Content(sb.ToString());
         }
 
+        [HttpGet("ReInitializeHistoricalOntologyIndexes/{indexNames}")]
+        public async Task<IActionResult> ReInitializeHistoricalOntologyIndexes(string indexNames, CancellationToken ct)
+        {
+            IEnumerable<string> ontologyIndexes;
+            IDictionary<string, string> historicalIndexesByTypeName;
+            var log = new StringBuilder();
+            if (indexNames == "all")
+            {
+                ontologyIndexes = _elasticService.OntologyIndexes;
+                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes;
+            }
+            else
+            {
+                ontologyIndexes = indexNames.Split(",");
+                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes
+                    .Where(x => ontologyIndexes.Contains(x.Key))
+                    .ToDictionary(x => x.Key, x => x.Value);
 
+                if (!IsIndexesValid(ontologyIndexes, log))
+                    return Content(log.ToString());
+            }
+
+            foreach (var item in historicalIndexesByTypeName.Values)
+            {
+                await _elasticManager.DeleteIndexAsync(item, ct);
+            }
+
+            foreach (var index in ontologyIndexes)
+            {
+                var attributesInfo = _ontologySchema.GetHistoricalAttributesInfo(index, historicalIndexesByTypeName[index]);
+                await _elasticManager.CreateMapping(attributesInfo);
+            }
+
+            var nodes = new List<Interfaces.Ontology.Data.INode>();
+            foreach (var index in ontologyIndexes)
+            {
+                var type = _ontologySchema.GetEntityTypeByName(index);
+                var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
+                nodes.AddRange(entities);
+            }
+
+            await _nodeRepository.PutHistoricalNodesAsync(nodes, ct);
+
+            log.AppendLine($"{nodes.Count} nodes added");
+            return Content(log.ToString());
+        }
 
         [HttpGet("RecreateElasticMaterialIndexes/{indexNames}")]
         public async Task<IActionResult> RecreateElasticMaterialIndexes(CancellationToken cancellationToken)
