@@ -306,11 +306,12 @@ namespace IIS.Core.Ontology.EntityFramework
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
         }
 
-        public Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken)
+        public async Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
+            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return true;
 
-            return _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
+            var response = await _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
+            return response.All(x => x.IsSuccess);
         }
 
         public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string fieldName, int size, CancellationToken ct = default)
