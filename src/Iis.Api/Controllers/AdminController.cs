@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.OntologyData;
+using MoreLinq;
 
 namespace Iis.Api.Controllers
 {
@@ -75,15 +76,11 @@ namespace Iis.Api.Controllers
             }
 
             var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, ct);
-            foreach (var extNode in extNodes)
-            {
-                await _elasticService.PutHistoricalNodesAsync(extNode, null, ct);
-            }
+            var response = await _nodeRepository.PutHistoricalNodesAsync(extNodes, ct);
 
-            log.AppendLine($"{extNodes.Count} nodes added");
+            LogElasticResult(log, response);
             return Content(log.ToString());
         }
-
 
         [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
         public async Task<IActionResult> RecreateElasticOntologyIndexes(string indexNames, CancellationToken cancellationToken)
@@ -130,7 +127,7 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken cancellationToken)
         {
             IEnumerable<string> ontologyIndexes;
-            var sb = new StringBuilder();
+            var log = new StringBuilder();
             if (indexNames == "all")
             {
                 ontologyIndexes = _elasticService.OntologyIndexes.ToList();
@@ -139,8 +136,8 @@ namespace Iis.Api.Controllers
             {
                 ontologyIndexes = indexNames.Split(',');
 
-                if (!IsIndexesValid(ontologyIndexes, sb))
-                    return Content(sb.ToString());
+                if (!IsIndexesValid(ontologyIndexes, log))
+                    return Content(log.ToString());
             }
             var deleteTasks = new List<Task>();
             foreach (var index in ontologyIndexes)
@@ -148,6 +145,7 @@ namespace Iis.Api.Controllers
                 deleteTasks.Add(_elasticManager.DeleteIndexAsync(index, cancellationToken));
             }
             await Task.WhenAll(deleteTasks);
+
             var itemsToUpdate = new List<Interfaces.Ontology.Data.INode>();
             foreach (var ontologyIndex in ontologyIndexes)
             {
@@ -157,9 +155,11 @@ namespace Iis.Api.Controllers
                 var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
                 itemsToUpdate.AddRange(entities);
             }
-            await _elasticService.PutNodesAsync(itemsToUpdate, cancellationToken);
-            sb.AppendLine($"{itemsToUpdate.Count} entities added");
-            return Content(sb.ToString());
+
+            var response = await _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
+            LogElasticResult(log, response);
+
+            return Content(log.ToString());
         }
 
         [HttpGet("ReInitializeHistoricalOntologyIndexes/{indexNames}")]
@@ -203,9 +203,9 @@ namespace Iis.Api.Controllers
                 nodes.AddRange(entities);
             }
 
-            await _nodeRepository.PutHistoricalNodesAsync(nodes, ct);
+            var response = await _nodeRepository.PutHistoricalNodesAsync(nodes, ct);
 
-            log.AppendLine($"{nodes.Count} nodes added");
+            LogElasticResult(log, response);
             return Content(log.ToString());
         }
 
@@ -262,6 +262,23 @@ namespace Iis.Api.Controllers
             }
 
             return true;
+        }
+
+        private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
+        {
+            var successResponses = response.Where(x => x.IsSuccess);
+            log.AppendLine($"Success operations: {successResponses.Count()}");
+            foreach (var item in successResponses.GroupBy(x => x.SuccessOperation))
+            {
+                log.AppendLine($"{item.Key}: {item.Count()}");
+            }
+
+            var failedRespones = response.Where(x => !x.IsSuccess);
+            log.AppendLine($"Failed operations: {failedRespones.Count()}");
+            foreach (var group in failedRespones.GroupBy(x => x.Id))
+            {
+                log.AppendLine($"error occurred for Id:{group.Key}, errorType:{group.First().ErrorType}, error message:{group.First().ErrorReason}");
+            }
         }
     }
 }
