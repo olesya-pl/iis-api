@@ -8,5 +8,6 @@ namespace Iis.Interfaces.Ontology.Data
     {
         string Title { get; }
         IReadOnlyList<IMigrationEntity> GetItems();
+        IReadOnlyList<IMigrationReference> GetReferences();
     }
 }
