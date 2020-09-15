@@ -15,6 +15,7 @@ namespace Iis.OntologyManager.Style
         public int ControlWidthDefault { get; set; }
         public int ButtonHeightDefault { get; private set; }
         public int ButtonWidthDefault { get; set; }
+        public int CheckboxHeightDefault { get; set; }
         public Color BackgroundColor { get; set; }
         public Color ComparisonBackColor { get; set; }
         public Color EntityTypeBackColor { get; set; }
@@ -44,6 +45,7 @@ namespace Iis.OntologyManager.Style
                 ControlWidthDefault = (int)(charWidth * 34),
                 ButtonHeightDefault = (int)(charHeight * 2),
                 ButtonWidthDefault = (int)(charWidth * 34),
+                CheckboxHeightDefault = (int)(charHeight),
                 BackgroundColor = Color.LightYellow,
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,
