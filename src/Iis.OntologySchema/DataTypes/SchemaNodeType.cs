@@ -28,6 +28,8 @@ namespace Iis.OntologySchema.DataTypes
                 switch (AttributeType.ScalarType)
                 {
                     case ScalarType.String:
+                    case ScalarType.IntegerRange:
+                    case ScalarType.FloatRange:
                         return typeof(string);
                     case ScalarType.Int:
                         return typeof(int);
@@ -136,7 +138,7 @@ namespace Iis.OntologySchema.DataTypes
         }
         public IEnumerable<INodeTypeLinked> GetDirectProperties()
         {
-            return IsInversed ? 
+            return IsInversed ?
                 new List<INodeTypeLinked> { RelationType.DirectRelationType.NodeType } :
                 OutgoingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(rt => rt.NodeType);
         }
@@ -189,7 +191,7 @@ namespace Iis.OntologySchema.DataTypes
         public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
         public bool IsObjectSign => Name == EntityTypeNames.ObjectSign.ToString() || IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
         public bool IsEnum => Name == EntityTypeNames.Enum.ToString() || IsInheritedFrom(EntityTypeNames.Enum.ToString());
-        public bool IsAncestorOfObjectOfStudy => IsAbstract && 
+        public bool IsAncestorOfObjectOfStudy => IsAbstract &&
             GetAllDescendants().All(nt => nt.IsAbstract || nt.IsObjectOfStudy);
         public bool IsSeparateObject => IsObjectOfStudy || IsObjectSign || IsEnum || IsAncestorOfObjectOfStudy;
 
@@ -379,13 +381,13 @@ namespace Iis.OntologySchema.DataTypes
                 .Select(r => r.TargetType)
                 .Single();
 
-            return dotNameParts.Length == 1 ? 
-                nodeType : 
+            return dotNameParts.Length == 1 ?
+                nodeType :
                 nodeType.GetNodeTypeByDotNameParts(dotNameParts.Skip(1).ToArray());
         }
 
         public override string ToString() => Name;
-        
+
         internal void RemoveRelationType(Guid id)
         {
             var relation = _outgoingRelations.Single(r => r.Id == id);

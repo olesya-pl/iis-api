@@ -82,7 +82,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             List<Guid> visitedEntityIds,
             CancellationToken cancellationToken = default)
         {
-            if (_ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId).IsObjectOfStudy) 
+            if (_ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId).IsObjectOfStudy)
             {
                 visitedEntityIds.Add(nodeEntity.Id);
             }
@@ -169,10 +169,27 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         fileId = value,
                         url = _fileUrlGetter.GetFileUrl(new Guid(value))
                     };
+                case ScalarType.IntegerRange:
+                case ScalarType.FloatRange:
+                    return FormatRange(value);
                 default:
                     return value;
             }
-        }       
+        }
+
+        private object FormatRange(string value)
+        {
+            var splitted = value.Split('-', StringSplitOptions.RemoveEmptyEntries);
+            if (splitted.Count() == 1 || splitted.Count() == 2)
+            {
+                return new
+                {
+                    gte = splitted.First(),
+                    lte = splitted.Last()
+                };
+            }
+            return null;
+        }
 
         private async Task<List<ExtNode>> GetExtNodesByRelations(
             IEnumerable<RelationEntity> relations,
