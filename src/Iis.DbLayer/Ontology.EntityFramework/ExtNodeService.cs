@@ -65,6 +65,20 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return extNode;
         }
 
+        public async Task<IExtNode> GetExtNodeWithoutNestedObjectsAsync(Guid id, CancellationToken ct = default)
+        {
+            var nodeEntity = await RunWithoutCommitAsync(async uow => await uow.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(id));
+
+            if (nodeEntity == null) return null;
+
+            var extNode = await MapExtNodeWithoutNestedObjectsAsync(
+                nodeEntity,
+                nodeEntity.NodeType.Name,
+                nodeEntity.NodeType.Title,
+                ct);
+            return extNode;
+        }
+
         public IExtNode GetExtNode(INode nodeEntity)
         {
             var extNode = MapExtNode(
@@ -91,6 +105,20 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             extNode.AttributeValue = GetAttributeValue(nodeEntity);
             extNode.ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType;
             extNode.Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds, cancellationToken);
+            return extNode;
+        }
+
+        private async Task<ExtNode> MapExtNodeWithoutNestedObjectsAsync(
+            NodeEntity nodeEntity,
+            string nodeTypeName,
+            string nodeTypeTitle,
+            CancellationToken cancellationToken = default)
+        {
+            var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
+            extNode.EntityTypeName = nodeEntity.NodeType.Name;
+            extNode.AttributeValue = GetAttributeValue(nodeEntity);
+            extNode.ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType;
+            extNode.Children = await GetExtNodesByRelationsWithoutNestedObjects(nodeEntity.OutgoingRelations, cancellationToken);
             return extNode;
         }
 
@@ -191,6 +219,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         relation.Node.NodeType.Name,
                         relation.Node.NodeType.Title,
                         visitedEntityIds,
+                        cancellationToken);
+                    result.Add(extNode);
+                }
+            }
+            return result;
+        }
+
+        private async Task<List<ExtNode>> GetExtNodesByRelationsWithoutNestedObjects(
+            IEnumerable<RelationEntity> relations,
+            CancellationToken cancellationToken = default)
+        {
+            var result = new List<ExtNode>();
+            foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.Node.NodeType.IsArchived
+                && !r.TargetNode.IsArchived && !r.TargetNode.NodeType.IsArchived))
+            {
+                var node = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.OntologyRepository.GetNodeEntityWithIncludesByIdAsync(relation.TargetNodeId));
+                if (!_ontologySchema.GetNodeTypeById(node.NodeTypeId).IsObjectOfStudy)
+                {
+                    var extNode = await MapExtNodeWithoutNestedObjectsAsync(
+                        node,
+                        relation.Node.NodeType.Name,
+                        relation.Node.NodeType.Title,
                         cancellationToken);
                     result.Add(extNode);
                 }
