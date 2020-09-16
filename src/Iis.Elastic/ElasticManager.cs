@@ -54,14 +54,6 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<bool> PutsDocumentsAsync(string indexName, string materialDocuments, CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(indexName)) return false;
-            var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
-            var response = await PostAsync(indexUrl, materialDocuments, token);
-            return response.Success;
-        }
-
         public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(indexName))

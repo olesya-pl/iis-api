@@ -212,6 +212,7 @@ namespace Iis.Api.Controllers
         [HttpGet("RecreateElasticMaterialIndexes/{indexNames}")]
         public async Task<IActionResult> RecreateElasticMaterialIndexes(CancellationToken cancellationToken)
         {
+            var log = new StringBuilder();
             var materialIndex = _elasticService.MaterialIndexes.First();
 
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
@@ -230,9 +231,10 @@ namespace Iis.Api.Controllers
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
-            var materialsCount = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
+            var response = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
 
-            return Content($"{materialsCount} materials completed");
+            LogElasticResult(log, response);
+            return Content(log.ToString());
         }
 
         [HttpGet("GetElasticJson/{id}")]
