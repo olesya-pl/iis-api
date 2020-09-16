@@ -11,5 +11,8 @@ namespace Iis.OntologyData.Migration
 
         public IReadOnlyList<MigrationEntity> Items;
         public IReadOnlyList<IMigrationEntity> GetItems() => Items;
+
+        public IReadOnlyList<MigrationReference> References;
+        public IReadOnlyList<IMigrationReference> GetReferences() => References;
     }
 }

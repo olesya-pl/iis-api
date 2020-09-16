@@ -7,6 +7,8 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyList<IDotNameValue> Items { get; }
         bool Contains(string dotName);
         bool ContainsOneOf(IEnumerable<string> dotNames);
-        string GetValue(string dotName);
+        string GetSingleValue(string dotName);
+        IReadOnlyList<string> GetValues(string dotName);
+        IReadOnlyList<IDotNameValue> GetItems(string dotName);
     }
 }

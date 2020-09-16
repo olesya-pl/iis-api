@@ -36,11 +36,17 @@ namespace Iis.OntologyData.DataTypes
             {
                 if (relation.TargetKind == Kind.Attribute)
                 {
-                    list.Add(new DotNameValue(relation.TypeName, relation.TargetNode.Value));
+                    list.Add(new DotNameValue(
+                        relation.TypeName, 
+                        relation.TargetNode.Value,
+                        new List<INode> { relation.Node, relation.TargetNode }));
                 }
                 else if (relation.IsLinkToSeparateObject)
                 {
-                    list.Add(new DotNameValue(relation.TypeName, relation.TargetNodeId.ToString()));
+                    list.Add(new DotNameValue(
+                        relation.TypeName, 
+                        relation.TargetNodeId.ToString(),
+                        new List<INode> { relation.Node }));
                 }
                 else
                 {
@@ -48,7 +54,10 @@ namespace Iis.OntologyData.DataTypes
                     foreach (var item in values.Items)
                     {
                         list.Add(new DotNameValue(
-                            $"{NodeType.Name}.{item.DotName}", item.Value));
+                            $"{NodeType.Name}.{item.DotName}", 
+                            item.Value, 
+                            new List<INode> { relation.Node, relation.TargetNode }
+                                .Concat(item.Nodes)));
                     }
                 }
             }

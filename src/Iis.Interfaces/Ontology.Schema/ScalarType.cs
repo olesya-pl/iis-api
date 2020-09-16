@@ -10,6 +10,8 @@ namespace Iis.Interfaces.Ontology.Schema
         Geo = 5,
         File = 6,
         Json = 7,
-        DateRange = 8
+        DateRange = 8,
+        IntegerRange = 9,
+        FloatRange = 10
     }
 }
