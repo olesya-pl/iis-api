@@ -283,6 +283,8 @@ namespace IIS.Core
                     Configuration["activeDirectory:server"],
                     Configuration["activeDirectory:login"],
                     Configuration["activeDirectory:password"]));
+            services.AddSingleton<IElasticState, ElasticState>();
+            services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));

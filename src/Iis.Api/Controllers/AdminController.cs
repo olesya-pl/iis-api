@@ -13,6 +13,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.OntologyData;
 using MoreLinq;
+using Iis.Services.Contracts.Interfaces;
+using System.Diagnostics;
 
 namespace Iis.Api.Controllers
 {
@@ -20,200 +22,84 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class AdminController : Controller
     {
-        IExtNodeService _extNodeService;
         IElasticManager _elasticManager;
-        IElasticService _elasticService;
-        IOntologySchema _ontologySchema;
         INodeRepository _nodeRepository;
-        private readonly OntologyNodesData ontologyNodesData;
         IMaterialService _materialService;
+        IElasticState _elasticState;
+        private readonly IAdminOntologyElasticService _adminElasticService;
         public AdminController(
-            IExtNodeService extNodeService,
             IMaterialService materialService,
-            IElasticService elasticService,
             IElasticManager elasticManager,
-            IOntologySchema ontologySchema,
             INodeRepository nodeRepository,
-            OntologyNodesData ontologyNodesData)
+            IElasticState elasticState,
+            IAdminOntologyElasticService adminElasticService)
         {
-            _extNodeService = extNodeService;
             _elasticManager = elasticManager;
-            _elasticService = elasticService;
             _materialService = materialService;
-            _ontologySchema = ontologySchema;
             _nodeRepository = nodeRepository;
-            this.ontologyNodesData = ontologyNodesData;
+            _elasticState = elasticState;
+            _adminElasticService = adminElasticService;
         }
 
         [HttpPost("CreateHistoricalIndexes/{indexNames}")]
-        public async Task<IActionResult> CreateHistoricalIndexes(string indexNames, CancellationToken ct)
+        public Task<IActionResult> CreateHistoricalIndexes(string indexNames, CancellationToken ct)
         {
-            IEnumerable<string> ontologyIndexes;
-            IDictionary<string, string> historicalIndexesByTypeName;
-            var log = new StringBuilder();
-            if (indexNames == "all")
-            {
-                ontologyIndexes = _elasticService.OntologyIndexes;
-                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes;
-            }
-            else
-            {
-                ontologyIndexes = indexNames.Split(",");
-                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes
-                    .Where(x => ontologyIndexes.Contains(x.Key))
-                    .ToDictionary(x => x.Key, x => x.Value);
-
-                if (!IsIndexesValid(ontologyIndexes, log))
-                    return Content(log.ToString());
-            }
-
-            await _elasticManager.DeleteIndexesAsync(historicalIndexesByTypeName.Values, ct);
-
-            foreach (var index in ontologyIndexes)
-            {
-                var attributesInfo = _ontologySchema.GetHistoricalAttributesInfo(index, historicalIndexesByTypeName[index]);
-                await _elasticManager.CreateMapping(attributesInfo);
-            }
-
-            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, ct);
-            var response = await _nodeRepository.PutHistoricalNodesAsync(extNodes, ct);
-
-            LogElasticResult(log, response);
-            return Content(log.ToString());
+            return RecreateOntologyIndexes(indexNames, true, false, ct);
         }
 
         [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
-        public async Task<IActionResult> RecreateElasticOntologyIndexes(string indexNames, CancellationToken cancellationToken)
+        public Task<IActionResult> RecreateElasticOntologyIndexes(string indexNames, CancellationToken ct)
         {
-            IEnumerable<string> ontologyIndexes;
-            var sb = new StringBuilder();
-            if (indexNames == "all")
-            {
-                ontologyIndexes = _elasticService.OntologyIndexes.ToList();
-            }
-            else
-            {
-                ontologyIndexes = indexNames.Split(',');
-
-                if (!IsIndexesValid(ontologyIndexes, sb))
-                    return Content(sb.ToString());
-            }
-
-            var deleteTasks = new List<Task>();
-            foreach (var index in ontologyIndexes)
-            {
-                deleteTasks.Add(_elasticManager.DeleteIndexAsync(index, cancellationToken));
-            }
-            await Task.WhenAll(deleteTasks);
-
-            foreach (var ontologyIndex in ontologyIndexes)
-            {
-                var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
-                var attributesInfo = _ontologySchema.GetAttributesInfo(ontologyIndex);
-                await _elasticManager.CreateMapping(attributesInfo);
-            }
-
-            var extNodes = await _extNodeService.GetExtNodesByTypeIdsAsync(ontologyIndexes, cancellationToken);
-            foreach (var extNode in extNodes)
-            {
-                await _elasticService.PutNodeAsync(extNode, cancellationToken);
-            }
-
-            sb.AppendLine($"{extNodes.Count} nodes added");
-            return Content(sb.ToString());
+            return RecreateOntologyIndexes(indexNames, false, false, ct);
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
-        public async Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken cancellationToken)
+        public Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken ct)
         {
-            IEnumerable<string> ontologyIndexes;
-            var log = new StringBuilder();
-            if (indexNames == "all")
-            {
-                ontologyIndexes = _elasticService.OntologyIndexes.ToList();
-            }
-            else
-            {
-                ontologyIndexes = indexNames.Split(',');
-
-                if (!IsIndexesValid(ontologyIndexes, log))
-                    return Content(log.ToString());
-            }
-            var deleteTasks = new List<Task>();
-            foreach (var index in ontologyIndexes)
-            {
-                deleteTasks.Add(_elasticManager.DeleteIndexAsync(index, cancellationToken));
-            }
-            await Task.WhenAll(deleteTasks);
-
-            var itemsToUpdate = new List<Interfaces.Ontology.Data.INode>();
-            foreach (var ontologyIndex in ontologyIndexes)
-            {
-                var type = _ontologySchema.GetEntityTypeByName(ontologyIndex);
-                var attributesInfo = _ontologySchema.GetAttributesInfo(ontologyIndex);
-                await _elasticManager.CreateMapping(attributesInfo);
-                var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
-                itemsToUpdate.AddRange(entities);
-            }
-
-            var response = await _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
-            LogElasticResult(log, response);
-
-            return Content(log.ToString());
+            return RecreateOntologyIndexes(indexNames, false, true, ct);
         }
 
         [HttpGet("ReInitializeHistoricalOntologyIndexes/{indexNames}")]
-        public async Task<IActionResult> ReInitializeHistoricalOntologyIndexes(string indexNames, CancellationToken ct)
+        public Task<IActionResult> ReInitializeHistoricalOntologyIndexes(string indexNames, CancellationToken ct)
         {
-            IEnumerable<string> ontologyIndexes;
-            IDictionary<string, string> historicalIndexesByTypeName;
-            var log = new StringBuilder();
+            return RecreateOntologyIndexes(indexNames, true, true, ct);
+        }
+
+        private async Task<IActionResult> RecreateOntologyIndexes(string indexNames, bool isHistorical, bool useNodesFromMemory, CancellationToken ct)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            _adminElasticService.Logger = new StringBuilder();
+
+            IEnumerable<string> indexes;
             if (indexNames == "all")
             {
-                ontologyIndexes = _elasticService.OntologyIndexes;
-                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes;
+                indexes = _elasticState.OntologyIndexes;
             }
             else
             {
-                ontologyIndexes = indexNames.Split(",");
-                historicalIndexesByTypeName = _elasticService.HistoricalOntologyIndexes
-                    .Where(x => ontologyIndexes.Contains(x.Key))
-                    .ToDictionary(x => x.Key, x => x.Value);
+                indexes = indexNames.Split(",");
 
-                if (!IsIndexesValid(ontologyIndexes, log))
-                    return Content(log.ToString());
+                if (!_adminElasticService.IsIndexesValid(indexes))
+                    return Content(_adminElasticService.Logger.ToString());
             }
 
-            foreach (var item in historicalIndexesByTypeName.Values)
-            {
-                await _elasticManager.DeleteIndexAsync(item, ct);
-            }
+            await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
+            await _adminElasticService.CreateMappingsAsync(indexes, isHistorical, ct);
 
-            foreach (var index in ontologyIndexes)
-            {
-                var attributesInfo = _ontologySchema.GetHistoricalAttributesInfo(index, historicalIndexesByTypeName[index]);
-                await _elasticManager.CreateMapping(attributesInfo);
-            }
+            if (useNodesFromMemory)
+                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
+            else
+                await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
 
-            var nodes = new List<Interfaces.Ontology.Data.INode>();
-            foreach (var index in ontologyIndexes)
-            {
-                var type = _ontologySchema.GetEntityTypeByName(index);
-                var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
-                nodes.AddRange(entities);
-            }
-
-            var response = await _nodeRepository.PutHistoricalNodesAsync(nodes, ct);
-
-            LogElasticResult(log, response);
-            return Content(log.ToString());
+            _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+            return Content(_adminElasticService.Logger.ToString());
         }
 
-        [HttpGet("RecreateElasticMaterialIndexes/{indexNames}")]
+        [HttpGet("RecreateElasticMaterialIndexes")]
         public async Task<IActionResult> RecreateElasticMaterialIndexes(CancellationToken cancellationToken)
         {
             var log = new StringBuilder();
-            var materialIndex = _elasticService.MaterialIndexes.First();
+            var materialIndex = _elasticState.MaterialIndexes.First();
 
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
@@ -248,22 +134,6 @@ namespace Iis.Api.Controllers
             }
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
-        }
-
-        private bool IsIndexesValid(IEnumerable<string> indexes, StringBuilder log)
-        {
-            var notValidNames = indexes
-                       .Where(name => !_elasticService.OntologyIndexes.Contains(name))
-                       .ToList();
-
-            if (notValidNames.Count > 0)
-            {
-                log.AppendLine("There are not valid index names in list:");
-                notValidNames.ForEach(name => log.AppendLine(name));
-                return false;
-            }
-
-            return true;
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
