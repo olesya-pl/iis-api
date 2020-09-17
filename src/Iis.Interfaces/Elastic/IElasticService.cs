@@ -9,11 +9,6 @@ namespace Iis.Interfaces.Elastic
 {
     public interface IElasticService
     {
-        IEnumerable<string> MaterialIndexes { get; }
-        IEnumerable<string> OntologyIndexes { get; }
-        IDictionary<string, string> HistoricalOntologyIndexes { get; }
-        IEnumerable<string> EventIndexes { get; }
-        IEnumerable<string> FeatureIndexes { get; }
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default);
         Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default);

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.ThemeManagement
 {
@@ -19,13 +20,15 @@ namespace Iis.ThemeManagement
         private readonly IMapper _mapper;
         private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
+        private readonly IElasticState _elasticState;
 
-        public ThemeService(OntologyContext context, IMapper mapper, IOntologyModel ontology, IElasticService elasticService)
+        public ThemeService(OntologyContext context, IMapper mapper, IOntologyModel ontology, IElasticService elasticService, IElasticState elasticState)
         {
             _context = context;
             _mapper = mapper;
             _ontology = ontology;
             _elasticService = elasticService;
+            _elasticState = elasticState;
         }
 
         public async Task<Guid> CreateThemeAsync(Theme theme)
@@ -162,7 +165,7 @@ namespace Iis.ThemeManagement
 
             var indexes = typeId switch
             {
-                _ when typeId == ThemeTypeEntity.EntityMaterialId  => _elasticService.MaterialIndexes,
+                _ when typeId == ThemeTypeEntity.EntityMaterialId  => _elasticState.MaterialIndexes,
                 _ when typeId == ThemeTypeEntity.EntityObjectId => GetOntologyIndexes(ontology, "ObjectOfStudy"),
                 _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(ontology, "Event"),
                 _   => (IEnumerable<string>) null
