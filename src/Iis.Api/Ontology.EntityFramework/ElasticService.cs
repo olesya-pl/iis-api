@@ -27,8 +27,6 @@ namespace IIS.Core.Ontology.EntityFramework
         private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
         private const decimal HistoricalSearchBoost = 0.05m;
 
-        public bool UseElastic { get; private set; }
-
         public ElasticService(
             IElasticManager elasticManager,
             IElasticConfiguration elasticConfiguration,
@@ -43,11 +41,12 @@ namespace IIS.Core.Ontology.EntityFramework
             _nodeRepository = nodeRepository;
             _materialRepository = materialRepository;
             _elasticState = elasticState;
+            
         }
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!UseElastic)
+            if (!_elasticState.UseElastic)
             {
                 throw new Exception(ELASTIC_IS_NOT_USING_MSG);
             }
@@ -66,7 +65,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!UseElastic)
+            if (!_elasticState.UseElastic)
             {
                 throw new Exception(ELASTIC_IS_NOT_USING_MSG);
             }
@@ -195,7 +194,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!UseElastic)
+            if (!_elasticState.UseElastic)
             {
                 throw new Exception(ELASTIC_IS_NOT_USING_MSG);
             }
@@ -226,21 +225,21 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
+            if (!_runTimeSettings.PutSavedToElastic || !_elasticState.UseElastic) return Task.FromResult(true);
 
             return _nodeRepository.PutNodeAsync(id, cancellationToken);
         }
 
         public Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return Task.FromResult(true);
+            if (!_runTimeSettings.PutSavedToElastic || !_elasticState.UseElastic) return Task.FromResult(true);
 
             return _nodeRepository.PutHistoricalNodesAsync(id, requestId, cancellationToken);
         }
 
         public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
         {
-            if (!UseElastic) return true;
+            if (!_elasticState.UseElastic) return true;
 
             if (!_runTimeSettings.PutSavedToElastic) return false;
 
@@ -278,15 +277,16 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
         {
-            if (!UseElastic) return false;
+            if (!_elasticState.UseElastic) return false;
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
         }
 
         public async Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !UseElastic) return true;
+            if (!_runTimeSettings.PutSavedToElastic || !_elasticState.UseElastic) return true;
 
             var response = await _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
+
             return response.All(x => x.IsSuccess);
         }
     }

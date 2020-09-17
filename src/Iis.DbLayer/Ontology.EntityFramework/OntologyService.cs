@@ -1,23 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 using Iis.DataModel;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
-
 using IIS.Repository;
 using IIS.Repository.Factories;
-
 using Microsoft.EntityFrameworkCore;
-
 using Newtonsoft.Json.Linq;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Attribute = Iis.Domain.Attribute;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
@@ -26,13 +22,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
+        private readonly IElasticState _elasticState;
 
         public OntologyService(IOntologyModel ontology,
             IElasticService elasticService,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, IElasticState elasticState) : base(unitOfWorkFactory)
         {
             _elasticService = elasticService;
             _ontology = ontology;
+            _elasticState = elasticState;
         }
 
         public Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
@@ -189,7 +187,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = _elasticState.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
@@ -212,7 +210,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = _elasticState.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
@@ -237,7 +235,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Distinct()
                 .ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
+            var isElasticSearch = _elasticState.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
