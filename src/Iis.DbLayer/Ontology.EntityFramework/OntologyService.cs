@@ -207,14 +207,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            return FilterNodeAsync("ObjectOfStudy", filter, cancellationToken);
-        }
-
         public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-
             var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
@@ -231,14 +225,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        private async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(string typeName, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            var types = _ontology.EntityTypes.Where(p => p.Name == typeName);
+            var types = _ontology.EntityTypes.Where(p => typeNameList.Contains(p.Name, StringComparer.OrdinalIgnoreCase));
+
             var derivedTypeNames = types
                 .SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types)
                 .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
                 .Select(e => e.Name)
+                .Distinct()
                 .ToArray();
 
             var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);

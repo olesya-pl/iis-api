@@ -30,6 +30,8 @@ namespace IIS.Core.GraphQL.EntityTypes
             descriptor.Item(OScalarType.Date.ToString()).Name("date");
             descriptor.Item(OScalarType.Geo.ToString()).Name("geo");
             descriptor.Item(OScalarType.File.ToString()).Name("file");
+            descriptor.Item(OScalarType.IntegerRange.ToString()).Name("integerRange");
+            descriptor.Item(OScalarType.FloatRange.ToString()).Name("floatRange");
             descriptor.Item("relation").Name("relation");
         }
     }
@@ -106,7 +108,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(AnyType))]
         public FormField FormField => _mapper.Map<FormField>(MetaObject?.FormField);
-        
+
         [GraphQLType(typeof(AnyType))]
         public ContainerMeta Container => _mapper.Map<ContainerMeta>(MetaObject?.Container);
 
