@@ -27,7 +27,7 @@ namespace Iis.Interfaces.Elastic
         bool UseElastic { get; }
 
         Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken);
-        Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string field, int size, CancellationToken ct = default);
+        Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string fieldName, int size, CancellationToken ct = default);
     }
 
     public class SearchResult

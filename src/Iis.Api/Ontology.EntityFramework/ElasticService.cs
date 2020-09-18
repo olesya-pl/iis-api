@@ -313,7 +313,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
         }
 
-        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string field, int size, CancellationToken ct = default)
+        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string fieldName, int size, CancellationToken ct = default)
         {
             var searchParams = new IisElasticSearchParams
             {
@@ -322,7 +322,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = size,
                 SearchFields = new List<IIisElasticField> 
                 { 
-                    new IisElasticField { Name = field } 
+                    new IisElasticField { Name = fieldName } 
                 }
             };
             var searchResult = await _elasticManager.Search(searchParams, ct);
