@@ -312,5 +312,21 @@ namespace IIS.Core.Ontology.EntityFramework
 
             return _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
         }
+
+        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string field, int size, CancellationToken ct = default)
+        {
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = OntologyIndexes.ToList(),
+                Query = query,
+                Size = size,
+                SearchFields = new List<IIisElasticField> 
+                { 
+                    new IisElasticField { Name = field } 
+                }
+            };
+            var searchResult = await _elasticManager.Search(searchParams, ct);
+            return searchResult.Items;
+        }
     }
 }
