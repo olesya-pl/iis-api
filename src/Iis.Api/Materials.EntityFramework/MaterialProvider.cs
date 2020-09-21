@@ -91,12 +91,12 @@ namespace IIS.Core.Materials.EntityFramework
             if (types != null)
             {
                 materialResult = await RunWithoutCommitAsync(async (unitOfWork) =>
-                    await unitOfWork.MaterialRepository.GetAllAsync(types, limit, offset));
+                    await unitOfWork.MaterialRepository.GetAllAsync(types, limit, offset, sortColumnName, sortOrder));
             }
             else
             {
                 materialResult = await RunWithoutCommitAsync(async (unitOfWork) =>
-                    await unitOfWork.MaterialRepository.GetAllAsync(limit, offset));
+                    await unitOfWork.MaterialRepository.GetAllAsync(limit, offset, sortColumnName, sortOrder));
             }
 
             mappingTasks = materialResult.Materials
