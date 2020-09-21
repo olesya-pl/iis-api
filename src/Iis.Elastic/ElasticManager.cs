@@ -324,6 +324,7 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(searchResponse);
         }
 
+        
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new

@@ -1,20 +1,27 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Iis.Services.Contracts;
-using Iis.Services.Contracts.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Iis.Services
 {
     public class AutocompleteService : IAutocompleteService
     {
         private readonly IOntologySchema _ontologySchema;
+        private readonly IElasticService _elasticService;
+        private const int DefaultSize = 10;
         private static readonly List<string> KeyWords = new List<string>();
 
-        public AutocompleteService(IOntologySchema ontologySchema)
+        public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService)
         {
             _ontologySchema = ontologySchema;
+            _elasticService = elasticService;
         }
 
         public List<string> GetTips(string query, int count)
@@ -32,6 +39,20 @@ namespace Iis.Services
                 .Take(count)
                 .ToList();
         }
+
+        public async Task<List<AutocompleteEntityDto>> GetEntitiesAsync(string query, int? size, CancellationToken ct = default) 
+        {
+            var response = await _elasticService.SearchByFieldAsync(query, "title", size.GetValueOrDefault(DefaultSize), ct);
+
+            return response.Select(x => new AutocompleteEntityDto 
+            {
+                Id = x.Identifier,
+                Title = x.SearchResult["title"].Value<string>(),
+                TypeName = x.SearchResult["NodeTypeName"].Value<string>(),
+                TypeTitle = x.SearchResult["NodeTypeTitle"].Value<string>()
+            }).ToList();
+        }
+
 
         private List<string> GetKeyWords()
         {

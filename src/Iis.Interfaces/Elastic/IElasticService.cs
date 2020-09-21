@@ -20,6 +20,7 @@ namespace Iis.Interfaces.Elastic
         Task<SearchResult> SearchByImageVector(decimal[] imageVector, int page, int pageSize, CancellationToken token);
         bool TypesAreSupported(IEnumerable<string> typeNames);
         Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken);
+        Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string fieldName, int size, CancellationToken ct = default);
     }
 
     public class SearchResult
