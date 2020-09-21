@@ -1,16 +1,12 @@
 
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
-using IIS.Domain;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
 
