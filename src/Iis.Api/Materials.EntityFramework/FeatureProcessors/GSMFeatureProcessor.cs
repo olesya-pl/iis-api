@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Newtonsoft.Json.Linq;
 
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
 
@@ -18,6 +18,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private const string SignTypeName = "CellphoneSign";
         private readonly IElasticService _elasticService;
         private readonly IOntologyModel _ontology;
+        private readonly IElasticState _elasticState;
         private readonly MutationCreateResolver _createResolver;
         private readonly MutationUpdateResolver _updateResolver;
 
@@ -43,16 +44,17 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MergeNullValueHandling = MergeNullValueHandling.Ignore
         };
 
-        public bool IsDummy => false; 
+        public bool IsDummy => false;
         public GSMFeatureProcessor(IElasticService elasticService,
             IOntologyModel ontology,
             MutationCreateResolver createResolver,
-            MutationUpdateResolver updateResolver)
+            MutationUpdateResolver updateResolver, IElasticState elasticState)
         {
             _elasticService = elasticService;
             _ontology = ontology;
             _createResolver = createResolver;
             _updateResolver = updateResolver;
+            _elasticState = elasticState;
         }
 
         public async Task<JObject> ProcessMetadataAsync(JObject metadata)
@@ -129,7 +131,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private async Task<(bool isExist, Guid? featureId, JObject feature)> SearchFeatureInElasticSearch(string fieldName, string fieldValue)
         {
             var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
-                        _elasticService.FeatureIndexes,
+                        _elasticState.FeatureIndexes,
                         new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:{fieldValue})" });
 
             if (searchResult.Count == 0) return (false, null, null);

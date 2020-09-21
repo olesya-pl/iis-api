@@ -6,6 +6,8 @@ using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
+using Iis.Services;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Ontology.EntityFramework;
 using Moq;
 using Xunit;
@@ -52,6 +54,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var ontologySchemaMock = new Mock<IOntologySchema>();
             var nodeRepositoryMock = new Mock<INodeRepository>();
             var materialRepositoryMock = new Mock<IMaterialRepository>();
+            var elasticStateMock = new Mock<IElasticState>();
 
             var objectOfStudyTypeMock = new Mock<INodeTypeLinked>();
             ontologySchemaMock
@@ -65,10 +68,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var sut = new ElasticService(
                 elasticServiceMock.Object,
                 elasticConfigurationMock.Object,
-                ontologySchemaMock.Object,
                 nodeRepositoryMock.Object,
                 materialRepositoryMock.Object,
-                new RunTimeSettings()
+                new RunTimeSettings(),
+                new ElasticState(ontologySchemaMock.Object)
                 );
             return sut;
         }

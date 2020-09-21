@@ -1,5 +1,5 @@
-﻿using System;
-using Iis.DataModel;
+﻿using Iis.DataModel;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using Iis.Services;
@@ -12,6 +12,7 @@ namespace Iis.UnitTests.Services
     public class AutocompleteUnitTests
     {
         private readonly Mock<IOntologySchema> _ontologySchemaMock = new Mock<IOntologySchema>();
+        private readonly Mock<IElasticService> _elasticServiceMock = new Mock<IElasticService>();
 
         public AutocompleteUnitTests()
         {
@@ -22,7 +23,7 @@ namespace Iis.UnitTests.Services
         public void GetTips_GivenSomeFieldsAndAliases_ShouldReturn3Aliases()
         {
             //Arrange
-            var service = new AutocompleteService(_ontologySchemaMock.Object);
+            var service = GetService();
 
             //Act
             var tips = service.GetTips("al", 10);
@@ -35,7 +36,7 @@ namespace Iis.UnitTests.Services
         public void GetTips_GivenSomeFieldsAndAliases_ShouldReturn2Fields()
         {
             //Arrange
-            var service = new AutocompleteService(_ontologySchemaMock.Object);
+            var service = GetService();
 
             //Act
             var tips = service.GetTips("use", 10);
@@ -49,13 +50,19 @@ namespace Iis.UnitTests.Services
         public void GetTips_GivenSomeFieldsAndAliases_ShouldNotReturnMoreThen3Tips()
         {
             //Arrange
-            var service = new AutocompleteService(_ontologySchemaMock.Object);
+            var service = GetService();
 
             //Act
             var tips = service.GetTips("a", 3);
 
             //Assert
             Assert.Equal(3, tips.Count);
+        }
+
+        private AutocompleteService GetService()
+        {
+
+            return new AutocompleteService(_ontologySchemaMock.Object, _elasticServiceMock.Object);
         }
 
         private void Init()

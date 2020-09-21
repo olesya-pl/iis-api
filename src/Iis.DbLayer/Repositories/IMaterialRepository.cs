@@ -26,7 +26,7 @@ namespace Iis.DbLayer.Repositories
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
 
-        Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken = default);
+        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default);
 
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default);
         
