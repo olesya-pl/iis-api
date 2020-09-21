@@ -96,7 +96,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             List<Guid> visitedEntityIds,
             CancellationToken cancellationToken = default)
         {
-            if (_ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId).IsObjectOfStudy) 
+            if (_ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId).IsObjectOfStudy)
             {
                 visitedEntityIds.Add(nodeEntity.Id);
             }
@@ -149,6 +149,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 Id = nodeEntity.Id.ToString("N"),
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
+                NodeType = _ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId),
                 NodeTypeName = nodeTypeName,
                 NodeTypeTitle = nodeTypeTitle,
                 CreatedAt = nodeEntity.CreatedAt,
@@ -200,7 +201,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 default:
                     return value;
             }
-        }       
+        }
 
         private async Task<List<ExtNode>> GetExtNodesByRelations(
             IEnumerable<RelationEntity> relations,
