@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
 
@@ -13,7 +14,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         public SatVoiceFeatureProcessor(IElasticService elasticService,
             IOntologyModel ontology,
             MutationCreateResolver createResolver,
-            MutationUpdateResolver updateResolver)
+            MutationUpdateResolver updateResolver,
+            IElasticState elasticState)
         {
 
         }
