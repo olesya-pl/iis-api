@@ -1,8 +1,11 @@
-﻿namespace Iis.Interfaces.Ontology.Data
+﻿using System.Collections.Generic;
+
+namespace Iis.Interfaces.Ontology.Data
 {
     public interface IDotNameValue
     {
-        string DotName { get; set; }
-        string Value { get; set; }
+        string DotName { get; }
+        string Value { get; }
+        IReadOnlyList<INode> Nodes { get; }
     }
 }

@@ -17,6 +17,7 @@ using IIS.Repository.Factories;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using System.Threading;
 using Iis.DbLayer.MaterialEnum;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -242,7 +243,7 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        public Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken)
+        public Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken)
         {
             return RunWithoutCommitAsync(async (unitOfWork)
                 => await unitOfWork.MaterialRepository.PutAllMaterialsToElasticSearchAsync(cancellationToken));

@@ -28,17 +28,17 @@ namespace Iis.OntologyManager.UiControls
 
         public UiComparisonControl(List<IOntologySchemaSource> schemaSources,
             OntologySchemaService schemaService,
-            IOntologySchema schema) 
+            IOntologySchema schema)
         {
             _schemaSources = schemaSources;
             _schemaService = schemaService;
             _schema = schema;
         }
-        
+
         protected override void CreateControls()
         {
             MainPanel.SuspendLayout();
-            var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 100, 10);
+            var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200, 20);
             var container = new UiContainerManager("Comparison", panels.panelTop);
 
             cmbSchemaSourcesCompare = new ComboBox
@@ -58,10 +58,10 @@ namespace Iis.OntologyManager.UiControls
             container.Add(btnComparisonUpdate);
 
             container.GoToNewColumn();
-            container.Add(cbComparisonCreate = new CheckBox { Text = "Create", Checked = true });
-            container.Add(cbComparisonUpdate = new CheckBox { Text = "Update", Checked = true });
-            container.Add(cbComparisonDelete = new CheckBox { Text = "Delete" });
-            container.Add(cbComparisonAliases = new CheckBox { Text = "Aliases" });
+            container.Add(cbComparisonCreate = new CheckBox { Text = "Create", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbComparisonUpdate = new CheckBox { Text = "Update", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbComparisonDelete = new CheckBox { Text = "Delete", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbComparisonAliases = new CheckBox { Text = "Aliases", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
 
             txtComparison = new RichTextBox
             {

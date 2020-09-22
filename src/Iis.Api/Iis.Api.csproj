@@ -15,6 +15,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\scripts\script-find-wrongValue-PropertyName.sql" Link="data\scripts\script-find-wrongValue-PropertyName.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\scripts\script-update-wrongValue-PropertyName.sql" Link="data\scripts\script-update-wrongValue-PropertyName.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.4" />
@@ -54,6 +63,7 @@
     <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
+    <ProjectReference Include="..\Iis.FlightRadar.DataModel\Iis.FlightRadar.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />

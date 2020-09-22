@@ -12,6 +12,7 @@ namespace Iis.OntologyManager.Style
         int ControlWidthDefault { get; }
         int ButtonHeightDefault { get; }
         int ButtonWidthDefault { get; }
+        int CheckboxHeightDefault { get; }
         Color EntityTypeBackColor { get; }
         int MarginHor { get; }
         int MarginVer { get; }

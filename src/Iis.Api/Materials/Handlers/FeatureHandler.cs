@@ -62,13 +62,13 @@ namespace IIS.Core.Materials.Handlers
             }
 
             _channel = _connection.CreateModel();
-            
+
             options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
         }
-        
+
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             ConfigureExchange(_channel, _сonfig.SourceChannel);
@@ -100,14 +100,14 @@ namespace IIS.Core.Materials.Handlers
 
             if(processor.IsDummy) return;
 
-            var material = await RunAsync(uow => uow.MaterialRepository.GetByIdAsync(message.Id)); 
+            var material = await RunAsync(uow => uow.MaterialRepository.GetByIdAsync(message.Id));
 
             if(material is null) return;
-            
+
             JObject metadata = JObject.Parse(material.Metadata);
 
             metadata = await processor.ProcessMetadataAsync(metadata);
-            
+
             material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 
             var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
@@ -158,7 +158,7 @@ namespace IIS.Core.Materials.Handlers
                 await unitOfWork.CommitAsync();
             }
         }
-        
+
         private void RunWithCommit(Action<IIISUnitOfWork> action)
         {
             using (var unitOfWork = _unitOfWorkFactory.Create())
@@ -187,8 +187,8 @@ namespace IIS.Core.Materials.Handlers
                     }
 
 
-                    var message = BodyToObject<MaterialEventMessage>(args.Body, options); 
-                    
+                    var message = BodyToObject<MaterialEventMessage>(args.Body, options);
+
                     await handler(message);
 
                     channel.BasicAck(args.DeliveryTag, false);
@@ -200,10 +200,10 @@ namespace IIS.Core.Materials.Handlers
                     channel.BasicReject(args.DeliveryTag, false);
                 }
             };
-            
+
             channel.BasicConsume(queue: config.QueueName, false, consumer: channelConsumer);
         }
-        
+
         private static void ConfigureExchange(IModel channel, ChannelConfig config)
         {
             if (channel is null || config is null) return;
@@ -230,7 +230,7 @@ namespace IIS.Core.Materials.Handlers
                 channel.QueueBind(config.QueueName, config.ExchangeName, routingKey);
             }
         }
-        
+
         private static T BodyToObject<T>(byte[] jsonBytes, JsonSerializerOptions deserializationOptions = null)
         {
             var json = Encoding.UTF8.GetString(jsonBytes);

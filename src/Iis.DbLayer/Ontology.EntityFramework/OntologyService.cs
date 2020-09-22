@@ -1,24 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 using Iis.DataModel;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
-
 using IIS.Repository;
 using IIS.Repository.Factories;
-
 using Microsoft.EntityFrameworkCore;
-
 using Newtonsoft.Json.Linq;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Attribute = Iis.Domain.Attribute;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
@@ -27,13 +23,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
+        private readonly IElasticState _elasticState;
 
         public OntologyService(IOntologyModel ontology,
             IElasticService elasticService,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, IElasticState elasticState) : base(unitOfWorkFactory)
         {
             _elasticService = elasticService;
             _ontology = ontology;
+            _elasticState = elasticState;
         }
 
         public Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
@@ -190,7 +188,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = _elasticState.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
@@ -208,18 +206,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            return FilterNodeAsync("ObjectOfStudy", filter, cancellationToken);
-        }
-
         public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-
             var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = _elasticState.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
@@ -232,17 +224,19 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        private async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(string typeName, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            var types = _ontology.EntityTypes.Where(p => p.Name == typeName);
+            var types = _ontology.EntityTypes.Where(p => typeNameList.Contains(p.Name, StringComparer.OrdinalIgnoreCase));
+
             var derivedTypeNames = types
                 .SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types)
                 .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
                 .Select(e => e.Name)
+                .Distinct()
                 .ToArray();
 
-            var isElasticSearch = _elasticService.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
+            var isElasticSearch = _elasticState.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
@@ -446,18 +440,31 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId)
         {
             var relations = await RunWithoutCommitAsync(async unitOfWork =>
-                   await unitOfWork.OntologyRepository.GetIncomingRelations(entityId));
+                   await unitOfWork.OntologyRepository.GetIncomingRelationsAsync(entityId));
 
+            return await MapRelations(relations);
+        }
+
+        public async Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds)
+        {
+            var relations = await RunWithoutCommitAsync(async unitOfWork =>
+                   await unitOfWork.OntologyRepository.GetIncomingRelationsAsync(entityIds));
+
+            return await MapRelations(relations);
+        }
+
+        private async Task<List<IncomingRelation>> MapRelations(List<RelationEntity> relations)
+        {
             var res = relations
-                .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
-                .Select(p => new IncomingRelation
-                {
-                    RelationId = p.Node.Id,
-                    RelationTypeName = p.Node.NodeType.Name,
-                    RelationTypeTitle = p.Node.NodeType.Title,
-                    EntityId = p.SourceNodeId,
-                    EntityTypeName = p.SourceNode.NodeType.Name
-                }).ToList();
+                            .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
+                            .Select(p => new IncomingRelation
+                            {
+                                RelationId = p.Node.Id,
+                                RelationTypeName = p.Node.NodeType.Name,
+                                RelationTypeTitle = p.Node.NodeType.Title,
+                                EntityId = p.SourceNodeId,
+                                EntityTypeName = p.SourceNode.NodeType.Name
+                            }).ToList();
 
             var resNodes = (await LoadNodesAsync(res.Select(p => p.EntityId), null)).ToDictionary(p => p.Id);
 
@@ -467,7 +474,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 {
                     item.Entity = resNodes[item.EntityId];
                 }
-
             }
 
             return res;

@@ -9,11 +9,6 @@ namespace Iis.Interfaces.Elastic
 {
     public interface IElasticService
     {
-        IEnumerable<string> MaterialIndexes { get; }
-        IEnumerable<string> OntologyIndexes { get; }
-        IDictionary<string, string> HistoricalOntologyIndexes { get; }
-        IEnumerable<string> EventIndexes { get; }
-        IEnumerable<string> FeatureIndexes { get; }
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default);
         Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default);
@@ -24,9 +19,8 @@ namespace Iis.Interfaces.Elastic
         Task<SearchResult> SearchMoreLikeThisAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
         Task<SearchResult> SearchByImageVector(decimal[] imageVector, int page, int pageSize, CancellationToken token);
         bool TypesAreSupported(IEnumerable<string> typeNames);
-        bool UseElastic { get; }
-
         Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken);
+        Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldAsync(string query, string fieldName, int size, CancellationToken ct = default);
     }
 
     public class SearchResult

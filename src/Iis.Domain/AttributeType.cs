@@ -22,6 +22,8 @@ namespace Iis.Domain
                 switch (ScalarTypeEnum)
                 {
                     case ScalarType.String:
+                    case ScalarType.IntegerRange:
+                    case ScalarType.FloatRange:
                         return typeof(string);
                     case ScalarType.Int:
                         return typeof(int);

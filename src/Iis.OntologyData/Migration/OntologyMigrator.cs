@@ -3,6 +3,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData.DataTypes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.OntologyData.Migration
@@ -12,7 +13,7 @@ namespace Iis.OntologyData.Migration
         OntologyNodesData _data;
         IOntologySchema _schema;
         IMigration _migration;
-        Dictionary<Guid, Guid> hierarchyMapper = new Dictionary<Guid, Guid>();
+        Dictionary<Guid, Guid> _hierarchyMapper = new Dictionary<Guid, Guid>();
         HashSet<Guid> _migratedIds = new HashSet<Guid>();
         StringBuilder _log = new StringBuilder();
         public OntologyMigrator(OntologyNodesData data, IOntologySchema schema, IMigration migration)
@@ -29,6 +30,12 @@ namespace Iis.OntologyData.Migration
                 Migrate(migrationEntity, migrationOptions);
             }
 
+            Log($"Міграція посилань");
+            foreach (var migrationReference in _migration.GetReferences())
+            {
+                MigrateReference(migrationReference);
+            }
+
             return new MigrationResult { Log = _log.ToString() };
         }
         public Dictionary<Guid, Guid> Migrate(IMigrationEntity migrationEntity, IMigrationOptions migrationOptions)
@@ -38,13 +45,15 @@ namespace Iis.OntologyData.Migration
             Log($"Всього {sourceNodes.Count} об'єктів");
 
             var targetType = _schema.GetEntityTypeByName(migrationEntity.TargetEntityName);
-
             if (migrationOptions.SaveNewObjects)
             {
                 foreach (var node in sourceNodes)
                 {
-                    var entity = _data.CreateNode(targetType.Id, Guid.NewGuid());
-                    hierarchyMapper[node.Id] = entity.Id;
+                    if (_migratedIds.Contains(node.Id)) continue;
+                    
+                    var newId = Guid.NewGuid();
+                    _data.CreateNode(targetType.Id, newId);
+                    _hierarchyMapper[node.Id] = newId;
                 }
             }
 
@@ -63,20 +72,21 @@ namespace Iis.OntologyData.Migration
                 }
             }
 
-            return hierarchyMapper;
+            return _hierarchyMapper;
         }
-        private void ProcessLinkedEntities(List<string> linkedEntities, IDotNameValues dotNameValues)
+        private void ProcessLinkedEntities(List<string> linkedEntities, IDotNameValues dotNameValues, Guid newEntityId)
         {
             foreach (var linkedDotName in linkedEntities)
             {
-                if (dotNameValues.Contains(linkedDotName))
+                var values = dotNameValues.GetValues(linkedDotName);
+                foreach (var value in values)
                 {
-                    var linkedIdStr = dotNameValues.GetValue(linkedDotName);
-                    if (!string.IsNullOrEmpty(linkedIdStr))
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        var linkedId = Guid.Parse(linkedIdStr);
+                        var linkedId = Guid.Parse(value);
                         var linkedNode = _data.GetNodeData(linkedId);
                         _migratedIds.Add(linkedId);
+                        _hierarchyMapper[linkedId] = newEntityId;
                         Log($"Entity{linkedNode.NodeType.Name}.{linkedId}/view");
                     }
                 }
@@ -94,7 +104,7 @@ namespace Iis.OntologyData.Migration
             
             if (migrationEntity.LinkedEntities != null)
             {
-                ProcessLinkedEntities(migrationEntity.LinkedEntities, dotNameValues);
+                ProcessLinkedEntities(migrationEntity.LinkedEntities, dotNameValues, entity.Id);
             }
             
             Log($"Entity{entity.NodeType.Name}.{entity.Id}/view");
@@ -109,15 +119,14 @@ namespace Iis.OntologyData.Migration
 
                 foreach (var migrationItem in migrationItems)
                 {
-                    SetValue(dotNameValue, dotNameValues, migrationItem, migrationItem.TargetDotName, entity);
+                    SetValue(dotNameValue, dotNameValues, migrationItem?.Options, migrationItem.TargetDotName, entity);
                 }
             }
         }
         private void SetValue(IDotNameValue dotNameValue, IDotNameValues dotNameValues, 
-            IMigrationItem migrationItem, string targetDotName, NodeData entity)
+            IMigrationItemOptions options, string targetDotName, NodeData entity)
         {
             var value = dotNameValue.Value;
-            var options = migrationItem?.Options;
             if (options != null)
             {
                 if (options.Ignore) return;
@@ -132,13 +141,13 @@ namespace Iis.OntologyData.Migration
                 {
                     var id = Guid.Parse(dotNameValue.Value);
                     var node = _data.GetNodeData(id);
-                    value = node.GetDotNameValues().GetValue(options.TakeValueFrom);
+                    value = node.GetDotNameValues().GetSingleValue(options.TakeValueFrom);
                 }
 
                 if (options.IsHierarchical)
                 {
                     var selfId = Guid.Parse(dotNameValue.Value);
-                    value = hierarchyMapper.ContainsKey(selfId) ? hierarchyMapper[selfId].ToString() : null;
+                    value = _hierarchyMapper.ContainsKey(selfId) ? _hierarchyMapper[selfId].ToString() : null;
                 }
             }
 
@@ -156,6 +165,28 @@ namespace Iis.OntologyData.Migration
                 _data.AddValueByDotName(entity, value, targetDotName.Split('.'));
             }
         }
+        private void MigrateReference(IMigrationReference migrationReference)
+        {
+            Log($"{migrationReference.EntityName}: {migrationReference.SourceDotName} => {migrationReference.TargetDotName}");
+            var entities = _data.GetEntitiesByTypeName(migrationReference.EntityName);
+            var options = new MigrationItemOptions { IsHierarchical = true };
+            foreach (var entity in entities)
+            {
+                var dotNameValues = entity.GetDotNameValues();
+                var items = dotNameValues.GetItems(migrationReference.SourceDotName);
+                if (items.Count > 0)
+                {
+                    Log($"{migrationReference.EntityName} id = {entity.Id}");
+                }
+                foreach (var dotNameValue in items)
+                {
+                    var nodeData = _data.GetNode(entity.Id);
+                    SetValue(dotNameValue, null, options, migrationReference.TargetDotName, nodeData);
+                    _data.SetNodesIsArchived(dotNameValue.Nodes.Select(n => n.Id));
+                }
+            }
+        }
+
         private void Log(string s)
         {
             _log.AppendLine(s);

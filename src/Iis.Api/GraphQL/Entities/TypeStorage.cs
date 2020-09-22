@@ -5,6 +5,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
 using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using HCScalarType = HotChocolate.Types.ScalarType;
+using IIS.Core.GraphQL.Entities.ObjectTypes;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -23,6 +24,8 @@ namespace IIS.Core.GraphQL.Entities
             [OScalarType.Decimal] = new DecimalType(),
             [OScalarType.Date] = new DateTimeType(), // HotChocolate uses ISO-8601 by default
             [OScalarType.Geo] = new AnyType(),
+            [OScalarType.FloatRange] = new FloatRangeType(),
+            [OScalarType.IntegerRange] = new IntegerRangeType()
 //            [OScalarType.File] = null, // Implemented as a dirty hack in Extensions.IAttributeTypeModel(), because File attribute is not scalar
         };
 

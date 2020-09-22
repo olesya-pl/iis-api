@@ -9,11 +9,13 @@ namespace Iis.OntologyData.DataTypes
     {
         public string DotName { get; set; }
         public string Value { get; set; }
+        public IReadOnlyList<INode> Nodes { get; set; }
         public DotNameValue() { }
-        public DotNameValue(string dotName, string value)
+        public DotNameValue(string dotName, string value, IEnumerable<INode> nodes)
         {
             DotName = dotName;
             Value = value;
+            Nodes = new List<INode>(nodes);
         }
         public override string ToString()
         {

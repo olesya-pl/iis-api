@@ -55,7 +55,7 @@ namespace Iis.Elastic
         {
             var result = new JObject();
 
-            if (Type != ElasticMappingPropertyType.Nested)
+            if (Type != ElasticMappingPropertyType.Nested || Properties.Count == 0)
             {
                 result["type"] = Type.ToString().ToUnderscore();
 

@@ -54,12 +54,52 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<bool> PutsDocumentsAsync(string indexName, string materialDocuments, CancellationToken token)
+        public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(indexName)) return false;
+            if (string.IsNullOrWhiteSpace(indexName))
+                return null;
+
             var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
-            var response = await PostAsync(indexUrl, materialDocuments, token);
-            return response.Success;
+            var response = await PostAsync(indexUrl, documents, ct);
+
+            return ParseBody(response.Body);
+        }
+
+        private List<ElasticBulkResponse> ParseBody(string body)
+        {
+
+            var jBody = JObject.Parse(body);
+            var statusItems = jBody["items"];
+            var result = new List<ElasticBulkResponse>();
+            foreach (JObject item in statusItems)
+            {
+                if (IsErrorStatusCode(item["index"]["status"].Value<int>()))
+                {
+                    result.Add(new ElasticBulkResponse
+                    {
+                        Id = item["index"]["_id"].Value<string>(),
+                        IsSuccess = false,
+                        ErrorReason = item["index"]["error"]["reason"].Value<string>(),
+                        ErrorType = item["index"]["error"]["type"].Value<string>(),
+                    });
+                }
+                else
+                {
+                    result.Add(new ElasticBulkResponse
+                    {
+                        Id = item["index"]["_id"].Value<string>(),
+                        IsSuccess = true,
+                        SuccessOperation = item["index"]["result"].Value<string>()
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        private bool IsErrorStatusCode(int statusCode)
+        {
+            return statusCode / 100 == 4;
         }
 
         public async Task<bool> DeleteDocumentAsync(string indexName, string documentId)
@@ -284,6 +324,7 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(searchResponse);
         }
 
+        
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new

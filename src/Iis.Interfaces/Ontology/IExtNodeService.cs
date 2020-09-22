@@ -13,5 +13,6 @@ namespace Iis.Interfaces.Ontology
 
         Task<IExtNode> GetExtNodeAsync(Guid id, CancellationToken ct = default);
         List<IExtNode> GetExtNodes(IReadOnlyCollection<INode> itemsToUpdate);
+        Task<IExtNode> GetExtNodeWithoutNestedObjectsAsync(Guid id, CancellationToken ct = default);
     }
 }
