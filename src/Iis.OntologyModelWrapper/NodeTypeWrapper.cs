@@ -16,7 +16,7 @@ namespace Iis.OntologyModelWrapper
         public INodeTypeLinked Source => _source;
         public NodeTypeWrapper(INodeTypeLinked source)
         {
-            if (_source == null)
+            if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
