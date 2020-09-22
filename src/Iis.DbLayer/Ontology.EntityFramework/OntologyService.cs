@@ -419,11 +419,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .FirstOrDefault();
         }
 
-        public Task<List<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
-            return RunWithoutCommitAsync(async unitOfWork =>
+            return await RunWithoutCommitAsync(async unitOfWork =>
                    await unitOfWork.OntologyRepository.GetAttributesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
-
         }
 
 

@@ -63,8 +63,6 @@ namespace Iis.OntologyData
         {
             return ids.Select(id => _storage.Nodes[id]).ToList();
         }
-
-
         internal void AddValueByDotName(NodeData entity, string value, string[] dotNameParts)
         {
             var node = entity;
@@ -125,5 +123,13 @@ namespace Iis.OntologyData
         }
         public INode GetNode(Guid id) => GetNodeData(id);
         public IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids) => GetNodesData(ids);
+        public IReadOnlyList<INode> GetNodesByTypeIds(IEnumerable<Guid> nodeTypeIds)
+        {
+            return Nodes.Where(n => nodeTypeIds.Contains(n.NodeTypeId)).ToList();
+        }
+        public IReadOnlyList<INode> GetNodesByTypeId(Guid nodeTypeId)
+        {
+            return Nodes.Where(n => n.NodeTypeId == nodeTypeId).ToList();
+        }
     }
 }

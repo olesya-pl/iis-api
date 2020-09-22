@@ -14,6 +14,8 @@ namespace Iis.Interfaces.Ontology.Data
         void ClearPatch();
         INode GetNode(Guid id);
         IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids);
+        IReadOnlyList<INode> GetNodesByTypeIds(IEnumerable<Guid> nodeTypeIds);
+        IReadOnlyList<INode> GetNodesByTypeId(Guid nodeTypeId);
         IReadOnlyList<INode> GetEntitiesByTypeName(string typeName);
         IReadOnlyList<INode> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
     }

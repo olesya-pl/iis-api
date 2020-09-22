@@ -30,12 +30,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _data = data;
             _elasticService = elasticService;
         }
-        public Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
+        public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
         {
             const string propertyName = "associatedWithEvent";
             var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
@@ -47,9 +47,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(r => r.Node.NodeTypeId == property.Id)
                 .Select(r => r.SourceNode);
 
-            return Task.FromResult(events.Select(ev => MapNode(ev)).AsEnumerable());
+            await Task.Yield();
+            return events.Select(ev => MapNode(ev)).AsEnumerable();
         }
-        public Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId)
+        public async Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId)
         {
             var node = _data.GetNode(entityId);
             var result = node.IncomingRelations
@@ -64,10 +65,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     Entity = MapNode(r.SourceNode)
                 }).ToList();
 
-            return Task.FromResult(result);
+            await Task.Yield();
+            return result;
         }
 
-        public Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
 
@@ -75,9 +77,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Select(n => (Entity)MapNode(n))
                 .ToList();
 
-            return Task.FromResult(result);
+            await Task.Yield();
+            return result;
         }
-        public Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
 
@@ -85,9 +88,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Select(n => MapNode(n))
                 .FirstOrDefault();
 
-            return Task.FromResult(result);
+            await Task.Yield();
+            return result;
         }
-        public Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
+        public async Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
         {
             var result = _data.Relations
                 .Where(r => featureIdList.Contains(r.TargetNodeId))
@@ -95,48 +99,89 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Distinct()
                 .ToList();
 
-            return Task.FromResult(result);
+            await Task.Yield();
+            return result;
         }
 
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-            //var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
-            //var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
+            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
 
-            //if (isElasticSearch)
-            //{
-            //    var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
-            //    var nodes = _data.GetNodes(searchResult.ids);
-            //    return nodes.Select(MapNode);
-            //}
-            //else
-            //{
-            //    var query = await RunWithoutCommitAsync(async unitOfWork =>
-            //        await unitOfWork.OntologyRepository.GetNodesWithSuggestionAsync(derivedTypes.Select(nt => nt.Id), filter));
-            //    var nodes = query.Select(MapNode);
-            //    return nodes;
-            //}
+            if (isElasticSearch)
+            {
+                var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
+                var nodes = _data.GetNodes(searchResult.ids);
+                return nodes.Select(MapNode);
+            }
+            else
+            {
+                var nodes = GetNodesWithSuggestion(derivedTypes.Select(nt => nt.Id), filter);
+                return nodes.Select(MapNode);
+            }
+        }
+        private List<INode> GetNodesWithSuggestion(IEnumerable<Guid> derived, ElasticFilter filter)
+        {
+            return _data.GetNodesByTypeIds(derived)
+                .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
+                    n.OutgoingRelations.Any(
+                        r => r.TargetNode.Value != null && 
+                        r.TargetNode.Value.Contains(filter.Suggestion)))
+                .Skip(filter.Offset)
+                .Take(filter.Limit)
+                .ToList();
+        }
+        private int GetNodesCountWithSuggestion(IEnumerable<Guid> derived, ElasticFilter filter)
+        {
+            return _data.GetNodesByTypeIds(derived)
+                .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
+                    n.OutgoingRelations.Any(
+                        r => r.TargetNode.Value != null &&
+                        r.TargetNode.Value.Contains(filter.Suggestion)))
+                .Count();
+        }
+        public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
+        {
+            var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
+
+            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            if (isElasticSearch)
+            {
+                var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                return searchResult.count;
+            }
+            else
+            {
+                return GetNodesCountWithSuggestion(derivedTypes.Select(nt => nt.Id), filter);
+            }
+        }
+        public async Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
+        {
+            var nodes = _data.GetNodes(matchList);
+            await Task.Yield();
+            return (nodes.Select(MapNode), nodes.Count);
         }
 
-        public Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
-            throw new NotImplementedException();
+            IReadOnlyList<IAttributeBase> result = _data.Nodes
+                .Where(n => n.NodeType.Name == valueTypeName &&
+                       n.Value == value &&
+                       n.OutgoingRelations.Any(r => r.SourceNode.NodeTypeId == nodeTypeId))
+                .Select(n => (IAttributeBase)(n.Attribute))
+                .Take(limit)
+                .ToList();
+
+            await Task.Yield();
+            return result;
         }
 
-        public Task<List<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
+            var node = _data.GetNode(nodeId);
 
-        public Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
+            await Task.Yield();
+            return MapNode(node);
         }
 
         public Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
