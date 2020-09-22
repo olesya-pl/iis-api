@@ -72,10 +72,10 @@ namespace IIS.Core.FlightRadar
             await Task.WhenAll(saveFlightHistoryTasks);
         }
 
-        private Task<List<Routes>> GetRoutesAsync(FlightRadarHistorySyncJobConfig minId)
+        private async Task<List<Routes>> GetRoutesAsync(FlightRadarHistorySyncJobConfig minId)
         {
             using var flightContext = _provider.GetRequiredService<FlightsContext>();
-            return flightContext.Routes
+            return await flightContext.Routes
                 .Where(p => p.Id > minId.LatestProcessedId)
                 .OrderBy(p => p.Id)
                 .Take(batchSize)
