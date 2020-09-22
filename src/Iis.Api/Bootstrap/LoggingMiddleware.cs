@@ -43,7 +43,7 @@ namespace Iis.Api.Bootstrap
 
                 var response = await FormatResponse(context, sw);
 
-                logger.LogInformation(response);
+                logger.LogInformation($"{request}{Environment.NewLine}{response}");
                 await responseBody.CopyToAsync(originalBodyStream);
             }
             catch (Exception ex) when (LogException(sw, ex)) { }
