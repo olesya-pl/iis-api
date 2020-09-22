@@ -74,7 +74,7 @@ namespace IIS.Core.FlightRadar
 
         private Task<List<Routes>> GetRoutesAsync(FlightRadarHistorySyncJobConfig minId)
         {
-            var flightContext = _provider.GetRequiredService<FlightsContext>();
+            using var flightContext = _provider.GetRequiredService<FlightsContext>();
             return flightContext.Routes
                 .Where(p => p.Id > minId.LatestProcessedId)
                 .OrderBy(p => p.Id)
