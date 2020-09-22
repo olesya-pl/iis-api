@@ -207,7 +207,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToListAsync();
         }
 
-        public Task<List<RelationEntity>> GetIncomingRelations(Guid entityId)
+        public Task<List<RelationEntity>> GetIncomingRelationsAsync(Guid entityId)
         {
             return Context.Relations
                 .AsNoTracking()
@@ -216,6 +216,18 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Include(p => p.SourceNode)
                 .ThenInclude(p => p.NodeType)
                 .Where(p => p.TargetNodeId == entityId)
+                .ToListAsync();
+        }
+
+        public Task<List<RelationEntity>> GetIncomingRelationsAsync(IReadOnlyCollection<Guid> entityIds)
+        {
+            return Context.Relations
+                .AsNoTracking()
+                .Include(p => p.Node)
+                .ThenInclude(p => p.NodeType)
+                .Include(p => p.SourceNode)
+                .ThenInclude(p => p.NodeType)
+                .Where(p => entityIds.Contains(p.TargetNodeId))
                 .ToListAsync();
         }
     }

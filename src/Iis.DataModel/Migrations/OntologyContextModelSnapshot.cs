@@ -228,6 +228,49 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("ElasticFields");
                 });
 
+            modelBuilder.Entity("Iis.DataModel.FlightRadar.FlightRadarHistoryEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ICAO")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Lat")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("Long")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("NodeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NodeId");
+
+                    b.ToTable("FlightRadarHistoryEntities");
+                });
+
+            modelBuilder.Entity("Iis.DataModel.FlightRadar.FlightRadarHistorySyncJobConfig", b =>
+                {
+                    b.Property<int>("LatestProcessedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("LatestProcessedId");
+
+                    b.ToTable("FlightRadarHistorySyncJobConfig");
+                });
+
             modelBuilder.Entity("Iis.DataModel.Materials.FileEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1186,6 +1229,15 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
                         .WithOne("IAttributeTypeModel")
                         .HasForeignKey("Iis.DataModel.AttributeTypeEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Iis.DataModel.FlightRadar.FlightRadarHistoryEntity", b =>
+                {
+                    b.HasOne("Iis.DataModel.NodeEntity", "Node")
+                        .WithMany()
+                        .HasForeignKey("NodeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

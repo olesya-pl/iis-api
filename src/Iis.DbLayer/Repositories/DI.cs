@@ -1,5 +1,4 @@
 ﻿using Iis.DbLayer.Repositories.Helpers;
-using Iis.Domain.Materials;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Iis.DbLayer.Repositories
@@ -14,6 +13,7 @@ namespace Iis.DbLayer.Repositories
             services.AddTransient<IMaterialRepository, MaterialRepository>();
             services.AddTransient<IMaterialSignRepository, MaterialSignRepository>();
             services.AddTransient<IAnnotationsRepository, AnnotationsRepository>();
+            services.AddTransient<IFlightRadarRepository, FlightRadarRepository>();
         }
     }
 }

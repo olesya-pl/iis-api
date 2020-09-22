@@ -66,6 +66,8 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.DbLayer.OntologyData;
 using Iis.Api.Ontology;
 using Iis.OntologyData;
+using IIS.Core.FlightRadar;
+using Iis.FlightRadar.DataModel;
 
 namespace IIS.Core
 {
@@ -99,6 +101,7 @@ namespace IIS.Core
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
+            var flightRadarDbConnectionString = Configuration.GetConnectionString("db-flightradar", "DB_");
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
@@ -106,6 +109,13 @@ namespace IIS.Core
                 services.AddDbContext<OntologyContext>(
                     options => options
                         .UseNpgsql(dbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Transient);
+
+                services.AddDbContext<FlightsContext>(
+                    options => options
+                        .UseNpgsql(flightRadarDbConnectionString)
                         .UseLoggerFactory(MyLoggerFactory),
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
@@ -175,6 +185,9 @@ namespace IIS.Core
             services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
+
+            services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
+            services.AddHostedService<FlightRadarHistorySyncJob>();
 
             services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -352,7 +365,7 @@ namespace IIS.Core
                         .AllowAnyMethod()
                 );
             }
-            
+
             app.UseMiddleware<LogHeaderMiddleware>();
 
 #if !DEBUG

@@ -39,7 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Services", "Iis.Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Services.Contracts", "Iis.Services.Contracts\Iis.Services.Contracts.csproj", "{52FEEA9D-286C-471B-8F3F-62E2A4F4B9DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.OntologyData", "Iis.OntologyData\Iis.OntologyData.csproj", "{2E2B2ED5-02AB-47EE-8378-A121E9694326}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologyData", "Iis.OntologyData\Iis.OntologyData.csproj", "{2E2B2ED5-02AB-47EE-8378-A121E9694326}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.FlightRadar.DataModel", "Iis.FlightRadar.DataModel\Iis.FlightRadar.DataModel.csproj", "{8962FBAF-EEA1-4010-BBFA-43701307582A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,10 @@ Global
 		{2E2B2ED5-02AB-47EE-8378-A121E9694326}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E2B2ED5-02AB-47EE-8378-A121E9694326}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E2B2ED5-02AB-47EE-8378-A121E9694326}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8962FBAF-EEA1-4010-BBFA-43701307582A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8962FBAF-EEA1-4010-BBFA-43701307582A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8962FBAF-EEA1-4010-BBFA-43701307582A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8962FBAF-EEA1-4010-BBFA-43701307582A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
