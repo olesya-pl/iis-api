@@ -106,7 +106,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
-            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
 
             if (isElasticSearch)
             {
@@ -144,7 +144,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
 
-            var isElasticSearch = _elasticService.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
@@ -245,6 +245,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
 
             return result;
+        }
+
+        public Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

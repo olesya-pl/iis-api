@@ -98,7 +98,7 @@ namespace Iis.OntologyData.Migration
             
             _migratedIds.Add(sourceNode.Id);
 
-            var entity = _data.GetNodeData(hierarchyMapper[sourceNode.Id]);
+            var entity = _data.GetNodeData(_hierarchyMapper[sourceNode.Id]);
             Log("");
             Log($"Entity{sourceNode.NodeType.Name}.{sourceNode.Id}/view");
             
@@ -180,7 +180,7 @@ namespace Iis.OntologyData.Migration
                 }
                 foreach (var dotNameValue in items)
                 {
-                    var nodeData = _data.GetNode(entity.Id);
+                    var nodeData = _data.GetNodeData(entity.Id);
                     SetValue(dotNameValue, null, options, migrationReference.TargetDotName, nodeData);
                     _data.SetNodesIsArchived(dotNameValue.Nodes.Select(n => n.Id));
                 }

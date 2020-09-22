@@ -117,7 +117,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
             extNode.EntityTypeName = nodeEntity.NodeType.Name;
             extNode.AttributeValue = GetAttributeValue(nodeEntity);
-            extNode.ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType;
+            extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
             extNode.Children = await GetExtNodesByRelationsWithoutNestedObjects(nodeEntity.OutgoingRelations, cancellationToken);
             return extNode;
         }
