@@ -125,6 +125,12 @@ namespace IIS.Core
                                         .UseNpgsql(dbConnectionString),
                                     contextLifetime: ServiceLifetime.Transient,
                                     optionsLifetime: ServiceLifetime.Transient);
+
+                services.AddDbContext<FlightsContext>(
+                                    options => options
+                                        .UseNpgsql(flightRadarDbConnectionString),
+                                    contextLifetime: ServiceLifetime.Transient,
+                                    optionsLifetime: ServiceLifetime.Transient);
 #endif
 
                 //using var context = OntologyContext.GetContext(dbConnectionString);
