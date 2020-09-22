@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -66,7 +67,15 @@ namespace IIS.Core.FlightRadar
 
         private async Task<IEnumerable<IncomingRelation>> GetIcaoSigns(string icao)
         {
-            var icaoSignType = _ontologyModel.GetEntityType(SignName);
+            IEntityTypeModel icaoSignType;
+            try
+            {
+                icaoSignType = _ontologyModel.GetEntityType(SignName);
+            }
+            catch (ArgumentNullException )
+            {
+                return Enumerable.Empty<IncomingRelation>();
+            }
             if (icaoSignType == null)
             {
                 return Enumerable.Empty<IncomingRelation>();
