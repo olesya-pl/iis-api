@@ -397,6 +397,10 @@ namespace IIS.Core
                 var serviceProvider = serviceScope.ServiceProvider;
                 var ontology = serviceProvider.GetRequiredService<IOntologyModel>();
                 var types = ontology.EntityTypes.Where(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
+                if (!types.Any())
+                {
+                    return;
+                }
                 var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
                     .Concat(types).Distinct().ToArray();
 
