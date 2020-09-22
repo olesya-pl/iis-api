@@ -31,6 +31,12 @@ namespace IIS.Core.FlightRadar
         public async Task SaveFlightRadarDataAsync(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems)
         {
             var signs = (await GetIcaoSigns(icao)).Select(p => p.EntityId).ToList();
+
+            if (!signs.Any())
+            {
+                return;
+            }
+
             var entityRelations = await _ontologyService.GetIncomingEntities(signs);
 
             if (!entityRelations.Any())
@@ -61,6 +67,10 @@ namespace IIS.Core.FlightRadar
         private async Task<IEnumerable<IncomingRelation>> GetIcaoSigns(string icao)
         {
             var icaoSignType = _ontologyModel.GetEntityType(SignName);
+            if (icaoSignType == null)
+            {
+                return Enumerable.Empty<IncomingRelation>();
+            }
             var nodes = await _ontologyService.GetNodesByUniqueValue(icaoSignType.Id, icao, "value", int.MaxValue);
             var nodeIds = nodes.Select(p => p.Id).ToList();
             return await _ontologyService.GetIncomingEntities(nodeIds);
