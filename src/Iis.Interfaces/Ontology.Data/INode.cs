@@ -1,7 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.Interfaces.Ontology.Data
 {
@@ -17,5 +15,6 @@ namespace Iis.Interfaces.Ontology.Data
 
         string Value { get; }
         public IDotNameValues GetDotNameValues();
+        bool HasPropertyWithValue(string propertyName, string value);
     }
 }
