@@ -109,19 +109,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter)
         {
-            if (string.IsNullOrWhiteSpace(filter.Suggestion))
-            {
-                return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
-                    .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
+            var query = string.IsNullOrWhiteSpace(filter.Suggestion)
+                ? Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
+                : Context.Relations
+                    .Include(e => e.SourceNode)
+                    .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
+                    .Where(e => EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"))
+                    .Select(e => e.SourceNode);
 
-            }
-            var relationsQ = Context.Relations
-                .Include(e => e.SourceNode)
-                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
-                .Where(e =>
-                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"));
-            return relationsQ
-                .Select(e => e.SourceNode)
+            return query
+                .OrderByDescending(x => x.CreatedAt)
+                .ThenBy(x => x.Id)
                 .Skip(filter.Offset)
                 .Take(filter.Limit)
                 .ToListAsync();
