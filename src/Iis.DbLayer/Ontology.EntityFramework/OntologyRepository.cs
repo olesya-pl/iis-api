@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
@@ -109,19 +107,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter)
         {
-            if (string.IsNullOrWhiteSpace(filter.Suggestion))
-            {
-                return Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
-                    .Skip(filter.Offset).Take(filter.Limit).ToListAsync();
+            var query = string.IsNullOrWhiteSpace(filter.Suggestion)
+                ? Context.Nodes.Where(e => derived.Contains(e.NodeTypeId) && !e.IsArchived)
+                : Context.Relations
+                    .Include(e => e.SourceNode)
+                    .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
+                    .Where(e => EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"))
+                    .Select(e => e.SourceNode);
 
-            }
-            var relationsQ = Context.Relations
-                .Include(e => e.SourceNode)
-                .Where(e => derived.Contains(e.SourceNode.NodeTypeId) && !e.Node.IsArchived && !e.SourceNode.IsArchived)
-                .Where(e =>
-                    EF.Functions.ILike(e.TargetNode.Attribute.Value, $"%{filter.Suggestion}%"));
-            return relationsQ
-                .Select(e => e.SourceNode)
+            return query
+                .OrderByDescending(x => x.CreatedAt)
+                .ThenBy(x => x.Id)
                 .Skip(filter.Offset)
                 .Take(filter.Limit)
                 .ToListAsync();
@@ -207,7 +203,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToListAsync();
         }
 
-        public Task<List<RelationEntity>> GetIncomingRelations(Guid entityId)
+        public Task<List<RelationEntity>> GetIncomingRelationsAsync(Guid entityId)
         {
             return Context.Relations
                 .AsNoTracking()
@@ -217,6 +213,33 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(p => p.NodeType)
                 .Where(p => p.TargetNodeId == entityId)
                 .ToListAsync();
+        }
+
+        public Task<List<RelationEntity>> GetIncomingRelationsAsync(IReadOnlyCollection<Guid> entityIds)
+        {
+            return Context.Relations
+                .AsNoTracking()
+                .Include(p => p.Node)
+                .ThenInclude(p => p.NodeType)
+                .Include(p => p.SourceNode)
+                .ThenInclude(p => p.NodeType)
+                .Where(p => entityIds.Contains(p.TargetNodeId))
+                .ToListAsync();
+        }
+
+        public List<NodeEntity> GetAllNodes()
+        {
+            return Context.Nodes.AsNoTracking().ToList();
+        }
+
+        public List<RelationEntity> GetAllRelations()
+        {
+            return Context.Relations.AsNoTracking().ToList();
+        }
+
+        public List<AttributeEntity> GetAllAttributes()
+        {
+            return Context.Attributes.AsNoTracking().ToList();
         }
     }
 }

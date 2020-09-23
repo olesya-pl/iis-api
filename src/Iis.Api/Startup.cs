@@ -66,6 +66,8 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.DbLayer.OntologyData;
 using Iis.Api.Ontology;
 using Iis.OntologyData;
+using IIS.Core.FlightRadar;
+using Iis.FlightRadar.DataModel;
 
 namespace IIS.Core
 {
@@ -99,6 +101,7 @@ namespace IIS.Core
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
+            var flightRadarDbConnectionString = Configuration.GetConnectionString("db-flightradar", "DB_");
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
@@ -109,10 +112,23 @@ namespace IIS.Core
                         .UseLoggerFactory(MyLoggerFactory),
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
+
+                services.AddDbContext<FlightsContext>(
+                    options => options
+                        .UseNpgsql(flightRadarDbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Transient);
 #else
                 services.AddDbContext<OntologyContext>(
                                     options => options
                                         .UseNpgsql(dbConnectionString),
+                                    contextLifetime: ServiceLifetime.Transient,
+                                    optionsLifetime: ServiceLifetime.Transient);
+
+                services.AddDbContext<FlightsContext>(
+                                    options => options
+                                        .UseNpgsql(flightRadarDbConnectionString),
                                     contextLifetime: ServiceLifetime.Transient,
                                     optionsLifetime: ServiceLifetime.Transient);
 #endif
@@ -175,6 +191,9 @@ namespace IIS.Core
             services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
+
+            services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
+            //services.AddHostedService<FlightRadarHistorySyncJob>();
 
             services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -283,6 +302,8 @@ namespace IIS.Core
                     Configuration["activeDirectory:server"],
                     Configuration["activeDirectory:login"],
                     Configuration["activeDirectory:password"]));
+            services.AddSingleton<IElasticState, ElasticState>();
+            services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
@@ -350,7 +371,7 @@ namespace IIS.Core
                         .AllowAnyMethod()
                 );
             }
-            
+
             app.UseMiddleware<LogHeaderMiddleware>();
 
 #if !DEBUG
@@ -376,6 +397,10 @@ namespace IIS.Core
                 var serviceProvider = serviceScope.ServiceProvider;
                 var ontology = serviceProvider.GetRequiredService<IOntologyModel>();
                 var types = ontology.EntityTypes.Where(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
+                if (!types.Any())
+                {
+                    return;
+                }
                 var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
                     .Concat(types).Distinct().ToArray();
 

@@ -101,15 +101,18 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
 
-        public async Task<int> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default)
+        public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default)
         {
             const int batchSize = 50000;
 
             var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                 .CountAsync();
 
+            var responses = new List<ElasticBulkResponse>(materialsCount);
             for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
             {
+                token.ThrowIfCancellationRequested();
+
                 var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                     .OrderBy(p => p.Id)
                     .Skip(i*batchSize)
@@ -123,29 +126,28 @@ namespace Iis.DbLayer.Repositories
                     .ToDictionary(k => k.Key, p => p.ToList());
                 var materialDocuments = materialEntities
                     .Select(p => MapEntityToDocument(p))
-                .Select(p =>
-                {
-                        if (!mlResponses.ContainsKey(p.Id))
-                        {
-                            return p;
-                        }
-                    var mlResponsesByEntity = mlResponses[p.Id];
-                    p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
-                    string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
-                    if (!string.IsNullOrEmpty(imageVector))
+                    .Select(p =>
                     {
-                        p.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
-                    }
-                        return p;
-                    })
+                            if (!mlResponses.ContainsKey(p.Id))
+                            {
+                                return p;
+                            }
+                        var mlResponsesByEntity = mlResponses[p.Id];
+                        p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
+                        string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
+                        if (!string.IsNullOrEmpty(imageVector))
+                        {
+                            p.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
+                        }
+                            return p;
+                        })
                     .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
-                await _elasticManager.PutsDocumentsAsync(MaterialIndexes.FirstOrDefault(),
-                        materialDocuments,
-                        token);
+                
+                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), materialDocuments, token);
+                responses.AddRange(response);
             }
 
-
-            return materialsCount;
+            return responses;
         }
 
 

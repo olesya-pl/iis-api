@@ -15,6 +15,8 @@
     <Compile Remove="Migrations\20200310142737_MaterialSigns.Designer.cs" />
     <Compile Remove="Migrations\20200721120237_MachineLearning_AddNewFields_Version_and_ProcessingDate.cs" />
     <Compile Remove="Migrations\20200721120237_MachineLearning_AddNewFields_Version_and_ProcessingDate.Designer.cs" />
+    <Compile Remove="Migrations\20200917101642_AddFlightRadarHistory.cs" />
+    <Compile Remove="Migrations\20200917101642_AddFlightRadarHistory.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
