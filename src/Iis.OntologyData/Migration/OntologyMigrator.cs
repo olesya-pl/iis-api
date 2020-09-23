@@ -163,6 +163,7 @@ namespace Iis.OntologyData.Migration
                     Log($"        {dotNameValue.Value} => {value}");
                 }
                 _data.AddValueByDotName(entity, value, targetDotName.Split('.'));
+                _data.SetNodesIsArchived(dotNameValue.Nodes.Select(n => n.Id));
             }
         }
         private void MigrateReference(IMigrationReference migrationReference)
@@ -182,7 +183,6 @@ namespace Iis.OntologyData.Migration
                 {
                     var nodeData = _data.GetNode(entity.Id);
                     SetValue(dotNameValue, null, options, migrationReference.TargetDotName, nodeData);
-                    _data.SetNodesIsArchived(dotNameValue.Nodes.Select(n => n.Id));
                 }
             }
         }
