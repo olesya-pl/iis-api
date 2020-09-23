@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
@@ -227,6 +225,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(p => p.NodeType)
                 .Where(p => entityIds.Contains(p.TargetNodeId))
                 .ToListAsync();
+        }
+
+        public List<NodeEntity> GetAllNodes()
+        {
+            return Context.Nodes.AsNoTracking().ToList();
+        }
+
+        public List<RelationEntity> GetAllRelations()
+        {
+            return Context.Relations.AsNoTracking().ToList();
+        }
+
+        public List<AttributeEntity> GetAllAttributes()
+        {
+            return Context.Attributes.AsNoTracking().ToList();
         }
     }
 }

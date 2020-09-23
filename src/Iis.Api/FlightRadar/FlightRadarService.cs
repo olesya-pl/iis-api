@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Iis.DataModel.FlightRadar;
 using Iis.DbLayer.Repositories;
-using Iis.Domain;
 using Iis.Domain.FlightRadar;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyData;
 using IIS.Repository;
 using IIS.Repository.Factories;
 
@@ -16,73 +18,76 @@ namespace IIS.Core.FlightRadar
     {
         private const string SignName = "ICAOSign";
         private readonly IMapper _mapper;
-        private readonly IOntologyModel _ontologyModel;
-        private readonly IOntologyService _ontologyService;
+        private readonly IOntologySchema _ontologySchema;
+        private OntologyNodesData _ontologyNodesData;
 
         public FlightRadarService(IMapper mapper,
-            IOntologyModel ontologyModel,
-            IOntologyService ontologyService,
+            IOntologySchema ontologySchema,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _mapper = mapper;
-            _ontologyModel = ontologyModel;
-            _ontologyService = ontologyService;
+            _ontologySchema = ontologySchema;
+
+            SignalSynchronizationStart();
+        }
+
+        public void SignalSynchronizationStart()
+        {
+            if (_ontologyNodesData == null)
+            {
+                var nodes = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetAllNodes());
+                var relations = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetAllRelations());
+                var attributes = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetAllAttributes());
+                var rawData = new NodesRawData(nodes, relations, attributes);
+                _ontologyNodesData = new OntologyNodesData(rawData, _ontologySchema);
+            }
         }
 
         public async Task SaveFlightRadarDataAsync(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems)
         {
-            var signs = (await GetIcaoSigns(icao)).Select(p => p.EntityId).ToList();
+            var signs = GetIcaoSigns(icao);
 
             if (!signs.Any())
             {
                 return;
             }
 
-            var entityRelations = await _ontologyService.GetIncomingEntities(signs);
+            var entityIds = GetIncomingEntities(signs);
+            await SaveHistoryEntities(icao, historyItems, entityIds);
 
-            if (!entityRelations.Any())
-            {
-                return;
-            }
-
-            await SaveHistoryEntities(icao, historyItems, entityRelations);
         }
 
-        private Task SaveHistoryEntities(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems, List<IncomingRelation> entityRelations)
+        private IEnumerable<Guid> GetIncomingEntities(IEnumerable<INode> signs)
+        {
+            return signs.SelectMany(p => p.IncomingRelations.Where(r => r.IsLinkToSeparateObject).Select(r => r.SourceNodeId));
+        }
+
+        private async Task SaveHistoryEntities(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems, IEnumerable<Guid> entityIds)
         {
             var histotyEntities = new List<FlightRadarHistoryEntity>();
-            foreach (var relation in entityRelations)
+            foreach (var entityId in entityIds)
             {
                 histotyEntities.AddRange(
                     _mapper.Map<List<FlightRadarHistoryEntity>>(historyItems)
                     .Select(p =>
                     {
-                        p.NodeId = relation.EntityId;
+                        p.Id = Guid.NewGuid();
+                        p.NodeId = entityId;
                         p.ICAO = icao;
                         return p;
                     }));
             }
-            return RunAsync(async unitOfWork => await unitOfWork.FlightRadarRepository.SaveAsync(histotyEntities));
+            await RunAsync(async unitOfWork => await unitOfWork.FlightRadarRepository.SaveAsync(histotyEntities));
         }
 
-        private async Task<IEnumerable<IncomingRelation>> GetIcaoSigns(string icao)
+        private IEnumerable<INode> GetIcaoSigns(string icao)
         {
-            IEntityTypeModel icaoSignType;
-            try
-            {
-                icaoSignType = _ontologyModel.GetEntityType(SignName);
-            }
-            catch (ArgumentNullException )
-            {
-                return Enumerable.Empty<IncomingRelation>();
-            }
-            if (icaoSignType == null)
-            {
-                return Enumerable.Empty<IncomingRelation>();
-            }
-            var nodes = await _ontologyService.GetNodesByUniqueValue(icaoSignType.Id, icao, "value", int.MaxValue);
-            var nodeIds = nodes.Select(p => p.Id).ToList();
-            return await _ontologyService.GetIncomingEntities(nodeIds);
+            return _ontologyNodesData.GetEntitiesByTypeName(SignName).Where(p => NodeHasPropertyWithValue(p, "value", icao));
+        }
+
+        private bool NodeHasPropertyWithValue(INode node, string propertyName, string value)
+        {
+            return node.OutgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value);
         }
 
         public Task UpdateLastProcessedIdAsync(FlightRadarHistorySyncJobConfig minId, int newMinId)
@@ -98,6 +103,11 @@ namespace IIS.Core.FlightRadar
         public async Task<FlightRadarHistorySyncJobConfig> GetLastProcessedIdAsync()
         {
             return await RunWithoutCommitAsync(async unitOfWork => await unitOfWork.FlightRadarRepository.GetLastProcessedIdAsync());
+        }
+
+        public void SignalSynchronizationStop()
+        {
+            _ontologyNodesData = null;
         }
     }
 }

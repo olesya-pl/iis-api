@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Iis.DataModel;
 using Iis.DataModel.FlightRadar;
 using Iis.Domain.FlightRadar;
 using Iis.FlightRadar.DataModel;
@@ -21,7 +20,7 @@ namespace IIS.Core.FlightRadar
         private readonly IMapper _mapper;
         private readonly IFlightRadarService _flightRadarService;
         private readonly ILogger<FlightRadarHistorySyncJob> _logger;
-        private const int batchSize = 2500;
+        private const int batchSize = 5000;
 
         public FlightRadarHistorySyncJob(IServiceProvider provider,
             IMapper mapper,
@@ -45,13 +44,14 @@ namespace IIS.Core.FlightRadar
 
                     if (!routes.Any())
                     {
+                        _flightRadarService.SignalSynchronizationStop();
                         await Task.Delay(TimeSpan.FromMinutes(2));
                         continue;
                     }
 
+                    _flightRadarService.SignalSynchronizationStart();
                     await SyncRoutesAsync(routes);
                     await _flightRadarService.UpdateLastProcessedIdAsync(minId, routes.Max(p => p.Id));
-                    await Task.Delay(TimeSpan.FromSeconds(5));
                 }
                 catch (Exception e)
                 {

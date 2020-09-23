@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -22,9 +23,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         Task<List<RelationEntity>> GetInversedRelationsQuery(IEnumerable<Guid> nodeIds, IEnumerable<Guid> relationIds);
         Task<int> GetNodesCountWithSuggestionAsync(IEnumerable<Guid> derived, string suggestion);
         Task<List<RelationEntity>> GetAllRelationsAsync(Guid nodeId);
+        List<NodeEntity> GetAllNodes();
         Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
+        List<RelationEntity> GetAllRelations();
         Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter);
-
+        List<AttributeEntity> GetAllAttributes();
         Task<List<AttributeEntity>> GetAttributesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName,
             int limit);
 
