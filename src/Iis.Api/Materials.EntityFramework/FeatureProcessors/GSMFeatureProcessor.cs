@@ -31,11 +31,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         };
         private static readonly Dictionary<string, string> signTypeFields = new Dictionary<string, string>
         {
-            { PhoneSignFields.PhoneNumber, FeatureFields.PhoneNumber },
-            { PhoneSignFields.DBObject, FeatureFields.DBObject },
-            { PhoneSignFields.IMEI, FeatureFields.IMEI },
-            { PhoneSignFields.IMSI, FeatureFields.IMSI },
-            { PhoneSignFields.TMSI, FeatureFields.TMSI }
+            { SignFields.PhoneNumber, FeatureFields.PhoneNumber },
+            { SignFields.DBObject, FeatureFields.DBObject },
+            { SignFields.IMEI, FeatureFields.IMEI },
+            { SignFields.IMSI, FeatureFields.IMSI },
+            { SignFields.TMSI, FeatureFields.TMSI }
         };
         private static readonly JsonMergeSettings mergeSettings = new JsonMergeSettings
         {
@@ -147,7 +147,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         private async Task<bool> PutFeatureToElasticSearch(Guid featureId, JObject feature)
         {
-            return await _elasticService.PutFeatureAsync(featureId, feature);
+            return await _elasticService.PutFeatureAsync(_elasticState.FeatureIndexes.First(), featureId, feature);
         }
 
         private Dictionary<string, object> GetPropertiesForEntity(JObject feature)

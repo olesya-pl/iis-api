@@ -103,11 +103,11 @@ namespace IIS.Core.Materials.Handlers
             var material = await RunAsync(uow => uow.MaterialRepository.GetByIdAsync(message.Id)); 
 
             if(material is null) return;
-            
+
             JObject metadata = JObject.Parse(material.Metadata);
 
             metadata = await processor.ProcessMetadataAsync(metadata);
-            
+
             material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 
             var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
