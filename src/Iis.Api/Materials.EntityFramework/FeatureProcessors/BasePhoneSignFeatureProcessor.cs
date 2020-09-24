@@ -15,7 +15,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
     public abstract class BasePhoneSignFeatureProcessor : IFeatureProcessor
     {
         private const string HIGHLIGHT = "highlight";
-        private string SignTypeIndexName => $"feature_{SignTypeName}";
+        private string SignTypeIndexName => SignTypeName;
         private string[] SignTypeIndexNames => new[] { SignTypeIndexName };
         protected static JsonMergeSettings mergeSettings = new JsonMergeSettings
         {
@@ -74,11 +74,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                     var updatedFeature = MergeFeatures(searchResult.feature, updatesResult.updates);
 
-                    await _elasticService.PutFeatureAsync(SignTypeIndexName, searchResult.featureId.Value, updatedFeature);
-
                     var properties = GetPropertiesFromFeature(updatesResult.updates);
 
                     var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
+
+                    await _elasticService.PutFeatureAsync(SignTypeIndexName, searchResult.featureId.Value, updatedFeature);
                 }
                 else
                 {
@@ -124,17 +124,19 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             var result = new JObject();
 
-            foreach (var property in feature.Properties())
+            foreach (var (featureFieldName, signFieldName) in SignFieldsMapping)
             {
-                var propertyName = property.Name.ToLowerInvariant();
+                var property = feature.Property(featureFieldName);
+                
+                if(property is null) continue;
+
+                if (featureFieldName == FeatureFields.featureId) continue;
 
                 var propertyValue = property.Value.Value<string>();
 
-                if (propertyName == FeatureFields.featureId.ToLowerInvariant()) continue;
-
                 if (string.IsNullOrWhiteSpace(propertyValue)) continue;
 
-                result.Add(propertyName, property.Value);
+                result.Add(signFieldName, property.Value);
             }
             return result;
         }
@@ -142,9 +144,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             var properties = new Dictionary<string, object>();
 
-            foreach (var (signFieldName, featureFieldName) in SignFieldsMapping)
+            foreach (var (featureFieldName, signFieldName) in SignFieldsMapping)
             {
-                var fieldValue = feature.GetValue(featureFieldName, StringComparison.OrdinalIgnoreCase)?.Value<string>();
+                var fieldValue = feature.GetValue(signFieldName, StringComparison.OrdinalIgnoreCase)?.Value<string>();
 
                 if (string.IsNullOrWhiteSpace(fieldValue)) continue;
 

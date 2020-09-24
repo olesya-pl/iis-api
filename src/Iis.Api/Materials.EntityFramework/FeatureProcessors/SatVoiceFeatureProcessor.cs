@@ -22,12 +22,12 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         protected override Dictionary<string, string> SignFieldsMapping => new Dictionary<string, string>
         {
-            { SignFields.PhoneNumber, FeatureFields.PhoneNumber },
-            { SignFields.Object, FeatureFields.Object },
-            { SignFields.IPv4, FeatureFields.IPv4 },
-            { SignFields.Beam, FeatureFields.Beam },
-            { SignFields.LocationX, FeatureFields.LocationX },
-            { SignFields.LocationY, FeatureFields.LocationY}
+            { FeatureFields.PhoneNumber, SignFields.PhoneNumber},
+            { FeatureFields.Object, SignFields.DBObject },
+            { FeatureFields.IPv4, SignFields.IPv4 },
+            { FeatureFields.Beam, SignFields.Beam },
+            { FeatureFields.LocationX, SignFields.LocationX },
+            { FeatureFields.LocationY, SignFields.LocationY }
         };
 
         public SatVoiceFeatureProcessor(IElasticService elasticService,

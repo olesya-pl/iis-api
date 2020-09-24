@@ -8,7 +8,6 @@
         public const string IMEI = "imei";
         public const string TMSI = "tmsi";
         public const string IPv4 = "ipv4";
-        public const string Object = "object";
         public const string Beam = "beam";
         public const string LocationX = "locationX";
         public const string LocationY = "locationY";
