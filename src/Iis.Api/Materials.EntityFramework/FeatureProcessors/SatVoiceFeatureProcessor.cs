@@ -15,9 +15,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         protected override List<string> PrioritizedFields => new List<string>
         {
-            FeatureFields.PhoneNumber,
-            FeatureFields.Object,
-            FeatureFields.IPv4
+            SignFields.PhoneNumber,
+            SignFields.DBObject,
+            SignFields.IPv4
         };
 
         protected override Dictionary<string, string> SignFieldsMapping => new Dictionary<string, string>
