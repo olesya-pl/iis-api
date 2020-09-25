@@ -249,7 +249,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
         {
-            var ctxSource = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetNodeEntityById(nodeId));
+            var ctxSource = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetActiveNodeEntityById(nodeId));
 
             if (ctxSource is null) return null;
             if (!ctxSource.OutgoingRelations.Any())

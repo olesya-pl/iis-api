@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Iis.DataModel;
 using Iis.Domain;
-using Iis.Interfaces.Ontology.Data;
+
 using IIS.Repository;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
@@ -16,6 +18,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public NodeEntity GetNodeEntityById(Guid id)
         {
             return Context.Nodes.FirstOrDefault(_ => _.Id == id);
+        }
+        public NodeEntity GetActiveNodeEntityById(Guid id)
+        {
+            return Context.Nodes
+                .Include(p => p.NodeType)
+                .FirstOrDefault(p => p.Id == id && !p.IsArchived && !p.NodeType.IsArchived);
         }
 
         public async Task<NodeEntity> GetNodeEntityByIdAsync(Guid id)
@@ -35,7 +43,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode)
                 .ThenInclude(tn => tn.NodeType)
-                .SingleOrDefaultAsync(n => !n.IsArchived && n.Id == id);
+                .SingleOrDefaultAsync(n => !n.IsArchived 
+                    && n.Id == id);
         }
 
         public Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids)
