@@ -1,6 +1,7 @@
 ﻿using Humanizer;
 using System.Linq;
 using System.Globalization;
+using System.Text;
 
 namespace Iis.Utility
 {
@@ -18,7 +19,21 @@ namespace Iis.Utility
 
             return new string(input.Where(ch => !char.IsWhiteSpace(ch)).ToArray());
         }
-        
+
+        public static string RemoveNewLinesCharacter(this string input)
+        {
+            var removeChars = new char[] { '\n', '\r', '\t' };
+            var sb = new StringBuilder(input.Length);
+            foreach (char c in input)
+            {
+                if (!removeChars.Contains(c))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+
         public static string ToLowerCamelCase(this string input)
         {
             if(string.IsNullOrWhiteSpace(input)) return input;

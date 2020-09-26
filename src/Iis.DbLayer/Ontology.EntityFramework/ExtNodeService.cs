@@ -149,6 +149,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 Id = nodeEntity.Id.ToString("N"),
                 NodeTypeId = nodeEntity.NodeTypeId.ToString("N"),
+                NodeType = _ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId),
                 NodeTypeName = nodeTypeName,
                 NodeTypeTitle = nodeTypeTitle,
                 CreatedAt = nodeEntity.CreatedAt,

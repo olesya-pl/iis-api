@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Iis.DataModel;
 using Iis.DataModel.FlightRadar;
 using Iis.Domain.FlightRadar;
 using Iis.FlightRadar.DataModel;
@@ -45,10 +44,12 @@ namespace IIS.Core.FlightRadar
 
                     if (!routes.Any())
                     {
+                        _flightRadarService.SignalSynchronizationStop();
                         await Task.Delay(TimeSpan.FromMinutes(2));
                         continue;
                     }
 
+                    _flightRadarService.SignalSynchronizationStart();
                     await SyncRoutesAsync(routes);
                     await _flightRadarService.UpdateLastProcessedIdAsync(minId, routes.Max(p => p.Id));
                 }
@@ -72,10 +73,10 @@ namespace IIS.Core.FlightRadar
             await Task.WhenAll(saveFlightHistoryTasks);
         }
 
-        private Task<List<Routes>> GetRoutesAsync(FlightRadarHistorySyncJobConfig minId)
+        private async Task<List<Routes>> GetRoutesAsync(FlightRadarHistorySyncJobConfig minId)
         {
-            var flightContext = _provider.GetRequiredService<FlightsContext>();
-            return flightContext.Routes
+            using var flightContext = _provider.GetRequiredService<FlightsContext>();
+            return await flightContext.Routes
                 .Where(p => p.Id > minId.LatestProcessedId)
                 .OrderBy(p => p.Id)
                 .Take(batchSize)
