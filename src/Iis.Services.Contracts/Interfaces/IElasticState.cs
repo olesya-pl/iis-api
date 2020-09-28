@@ -10,5 +10,6 @@ namespace Iis.Services.Contracts.Interfaces
         Dictionary<string, string> HistoricalOntologyIndexes { get; }
         List<string> MaterialIndexes { get; }
         List<string> OntologyIndexes { get; }
+        List<string> SignIndexes { get; }
     }
 }

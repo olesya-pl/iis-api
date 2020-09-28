@@ -1,20 +1,17 @@
-﻿using Iis.DbLayer.Repositories;
-using Iis.Elastic;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
-using Iis.Interfaces.Ontology.Schema;
-using IIS.Core.Materials;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Iis.OntologyData;
+using System.Collections.Generic;
+using Iis.DbLayer.Repositories;
+using Iis.Elastic;
+using Iis.Interfaces.Elastic;
+using IIS.Core.Materials;
+using Microsoft.AspNetCore.Mvc;
 using MoreLinq;
 using Iis.Services.Contracts.Interfaces;
-using System.Diagnostics;
 
 namespace Iis.Api.Controllers
 {
@@ -22,6 +19,7 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class AdminController : Controller
     {
+        private const string AllIndexes = "all";
         IElasticManager _elasticManager;
         INodeRepository _nodeRepository;
         IMaterialService _materialService;
@@ -65,13 +63,25 @@ namespace Iis.Api.Controllers
             return RecreateOntologyIndexes(indexNames, true, true, ct);
         }
 
+        [HttpGet("ReCreateSignIndexes/{indexNames}")]
+        public Task<IActionResult> ReCreateSignIndexes(string indexNames, CancellationToken ct)
+        {
+            return CreateOntologyIndexes(indexNames, _elasticState.SignIndexes, false, false, ct);
+        }
+
+        [HttpGet("ReInitializeSignIndexes/{indexNames}")]
+        public Task<IActionResult> ReInitializeSignIndexes(string indexNames, CancellationToken ct)
+        {
+            return CreateOntologyIndexes(indexNames, _elasticState.SignIndexes, true, false, ct);
+        }
+
         private async Task<IActionResult> RecreateOntologyIndexes(string indexNames, bool isHistorical, bool useNodesFromMemory, CancellationToken ct)
         {
             var stopwatch = Stopwatch.StartNew();
             _adminElasticService.Logger = new StringBuilder();
 
             IEnumerable<string> indexes;
-            if (indexNames == "all")
+            if (indexNames == AllIndexes)
             {
                 indexes = _elasticState.OntologyIndexes;
             }
@@ -84,7 +94,7 @@ namespace Iis.Api.Controllers
             }
 
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
-            await _adminElasticService.CreateMappingsAsync(indexes, isHistorical, ct);
+            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
 
             if (useNodesFromMemory)
                 await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
@@ -151,6 +161,30 @@ namespace Iis.Api.Controllers
             {
                 log.AppendLine($"error occurred for Id:{group.Key}, errorType:{group.First().ErrorType}, error message:{group.First().ErrorReason}");
             }
+        }
+
+        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IEnumerable<string> baseIndexList, bool useMemoryCache, bool isHistorical, CancellationToken ct)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var indexes = indexNames == AllIndexes ? baseIndexList : baseIndexList.Where(indexName => indexNames.Split(",").Contains(indexName, StringComparer.OrdinalIgnoreCase)).ToList();
+
+            if(!indexes.Any()) return Content("There is no valid index names were provided.");
+            
+            _adminElasticService.Logger  = new StringBuilder();
+
+            await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
+
+            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
+
+            if(useMemoryCache)
+                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
+            else
+                await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
+
+            _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+
+            return Content(_adminElasticService.Logger.ToString()); 
         }
     }
 }

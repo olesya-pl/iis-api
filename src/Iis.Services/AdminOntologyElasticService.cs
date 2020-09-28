@@ -68,15 +68,14 @@ namespace Iis.Services
             }
         }
 
-        public async Task CreateMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task CreateIndexWithMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             foreach (var index in indexes)
             {
                 ct.ThrowIfCancellationRequested();
 
-                var historicalIndex = _elasticState.HistoricalOntologyIndexes[index];
                 var attributesInfo = isHistorical
-                    ? _ontologySchema.GetHistoricalAttributesInfo(index, historicalIndex)
+                    ? _ontologySchema.GetHistoricalAttributesInfo(index, _elasticState.HistoricalOntologyIndexes[index])
                     : _ontologySchema.GetAttributesInfo(index);
 
                 var result = await _elasticManager.CreateMapping(attributesInfo, ct);
