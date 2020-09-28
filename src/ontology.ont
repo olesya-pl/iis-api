@@ -16835,6 +16835,30 @@
       "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
+    },
+    {
+      "Id": "9a14e5c2-4b53-4ac0-ba64-20df76895a7b",
+      "Name": "location",
+      "Title": "Розташування",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "59762b16-8ab7-45aa-b795-db816ba7a714",
+      "Name": "location",
+      "Title": "Розташування",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
     }
   ],
   "RelationTypes": [
@@ -22152,6 +22176,13 @@
       "TargetTypeId": "e3a67539-642f-41aa-9ce0-3da1ba069b15"
     },
     {
+      "Id": "59762b16-8ab7-45aa-b795-db816ba7a714",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "30a373f5-470b-4df0-b8ba-fef817169499",
+      "TargetTypeId": "9a14e5c2-4b53-4ac0-ba64-20df76895a7b"
+    },
+    {
       "Id": "a18905e6-3212-4e50-a681-2b846b15210b",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -24161,6 +24192,10 @@
     {
       "Id": "e041782a-612c-4837-ac72-c2ebe3af5a5e",
       "ScalarType": 0
+    },
+    {
+      "Id": "9a14e5c2-4b53-4ac0-ba64-20df76895a7b",
+      "ScalarType": 5
     }
   ],
   "Aliases": []
