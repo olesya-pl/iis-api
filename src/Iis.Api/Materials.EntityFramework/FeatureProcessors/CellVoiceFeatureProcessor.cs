@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
@@ -7,28 +7,28 @@ using IIS.Core.Materials.FeatureProcessors;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
-    public class SatVoiceFeatureProcessor : BasePhoneSignFeatureProcessor, IFeatureProcessor
+    public class CellVoiceFeatureProcessor : BasePhoneSignFeatureProcessor, IFeatureProcessor
     {
-        protected override string SignTypeName => "SatellitePhoneSign";
+        protected override string SignTypeName => "CellphoneSign";
 
         protected override List<string> PrioritizedFields => new List<string>
         {
+            SignFields.IMSI,
             SignFields.PhoneNumber,
-            SignFields.DBObject,
-            SignFields.IPv4
+            SignFields.IMEI,
+            SignFields.DBObject
         };
 
         protected override Dictionary<string, string> SignFieldsMapping => new Dictionary<string, string>
         {
-            { FeatureFields.PhoneNumber, SignFields.PhoneNumber},
-            { FeatureFields.Object, SignFields.DBObject },
-            { FeatureFields.IPv4, SignFields.IPv4 },
-            { FeatureFields.Beam, SignFields.Beam },
-            { FeatureFields.LocationX, SignFields.LocationX },
-            { FeatureFields.LocationY, SignFields.LocationY }
+            { FeatureFields.PhoneNumber, SignFields.PhoneNumber },
+            { FeatureFields.DBObject, SignFields.DBObject },
+            { FeatureFields.IMEI, SignFields.IMEI },
+            { FeatureFields.IMSI, SignFields.IMSI },
+            { FeatureFields.TMSI, SignFields.TMSI }
         };
 
-        public SatVoiceFeatureProcessor(IElasticService elasticService,
+        public CellVoiceFeatureProcessor(IElasticService elasticService,
             IOntologyModel ontology,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
@@ -36,4 +36,5 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         : base(elasticService, ontology, createResolver, updateResolver, elasticState)
         {}
     }
+
 }

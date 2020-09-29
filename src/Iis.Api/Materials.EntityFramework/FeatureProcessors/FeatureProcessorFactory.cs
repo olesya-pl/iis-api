@@ -25,7 +25,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             return materialSource switch
             {
-                "cell.voice" when materialType == "audio" => new GSMFeatureProcessor(_elasticService, _ontology, _createResolver, _updateResolver, _elasticState),
+                "cell.voice" when materialType == "audio" => new CellVoiceFeatureProcessor(_elasticService, _ontology, _createResolver, _updateResolver, _elasticState),
                 "sat.voice" when materialType == "audio" => new SatVoiceFeatureProcessor(_elasticService, _ontology, _createResolver, _updateResolver, _elasticState),
                 _ => new DummyFeatureProcessor()
             };
