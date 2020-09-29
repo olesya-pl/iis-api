@@ -6,7 +6,7 @@ namespace Iis.DbLayer.Repositories
 {
     public interface IFlightRadarRepository
     {
-        Task SaveAsync(IReadOnlyCollection<FlightRadarHistoryEntity> entity);
+        Task SaveAsync(IReadOnlyCollection<LocationHistoryEntity> entity);
         void RemoveSyncJobConfig();
         Task AddSyncJobConfigAsync(FlightRadarHistorySyncJobConfig configToAdd);
         Task<FlightRadarHistorySyncJobConfig> GetLastProcessedIdAsync();
