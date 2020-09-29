@@ -16,6 +16,7 @@ namespace Iis.DbLayer.Repositories
         IMaterialRepository MaterialRepository { get; }
         IOntologyRepository OntologyRepository { get; }
         IAnnotationsRepository AnnotationsRepository {get; }
+        IFlightRadarRepository FlightRadarRepository { get; }
     }
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
         where TContext : DbContext
@@ -29,6 +30,8 @@ namespace Iis.DbLayer.Repositories
         public IOntologyRepository OntologyRepository => ResolveRepository<IOntologyRepository>();
 
         public IAnnotationsRepository AnnotationsRepository => ResolveRepository<IAnnotationsRepository>();
+
+        public IFlightRadarRepository FlightRadarRepository => ResolveRepository<IFlightRadarRepository>();
 
         protected override T ResolveRepository<T>()
         {

@@ -16,6 +16,10 @@ namespace Iis.OntologyModelWrapper
         public INodeTypeLinked Source => _source;
         public NodeTypeWrapper(INodeTypeLinked source)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
             _source = source;
         }
 
@@ -56,9 +60,9 @@ namespace Iis.OntologyModelWrapper
 
         public IMeta Meta
         {
-            get 
+            get
             {
-                return _source.MetaObject; 
+                return _source.MetaObject;
             }
             set { throw new NotImplementedException(); }
         }

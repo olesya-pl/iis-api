@@ -249,7 +249,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
         {
-            var ctxSource = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetNodeEntityById(nodeId));
+            var ctxSource = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetActiveNodeEntityById(nodeId));
 
             if (ctxSource is null) return null;
             if (!ctxSource.OutgoingRelations.Any())
@@ -441,18 +441,31 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId)
         {
             var relations = await RunWithoutCommitAsync(async unitOfWork =>
-                   await unitOfWork.OntologyRepository.GetIncomingRelations(entityId));
+                   await unitOfWork.OntologyRepository.GetIncomingRelationsAsync(entityId));
 
+            return await MapRelations(relations);
+        }
+
+        public async Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds)
+        {
+            var relations = await RunWithoutCommitAsync(async unitOfWork =>
+                   await unitOfWork.OntologyRepository.GetIncomingRelationsAsync(entityIds));
+
+            return await MapRelations(relations);
+        }
+
+        private async Task<List<IncomingRelation>> MapRelations(List<RelationEntity> relations)
+        {
             var res = relations
-                .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
-                .Select(p => new IncomingRelation
-                {
-                    RelationId = p.Node.Id,
-                    RelationTypeName = p.Node.NodeType.Name,
-                    RelationTypeTitle = p.Node.NodeType.Title,
-                    EntityId = p.SourceNodeId,
-                    EntityTypeName = p.SourceNode.NodeType.Name
-                }).ToList();
+                            .Where(p => _ontology.EntityTypes.Select(p => p.Id).Contains(p.SourceNode.NodeTypeId))
+                            .Select(p => new IncomingRelation
+                            {
+                                RelationId = p.Node.Id,
+                                RelationTypeName = p.Node.NodeType.Name,
+                                RelationTypeTitle = p.Node.NodeType.Title,
+                                EntityId = p.SourceNodeId,
+                                EntityTypeName = p.SourceNode.NodeType.Name
+                            }).ToList();
 
             var resNodes = (await LoadNodesAsync(res.Select(p => p.EntityId), null)).ToDictionary(p => p.Id);
 
@@ -462,7 +475,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 {
                     item.Entity = resNodes[item.EntityId];
                 }
-
             }
 
             return res;
