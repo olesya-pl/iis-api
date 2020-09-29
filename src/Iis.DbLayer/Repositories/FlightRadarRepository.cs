@@ -24,7 +24,7 @@ namespace Iis.DbLayer.Repositories
             Context.FlightRadarHistorySyncJobConfig.RemoveRange(Context.FlightRadarHistorySyncJobConfig);
         }
 
-        public Task SaveAsync(IReadOnlyCollection<FlightRadarHistoryEntity> entities)
+        public Task SaveAsync(IReadOnlyCollection<LocationHistoryEntity> entities)
         {
             return Context.AddRangeAsync(entities);
         }
