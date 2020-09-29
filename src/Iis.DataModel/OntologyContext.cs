@@ -64,7 +64,7 @@ namespace Iis.DataModel
 
         public DbSet<AnnotationEntity> Annotations { get; set; }
 
-        public DbSet<FlightRadarHistoryEntity> FlightRadarHistoryEntities { get; set; }
+        public DbSet<LocationHistoryEntity> LocationHistory { get; set; }
 
         public DbSet<FlightRadarHistorySyncJobConfig> FlightRadarHistorySyncJobConfig { get; set;}
 
