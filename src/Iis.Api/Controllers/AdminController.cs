@@ -94,6 +94,7 @@ namespace Iis.Api.Controllers
             }
 
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
+
             await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
 
             if (useNodesFromMemory)
@@ -102,6 +103,7 @@ namespace Iis.Api.Controllers
                 await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+
             return Content(_adminElasticService.Logger.ToString());
         }
 
