@@ -30,7 +30,7 @@ namespace Iis.Elastic
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
             }
 
-            var coordinates = extNode.GetCoordinates();
+            var coordinates = extNode.GetCoordinatesWithoutNestedObjects();
             if (coordinates != null && coordinates.Count > 0)
             {
                 var coords = new JArray();
