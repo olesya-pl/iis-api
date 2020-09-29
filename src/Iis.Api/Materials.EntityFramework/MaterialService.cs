@@ -100,7 +100,12 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
             }
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type });
+
+            var message = new MaterialEventMessage { Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type };
+
+            _eventProducer.SendMaterialEvent(message);
+
+            _eventProducer.SendMaterialFeatureEvent(message);
 
             // todo: put message to rabbit instead of calling another service directly
             if (material.Metadata.SelectToken("Features.Nodes") != null)
