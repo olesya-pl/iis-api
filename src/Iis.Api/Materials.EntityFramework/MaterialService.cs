@@ -134,13 +134,34 @@ namespace IIS.Core.Materials.EntityFramework
             var material = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(input.Id, new[] { MaterialIncludeEnum.WithChildren }));
 
             if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
-            if (input.ImportanceId.HasValue) material.ImportanceSignId = input.ImportanceId.Value;
-            if (input.ReliabilityId.HasValue) material.ReliabilitySignId = input.ReliabilityId.Value;
-            if (input.RelevanceId.HasValue) material.RelevanceSignId = input.RelevanceId.Value;
-            if (input.CompletenessId.HasValue) material.CompletenessSignId = input.CompletenessId.Value;
-            if (input.SourceReliabilityId.HasValue) material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
-            if (input.ProcessedStatusId.HasValue) material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
-            if (input.SessionPriorityId.HasValue) material.SessionPriorityId = input.SessionPriorityId.Value;
+            if (input.ImportanceId.HasValue) {
+                material.ImportanceSignId = input.ImportanceId.Value;
+                material.Importance = null;
+            }
+            if (input.ReliabilityId.HasValue) {
+                material.ReliabilitySignId = input.ReliabilityId.Value;
+                material.Reliability = null;
+            }
+            if (input.RelevanceId.HasValue) {
+                material.RelevanceSignId = input.RelevanceId.Value;
+                material.Relevance = null;
+            }
+            if (input.CompletenessId.HasValue) {
+                material.CompletenessSignId = input.CompletenessId.Value;
+                material.Completeness = null;
+            }
+            if (input.SourceReliabilityId.HasValue) {
+                material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
+                material.SourceReliability = null;
+            }
+            if (input.ProcessedStatusId.HasValue) {
+                material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
+                material.ProcessedStatus = null;
+            }
+            if (input.SessionPriorityId.HasValue) {
+                material.SessionPriorityId = input.SessionPriorityId.Value;
+                material.SessionPriority = null;
+            }
             if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
             if (input.Content != null) material.Content = input.Content;
 
