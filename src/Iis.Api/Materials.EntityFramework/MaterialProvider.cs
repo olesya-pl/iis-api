@@ -310,6 +310,8 @@ namespace IIS.Core.Materials.EntityFramework
 
         private bool IsObjectSign(Node node)
         {
+            if (node is null) return false;
+
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 
             return nodeType.IsObjectSign;

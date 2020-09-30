@@ -15,6 +15,7 @@ namespace IIS.Core.Materials
     {
         void SendMaterialAddedEventAsync(MaterialAddedEvent eventData);
         void SendMaterialEvent(MaterialEventMessage eventMessage);
+        void SendMaterialFeatureEvent(MaterialEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
     }
 
@@ -75,8 +76,22 @@ namespace IIS.Core.Materials
         {
             var routingKey = $"processing.ml.{eventMessage.Type}";
 
-            var json = JObject.FromObject(eventMessage).ToString();
+            SendMaterialEventMessage(eventMessage, routingKey);
+        }
+
+        public void SendMaterialFeatureEvent(MaterialEventMessage eventMessage)
+        {
+            var routingKey = $"processing.features.{eventMessage.Type}";
+
+            SendMaterialEventMessage(eventMessage, routingKey);
+        }
+
+        private void SendMaterialEventMessage(MaterialEventMessage message, string routingKey)
+        {
+            var json = JObject.FromObject(message).ToString();
+
             var body = Encoding.UTF8.GetBytes(json);
+
             var properties = _materialEventChannel.CreateBasicProperties();
 
             properties.Persistent = true;
@@ -86,7 +101,6 @@ namespace IIS.Core.Materials
                                 basicProperties: null,
                                 body: body);
         }
-
         private IModel ConfigChannel(IModel channel, ChannelConfig config)
         {
             if(config is null) return channel;
@@ -102,7 +116,6 @@ namespace IIS.Core.Materials
             _materialEventChannel.Dispose();
             _connection.Dispose();
         }
-
         public void SendAvailableForOperatorEvent(Guid materialId)
         {
             _channel.QueueDeclare(
