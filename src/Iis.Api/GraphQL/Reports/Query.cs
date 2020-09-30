@@ -1,33 +1,32 @@
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Api.GraphQL.Common;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Common;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Iis.DataModel;
 
 namespace IIS.Core.GraphQL.Reports
 {
     public class Query
     {
         [GraphQLNonNullType]
-        public async Task<GraphQLCollection<Report>> GetReportList([Service] OntologyContext context, [GraphQLNonNullType] PaginationInput pagination)
+        public async Task<GraphQLCollection<Report>> GetReportList([Service] IReportService reportService, [GraphQLNonNullType] PaginationInput pagination, SortingInput sorting)
         {
-            var query = context.Reports.GetPage(pagination).Include(r => r.ReportEvents);
-            var result = await query.Select(row => new Report(row)).ToListAsync();
-            var totalCount = await context.Reports.CountAsync();
-            return new GraphQLCollection<Report>(result, totalCount);
+            var (count, items) = await reportService.GetReportPageAsync(pagination.PageSize, pagination.Offset());
+            return new GraphQLCollection<Report>(items.Select(x => new Report(x)).ToList(), count);
         }
 
         [GraphQLType(typeof(ReportType))]
-        public async Task<Report> GetReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
+        public async Task<Report> GetReport([Service] IReportService reportService, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var dbReport = await context.Reports.Include(r => r.ReportEvents).SingleOrDefaultAsync(r => r.Id == id);
+            var report = await reportService.GetAsync(id);
 
-            if(dbReport is null) return null;
+            if(report is null) 
+                return null;
             
-            return new Report(dbReport);
+            return new Report(report);
         }
     }
 }

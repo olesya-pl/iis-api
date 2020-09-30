@@ -24,9 +24,11 @@ namespace Iis.Services
             EventIndexes = new List<string> { "Event" };
             MaterialIndexes = new List<string> { "Materials" };
             FeatureIndexes = new List<string> { "Features" };
+            ReportIndex = "Reports";
         }
 
         public bool UseElastic { get; }
+        public string ReportIndex { get; set; }
         public List<string> MaterialIndexes { get; }
         public List<string> OntologyIndexes { get; }
         public Dictionary<string, string> HistoricalOntologyIndexes { get; }

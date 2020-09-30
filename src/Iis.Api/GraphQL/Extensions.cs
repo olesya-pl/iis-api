@@ -10,6 +10,8 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Meta;
+using Iis.Api.GraphQL.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace IIS.Core.GraphQL
 {
@@ -107,6 +109,21 @@ namespace IIS.Core.GraphQL
             }
 
             return query.Skip(pagination.Offset()).Take(pagination.PageSize);
+        }
+
+        public static IQueryable<T> ApplyOrdering<T>(this IQueryable<T> query, SortingInput sorting) 
+        {
+            if (sorting == null)
+                return query;
+
+            var availableFields = typeof(T).GetProperties();
+            var field = availableFields?.FirstOrDefault(x => string.Equals(x.Name, sorting.ColumnName, StringComparison.OrdinalIgnoreCase));
+            if(field == null)
+                throw new ArgumentException($"sorting can not be made by {sorting.ColumnName}", nameof(sorting.ColumnName));
+
+            return string.Equals(sorting.Order, "desc", StringComparison.OrdinalIgnoreCase)
+                ? query.OrderByDescending(x => EF.Property<object>(x, field.Name))
+                : query.OrderBy(x => EF.Property<object>(x, field.Name));
         }
     }
 }

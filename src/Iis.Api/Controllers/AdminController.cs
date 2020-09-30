@@ -83,16 +83,27 @@ namespace Iis.Api.Controllers
                     return Content(_adminElasticService.Logger.ToString());
             }
 
-            await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
-            await _adminElasticService.CreateMappingsAsync(indexes, isHistorical, ct);
+            await _adminElasticService.DeleteOntologyIndexesAsync(indexes, isHistorical, ct);
+            await _adminElasticService.CreateOntologyMappingsAsync(indexes, isHistorical, ct);
 
             if (useNodesFromMemory)
-                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
+                await _adminElasticService.FillOntologyIndexesFromMemoryAsync(indexes, isHistorical, ct);
             else
-                await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
+                await _adminElasticService.FillOntologyIndexesAsync(indexes, isHistorical, ct);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
             return Content(_adminElasticService.Logger.ToString());
+        }
+
+        [HttpGet("RecreateElasticReportIndex")]
+        public async Task<IActionResult> RecreateReportIndex(CancellationToken ct) 
+        {
+            var log = new StringBuilder();
+            var index = _elasticState.ReportIndex;
+
+            await _adminElasticService.DeleteIndexesAsync(new string[] { index }, ct);
+
+            return Content(log.ToString());
         }
 
         [HttpGet("RecreateElasticMaterialIndexes")]

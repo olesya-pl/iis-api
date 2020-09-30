@@ -1,10 +1,14 @@
-﻿using Iis.DbLayer.Repositories;
+﻿using Iis.DataModel;
+using Iis.DataModel.Reports;
+using Iis.DbLayer.Repositories;
+using Iis.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
 using Iis.Services.Contracts.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +26,11 @@ namespace Iis.Services
         private readonly IExtNodeService _extNodeService;
         private readonly INodeRepository _nodeRepository;
         private readonly OntologyNodesData ontologyNodesData;
+        private readonly Dictionary<Type, Func<ElasticMappingConfiguration>> _mappingCreatorByType = new Dictionary<Type, Func<ElasticMappingConfiguration>>()
+        {
+            { typeof(ReportEntity), CreateReportEntityMappings }
+        };
+
 
         public StringBuilder Logger { get; set; }
 
@@ -56,19 +65,13 @@ namespace Iis.Services
             return true;
         }
 
-        public async Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task DeleteOntologyIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var indexesToDelete = isHistorical ? GetHistoricalIndexes(indexes) : indexes;
-            foreach (var index in indexesToDelete)
-            {
-                ct.ThrowIfCancellationRequested();
-                var result = await _elasticManager.DeleteIndexAsync(index, ct);
-                if (!result)
-                    TryLog($"{index} was not deleted");
-            }
+            await DeleteIndexesAsync(indexesToDelete);
         }
 
-        public async Task CreateMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task CreateOntologyMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             foreach (var index in indexes)
             {
@@ -86,7 +89,7 @@ namespace Iis.Services
             }
         }
 
-        public async Task FillIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task FillOntologyIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var nodeIds = await _extNodeService.GetExtNodesByTypeIdsAsync(indexes, ct);
             if (isHistorical)
@@ -114,7 +117,7 @@ namespace Iis.Services
             }
         }
 
-        public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task FillOntologyIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var nodes = GetNodesFromMemory(indexes);
             var response = isHistorical
@@ -124,6 +127,37 @@ namespace Iis.Services
             LogBulkResponse(response);
         }
 
+        public async Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default)
+        {
+            foreach (var index in indexes)
+            {
+                ct.ThrowIfCancellationRequested();
+                var result = await _elasticManager.DeleteIndexAsync(index, ct);
+                if (!result)
+                    TryLog($"{index} was not deleted");
+            }
+        }
+
+        public async Task CreateIndexBasedOnDbEntityAsync(string index, Type entityType, CancellationToken ct = default)
+        {
+            var createMappingFunc = _mappingCreatorByType.GetValueOrDefault(entityType);
+            if (createMappingFunc == null)
+                throw new ArgumentOutOfRangeException($"type: {entityType.FullName} can not be handled");
+
+            await _elasticManager.CreateIndexesAsync(new[] { index }, createMappingFunc().ToJObject(), ct);
+        }
+
+        private static ElasticMappingConfiguration CreateReportEntityMappings()
+        {
+            var report = new ReportEntity();
+            return new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+                new ElasticMappingProperty(nameof(report.Id), ElasticMappingPropertyType.Keyword),
+                new ElasticMappingProperty(nameof(report.Recipient), ElasticMappingPropertyType.Text, true),
+                new ElasticMappingProperty(nameof(report.Title), ElasticMappingPropertyType.Text, true),
+                new ElasticMappingProperty(nameof(report.CreatedAt), ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
+                new ElasticMappingProperty("ReportEventIds", ElasticMappingPropertyType.Keyword, true)
+            });
+        }
 
         private List<INode> GetNodesFromMemory(IEnumerable<string> indexes)
         {
