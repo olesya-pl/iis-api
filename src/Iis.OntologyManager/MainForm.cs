@@ -6,10 +6,8 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
 using Iis.OntologyData.Migration;
-using Iis.OntologyManager.Parameters;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
-using Iis.OntologySchema.Saver;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
@@ -40,12 +38,14 @@ namespace Iis.OntologyManager
         
         UiFilterControl _filterControl;
         UiMigrationControl _migrationControl;
+        UiDuplicatesControl _duplicatesControl;
         UiEntityTypeControl _uiEntityTypeControl;
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         const string VERSION = "1.18";
         Button btnMigrate;
+        Button btnDuplicates;
         ILogger _logger;
 
         private enum NodeViewType : byte
@@ -56,15 +56,16 @@ namespace Iis.OntologyManager
         }
 
         string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
-        INodeTypeLinked SelectedNodeType
-        {
-            get
-            {
-                return gridTypes.SelectedRows.Count == 0 ?
-                    null :
-                    (INodeTypeLinked)gridTypes.SelectedRows[0].DataBoundItem;
-            }
-        }
+        INodeTypeLinked SelectedNodeType =>
+            gridTypes.SelectedRows.Count == 0 ?
+                null : (INodeTypeLinked)gridTypes.SelectedRows[0].DataBoundItem;
+        IOntologySchemaSource SelectedSchemaSource =>
+             (OntologySchemaSource) cmbSchemaSources.SelectedItem ??
+                (_schemaSources?.Count > 0 ? _schemaSources[0] : null);
+        string SelectedConnectionString =>
+            SelectedSchemaSource?.SourceKind == SchemaSourceKind.Database ?
+                SelectedSchemaSource.Data : null;
+
         public MainForm(IConfiguration configuration,
             OntologySchemaService schemaService,
             ILogger logger, 
@@ -215,9 +216,14 @@ namespace Iis.OntologyManager
             btnCompare = new Button { Text = "Порівняти", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
+            
             btnMigrate = new Button { Text = "Міграція", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnMigrate.Click += btnMigrate_Click;
             container.Add(btnMigrate);
+
+            btnDuplicates = new Button { Text = "Дублікати", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnDuplicates.Click += btnDuplicates_Click;
+            container.Add(btnDuplicates);
 
             panelTop.ResumeLayout();
         }
@@ -257,6 +263,20 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
+        private void btnDuplicates_Click(object sender, EventArgs e)
+        {
+            var form = _uiControlsCreator.GetModalForm(this);
+            var rootPanel = _uiControlsCreator.GetFillPanel(form);
+            _duplicatesControl = new UiDuplicatesControl();
+            _duplicatesControl.Initialize("DuplicatesControl", rootPanel);
+            _duplicatesControl.OnGetData += GetOntologyData;
+
+            using var context = OntologyContext.GetContext(SelectedConnectionString);
+            _duplicatesControl.PatchSaver = new OntologyPatchSaver(context, _mapper);
+
+            form.ShowDialog();
+            form.Close();
+        }
         private void btnMigrate_Click(object sender, EventArgs e)
         {
             var form = _uiControlsCreator.GetModalForm(this);
@@ -270,23 +290,15 @@ namespace Iis.OntologyManager
         }
         private IMigrationResult Migrate(IMigration migration, IMigrationOptions migrationOptions)
         {
-            var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
-                (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
-            if (currentSchemaSource == null || currentSchemaSource.SourceKind != SchemaSourceKind.Database)
-            {
-                return null;
-            }
+            if (SelectedConnectionString == null) return null;
 
-            using var context = OntologyContext.GetContext(currentSchemaSource.Data);
-            var schema = _schemaService.GetOntologySchema(currentSchemaSource);
-
-            var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
-            var ontologyData = new OntologyNodesData(rawData, schema);
-            var migrator = new OntologyMigrator(ontologyData, schema, migration);
+            var ontologyData = GetOntologyData(SelectedConnectionString);
+            var migrator = new OntologyMigrator(ontologyData, migration);
             var result = migrator.Migrate(migrationOptions);
 
+            using var context = OntologyContext.GetContext(SelectedConnectionString);
             var ontologyPatchSaver = new OntologyPatchSaver(context, _mapper);
-            ontologyPatchSaver.SavePatch(ontologyData.Patch); 
+            ontologyPatchSaver.SavePatch(ontologyData.Patch);
             return result;
         }
 
@@ -455,6 +467,28 @@ namespace Iis.OntologyManager
             if (relationType == null) return;
             SetNodeTypeView(relationType, true);
         }
+        #endregion
+
+        #region Ontology Data
+
+        public OntologyNodesData GetOntologyData(string connectionString)
+        {
+            using var context = OntologyContext.GetContext(connectionString);
+            var schema = _schemaService.GetOntologySchema(SelectedSchemaSource);
+
+            var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
+            return new OntologyNodesData(rawData, schema);
+        }
+        public OntologyNodesData GetOntologyData()
+        {
+            if (SelectedConnectionString == null) return null;
+            using var context = OntologyContext.GetContext(SelectedConnectionString);
+            var schema = _schemaService.GetOntologySchema(SelectedSchemaSource);
+
+            var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
+            return new OntologyNodesData(rawData, schema);
+        }
+
         #endregion
     }
 }

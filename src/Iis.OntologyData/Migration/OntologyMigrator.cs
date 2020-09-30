@@ -11,15 +11,13 @@ namespace Iis.OntologyData.Migration
     public class OntologyMigrator
     {
         OntologyNodesData _data;
-        IOntologySchema _schema;
         IMigration _migration;
         Dictionary<Guid, Guid> _hierarchyMapper = new Dictionary<Guid, Guid>();
         HashSet<Guid> _migratedIds = new HashSet<Guid>();
         StringBuilder _log = new StringBuilder();
-        public OntologyMigrator(OntologyNodesData data, IOntologySchema schema, IMigration migration)
+        public OntologyMigrator(OntologyNodesData data, IMigration migration)
         {
             _data = data;
-            _schema = schema;
             _migration = migration;
         }
         public IMigrationResult Migrate(IMigrationOptions migrationOptions)
@@ -44,7 +42,7 @@ namespace Iis.OntologyData.Migration
             var sourceNodes = _data.GetEntitiesByTypeName(migrationEntity.SourceEntityName);
             Log($"Всього {sourceNodes.Count} об'єктів");
 
-            var targetType = _schema.GetEntityTypeByName(migrationEntity.TargetEntityName);
+            var targetType = _data.Schema.GetEntityTypeByName(migrationEntity.TargetEntityName);
             if (migrationOptions.SaveNewObjects)
             {
                 foreach (var node in sourceNodes)
