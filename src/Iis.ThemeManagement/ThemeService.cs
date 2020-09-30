@@ -16,6 +16,7 @@ namespace Iis.ThemeManagement
 {
     public class ThemeService
     {
+        private const string CoordinatesPrefix = "__coordinates:*";
         private readonly OntologyContext _context;
         private readonly IMapper _mapper;
         private readonly IOntologyModel _ontology;
@@ -158,7 +159,7 @@ namespace Iis.ThemeManagement
         {
             var filter = new ElasticFilter
             {
-                Limit = 1000,
+                Limit = 50,
                 Offset = 0,
                 Suggestion = query
             };
@@ -166,7 +167,7 @@ namespace Iis.ThemeManagement
             var indexes = typeId switch
             {
                 _ when typeId == ThemeTypeEntity.EntityMaterialId  => _elasticState.MaterialIndexes,
-                _ when typeId == ThemeTypeEntity.EntityObjectId => GetOntologyIndexes(ontology, "ObjectOfStudy"),
+                _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(ontology, "ObjectOfStudy"),
                 _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(ontology, "Event"),
                 _   => (IEnumerable<string>) null
             };
@@ -188,10 +189,10 @@ namespace Iis.ThemeManagement
             {
                 if(typeId == ThemeTypeEntity.EntityMapId)
                 {
-                    filter.Suggestion = "__coordinates:* && " + filter.Suggestion; 
+                    filter.Suggestion = filter.Suggestion.Contains(CoordinatesPrefix) ? filter.Suggestion : $"{CoordinatesPrefix} && {filter.Suggestion}"; 
                 }
 
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(indexes,filter);
+                var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(indexes,filter);
 
                 return (Id: id, Count: searchResult.Count);
             }
@@ -201,11 +202,13 @@ namespace Iis.ThemeManagement
         {
             var types = ontology.EntityTypes.Where(p => p.Name == typeName);
 
-            return types.SelectMany(e => ontology.GetChildTypes(e))
-                                        .Concat(types)
-                                        .Distinct()
-                                        .Select(nt => nt.Name)
-                                        .ToArray();
+            return types
+                .SelectMany(e => _ontology.GetChildTypes(e))
+                .Concat(types)
+                .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
+                .Select(e => e.Name)
+                .Distinct()
+                .ToArray();
         }
     }
 }
