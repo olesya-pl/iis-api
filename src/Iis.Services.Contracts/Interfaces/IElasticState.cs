@@ -6,7 +6,6 @@ namespace Iis.Services.Contracts.Interfaces
     {
         bool UseElastic { get; }
         List<string> EventIndexes { get; }
-        List<string> FeatureIndexes { get; }
         Dictionary<string, string> HistoricalOntologyIndexes { get; }
         List<string> MaterialIndexes { get; }
         List<string> OntologyIndexes { get; }

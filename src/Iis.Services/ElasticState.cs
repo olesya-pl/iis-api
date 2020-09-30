@@ -23,7 +23,6 @@ namespace Iis.Services
 
             EventIndexes = new List<string> { "Event" };
             MaterialIndexes = new List<string> { "Materials" };
-            FeatureIndexes = new List<string> { "Features" };
             SignIndexes = new List<string>{ "CellphoneSign", "SatellitePhoneSign"};
         }
 
@@ -32,7 +31,6 @@ namespace Iis.Services
         public List<string> OntologyIndexes { get; }
         public Dictionary<string, string> HistoricalOntologyIndexes { get; }
         public List<string> EventIndexes { get; }
-        public List<string> FeatureIndexes { get; }
         public List<string> SignIndexes { get; }
 
         private string GetHistoricalIndex(string typeName) => $"historical_{typeName}";
