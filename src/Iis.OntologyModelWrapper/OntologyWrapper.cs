@@ -38,6 +38,9 @@ namespace Iis.OntologyModelWrapper
         public INodeTypeModel GetType(Guid id)
         {
             var nodeType = _schema.GetNodeTypeById(id);
+            
+            if(nodeType is null) return null;
+
             switch (nodeType.Kind)
             {
                 case Kind.Entity:
