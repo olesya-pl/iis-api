@@ -20,6 +20,8 @@ namespace IIS.Core.NodeMaterialRelation
 
         public async Task Create(NodeMaterialRelation relation)
         {
+            if(!MaterialExists(relation.MaterialId)) throw new InvalidOperationException($"There is no Material with ID:{relation.MaterialId}");
+
             ValidateUniquness(relation);
 
             _context.MaterialFeatures.Add(new MaterialFeatureEntity
@@ -40,6 +42,11 @@ namespace IIS.Core.NodeMaterialRelation
             {
                 throw new Exception(UniqueConstraintViolationMessage);
             }
+        }
+
+        private bool MaterialExists(Guid materialId)
+        {
+            return _context.Materials.Any(e => e.Id == materialId);
         }
 
         public async Task Delete(NodeMaterialRelation relation)
