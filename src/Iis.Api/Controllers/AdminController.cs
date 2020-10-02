@@ -1,19 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Iis.DbLayer.Repositories;
+﻿using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
 using MoreLinq;
-using Iis.Services.Contracts.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using Iis.DataModel.Reports;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Iis.Api.Controllers
 {
@@ -35,10 +33,10 @@ namespace Iis.Api.Controllers
             IElasticState elasticState,
             IAdminOntologyElasticService adminElasticService)
         {
-            _elasticManager = elasticManager;
-            _materialService = materialService;
-            _nodeRepository = nodeRepository;
-            _elasticState = elasticState;
+            _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
+            _materialService = materialService ?? throw new ArgumentNullException(nameof(materialService));
+            _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
+            _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _adminElasticService = adminElasticService ?? throw new ArgumentNullException(nameof(adminElasticService));
         }
 

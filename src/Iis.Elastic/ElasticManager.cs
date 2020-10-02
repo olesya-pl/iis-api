@@ -1,17 +1,15 @@
-﻿using System;
+﻿using Elasticsearch.Net;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Elasticsearch.Net;
-using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
-using Microsoft.Extensions.Logging;
-using Iis.Utility;
-using Iis.Domain.Elastic;
-using System.Diagnostics;
 
 namespace Iis.Elastic
 {

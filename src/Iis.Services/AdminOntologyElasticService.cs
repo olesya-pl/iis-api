@@ -136,14 +136,13 @@ namespace Iis.Services
             }
         }
 
-        public async Task CreateReportMappingsAsync(CancellationToken ct = default)
+        public async Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default)
         {
-            var report = new ReportEntity();
             var mappingConfiguration =  new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
-                new ElasticMappingProperty(nameof(report.Id), ElasticMappingPropertyType.Keyword),
-                new ElasticMappingProperty(nameof(report.Recipient), ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty(nameof(report.Title), ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty(nameof(report.CreatedAt), ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
+                new ElasticMappingProperty(nameof(ReportEntity.Id), ElasticMappingPropertyType.Keyword),
+                new ElasticMappingProperty(nameof(ReportEntity.Recipient), ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty(nameof(ReportEntity.Title), ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty(nameof(ReportEntity.CreatedAt), ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("ReportEventIds", ElasticMappingPropertyType.Keyword, true)
             });
 

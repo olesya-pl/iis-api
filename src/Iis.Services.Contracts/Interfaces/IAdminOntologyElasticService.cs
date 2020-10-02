@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
         bool IsIndexesValid(IEnumerable<string> indexes);
         Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default);
-        Task CreateReportMappingsAsync(CancellationToken ct = default);
+        Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default);
         Task FillReportIndexAsync(CancellationToken ct = default);
     }
 }
