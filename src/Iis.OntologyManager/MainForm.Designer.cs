@@ -54,7 +54,7 @@ namespace Iis.OntologyManager
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(0, 0);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(1000, 110);
+            this.panelTop.Size = new System.Drawing.Size(1000, 140);
             this.panelTop.TabIndex = 0;
             // 
             // panelMain

@@ -63,6 +63,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.Events, opts => opts.Ignore())
+                .ForMember(dest => dest.Features, opts => opts.Ignore())
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -303,7 +305,7 @@ namespace Iis.Api
             CreateMap<Iis.Domain.IncomingRelation, Iis.Api.Ontology.IncomingRelation>()
                 .ForMember(dest => dest.Entity, opts => opts.Ignore());
 
-            CreateMap<Iis.Domain.FlightRadar.FlightRadarHistory, Iis.DataModel.FlightRadar.FlightRadarHistoryEntity>();
+            CreateMap<Iis.Domain.FlightRadar.FlightRadarHistory, Iis.DataModel.FlightRadar.LocationHistoryEntity>();
             CreateMap<FlightRadar.DataModel.Routes, Iis.Domain.FlightRadar.FlightRadarHistory>()
                 .ForMember(dest => dest.Lat, opts => opts.MapFrom(src => src.Latitude))
                 .ForMember(dest => dest.Long, opts => opts.MapFrom(src => src.Longitude))

@@ -29,6 +29,11 @@ namespace AcceptanceTests.Contour.UISteps
 
 		}
 
-
+		[Then(@"I must see the (.*) element")]
+		public void ThenIMustSeeTheElement(string element)
+		{
+			IWebElement buttonElement = driver.FindElement(By.CssSelector(element));
+			Assert.True(buttonElement.Displayed);
+		}
 	}
 }

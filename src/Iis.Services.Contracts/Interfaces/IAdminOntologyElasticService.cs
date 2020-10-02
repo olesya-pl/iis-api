@@ -10,10 +10,10 @@ namespace Iis.Services.Contracts.Interfaces
     {
         StringBuilder Logger { get; set; }
 
-        Task CreateOntologyMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
-        Task DeleteOntologyIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
-        Task FillOntologyIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
-        Task FillOntologyIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
+        Task CreateIndexWithMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
+        Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
+        Task FillIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
+        Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
         bool IsIndexesValid(IEnumerable<string> indexes);
         Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default);
         Task CreateReportMappingsAsync(CancellationToken ct = default);

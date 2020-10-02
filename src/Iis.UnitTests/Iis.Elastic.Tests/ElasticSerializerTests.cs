@@ -6,6 +6,8 @@ using Iis.Elastic;
 using Iis.Domain.ExtendedData;
 using Newtonsoft.Json.Linq;
 using AutoFixture.Xunit2;
+using Moq;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests
 {
@@ -34,6 +36,9 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void GetJsonObjectByExtNode_Children()
         {
+            var nodeTypeMock = new Mock<INodeTypeLinked>();
+            nodeTypeMock.Setup(p => p.IsObjectOfStudy).Returns(false);
+
             var serializer = new ElasticSerializer();
             var extNode = new ExtNode
             {
@@ -48,22 +53,26 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     {
                         NodeTypeName = "name",
                         AttributeValue = "abcde",
+                        NodeType = nodeTypeMock.Object
                     },
                     new ExtNode
                     {
                         NodeTypeName = "affiliation",
                         AttributeValue = null,
+                        NodeType = nodeTypeMock.Object,
                         Children = new List<ExtNode>
                         {
                             new ExtNode
                             {
                                 NodeTypeName = "code",
-                                AttributeValue = "pending"
+                                AttributeValue = "pending",
+                                NodeType = nodeTypeMock.Object
                             },
                             new ExtNode
                             {
                                 NodeTypeName = "sidc",
-                                AttributeValue = "SPG"
+                                AttributeValue = "SPG",
+                                NodeType = nodeTypeMock.Object
                             }
                         }
                     }
@@ -89,22 +98,28 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         public void GetJsonObjectByExtNode_ItemsWithTheSameKey(string signValue1, string signValue2)
         {
 
+            var nodeTypeMock = new Mock<INodeTypeLinked>();
+            nodeTypeMock.Setup(p => p.IsObjectOfStudy).Returns(false);
+
             var serializer = new ElasticSerializer();
             var extNode = new ExtNode
             {
                 CreatedAt = new DateTime(2020, 1, 2),
                 UpdatedAt = new DateTime(2020, 1, 3),
                 AttributeValue = null,
+                NodeType = nodeTypeMock.Object,
                 Children = new List<ExtNode>
                 {
                     new ExtNode
                     {
                         NodeTypeName = "sign",
+                        NodeType = nodeTypeMock.Object,
                         Children = new List<ExtNode>
                         {
                             new ExtNode
                             {
                                 NodeTypeName = "value",
+                                NodeType = nodeTypeMock.Object,
                                 AttributeValue = signValue1
                             }
                         }
@@ -112,11 +127,13 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     new ExtNode
                     {
                         NodeTypeName = "sign",
+                        NodeType = nodeTypeMock.Object,
                         Children = new List<ExtNode>
                         {
                             new ExtNode
                             {
                                 NodeTypeName = "value",
+                                NodeType = nodeTypeMock.Object,
                                 AttributeValue = signValue2
                             }
                         }

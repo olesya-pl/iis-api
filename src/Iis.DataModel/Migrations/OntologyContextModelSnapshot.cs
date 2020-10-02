@@ -228,16 +228,28 @@ namespace Iis.DataModel.Migrations
                     b.ToTable("ElasticFields");
                 });
 
-            modelBuilder.Entity("Iis.DataModel.FlightRadar.FlightRadarHistoryEntity", b =>
+            modelBuilder.Entity("Iis.DataModel.FlightRadar.FlightRadarHistorySyncJobConfig", b =>
+                {
+                    b.Property<int>("LatestProcessedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("LatestProcessedId");
+
+                    b.ToTable("FlightRadarHistorySyncJobConfig");
+                });
+
+            modelBuilder.Entity("Iis.DataModel.FlightRadar.LocationHistoryEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ExternalId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("ICAO")
+                    b.Property<string>("ExternalId")
                         .HasColumnType("text");
 
                     b.Property<decimal>("Lat")
@@ -254,21 +266,11 @@ namespace Iis.DataModel.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EntityId");
+
                     b.HasIndex("NodeId");
 
-                    b.ToTable("FlightRadarHistoryEntities");
-                });
-
-            modelBuilder.Entity("Iis.DataModel.FlightRadar.FlightRadarHistorySyncJobConfig", b =>
-                {
-                    b.Property<int>("LatestProcessedId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.HasKey("LatestProcessedId");
-
-                    b.ToTable("FlightRadarHistorySyncJobConfig");
+                    b.ToTable("LocationHistory");
                 });
 
             modelBuilder.Entity("Iis.DataModel.Materials.FileEntity", b =>
@@ -1233,8 +1235,14 @@ namespace Iis.DataModel.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Iis.DataModel.FlightRadar.FlightRadarHistoryEntity", b =>
+            modelBuilder.Entity("Iis.DataModel.FlightRadar.LocationHistoryEntity", b =>
                 {
+                    b.HasOne("Iis.DataModel.NodeEntity", "Entity")
+                        .WithMany()
+                        .HasForeignKey("EntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Iis.DataModel.NodeEntity", "Node")
                         .WithMany()
                         .HasForeignKey("NodeId")

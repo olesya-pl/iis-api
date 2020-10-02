@@ -3,7 +3,7 @@
 	- Create a new military organization
 
 Background: 
-	Given I want to sign in with the user olya and password hammer69 in the Contour
+	Given I want to sign in with the user olya and password 123 in the Contour
 
 @smoke
 Scenario: Create a new military organization

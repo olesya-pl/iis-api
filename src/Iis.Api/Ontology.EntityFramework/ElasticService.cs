@@ -237,7 +237,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutHistoricalNodesAsync(id, requestId, cancellationToken);
         }
 
-        public async Task<bool> PutFeatureAsync(Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
+        public async Task<bool> PutFeatureAsync(string featureIndexName, Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
         {
             if (!_elasticState.UseElastic) return true;
 
@@ -245,7 +245,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             if (featureDocument is null) return false;
 
-            return await _elasticManager.PutDocumentAsync(_elasticState.FeatureIndexes.FirstOrDefault(), featureId.ToString("N"), featureDocument.ToString(Formatting.None));
+            return await _elasticManager.PutDocumentAsync(featureIndexName, featureId.ToString("N"), featureDocument.ToString(Formatting.None));
         }
 
         public bool TypesAreSupported(IEnumerable<string> typeNames)

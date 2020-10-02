@@ -169,5 +169,11 @@ namespace Iis.OntologyData
             node.IsArchived = true;
             _patch._update._nodes.Add(Nodes[id]);
         }
+        public void DeleteEntity(Guid id, bool deleteOutcomingRelations, bool deleteIncomingRelations)
+        {
+            SetNodeIsArchived(id);
+            MarkLinkedAsArchived(Nodes[id]);
+            RemoveArchivedItems();
+        }
     }
 }

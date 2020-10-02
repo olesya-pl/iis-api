@@ -16,7 +16,7 @@ namespace Iis.Services
                     .Where(nt => !nt.IsAbstract)
                     .Select(nt => nt.Name)
                     .ToList();
-                
+
                 UseElastic = true;
                 HistoricalOntologyIndexes = OntologyIndexes.ToDictionary(k => k, GetHistoricalIndex);
             }
@@ -25,6 +25,7 @@ namespace Iis.Services
             MaterialIndexes = new List<string> { "Materials" };
             FeatureIndexes = new List<string> { "Features" };
             ReportIndex = "Reports";
+            SignIndexes = new List<string>{ "CellphoneSign", "SatellitePhoneSign"};
         }
 
         public bool UseElastic { get; }
@@ -33,7 +34,7 @@ namespace Iis.Services
         public List<string> OntologyIndexes { get; }
         public Dictionary<string, string> HistoricalOntologyIndexes { get; }
         public List<string> EventIndexes { get; }
-        public List<string> FeatureIndexes { get; }
+        public List<string> SignIndexes { get; }
 
         private string GetHistoricalIndex(string typeName) => $"historical_{typeName}";
     }

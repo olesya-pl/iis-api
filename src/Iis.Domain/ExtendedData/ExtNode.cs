@@ -23,22 +23,35 @@ namespace Iis.Domain.ExtendedData
         public DateTime UpdatedAt { get; set; }
         public IReadOnlyList<IExtNode> Children { get; set; } = new List<ExtNode>();
         public bool IsAttribute => AttributeValue != null && Children.Count == 0;
-        public List<IGeoCoordinates> GetCoordinates()
+
+        public INodeTypeLinked NodeType { get; set; }
+
+        public List<IGeoCoordinates> GetCoordinatesWithoutNestedObjects()
         {
-            var geoNodes = GetAttributesRecursive(ScalarTypeEnum.Geo);
+            var geoNodes = GetAttributesRecursiveWithoutNestedObjects(ScalarTypeEnum.Geo);
             if (geoNodes.Count == 0) return null;
 
             return geoNodes.Select(gn => ExtractCoordinates(gn.AttributeValue.ToString())).ToList();
 
         }
 
-        public List<(IExtNode Node, IGeoCoordinates Coordinates)> GetNodeCoordinates() 
+        public List<(IExtNode Node, IGeoCoordinates Coordinates)> GetNodeCoordinates()
         {
             var geoNodes = GetAttributesRecursive(ScalarTypeEnum.Geo);
-            if (geoNodes.Count == 0) 
+            if (geoNodes.Count == 0)
                 return new List<(IExtNode Node, IGeoCoordinates Coordinates)>();
 
             return geoNodes.Select(x => (x, ExtractCoordinates(x.AttributeValue.ToString()))).ToList();
+        }
+
+        public List<IExtNode> GetAttributesRecursiveWithoutNestedObjects(ScalarType scalarType)
+        {
+            if (IsAttribute && ScalarType == scalarType)
+            {
+                return new List<IExtNode> { this };
+            }
+            var children = Children.Where(p => !p.NodeType.IsObjectOfStudy).SelectMany(n => n.GetAttributesRecursiveWithoutNestedObjects(scalarType));
+            return children.ToList();
         }
 
         public List<IExtNode> GetAttributesRecursive(ScalarType scalarType)

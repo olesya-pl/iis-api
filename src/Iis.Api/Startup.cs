@@ -195,7 +195,7 @@ namespace IIS.Core
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
             services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
-            //services.AddHostedService<FlightRadarHistorySyncJob>();
+            services.AddHostedService<FlightRadarHistorySyncJob>();
 
             services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
