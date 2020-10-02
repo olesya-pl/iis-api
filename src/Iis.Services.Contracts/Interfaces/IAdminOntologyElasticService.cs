@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +15,8 @@ namespace Iis.Services.Contracts.Interfaces
         Task FillOntologyIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
         Task FillOntologyIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
         bool IsIndexesValid(IEnumerable<string> indexes);
-
         Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default);
+        Task CreateReportMappingsAsync(CancellationToken ct = default);
+        Task FillReportIndexAsync(CancellationToken ct = default);
     }
 }

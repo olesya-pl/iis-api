@@ -14,5 +14,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task<ReportDto> UpdateAsync(ReportDto report);
         Task<ReportDto> UpdateEventsAsync(Guid id, IEnumerable<Guid> eventIdsToAdd, IEnumerable<Guid> eventIdsToRemove);
         Task<ReportDto> GetAsync(Guid id);
+        Task<List<ReportDto>> GetAllAsync();
     }
 }

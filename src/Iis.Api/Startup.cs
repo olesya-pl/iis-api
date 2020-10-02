@@ -299,6 +299,7 @@ namespace IIS.Core
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();
+            services.AddTransient<IReportElasticService, ReportElasticService>();
             services.AddTransient<ISanitizeService, SanitizeService>();
             services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(

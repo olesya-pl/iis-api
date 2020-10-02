@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Iis.Domain.Elastic
 {
-    public class IisElasticSearchParams: IIisElasticSearchParams
+    public class IisElasticSearchParams : IIisElasticSearchParams
     {
         public List<string> BaseIndexNames { get; set; } = new List<string>();
         public string Query { get; set; }
@@ -12,5 +12,7 @@ namespace Iis.Domain.Elastic
         public bool IsLenient { get; set; } = true;
         public int From { get; set; }
         public int Size { get; set; }
+        public string SortColumn { get; set; }
+        public string SortOrder { get; set; }
     }
 }

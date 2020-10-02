@@ -15,6 +15,7 @@ using Iis.OntologyData;
 using MoreLinq;
 using Iis.Services.Contracts.Interfaces;
 using System.Diagnostics;
+using Iis.DataModel.Reports;
 
 namespace Iis.Api.Controllers
 {
@@ -27,6 +28,7 @@ namespace Iis.Api.Controllers
         IMaterialService _materialService;
         IElasticState _elasticState;
         private readonly IAdminOntologyElasticService _adminElasticService;
+        
         public AdminController(
             IMaterialService materialService,
             IElasticManager elasticManager,
@@ -38,7 +40,7 @@ namespace Iis.Api.Controllers
             _materialService = materialService;
             _nodeRepository = nodeRepository;
             _elasticState = elasticState;
-            _adminElasticService = adminElasticService;
+            _adminElasticService = adminElasticService ?? throw new ArgumentNullException(nameof(adminElasticService));
         }
 
         [HttpPost("CreateHistoricalIndexes/{indexNames}")]
@@ -98,12 +100,14 @@ namespace Iis.Api.Controllers
         [HttpGet("RecreateElasticReportIndex")]
         public async Task<IActionResult> RecreateReportIndex(CancellationToken ct) 
         {
-            var log = new StringBuilder();
+            _adminElasticService.Logger = new StringBuilder();
             var index = _elasticState.ReportIndex;
 
             await _adminElasticService.DeleteIndexesAsync(new string[] { index }, ct);
 
-            return Content(log.ToString());
+            await _adminElasticService.FillReportIndexAsync(ct);
+
+            return Content(_adminElasticService.Logger.ToString());
         }
 
         [HttpGet("RecreateElasticMaterialIndexes")]

@@ -37,18 +37,11 @@ namespace Iis.Services
             var reportEntity = _mapper.Map<ReportEntity>(report);
 
             reportEntity.Id = Guid.NewGuid();
-            reportEntity.CreatedAt = DateTime.Now;
+            reportEntity.CreatedAt = DateTime.UtcNow;
 
             await RunAsync(uow => uow.ReportRepository.Create(reportEntity));
-            try
-            {
-                await _mediatr.Publish(_mapper.Map<ReportCreatedEvent>(reportEntity));
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-            
+
+            await _mediatr.Publish(_mapper.Map<ReportCreatedEvent>(reportEntity));
             return _mapper.Map<ReportDto>(reportEntity);
         }
 
@@ -89,7 +82,7 @@ namespace Iis.Services
             if (sourceReport == null)
                 throw new ArgumentException($"Cannot find report with id  = {sourceId}");
 
-            var copiedReport = new ReportEntity(sourceReport, Guid.NewGuid(), DateTime.Now);
+            var copiedReport = new ReportEntity(sourceReport, Guid.NewGuid(), DateTime.UtcNow);
 
             copiedReport.Title = newReport.Title ?? newReport.Title;
             copiedReport.Recipient = newReport.Recipient ?? newReport.Recipient;
@@ -128,11 +121,18 @@ namespace Iis.Services
             return _mapper.Map<ReportDto>(report);
         }
 
-        public async Task<ReportDto> GetAsync(Guid id) 
+        public async Task<ReportDto> GetAsync(Guid id)
         {
             var report = await GetByIdAsync(id);
 
             return _mapper.Map<ReportDto>(report);
+        }
+
+        public async Task<List<ReportDto>> GetAllAsync() 
+        {
+            var reports = await RunWithoutCommitAsync(uow => uow.ReportRepository.GetAllAsync());
+
+            return _mapper.Map<List<ReportDto>>(reports);
         }
 
         private Task<ReportEntity> GetByIdAsync(Guid id) => RunWithoutCommitAsync(uow => uow.ReportRepository.GetByIdAsync(id));

@@ -26,11 +26,8 @@ namespace Iis.Services
         private readonly IExtNodeService _extNodeService;
         private readonly INodeRepository _nodeRepository;
         private readonly OntologyNodesData ontologyNodesData;
-        private readonly Dictionary<Type, Func<ElasticMappingConfiguration>> _mappingCreatorByType = new Dictionary<Type, Func<ElasticMappingConfiguration>>()
-        {
-            { typeof(ReportEntity), CreateReportEntityMappings }
-        };
-
+        private readonly IReportElasticService _reportElasticService;
+        private readonly IReportService _reportService;
 
         public StringBuilder Logger { get; set; }
 
@@ -40,14 +37,16 @@ namespace Iis.Services
             IOntologySchema ontologySchema,
             IExtNodeService extNodeService,
             INodeRepository nodeRepository,
-            OntologyNodesData ontologyNodesData)
+            OntologyNodesData ontologyNodesData, IReportElasticService reportElasticService, IReportService reportService)
         {
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
             _ontologySchema = ontologySchema ?? throw new ArgumentNullException(nameof(ontologySchema));
             _extNodeService = extNodeService ?? throw new ArgumentNullException(nameof(extNodeService));
             _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
-            this.ontologyNodesData = ontologyNodesData;
+            this.ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
+            _reportElasticService = reportElasticService ?? throw new ArgumentNullException(nameof(reportElasticService));
+            _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
         }
 
         public bool IsIndexesValid(IEnumerable<string> indexes)
@@ -138,25 +137,28 @@ namespace Iis.Services
             }
         }
 
-        public async Task CreateIndexBasedOnDbEntityAsync(string index, Type entityType, CancellationToken ct = default)
-        {
-            var createMappingFunc = _mappingCreatorByType.GetValueOrDefault(entityType);
-            if (createMappingFunc == null)
-                throw new ArgumentOutOfRangeException($"type: {entityType.FullName} can not be handled");
-
-            await _elasticManager.CreateIndexesAsync(new[] { index }, createMappingFunc().ToJObject(), ct);
-        }
-
-        private static ElasticMappingConfiguration CreateReportEntityMappings()
+        public async Task CreateReportMappingsAsync(CancellationToken ct = default)
         {
             var report = new ReportEntity();
-            return new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+            var mappingConfiguration =  new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
                 new ElasticMappingProperty(nameof(report.Id), ElasticMappingPropertyType.Keyword),
-                new ElasticMappingProperty(nameof(report.Recipient), ElasticMappingPropertyType.Text, true),
-                new ElasticMappingProperty(nameof(report.Title), ElasticMappingPropertyType.Text, true),
+                new ElasticMappingProperty(nameof(report.Recipient), ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty(nameof(report.Title), ElasticMappingPropertyType.Text),
                 new ElasticMappingProperty(nameof(report.CreatedAt), ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
                 new ElasticMappingProperty("ReportEventIds", ElasticMappingPropertyType.Keyword, true)
             });
+
+            await _elasticManager.CreateIndexesAsync(new[] { _elasticState.ReportIndex }, mappingConfiguration.ToJObject(), ct);
+        }
+
+        public async Task FillReportIndexAsync(CancellationToken ct = default) 
+        {
+            var reports = await _reportService.GetAllAsync();
+            
+            TryLog($"Found {reports.Count} reports");
+
+            var response = await _reportElasticService.PutAsync(reports);
+            LogBulkResponse(response);
         }
 
         private List<INode> GetNodesFromMemory(IEnumerable<string> indexes)
