@@ -54,24 +54,13 @@ namespace Iis.OntologyManager.DuplicateSearch
         {
             var list = new List<DuplicateSearchResultItem>();
 
-            foreach (var entityParam in param.EntityParameters)
-            {
-                list.AddRange(GetAllValues(entityParam));
-            }
-
-            return list.OrderBy(t => t.Value).ThenBy(t => t.Node.Id).ToList();
-        }
-        private List<DuplicateSearchResultItem> GetAllValues(DuplicateSearchEntityParameter entityParam)
-        {
-            var list = new List<DuplicateSearchResultItem>();
-
-            var entities = _data.GetEntitiesByTypeName(entityParam.EntityTypeName);
+            var entities = _data.GetEntitiesByTypeName(param.EntityTypeName);
             foreach (var entity in entities)
             {
                 var addedValues = new HashSet<string>();
 
                 var dotNameValues = entity.GetDotNameValues();
-                foreach (var dotName in entityParam.DotNames)
+                foreach (var dotName in param.DotNames)
                 {
                     var values = dotNameValues.GetItems(dotName);
                     foreach (var value in values)
@@ -90,7 +79,7 @@ namespace Iis.OntologyManager.DuplicateSearch
                 }
             }
 
-            return list;
+            return list.OrderBy(t => t.Value).ToList();
         }
     }
 }

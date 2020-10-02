@@ -17,5 +17,8 @@ namespace Iis.Interfaces.Ontology.Data
 
         string Value { get; }
         public IDotNameValues GetDotNameValues();
+        
+        INode GetSingleDirectProperty(string name);
+        INode GetSingleProperty(IDotName dotName);
     }
 }

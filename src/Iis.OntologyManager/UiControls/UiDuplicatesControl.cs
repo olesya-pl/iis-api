@@ -1,6 +1,7 @@
 ﻿using Iis.DbLayer.OntologyData;
 using Iis.OntologyData;
 using Iis.OntologyManager.DuplicateSearch;
+using Iis.OntologySchema;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,14 +25,10 @@ namespace Iis.OntologyManager.UiControls
 
         public event Func<OntologyNodesData> OnGetData;
 
-        public DuplicateSearchResultItem SelectedItem
-        {
-            get
-            {
-                var selectedRow = grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
-                return selectedRow == null ? null : (DuplicateSearchResultItem)selectedRow.DataBoundItem;
-            }
-        }
+        DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
+        object SelectedValue(string columnName) =>
+            SelectedRow == null ? null :
+            SelectedRow.Cells[grid.Columns[columnName].Index].Value;
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
@@ -46,13 +43,7 @@ namespace Iis.OntologyManager.UiControls
             btnSearch.Width = _style.ButtonWidthDefault;
             btnSearch.Click += (sender, e) => { Search(true); };
 
-            grid = _uiControlsCreator.GetDataGridView("gridDuplicateResult", null,
-                new List<string> { "Value", "Url", "LinksCount" });
-            grid.Columns[0].Width *= 2;
-            grid.Columns[1].Width *= 5;
-            grid.Columns[0].HeaderText = "Значення";
-            grid.Columns[1].HeaderText = "Урл";
-            grid.Columns[2].HeaderText = "Вхідні зв'язки";
+            grid = _uiControlsCreator.GetDataGridView("gridDuplicateResult", null, new List<string>());
             grid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             grid.Width = panels.panelBottom.Width;
             grid.ColumnHeadersVisible = true;
@@ -68,17 +59,16 @@ namespace Iis.OntologyManager.UiControls
             bottomContainer.Add(grid, null, true);
             grid.DoubleClick += (sender, e) => { OpenUrl(); };
             grid.CellFormatting += grid_CellFormatting;
-            //_grid.ContextMenuStrip = menuChildren;
-            
         }
         private void grid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             var grid = (DataGridView)sender;
-            var resultItem = (DuplicateSearchResultItem)grid.Rows[e.RowIndex].DataBoundItem;
-            if (resultItem == null) return;
+            if (grid.Columns["OrderNumber"] == null) return;
+            var row = grid.Rows[e.RowIndex];
             
-            var color = resultItem.OrderNumber % 2 == 1 ? _style.RelationTypeBackColor : _style.AttributeTypeBackColor;
-            var row = (DataGridViewRow)grid.Rows[e.RowIndex];
+            int orderNumber = Convert.ToInt32(row.Cells[grid.Columns["OrderNumber"].Index].Value);
+            
+            var color = orderNumber % 2 == 1 ? _style.RelationTypeBackColor : _style.AttributeTypeBackColor;
             var style = row.DefaultCellStyle;
 
             style.BackColor = color;
@@ -88,20 +78,22 @@ namespace Iis.OntologyManager.UiControls
         }
         private void OpenUrl()
         {
-            if (SelectedItem == null) return;
+            var baseUrl = SelectedValue("Url")?.ToString();
+            if (baseUrl == null) return;
 
-            var url = SelectedItem.Url.Replace("&", "^&");
+            var url = baseUrl.Replace("&", "^&");
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
         private void Delete()
         {
-            if (SelectedItem == null) return;
+            if (SelectedRow == null) return;
             if (MessageBox.Show("Ви дійсно хочете видалити цю сутність?", "Видалення", MessageBoxButtons.YesNo) == DialogResult.No)
             {
                 return;
             }
 
-            _data.DeleteEntity(SelectedItem.Node.Id, true, true);
+            var id = (Guid)SelectedValue("Id");
+            _data.DeleteEntity(id, true, true);
             PatchSaver.SavePatch(_data.Patch);
             Search(false);
         }
@@ -116,7 +108,55 @@ namespace Iis.OntologyManager.UiControls
             var param = new DuplicateSearchParameter(txtSearch.Text, txtUrl.Text);
             var duplicateSearcher = new DuplicateSearcher(_data);
             var searchResult = duplicateSearcher.Search(param);
-            grid.DataSource = searchResult.Items;
+            ConfigureGrid(param);
+            PopulateGrid(param, searchResult);
+        }
+        private DataGridViewColumn AddTextColumn(string name, string headerText)
+        {
+            var column = new DataGridViewColumn
+            {
+                Name = name,
+                HeaderText = headerText,
+                CellTemplate = new DataGridViewTextBoxCell()
+            };
+            grid.Columns.Add(column);
+            return column;
+        }
+        private void ConfigureGrid(DuplicateSearchParameter param)
+        {
+            grid.Columns.Clear();
+            AddTextColumn("Value", "Значення");
+
+            foreach (var dotName in param.DotNames)
+            {
+                AddTextColumn("Data_" + dotName, dotName);
+            }
+
+            AddTextColumn("Url", "Урл");
+            AddTextColumn("LinksCount", "Вхідні зв'язки");
+            AddTextColumn("OrderNumber", "OrderNumber").Visible = true;
+            AddTextColumn("Id", "Id").Visible = true;
+        }
+        private void PopulateGrid(DuplicateSearchParameter param, DuplicateSearchResult result)
+        {
+            grid.Rows.Clear();
+            foreach (var item in result.Items)
+            {
+                var row = new DataGridViewRow();
+                row.CreateCells(grid);
+                row.Cells[grid.Columns["Value"].Index].Value = item.Value;
+                foreach (var dotNameStr in param.DotNames)
+                {
+                    var dotName = new DotName(dotNameStr);
+                    row.Cells[grid.Columns["Data_" + dotName].Index].Value =
+                        item.Node.GetSingleProperty(dotName)?.Value;
+                }
+                row.Cells[grid.Columns["Url"].Index].Value = item.Url;
+                row.Cells[grid.Columns["LinksCount"].Index].Value = item.LinksCount;
+                row.Cells[grid.Columns["OrderNumber"].Index].Value = item.OrderNumber;
+                row.Cells[grid.Columns["Id"].Index].Value = item.Node.Id;
+                grid.Rows.Add(row);
+            }
         }
     }
 }

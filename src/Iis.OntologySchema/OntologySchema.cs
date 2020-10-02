@@ -479,5 +479,9 @@ namespace Iis.OntologySchema
         {
             return nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Any(i => i.SourceType.Name == FuzzyDateEntityTypeName);
         }
+        public IDotName GetDotName(string value)
+        {
+            return new DotName(value);
+        }
     }
 }

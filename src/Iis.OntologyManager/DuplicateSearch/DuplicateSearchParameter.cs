@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.OntologyManager.DuplicateSearch
@@ -7,14 +8,19 @@ namespace Iis.OntologyManager.DuplicateSearch
     public class DuplicateSearchParameter
     {
         public string Url { get; }
-        public List<DuplicateSearchEntityParameter> EntityParameters { get; } = new List<DuplicateSearchEntityParameter>();
+        public string EntityTypeName { get; }
+        public List<string> DotNames { get; }
+
         public DuplicateSearchParameter(string param, string url)
         {
             Url = url;
-            foreach (var entityParamStr in param.Split(';'))
-            {
-                EntityParameters.Add(new DuplicateSearchEntityParameter(entityParamStr));
-            }
+            var semiColonIndex = param.IndexOf(':');
+            EntityTypeName = param.Substring(0, semiColonIndex).Trim();
+            DotNames = param
+                .Substring(semiColonIndex + 1)
+                .Split(',')
+                .Select(s => s.Trim())
+                .ToList();
         }
     }
 }
