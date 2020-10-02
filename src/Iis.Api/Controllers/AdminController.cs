@@ -101,9 +101,9 @@ namespace Iis.Api.Controllers
             await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
 
             if (useNodesFromMemory)
-                await _adminElasticService.FillOntologyIndexesFromMemoryAsync(indexes, isHistorical, ct);
+                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
             else
-                await _adminElasticService.FillOntologyIndexesAsync(indexes, isHistorical, ct);
+                await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 

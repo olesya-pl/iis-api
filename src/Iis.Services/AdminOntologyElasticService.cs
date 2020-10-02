@@ -64,7 +64,7 @@ namespace Iis.Services
             return true;
         }
 
-        public async Task DeleteOntologyIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var indexesToDelete = isHistorical ? GetHistoricalIndexes(indexes) : indexes;
             await DeleteIndexesAsync(indexesToDelete);
@@ -87,7 +87,7 @@ namespace Iis.Services
             }
         }
 
-        public async Task FillOntologyIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task FillIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var nodeIds = await _extNodeService.GetExtNodesByTypeIdsAsync(indexes, ct);
             if (isHistorical)
@@ -115,7 +115,7 @@ namespace Iis.Services
             }
         }
 
-        public async Task FillOntologyIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var nodes = GetNodesFromMemory(indexes);
             var response = isHistorical

@@ -23,7 +23,6 @@ namespace Iis.Services
 
             EventIndexes = new List<string> { "Event" };
             MaterialIndexes = new List<string> { "Materials" };
-            FeatureIndexes = new List<string> { "Features" };
             ReportIndex = "Reports";
             SignIndexes = new List<string>{ "CellphoneSign", "SatellitePhoneSign"};
         }
