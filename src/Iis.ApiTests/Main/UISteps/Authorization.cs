@@ -22,6 +22,7 @@ namespace AcceptanceTests.Contour.UISteps
 		public void IWantToAuthorizeInTheContour(string login, string password)
 		{
 			driver.WithTimeout(5).Navigate().GoToUrl(homeUrl);
+			//driver.Manage().Timeouts().ImplicitWait;
 
 			IWebElement loginField =
 				driver.FindElement(By.CssSelector("div[name='username'] input"));
@@ -38,7 +39,7 @@ namespace AcceptanceTests.Contour.UISteps
 
 			submitButton.Click();
 
-			driver.WaitFor(10);
+			driver.WaitFor(15);
 		}
 	}
 }
