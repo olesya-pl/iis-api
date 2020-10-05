@@ -47,7 +47,7 @@ namespace Iis.Services
 
             if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortOrder)) 
             {
-                searchParams.SortColumn = GetValidSortColumnName(sortOrder);
+                searchParams.SortColumn = GetValidSortColumnName(sortColumn);
                 searchParams.SortOrder = sortOrder;
             }
 
