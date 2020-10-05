@@ -38,7 +38,7 @@ namespace AcceptanceTests.Contour.UISteps
 
 			submitButton.Click();
 
-			driver.WaitFor(15);
+			driver.WaitFor(10);
 		}
 	}
 }

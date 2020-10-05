@@ -11,5 +11,7 @@ namespace Iis.Interfaces.Elastic
         bool IsLenient { get; }
         int From { get; }
         int Size { get; }
+        string SortColumn { get; }
+        string SortOrder { get; }
     }
 }

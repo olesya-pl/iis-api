@@ -68,6 +68,8 @@ using Iis.Api.Ontology;
 using Iis.OntologyData;
 using IIS.Core.FlightRadar;
 using Iis.FlightRadar.DataModel;
+using MediatR;
+using Iis.EventHandlers;
 
 namespace IIS.Core
 {
@@ -296,6 +298,8 @@ namespace IIS.Core
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
+            services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();
+            services.AddTransient<IReportElasticService, ReportElasticService>();
             services.AddTransient<ISanitizeService, SanitizeService>();
             services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(
@@ -311,6 +315,7 @@ namespace IIS.Core
 
             services.RegisterRepositories();
             services.RegisterElasticModules();
+            services.AddMediatR(typeof(ReportEventHandler));
         }
 
 

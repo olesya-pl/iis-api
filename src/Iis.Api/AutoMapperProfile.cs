@@ -27,6 +27,8 @@ using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
 using Iis.Interfaces.Ontology.Data;
 using Contracts = Iis.Services.Contracts;
+using Iis.DataModel.Reports;
+using Iis.Events.Reports;
 
 namespace Iis.Api
 {
@@ -309,6 +311,30 @@ namespace Iis.Api
                 .ForMember(dest => dest.Long, opts => opts.MapFrom(src => src.Longitude))
                 .ForMember(dest => dest.RegisteredAt, opts => opts.MapFrom(src => src.TimeNow))
                 .ForMember(dest => dest.ExternalId, opts => opts.MapFrom(src => src.Id.ToString()));
+
+
+            #region Reports
+
+            CreateMap<ReportEntity, ReportDto>()
+                .ForMember(dest => dest.ReportEventIds, opts => opts.MapFrom(src => src.ReportEvents.Select(e => e.EventId)));
+
+            CreateMap<ReportDto, ReportEntity>()
+                .ForMember(dest => dest.ReportEvents, opts => opts.Ignore());
+
+            CreateMap<ReportEntity, ReportEvent>()
+                .ForMember(dest => dest.ReportEventIds, opts => opts.MapFrom(src => src.ReportEvents.Select(r => r.EventId)))
+                .IncludeAllDerived();
+            CreateMap<ReportEntity, ReportCreatedEvent>();
+            CreateMap<ReportEntity, ReportUpdatedEvent>();
+            CreateMap<ReportEntity, ReportRemovedEvent>();
+
+
+            CreateMap<ReportCreatedEvent, ReportDto>();
+            CreateMap<ReportUpdatedEvent, ReportDto>();
+            CreateMap<ReportRemovedEvent, ReportDto>();
+
+            #endregion
+
         }
     }
 }

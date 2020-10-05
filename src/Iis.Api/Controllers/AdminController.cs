@@ -1,17 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Iis.DbLayer.Repositories;
+﻿using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
 using MoreLinq;
-using Iis.Services.Contracts.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Iis.Api.Controllers
 {
@@ -25,6 +25,7 @@ namespace Iis.Api.Controllers
         IMaterialService _materialService;
         IElasticState _elasticState;
         private readonly IAdminOntologyElasticService _adminElasticService;
+        
         public AdminController(
             IMaterialService materialService,
             IElasticManager elasticManager,
@@ -32,11 +33,11 @@ namespace Iis.Api.Controllers
             IElasticState elasticState,
             IAdminOntologyElasticService adminElasticService)
         {
-            _elasticManager = elasticManager;
-            _materialService = materialService;
-            _nodeRepository = nodeRepository;
-            _elasticState = elasticState;
-            _adminElasticService = adminElasticService;
+            _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
+            _materialService = materialService ?? throw new ArgumentNullException(nameof(materialService));
+            _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
+            _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
+            _adminElasticService = adminElasticService ?? throw new ArgumentNullException(nameof(adminElasticService));
         }
 
         [HttpPost("CreateHistoricalIndexes/{indexNames}")]
@@ -103,6 +104,19 @@ namespace Iis.Api.Controllers
                 await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+
+            return Content(_adminElasticService.Logger.ToString());
+        }
+
+        [HttpGet("RecreateElasticReportIndex")]
+        public async Task<IActionResult> RecreateReportIndex(CancellationToken ct) 
+        {
+            _adminElasticService.Logger = new StringBuilder();
+            var index = _elasticState.ReportIndex;
+
+            await _adminElasticService.DeleteIndexesAsync(new string[] { index }, ct);
+
+            await _adminElasticService.FillReportIndexAsync(ct);
 
             return Content(_adminElasticService.Logger.ToString());
         }
