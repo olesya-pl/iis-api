@@ -89,9 +89,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
-                .ThenInclude(e => e.NodeType)
-                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
+                    .ThenInclude(e => e.NodeType)
+                .Include(e => e.TargetNode)
+                    .ThenInclude(e => e.Attribute)
+                .Include(e => e.SourceNode)
+                .Where(e => nodeIds.Contains(e.SourceNodeId) 
+                    && !e.Node.IsArchived
+                    && !e.TargetNode.IsArchived
+                    && !e.SourceNode.IsArchived);
             if (relationIds != null)
                 relationsQ = relationsQ.Where(e => relationIds.Contains(e.Node.NodeTypeId));
             return relationsQ.ToListAsync();
