@@ -19,6 +19,7 @@ namespace Iis.OntologySchema.DataTypes
         public IAttributeType AttributeType => _attributeType;
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
+        public IOntologySchema Schema { get; internal set; }
         public Type ClrType
         {
             get

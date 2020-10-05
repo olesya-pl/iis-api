@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -35,7 +36,7 @@ namespace Iis.OntologyManager.UiControls
             var container = new UiContainerManager("DuplicateSearchOptions", panels.panelTop);
             container.SetColWidth(500);
             container.Add(txtSearch = new TextBox(), "Параметри пошуку");
-            txtSearch.Text = "MilitaryOrganization: title, commonInfo.OpenName, commonInfo.RealNameShort";
+            txtSearch.Text = "MilitaryOrganization: title, commonInfo.OpenName, commonInfo.RealNameShort (parent.title)";
             container.Add(txtUrl = new TextBox(), "Базовий Урл");
             txtUrl.Text = "http://qa.contour.net";
 
@@ -127,7 +128,7 @@ namespace Iis.OntologyManager.UiControls
             grid.Columns.Clear();
             AddTextColumn("Value", "Значення");
 
-            foreach (var dotName in param.DotNames)
+            foreach (var dotName in param.DotNames.Union(param.DistinctNames))
             {
                 AddTextColumn("Data_" + dotName, dotName);
             }
@@ -145,9 +146,8 @@ namespace Iis.OntologyManager.UiControls
                 var row = new DataGridViewRow();
                 row.CreateCells(grid);
                 row.Cells[grid.Columns["Value"].Index].Value = item.Value;
-                foreach (var dotNameStr in param.DotNames)
+                foreach (var dotName in param.DotNames.Union(param.DistinctNames))
                 {
-                    var dotName = new DotName(dotNameStr);
                     row.Cells[grid.Columns["Data_" + dotName].Index].Value =
                         item.Node.GetSingleProperty(dotName)?.Value;
                 }

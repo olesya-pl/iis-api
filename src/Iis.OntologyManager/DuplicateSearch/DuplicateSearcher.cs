@@ -29,7 +29,7 @@ namespace Iis.OntologyManager.DuplicateSearch
 
             foreach (var item in allValues)
             {
-                if (item.Value == previousItem?.Value)
+                if (item.Value == previousItem?.Value && item.Node.HasTheSameValues(previousItem.Node, param.DistinctNames))
                 {
                     if (isNew)
                     {
@@ -44,9 +44,9 @@ namespace Iis.OntologyManager.DuplicateSearch
                     item.Url = GetUrl(param.Url, item.Node);
                     isNew = false;
                 } else {
-                    previousItem = item;
                     isNew = true;
                 }
+                previousItem = item;
             }
             return result;
         }
@@ -79,7 +79,12 @@ namespace Iis.OntologyManager.DuplicateSearch
                 }
             }
 
-            return list.OrderBy(t => t.Value).ToList();
+            var result = list.OrderBy(t => t.Value);
+            foreach (var distinctName in param.DistinctNames)
+            {
+                result = result.ThenBy(t => t.Node.GetSingleProperty(distinctName)?.Value);
+            }
+            return result.ToList();
         }
     }
 }

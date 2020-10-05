@@ -49,7 +49,7 @@ namespace Iis.OntologySchema
 
         public void Initialize(IOntologyRawData ontologyRawData)
         {
-            _storage = new SchemaStorage(_mapper);
+            _storage = new SchemaStorage(_mapper, this);
             _storage.Initialize(ontologyRawData);
         }
 

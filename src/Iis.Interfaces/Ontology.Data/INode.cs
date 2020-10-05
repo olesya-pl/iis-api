@@ -20,5 +20,8 @@ namespace Iis.Interfaces.Ontology.Data
         
         INode GetSingleDirectProperty(string name);
         INode GetSingleProperty(IDotName dotName);
+        INode GetSingleProperty(string dotName);
+        bool AllValuesAreEmpty(IEnumerable<string> dotNames);
+        bool HasTheSameValues(INode another, IEnumerable<string> dotNames);
     }
 }

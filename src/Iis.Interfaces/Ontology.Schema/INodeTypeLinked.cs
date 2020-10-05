@@ -52,5 +52,6 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsSeparateObject { get; }
         INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts);
         IRelationTypeLinked GetRelationTypeByName(string name);
+        IOntologySchema Schema { get; }
     }
 }
