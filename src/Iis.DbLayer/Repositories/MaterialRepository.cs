@@ -337,7 +337,12 @@ namespace Iis.DbLayer.Repositories
             return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
         }
 
-        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
+        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(
+            int limit = 0, 
+            int offset = 0, 
+            Expression<Func<MaterialEntity, bool>> predicate = null, 
+            string sortColumnName = null, 
+            string sortOrder = null)
         {
             var materialQuery = predicate is null
                                 ? GetMaterialsQuery(_includeAll)

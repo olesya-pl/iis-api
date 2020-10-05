@@ -52,6 +52,8 @@ namespace Iis.DbLayer.Extensions
                 ("title", "desc") => materialsQuery.OrderByDescending(p => p.Title),
                 ("importance", "asc") => materialsQuery.OrderBy(p => p.ImportanceSignId),
                 ("importance", "desc") => materialsQuery.OrderByDescending(p => p.ImportanceSignId),
+                ("processedStatus", "asc") => materialsQuery.OrderBy(p => p.ProcessedStatusSignId),
+                ("processedStatus", "desc") => materialsQuery.OrderByDescending(p => p.ProcessedStatusSignId),
 
                 ("nodes", "asc") => materialsQuery
                     .OrderBy(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
