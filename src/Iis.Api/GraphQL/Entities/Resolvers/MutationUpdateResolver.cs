@@ -226,6 +226,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 case "update":
                     await ApplyUpdate(node, embed, inputObject, dotName, requestId);
                     break;
+                case "delete":
+                    node.RemoveNode(existingRelation);
+                    await SaveChangesForDeletedRelation(existingRelation, requestId);
+                    break;
                 default:
                     throw new ArgumentException($"Unknown single patch object property: {action}");
             }
