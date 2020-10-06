@@ -19,7 +19,6 @@ namespace Iis.OntologyData
         public IEnumerable<IRelation> Relations => _storage.Relations.Values;
         public IEnumerable<IAttribute> Attributes => _storage.Attributes.Values;
 
-        public IOntologySchema Schema => _schema;
         public IOntologyPatch Patch => _storage.Patch;
 
         public OntologyNodesData(INodesRawData rawData, IOntologySchema schema)
