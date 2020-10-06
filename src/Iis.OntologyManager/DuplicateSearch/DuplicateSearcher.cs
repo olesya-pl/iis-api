@@ -29,7 +29,7 @@ namespace Iis.OntologyManager.DuplicateSearch
 
             foreach (var item in allValues)
             {
-                if (item.Value == previousItem?.Value)
+                if (item.Value == previousItem?.Value && item.Node.HasTheSameValues(previousItem.Node, param.DistinctNames))
                 {
                     if (isNew)
                     {
@@ -44,9 +44,9 @@ namespace Iis.OntologyManager.DuplicateSearch
                     item.Url = GetUrl(param.Url, item.Node);
                     isNew = false;
                 } else {
-                    previousItem = item;
                     isNew = true;
                 }
+                previousItem = item;
             }
             return result;
         }
@@ -54,24 +54,13 @@ namespace Iis.OntologyManager.DuplicateSearch
         {
             var list = new List<DuplicateSearchResultItem>();
 
-            foreach (var entityParam in param.EntityParameters)
-            {
-                list.AddRange(GetAllValues(entityParam));
-            }
-
-            return list.OrderBy(t => t.Value).ThenBy(t => t.Node.Id).ToList();
-        }
-        private List<DuplicateSearchResultItem> GetAllValues(DuplicateSearchEntityParameter entityParam)
-        {
-            var list = new List<DuplicateSearchResultItem>();
-
-            var entities = _data.GetEntitiesByTypeName(entityParam.EntityTypeName);
+            var entities = _data.GetEntitiesByTypeName(param.EntityTypeName);
             foreach (var entity in entities)
             {
                 var addedValues = new HashSet<string>();
 
                 var dotNameValues = entity.GetDotNameValues();
-                foreach (var dotName in entityParam.DotNames)
+                foreach (var dotName in param.DotNames)
                 {
                     var values = dotNameValues.GetItems(dotName);
                     foreach (var value in values)
@@ -90,7 +79,12 @@ namespace Iis.OntologyManager.DuplicateSearch
                 }
             }
 
-            return list;
+            var result = list.OrderBy(t => t.Value);
+            foreach (var distinctName in param.DistinctNames)
+            {
+                result = result.ThenBy(t => t.Node.GetSingleProperty(distinctName)?.Value);
+            }
+            return result.ToList();
         }
     }
 }

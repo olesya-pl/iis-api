@@ -1,5 +1,7 @@
 ﻿using AcceptanceTests.Steps;
+using DocumentFormat.OpenXml.Presentation;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -34,6 +36,14 @@ namespace AcceptanceTests.Contour.UISteps
 		{
 			IWebElement buttonElement = driver.FindElement(By.CssSelector(element));
 			Assert.True(buttonElement.Displayed);
+		}
+
+	    [Then(@"I must see the (.*) element in (.*) seconds")]
+		public void ThenIMustSeeTheElementInSeconds(string element, int seconds)
+		{
+			driver.WaitFor(seconds);
+			IWebElement elementToCheck = driver.FindElement(By.CssSelector(element));
+			Assert.True(elementToCheck.Displayed);
 		}
 	}
 }

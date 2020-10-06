@@ -28,7 +28,7 @@ namespace AcceptanceTests.Tests.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "IOBigCardUI.feature"
+#line 1 "ObjectsBigCardUI.feature"
 #line hidden
         
         public IOBigCard_SmokeFeature(IOBigCard_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)

@@ -10,10 +10,12 @@ namespace Iis.OntologySchema.DataTypes
     internal class SchemaStorage
     {
         IMapper _mapper;
+        IOntologySchema _schema;
 
-        public SchemaStorage(IMapper mapper)
+        public SchemaStorage(IMapper mapper, IOntologySchema schema)
         {
             _mapper = mapper;
+            _schema = schema;
         }
         
         public Dictionary<Guid, SchemaNodeType> NodeTypes { get; private set; }
@@ -52,6 +54,12 @@ namespace Iis.OntologySchema.DataTypes
                     NodeTypes[attributeId]._attributeType = AttributeTypes[attributeId];
                 }
             }
+
+            foreach (var nodeType in NodeTypes.Values)
+            {
+                nodeType.Schema = _schema;
+            }
+
             SetDotNameTypes();
         }
         private void AddRelation(SchemaRelationType relationType)

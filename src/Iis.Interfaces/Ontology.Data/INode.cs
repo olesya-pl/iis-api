@@ -19,5 +19,11 @@ namespace Iis.Interfaces.Ontology.Data
         IDotNameValues GetDotNameValues();
         INode GetChildNode(string childTypeName);
         IReadOnlyList<INode> GetChildNodes(string childTypeName);
+        
+        INode GetSingleDirectProperty(string name);
+        INode GetSingleProperty(IDotName dotName);
+        INode GetSingleProperty(string dotName);
+        bool AllValuesAreEmpty(IEnumerable<string> dotNames);
+        bool HasTheSameValues(INode another, IEnumerable<string> dotNames);
     }
 }

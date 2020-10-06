@@ -49,7 +49,7 @@ namespace Iis.OntologySchema
 
         public void Initialize(IOntologyRawData ontologyRawData)
         {
-            _storage = new SchemaStorage(_mapper);
+            _storage = new SchemaStorage(_mapper, this);
             _storage.Initialize(ontologyRawData);
         }
 
@@ -491,6 +491,10 @@ namespace Iis.OntologySchema
                 }
             }
             return result.Distinct().ToList();
+        }
+        public IDotName GetDotName(string value)
+        {
+            return new DotName(value);
         }
     }
 }

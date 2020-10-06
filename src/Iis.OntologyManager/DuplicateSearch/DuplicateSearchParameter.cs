@@ -1,20 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Iis.OntologyManager.DuplicateSearch
 {
     public class DuplicateSearchParameter
     {
         public string Url { get; }
-        public List<DuplicateSearchEntityParameter> EntityParameters { get; } = new List<DuplicateSearchEntityParameter>();
+        public string EntityTypeName { get; }
+        public List<string> DotNames { get; }
+        public List<string> DistinctNames { get; set; }
+
         public DuplicateSearchParameter(string param, string url)
         {
             Url = url;
-            foreach (var entityParamStr in param.Split(';'))
-            {
-                EntityParameters.Add(new DuplicateSearchEntityParameter(entityParamStr));
-            }
+            var regex = new Regex(@"(\S+):([^(]+)(\(([^)]+)\))?");
+            var match = regex.Match(param);
+            if (!match.Success) throw new ArgumentException();
+            EntityTypeName = match.Groups[1].ToString();
+            DotNames = match.Groups[2].ToString()
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+            DistinctNames = match.Groups[4].ToString()
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+
         }
     }
 }
