@@ -14,7 +14,7 @@ namespace IIS.Core.GraphQL.Reports
         [GraphQLNonNullType]
         public async Task<GraphQLCollection<Report>> GetReportList([Service] IReportElasticService reportElasticService, [GraphQLNonNullType] PaginationInput pagination, SortingInput sorting)
         {
-            var (count, items) = await reportElasticService.SearchAsync(pagination.PageSize, pagination.Offset(), sorting.ColumnName, sorting.Order);
+            var (count, items) = await reportElasticService.SearchAsync(pagination.PageSize, pagination.Offset(), sorting?.ColumnName, sorting?.Order);
             return new GraphQLCollection<Report>(items.Select(x => new Report(x)).ToList(), count);
         }
 

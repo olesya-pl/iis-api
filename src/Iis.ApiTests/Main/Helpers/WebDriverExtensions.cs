@@ -12,7 +12,7 @@ namespace AcceptanceTests.Steps
 
             return driver;
         }
-        public static void WaitFor(this IWebDriver driver, double seconds)
+        public static IWebDriver WaitFor(this IWebDriver driver, double seconds)
         {
             var expectedMessage = $"Timed out after {seconds} seconds";
 
@@ -21,9 +21,11 @@ namespace AcceptanceTests.Steps
             try
             {
                 wait.Until(d => false);
+                return driver;
             }
             catch(WebDriverTimeoutException timeOutException) when (timeOutException.Message == expectedMessage)
             {
+                return driver;
             }
             catch (Exception)
             {
