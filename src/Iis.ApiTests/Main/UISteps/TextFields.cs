@@ -25,8 +25,6 @@ namespace AcceptanceTests.Contour.UISteps
 		public void GivenIEnterSomethingInTheTextField(string text, string textField)
 		{
 			IWebElement textForm = driver.FindElement(By.CssSelector(textField));
-			///driver.SwitchTo().ActiveElement().SendKeys($"{text}_{DateTime.Now}");
-			///driver.SwitchTo().DefaultContent();
 			textForm.SendKeys($"{text}_{DateTime.Now}");		
 		}
 
@@ -36,6 +34,15 @@ namespace AcceptanceTests.Contour.UISteps
 			IWebElement textForm = driver.FindElement(By.CssSelector(textField));
 
 			textForm.SendKeys(text);
+		}
+
+		[When(@"I entered (.*) in the (.*) text field and press Enter key")]
+		public void GivenIInputInTheTextFieldAndPressEnterKey(string text, string textField)
+		{
+			IWebElement textForm = driver.FindElement(By.CssSelector(textField));
+
+			textForm.SendKeys(text);
+			textForm.SendKeys(Keys.Enter);
 		}
 
 
@@ -48,8 +55,5 @@ namespace AcceptanceTests.Contour.UISteps
 			Assert.True(expectedLoginField.Displayed);
 			Assert.True(expectedPasswordField.Displayed);
 		}
-
-
-
 	}
 }

@@ -20,6 +20,7 @@ namespace AcceptanceTests.Contour.UISteps
 			driver = context.GetDriver();
 		}
 
+		#region Given/When
 		[Given(@"I press Down button plus Enter button on the (.*) item")]
 		public void WhenIPressDownButtonPlusEnterButtonOnTheItem(string item)
 		{
@@ -29,6 +30,7 @@ namespace AcceptanceTests.Contour.UISteps
 
 			itemToPress.SendKeys(Keys.Enter);
 		}
+		#endregion
 
 	}
 }
