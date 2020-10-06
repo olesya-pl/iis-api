@@ -65,9 +65,10 @@ namespace Iis.OntologyData.DataTypes
         }
         public INode GetSingleDirectProperty(string name)
         {
-            return OutgoingRelations
-                .SingleOrDefault(r => r.Node.NodeType.Name == name)
-                ?.TargetNode;
+            var relation = OutgoingRelations
+                .SingleOrDefault(r => r.TypeName == name);
+
+            return relation?.TargetNode;
         }
         public INode GetSingleProperty(IDotName dotName)
         {

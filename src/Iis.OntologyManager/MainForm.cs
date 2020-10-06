@@ -43,7 +43,7 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.18";
+        const string VERSION = "1.19";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
