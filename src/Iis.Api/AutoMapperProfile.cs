@@ -27,6 +27,8 @@ using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
 using Iis.Interfaces.Ontology.Data;
 using Contracts = Iis.Services.Contracts;
+using Iis.DataModel.Reports;
+using Iis.Events.Reports;
 
 namespace Iis.Api
 {
@@ -61,6 +63,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.Events, opts => opts.Ignore())
+                .ForMember(dest => dest.Features, opts => opts.Ignore())
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -301,12 +305,36 @@ namespace Iis.Api
             CreateMap<Iis.Domain.IncomingRelation, Iis.Api.Ontology.IncomingRelation>()
                 .ForMember(dest => dest.Entity, opts => opts.Ignore());
 
-            CreateMap<Iis.Domain.FlightRadar.FlightRadarHistory, Iis.DataModel.FlightRadar.FlightRadarHistoryEntity>();
+            CreateMap<Iis.Domain.FlightRadar.FlightRadarHistory, Iis.DataModel.FlightRadar.LocationHistoryEntity>();
             CreateMap<FlightRadar.DataModel.Routes, Iis.Domain.FlightRadar.FlightRadarHistory>()
                 .ForMember(dest => dest.Lat, opts => opts.MapFrom(src => src.Latitude))
                 .ForMember(dest => dest.Long, opts => opts.MapFrom(src => src.Longitude))
                 .ForMember(dest => dest.RegisteredAt, opts => opts.MapFrom(src => src.TimeNow))
                 .ForMember(dest => dest.ExternalId, opts => opts.MapFrom(src => src.Id.ToString()));
+
+
+            #region Reports
+
+            CreateMap<ReportEntity, ReportDto>()
+                .ForMember(dest => dest.ReportEventIds, opts => opts.MapFrom(src => src.ReportEvents.Select(e => e.EventId)));
+
+            CreateMap<ReportDto, ReportEntity>()
+                .ForMember(dest => dest.ReportEvents, opts => opts.Ignore());
+
+            CreateMap<ReportEntity, ReportEvent>()
+                .ForMember(dest => dest.ReportEventIds, opts => opts.MapFrom(src => src.ReportEvents.Select(r => r.EventId)))
+                .IncludeAllDerived();
+            CreateMap<ReportEntity, ReportCreatedEvent>();
+            CreateMap<ReportEntity, ReportUpdatedEvent>();
+            CreateMap<ReportEntity, ReportRemovedEvent>();
+
+
+            CreateMap<ReportCreatedEvent, ReportDto>();
+            CreateMap<ReportUpdatedEvent, ReportDto>();
+            CreateMap<ReportRemovedEvent, ReportDto>();
+
+            #endregion
+
         }
     }
 }

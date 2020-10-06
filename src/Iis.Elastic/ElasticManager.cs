@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Elasticsearch.Net;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Elasticsearch.Net;
-using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
-using Microsoft.Extensions.Logging;
-using Iis.Utility;
-using Iis.Domain.Elastic;
 
 namespace Iis.Elastic
 {
@@ -54,7 +53,7 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct)
+        public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(indexName))
                 return null;
@@ -404,6 +403,13 @@ namespace Iis.Elastic
             json["query"] = new JObject();
 
             PrepareHighlights(json);
+            if(!string.IsNullOrEmpty(searchParams.SortColumn) && !string.IsNullOrEmpty(searchParams.SortOrder))
+            {
+                json["sort"] = new JArray()
+                {
+                    CreateSortSection(searchParams.SortColumn, searchParams.SortOrder)
+                };
+            }
 
             if (IsExactQuery(searchParams.Query))
             {
@@ -419,6 +425,13 @@ namespace Iis.Elastic
             }
 
             return json.ToString();
+        }
+
+        private JObject CreateSortSection(string sortColumName, string sortOder) 
+        {
+            var result = new JObject();
+            result.Add(sortColumName, new JObject() { new JProperty("order", sortOder) });
+            return result;
         }
 
         private bool IsExactQuery(string query)

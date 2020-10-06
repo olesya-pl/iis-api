@@ -13,7 +13,7 @@ namespace Iis.OntologyData
     {
         DataStorage _storage;
         IMapper _mapper;
-        IOntologySchema _schema;
+        public IOntologySchema Schema { get; }
 
         public IEnumerable<INode> Nodes => _storage.Nodes.Values;
         public IEnumerable<IRelation> Relations => _storage.Relations.Values;
@@ -25,8 +25,8 @@ namespace Iis.OntologyData
         public OntologyNodesData(INodesRawData rawData, IOntologySchema schema)
         {
             _mapper = GetMapper();
-            _schema = schema;
-            _storage = new DataStorage(rawData, _mapper, _schema);
+            Schema = schema;
+            _storage = new DataStorage(rawData, _mapper, Schema);
         }
         private IMapper GetMapper()
         {
@@ -114,6 +114,8 @@ namespace Iis.OntologyData
         {
             _storage.SetNodeIsArchived(nodeId);
         }
+        public void DeleteEntity(Guid id, bool deleteOutcomingRelations, bool deleteIncomingRelations) =>
+            _storage.DeleteEntity(id, deleteOutcomingRelations, deleteIncomingRelations);
         public void SetNodesIsArchived(IEnumerable<Guid> nodeIds)
         {
             foreach (var nodeId in nodeIds)

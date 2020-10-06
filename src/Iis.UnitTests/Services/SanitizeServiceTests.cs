@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentAssertions;
+using Iis.DataModel.Reports;
 using Iis.Services;
 using Xunit;
 

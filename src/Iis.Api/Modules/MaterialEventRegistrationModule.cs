@@ -32,7 +32,7 @@ namespace Iis.Api.Modules
                         .AddTransient<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl))
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
                         //.AddHostedService<MaterialEventConsumer>()
-                        //.AddHostedService<MaterialOperatorAssigner>()
+                        .AddHostedService<MaterialOperatorAssigner>()
                         .AddHostedService<FeatureHandler>();
         }
     }

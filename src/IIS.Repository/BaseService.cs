@@ -49,6 +49,15 @@ namespace IIS.Repository
             }
         }
 
+        protected async Task RunAsync(Action<TUnitOfWork> action)
+        {
+            using (var unitOfWork = unitOfWorkFactory.Create())
+            {
+                action(unitOfWork);
+                await unitOfWork.CommitAsync();
+            }
+        }
+
         protected void Run(Action<TUnitOfWork> action)
         {
             using (var unitOfWork = unitOfWorkFactory.Create())

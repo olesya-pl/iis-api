@@ -1,10 +1,14 @@
-﻿using Iis.DbLayer.Repositories;
+﻿using Iis.DataModel;
+using Iis.DataModel.Reports;
+using Iis.DbLayer.Repositories;
+using Iis.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
 using Iis.Services.Contracts.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +26,8 @@ namespace Iis.Services
         private readonly IExtNodeService _extNodeService;
         private readonly INodeRepository _nodeRepository;
         private readonly OntologyNodesData ontologyNodesData;
+        private readonly IReportElasticService _reportElasticService;
+        private readonly IReportService _reportService;
 
         public StringBuilder Logger { get; set; }
 
@@ -31,14 +37,16 @@ namespace Iis.Services
             IOntologySchema ontologySchema,
             IExtNodeService extNodeService,
             INodeRepository nodeRepository,
-            OntologyNodesData ontologyNodesData)
+            OntologyNodesData ontologyNodesData, IReportElasticService reportElasticService, IReportService reportService)
         {
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
             _ontologySchema = ontologySchema ?? throw new ArgumentNullException(nameof(ontologySchema));
             _extNodeService = extNodeService ?? throw new ArgumentNullException(nameof(extNodeService));
             _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
-            this.ontologyNodesData = ontologyNodesData;
+            this.ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
+            _reportElasticService = reportElasticService ?? throw new ArgumentNullException(nameof(reportElasticService));
+            _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
         }
 
         public bool IsIndexesValid(IEnumerable<string> indexes)
@@ -59,24 +67,17 @@ namespace Iis.Services
         public async Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var indexesToDelete = isHistorical ? GetHistoricalIndexes(indexes) : indexes;
-            foreach (var index in indexesToDelete)
-            {
-                ct.ThrowIfCancellationRequested();
-                var result = await _elasticManager.DeleteIndexAsync(index, ct);
-                if (!result)
-                    TryLog($"{index} was not deleted");
-            }
+            await DeleteIndexesAsync(indexesToDelete);
         }
 
-        public async Task CreateMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task CreateIndexWithMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             foreach (var index in indexes)
             {
                 ct.ThrowIfCancellationRequested();
 
-                var historicalIndex = _elasticState.HistoricalOntologyIndexes[index];
                 var attributesInfo = isHistorical
-                    ? _ontologySchema.GetHistoricalAttributesInfo(index, historicalIndex)
+                    ? _ontologySchema.GetHistoricalAttributesInfo(index, _elasticState.HistoricalOntologyIndexes[index])
                     : _ontologySchema.GetAttributesInfo(index);
 
                 var result = await _elasticManager.CreateMapping(attributesInfo, ct);
@@ -124,6 +125,39 @@ namespace Iis.Services
             LogBulkResponse(response);
         }
 
+        public async Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default)
+        {
+            foreach (var index in indexes)
+            {
+                ct.ThrowIfCancellationRequested();
+                var result = await _elasticManager.DeleteIndexAsync(index, ct);
+                if (!result)
+                    TryLog($"{index} was not deleted");
+            }
+        }
+
+        public async Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default)
+        {
+            var mappingConfiguration =  new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+                new ElasticMappingProperty(nameof(ReportEntity.Id), ElasticMappingPropertyType.Keyword),
+                new ElasticMappingProperty(nameof(ReportEntity.Recipient), ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty(nameof(ReportEntity.Title), ElasticMappingPropertyType.Text),
+                new ElasticMappingProperty(nameof(ReportEntity.CreatedAt), ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
+                new ElasticMappingProperty("ReportEventIds", ElasticMappingPropertyType.Keyword, true)
+            });
+
+            await _elasticManager.CreateIndexesAsync(new[] { _elasticState.ReportIndex }, mappingConfiguration.ToJObject(), ct);
+        }
+
+        public async Task FillReportIndexAsync(CancellationToken ct = default) 
+        {
+            var reports = await _reportService.GetAllAsync();
+            
+            TryLog($"Found {reports.Count} reports");
+
+            var response = await _reportElasticService.PutAsync(reports);
+            LogBulkResponse(response);
+        }
 
         private List<INode> GetNodesFromMemory(IEnumerable<string> indexes)
         {

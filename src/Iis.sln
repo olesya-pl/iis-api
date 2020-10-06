@@ -41,7 +41,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Services.Contracts", "I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologyData", "Iis.OntologyData\Iis.OntologyData.csproj", "{2E2B2ED5-02AB-47EE-8378-A121E9694326}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.FlightRadar.DataModel", "Iis.FlightRadar.DataModel\Iis.FlightRadar.DataModel.csproj", "{8962FBAF-EEA1-4010-BBFA-43701307582A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.FlightRadar.DataModel", "Iis.FlightRadar.DataModel\Iis.FlightRadar.DataModel.csproj", "{8962FBAF-EEA1-4010-BBFA-43701307582A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Events", "Iis.Events\Iis.Events.csproj", "{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.EventHandlers", "Iis.EventHandlers\Iis.EventHandlers.csproj", "{7D081911-CBC0-4A0C-9662-C3D23804F692}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +133,14 @@ Global
 		{8962FBAF-EEA1-4010-BBFA-43701307582A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8962FBAF-EEA1-4010-BBFA-43701307582A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8962FBAF-EEA1-4010-BBFA-43701307582A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

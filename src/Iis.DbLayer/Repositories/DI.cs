@@ -14,6 +14,7 @@ namespace Iis.DbLayer.Repositories
             services.AddTransient<IMaterialSignRepository, MaterialSignRepository>();
             services.AddTransient<IAnnotationsRepository, AnnotationsRepository>();
             services.AddTransient<IFlightRadarRepository, FlightRadarRepository>();
+            services.AddTransient<IReportRepository, ReportRepository>();
         }
     }
 }
