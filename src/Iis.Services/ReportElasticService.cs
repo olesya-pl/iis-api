@@ -2,6 +2,7 @@
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 using MoreLinq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,28 +28,28 @@ namespace Iis.Services
         public Task<bool> PutAsync(ReportDto report)
         {
             var jsonReport = JsonConvert.SerializeObject(report);
-            return _elasticManager.PutDocumentAsync(_elasticIndex, report.Id.ToString(), jsonReport);
+            return _elasticManager.PutDocumentAsync(_elasticIndex, report.Id.ToString("N"), jsonReport, true);
         }
 
         public Task<bool> RemoveAsync(Guid id)
         {
-            return _elasticManager.DeleteDocumentAsync(_elasticIndex, id.ToString());
+            return _elasticManager.DeleteDocumentAsync(_elasticIndex, id.ToString("N"));
         }
 
-        public async Task<(int Count, List<ReportDto> Items)> SearchAsync(int pageSize, int offset, string sortColumn, string sortOrder) 
+        public async Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search) 
         {
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = new List<string> { _elasticIndex },
-                Query = "*",
-                From = offset,
-                Size = pageSize,
+                Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"*{search.Suggestion}*",
+                From = search.Offset,
+                Size = search.PageSize,
             };
 
-            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortOrder)) 
+            if (!string.IsNullOrEmpty(search.SortColumn) && !string.IsNullOrEmpty(search.SortOrder)) 
             {
-                searchParams.SortColumn = GetValidSortColumnName(sortColumn);
-                searchParams.SortOrder = sortOrder;
+                searchParams.SortColumn = GetValidSortColumnName(search.SortColumn);
+                searchParams.SortOrder = search.SortOrder;
             }
 
             var searchResult = await _elasticManager.Search(searchParams);
