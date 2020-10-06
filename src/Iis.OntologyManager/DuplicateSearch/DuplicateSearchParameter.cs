@@ -21,14 +21,10 @@ namespace Iis.OntologyManager.DuplicateSearch
             if (!match.Success) throw new ArgumentException();
             EntityTypeName = match.Groups[1].ToString();
             DotNames = match.Groups[2].ToString()
-                .Split(',')
-                .Select(s => s.Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .ToList();
             DistinctNames = match.Groups[4].ToString()
-                .Split(',')
-                .Select(s => s.Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .ToList();
 
         }
