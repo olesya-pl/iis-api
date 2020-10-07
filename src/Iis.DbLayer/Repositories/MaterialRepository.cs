@@ -170,14 +170,12 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = MaterialIndexes.ToList(),
                 Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL",
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchFields = materialFields
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
             return new SearchResult
