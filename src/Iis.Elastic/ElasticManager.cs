@@ -419,11 +419,11 @@ namespace Iis.Elastic
                 };
             }
 
-            if (IsExactQuery(searchParams.Query))
+            if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
             {
                 PopulateExactQuery(searchParams, json);
             }
-            else if (searchParams.SearchFields?.Any() == true)
+            else if (searchParams.SearchFields.Any())
             {
                 PopulateFieldsIntoQuery(searchParams, json);
             }

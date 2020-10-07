@@ -8,7 +8,7 @@ namespace Iis.Domain.Elastic
         public List<string> BaseIndexNames { get; set; } = new List<string>();
         public string Query { get; set; }
         public List<string> ResultFields { get; set; } = new List<string> { "*" };
-        public IReadOnlyList<IIisElasticField> SearchFields { get; set; }
+        public IReadOnlyList<IIisElasticField> SearchFields { get; set; } = new List<IisElasticField>();
         public bool IsLenient { get; set; } = true;
         public int From { get; set; }
         public int Size { get; set; }
