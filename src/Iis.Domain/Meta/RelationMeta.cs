@@ -31,6 +31,7 @@ namespace Iis.Domain.Meta
     {
         public string Formula { get; set; }
         public string Format { get; set; }
+        public bool? IsAggregated { get; set; }
     }
 
     // Describes virtual inversed relation

@@ -25,6 +25,7 @@ namespace Iis.OntologySchema.DataTypes
         public IContainerMeta Container { get; set; }
         public IValidation Validation { get; set; }
         public IInversedRelationMeta Inversed { get; set; }
+        public bool? IsAggregated { get; set; }
 
         public SchemaMeta(string json)
         {
@@ -45,6 +46,10 @@ namespace Iis.OntologySchema.DataTypes
             if (jObj.ContainsKey("HasFewEntities"))
             {
                 HasFewEntities = bool.Parse(jObj["HasFewEntities"].ToString());
+            }
+            if (jObj.ContainsKey("IsAggregated"))
+            {
+                IsAggregated = bool.Parse(jObj["IsAggregated"].ToString());
             }
             if (jObj.ContainsKey("Title"))
             {

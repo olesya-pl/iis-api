@@ -3,7 +3,6 @@ using Iis.DbLayer.Repositories;
 using Iis.Domain.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -93,11 +92,15 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
-        public async Task<(int Count, List<JObject> Entities)> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        public async Task<(int Count, List<JObject> Entities)> SearchEntitiesByConfiguredFieldsAsync(
+            IEnumerable<string> typeNames, 
+            IElasticNodeFilter filter, 
+            CancellationToken cancellationToken = default)
         {
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
-            var searchFields = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p))).ToList();
-
+            var searchFields = _elasticConfiguration
+                .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p))).ToList();
+            
             IElasticSearchResult searchByHistoryResult = null;
             if (useHistoricalSearch)
             {
