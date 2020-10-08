@@ -165,6 +165,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 return actualHighlights;
 
             var result = DeepCloneWithNewPrefix(historicalHighlights, "historical");
+            if (actualHighlights == null)
+                return result;
+
             foreach (var item in ((JObject)actualHighlights).Children<JProperty>())
             {
                 if (item.Name == "Id" && item.Value[0].Value<string>().Contains(entityId))
