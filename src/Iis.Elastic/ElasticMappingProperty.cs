@@ -13,42 +13,107 @@ namespace Iis.Elastic
         public List<string> Formats { get; } = new List<string>();
         public string Path { get; set; }
         public List<ElasticMappingProperty> Properties { get; set; } = new List<ElasticMappingProperty>();
-        public bool SupportsNullValue { get; }
-        public int? Dimensions { get; }
-        public string TermVector { get; }
+        public bool SupportsNullValue { get; private set; }
+        public int? Dimensions { get; private set; }
+        public string TermVector { get; private set; }
 
         public ElasticMappingProperty() { }
 
-        public ElasticMappingProperty(string dotName,
-            ElasticMappingPropertyType type,
-            bool supportsNullValue = false,
-            IEnumerable<string> formats = null,
-            int? dimensions = null,
-            string termVector = null)
+        public static ElasticMappingProperty CreateDenseVectorProperty(string dotName, int dimensions)
         {
             var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            Name = splitted[0];
-            if (splitted.Length == 1)
+            if (splitted.Length > 1)
             {
-                Type = type;
-            }
-            else
-            {
-                Type = ElasticMappingPropertyType.Nested;
-                Properties = new List<ElasticMappingProperty>
+                return new ElasticMappingProperty
                 {
-                    new ElasticMappingProperty(string.Join('.', splitted.Skip(1)), type, formats:formats)
+                    Name = splitted[0],
+                    Type = ElasticMappingPropertyType.Nested,
+                    Properties = new List<ElasticMappingProperty>
+                    {
+                        CreateDenseVectorProperty(string.Join('.', splitted.Skip(1)), dimensions)
+                    }
                 };
             }
-            SupportsNullValue = supportsNullValue;
+            return new ElasticMappingProperty
+            {
+                Name = splitted[0],
+                Type = ElasticMappingPropertyType.DenseVector,
+                Dimensions = dimensions
+            };
+        }
 
+        public static ElasticMappingProperty CreateTextProperty(string dotName, string termVector)
+        {
+            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (splitted.Length > 1)
+            {
+                return new ElasticMappingProperty
+                {
+                    Name = splitted[0],
+                    Type = ElasticMappingPropertyType.Nested,
+                    Properties = new List<ElasticMappingProperty>
+                    {
+                        CreateTextProperty(string.Join('.', splitted.Skip(1)), termVector)
+                    }
+                };
+            }
+            return new ElasticMappingProperty
+            {
+                Name = splitted[0],
+                Type = ElasticMappingPropertyType.Text,
+                TermVector = termVector
+            };
+        }
+
+        public static ElasticMappingProperty CreateDateTimeProperty(string dotName, IEnumerable<string> formats)
+        {
+            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (splitted.Length > 1)
+            {
+                return new ElasticMappingProperty
+                {
+                    Name = splitted[0],
+                    Type = ElasticMappingPropertyType.Nested,
+                    Properties = new List<ElasticMappingProperty>
+                    {
+                        CreateDateTimeProperty(string.Join('.', splitted.Skip(1)), formats)
+                    }
+                };
+            }
+            var res = new ElasticMappingProperty
+            {
+                Name = splitted[0],
+                Type = ElasticMappingPropertyType.Date
+            };
             if (formats != null && formats.Any())
             {
-                Formats.AddRange(formats);
+               res.Formats.AddRange(formats);
             }
-            Dimensions = dimensions;
+            return res;
+        }
 
-            TermVector = termVector;
+        public static ElasticMappingProperty CreateKeywordProperty(string dotName, bool supportsNullValue)
+        {
+            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (splitted.Length > 1)
+            {
+                return new ElasticMappingProperty
+                {
+                    Name = splitted[0],
+                    Type = ElasticMappingPropertyType.Nested,
+                    Properties = new List<ElasticMappingProperty>
+                    {
+                        CreateKeywordProperty(string.Join('.', splitted.Skip(1)), supportsNullValue)
+                    }
+                };
+            }
+            var res = new ElasticMappingProperty
+            {
+                Name = splitted[0],
+                Type = ElasticMappingPropertyType.Keyword,                
+            };
+            res.SupportsNullValue = supportsNullValue;
+            return res;
         }
 
         public JObject ToJObject()

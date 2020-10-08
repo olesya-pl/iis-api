@@ -130,13 +130,13 @@ namespace Iis.Api.Controllers
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
-                new ElasticMappingProperty("Content", ElasticMappingPropertyType.Text, termVector: ElasticConfiguration.DefaultTermVector),
-                new ElasticMappingProperty("Metadata.features.PhoneNumber", ElasticMappingPropertyType.Keyword),
-                new ElasticMappingProperty("Metadata.RegTime", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
-                new ElasticMappingProperty("CreatedDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
-                new ElasticMappingProperty("LoadData.ReceivingDate", ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
-                new ElasticMappingProperty("ParentId", ElasticMappingPropertyType.Keyword, true),
-                new ElasticMappingProperty("ImageVector", ElasticMappingPropertyType.DenseVector, dimensions:MaterialDocument.ImageVectorDimensionsCount)
+                ElasticMappingProperty.CreateTextProperty("Content", ElasticConfiguration.DefaultTermVector),
+                ElasticMappingProperty.CreateKeywordProperty("Metadata.features.PhoneNumber", false),
+                ElasticMappingProperty.CreateDateTimeProperty("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
+                ElasticMappingProperty.CreateDateTimeProperty("CreatedDate", ElasticConfiguration.DefaultDateFormats),
+                ElasticMappingProperty.CreateDateTimeProperty("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
+                ElasticMappingProperty.CreateKeywordProperty("ParentId", true),
+                ElasticMappingProperty.CreateDenseVectorProperty("ImageVector", MaterialDocument.ImageVectorDimensionsCount)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },

@@ -139,11 +139,11 @@ namespace Iis.Services
         public async Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default)
         {
             var mappingConfiguration =  new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
-                new ElasticMappingProperty(nameof(ReportEntity.Id), ElasticMappingPropertyType.Keyword),
-                new ElasticMappingProperty(nameof(ReportEntity.Recipient), ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty(nameof(ReportEntity.Title), ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty(nameof(ReportEntity.CreatedAt), ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
-                new ElasticMappingProperty("ReportEventIds", ElasticMappingPropertyType.Keyword, true)
+                ElasticMappingProperty.CreateKeywordProperty(nameof(ReportEntity.Id), false),
+                ElasticMappingProperty.CreateTextProperty(nameof(ReportEntity.Recipient), null),
+                ElasticMappingProperty.CreateTextProperty(nameof(ReportEntity.Title), null),
+                ElasticMappingProperty.CreateDateTimeProperty(nameof(ReportEntity.CreatedAt), ElasticConfiguration.DefaultDateFormats),
+                ElasticMappingProperty.CreateKeywordProperty("ReportEventIds", true)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { _elasticState.ReportIndex }, mappingConfiguration.ToJObject(), ct);
