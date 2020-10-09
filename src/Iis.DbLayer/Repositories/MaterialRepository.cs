@@ -221,7 +221,7 @@ namespace Iis.DbLayer.Repositories
             }
             return Context.Nodes
                 .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                .Where(e => (!typeIdList.Any() || typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
+                .Where(e => (!typeIdList.Any() || typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId && !e.Relation.Node.IsArchived)
                 .AsNoTracking()
                 .Select(e => e.Node.Id)
                 .ToList();

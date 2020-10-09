@@ -154,7 +154,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
         {
             return Context.Relations
-                .Where(e => featureIdList.Contains(e.TargetNodeId))
+                .Where(e => featureIdList.Contains(e.TargetNodeId) && !e.Node.IsArchived)
                 .Select(e => e.SourceNodeId)
                 .ToListAsync();
         }
