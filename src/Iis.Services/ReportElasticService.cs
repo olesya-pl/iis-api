@@ -58,7 +58,7 @@ namespace Iis.Services
 
         public async Task<ReportDto> GetAsync(Guid id) 
         {
-            var document = await _elasticManager.GetDocumentByIdAsync(new string[] { _elasticIndex }, id.ToString());
+            var document = await _elasticManager.GetDocumentByIdAsync(new string[] { _elasticIndex }, id.ToString("N"));
             var jsonReport = document.Items.FirstOrDefault()?.SearchResult;
             
             return jsonReport?.ToObject<ReportDto>();
