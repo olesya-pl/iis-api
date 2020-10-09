@@ -9,6 +9,8 @@ namespace Iis.Elastic
         Alias,
         Keyword,
         DenseVector,
-        DateRange
+        DateRange,
+        IntegerRange,
+        FloatRange
     }
 }

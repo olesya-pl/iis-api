@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Elastic.ElasticMappingProperties;
+using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -44,19 +45,16 @@ namespace Iis.Elastic
 
         public static ElasticMappingPropertyType ToMappingType(ScalarType scalarType)
         {
-            switch (scalarType)
+            return scalarType switch
             {
-                case ScalarType.Int:
-                    return ElasticMappingPropertyType.Integer;
-                case ScalarType.Date:
-                    return ElasticMappingPropertyType.Date;
-                case ScalarType.DateRange:
-                    return ElasticMappingPropertyType.DateRange;
-                case ScalarType.File:
-                    return ElasticMappingPropertyType.Nested;
-                default:
-                    return ElasticMappingPropertyType.Text;
-            }
+                ScalarType.Int => ElasticMappingPropertyType.Integer,
+                ScalarType.IntegerRange => ElasticMappingPropertyType.IntegerRange,
+                ScalarType.FloatRange => ElasticMappingPropertyType.FloatRange,
+                ScalarType.Date => ElasticMappingPropertyType.Date,
+                ScalarType.DateRange => ElasticMappingPropertyType.DateRange,
+                ScalarType.File => ElasticMappingPropertyType.Nested,
+                _ => ElasticMappingPropertyType.Text,
+            };
         }
 
         private void AddProperty(List<ElasticMappingProperty> properties, string[] nameParts, ElasticMappingPropertyType propertyType)
@@ -66,21 +64,10 @@ namespace Iis.Elastic
             var existingProperty = properties.SingleOrDefault(p => p.Name == name);
             if (existingProperty == null)
             {
-                var mappingProperty = new ElasticMappingProperty { Name = name };
-                var isNestedProperty = nameParts.Length > 1;
-                if (isNestedProperty)
+                var mappingProperty = ElasticMappingPropertyFactory.Create(nameParts, propertyType);
+                if (nameParts.Count() > 1)
                 {
-                    mappingProperty.Type = ElasticMappingPropertyType.Nested;
                     AddProperty(mappingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
-                }
-                else
-                {
-                    mappingProperty.Type = propertyType;
-
-                    if(propertyType == ElasticMappingPropertyType.Date)
-                    {
-                        mappingProperty.AddFormats(ElasticConfiguration.DefaultDateFormats);
-                    }
                 }
                 properties.Add(mappingProperty);
             }
@@ -99,12 +86,7 @@ namespace Iis.Elastic
 
             foreach (var aliasName in attributeInfoItem.AliasesList)
             {
-                var mappingProperty = new ElasticMappingProperty
-                {
-                    Name = aliasName,
-                    Type = ElasticMappingPropertyType.Alias,
-                    Path = attributeInfoItem.DotName
-                };
+                var mappingProperty = AliasProperty.Create(aliasName, attributeInfoItem.DotName);
                 properties.Add(mappingProperty);
             }
         }

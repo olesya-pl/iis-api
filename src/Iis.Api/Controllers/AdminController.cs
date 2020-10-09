@@ -1,5 +1,6 @@
 ﻿using Iis.DbLayer.Repositories;
 using Iis.Elastic;
+using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
@@ -130,13 +131,13 @@ namespace Iis.Api.Controllers
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
-                ElasticMappingProperty.CreateTextProperty("Content", ElasticConfiguration.DefaultTermVector),
-                ElasticMappingProperty.CreateKeywordProperty("Metadata.features.PhoneNumber", false),
-                ElasticMappingProperty.CreateDateTimeProperty("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
-                ElasticMappingProperty.CreateDateTimeProperty("CreatedDate", ElasticConfiguration.DefaultDateFormats),
-                ElasticMappingProperty.CreateDateTimeProperty("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
-                ElasticMappingProperty.CreateKeywordProperty("ParentId", true),
-                ElasticMappingProperty.CreateDenseVectorProperty("ImageVector", MaterialDocument.ImageVectorDimensionsCount)
+                TextProperty.Create("Content", ElasticConfiguration.DefaultTermVector),
+                KeywordProperty.Create("Metadata.features.PhoneNumber", false),
+                DateProperty.Create("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
+                KeywordProperty.Create("ParentId", true),
+                DenseVectorProperty.Create("ImageVector", MaterialDocument.ImageVectorDimensionsCount)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
