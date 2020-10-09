@@ -39,6 +39,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         protected override void Configure(IInputObjectTypeDescriptor d)
         {
             d.Name($"SingleInput_{_typeName}");
+            d.Field("delete").Type<IdType>();
             if (_createType == null)
                 d.Field("create").Type<EntityRelationInputType>();
             else

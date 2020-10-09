@@ -68,5 +68,50 @@ namespace Iis.OntologyData.DataTypes
         {
             return OutgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value);
         }
+        
+        public INode GetSingleDirectProperty(string name)
+        {
+            return OutgoingRelations
+                .SingleOrDefault(r => r.Node.NodeType.Name == name)
+                ?.TargetNode;
+        }
+        public INode GetSingleProperty(IDotName dotName)
+        {
+            INode currentNode = this;
+            foreach (var name in dotName.Parts)
+            {
+                currentNode = currentNode.GetSingleDirectProperty(name);
+                if (currentNode == null) return null;
+            }
+            return currentNode;
+        }
+        public INode GetSingleProperty(string dotName)
+        {
+            return GetSingleProperty(NodeType.Schema.GetDotName(dotName));
+        }
+        public bool HasTheSameValues(INode another, IEnumerable<string> dotNames)
+        {
+            if (another == null) return false;
+            foreach (var dotName in dotNames)
+            {
+                if (this.GetSingleProperty(dotName)?.Value != another.GetSingleProperty(dotName)?.Value)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public bool AllValuesAreEmpty(IEnumerable<string> dotNames)
+        {
+            foreach (var dotName in dotNames)
+            {
+                if (!string.IsNullOrEmpty(GetSingleProperty(dotName)?.Value)) 
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

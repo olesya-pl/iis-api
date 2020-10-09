@@ -8,5 +8,6 @@ namespace Iis.Domain.Elastic
         public bool IsExcluded { get; set; } = false;
         public int Fuzziness { get; set; } = 0;
         public decimal Boost { get; set; } = 1.0m;
+        public bool IsAggregated { get; set; }
     }
 }

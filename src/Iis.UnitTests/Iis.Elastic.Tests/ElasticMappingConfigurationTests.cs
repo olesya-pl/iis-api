@@ -1,4 +1,5 @@
 ﻿using Iis.Elastic;
+using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using System;
@@ -44,6 +45,38 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         }
 
         [Fact]
+        public void ConstructorFromAttributeInfo_Single_IntegerRange()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("name1", ScalarType.IntegerRange, null),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Single(result.Properties);
+            var property = result.Properties[0];
+            Assert.Equal("name1", property.Name);
+            Assert.Equal(ElasticMappingPropertyType.IntegerRange, property.Type);
+            Assert.Empty(property.Properties);
+        }
+
+        [Fact]
+        public void ConstructorFromAttributeInfo_Single_FloatRange()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("name1", ScalarType.FloatRange, null),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Single(result.Properties);
+            var property = result.Properties[0];
+            Assert.Equal("name1", property.Name);
+            Assert.Equal(ElasticMappingPropertyType.FloatRange, property.Type);
+            Assert.Empty(property.Properties);
+        }
+
+        [Fact]
         public void ConstructorFromAttributeInfo_Single_IsFile_JsonConversion()
         {
             var list = new List<AttributeInfoItem>
@@ -56,6 +89,36 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var property = result.Properties[0];
             var json = property.ToJObject();
             Assert.Equal("nested", json["type"]);
+        }
+
+        [Fact]
+        public void ConstructorFromAttributeInfo_Single_IntegerRange_JsonConversion()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("name1", ScalarType.IntegerRange, null),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Single(result.Properties);
+            var property = result.Properties[0];
+            var json = property.ToJObject();
+            Assert.Equal("integer_range", json["type"]);
+        }
+
+        [Fact]
+        public void ConstructorFromAttributeInfo_Single_FloatRange_JsonConversion()
+        {
+            var list = new List<AttributeInfoItem>
+            {
+                new AttributeInfoItem("name1", ScalarType.FloatRange, null),
+            };
+            var attributeInfo = new AttributeInfo("dummy", list);
+            var result = new ElasticMappingConfiguration(attributeInfo);
+            Assert.Single(result.Properties);
+            var property = result.Properties[0];
+            var json = property.ToJObject();
+            Assert.Equal("float_range", json["type"]);
         }
 
         [Fact]
@@ -97,12 +160,12 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             Assert.Equal("child", child.Name);
             Assert.Equal(ElasticMappingPropertyType.Text, child.Type);
 
-            var alias1 = result.Properties[1];
+            var alias1 = result.Properties[1] as AliasProperty;
             Assert.Equal("alias1", alias1.Name);
             Assert.Equal(ElasticMappingPropertyType.Alias, alias1.Type);
             Assert.Equal("parent.child", alias1.Path);
 
-            var alias2 = result.Properties[2];
+            var alias2 = result.Properties[2] as AliasProperty;
             Assert.Equal("alias2", alias2.Name);
             Assert.Equal(ElasticMappingPropertyType.Alias, alias2.Type);
             Assert.Equal("parent.child", alias2.Path);

@@ -11,6 +11,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public interface IOntologyRepository
     {
         NodeEntity GetNodeEntityById(Guid id);
+        NodeEntity GetActiveNodeEntityById(Guid id);
         Task<NodeEntity> GetNodeEntityByIdAsync(Guid id);
         Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id);
         AttributeEntity GetAttributeEntityById(Guid id);

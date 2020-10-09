@@ -153,6 +153,8 @@ namespace Iis.OntologyManager.UiControls
 
             gridChildren = _uiControlsCreator.GetDataGridView("gridChildren", null,
                 new List<string> { "RelationName", "RelationTitle", "Name", "InheritedFrom", "EmbeddingOptions", "ScalarType" });
+            gridChildren.Columns[0].Width *= 2;
+            gridChildren.Columns[1].Width *= 5;
             gridChildren.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             gridChildren.ColumnHeadersVisible = true;
             gridChildren.AutoGenerateColumns = false;

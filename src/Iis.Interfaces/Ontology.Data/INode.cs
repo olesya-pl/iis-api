@@ -16,5 +16,10 @@ namespace Iis.Interfaces.Ontology.Data
         string Value { get; }
         public IDotNameValues GetDotNameValues();
         bool HasPropertyWithValue(string propertyName, string value);
+        INode GetSingleProperty(IDotName dotName);
+        INode GetSingleProperty(string dotName);
+        INode GetSingleDirectProperty(string name);
+        bool AllValuesAreEmpty(IEnumerable<string> dotNames);
+        bool HasTheSameValues(INode another, IEnumerable<string> dotNames);
     }
 }

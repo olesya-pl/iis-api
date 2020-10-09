@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Iis.DataModel.FlightRadar;
 using Iis.DbLayer.Repositories;
+using Iis.Domain;
 using Iis.Domain.FlightRadar;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -18,14 +19,17 @@ namespace IIS.Core.FlightRadar
     {
         private const string SignName = "ICAOSign";
         private readonly IMapper _mapper;
+        private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private OntologyNodesData _ontologyNodesData;
 
         public FlightRadarService(IMapper mapper,
             IOntologySchema ontologySchema,
+            IOntologyService ontologyService,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _mapper = mapper;
+            _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
 
             SignalSynchronizationStart();
@@ -52,28 +56,47 @@ namespace IIS.Core.FlightRadar
                 return;
             }
 
-            var entityIds = GetIncomingEntities(signs);
-            await SaveHistoryEntities(icao, historyItems, entityIds);
+            var signEntityRelations = GetIncomingEntities(signs);
+            await SaveSignsLocationsAsync(signs, historyItems);
+            await SaveHistoryEntitiesAsync(historyItems, signEntityRelations);
 
         }
 
-        private IEnumerable<Guid> GetIncomingEntities(IEnumerable<INode> signs)
+        private async Task SaveSignsLocationsAsync(IEnumerable<INode> signs, IReadOnlyCollection<FlightRadarHistory> historyItems)
         {
-            return signs.SelectMany(p => p.IncomingRelations.Where(r => r.IsLinkToSeparateObject).Select(r => r.SourceNodeId));
+            var latestValue = historyItems.OrderBy(p => p.RegisteredAt).LastOrDefault();
+            if (latestValue is null)
+                return;
+            foreach (var sign in signs)
+            {
+                var node = (await _ontologyService.LoadNodesAsync(sign.Id, null)) as Entity;
+                node.SetProperty("location", new Dictionary<string, object> {
+                    { "type", "Point" },
+                    { "coordinates", new [] {latestValue.Lat, latestValue.Long} }
+                });
+                await _ontologyService.SaveNodeAsync(node);
+            }
         }
 
-        private async Task SaveHistoryEntities(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems, IEnumerable<Guid> entityIds)
+        private IEnumerable<SignEntityRelation> GetIncomingEntities(IEnumerable<INode> signs)
         {
-            var histotyEntities = new List<FlightRadarHistoryEntity>();
-            foreach (var entityId in entityIds)
+            return signs
+                .SelectMany(p => p.IncomingRelations.Where(r => r.IsLinkToSeparateObject)
+                .Select(r => new SignEntityRelation(r.TargetNodeId, r.SourceNodeId)));
+        }
+
+        private async Task SaveHistoryEntitiesAsync(IReadOnlyCollection<FlightRadarHistory> historyItems, IEnumerable<SignEntityRelation> signEntityRelations)
+        {
+            var histotyEntities = new List<LocationHistoryEntity>();
+            foreach (var relation in signEntityRelations)
             {
                 histotyEntities.AddRange(
-                    _mapper.Map<List<FlightRadarHistoryEntity>>(historyItems)
+                    _mapper.Map<List<LocationHistoryEntity>>(historyItems)
                     .Select(p =>
                     {
                         p.Id = Guid.NewGuid();
-                        p.NodeId = entityId;
-                        p.ICAO = icao;
+                        p.EntityId = relation.EntityId;
+                        p.NodeId = relation.NodeId;
                         return p;
                     }));
             }
@@ -103,6 +126,18 @@ namespace IIS.Core.FlightRadar
         public void SignalSynchronizationStop()
         {
             _ontologyNodesData = null;
+        }
+
+        private class SignEntityRelation
+        {
+            public SignEntityRelation(Guid nodeId, Guid entityId)
+            {
+                NodeId = nodeId;
+                EntityId = entityId;
+            }
+
+            public Guid NodeId { get; set; }
+            public Guid EntityId { get; set; }
         }
     }
 }

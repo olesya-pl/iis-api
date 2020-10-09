@@ -9,102 +9,63 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Reports;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Dtos;
 
 namespace IIS.Core.GraphQL.Reports
 {
     public class Mutation
     {
-        public async Task<Report> CreateReport([Service] OntologyContext context, [GraphQLNonNullType] ReportInput data)
+        public async Task<Report> CreateReport([Service] IReportService reportService, [GraphQLNonNullType] ReportInput data)
         {
-            var report = new Iis.DataModel.Reports.ReportEntity
+            var report = await reportService.CreateAsync(new ReportDto
             {
-                Id        = Guid.NewGuid(),
-                CreatedAt = DateTime.Now,
                 Recipient = data.Recipient,
-                Title     = data.Title
-            };
-
-            context.Reports.Add(report);
-            await context.SaveChangesAsync();
+                Title = data.Title
+            });
 
             return new Report(report);
         }
 
-        public async Task<Report> UpdateReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] ReportInput data)
+        public async Task<Report> UpdateReport([Service] IReportService reportService, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] ReportInput data)
         {
-            var reportInDb = context.Reports.Find(id);
-            if (reportInDb == null)
-                throw new InvalidOperationException($"Cannot find report with id = {id}");
-            reportInDb.Recipient = data.Recipient;
-            reportInDb.Title     = data.Title;
-            await context.SaveChangesAsync();
-            return new Report(reportInDb);
+            var updatedReport = await reportService.UpdateAsync(new ReportDto 
+            {
+                Id = id,
+                Title = data.Title,
+                Recipient = data.Recipient
+            });
+            
+            return new Report(updatedReport);
         }
 
-        public async Task<DeleteEntityReportResponse> DeleteReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
+        public async Task<DeleteEntityReportResponse> DeleteReport([Service] IReportService reportService, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var report = context.Reports.Include(r => r.ReportEvents).Single(r => r.Id == id);
-            context.Reports.Remove(report);
-            await context.SaveChangesAsync();
+            var removedReport = await reportService.RemoveAsync(id);
             return new DeleteEntityReportResponse
             {
-                Details = new Report(report)
+                Details = new Report(removedReport)
             };
         }
 
-        public async Task<Report> UpdateReportEvents([Service]                                  IResolverContext  ctx,
-                                                     [Service]                                  OntologyContext   context,
-                                                     [GraphQLType(typeof(NonNullType<IdType>))] Guid              id,
-                                                     [GraphQLNonNullType]                       UpdateReportData  data)
+        public async Task<Report> UpdateReportEvents([Service] IResolverContext ctx,
+                                                     [Service] IReportService reportService,
+                                                     [GraphQLType(typeof(NonNullType<IdType>))] Guid id,
+                                                     [GraphQLNonNullType] UpdateReportData data)
         {
-            var forAdd    = new HashSet<Guid>(data.AddEvents);
-            var forRemove = new HashSet<Guid>(data.RemoveEvents);
+            var updatedReport = await reportService.UpdateEventsAsync(id, data.AddEvents, data.RemoveEvents);
 
-            forAdd   .ExceptWith(data.RemoveEvents);
-            forRemove.ExceptWith(data.AddEvents);
-
-            var loader =  ctx.DataLoader<NodeDataLoader>();
-            var addRange = forAdd.Select(eventId => new ReportEventEntity
-            {
-                EventId = eventId,
-                ReportId = id
-            }).ToList();
-            var removeRange = context.ReportEvents.Where(re => re.ReportId == id && forRemove.Contains(re.EventId))
-                .ToList();
-
-            if (addRange.Count > 0 || removeRange.Count > 0)
-            {
-                if (addRange.Count > 0)
-                    context.ReportEvents.AddRange(addRange);
-                if (removeRange.Count > 0)
-                    context.ReportEvents.RemoveRange(removeRange);
-                await context.SaveChangesAsync();
-            }
-
-            var report = await context.Reports
-                .Include(r => r.ReportEvents)
-                .SingleOrDefaultAsync(r => r.Id == id);
-
-            if (report == null)
-                throw new InvalidOperationException($"Cannot find report with id = {id}");
-
-            return new Report(report);
+            return new Report(updatedReport);
         }
 
-        public async Task<Report> CopyReport([Service] OntologyContext context, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] CopyReportInput data)
+        public async Task<Report> CopyReport([Service] IReportService reportService, [GraphQLType(typeof(NonNullType<IdType>))] Guid id, [GraphQLNonNullType] CopyReportInput data)
         {
-            var existingReport = context.Reports.Include(r => r.ReportEvents).SingleOrDefault(u => u.Id == id);
-            if (existingReport == null)
-                throw new InvalidOperationException($"Cannot find report with id  = {id}");
-
-            var newReport = new Iis.DataModel.Reports.ReportEntity(existingReport, Guid.NewGuid(), DateTime.Now);
-
-            newReport.Title = data.Title ?? newReport.Title;
-            newReport.Recipient = data.Recipient ?? newReport.Recipient;
-
-            context.Reports.Add(newReport);
-            await context.SaveChangesAsync();
-            return new Report(newReport);
+            var copiedReport = await reportService.CopyAsync(id, new ReportDto 
+            {
+                Title = data.Title,
+                Recipient = data.Recipient
+            });
+            return new Report(copiedReport);
         }
     }
 }

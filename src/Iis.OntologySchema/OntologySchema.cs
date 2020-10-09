@@ -49,7 +49,7 @@ namespace Iis.OntologySchema
 
         public void Initialize(IOntologyRawData ontologyRawData)
         {
-            _storage = new SchemaStorage(_mapper);
+            _storage = new SchemaStorage(_mapper, this);
             _storage.Initialize(ontologyRawData);
         }
 
@@ -478,6 +478,10 @@ namespace Iis.OntologySchema
         public bool IsFuzzyDateEntityAttribute(INodeTypeLinked nodeType)
         {
             return nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Any(i => i.SourceType.Name == FuzzyDateEntityTypeName);
+        }
+        public IDotName GetDotName(string value)
+        {
+            return new DotName(value);
         }
     }
 }

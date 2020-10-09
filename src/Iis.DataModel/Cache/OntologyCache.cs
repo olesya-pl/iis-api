@@ -25,17 +25,6 @@ namespace Iis.DataModel.Cache
         public MaterialSignEntity GetMaterialSign(Guid id)
         {
             return _materialSignsDict[id];
-        }
-
-        public void PutFieldNamesByNodeType(string typeName, IReadOnlyCollection<string> fieldNames)
-        {
-            _fieldNamesByType["typeName"] = fieldNames;
-        }
-
-        public IReadOnlyCollection<string> GetFieldNamesByNodeType(string typeName)
-        {
-            _fieldNamesByType.TryGetValue(typeName, out var result);
-            return result;
-        }
+        }        
     }
 }

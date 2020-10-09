@@ -28,6 +28,7 @@ namespace IIS.Core.Materials.EntityFramework
 {
     public class MaterialProvider<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialProvider where TUnitOfWork : IIISUnitOfWork
     {
+        private const string WildCart = "*";
         private static readonly JsonSerializerSettings _materialDocSerializeSettings = new JsonSerializerSettings
         {
             DateParseHandling = DateParseHandling.None
@@ -74,7 +75,7 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<Material> materials;
             (IEnumerable<MaterialEntity> Materials, int TotalCount) materialResult;
 
-            if (!string.IsNullOrWhiteSpace(filterQuery))
+            if (!string.IsNullOrWhiteSpace(filterQuery) && filterQuery != WildCart)
             {
                 var searchResult = await _elasticService.SearchMaterialsByConfiguredFieldsAsync(
                     new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery });
@@ -294,6 +295,8 @@ namespace IIS.Core.Materials.EntityFramework
 
         private bool IsEvent(Node node)
         {
+            if(node is null) return false;
+            
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 
             return nodeType.IsEvent;
@@ -310,6 +313,8 @@ namespace IIS.Core.Materials.EntityFramework
 
         private bool IsObjectSign(Node node)
         {
+            if (node is null) return false;
+
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 
             return nodeType.IsObjectSign;

@@ -43,7 +43,7 @@ namespace Iis.Interfaces.Ontology.Schema
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
-        List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0);
+        List<NodeAggregationInfo> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0);
         bool IsInheritedFrom(string nodeTypeName);
         bool IsObjectOfStudy { get; }
         bool IsEvent { get; }
@@ -52,5 +52,12 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsSeparateObject { get; }
         INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts);
         IRelationTypeLinked GetRelationTypeByName(string name);
+        IOntologySchema Schema { get; }
+    }
+
+    public class NodeAggregationInfo
+    {
+        public string Name { get; set; }
+        public bool IsAggregated { get; set; }
     }
 }

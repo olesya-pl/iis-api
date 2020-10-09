@@ -68,6 +68,8 @@ using Iis.Api.Ontology;
 using Iis.OntologyData;
 using IIS.Core.FlightRadar;
 using Iis.FlightRadar.DataModel;
+using MediatR;
+using Iis.EventHandlers;
 
 namespace IIS.Core
 {
@@ -193,7 +195,7 @@ namespace IIS.Core
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
             services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
-            //services.AddHostedService<FlightRadarHistorySyncJob>();
+            services.AddHostedService<FlightRadarHistorySyncJob>();
 
             services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -296,6 +298,8 @@ namespace IIS.Core
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
+            services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();
+            services.AddTransient<IReportElasticService, ReportElasticService>();
             services.AddTransient<ISanitizeService, SanitizeService>();
             services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(
@@ -311,6 +315,7 @@ namespace IIS.Core
 
             services.RegisterRepositories();
             services.RegisterElasticModules();
+            services.AddMediatR(typeof(ReportEventHandler));
         }
 
 
@@ -359,7 +364,6 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
-            PopulateEntityFieldsCache(app);
             app.UpdateMilitaryAmmountCodes();
 
             if (!Configuration.GetValue<bool>("disableCORS", false))
@@ -386,33 +390,6 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private void PopulateEntityFieldsCache(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices
-                .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                var serviceProvider = serviceScope.ServiceProvider;
-                var ontology = serviceProvider.GetRequiredService<IOntologyModel>();
-                var types = ontology.EntityTypes.Where(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
-                if (!types.Any())
-                {
-                    return;
-                }
-                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
-                    .Concat(types).Distinct().ToArray();
-
-                var ontologySchema = serviceProvider.GetRequiredService<IOntologySchema>();
-                var cache = serviceProvider.GetRequiredService<IOntologyCache>();
-
-                foreach (var type in derivedTypes)
-                {
-                    var nodeType = ontologySchema.GetEntityTypeByName(type.Name);
-                    cache.PutFieldNamesByNodeType(type.Name, nodeType.GetAttributeDotNamesRecursiveWithLimit());
-                }
-            }
         }
 
         private void UpdateDatabase(IApplicationBuilder app)
