@@ -23,7 +23,7 @@ namespace Iis.Api.BackgroundServices
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var themeService = scope.ServiceProvider.GetRequiredService<ThemeService>();
-                    await themeService.UpdateQueryResults(stoppingToken);
+                    await themeService.UpdateQueryResultsAsync(stoppingToken);
                 } 
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }

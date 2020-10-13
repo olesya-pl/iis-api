@@ -36,7 +36,7 @@ namespace Iis.ThemeManagement
         public async Task<Guid> CreateThemeAsync(Theme theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
-            entity.QueryResults = await GetQueryResultsAsync(entity.TypeId, entity.Query, _ontology);
+            entity.QueryResults = await GetQueryResultsAsync(entity.TypeId, entity.Query);
 
             _context.Themes.Add(entity);
 
@@ -135,7 +135,7 @@ namespace Iis.ThemeManagement
             return _mapper.Map<IEnumerable<ThemeType>>(entities);
         }
 
-        public async Task UpdateQueryResults(CancellationToken ct)
+        public async Task UpdateQueryResultsAsync(CancellationToken ct)
         {
             var themesByQuery = _context.Themes
                 .AsNoTracking()
@@ -145,7 +145,7 @@ namespace Iis.ThemeManagement
             foreach (var groupedTheme in themesByQuery)
             {
                 ct.ThrowIfCancellationRequested();
-                var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query, _ontology);
+                var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query);
                 foreach (var theme in groupedTheme)
                 {
                     if (theme.QueryResults != newCount)
@@ -167,7 +167,7 @@ namespace Iis.ThemeManagement
                     .AsNoTracking();
         }
 
-        private Task<int> GetQueryResultsAsync(Guid typeId, string query, IOntologyModel ontology)
+        private Task<int> GetQueryResultsAsync(Guid typeId, string query)
         {
             var filter = new ElasticFilter
             {
@@ -179,8 +179,8 @@ namespace Iis.ThemeManagement
             var indexes = typeId switch
             {
                 _ when typeId == ThemeTypeEntity.EntityMaterialId => _elasticState.MaterialIndexes,
-                _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(ontology, "ObjectOfStudy"),
-                _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(ontology, "Event"),
+                _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(_ontology, "ObjectOfStudy"),
+                _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(_ontology, "Event"),
                 _ => (IEnumerable<string>)null
             };
 

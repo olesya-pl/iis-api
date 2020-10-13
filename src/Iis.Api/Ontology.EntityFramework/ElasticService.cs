@@ -45,11 +45,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!_elasticState.UseElastic)
-            {
-                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
-            }
-
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
@@ -64,11 +59,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!_elasticState.UseElastic)
-            {
-                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
-            }
-
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
@@ -80,11 +70,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!_elasticState.UseElastic)
-            {
-                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
-            }
-
             var searchFields = new List<IisElasticField>();
             var ontologyFields
                 = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p)));
@@ -232,21 +217,11 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!_elasticState.UseElastic)
-            {
-                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
-            }
-
             return _materialRepository.SearchMaterials(filter, cancellationToken);
         }
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            if (!_elasticState.UseElastic)
-            {
-                throw new Exception(ELASTIC_IS_NOT_USING_MSG);
-            }
-
             return _materialRepository.CountMaterialsAsync(filter, cancellationToken);
         }
 
@@ -273,22 +248,20 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !_elasticState.UseElastic) return Task.FromResult(true);
+            if (!_runTimeSettings.PutSavedToElastic) return Task.FromResult(true);
 
             return _nodeRepository.PutNodeAsync(id, cancellationToken);
         }
 
         public Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !_elasticState.UseElastic) return Task.FromResult(true);
+            if (!_runTimeSettings.PutSavedToElastic) return Task.FromResult(true);
 
             return _nodeRepository.PutHistoricalNodesAsync(id, requestId, cancellationToken);
         }
 
         public async Task<bool> PutFeatureAsync(string featureIndexName, Guid featureId, JObject featureDocument, CancellationToken cancellation = default)
         {
-            if (!_elasticState.UseElastic) return true;
-
             if (!_runTimeSettings.PutSavedToElastic) return false;
 
             if (featureDocument is null) return false;
@@ -325,13 +298,12 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
         {
-            if (!_elasticState.UseElastic) return false;
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
         }
 
         public async Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken)
         {
-            if (!_runTimeSettings.PutSavedToElastic || !_elasticState.UseElastic) return true;
+            if (!_runTimeSettings.PutSavedToElastic) return true;
 
             var response = await _nodeRepository.PutNodesAsync(itemsToUpdate, cancellationToken);
 

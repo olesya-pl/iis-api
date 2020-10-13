@@ -17,7 +17,6 @@ namespace Iis.Services
                     .Select(nt => nt.Name)
                     .ToList();
 
-                UseElastic = true;
                 HistoricalOntologyIndexes = OntologyIndexes.ToDictionary(k => k, GetHistoricalIndex);
             }
 
@@ -27,7 +26,6 @@ namespace Iis.Services
             SignIndexes = new List<string>{ "CellphoneSign", "SatellitePhoneSign"};
         }
 
-        public bool UseElastic { get; }
         public string ReportIndex { get; set; }
         public List<string> MaterialIndexes { get; }
         public List<string> OntologyIndexes { get; }

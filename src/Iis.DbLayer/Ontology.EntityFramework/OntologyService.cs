@@ -187,7 +187,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
-            var isElasticSearch = _elasticState.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
@@ -210,7 +210,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var derivedTypes = types.SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types).Distinct().ToArray();
 
-            var isElasticSearch = _elasticState.UseElastic && !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
+            var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
@@ -235,7 +235,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Distinct()
                 .ToArray();
 
-            var isElasticSearch = _elasticState.UseElastic && _elasticService.TypesAreSupported(derivedTypeNames);
+            var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
                 var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
