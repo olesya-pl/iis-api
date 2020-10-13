@@ -31,20 +31,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return await Context.Nodes.FirstOrDefaultAsync(_ => _.Id == id);
         }
 
-        public Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id)
+        private IQueryable<NodeEntity> GetGetNodeEntityWithIncludesQuery()
         {
             return Context.Nodes
                 .Include(n => n.Attribute)
                 .Include(n => n.NodeType)
-                .ThenInclude(nt => nt.IAttributeTypeModel)
+                .ThenInclude(nt => nt.AttributeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode)
-                .ThenInclude(tn => tn.NodeType)
-                .SingleOrDefaultAsync(n => !n.IsArchived 
-                    && n.Id == id);
+                .ThenInclude(tn => tn.NodeType);
+        }
+        public async Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id)
+        {
+            var query = GetGetNodeEntityWithIncludesQuery();
+            return await query.SingleOrDefaultAsync(n => !n.IsArchived && n.Id == id);
+        }
+        public NodeEntity GetNodeEntityWithIncludesById(Guid id)
+        {
+            var query = GetGetNodeEntityWithIncludesQuery();
+            return query.SingleOrDefault(n => !n.IsArchived && n.Id == id);
         }
 
         public Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids)
@@ -264,6 +272,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public List<AttributeEntity> GetAllAttributes()
         {
             return Context.Attributes.AsNoTracking().ToList();
+        }
+
+        public string GetAttributeValueByDotName(Guid id, string dotName)
+        {
+            var parts = dotName.Split('.');
+            var nodeEntity = GetNodeEntityWithIncludesById(id);
+            foreach (var part in parts)
+            {
+                if (nodeEntity == null) return null;
+                var relation = nodeEntity.OutgoingRelations
+                    .SingleOrDefault(r => r.Node.NodeType.Name == part);
+                if (relation == null) return null;
+
+                nodeEntity =  GetNodeEntityWithIncludesById(relation.TargetNodeId);
+            }
+            return nodeEntity?.Attribute?.Value;
         }
     }
 }

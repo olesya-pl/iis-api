@@ -37,5 +37,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         Task<List<Guid>> GetSourceNodeIdByTargetNodeId(Guid? propertyId, Guid entityId);
         Task<List<RelationEntity>> GetIncomingRelationsAsync(Guid entityId);
         Task<List<RelationEntity>> GetIncomingRelationsAsync(IReadOnlyCollection<Guid> entityIds);
+        string GetAttributeValueByDotName(Guid id, string dotName);
     }
 }

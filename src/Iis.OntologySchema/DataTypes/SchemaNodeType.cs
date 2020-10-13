@@ -426,5 +426,10 @@ namespace Iis.OntologySchema.DataTypes
                 _outgoingRelations.Remove(relation);
             }
         }
+
+        public IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes()
+        {
+            return OutgoingRelations.Where(r => r.NodeType.MetaObject.Formula != null).ToList();
+        }
     }
 }

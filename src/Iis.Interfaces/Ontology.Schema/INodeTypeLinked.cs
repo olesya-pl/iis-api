@@ -53,6 +53,7 @@ namespace Iis.Interfaces.Ontology.Schema
         INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts);
         IRelationTypeLinked GetRelationTypeByName(string name);
         IOntologySchema Schema { get; }
+        IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes();
     }
 
     public class NodeAggregationInfo
