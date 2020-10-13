@@ -2,6 +2,7 @@
 using Iis.DataModel.Reports;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
+using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
@@ -139,11 +140,11 @@ namespace Iis.Services
         public async Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default)
         {
             var mappingConfiguration =  new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
-                new ElasticMappingProperty(nameof(ReportEntity.Id), ElasticMappingPropertyType.Keyword),
-                new ElasticMappingProperty(nameof(ReportEntity.Recipient), ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty(nameof(ReportEntity.Title), ElasticMappingPropertyType.Text),
-                new ElasticMappingProperty(nameof(ReportEntity.CreatedAt), ElasticMappingPropertyType.Date, formats:ElasticConfiguration.DefaultDateFormats),
-                new ElasticMappingProperty("ReportEventIds", ElasticMappingPropertyType.Keyword, true)
+                KeywordProperty.Create(nameof(ReportEntity.Id), false),
+                TextProperty.Create(nameof(ReportEntity.Recipient), null),
+                TextProperty.Create(nameof(ReportEntity.Title), null),
+                DateProperty.Create(nameof(ReportEntity.CreatedAt), ElasticConfiguration.DefaultDateFormats),
+                KeywordProperty.Create("ReportEventIds", true)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { _elasticState.ReportIndex }, mappingConfiguration.ToJObject(), ct);

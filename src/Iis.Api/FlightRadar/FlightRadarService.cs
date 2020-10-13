@@ -105,12 +105,7 @@ namespace IIS.Core.FlightRadar
 
         private IEnumerable<INode> GetIcaoSigns(string icao)
         {
-            return _ontologyNodesData.GetEntitiesByTypeName(SignName).Where(p => NodeHasPropertyWithValue(p, "value", icao));
-        }
-
-        private bool NodeHasPropertyWithValue(INode node, string propertyName, string value)
-        {
-            return node.OutgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value);
+            return _ontologyNodesData.GetEntitiesByTypeName(SignName).Where(p => p.HasPropertyWithValue("value", icao));
         }
 
         public Task UpdateLastProcessedIdAsync(FlightRadarHistorySyncJobConfig minId, int newMinId)

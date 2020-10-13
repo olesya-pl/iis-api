@@ -6,5 +6,6 @@
         bool IsExcluded { get; }
         int Fuzziness { get; }
         decimal Boost { get; }
+        bool IsAggregated { get; }
     }
 }

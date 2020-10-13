@@ -1,7 +1,5 @@
-﻿using Iis.DataModel.Cache;
-using Iis.DbLayer.Repositories;
+﻿using Iis.DbLayer.Repositories;
 using Iis.Domain.Elastic;
-using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using System;
@@ -12,13 +10,11 @@ namespace Iis.DbLayer.Elastic
 {
     public class IisElasticConfiguration : IElasticConfiguration
     {
-        IOntologySchema _ontologySchema;
-        IOntologyCache _ontologyCache;
-        List<IElasticFieldEntity> _elasticFields = new List<IElasticFieldEntity>();
-        public IisElasticConfiguration(IOntologySchema ontologySchema, IOntologyCache ontologyCache)
+        private readonly IOntologySchema _ontologySchema;
+        private readonly List<IElasticFieldEntity> _elasticFields = new List<IElasticFieldEntity>();
+        public IisElasticConfiguration(IOntologySchema ontologySchema)
         {
             _ontologySchema = ontologySchema;
-            _ontologyCache = ontologyCache;
         }
 
         public void ReloadFields(IEnumerable<IElasticFieldEntity> elasticFields, string typeName = null)
@@ -29,21 +25,56 @@ namespace Iis.DbLayer.Elastic
 
         public IReadOnlyList<IIisElasticField> GetOntologyIncludedFields(IEnumerable<string> typeNames)
         {
-            var fieldNames = new List<string>();
+            var fields = new Dictionary<string, NodeAggregationInfo>();
             foreach (var typeName in typeNames)
             {
-                fieldNames.AddRange(GetFieldNamesByNodeType(typeName));
+                MergeOntologyFields(fields, GetFieldsByNodeType(typeName));
             }
-            if (fieldNames.Count == 0) return new List<IIisElasticField>();
+            if (fields.Count == 0) return new List<IIisElasticField>();
 
-            fieldNames = fieldNames.Distinct().ToList();
+            return MergeConfiguredElasticFields(fields, GetConfiguredElasticFields(typeNames));            
+        }
 
-            var result = GetConfiguredElasticFields(typeNames);
-            result.AddRange(fieldNames
-                .Where(name => !result.Any(ef => ef.Name == name))
-                .Select(name => new IisElasticField { Name = name })
-                );
-            return result.Where(p => !p.IsExcluded).ToList();
+        private IReadOnlyList<IIisElasticField> MergeConfiguredElasticFields(
+            Dictionary<string, NodeAggregationInfo> ontologyFields, 
+            List<IisElasticField> configuredElasticFields)
+        {
+            var mappedFieldsDictionary
+                = ontologyFields.Select(p => new IisElasticField
+                {
+                    Name = p.Value.Name,
+                    IsAggregated = p.Value.IsAggregated
+                }).ToDictionary(p => p.Name);
+
+            foreach (var field in configuredElasticFields)
+            {
+                if (mappedFieldsDictionary.ContainsKey(field.Name))
+                {
+                    field.IsAggregated = mappedFieldsDictionary[field.Name].IsAggregated;
+                    mappedFieldsDictionary[field.Name] = field;
+                }
+                else
+                {
+                    mappedFieldsDictionary.Add(field.Name, field);
+                }
+            }
+            return mappedFieldsDictionary.Values.Where(p => !p.IsExcluded).ToList();
+        }
+
+        private void MergeOntologyFields(
+            Dictionary<string, NodeAggregationInfo> destination, IReadOnlyCollection<NodeAggregationInfo> source)
+        {
+            foreach (var field in source)
+            {
+                if (destination.ContainsKey(field.Name))
+                {
+                    destination[field.Name].IsAggregated = destination[field.Name].IsAggregated || field.IsAggregated;
+                }
+                else
+                {
+                    destination.Add(field.Name, field);
+                }
+            }
         }
 
         private List<IisElasticField> GetConfiguredElasticFields(IEnumerable<string> typeNames)
@@ -94,23 +125,15 @@ namespace Iis.DbLayer.Elastic
             };
         }
 
-        private List<string> GetFieldNamesByNodeType(string typeName)
+        private List<NodeAggregationInfo> GetFieldsByNodeType(string typeName)
         {
-            var cachedItems = _ontologyCache.GetFieldNamesByNodeType(typeName);
-            if (cachedItems != null && cachedItems.Any())
-            {
-                return cachedItems.ToList();
-            }
-
             var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
             if (nodeType != null)
             {
-                var dbItems = nodeType.GetAttributeDotNamesRecursiveWithLimit();
-                _ontologyCache.PutFieldNamesByNodeType(typeName, dbItems);
-                return dbItems;
+                return nodeType.GetAttributeDotNamesRecursiveWithLimit();
             }
 
-            return new List<string>();
+            return new List<NodeAggregationInfo>();
         }
 
         public IReadOnlyList<IIisElasticField> GetMaterialsIncludedFields(IEnumerable<string> typeNames)

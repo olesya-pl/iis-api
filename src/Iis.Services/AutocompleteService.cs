@@ -17,6 +17,7 @@ namespace Iis.Services
         private readonly IElasticService _elasticService;
         private const int DefaultSize = 10;
         private static readonly List<string> KeyWords = new List<string>();
+        private static readonly string[] SearchableFileds = new string[] { "title", "commonInfo.RealNameShort" };
 
         public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService)
         {
@@ -28,7 +29,7 @@ namespace Iis.Services
         {
             var result = new List<string>(count);
             result.AddRange(GetKeyWords().Where(x => x.StartsWith(query, StringComparison.InvariantCultureIgnoreCase)));
-            
+
             if (result.Count < count)
             {
                 result.AddRange(GetKeyWords().Where(x => x.Contains(query, StringComparison.InvariantCultureIgnoreCase)));
@@ -40,19 +41,30 @@ namespace Iis.Services
                 .ToList();
         }
 
-        public async Task<List<AutocompleteEntityDto>> GetEntitiesAsync(string query, int? size, CancellationToken ct = default) 
+        public async Task<List<AutocompleteEntityDto>> GetEntitiesAsync(string query, int? size, CancellationToken ct = default)
         {
-            var response = await _elasticService.SearchByFieldAsync(query, "title", size.GetValueOrDefault(DefaultSize), ct);
+            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFileds, size.GetValueOrDefault(DefaultSize), ct);
 
-            return response.Select(x => new AutocompleteEntityDto 
+            return response.Select(x => new AutocompleteEntityDto
             {
                 Id = x.Identifier,
-                Title = x.SearchResult["title"].Value<string>(),
+                Title = GetFirstNotNullField(x.SearchResult),
                 TypeName = x.SearchResult["NodeTypeName"].Value<string>(),
                 TypeTitle = x.SearchResult["NodeTypeTitle"].Value<string>()
             }).ToList();
         }
 
+        private string GetFirstNotNullField(JObject jObject) 
+        {
+            foreach (var item in SearchableFileds)
+            {
+                var result = jObject.SelectToken(item)?.Value<string>();
+                if (!string.IsNullOrEmpty(result))
+                    return result;
+            }
+
+            return null;
+        }
 
         private List<string> GetKeyWords()
         {
@@ -74,9 +86,9 @@ namespace Iis.Services
 
         private bool IsEligibleNodeType(INodeTypeLinked nodeType)
         {
-            if(nodeType.Kind == Kind.Attribute && !_ontologySchema.IsFuzzyDateEntityAttribute(nodeType)) return true;
+            if (nodeType.Kind == Kind.Attribute && !_ontologySchema.IsFuzzyDateEntityAttribute(nodeType)) return true;
 
-            if(_ontologySchema.IsFuzzyDateEntity(nodeType)) return true;
+            if (_ontologySchema.IsFuzzyDateEntity(nodeType)) return true;
 
             return false;
         }

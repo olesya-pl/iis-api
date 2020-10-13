@@ -337,19 +337,44 @@ namespace Iis.OntologySchema.DataTypes
             }
             return result;
         }
-        public List<string> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)
+        public List<NodeAggregationInfo> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)
         {
             const int MaxRecursionLevel = 4;
-            var result = new List<string>();
+            var result = new List<NodeAggregationInfo>();
 
             if (Kind == Kind.Attribute)
             {
-                result.Add(Name);
+                result.Add(new NodeAggregationInfo 
+                { 
+                    Name = Name, 
+                    IsAggregated = IncomingRelations.FirstOrDefault()?.NodeType?.MetaObject?.IsAggregated  == true 
+                } );
             }
             var isTopLevel = recursionLevel == 0;
             if (isTopLevel)
             {
-                result.AddRange(new[] { "NodeTypeName", "NodeTypeTitle", "CreatedAt", "UpdatedAt" });
+                result.AddRange(new[] {
+                    new NodeAggregationInfo
+                    {
+                        Name = "NodeTypeName",
+                        IsAggregated = false
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "NodeTypeTitle",
+                        IsAggregated = true
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "CreatedAt",
+                        IsAggregated = false
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "UpdatedAt",
+                        IsAggregated = false
+                    } 
+                });
             }
 
             if (recursionLevel == MaxRecursionLevel)
@@ -364,7 +389,11 @@ namespace Iis.OntologySchema.DataTypes
                 result.AddRange(relation.TargetType.GetAttributeDotNamesRecursiveWithLimit(relationName, recursionLevel + 1));
             }
 
-            return result.Select(name => (parentName == null ? name : $"{parentName}.{name}")).ToList();
+            return result.Select(p => new NodeAggregationInfo 
+            {
+                Name = (parentName == null ? p.Name : $"{parentName}.{p.Name}"),
+                IsAggregated = p.IsAggregated
+            } ).ToList();
         }
 
         internal SchemaRelationType GetRelationByName(string relationName)

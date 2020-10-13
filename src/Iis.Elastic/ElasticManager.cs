@@ -41,15 +41,23 @@ namespace Iis.Elastic
             _responseLogUtils = responseLogUtils;
         }
 
-        public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
+        public Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
         {
-            if(string.IsNullOrWhiteSpace(indexName) || string.IsNullOrWhiteSpace(documentId) || string.IsNullOrWhiteSpace(jsonDocument)) return false;
+            return PutDocumentAsync(indexName, documentId, jsonDocument, false, cancellationToken);
+        }
 
-            var indexUrl = $"{GetRealIndexName(indexName)}/_doc/{documentId}";
+        public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, bool waitForIndexing, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(indexName) || string.IsNullOrWhiteSpace(documentId) || string.IsNullOrWhiteSpace(jsonDocument)) 
+                return false;
 
             PostData postData = jsonDocument;
 
-            var response = await _lowLevelClient.DoRequestAsync<StringResponse>(HttpMethod.PUT, indexUrl, cancellationToken, postData);
+            var response = await _lowLevelClient.IndexAsync<StringResponse>(GetRealIndexName(indexName), documentId, postData, new IndexRequestParameters 
+            {
+                Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
+            });
+
             return response.Success;
         }
 
@@ -411,11 +419,11 @@ namespace Iis.Elastic
                 };
             }
 
-            if (IsExactQuery(searchParams.Query))
+            if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
             {
                 PopulateExactQuery(searchParams, json);
             }
-            else if (searchParams.SearchFields?.Any() == true)
+            else if (searchParams.SearchFields.Any())
             {
                 PopulateFieldsIntoQuery(searchParams, json);
             }
