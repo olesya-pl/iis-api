@@ -47,7 +47,7 @@ namespace Iis.OntologyData.DataTypes
                 else if (relation.IsLinkToSeparateObject)
                 {
                     list.Add(new DotNameValue(
-                        relation.TypeName, 
+                        relation.TypeName,
                         relation.TargetNodeId.ToString(),
                         new List<INode> { relation.Node }));
                 }
@@ -57,8 +57,8 @@ namespace Iis.OntologyData.DataTypes
                     foreach (var item in values.Items)
                     {
                         list.Add(new DotNameValue(
-                            $"{NodeType.Name}.{item.DotName}", 
-                            item.Value, 
+                            $"{NodeType.Name}.{item.DotName}",
+                            item.Value,
                             new List<INode> { relation.Node, relation.TargetNode }
                                 .Concat(item.Nodes)));
                     }
@@ -66,6 +66,12 @@ namespace Iis.OntologyData.DataTypes
             }
             return new DotNameValues(list);
         }
+
+        public bool HasPropertyWithValue(string propertyName, string value)
+        {
+            return OutgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value);
+        }
+        
         public INode GetSingleDirectProperty(string name)
         {
             return OutgoingRelations

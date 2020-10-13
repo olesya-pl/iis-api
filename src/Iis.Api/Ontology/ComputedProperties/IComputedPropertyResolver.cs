@@ -6,6 +6,7 @@ using Flee.PublicTypes;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
+using Iis.Utility;
 
 namespace IIS.Core.Ontology.ComputedProperties
 {

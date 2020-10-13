@@ -48,12 +48,23 @@ namespace Iis.Services
             return response.Select(x => new AutocompleteEntityDto
             {
                 Id = x.Identifier,
-                Title = x.SearchResult["title"].Value<string>(),
+                Title = GetFirstNotNullField(x.SearchResult),
                 TypeName = x.SearchResult["NodeTypeName"].Value<string>(),
                 TypeTitle = x.SearchResult["NodeTypeTitle"].Value<string>()
             }).ToList();
         }
 
+        private string GetFirstNotNullField(JObject jObject) 
+        {
+            foreach (var item in SearchableFileds)
+            {
+                var result = jObject.SelectToken(item)?.Value<string>();
+                if (!string.IsNullOrEmpty(result))
+                    return result;
+            }
+
+            return null;
+        }
 
         private List<string> GetKeyWords()
         {

@@ -231,14 +231,20 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private object FormatRange(string value)
         {
-            var splitted = value.Split('-', StringSplitOptions.RemoveEmptyEntries);
+            var splitted = value.Split('-', ' ', StringSplitOptions.RemoveEmptyEntries);
             if (splitted.Count() == 1 || splitted.Count() == 2)
             {
-                return new
+                var firstString = splitted.First();
+                var lastString = splitted.Last();
+
+                if (decimal.TryParse(firstString, out var first) && decimal.TryParse(lastString, out var last))
                 {
-                    gte = splitted.First(),
-                    lte = splitted.Last()
-                };
+                    return new
+                    {
+                        gte = first,
+                        lte = last
+                    };
+                }             
             }
             return null;
         }
