@@ -1,63 +1,61 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Flee.PublicTypes;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 
 namespace IIS.Core.Ontology.ComputedProperties
 {
     public interface IComputedPropertyResolver
     {
-        object Resolve(IEmbeddingRelationTypeModel relationType, Node node);
-        List<string> GetRequiredFields(IEmbeddingRelationTypeModel relationType);
+        object Resolve(Guid nodeId, string formula);
     }
 
     public class ComputedPropertyResolver : IComputedPropertyResolver
     {
+        IOntologyService _ontologyService;
+        public ComputedPropertyResolver(IOntologyService ontologyService)
+        {
+            _ontologyService = ontologyService;
+        }
         // Contour legacy formulas
-        private string CleanFormula(string formula)
-        {
-            formula = formula.Replace("entity.", ""); // remove prefix from existing formulas, remove later
-            formula = formula.Replace("h.", ""); // remove prefix from existing formulas, remove later
-            return formula;
-        }
 
-        private string GetFormula(IEmbeddingRelationTypeModel relationType)
+        private string ReplaceVariables(Guid nodeId, string formula)
         {
-            var formula = (relationType.Meta as AttributeRelationMeta)?.Formula;
-            if (formula == null)
-                throw new ArgumentException($"No formula found in computed property {relationType.Name}");
-            return CleanFormula(formula);
-        }
-
-        public object Resolve(IEmbeddingRelationTypeModel relationType, Node node)
-        {
-            var formula = GetFormula(relationType);
-            var context = new ExpressionContext();
-            context.Imports.AddType(typeof(ComputedPropertyFunctions));
-            context.Variables.ResolveVariableType += (sender, args)
-                => { args.VariableType = node.Type.GetProperty(args.VariableName).TargetType.ClrType; };
-            context.Variables.ResolveVariableValue += (sender, args)
-                => { args.VariableValue = node.GetAttributeValue(args.VariableName); };
-            var eDynamic = context.CompileDynamic(formula);
-            var result = eDynamic.Evaluate();
+            var regex = new Regex("[^{]*{([^}]+)}");
+            var matches = regex.Matches(formula);
+            var result = formula;
+            foreach (Match match in matches)
+            {
+                var dotName = match.Groups[1].ToString();
+                var value = _ontologyService.GetAttributeValueByDotName(nodeId, dotName);
+                result = result.Replace("{" + dotName + "}", "\"" + value + "\"");
+            }
             return result;
         }
-
-        public List<string> GetRequiredFields(IEmbeddingRelationTypeModel relationType)
+        public object Resolve(Guid nodeId, string formula)
         {
-            var formula = GetFormula(relationType);
-            var list = new List<string>();
+            var singleFormulas = formula.Split(';').Select(s => s.Trim());
+            string value = null;
+            foreach (var singleFormula in singleFormulas)
+            {
+                value = ResolveSingleFormula(nodeId, singleFormula)?.ToString();
+                if (!string.IsNullOrWhiteSpace(value)) return value;
+            }
+            return value;
+        }
+        private object ResolveSingleFormula(Guid nodeId, string formula)
+        {
+            var replaced = ReplaceVariables(nodeId, formula);
+
             var context = new ExpressionContext();
             context.Imports.AddType(typeof(ComputedPropertyFunctions));
-            context.Variables.ResolveVariableType += (sender, args) =>
-            {
-                list.Add(args.VariableName);
-                args.VariableType = typeof(object);
-            };
-            var eDynamic = context.CompileDynamic(formula);
-            return list;
+            var eDynamic = context.CompileDynamic(replaced);
+            var result = eDynamic.Evaluate();
+            return result;
         }
     }
 }

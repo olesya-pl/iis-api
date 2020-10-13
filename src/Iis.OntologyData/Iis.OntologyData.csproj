@@ -6,10 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Flee" Version="1.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
 
 </Project>

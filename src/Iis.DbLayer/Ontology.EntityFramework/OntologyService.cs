@@ -479,5 +479,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return res;
         }
+        public string GetAttributeValueByDotName(Guid id, string dotName)
+        {
+            return RunWithoutCommit(unitOfWork =>
+                       unitOfWork.OntologyRepository.GetAttributeValueByDotName(id, dotName));
+        }
     }
 }

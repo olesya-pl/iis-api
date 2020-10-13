@@ -103,11 +103,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
             extNode.EntityTypeName = nodeEntity.NodeType.Name;
             extNode.AttributeValue = GetAttributeValue(nodeEntity);
-            extNode.ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType;
+            extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
             extNode.Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds, cancellationToken);
             return extNode;
         }
-
         private async Task<ExtNode> MapExtNodeWithoutNestedObjectsAsync(
             NodeEntity nodeEntity,
             string nodeTypeName,
@@ -117,7 +116,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
             extNode.EntityTypeName = nodeEntity.NodeType.Name;
             extNode.AttributeValue = GetAttributeValue(nodeEntity);
-            extNode.ScalarType = nodeEntity.NodeType?.IAttributeTypeModel?.ScalarType;
+            extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
             extNode.Children = await GetExtNodesByRelationsWithoutNestedObjects(nodeEntity.OutgoingRelations, cancellationToken);
             return extNode;
         }
@@ -136,9 +135,33 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             extNode.EntityTypeName = nodeEntity.NodeType.Name;
             extNode.AttributeValue = GetAttributeValue(nodeEntity);
             extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
-            extNode.Children = GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds);
+
+            var children = MapComputedProperties(nodeEntity, nodeEntity.NodeType.GetComputedRelationTypes());
+            children.AddRange(GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds));
+            extNode.Children = children;
             return extNode;
         }
+        private List<ExtNode> MapComputedProperties(INode node, IEnumerable<IRelationTypeLinked> computedRelationTypes)
+        {
+            var list = new List<ExtNode>();
+            foreach (var relationType in computedRelationTypes)
+            {
+                var formula = relationType.NodeType.MetaObject.Formula;
+                var computedValue = node.ResolveFormula(formula);
+                list.Add(new ExtNode
+                {
+                    NodeTypeId = relationType.Id.ToString("N"),
+                    NodeType = relationType.NodeType,
+                    NodeTypeName = relationType.NodeType.Name,
+                    NodeTypeTitle = relationType.NodeType.Title,
+                    EntityTypeName = relationType.SourceType.Name,
+                    AttributeValue = computedValue,
+                    ScalarType = ScalarType.String
+                });
+            }
+            return list;
+        }
+
 
         private ExtNode MapExtNodeBase(
             INodeBase nodeEntity,
@@ -161,7 +184,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             if (nodeEntity.Attribute == null) return null;
 
-            var scalarType = nodeEntity.NodeType.IAttributeTypeModel.ScalarType;
+            var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
             return FormatValue(scalarType, value);
         }
@@ -293,7 +316,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return _context.Nodes
                 .Include(n => n.Attribute)
                 .Include(n => n.NodeType)
-                .ThenInclude(nt => nt.IAttributeTypeModel)
+                .ThenInclude(nt => nt.AttributeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.Node)
                 .ThenInclude(rn => rn.NodeType)
