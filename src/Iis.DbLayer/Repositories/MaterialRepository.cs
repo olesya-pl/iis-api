@@ -237,7 +237,18 @@ namespace Iis.DbLayer.Repositories
                 .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material).ToList();
         }
-
+        public Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds)
+        {
+            return Context.Materials
+                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                    (Material, MaterialInfo) => new { Material, MaterialInfo })
+                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .AsNoTracking()
+                .Select(m => m.MaterialInfoJoined.Material)
+                .ToListAsync();
+        }
         public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds)
         {
             return Context.Materials

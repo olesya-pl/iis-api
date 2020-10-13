@@ -258,6 +258,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(p => entityIds.Contains(p.TargetNodeId))
                 .ToListAsync();
         }
+        public Task<List<RelationEntity>> GetIncomingRelationsAsync(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList)
+        {
+            return Context.Relations
+                    .Include(p => p.Node)
+                    .ThenInclude(p => p.NodeType)
+                    .Where(p => entityIdList.Contains(p.TargetNodeId) && relationTypeNameList.Contains(p.Node.NodeType.Name))
+                    .AsNoTracking()
+                    .ToListAsync();
+        }
 
         public List<NodeEntity> GetAllNodes()
         {
