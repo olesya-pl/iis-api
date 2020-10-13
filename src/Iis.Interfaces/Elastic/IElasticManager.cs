@@ -22,5 +22,7 @@ namespace Iis.Interfaces.Elastic
         Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default);
         Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchByImageVector(decimal[] imageVector, IIisElasticSearchParams searchParams, CancellationToken token);
+        Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default);
     }
 }

@@ -187,6 +187,17 @@ namespace Iis.DbLayer.Repositories
             };
         }
 
+        public Task<int> CountMaterialsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        {
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = MaterialIndexes.ToList(),
+                Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL"
+            };
+
+            return _elasticManager.CountAsync(searchParams, cancellationToken);
+        }
+
         public void AddMaterialEntity(MaterialEntity materialEntity)
         {
             Context.Materials.Add(materialEntity);

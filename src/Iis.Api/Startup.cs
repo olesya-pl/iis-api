@@ -70,6 +70,7 @@ using IIS.Core.FlightRadar;
 using Iis.FlightRadar.DataModel;
 using MediatR;
 using Iis.EventHandlers;
+using Iis.Api.BackgroundServices;
 
 namespace IIS.Core
 {
@@ -308,6 +309,7 @@ namespace IIS.Core
                     Configuration["activeDirectory:password"]));
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
+            services.AddHostedService<ThemeCounterBackgroundService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));

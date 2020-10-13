@@ -21,6 +21,12 @@ namespace Iis.Interfaces.Elastic
         bool TypesAreSupported(IEnumerable<string> typeNames);
         Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken);
         Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, string[] fieldNames, int size, CancellationToken ct = default);
+        Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        Task<int> CountMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
+        Task<int> CountEntitiesByConfiguredFieldsAsync(
+                IEnumerable<string> typeNames,
+                IElasticNodeFilter filter,
+                CancellationToken cancellationToken = default);
     }
 
     public class SearchResult

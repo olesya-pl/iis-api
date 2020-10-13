@@ -1071,6 +1071,11 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("character varying(1024)")
                         .HasMaxLength(1024);
 
+                    b.Property<int>("QueryResults")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("character varying(1024)")

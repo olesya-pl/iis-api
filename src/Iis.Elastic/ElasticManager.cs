@@ -127,6 +127,17 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(response);
         }
 
+        public async Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetCountJson(searchParams);
+            var path = searchParams.BaseIndexNames.Count == 0 ?
+                "_count" :
+                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_count";
+
+            var response = await GetAsync(path, jsonString, cancellationToken);
+            return JObject.Parse(response.Body)["count"].Value<int>();
+        }
+
         public async Task<IElasticSearchResult> Search(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetSearchJson(searchParams);
@@ -136,6 +147,17 @@ namespace Iis.Elastic
 
             var response = await GetAsync(path, jsonString, cancellationToken);
             return _resultExtractor.GetFromResponse(response);
+        }
+
+        public async Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetCountJson(searchParams);
+            var path = searchParams.BaseIndexNames.Count == 0 ?
+                "_count" :
+                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_count";
+
+            var response = await GetAsync(path, jsonString, cancellationToken);
+            return JObject.Parse(response.Body)["count"].Value<int>();
         }
 
         public async Task<IElasticSearchResult> SearchMoreLikeThisAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
@@ -402,6 +424,37 @@ namespace Iis.Elastic
             return json.ToString();
         }
 
+        private string GetCountJson(IMultiElasticSearchParams searchParams)
+        {
+            var json = new JObject();
+            json["query"] = new JObject();
+            json["query"]["bool"] = new JObject();
+
+            var shouldSections = new JArray();
+            foreach (var searchItem in searchParams.SearchParams)
+            {
+                if (IsExactQuery(searchItem.Query))
+                {
+                    var shouldSection = CreateExactShouldSection(searchItem.Query, searchParams.IsLenient);
+                    shouldSections.Add(shouldSection);
+                }
+                else if (searchItem.Fields?.Any() == true)
+                {
+                    var shouldSection = CreateMultiFieldShouldSection(searchItem.Query, searchItem.Fields, searchParams.IsLenient);
+                    shouldSections.Merge(shouldSection);
+                }
+                else
+                {
+                    var shouldSection = CreateFallbackShouldSection(searchItem.Query, searchParams.IsLenient);
+                    shouldSections.Add(shouldSection);
+                }
+            }
+
+            json["query"]["bool"]["should"] = shouldSections;
+            return json.ToString();
+        }
+
+
         private string GetSearchJson(IIisElasticSearchParams searchParams)
         {
             var json = new JObject();
@@ -418,6 +471,27 @@ namespace Iis.Elastic
                     CreateSortSection(searchParams.SortColumn, searchParams.SortOrder)
                 };
             }
+
+            if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
+            {
+                PopulateExactQuery(searchParams, json);
+            }
+            else if (searchParams.SearchFields.Any())
+            {
+                PopulateFieldsIntoQuery(searchParams, json);
+            }
+            else
+            {
+                PrepareFallbackQuery(searchParams, json);
+            }
+
+            return json.ToString();
+        }
+
+        private string GetCountJson(IIisElasticSearchParams searchParams)
+        {
+            var json = new JObject();
+            json["query"] = new JObject();
 
             if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
             {
