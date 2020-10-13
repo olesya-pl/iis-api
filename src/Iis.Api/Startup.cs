@@ -364,7 +364,6 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
-            PopulateEntityFieldsCache(app);
             app.UpdateMilitaryAmmountCodes();
 
             if (!Configuration.GetValue<bool>("disableCORS", false))
@@ -391,33 +390,6 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private void PopulateEntityFieldsCache(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices
-                .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                var serviceProvider = serviceScope.ServiceProvider;
-                var ontology = serviceProvider.GetRequiredService<IOntologyModel>();
-                var types = ontology.EntityTypes.Where(p => p.Name == EntityTypeNames.ObjectOfStudy.ToString());
-                if (!types.Any())
-                {
-                    return;
-                }
-                var derivedTypes = types.SelectMany(e => ontology.GetChildTypes(e))
-                    .Concat(types).Distinct().ToArray();
-
-                var ontologySchema = serviceProvider.GetRequiredService<IOntologySchema>();
-                var cache = serviceProvider.GetRequiredService<IOntologyCache>();
-
-                foreach (var type in derivedTypes)
-                {
-                    var nodeType = ontologySchema.GetEntityTypeByName(type.Name);
-                    cache.PutFieldNamesByNodeType(type.Name, nodeType.GetAttributeDotNamesRecursiveWithLimit());
-                }
-            }
         }
 
         private void UpdateDatabase(IApplicationBuilder app)

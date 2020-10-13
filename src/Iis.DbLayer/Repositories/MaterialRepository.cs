@@ -170,14 +170,12 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
         {
-            var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(MaterialIndexes);
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = MaterialIndexes.ToList(),
                 Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL",
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchFields = materialFields
             };
             var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
             return new SearchResult
@@ -223,7 +221,7 @@ namespace Iis.DbLayer.Repositories
             }
             return Context.Nodes
                 .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                .Where(e => (!typeIdList.Any() || typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId)
+                .Where(e => (!typeIdList.Any() || typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId && !e.Relation.Node.IsArchived)
                 .AsNoTracking()
                 .Select(e => e.Node.Id)
                 .ToList();
@@ -337,7 +335,12 @@ namespace Iis.DbLayer.Repositories
             return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
         }
 
-        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(int limit = 0, int offset = 0, Expression<Func<MaterialEntity, bool>> predicate = null, string sortColumnName = null, string sortOrder = null)
+        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(
+            int limit = 0, 
+            int offset = 0, 
+            Expression<Func<MaterialEntity, bool>> predicate = null, 
+            string sortColumnName = null, 
+            string sortOrder = null)
         {
             var materialQuery = predicate is null
                                 ? GetMaterialsQuery(_includeAll)

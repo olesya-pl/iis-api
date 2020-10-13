@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 using Iis.DataModel.Materials;
+using Iis.DbLayer.MaterialDictionaries;
 
 namespace Iis.DbLayer.Extensions
 {
@@ -44,21 +45,21 @@ namespace Iis.DbLayer.Extensions
             var orderedQueryable = (sortColumnName, sortOrder)
             switch
             {
-                ("type", "asc") => materialsQuery.OrderBy(p => p.Type),
-                ("type", "desc") => materialsQuery.OrderByDescending(p => p.Type),
-                ("source", "asc") => materialsQuery.OrderBy(p => p.Source),
-                ("source", "desc") => materialsQuery.OrderByDescending(p => p.Source),
-                ("title", "asc") => materialsQuery.OrderBy(p => p.Title),
-                ("title", "desc") => materialsQuery.OrderByDescending(p => p.Title),
-                ("importance", "asc") => materialsQuery.OrderBy(p => p.ImportanceSignId),
-                ("importance", "desc") => materialsQuery.OrderByDescending(p => p.ImportanceSignId),
-
-                ("nodes", "asc") => materialsQuery
-                    .OrderBy(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
-                ("nodes", "desc") => materialsQuery
-                    .OrderByDescending(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
-
-                ("createdDate", "asc") => materialsQuery.OrderBy(p => p.CreatedDate),
+                (MaterialSortingFields.Type, SortDirections.ASC) => materialsQuery.OrderBy(p => p.Type),
+                (MaterialSortingFields.Type, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.Type),
+                (MaterialSortingFields.Source, SortDirections.ASC) => materialsQuery.OrderBy(p => p.Source),
+                (MaterialSortingFields.Source, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.Source),
+                (MaterialSortingFields.Title, SortDirections.ASC) => materialsQuery.OrderBy(p => p.Title),
+                (MaterialSortingFields.Title, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.Title),
+                (MaterialSortingFields.Importance, SortDirections.ASC) => materialsQuery.OrderBy(p => p.ImportanceSignId),
+                (MaterialSortingFields.Importance, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.ImportanceSignId),
+                (MaterialSortingFields.ProcessedStatus, SortDirections.ASC) => materialsQuery.OrderBy(p => p.ProcessedStatusSignId),
+                (MaterialSortingFields.ProcessedStatus, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.ProcessedStatusSignId),
+                (MaterialSortingFields.Nodes, SortDirections.ASC) => materialsQuery.OrderBy(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
+                (MaterialSortingFields.Nodes, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
+                (MaterialSortingFields.CreatedDate, SortDirections.ASC) => materialsQuery.OrderBy(p => p.CreatedDate),
+                (MaterialSortingFields.SessionPriority, SortDirections.ASC) => materialsQuery.OrderBy(p => p.SessionPriorityId),
+                (MaterialSortingFields.SessionPriority, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.SessionPriorityId),
                 _ => materialsQuery.OrderByDescending(p => p.CreatedDate),
             };
             return orderedQueryable.ThenBy(p => p.Id);

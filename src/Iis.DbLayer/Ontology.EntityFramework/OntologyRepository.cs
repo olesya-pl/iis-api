@@ -31,7 +31,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return await Context.Nodes.FirstOrDefaultAsync(_ => _.Id == id);
         }
 
-        public Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id)
+        private IQueryable<NodeEntity> GetGetNodeEntityWithIncludesQuery()
         {
             return Context.Nodes
                 .Include(n => n.Attribute)
@@ -42,15 +42,23 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode)
-                .ThenInclude(tn => tn.NodeType)
-                .SingleOrDefaultAsync(n => !n.IsArchived 
-                    && n.Id == id);
+                .ThenInclude(tn => tn.NodeType);
+        }
+        public async Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id)
+        {
+            var query = GetGetNodeEntityWithIncludesQuery();
+            return await query.SingleOrDefaultAsync(n => !n.IsArchived && n.Id == id);
+        }
+        public NodeEntity GetNodeEntityWithIncludesById(Guid id)
+        {
+            var query = GetGetNodeEntityWithIncludesQuery();
+            return query.SingleOrDefault(n => !n.IsArchived && n.Id == id);
         }
 
         public Task<List<NodeEntity>> GetNodeEntitiesByIdsAsync(IEnumerable<Guid> ids)
         {
             return Context.Nodes
-                .Where(node => !node.IsArchived && ids.Contains(node.Id)).ToListAsync();
+                .Where(node => !node.IsArchived && !node.NodeType.IsArchived && ids.Contains(node.Id)).ToListAsync();
         }
 
         public Task<List<RelationEntity>> GetSourceRelationByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -89,9 +97,18 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relationsQ = Context.Relations
                 .Include(e => e.Node)
-                .ThenInclude(e => e.NodeType)
-                .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
-                .Where(e => nodeIds.Contains(e.SourceNodeId) && !e.Node.IsArchived);
+                    .ThenInclude(e => e.NodeType)
+                .Include(e => e.TargetNode)
+                    .ThenInclude(e => e.Attribute)
+                .Include(e => e.SourceNode)
+                .Where(e => nodeIds.Contains(e.SourceNodeId) 
+                    && !e.Node.IsArchived
+                    && !e.Node.NodeType.IsArchived
+                    && !e.TargetNode.IsArchived
+                    && !e.SourceNode.IsArchived
+                    && !e.TargetNode.NodeType.IsArchived
+                    && !e.SourceNode.NodeType.IsArchived
+                    );
             if (relationIds != null)
                 relationsQ = relationsQ.Where(e => relationIds.Contains(e.Node.NodeTypeId));
             return relationsQ.ToListAsync();
@@ -103,7 +120,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(e => e.NodeType)
                 .Include(e => e.TargetNode).ThenInclude(e => e.Attribute)
                 .Include(e => e.SourceNode).ThenInclude(e => e.Attribute)
-                .Where(e => nodeIds.Contains(e.TargetNodeId) && !e.Node.IsArchived);
+                .Where(e => nodeIds.Contains(e.TargetNodeId) 
+                    && !e.Node.IsArchived 
+                    && !e.Node.NodeType.IsArchived
+                    && !e.TargetNode.IsArchived
+                    && !e.SourceNode.IsArchived
+                    && !e.SourceNode.NodeType.IsArchived
+                    && !e.TargetNode.NodeType.IsArchived);
             if (relationIds != null)
                 relationsQ = relationsQ.Where(e => relationIds.Contains(e.Node.NodeTypeId));
             return relationsQ.ToListAsync();
@@ -149,7 +172,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
         {
             return Context.Relations
-                .Where(e => featureIdList.Contains(e.TargetNodeId))
+                .Where(e => featureIdList.Contains(e.TargetNodeId) && !e.Node.IsArchived)
                 .Select(e => e.SourceNodeId)
                 .ToListAsync();
         }
@@ -249,6 +272,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public List<AttributeEntity> GetAllAttributes()
         {
             return Context.Attributes.AsNoTracking().ToList();
+        }
+
+        public string GetAttributeValueByDotName(Guid id, string dotName)
+        {
+            var parts = dotName.Split('.');
+            var nodeEntity = GetNodeEntityWithIncludesById(id);
+            foreach (var part in parts)
+            {
+                if (nodeEntity == null) return null;
+                var relation = nodeEntity.OutgoingRelations
+                    .SingleOrDefault(r => r.Node.NodeType.Name == part);
+                if (relation == null) return null;
+
+                nodeEntity =  GetNodeEntityWithIncludesById(relation.TargetNodeId);
+            }
+            return nodeEntity?.Attribute?.Value;
         }
     }
 }

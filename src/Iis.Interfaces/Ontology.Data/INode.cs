@@ -1,7 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.Interfaces.Ontology.Data
 {
@@ -19,11 +17,13 @@ namespace Iis.Interfaces.Ontology.Data
         IDotNameValues GetDotNameValues();
         INode GetChildNode(string childTypeName);
         IReadOnlyList<INode> GetChildNodes(string childTypeName);
-        
-        INode GetSingleDirectProperty(string name);
+        bool HasPropertyWithValue(string propertyName, string value);
         INode GetSingleProperty(IDotName dotName);
         INode GetSingleProperty(string dotName);
+        INode GetSingleDirectProperty(string name);
         bool AllValuesAreEmpty(IEnumerable<string> dotNames);
         bool HasTheSameValues(INode another, IEnumerable<string> dotNames);
+        IDotNameValues GetComputedValues();
+        string ResolveFormula(string formula);
     }
 }

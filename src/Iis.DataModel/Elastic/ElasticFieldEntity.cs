@@ -1,11 +1,8 @@
 ﻿using Iis.Interfaces.Elastic;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DataModel.Elastic
 {
-    public class ElasticFieldEntity : BaseEntity, IElasticFieldEntity, IIisElasticField
+    public class ElasticFieldEntity : BaseEntity, IElasticFieldEntity
     {
         public string TypeName { get; set; }
         public ElasticObjectType ObjectType { get; set; }

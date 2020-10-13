@@ -107,7 +107,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             extNode.Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds, cancellationToken);
             return extNode;
         }
-
         private async Task<ExtNode> MapExtNodeWithoutNestedObjectsAsync(
             NodeEntity nodeEntity,
             string nodeTypeName,
@@ -136,9 +135,33 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             extNode.EntityTypeName = nodeEntity.NodeType.Name;
             extNode.AttributeValue = GetAttributeValue(nodeEntity);
             extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
-            extNode.Children = GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds);
+
+            var children = MapComputedProperties(nodeEntity, nodeEntity.NodeType.GetComputedRelationTypes());
+            children.AddRange(GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds));
+            extNode.Children = children;
             return extNode;
         }
+        private List<ExtNode> MapComputedProperties(INode node, IEnumerable<IRelationTypeLinked> computedRelationTypes)
+        {
+            var list = new List<ExtNode>();
+            foreach (var relationType in computedRelationTypes)
+            {
+                var formula = relationType.NodeType.MetaObject.Formula;
+                var computedValue = node.ResolveFormula(formula);
+                list.Add(new ExtNode
+                {
+                    NodeTypeId = relationType.Id.ToString("N"),
+                    NodeType = relationType.NodeType,
+                    NodeTypeName = relationType.NodeType.Name,
+                    NodeTypeTitle = relationType.NodeType.Title,
+                    EntityTypeName = relationType.SourceType.Name,
+                    AttributeValue = computedValue,
+                    ScalarType = ScalarType.String
+                });
+            }
+            return list;
+        }
+
 
         private ExtNode MapExtNodeBase(
             INodeBase nodeEntity,
@@ -208,14 +231,20 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private object FormatRange(string value)
         {
-            var splitted = value.Split('-', StringSplitOptions.RemoveEmptyEntries);
+            var splitted = value.Split('-', ' ', StringSplitOptions.RemoveEmptyEntries);
             if (splitted.Count() == 1 || splitted.Count() == 2)
             {
-                return new
+                var firstString = splitted.First();
+                var lastString = splitted.Last();
+
+                if (decimal.TryParse(firstString, out var first) && decimal.TryParse(lastString, out var last))
                 {
-                    gte = splitted.First(),
-                    lte = splitted.Last()
-                };
+                    return new
+                    {
+                        gte = first,
+                        lte = last
+                    };
+                }             
             }
             return null;
         }

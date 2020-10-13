@@ -1,9 +1,12 @@
-﻿using Iis.Interfaces.Ontology.Data;
+﻿using Flee.PublicTypes;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Iis.OntologyData.DataTypes
 {
@@ -37,14 +40,14 @@ namespace Iis.OntologyData.DataTypes
                 if (relation.TargetKind == Kind.Attribute)
                 {
                     list.Add(new DotNameValue(
-                        relation.TypeName, 
+                        relation.TypeName,
                         relation.TargetNode.Value,
                         new List<INode> { relation.Node, relation.TargetNode }));
                 }
                 else if (relation.IsLinkToSeparateObject)
                 {
                     list.Add(new DotNameValue(
-                        relation.TypeName, 
+                        relation.TypeName,
                         relation.TargetNodeId.ToString(),
                         new List<INode> { relation.Node }));
                 }
@@ -54,8 +57,8 @@ namespace Iis.OntologyData.DataTypes
                     foreach (var item in values.Items)
                     {
                         list.Add(new DotNameValue(
-                            $"{NodeType.Name}.{item.DotName}", 
-                            item.Value, 
+                            $"{NodeType.Name}.{item.DotName}",
+                            item.Value,
                             new List<INode> { relation.Node, relation.TargetNode }
                                 .Concat(item.Nodes)));
                     }
@@ -63,6 +66,12 @@ namespace Iis.OntologyData.DataTypes
             }
             return new DotNameValues(list);
         }
+
+        public bool HasPropertyWithValue(string propertyName, string value)
+        {
+            return OutgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value);
+        }
+        
         public INode GetChildNode(string childTypeName)
         {
             return _outgoingRelations
@@ -109,17 +118,58 @@ namespace Iis.OntologyData.DataTypes
             }
             return true;
         }
-
         public bool AllValuesAreEmpty(IEnumerable<string> dotNames)
         {
             foreach (var dotName in dotNames)
             {
-                if (!string.IsNullOrEmpty(GetSingleProperty(dotName)?.Value)) 
+                if (!string.IsNullOrEmpty(GetSingleProperty(dotName)?.Value))
                 {
                     return false;
                 }
             }
             return true;
+        }
+        //public string GetDirectComputedValue(string name)
+        //{
+        //    var relation = OutgoingRelations.SingleOrDefault(r => r.Node.NodeType.Name == name);
+        //    if (relation == null) return null;
+        //    return null;
+        //}
+        public string ResolveFormula(string formula)
+        {
+            var replaced = ReplaceVariables(formula);
+
+            var context = new ExpressionContext();
+            context.Imports.AddType(typeof(ComputedPropertyFunctions));
+            var eDynamic = context.CompileDynamic(replaced);
+            var result = eDynamic.Evaluate();
+            return result.ToString();
+        }
+        private string ReplaceVariables(string formula)
+        {
+            var regex = new Regex("[^{]*{([^}]+)}");
+            var matches = regex.Matches(formula);
+            var result = formula;
+            foreach (Match match in matches)
+            {
+                var dotName = match.Groups[1].ToString();
+                var value = GetSingleProperty(dotName)?.Value;
+                result = result.Replace("{" + dotName + "}", "\"" + value + "\"");
+            }
+            return result;
+        }
+        public IDotNameValues GetComputedValues()
+        {
+            var list = new List<DotNameValue>();
+            foreach (var computedRelationType in NodeType.GetComputedRelationTypes())
+            {
+                list.Add(new DotNameValue
+                {
+                    DotName = computedRelationType.NodeType.Name,
+                    Value = ResolveFormula(computedRelationType.NodeType.MetaObject.Formula)
+                });
+            }
+            return new DotNameValues(list);
         }
     }
 }

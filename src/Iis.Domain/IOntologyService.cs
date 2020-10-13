@@ -26,5 +26,6 @@ namespace Iis.Domain
         Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
         Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
+        string GetAttributeValueByDotName(Guid id, string dotName);
     }
 }

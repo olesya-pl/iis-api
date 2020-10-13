@@ -74,6 +74,7 @@ namespace IIS.Core.Materials
 
         public void SendMaterialEvent(MaterialEventMessage eventMessage)
         {
+            _logger.LogInformation($"sending material with id {eventMessage.Id} for ML processing");
             var routingKey = $"processing.ml.{eventMessage.Type}";
 
             SendMaterialEventMessage(eventMessage, routingKey);
