@@ -1,10 +1,16 @@
-﻿using Iis.DataModel;
+﻿using FluentAssertions;
+using Iis.DataModel;
+using Iis.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using Iis.Services;
 using Moq;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Iis.UnitTests.Services
@@ -59,9 +65,25 @@ namespace Iis.UnitTests.Services
             Assert.Equal(3, tips.Count);
         }
 
+        [Fact]
+        public async Task GetEntities_GivenTwoEntities_ShouldReturnTwoValidAutocompleteEntity() 
+        {
+            //Arrange
+            var service = GetService();
+
+            //Act
+            var entities = await service.GetEntitiesAsync("some text", 5);
+
+            //Assert
+            entities.Should().HaveCount(2);
+            entities.Should().ContainSingle(x => x.Title == "1 армійський корпус");
+            entities.Should().ContainSingle(x => x.Title == "1 АК");
+            entities.Should().OnlyContain(x => x.TypeName == "MilitaryOrganization");
+            entities.Should().OnlyContain(x => x.TypeTitle == "Військовий підрозділ");
+        }
+
         private AutocompleteService GetService()
         {
-
             return new AutocompleteService(_ontologySchemaMock.Object, _elasticServiceMock.Object);
         }
 
@@ -90,6 +112,36 @@ namespace Iis.UnitTests.Services
                 { "person.userInfo.lastname", new SchemaNodeType() { Kind = Kind.Attribute} },
                 { "person.userInfo", new SchemaNodeType() { Kind = Kind.Relation} },
             });
+
+            _elasticServiceMock
+                .Setup(x => x.SearchByFieldsAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<ElasticSearchResultItem>()
+                {
+                    new ElasticSearchResultItem
+                    {
+                        Identifier = Guid.NewGuid().ToString("N"),
+                        SearchResult = JObject.Parse(@"{
+                            ""NodeTypeName"" : ""MilitaryOrganization"",
+                            ""NodeTypeTitle"" : ""Військовий підрозділ"",
+                            ""title"" : """",
+                            ""commonInfo"" : {
+                                ""RealNameShort"" : ""1 АК""
+                                }
+                         }")
+                    },
+                    new ElasticSearchResultItem
+                    {
+                        Identifier = Guid.NewGuid().ToString("N"),
+                         SearchResult = JObject.Parse(@"{
+                            ""NodeTypeName"" : ""MilitaryOrganization"",
+                            ""NodeTypeTitle"" : ""Військовий підрозділ"",
+                            ""title"" : ""1 армійський корпус"",
+                            ""commonInfo"" : {
+                                ""RealNameShort"" : ""1 АК""
+                                }
+                         }")
+                    }
+                }); ;
         }
     }
 }
