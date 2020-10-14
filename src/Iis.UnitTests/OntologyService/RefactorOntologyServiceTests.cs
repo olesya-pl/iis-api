@@ -34,13 +34,12 @@ namespace Iis.UnitTests.OntologyService
         public async Task Test()
         {
             Initialize("Server=localhost;Database=contour_dev_net;Username=postgres;Password=123");
-            await GetIncomingEntitiesTest();
-            
+            //await GetIncomingEntitiesTest();
+            await GetNodesAsyncTest();
         }
         private async Task GetIncomingEntitiesTest()
         {
             var entityTypes = _schema.GetAllNodeTypes().Where(nt => nt.Kind == Kind.Entity);
-            await _newService.GetIncomingEntities(new Guid("{99df8deb-68d6-4545-b5bd-66d9fc5df425}"));
             foreach (var entityType in entityTypes)
             {
                 var nodes = _data.GetNodesByTypeId(entityType.Id);
@@ -53,7 +52,15 @@ namespace Iis.UnitTests.OntologyService
                         newIncomingRelations.OrderBy(r => r.RelationId).ToList());
                 }
             }
+        }
+        private async Task GetNodesAsyncTest()
+        {
+            var nodeIds = _data.Nodes.OrderBy(n => n.Id).Select(n => n.Id).Take(50);
+            var oldResult = await _oldService.GetNodesAsync(nodeIds);
+            var newResult = await _newService.GetNodesAsync(nodeIds);
             
+            Assert.Equal(oldResult.count, newResult.count);
+            AssertNodeLists(oldResult.nodes, newResult.nodes);
         }
         private void Initialize(string connectionString)
         {
@@ -98,6 +105,48 @@ namespace Iis.UnitTests.OntologyService
             for (int i = 0; i < list1.Count; i++)
             {
                 AssertIncomingRelations(list1[i], list2[i]);
+            }
+        }
+        private void AssertNodes(Node oldNode, Node newNode)
+        {
+            if (oldNode == null && newNode == null) return;
+
+            Assert.Equal(oldNode.GetType(), newNode.GetType());
+            Assert.Equal(oldNode.Id, newNode.Id);
+            Assert.Equal(oldNode.Type?.Id, newNode.Type?.Id);
+            Assert.Equal(oldNode.CreatedAt, newNode.CreatedAt);
+            Assert.Equal(oldNode.UpdatedAt, newNode.UpdatedAt);
+            AssertNodeLists(oldNode.Nodes, newNode.Nodes);
+
+            if (oldNode is Domain.Attribute)
+            {
+                AssertAttributes(oldNode as Domain.Attribute, newNode as Domain.Attribute);
+            }
+
+            if (oldNode is Relation)
+            {
+                AssertRelations(oldNode as Relation, newNode as Relation);
+            }
+        }
+        private void AssertAttributes(Domain.Attribute oldAttribute, Domain.Attribute newAttribute)
+        {
+            Assert.Equal(oldAttribute.Value, newAttribute.Value);
+        }
+        private void AssertRelations(Relation oldRelation, Relation newRelation)
+        {
+            AssertNodes(oldRelation.Target, newRelation.Target);
+            AssertNodes(oldRelation.AttributeTarget, newRelation.AttributeTarget);
+            AssertNodes(oldRelation.EntityTarget, newRelation.EntityTarget);
+        }
+        private void AssertNodeLists(IEnumerable<Node> oldNodes, IEnumerable<Node> newNodes)
+        {
+            var oldOrdered = oldNodes.OrderBy(n => n.Id).ToList();
+            var newOrdered = newNodes.OrderBy(n => n.Id).ToList();
+
+            Assert.Equal(oldOrdered.Count, newOrdered.Count);
+            for (int i = 0; i < oldOrdered.Count; i++)
+            {
+                AssertNodes(oldOrdered[i], newOrdered[i]);
             }
         }
     }

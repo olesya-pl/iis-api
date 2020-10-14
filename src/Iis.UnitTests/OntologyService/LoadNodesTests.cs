@@ -39,7 +39,7 @@ namespace Iis.UnitTests.OntologyService
                 new Mock<IElasticState>().Object);
 
             //act
-            var res = await sut.LoadNodesAsync(nodeId, null, CancellationToken.None);
+            var res = await sut.LoadNodesAsync(nodeId, CancellationToken.None);
 
             //assert
             Assert.Null(res);

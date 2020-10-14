@@ -116,7 +116,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             res.Children = p.Children.Select(c => _mapper.Map<Material>(c)).ToList();
 
-            var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x, null)));
+            var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x)));
 
             res.Events = nodes.Where(x => IsEvent(x)).Select(x => _nodeToJObjectMapper.EventToJObject(x));
             res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => _nodeToJObjectMapper.NodeToJObject(x));
@@ -407,7 +407,7 @@ namespace IIS.Core.Materials.EntityFramework
         private async Task<MaterialFeature> MapAsync(MaterialFeatureEntity feature)
         {
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
-            result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
+            result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId);
             return result;
         }
 

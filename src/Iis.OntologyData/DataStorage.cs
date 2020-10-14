@@ -20,11 +20,13 @@ namespace Iis.OntologyData
 
         IMapper _mapper;
         IOntologySchema _schema;
+        OntologyNodesData _data;
 
-        public DataStorage(INodesRawData rawData, IMapper mapper, IOntologySchema schema)
+        public DataStorage(INodesRawData rawData, IMapper mapper, IOntologySchema schema, OntologyNodesData data)
         {
             _mapper = mapper;
             _schema = schema;
+            _data = data;
             Initialize(rawData);
         }
         public void Initialize(INodesRawData rawData)
@@ -153,6 +155,7 @@ namespace Iis.OntologyData
         private void CompleteNode(NodeData node)
         {
             node.NodeType = _schema.GetNodeTypeById(node.NodeTypeId);
+            node.AllData = _data;
         }
         private void CompleteAttribute(AttributeData attribute)
         {

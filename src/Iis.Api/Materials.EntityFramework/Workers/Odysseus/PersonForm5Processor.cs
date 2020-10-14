@@ -61,7 +61,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
             var entityIdText = ExtractTextOfDataType(data, ENTITY_TYPE);
             if (!Guid.TryParse(entityIdText, out var personId))
                 throw new ArgumentException($"Can not parse {ENTITY_TYPE} id: {entityIdText}");
-            var entity = await _ontologyService.LoadNodesAsync(personId, null)
+            var entity = await _ontologyService.LoadNodesAsync(personId)
                          ?? throw new ArgumentException($"{ENTITY_TYPE} with id {personId} was not found");
             var type = _ontology.GetEntityType(ENTITY_TYPE);
             if (!entity.Type.IsSubtypeOf(type))
@@ -235,7 +235,7 @@ namespace IIS.Core.Materials.EntityFramework.Workers.Odysseus
                 passport = new Entity(Guid.NewGuid(), passportType);
                 person.SetProperty("passport", passport);
             } else {
-                var node = await _ontologyService.LoadNodesAsync(passport.Id, null);
+                var node = await _ontologyService.LoadNodesAsync(passport.Id);
                 passport = (Entity)node;
             }
             passport.SetProperty("issueInfo", item.IssueInfo);

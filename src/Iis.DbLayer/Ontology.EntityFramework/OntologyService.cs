@@ -248,7 +248,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
+        public async Task<Node> LoadNodesAsync(Guid nodeId, CancellationToken cancellationToken = default)
         {
             var ctxSource = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetActiveNodeEntityById(nodeId));
 
@@ -319,8 +319,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return nodes.Select(n => MapNode(n)).ToList();
         }
-
-
         private void FillRelations(List<NodeEntity> nodes, List<RelationEntity> relations)
         {
             var nodesDict = nodes.ToDictionary(n => n.Id);

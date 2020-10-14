@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public static async Task<Node> LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeModel targetType)
         {
-            var existingNode = await service.LoadNodesAsync(targetId, null); // no fields needed, only type
+            var existingNode = await service.LoadNodesAsync(targetId); // no fields needed, only type
             if (existingNode == null)
                 throw new ArgumentException($"Node with id {targetId} not found");
             if (!targetType.IsAssignableFrom(existingNode.Type))

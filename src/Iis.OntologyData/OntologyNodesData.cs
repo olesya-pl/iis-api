@@ -21,11 +21,13 @@ namespace Iis.OntologyData
 
         public IOntologyPatch Patch => _storage.Patch;
 
+        internal ReadWriteLocker Locker { get; set; }  = new ReadWriteLocker();
+
         public OntologyNodesData(INodesRawData rawData, IOntologySchema schema)
         {
             _mapper = GetMapper();
             Schema = schema;
-            _storage = new DataStorage(rawData, _mapper, Schema);
+            _storage = new DataStorage(rawData, _mapper, Schema, this);
         }
         private IMapper GetMapper()
         {
@@ -40,10 +42,11 @@ namespace Iis.OntologyData
         }
         public IReadOnlyList<INode> GetEntitiesByTypeName(string typeName)
         {
-            return _storage.Nodes.Values
+            return Locker.ReadLock(() => 
+                _storage.Nodes.Values
                 .Where(n => n.NodeType.Kind == Kind.Entity
                     && n.NodeType.Name == typeName)
-                .ToList();
+                .ToList());
         }
         internal NodeData CreateNode(Guid nodeTypeId, Guid? id = null) =>
             _storage.CreateNode(nodeTypeId, id);
@@ -56,54 +59,57 @@ namespace Iis.OntologyData
 
         internal NodeData GetNodeData(Guid id)
         {
-            return _storage.Nodes[id];
+            return Locker.ReadLock(() => _storage.Nodes[id]);
         }
         internal IReadOnlyList<NodeData> GetNodesData(IEnumerable<Guid> ids)
         {
-            return ids.Select(id => _storage.Nodes[id]).ToList();
+            return Locker.ReadLock(() => ids.Select(id => _storage.Nodes[id]).ToList());
         }
         internal void AddValueByDotName(NodeData entity, string value, string[] dotNameParts)
         {
-            var node = entity;
-            for (int i = 0; i < dotNameParts.Length; i++)
+            Locker.WriteLock(() =>
             {
-                var isLastItem = i == dotNameParts.Length - 1;
-
-                var relationType = node.NodeType.GetRelationTypeByName(dotNameParts[i]);
-                if (relationType == null)
+                var node = entity;
+                for (int i = 0; i < dotNameParts.Length; i++)
                 {
-                    throw new Exception($"Cannot find embedded type {dotNameParts[i]} for entity type {node.NodeType.Name}");
-                }
+                    var isLastItem = i == dotNameParts.Length - 1;
 
-                if (!isLastItem)
-                {
-                    var existingRelation = entity._outgoingRelations
-                        .SingleOrDefault(r => r.Node.NodeTypeId == relationType.Id);
-                    if (existingRelation != null)
+                    var relationType = node.NodeType.GetRelationTypeByName(dotNameParts[i]);
+                    if (relationType == null)
                     {
-                        node = existingRelation._targetNode;
-                        continue;
+                        throw new Exception($"Cannot find embedded type {dotNameParts[i]} for entity type {node.NodeType.Name}");
                     }
+
+                    if (!isLastItem)
+                    {
+                        var existingRelation = entity._outgoingRelations
+                            .SingleOrDefault(r => r.Node.NodeTypeId == relationType.Id);
+                        if (existingRelation != null)
+                        {
+                            node = existingRelation._targetNode;
+                            continue;
+                        }
+                    }
+
+                    if (isLastItem && relationType.TargetType.IsSeparateObject)
+                    {
+                        var linkNode = _storage.CreateNode(relationType.Id);
+                        _storage.CreateRelation(linkNode.Id, node.Id, Guid.Parse(value));
+                        break;
+                    }
+
+                    var relationNode = _storage.CreateNode(relationType.Id);
+                    var targetNode = _storage.CreateNode(relationType.TargetTypeId);
+                    _storage.CreateRelation(relationNode.Id, node.Id, targetNode.Id);
+
+                    if (isLastItem)
+                    {
+                        _storage.CreateAttribute(targetNode.Id, value);
+                    }
+
+                    node = targetNode;
                 }
-
-                if (isLastItem && relationType.TargetType.IsSeparateObject)
-                {
-                    var linkNode = _storage.CreateNode(relationType.Id);
-                    _storage.CreateRelation(linkNode.Id, node.Id, Guid.Parse(value));
-                    break;
-                }
-
-                var relationNode = _storage.CreateNode(relationType.Id);
-                var targetNode = _storage.CreateNode(relationType.TargetTypeId);
-                _storage.CreateRelation(relationNode.Id, node.Id, targetNode.Id);
-
-                if (isLastItem)
-                {
-                    _storage.CreateAttribute(targetNode.Id, value);
-                }
-
-                node = targetNode;
-            }
+            });
         }
         public void ClearPatch()
         {
@@ -111,33 +117,36 @@ namespace Iis.OntologyData
         }
         public void SetNodeIsArchived(Guid nodeId)
         {
-            _storage.SetNodeIsArchived(nodeId);
+            Locker.WriteLock(() => _storage.SetNodeIsArchived(nodeId));
         }
         public void DeleteEntity(Guid id, bool deleteOutcomingRelations, bool deleteIncomingRelations) =>
-            _storage.DeleteEntity(id, deleteOutcomingRelations, deleteIncomingRelations);
+            Locker.WriteLock(() => _storage.DeleteEntity(id, deleteOutcomingRelations, deleteIncomingRelations));
         public void SetNodesIsArchived(IEnumerable<Guid> nodeIds)
         {
-            foreach (var nodeId in nodeIds)
+            Locker.WriteLock(() =>
             {
-                _storage.SetNodeIsArchived(nodeId);
-            }
+                foreach (var nodeId in nodeIds)
+                {
+                    _storage.SetNodeIsArchived(nodeId);
+                }
+            });
         }
         public IReadOnlyList<INode> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
-            return Nodes
+            return Locker.ReadLock(() => Nodes
                 .Where(r => r.NodeTypeId == nodeTypeId
                     && r.GetChildNode(valueTypeName)?.Value == value)
-                .ToList();
+                .ToList());
         }
         public INode GetNode(Guid id) => GetNodeData(id);
         public IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids) => GetNodesData(ids);
         public IReadOnlyList<INode> GetNodesByTypeIds(IEnumerable<Guid> nodeTypeIds)
         {
-            return Nodes.Where(n => nodeTypeIds.Contains(n.NodeTypeId)).ToList();
+            return Locker.ReadLock(() => Nodes.Where(n => nodeTypeIds.Contains(n.NodeTypeId)).ToList());
         }
         public IReadOnlyList<INode> GetNodesByTypeId(Guid nodeTypeId)
         {
-            return Nodes.Where(n => n.NodeTypeId == nodeTypeId).ToList();
+            return Locker.ReadLock(() => Nodes.Where(n => n.NodeTypeId == nodeTypeId).ToList());
         }
     }
 }

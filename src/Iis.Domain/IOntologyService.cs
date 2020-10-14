@@ -20,7 +20,7 @@ namespace Iis.Domain
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
         Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default);
         Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default);
-        Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default);
+        Task<Node> LoadNodesAsync(Guid nodeId, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default);
         Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);

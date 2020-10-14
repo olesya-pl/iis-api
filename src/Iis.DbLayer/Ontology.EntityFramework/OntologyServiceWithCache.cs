@@ -175,7 +175,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return result;
         }
 
-        public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
+        public async Task<Node> LoadNodesAsync(Guid nodeId, CancellationToken cancellationToken = default)
         {
             var node = _data.GetNode(nodeId);
 
