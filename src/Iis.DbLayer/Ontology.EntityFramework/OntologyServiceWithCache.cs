@@ -219,7 +219,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 var value = AttributeType.ParseValue(node.Value, nodeType.AttributeType.ScalarType);
                 var attributeType = new AttributeTypeWrapper(nodeType);
-                result = new Attribute(node.Id, attributeType, node.Value, node.CreatedAt, node.UpdatedAt);
+                result = new Attribute(node.Id, attributeType, value, node.CreatedAt, node.UpdatedAt);
             }
             else if (nodeType.Kind == Kind.Entity)
             {
@@ -252,6 +252,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
 
         public Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetAttributeValueByDotName(Guid id, string dotName)
         {
             throw new NotImplementedException();
         }

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -32,11 +33,27 @@ namespace Iis.UnitTests.OntologyService
         [Fact]
         public async Task Test()
         {
-            Initialize("Server=localhost;Database=contour_dev_net;Username=postgres;Password = 123");
-            var oldNodes = await _oldService.GetIncomingEntities(new Guid("05dc8ec8-0969-4dc6-a0c3-5703cdcf616b"));
-            var newNodes = await _newService.GetIncomingEntities(new Guid("05dc8ec8-0969-4dc6-a0c3-5703cdcf616b"));
-            oldNodes.ShouldDeepEqual(newNodes);
-            //Assert.Equal(0, nodes.Count);
+            Initialize("Server=localhost;Database=contour_dev_net;Username=postgres;Password=123");
+            await GetIncomingEntitiesTest();
+            
+        }
+        private async Task GetIncomingEntitiesTest()
+        {
+            var entityTypes = _schema.GetAllNodeTypes().Where(nt => nt.Kind == Kind.Entity);
+            await _newService.GetIncomingEntities(new Guid("{99df8deb-68d6-4545-b5bd-66d9fc5df425}"));
+            foreach (var entityType in entityTypes)
+            {
+                var nodes = _data.GetNodesByTypeId(entityType.Id);
+                foreach (var node in nodes)
+                {
+                    var oldIncomingRelations = await _oldService.GetIncomingEntities(node.Id);
+                    var newIncomingRelations = await _newService.GetIncomingEntities(node.Id);
+                    AssertIncomingRelationLists(
+                        oldIncomingRelations.OrderBy(r => r.RelationId).ToList(), 
+                        newIncomingRelations.OrderBy(r => r.RelationId).ToList());
+                }
+            }
+            
         }
         private void Initialize(string connectionString)
         {
@@ -65,6 +82,23 @@ namespace Iis.UnitTests.OntologyService
             var rawData = new NodesRawData(_context.Nodes, _context.Relations, _context.Attributes);
             _data = new OntologyNodesData(rawData, _schema);
             _newService = new OntologyServiceWithCache(_data, elasticService.Object);
+        }
+        private void AssertIncomingRelations(IncomingRelation ir1, IncomingRelation ir2)
+        {
+            Assert.Equal(ir1.RelationId, ir2.RelationId);
+            Assert.Equal(ir1.RelationTypeName, ir2.RelationTypeName);
+            Assert.Equal(ir1.RelationTypeTitle, ir2.RelationTypeTitle);
+            Assert.Equal(ir1.EntityId, ir2.EntityId);
+            Assert.Equal(ir1.EntityTypeName, ir2.EntityTypeName);
+            Assert.Equal(ir1.Entity?.Id, ir2.Entity?.Id);
+        }
+        private void AssertIncomingRelationLists(IReadOnlyList<IncomingRelation> list1, IReadOnlyList<IncomingRelation> list2)
+        {
+            Assert.Equal(list1.Count, list2.Count);
+            for (int i = 0; i < list1.Count; i++)
+            {
+                AssertIncomingRelations(list1[i], list2[i]);
+            }
         }
     }
 }
