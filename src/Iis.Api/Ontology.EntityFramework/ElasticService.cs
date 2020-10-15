@@ -93,7 +93,7 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
-        public async Task<(int Count, List<JObject> Entities)> SearchEntitiesByConfiguredFieldsAsync(
+        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(
             IEnumerable<string> typeNames, 
             IElasticNodeFilter filter, 
             CancellationToken cancellationToken = default)
@@ -117,7 +117,12 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }
 
-            return (searchResult.Count, searchResult.Items.Select(x => x.SearchResult).ToList());
+            return new SearchEntitiesByConfiguredFieldsResult 
+            {
+                Count = searchResult.Count,
+                Entities = searchResult.Items.Select(x => x.SearchResult).ToList(),
+                Aggregations = searchResult.Aggregations
+            };
         }
 
         public async Task<int> CountEntitiesByConfiguredFieldsAsync(

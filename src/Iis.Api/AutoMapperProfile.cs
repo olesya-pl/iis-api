@@ -335,6 +335,11 @@ namespace Iis.Api
 
             #endregion
 
+            CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
+            CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();
+            CreateMap<Iis.Interfaces.Elastic.SearchEntitiesByConfiguredFieldsResult, IIS.Core.GraphQL.Entities.ObjectOfStudyFilterableQueryResponse>()
+                .ForMember(dest => dest.Aggregations, opts => opts.MapFrom(src => src.Aggregations))
+                .ForMember(dest => dest.Items, opts => opts.MapFrom(src => src.Entities));
         }
     }
 }

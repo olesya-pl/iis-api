@@ -223,7 +223,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var types = _ontology.EntityTypes.Where(p => typeNameList.Contains(p.Name, StringComparer.OrdinalIgnoreCase));
 
@@ -238,12 +238,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
-                return (searchResult.Entities, searchResult.Count);
+                return _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
             }
             else
             {
-                return (new List<JObject>(), 0);
+                return Task.FromResult(new SearchEntitiesByConfiguredFieldsResult());
             }
         }
 

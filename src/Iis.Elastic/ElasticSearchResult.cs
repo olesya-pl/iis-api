@@ -8,6 +8,8 @@ namespace Iis.Elastic
     {
         public int Count { get; set; }
         public IEnumerable<IElasticSearchResultItem> Items { get; set; }
+
+        public Dictionary<string, AggregationItem> Aggregations { get; set; }
     }
 
     public class ElasticSearchResultItem : IElasticSearchResultItem
