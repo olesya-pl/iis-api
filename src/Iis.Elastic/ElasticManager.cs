@@ -430,6 +430,10 @@ namespace Iis.Elastic
 
         private void PrepareAggregations(JObject json, List<IIisElasticField> fields)
         {
+            if (!fields.Any())
+            {
+                return;
+            }
             var aggs = new JObject();
             json["aggs"] = aggs;
             foreach (var field in fields)
