@@ -296,7 +296,7 @@ namespace IIS.Core
 
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);
-            services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
+            services.AddTransient<IIisElasticConfigService, IisElasticConfigService<IIISUnitOfWork>>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();

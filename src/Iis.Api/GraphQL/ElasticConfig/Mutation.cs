@@ -2,6 +2,7 @@
 using HotChocolate;
 using Iis.Interfaces.Elastic;
 using IIS.Core.GraphQL.Common;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,12 +14,29 @@ namespace IIS.Core.GraphQL.ElasticConfig
             [Service] IElasticConfiguration configuration,
             [Service] IIisElasticConfigService service,
             [Service] IMapper mapper,
-            [GraphQLNonNullType] ElasticFieldsInput input)
+            [GraphQLNonNullType] ElasticFieldsInput[] inputs)
+        {
+            List<Task<List<ElasticField>>> resultTasks = new List<Task<List<ElasticField>>>();
+            foreach (var input in inputs)
+            {
+                 resultTasks.Add(SaveElasticFieldsInput(configuration, service, mapper, input));
+                
+            }
+            var taskResults = await Task.WhenAll(resultTasks);
+            var result = taskResults.SelectMany(p => p).ToList();
+            return new GraphQLCollection<ElasticField>(result, result.Count);
+        }
+
+        private static async Task<List<ElasticField>> SaveElasticFieldsInput(
+            IElasticConfiguration configuration, 
+            IIisElasticConfigService service, 
+            IMapper mapper, 
+            ElasticFieldsInput input)
         {
             var fieldEntities = await service.SaveElasticFieldsAsync(input.TypeName, input.Fields);
             configuration.ReloadFields(fieldEntities, input.TypeName);
             var result = fieldEntities.Select(ef => mapper.Map<ElasticField>(ef)).ToList();
-            return new GraphQLCollection<ElasticField>(result, result.Count);
+            return result;
         }
     }
 }
