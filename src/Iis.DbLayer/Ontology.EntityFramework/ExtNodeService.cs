@@ -10,10 +10,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 
 using Microsoft.EntityFrameworkCore;
-
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +83,25 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 nodeEntity.NodeType.Name,
                 nodeEntity.NodeType.Title,
                 new List<Guid> { nodeEntity.Id });
+            return extNode;
+        }
+
+        private async Task<ExtNode> MapExtNodeWithoutChildRelationsAsync(
+            NodeEntity nodeEntity,
+            string nodeTypeName,
+            string nodeTypeTitle,
+            List<Guid> visitedEntityIds,
+            CancellationToken cancellationToken = default)
+        {
+            if (_ontologySchema.GetNodeTypeById(nodeEntity.NodeTypeId).IsObjectOfStudy)
+            {
+                visitedEntityIds.Add(nodeEntity.Id);
+            }
+            var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
+            extNode.EntityTypeName = nodeEntity.NodeType.Name;
+            extNode.AttributeValue = GetAttributeValue(nodeEntity);
+            extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
+            extNode.Children = await GetExtNodesByRelations(nodeEntity.OutgoingRelations, visitedEntityIds, cancellationToken);
             return extNode;
         }
 
@@ -162,6 +178,23 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return list;
         }
 
+
+        private ExtNode MapExtNodeWithoutChildRelations(
+            INode nodeEntity,
+            string nodeTypeName,
+            string nodeTypeTitle,
+            List<Guid> visitedEntityIds)
+        {
+            if (nodeEntity.NodeType.IsObjectOfStudy)
+            {
+                visitedEntityIds.Add(nodeEntity.Id);
+            }
+            var extNode = MapExtNodeBase(nodeEntity, nodeTypeName, nodeTypeTitle);
+            extNode.EntityTypeName = nodeEntity.NodeType.Name;
+            extNode.AttributeValue = GetAttributeValue(nodeEntity);
+            extNode.ScalarType = nodeEntity.NodeType?.AttributeType?.ScalarType;
+            return extNode;
+        }
 
         private ExtNode MapExtNodeBase(
             INodeBase nodeEntity,
@@ -268,6 +301,22 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         visitedEntityIds,
                         cancellationToken);
                     result.Add(extNode);
+
+                    var meta = relation.Node.NodeType.Meta;
+                    if (!string.IsNullOrEmpty(meta))
+                    {
+                        var metaObj = JObject.Parse(meta);
+                        if (metaObj.ContainsKey("IsAggregated") && metaObj.Value<bool>("IsAggregated") == true)
+                        {
+                            var aggregateNode = await MapExtNodeWithoutChildRelationsAsync(
+                                node,
+                                $"{relation.Node.NodeType.Name}Aggregate",
+                                relation.Node.NodeType.Title,
+                                visitedEntityIds);
+                            result.Add(aggregateNode);
+                        }
+                    }
+                    
                 }
             }
             return result;
@@ -312,7 +361,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         relation.Node.NodeType.Title,
                         visitedEntityIds);
                     result.Add(extNode);
-                }
+                    
+                    if (relation.Node.NodeType.MetaObject.IsAggregated == true)
+                    {
+                        var aggregateNode = MapExtNodeWithoutChildRelations(
+                            node,
+                            $"{relation.Node.NodeType.Name}Aggregate",
+                            relation.Node.NodeType.Title,
+                            visitedEntityIds);
+                        result.Add(aggregateNode);
+                    }
+                 }
             }
             return result;
         }

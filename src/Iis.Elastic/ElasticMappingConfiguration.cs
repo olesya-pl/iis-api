@@ -21,7 +21,7 @@ namespace Iis.Elastic
             {
                 var nameParts = item.DotName.Split('.');
                 var mappingType = ToMappingType(item.ScalarType);
-                AddProperty(Properties, nameParts, mappingType);
+                AddProperty(Properties, nameParts, mappingType, item.IsAggregated);
             }
             foreach (var item in attributeInfo.Items)
             {
@@ -57,25 +57,28 @@ namespace Iis.Elastic
             };
         }
 
-        private void AddProperty(List<ElasticMappingProperty> properties, string[] nameParts, ElasticMappingPropertyType propertyType)
+        private void AddProperty(List<ElasticMappingProperty> properties, string[] nameParts, ElasticMappingPropertyType propertyType, bool isAggregated)
         {
             if (nameParts.Length == 0) throw new ArgumentException("nameParts should not be empty");
             var name = nameParts[0];
             var existingProperty = properties.SingleOrDefault(p => p.Name == name);
             if (existingProperty == null)
             {
-                var mappingProperty = ElasticMappingPropertyFactory.Create(nameParts, propertyType);
+                var mappingProperties = ElasticMappingPropertyFactory.Create(nameParts, propertyType, isAggregated);
                 if (nameParts.Count() > 1)
                 {
-                    AddProperty(mappingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
+                    foreach (var mappingProperty in mappingProperties) 
+                    {
+                        AddProperty(mappingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType, isAggregated);
+                    }
                 }
-                properties.Add(mappingProperty);
+                properties.AddRange(mappingProperties);
             }
             else
             {
                 if (nameParts.Length > 1)
                 {
-                    AddProperty(existingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType);
+                    AddProperty(existingProperty.Properties, nameParts.Skip(1).ToArray(), propertyType, isAggregated);
                 }
             }
         }

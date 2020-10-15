@@ -59,7 +59,6 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var expected = new JObject(
                 new JProperty("type", dateType.ToString().ToLower())
             );
-
             actual.Should().BeEquivalentTo(expected);
         }
 
@@ -73,7 +72,6 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 new JProperty("type", ElasticMappingPropertyType.Text.ToString().ToLower()),
                 new JProperty("term_vector", "with_positions_offsets")
             );
-
             actual.Should().BeEquivalentTo(expected);
         }
 

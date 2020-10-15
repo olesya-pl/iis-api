@@ -1,4 +1,6 @@
 ﻿using Elasticsearch.Net;
+
+using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
@@ -18,6 +20,7 @@ namespace Iis.Elastic
         private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
         private const string RemoveSymbolsPattern = "№";
         public const string NullValue = "NULL";
+        public const string AggregateSuffix = "Aggregate";
         private readonly ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;
         private readonly SearchResultExtractor _resultExtractor;
@@ -281,6 +284,7 @@ namespace Iis.Elastic
         public async Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default)
         {
             var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
+            mappingConfiguration.Properties.Add(KeywordProperty.Create($"NodeTypeTitle{AggregateSuffix}", false));
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
@@ -343,7 +347,7 @@ namespace Iis.Elastic
                     script = new {
                         source = "1 / (l2norm(params.queryVector, doc['ImageVector']) + 1)",
                         @params = new {
-                            queryVector =  imageVector
+                            queryVector = imageVector
                         }
                     }
                 }
@@ -352,7 +356,6 @@ namespace Iis.Elastic
             ctx: token);
             return _resultExtractor.GetFromResponse(searchResponse);
         }
-
         
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
@@ -399,6 +402,7 @@ namespace Iis.Elastic
             json["query"]["bool"] = new JObject();
 
             PrepareHighlights(json);
+            PrepareAggregations(json, searchParams.SearchParams.SelectMany(p => p.Fields).Where(p => p.IsAggregated).ToList());
 
             var shouldSections = new JArray();
             foreach (var searchItem in searchParams.SearchParams)
@@ -422,6 +426,20 @@ namespace Iis.Elastic
 
             json["query"]["bool"]["should"] = shouldSections;
             return json.ToString();
+        }
+
+        private void PrepareAggregations(JObject json, List<IIisElasticField> fields)
+        {
+            var aggs = new JObject();
+            json["aggs"] = aggs;
+            foreach (var field in fields)
+            {
+                var fieldObj = new JObject();
+                fieldObj["field"] = $"{field.Name}{AggregateSuffix}";
+                var terms = new JObject();
+                terms["terms"] = fieldObj;
+                aggs[field.Name] = terms;
+            }
         }
 
         private string GetCountJson(IMultiElasticSearchParams searchParams)
