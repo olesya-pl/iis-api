@@ -20,6 +20,7 @@ namespace Iis.DbLayer.Repositories
         private readonly NodeFlattener _nodeFlattener;
         private readonly IChangeHistoryService _changeHistoryService;
         private const int BulkSize = 50000;
+        private static List<string> PropertiesToIgnore = new List<string>() { "photo", "lastConfirmedAt" };
 
         public NodeRepository(IElasticManager elasticManager,
             NodeFlattener nodeFlattener,
@@ -82,6 +83,7 @@ namespace Iis.DbLayer.Repositories
             await Task.WhenAll(getActualNode, getNodeChanges);
 
             var changes = getNodeChanges.Result
+                .Where(x => !string.IsNullOrWhiteSpace(x.OldValue) && !PropertiesToIgnore.Contains(x.PropertyName))
                 .GroupBy(x => x.RequestId)
                 .Where(x => x.Count() > 0)
                 .OrderByDescending(x => x.First().Date)
@@ -148,7 +150,7 @@ namespace Iis.DbLayer.Repositories
         private List<FlattenNodeResult> GetHistoricalNodes(FlattenNodeResult node, IEnumerable<IChangeHistoryItem> changes)
         {
             var changesByRequestId = changes
-                    .Where(x => x.TargetId.ToString("N") == node.Id)
+                    .Where(x => x.TargetId.ToString("N") == node.Id && !PropertiesToIgnore.Contains(x.PropertyName))
                     .GroupBy(x => x.RequestId)
                     .Where(x => x.Count() > 0)
                     .OrderByDescending(x => x.First().Date)
