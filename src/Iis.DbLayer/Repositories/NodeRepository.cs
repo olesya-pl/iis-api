@@ -20,7 +20,7 @@ namespace Iis.DbLayer.Repositories
         private readonly NodeFlattener _nodeFlattener;
         private readonly IChangeHistoryService _changeHistoryService;
         private const int BulkSize = 50000;
-        private static List<string> PropertiesToIgnore = new List<string>() { "photo", "lastConfirmedAt" };
+        private static List<string> PropertiesToIgnore = new List<string>() { "photo", "lastConfirmedAt", "attachment" };
 
         public NodeRepository(IElasticManager elasticManager,
             NodeFlattener nodeFlattener,
