@@ -35,7 +35,8 @@ namespace Iis.UnitTests.OntologyService
         {
             Initialize("Server=localhost;Database=contour_dev_net;Username=postgres;Password=123");
             //await GetIncomingEntitiesTest();
-            await GetNodesAsyncTest();
+            //await GetNodesAsyncTest();
+            await LoadNodesAsyncTest();
         }
         private async Task GetIncomingEntitiesTest()
         {
@@ -61,6 +62,19 @@ namespace Iis.UnitTests.OntologyService
             
             Assert.Equal(oldResult.count, newResult.count);
             AssertNodeLists(oldResult.nodes, newResult.nodes);
+        }
+        private async Task LoadNodesAsyncTest()
+        {
+            var entityType = _schema.GetEntityTypeByName("MilitaryOrganization");
+            var relationType = entityType.GetRelationTypeByName("child");
+            var embedding = new EmbeddingRelationTypeWrapper(relationType.NodeType);
+            //var oldNodes = await _oldService.LoadNodesAsync(new[] { new Guid("e4bd66d2-178b-4741-99ca-de45295b2990") }, new[] { embedding });
+            AssertNodeLists(
+                await _oldService.LoadNodesAsync(new[] { new Guid("e4bd66d2-178b-4741-99ca-de45295b2990") }, null),
+                await _newService.LoadNodesAsync(new[] { new Guid("e4bd66d2-178b-4741-99ca-de45295b2990") }, null));
+            AssertNodeLists(
+                await _oldService.LoadNodesAsync(new[] { new Guid("e4bd66d2-178b-4741-99ca-de45295b2990") }, new[] { embedding }),
+                await _newService.LoadNodesAsync(new[] { new Guid("e4bd66d2-178b-4741-99ca-de45295b2990") }, new[] { embedding }));
         }
         private void Initialize(string connectionString)
         {

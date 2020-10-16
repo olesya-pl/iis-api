@@ -29,11 +29,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _data = data;
             _elasticService = elasticService;
         }
-        public async Task<(IEnumerable<JObject> nodes, int count)> FilterObjectsOfStudyAsync(ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
         {
             const string propertyName = "associatedWithEvent";
@@ -67,7 +62,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await Task.Yield();
             return result;
         }
-
         public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
@@ -101,7 +95,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await Task.Yield();
             return result;
         }
-
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
@@ -160,7 +153,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await Task.Yield();
             return (nodes.Select(MapNode), nodes.Count);
         }
-
         public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             IReadOnlyList<IAttributeBase> result = _data.Nodes
@@ -174,7 +166,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await Task.Yield();
             return result;
         }
-
         public async Task<Node> LoadNodesAsync(Guid nodeId, CancellationToken cancellationToken = default)
         {
             var node = _data.GetNode(nodeId);
@@ -182,32 +173,71 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await Task.Yield();
             return MapNode(node);
         }
-
-        public Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
+            var nodes = _data.GetNodes(nodeIds);
 
+            if (relationTypes == null) 
+            {
+                return nodes.Select(n => MapNode(n)).ToList();
+            }
+            // by fact we pass only one relation type here
+            var relationType = relationTypes.Single();
+
+
+            //var directIds = relationTypes.Where(r => !r.IsInversed).Select(r => r.Id).ToArray();
+            //var inversedIds = relationTypes.Where(r => r.IsInversed).Select(r => r.DirectRelationType.Id).ToArray();
+            //var relations = new List<RelationEntity>();
+            //if (directIds.Length > 0)
+            //{
+            //    var result = await RunWithoutCommitAsync(async unitOfWork =>
+            //        await unitOfWork.OntologyRepository.GetDirectRelationsQuery(nodeIds, directIds));
+            //    relations.AddRange(result);
+            //}
+
+            //if (inversedIds.Length > 0)
+            //{
+            //    var result = await RunWithoutCommitAsync(async unitOfWork =>
+            //            await unitOfWork.OntologyRepository.GetInversedRelationsQuery(nodeIds, inversedIds));
+            //    var map = relationTypes.Where(r => r.IsInversed).ToDictionary(r => r.DirectRelationType.Id, r => r.Id);
+            //    foreach (var rel in result)
+            //    {
+            //        var r = new RelationEntity
+            //        {
+            //            Id = rel.Id,
+            //            TargetNodeId = rel.SourceNodeId,
+            //            TargetNode = rel.SourceNode,
+            //            SourceNodeId = rel.TargetNodeId,
+            //            SourceNode = rel.TargetNode
+            //        };
+            //        r.Node = new NodeEntity
+            //        {
+            //            Id = rel.Id,
+            //            NodeTypeId = map[rel.Node.NodeTypeId],
+            //            Relation = r
+            //        };
+            //        relations.Add(r);
+            //    }
+            //}
+            //FillRelations(nodes, relations);
+            return null;
+        }
         public Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
-
         public Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
-
         public Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
-
         private Node MapNode(INode node)
         {
             return MapNode(node, new List<Node>());
         }
-
         private Node MapNode(INode node, List<Node> mappedNodes)
         {
             var m = mappedNodes.SingleOrDefault(e => e.Id == node.Id);
@@ -245,17 +275,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-
         public Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds)
         {
             throw new NotImplementedException();
         }
-
         public Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
-
         public string GetAttributeValueByDotName(Guid id, string dotName)
         {
             throw new NotImplementedException();
