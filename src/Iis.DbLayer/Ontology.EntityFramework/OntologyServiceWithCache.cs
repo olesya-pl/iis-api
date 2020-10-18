@@ -5,6 +5,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyModelWrapper;
+using Iis.Utility;
 using IIS.Repository.Factories;
 using Newtonsoft.Json.Linq;
 using System;
@@ -104,12 +105,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
                 var nodes = _data.GetNodes(searchResult.ids);
-                return nodes.Select(MapNode);
+                return nodes.Select(n => MapNode(n));
             }
             else
             {
                 var nodes = GetNodesWithSuggestion(derivedTypes.Select(nt => nt.Id), filter);
-                return nodes.Select(MapNode);
+                return nodes.Select(n => MapNode(n));
             }
         }
         private List<INode> GetNodesWithSuggestion(IEnumerable<Guid> derived, ElasticFilter filter)
@@ -151,7 +152,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var nodes = _data.GetNodes(matchList);
             await Task.Yield();
-            return (nodes.Select(MapNode), nodes.Count);
+            return (nodes.Select(n => MapNode(n)), nodes.Count);
         }
         public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
@@ -176,69 +177,95 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
         {
             var nodes = _data.GetNodes(nodeIds);
+            await Task.Yield();
+            return nodes.Select(n => MapNode(n, relationTypes)).ToList();
+        }
+        public async Task RemoveNodeAsync(Node source, CancellationToken cancellationToken = default)
+        {
+            await Task.Yield();
+            _data.RemoveNode(source.Id);
+        }
+        public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
+        {
+            await SaveNodeAsync(source, null, cancellationToken);
+        }
+        public async Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default)
+        {
+            var node = _data.GetNode(source.Id) ?? _data.CreateNode(source.Type.Id, source.Id);
+            SaveRelations(source, node);
 
-            if (relationTypes == null) 
+            if (requestId.HasValue)
             {
-                return nodes.Select(n => MapNode(n)).ToList();
+                await Task.WhenAll(_elasticService.PutNodeAsync(source.Id), _elasticService.PutHistoricalNodesAsync(source.Id, requestId));
             }
-            // by fact we pass only one relation type here
-            var relationType = relationTypes.Single();
+            else
+                await _elasticService.PutNodeAsync(source.Id);
+        }
+        private void SaveRelations(Node source, INode existing)
+        {
+            foreach (IEmbeddingRelationTypeModel relationType in source.Type.AllProperties)
+            {
+                if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                {
+                    Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type.Id == relationType.Id);
+                    IRelation existingRelation = existing.OutgoingRelations
+                        .SingleOrDefault(e => e.Node.NodeTypeId == relationType.Id && !e.Node.IsArchived);
+                    ApplyChanges(existing, sourceRelation, existingRelation);
+                }
+                else
+                {
+                    IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type.Id == relationType.Id);
+                    IEnumerable<IRelation> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
+                    var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
+                    foreach (var pair in pairs)
+                    {
+                        ApplyChanges(existing, pair.Left, pair.Right);
+                    }
+                }
+            }
+        }
+        void ApplyChanges(INodeBase existing, Relation sourceRelation, IRelation existingRelation)
+        {
+            if (sourceRelation == null && existingRelation == null) return;
 
-
-            //var directIds = relationTypes.Where(r => !r.IsInversed).Select(r => r.Id).ToArray();
-            //var inversedIds = relationTypes.Where(r => r.IsInversed).Select(r => r.DirectRelationType.Id).ToArray();
-            //var relations = new List<RelationEntity>();
-            //if (directIds.Length > 0)
-            //{
-            //    var result = await RunWithoutCommitAsync(async unitOfWork =>
-            //        await unitOfWork.OntologyRepository.GetDirectRelationsQuery(nodeIds, directIds));
-            //    relations.AddRange(result);
-            //}
-
-            //if (inversedIds.Length > 0)
-            //{
-            //    var result = await RunWithoutCommitAsync(async unitOfWork =>
-            //            await unitOfWork.OntologyRepository.GetInversedRelationsQuery(nodeIds, inversedIds));
-            //    var map = relationTypes.Where(r => r.IsInversed).ToDictionary(r => r.DirectRelationType.Id, r => r.Id);
-            //    foreach (var rel in result)
-            //    {
-            //        var r = new RelationEntity
-            //        {
-            //            Id = rel.Id,
-            //            TargetNodeId = rel.SourceNodeId,
-            //            TargetNode = rel.SourceNode,
-            //            SourceNodeId = rel.TargetNodeId,
-            //            SourceNode = rel.TargetNode
-            //        };
-            //        r.Node = new NodeEntity
-            //        {
-            //            Id = rel.Id,
-            //            NodeTypeId = map[rel.Node.NodeTypeId],
-            //            Relation = r
-            //        };
-            //        relations.Add(r);
-            //    }
-            //}
-            //FillRelations(nodes, relations);
-            return null;
+            if (sourceRelation == null && existingRelation != null)
+            {
+                _data.RemoveNode(existingRelation.Id);
+            }
+            else if (sourceRelation != null && existingRelation == null)
+            {
+                CreateRelation(sourceRelation, existing.Id);
+            }
+            else
+            {
+                Guid existingId = existingRelation.TargetNodeId;
+                Guid targetId = sourceRelation.Target.Id;
+                if (existingId != targetId)
+                {
+                    _data.RemoveNode(existingRelation.Id);
+                    CreateRelation(sourceRelation, existing.Id);
+                    _data.UpdateRelationTarget(existingRelation.Id, targetId);
+                }
+            }
         }
-        public Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default)
+        private IRelation CreateRelation(Relation relation, Guid sourceId)
         {
-            throw new NotImplementedException();
+            if (relation.Target is Attribute)
+            {
+                var attribute = relation.Target as Attribute;
+                var value = AttributeType.ValueToString(attribute.Value, ((IAttributeTypeModel)attribute.Type).ScalarTypeEnum);
+                return _data.CreateRelationWithAttribute(sourceId, relation.Type.Id, value);
+            }
+            else
+            {
+                return _data.CreateRelation(sourceId, relation.Target.Id, relation.Type.Id);
+            }
         }
-        public Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default)
+        private Node MapNode(INode node, IEnumerable<IEmbeddingRelationTypeModel> relationTypes = null)
         {
-            throw new NotImplementedException();
+            return MapNode(node, new List<Node>(), relationTypes);
         }
-        public Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-        private Node MapNode(INode node)
-        {
-            return MapNode(node, new List<Node>());
-        }
-        private Node MapNode(INode node, List<Node> mappedNodes)
+        private Node MapNode(INode node, List<Node> mappedNodes, IEnumerable<IEmbeddingRelationTypeModel> relationTypes = null)
         {
             var m = mappedNodes.SingleOrDefault(e => e.Id == node.Id);
             if (m != null) return m;
@@ -266,11 +293,29 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else throw new Exception($"Node mapping does not support ontology type {nodeType.GetType()}.");
 
-            foreach (var relatedNode in node.OutgoingRelations
-                .Where(e => !e.Node.IsArchived && (e.Node.NodeType == null || !e.Node.NodeType.IsArchived)))
+            foreach (var relation in node.GetDirectRelations())
             {
-                var mapped = MapNode(relatedNode.Node, mappedNodes);
-                result.AddNode(mapped);
+                if (relationTypes == null || relationTypes.Any(rt => rt.Id == relation.Node.NodeType.Id))
+                {
+                    var mapped = MapNode(relation.Node, mappedNodes);
+                    result.AddNode(mapped);
+                }
+            }
+
+            if (relationTypes != null)
+            {
+                var inversedTypeIds = relationTypes.Where(rt => rt.IsInversed).Select(rt => rt.Id).ToList();
+                if (inversedTypeIds.Count > 0)
+                {
+                    foreach (var relation in node.GetInversedRelations())
+                    {
+                        if (inversedTypeIds.Contains(relation.Node.NodeType.Id))
+                        {
+                            var mapped = MapNode(relation.Node, mappedNodes);
+                            result.AddNode(mapped);
+                        }
+                    }
+                }
             }
 
             return result;

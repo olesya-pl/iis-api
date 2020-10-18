@@ -27,10 +27,46 @@ namespace Iis.OntologyData.DataTypes
         internal List<RelationData> _outgoingRelations = new List<RelationData>();
         public IReadOnlyList<IRelation> OutgoingRelations => _outgoingRelations;
 
-        public IRelation Relation { get; internal set; }
+        internal IRelation _relation { get; set; }
+        public IRelation Relation => _relation;
         public IAttribute Attribute { get; internal set; }
         public string Value => Attribute?.Value;
 
+        public IReadOnlyList<IRelation> GetDirectRelations() =>
+            AllData.Locker.ReadLock(() => OutgoingRelations.ToList());
+
+        public IReadOnlyList<IRelation> GetInversedRelations()
+        {
+            return AllData.Locker.ReadLock(() =>
+            {
+                var result = new List<IRelation>();
+                foreach (var relation in _incomingRelations.Where(r => r.Node.NodeType.HasInversed))
+                {
+                    //TODO: че-нибудь придумать чтобы инвертированные связи не создавались каждый раз как здрасьте
+                    var relationType = relation.Node.NodeType.RelationType;
+                    var inversedRelation = new RelationData
+                    {
+                        Id = relation.Id,
+                        TargetNodeId = relation.SourceNodeId,
+                        _targetNode = relation._sourceNode,
+                        SourceNodeId = relation.TargetNodeId,
+                        _sourceNode = relation._targetNode
+                    };
+                    inversedRelation._node = new NodeData
+                    {
+                        Id = relation.Id,
+                        NodeTypeId = relationType.InversedRelationType.Id,
+                        NodeType = relationType.InversedRelationType.NodeType,
+                        _relation = inversedRelation,
+                        AllData = AllData,
+                        CreatedAt = relation.Node.CreatedAt,
+                        UpdatedAt = relation.Node.UpdatedAt
+                    };
+                    result.Add(inversedRelation);
+                }
+                return result;
+            });
+        }
         public IDotNameValues GetDotNameValues()
         {
             return AllData.Locker.ReadLock(() =>

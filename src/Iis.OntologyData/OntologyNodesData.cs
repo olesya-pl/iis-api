@@ -48,14 +48,20 @@ namespace Iis.OntologyData
                     && n.NodeType.Name == typeName)
                 .ToList());
         }
-        internal NodeData CreateNode(Guid nodeTypeId, Guid? id = null) =>
-            _storage.CreateNode(nodeTypeId, id);
+        public INode CreateNode(Guid nodeTypeId, Guid? id = null) =>
+            Locker.WriteLock(() => _storage.CreateNode(nodeTypeId, id));
 
-        internal RelationData CreateRelation(Guid id, Guid sourceNodeId, Guid targetNodeId) =>
-            _storage.CreateRelation(id, sourceNodeId, targetNodeId);
+        public IRelation CreateRelation(Guid sourceNodeId, Guid targetNodeId, Guid nodeTypeId, Guid? id = null) =>
+            Locker.WriteLock(() => _storage.CreateRelation(sourceNodeId, targetNodeId, nodeTypeId, id));
 
-        internal AttributeData CreateAttribute(Guid id, string value) =>
-            _storage.CreateAttribute(id, value);
+        public IAttribute CreateAttribute(Guid id, string value) =>
+            Locker.WriteLock(() => _storage.CreateAttribute(id, value));
+
+        public IRelation UpdateRelationTarget(Guid id, Guid targetId) =>
+            Locker.WriteLock(() => _storage.UpdateRelationTarget(id, targetId));
+
+        public IRelation CreateRelationWithAttribute(Guid sourceNodeId, Guid nodeTypeId, string value) =>
+            Locker.WriteLock(() => _storage.CreateRelationWithAttribute(sourceNodeId, nodeTypeId, value));
 
         internal NodeData GetNodeData(Guid id)
         {
@@ -93,14 +99,12 @@ namespace Iis.OntologyData
 
                     if (isLastItem && relationType.TargetType.IsSeparateObject)
                     {
-                        var linkNode = _storage.CreateNode(relationType.Id);
-                        _storage.CreateRelation(linkNode.Id, node.Id, Guid.Parse(value));
+                        _storage.CreateRelation(node.Id, Guid.Parse(value), relationType.Id);
                         break;
                     }
 
-                    var relationNode = _storage.CreateNode(relationType.Id);
                     var targetNode = _storage.CreateNode(relationType.TargetTypeId);
-                    _storage.CreateRelation(relationNode.Id, node.Id, targetNode.Id);
+                    _storage.CreateRelation(node.Id, targetNode.Id, relationType.Id);
 
                     if (isLastItem)
                     {
@@ -119,8 +123,8 @@ namespace Iis.OntologyData
         {
             Locker.WriteLock(() => _storage.SetNodeIsArchived(nodeId));
         }
-        public void DeleteEntity(Guid id, bool deleteOutcomingRelations, bool deleteIncomingRelations) =>
-            Locker.WriteLock(() => _storage.DeleteEntity(id, deleteOutcomingRelations, deleteIncomingRelations));
+        public void RemoveNode(Guid id) =>
+            Locker.WriteLock(() => _storage.RemoveNode(id));
         public void SetNodesIsArchived(IEnumerable<Guid> nodeIds)
         {
             Locker.WriteLock(() =>

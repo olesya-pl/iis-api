@@ -94,7 +94,7 @@ namespace Iis.OntologyManager.UiControls
             }
 
             var id = (Guid)SelectedValue("Id");
-            _data.DeleteEntity(id, true, true);
+            _data.RemoveNode(id);
             PatchSaver.SavePatch(_data.Patch);
             Search(false);
         }
