@@ -177,7 +177,7 @@ namespace Iis.DbLayer.Repositories
                 From = filter.Offset,
                 Size = filter.Limit,
             };
-            var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
+            var searchResult = await _elasticManager.SearchAsync(searchParams, cancellationToken);
             return new SearchResult
             {
                 Count = searchResult.Count,

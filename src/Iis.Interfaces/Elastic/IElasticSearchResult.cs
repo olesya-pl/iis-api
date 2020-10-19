@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Interfaces.Elastic
 {
+    //TODO: надо с этим файлом что-то делать
     public class AggregationBucket
     {
         public string Key { get; set; }
@@ -28,5 +30,17 @@ namespace Iis.Interfaces.Elastic
         string Identifier { get; set; }
         JToken Higlight { get; set; }
         JObject SearchResult { get; set; }        
+    }
+
+    public class SearchResult
+    {
+        public Dictionary<Guid, SearchResultItem> Items { get; set; }
+        public int Count { get; set; }
+    }
+
+    public class SearchResultItem
+    {
+        public JToken Highlight { get; set; }
+        public JObject SearchResult { get; set; }
     }
 }

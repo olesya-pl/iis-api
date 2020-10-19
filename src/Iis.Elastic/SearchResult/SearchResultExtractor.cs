@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
-namespace Iis.Elastic
+namespace Iis.Elastic.SearchResult
 {
     internal class SearchResultExtractor
     {

@@ -207,9 +207,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         }
         protected virtual async Task<(bool isExist, Guid? featureId, JObject feature)> SearchFeatureInElasticSearchAsync(string fieldName, string fieldValue)
         {
-            var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(
-                        SignTypeIndexNames,
-                        new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:{fieldValue})" });
+            var filter = new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:{fieldValue})" };
+            
+            var searchResult = await _elasticService.SearchSignsAsync(SignTypeIndexNames, filter);
 
             if (searchResult.Count == 0) return (false, null, null);
 

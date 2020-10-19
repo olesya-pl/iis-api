@@ -1,6 +1,5 @@
 ﻿using Elasticsearch.Net;
 
-using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
@@ -12,7 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Iis.Elastic.SearchResult;
+using Iis.Elastic.ElasticMappingProperties;
 namespace Iis.Elastic
 {
     internal class ElasticManager: IElasticManager
@@ -119,47 +119,49 @@ namespace Iis.Elastic
             return searchResponse.Success;
         }
 
-        public async Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public Task<IElasticSearchResult> SearchAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetSearchJson(searchParams);
-            var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_search" :
-                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
-            var response = await GetAsync(path, jsonString, cancellationToken);
+            return SearchAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetCountJson(searchParams);
+
+            return CountAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public Task<IElasticSearchResult> SearchAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetSearchJson(searchParams);
+
+            return SearchAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetCountJson(searchParams);
+
+            return CountAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public async Task<IElasticSearchResult> SearchAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default)
+        {
+            var path = baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
+
+            var response = await GetAsync(path, queryData, cancellationToken);
+
             return _resultExtractor.GetFromResponse(response);
         }
 
-        public async Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public async Task<int> CountAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default)
         {
-            var jsonString = GetCountJson(searchParams);
-            var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_count" :
-                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_count";
+            var path = baseIndexNameList.Any() ? "_count" : $"{GetRealIndexNames(baseIndexNameList)}/_count";
 
-            var response = await GetAsync(path, jsonString, cancellationToken);
-            return JObject.Parse(response.Body)["count"].Value<int>();
-        }
+            var response = await GetAsync(path, queryData, cancellationToken);
 
-        public async Task<IElasticSearchResult> Search(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
-        {
-            var jsonString = GetSearchJson(searchParams);
-            var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_search" :
-                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
-
-            var response = await GetAsync(path, jsonString, cancellationToken);
-            return _resultExtractor.GetFromResponse(response);
-        }
-
-        public async Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
-        {
-            var jsonString = GetCountJson(searchParams);
-            var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_count" :
-                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_count";
-
-            var response = await GetAsync(path, jsonString, cancellationToken);
             return JObject.Parse(response.Body)["count"].Value<int>();
         }
 
@@ -196,7 +198,7 @@ namespace Iis.Elastic
 
             var query = json.ToString(Newtonsoft.Json.Formatting.None);
 
-            var path = searchParams.BaseIndexNames.Count == 0 ?
+            var path = searchParams.BaseIndexNames.Count() == 0 ?
                 "_search" :
                 $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
@@ -226,9 +228,7 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(searchResponse);
         }
 
-        public async Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames,
-            string documentId,
-            CancellationToken token = default)
+        public async Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames, string documentId, CancellationToken token = default)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(
                 GetRealIndexNames(indexNames),
@@ -356,7 +356,7 @@ namespace Iis.Elastic
             ctx: token);
             return _resultExtractor.GetFromResponse(searchResponse);
         }
-        
+
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
@@ -475,7 +475,6 @@ namespace Iis.Elastic
             json["query"]["bool"]["should"] = shouldSections;
             return json.ToString();
         }
-
 
         private string GetSearchJson(IIisElasticSearchParams searchParams)
         {
