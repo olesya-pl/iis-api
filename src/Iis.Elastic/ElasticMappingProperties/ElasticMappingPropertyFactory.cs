@@ -26,7 +26,7 @@ namespace Iis.Elastic.ElasticMappingProperties
                         }
                         return res;
                     case ElasticMappingPropertyType.Integer:
-                        return new List<ElasticMappingProperty> { IntegerRangeProperty.Create(name) };
+                        return new List<ElasticMappingProperty> { IntegerProperty.Create(name) };
                     case ElasticMappingPropertyType.Date:
                         return new List<ElasticMappingProperty> { DateProperty.Create(name, ElasticConfiguration.DefaultDateFormats) };
                     case ElasticMappingPropertyType.Keyword:
