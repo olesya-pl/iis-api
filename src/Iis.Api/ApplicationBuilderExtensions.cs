@@ -50,7 +50,8 @@ namespace Iis.Api
                     {
                         var nodes = ontologyService.GetEntitiesByUniqueValue(amountType.Id, militaryAmount.Name, "name")
                             .GetAwaiter().GetResult();
-                        var amount = nodes.First();
+                        var amount = nodes.FirstOrDefault();
+                        if (amount == null) continue;
                         amount.SetProperty("code", militaryAmount.Code);
                         amount.SetProperty("name", militaryAmount.Name);
                         ontologyService.SaveNodeAsync(amount).GetAwaiter().GetResult();

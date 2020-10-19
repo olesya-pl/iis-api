@@ -159,11 +159,12 @@ namespace IIS.Core
                 var ontologyProvider = new OntologyProvider(context);
                 //ontology = ontologyProvider.GetOntology();
                 ontology = new OntologyWrapper(ontologySchema);
-
+                services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
+                var ontologySaver = new OntologyPatchSaver(OntologyContext.GetContext(dbConnectionString));
 
                 var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
-                var ontologyData = new OntologyNodesData(rawData, ontologySchema);
-                services.AddSingleton(ontologyData);
+                var ontologyData = new OntologyNodesData(rawData, ontologySchema, ontologySaver);
+                services.AddSingleton<IOntologyNodesData>(ontologyData);
                 //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                 //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
                 //}
@@ -190,7 +191,8 @@ namespace IIS.Core
             services.AddTransient<IOntologyRepository, OntologyRepository>();
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
-            services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
+            //services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
+            services.AddTransient<IOntologyService, OntologyServiceWithCache>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
@@ -217,7 +219,6 @@ namespace IIS.Core
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
-            services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
 

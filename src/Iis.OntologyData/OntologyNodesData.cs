@@ -13,6 +13,7 @@ namespace Iis.OntologyData
     {
         DataStorage _storage;
         IMapper _mapper;
+        IOntologyPatchSaver _saver;
         public IOntologySchema Schema { get; }
 
         public IEnumerable<INode> Nodes => _storage.Nodes.Values;
@@ -21,13 +22,16 @@ namespace Iis.OntologyData
 
         public IOntologyPatch Patch => _storage.Patch;
 
-        internal ReadWriteLocker Locker { get; set; }  = new ReadWriteLocker();
+        internal ReadWriteLocker Locker { get; set; }
 
-        public OntologyNodesData(INodesRawData rawData, IOntologySchema schema)
+        public OntologyNodesData(INodesRawData rawData, IOntologySchema schema, IOntologyPatchSaver saver)
         {
             _mapper = GetMapper();
             Schema = schema;
             _storage = new DataStorage(rawData, _mapper, Schema, this);
+            _saver = saver;
+            Locker = new ReadWriteLocker();
+            Locker.OnCommingChanges += () => _saver.SavePatch(Patch);
         }
         private IMapper GetMapper()
         {
@@ -40,6 +44,9 @@ namespace Iis.OntologyData
 
             return new Mapper(configuration);
         }
+        public T ReadLock<T>(Func<T> func) => Locker.ReadLock(func);
+        public T WriteLock<T>(Func<T> func) => Locker.WriteLock(func);
+        public void WriteLock(Action action) => Locker.WriteLock(action);
         public IReadOnlyList<INode> GetEntitiesByTypeName(string typeName)
         {
             return Locker.ReadLock(() => 

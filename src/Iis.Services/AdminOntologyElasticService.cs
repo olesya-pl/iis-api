@@ -26,7 +26,7 @@ namespace Iis.Services
         private readonly IOntologySchema _ontologySchema;
         private readonly IExtNodeService _extNodeService;
         private readonly INodeRepository _nodeRepository;
-        private readonly OntologyNodesData ontologyNodesData;
+        private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IReportElasticService _reportElasticService;
         private readonly IReportService _reportService;
 
@@ -38,14 +38,14 @@ namespace Iis.Services
             IOntologySchema ontologySchema,
             IExtNodeService extNodeService,
             INodeRepository nodeRepository,
-            OntologyNodesData ontologyNodesData, IReportElasticService reportElasticService, IReportService reportService)
+            IOntologyNodesData ontologyNodesData, IReportElasticService reportElasticService, IReportService reportService)
         {
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
             _ontologySchema = ontologySchema ?? throw new ArgumentNullException(nameof(ontologySchema));
             _extNodeService = extNodeService ?? throw new ArgumentNullException(nameof(extNodeService));
             _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
-            this.ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
+            _ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
             _reportElasticService = reportElasticService ?? throw new ArgumentNullException(nameof(reportElasticService));
             _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
         }
@@ -166,7 +166,7 @@ namespace Iis.Services
             foreach (var index in indexes)
             {
                 var type = _ontologySchema.GetEntityTypeByName(index);
-                var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
+                var entities = _ontologyNodesData.GetEntitiesByTypeName(type.Name);
                 nodes.AddRange(entities);
             }
 

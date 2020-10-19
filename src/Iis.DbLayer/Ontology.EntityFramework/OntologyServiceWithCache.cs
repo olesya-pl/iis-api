@@ -5,6 +5,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyModelWrapper;
+using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
 using IIS.Repository.Factories;
 using Newtonsoft.Json.Linq;
@@ -23,12 +24,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         readonly IOntologyNodesData _data;
         readonly IElasticService _elasticService;
+        readonly IElasticState _elasticState;
         public OntologyServiceWithCache(
             IOntologyNodesData data,
-            IElasticService elasticService)
+            IElasticService elasticService, 
+            IElasticState elasticState)
         {
             _data = data;
             _elasticService = elasticService;
+            _elasticState = elasticState;
         }
         public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
         {
@@ -191,8 +195,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         public async Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default)
         {
-            var node = _data.GetNode(source.Id) ?? _data.CreateNode(source.Type.Id, source.Id);
-            SaveRelations(source, node);
+            _data.WriteLock(() =>
+            {
+                var node = _data.GetNode(source.Id) ?? _data.CreateNode(source.Type.Id, source.Id);
+                SaveRelations(source, node);
+            });
 
             if (requestId.HasValue)
             {
@@ -224,7 +231,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 }
             }
         }
-        void ApplyChanges(INodeBase existing, Relation sourceRelation, IRelation existingRelation)
+        private void ApplyChanges(INodeBase existing, Relation sourceRelation, IRelation existingRelation)
         {
             if (sourceRelation == null && existingRelation == null) return;
 
@@ -244,7 +251,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 {
                     _data.RemoveNode(existingRelation.Id);
                     CreateRelation(sourceRelation, existing.Id);
-                    _data.UpdateRelationTarget(existingRelation.Id, targetId);
                 }
             }
         }
@@ -320,17 +326,28 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds)
+        public async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
-        public Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
+            var finalTypeNames = _data.Schema
+                .GetEntityTypesByName(typeNameList, true)
+                .Select(nt => nt.Name)
+                .Distinct();
+
+            var isElasticSearch = _elasticState.UseElastic && _elasticService.TypesAreSupported(finalTypeNames);
+            if (isElasticSearch)
+            {
+                var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(finalTypeNames, filter);
+                return (searchResult.Entities, searchResult.Count);
+            }
+            else
+            {
+                return (new List<JObject>(), 0);
+            }
         }
         public string GetAttributeValueByDotName(Guid id, string dotName)
         {
-            throw new NotImplementedException();
+            var node = _data.GetNode(id);
+            return node?.GetSingleProperty(dotName)?.Value;
         }
     }
 }

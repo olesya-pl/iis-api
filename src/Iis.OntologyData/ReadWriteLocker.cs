@@ -7,7 +7,9 @@ namespace Iis.OntologyData
 {
     public class ReadWriteLocker
     {
-        ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+
+        public event Action OnCommingChanges;
 
         public T ReadLock<T>(Func<T> func)
         {
@@ -23,10 +25,15 @@ namespace Iis.OntologyData
         }
         public T WriteLock<T>(Func<T> func)
         {
-            _lock.EnterReadLock();
+            _lock.EnterWriteLock();
             try
             {
-                return func();
+                var result = func();
+                if (_lock.RecursiveWriteCount == 1)
+                {
+                    OnCommingChanges();
+                }
+                return result;
             }
             finally
             {
@@ -35,10 +42,14 @@ namespace Iis.OntologyData
         }
         public void WriteLock(Action action)
         {
-            _lock.EnterReadLock();
+            _lock.EnterWriteLock();
             try
             {
                 action();
+                if (_lock.RecursiveWriteCount == 1)
+                {
+                    OnCommingChanges();
+                }
             }
             finally
             {

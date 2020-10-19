@@ -28,6 +28,7 @@ namespace Iis.OntologyData
             _schema = schema;
             _data = data;
             Initialize(rawData);
+            _patch = new OntologyPatch();
         }
         public void Initialize(INodesRawData rawData)
         {
@@ -52,7 +53,7 @@ namespace Iis.OntologyData
 
             foreach (var node in Nodes.Values.Where(n => n.IsArchived || n.NodeType == null))
             {
-                node.IsArchived = true;
+                SetNodeIsArchived(node);
                 MarkLinkedAsArchived(node);
             }
 
@@ -128,17 +129,18 @@ namespace Iis.OntologyData
         {
             foreach (var relation in node._outgoingRelations)
             {
-                relation._node.IsArchived = true;
+                SetNodeIsArchived(relation._node);
                 if (relation.TargetNode.NodeType != null && !relation.IsLinkToSeparateObject && !relation.TargetNode.IsArchived)
                 {
                     relation._targetNode.IsArchived = true;
+                    _patch._update._nodes.Add(relation._targetNode);
                     MarkLinkedAsArchived(relation._targetNode);
                 }
             }
 
             foreach (var relation in node._incomingRelations)
             {
-                relation._node.IsArchived = true;
+                SetNodeIsArchived(relation._node);
             }
         }
 
@@ -187,11 +189,11 @@ namespace Iis.OntologyData
         {
             _patch = new OntologyPatch();
         }
-        public void SetNodeIsArchived(Guid id)
+        public void SetNodeIsArchived(Guid id) => SetNodeIsArchived(Nodes[id]);
+        public void SetNodeIsArchived(NodeData node)
         {
-            var node = Nodes[id];
             node.IsArchived = true;
-            _patch._update._nodes.Add(Nodes[id]);
+            _patch._update._nodes.Add(node);
         }
         public void RemoveNode(Guid id)
         {

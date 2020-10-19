@@ -33,5 +33,6 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsFuzzyDateEntityAttribute(INodeTypeLinked nodeType);
         IDotName GetDotName(string value);
         IReadOnlyList<INodeTypeLinked> GetNodeTypes(IEnumerable<Guid> ids, bool includeChildren = false);
+        IReadOnlyList<INodeTypeLinked> GetEntityTypesByName(IEnumerable<string> names, bool includeChildren);
     }
 }

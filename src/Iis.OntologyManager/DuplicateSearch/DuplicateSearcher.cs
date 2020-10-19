@@ -9,9 +9,9 @@ namespace Iis.OntologyManager.DuplicateSearch
 {
     public class DuplicateSearcher
     {
-        OntologyNodesData _data;
+        IOntologyNodesData _data;
 
-        public DuplicateSearcher(OntologyNodesData data)
+        public DuplicateSearcher(IOntologyNodesData data)
         {
             _data = data;
         }

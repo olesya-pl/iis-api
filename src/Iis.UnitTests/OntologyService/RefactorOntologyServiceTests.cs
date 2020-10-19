@@ -1,10 +1,12 @@
 ﻿using DeepEqual.Syntax;
 using Iis.DataModel;
 using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.OntologySchema;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
 using Iis.OntologyModelWrapper;
@@ -25,7 +27,7 @@ namespace Iis.UnitTests.OntologyService
 {
     public class RefactorOntologyServiceTests
     {
-        OntologyNodesData _data;
+        IOntologyNodesData _data;
         IOntologySchema _schema;
         IOntologyService _oldService;
         IOntologyService _newService;
@@ -119,8 +121,8 @@ namespace Iis.UnitTests.OntologyService
                 ontologyModel, elasticService.Object, uowFacotryMock.Object, elasticState.Object);
 
             var rawData = new NodesRawData(_context.Nodes, _context.Relations, _context.Attributes);
-            _data = new OntologyNodesData(rawData, _schema);
-            _newService = new OntologyServiceWithCache(_data, elasticService.Object);
+            _data = new OntologyNodesData(rawData, _schema, new OntologyPatchSaver(_context));
+            _newService = new OntologyServiceWithCache(_data, elasticService.Object, elasticState.Object);
         }
         private void AssertIncomingRelations(IncomingRelation ir1, IncomingRelation ir2)
         {

@@ -13,6 +13,9 @@ namespace Iis.Interfaces.Ontology.Data
         IOntologyPatch Patch { get; }
         void ClearPatch();
         INode GetNode(Guid id);
+        T ReadLock<T>(Func<T> func);
+        T WriteLock<T>(Func<T> func);
+        void WriteLock(Action action);
         IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids);
         IReadOnlyList<INode> GetNodesByTypeIds(IEnumerable<Guid> nodeTypeIds);
         IReadOnlyList<INode> GetNodesByTypeId(Guid nodeTypeId);
@@ -24,5 +27,6 @@ namespace Iis.Interfaces.Ontology.Data
         IAttribute CreateAttribute(Guid id, string value);
         IRelation UpdateRelationTarget(Guid id, Guid targetId);
         IRelation CreateRelationWithAttribute(Guid sourceNodeId, Guid nodeTypeId, string value);
+        void SetNodeIsArchived(Guid nodeId);
     }
 }

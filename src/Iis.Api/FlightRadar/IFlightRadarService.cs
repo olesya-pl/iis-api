@@ -10,7 +10,5 @@ namespace IIS.Core.FlightRadar
         Task SaveFlightRadarDataAsync(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems);
         Task UpdateLastProcessedIdAsync(FlightRadarHistorySyncJobConfig minId, int newMinId);
         Task<FlightRadarHistorySyncJobConfig> GetLastProcessedIdAsync();
-        void SignalSynchronizationStart();
-        void SignalSynchronizationStop();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Iis.DbLayer.OntologyData;
+using Iis.Interfaces.Ontology.Data;
 using Iis.OntologyData;
 using Iis.OntologyManager.DuplicateSearch;
 using Iis.OntologySchema;
@@ -21,10 +22,10 @@ namespace Iis.OntologyManager.UiControls
         DataGridView grid;
         ContextMenuStrip menuGrid;
 
-        OntologyNodesData _data;
+        IOntologyNodesData _data;
         public OntologyPatchSaver PatchSaver { get; set; }
 
-        public event Func<OntologyNodesData> OnGetData;
+        public event Func<IOntologyNodesData> OnGetData;
 
         DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
         object SelectedValue(string columnName) =>

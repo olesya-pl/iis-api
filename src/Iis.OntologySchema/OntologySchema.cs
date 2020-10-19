@@ -121,6 +121,25 @@ namespace Iis.OntologySchema
                     && nt.Name == entityTypeName)
                 .SingleOrDefault();
         }
+        public IReadOnlyList<INodeTypeLinked> GetEntityTypesByName(IEnumerable<string> names, bool includeChildren)
+        {
+            IEnumerable<INodeTypeLinked> nodeTypes = _storage.NodeTypes.Values
+                .Where(nt => !nt.IsArchived
+                    && nt.Kind == Kind.Entity
+                    && names.Contains(nt.Name))
+                .ToList();
+
+            if (includeChildren)
+            {
+                nodeTypes = nodeTypes
+                    .SelectMany(nt => nt.GetAllDescendants())
+                    .Concat(nodeTypes)
+                    .Where(nt => nt.Kind == Kind.Entity && !nt.IsAbstract);
+            }
+
+            return nodeTypes.Distinct().ToList();
+
+        }
 
         private SchemaRelationType GetRelationType(string entityName, string relationName)
         {

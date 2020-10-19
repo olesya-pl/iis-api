@@ -13,7 +13,6 @@ namespace Iis.Domain
         Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId);
-        Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds);
         Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId);
         Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);

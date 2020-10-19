@@ -478,14 +478,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return await MapRelations(relations);
         }
 
-        public async Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds)
-        {
-            var relations = await RunWithoutCommitAsync(async unitOfWork =>
-                   await unitOfWork.OntologyRepository.GetIncomingRelationsAsync(entityIds));
-
-            return await MapRelations(relations);
-        }
-
         private async Task<List<IncomingRelation>> MapRelations(List<RelationEntity> relations)
         {
             var res = relations
