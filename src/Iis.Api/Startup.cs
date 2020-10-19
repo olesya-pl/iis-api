@@ -198,7 +198,7 @@ namespace IIS.Core
             services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
             services.AddHostedService<FlightRadarHistorySyncJob>();
 
-            services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
+            services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
             services.AddTransient<IOntologySchemaSource, OntologySchemaSource>();
             services.AddTransient<MutationUpdateResolver>();
