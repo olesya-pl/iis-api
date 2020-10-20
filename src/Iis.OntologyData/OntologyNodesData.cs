@@ -72,7 +72,7 @@ namespace Iis.OntologyData
 
         internal NodeData GetNodeData(Guid id)
         {
-            return Locker.ReadLock(() => _storage.Nodes[id]);
+            return Locker.ReadLock(() => _storage.Nodes.GetValueOrDefault(id));
         }
         internal IReadOnlyList<NodeData> GetNodesData(IEnumerable<Guid> ids)
         {

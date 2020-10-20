@@ -177,7 +177,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
         {
-            var nodes = _data.GetNodes(nodeIds);
+            var nodes = _data.GetNodes(nodeIds.Distinct());
             await Task.Yield();
             return nodes.Select(n => MapNode(n, relationTypes)).ToList();
         }
@@ -220,7 +220,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 {
                     IEnumerable<Relation> sourceRelations = source.Nodes.OfType<Relation>().Where(e => e.Type.Id == relationType.Id);
                     IEnumerable<IRelation> existingRelations = existing.OutgoingRelations.Where(e => e.Node.NodeTypeId == relationType.Id);
-                    var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id);
+                    var pairs = sourceRelations.FullOuterJoin(existingRelations, e => e.Id, e => e.Id).ToList();
                     foreach (var pair in pairs)
                     {
                         ApplyChanges(existing, pair.Left, pair.Right);
