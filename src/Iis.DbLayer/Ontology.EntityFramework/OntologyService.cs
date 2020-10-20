@@ -269,16 +269,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return node;
         }
 
-        private int _depth = 0;
         public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds,
             IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
         {
-            if (nodeIds.FirstOrDefault() == new Guid("077933d4-68d7-4c6e-a8dc-a75780ec8166") && relationTypes?.FirstOrDefault()?.Name == "parent")
-            {
-                var q = 0;
-            }
-            Log($"LoadNodesAsync: {nodeIds.Count()} node ids", _depth);
-            _depth++;
             var nodes = await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.OntologyRepository.GetNodeEntitiesByIdsAsync(nodeIds));
 
@@ -329,7 +322,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 FillRelations(nodes, relations);
             }
 
-            _depth--;
             return nodes.Select(n => MapNode(n)).ToList();
         }
         private void FillRelations(List<NodeEntity> nodes, List<RelationEntity> relations)
@@ -349,63 +341,44 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private Node MapNode(NodeEntity ctxNode, List<Node> mappedNodes)
         {
-            _depth++;
-            try
+            var m = mappedNodes.SingleOrDefault(e => e.Id == ctxNode.Id);
+            if (m != null) return m;
+
+            var type = _ontology.GetType(ctxNode.NodeTypeId)
+                        ?? throw new ArgumentException($"Ontology type with id {ctxNode.NodeTypeId} was not found.");
+            Node node;
+            if (type is IAttributeTypeModel attrType)
             {
-                var id = ctxNode.Id.ToString("N");
-                Log($"MapNode: {id}", _depth);
-                if (ctxNode.Id == new Guid("077933d468d74c6ea8dca75780ec8166"))
+                var attribute = ctxNode.Attribute ?? RunWithoutCommit((unitOfWork) =>
+                                    unitOfWork.OntologyRepository.GetAttributeEntityById(ctxNode.Id));
+                if (attribute == null)
                 {
-                    var q = 0;
+                    throw new Exception($"Attribute does not exists for attribute type node id = {ctxNode.Id}");
                 }
-                var m = mappedNodes.SingleOrDefault(e => e.Id == ctxNode.Id);
-                if (m != null)
-                {
-                    Log($"Result cached: {m.Nodes.Count()} nodes", _depth);
-                    return m;
-                }
-
-                var type = _ontology.GetType(ctxNode.NodeTypeId)
-                           ?? throw new ArgumentException($"Ontology type with id {ctxNode.NodeTypeId} was not found.");
-                Node node;
-                if (type is IAttributeTypeModel attrType)
-                {
-                    var attribute = ctxNode.Attribute ?? RunWithoutCommit((unitOfWork) =>
-                                        unitOfWork.OntologyRepository.GetAttributeEntityById(ctxNode.Id));
-                    if (attribute == null)
-                    {
-                        throw new Exception($"Attribute does not exists for attribute type node id = {ctxNode.Id}");
-                    }
-                    var value = AttributeType.ParseValue(attribute.Value, attrType.ScalarTypeEnum);
-                    node = new Attribute(ctxNode.Id, attrType, value, ctxNode.CreatedAt, ctxNode.UpdatedAt);
-                }
-                else if (type is IEntityTypeModel entityType)
-                {
-                    node = new Entity(ctxNode.Id, entityType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
-                    mappedNodes.Add(node);
-                }
-                else if (type is IEmbeddingRelationTypeModel relationType)
-                {
-                    node = new Relation(ctxNode.Id, relationType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
-                    var target = MapNode(ctxNode.Relation.TargetNode, mappedNodes);
-                    node.AddNode(target);
-                }
-                else throw new Exception($"Node mapping does not support ontology type {type.GetType()}.");
-
-                foreach (var relatedNode in ctxNode.OutgoingRelations
-                    .Where(e => !e.Node.IsArchived && (e.Node.NodeType == null || !e.Node.NodeType.IsArchived)))
-                {
-                    var mapped = MapNode(relatedNode.Node, mappedNodes);
-                    node.AddNode(mapped);
-                }
-
-                Log($"Result cached: {node.Nodes.Count()} nodes", _depth);
-                return node;
+                var value = AttributeType.ParseValue(attribute.Value, attrType.ScalarTypeEnum);
+                node = new Attribute(ctxNode.Id, attrType, value, ctxNode.CreatedAt, ctxNode.UpdatedAt);
             }
-            finally
+            else if (type is IEntityTypeModel entityType)
             {
-                _depth--;
+                node = new Entity(ctxNode.Id, entityType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
+                mappedNodes.Add(node);
             }
+            else if (type is IEmbeddingRelationTypeModel relationType)
+            {
+                node = new Relation(ctxNode.Id, relationType, ctxNode.CreatedAt, ctxNode.UpdatedAt);
+                var target = MapNode(ctxNode.Relation.TargetNode, mappedNodes);
+                node.AddNode(target);
+            }
+            else throw new Exception($"Node mapping does not support ontology type {type.GetType()}.");
+
+            foreach (var relatedNode in ctxNode.OutgoingRelations
+                .Where(e => !e.Node.IsArchived && (e.Node.NodeType == null || !e.Node.NodeType.IsArchived)))
+            {
+                var mapped = MapNode(relatedNode.Node, mappedNodes);
+                node.AddNode(mapped);
+            }
+
+            return node;
         }
         public async Task RemoveNodeAsync(Node node, CancellationToken cancellationToken = default)
         {

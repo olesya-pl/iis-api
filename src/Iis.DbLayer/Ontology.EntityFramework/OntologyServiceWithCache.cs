@@ -24,15 +24,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         readonly IOntologyNodesData _data;
         readonly IElasticService _elasticService;
-        readonly IElasticState _elasticState;
         public OntologyServiceWithCache(
             IOntologyNodesData data,
-            IElasticService elasticService, 
-            IElasticState elasticState)
+            IElasticService elasticService)
         {
             _data = data;
             _elasticService = elasticService;
-            _elasticState = elasticState;
         }
         public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
         {
@@ -326,22 +323,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public async Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            var finalTypeNames = _data.Schema
+            var derivedTypeNames = _data.Schema
                 .GetEntityTypesByName(typeNameList, true)
                 .Select(nt => nt.Name)
                 .Distinct();
 
-            var isElasticSearch = _elasticState.UseElastic && _elasticService.TypesAreSupported(finalTypeNames);
+            var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(finalTypeNames, filter);
-                return (searchResult.Entities, searchResult.Count);
+                return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
             }
             else
             {
-                return (new List<JObject>(), 0);
+                return new SearchEntitiesByConfiguredFieldsResult();
             }
         }
         public string GetAttributeValueByDotName(Guid id, string dotName)

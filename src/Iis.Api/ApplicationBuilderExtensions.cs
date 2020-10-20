@@ -5,6 +5,7 @@ using System.Linq;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,45 +30,31 @@ namespace Iis.Api
                 .CreateScope())
                 {
                     var serviceProvider = serviceScope.ServiceProvider;
-                    var ontologyModel = serviceProvider.GetRequiredService<IOntologyModel>();
-                    var ontologyService = serviceProvider.GetRequiredService<IOntologyService>();
-                    var context = serviceProvider.GetRequiredService<OntologyContext>();
+                    var ontologyData = serviceProvider.GetRequiredService<IOntologyNodesData>();
 
-                    var amountType = ontologyModel.EntityTypes.FirstOrDefault(p => p.Name == "MilitaryAmount");
-
-                    if (amountType == null)
-                    {
-                        return;
-                    }
-
-                    if (!File.Exists("data/contour/entities/MilitaryAmount.json"))
-                    {
-                        return;
-                    }
+                    var amountType = ontologyData.Schema.GetEntityTypeByName("MilitaryAmount");
+                    var codeRelationType = amountType.GetRelationTypeByName("code");
+                    if (amountType == null || codeRelationType == null) return;
+                    if (!File.Exists("data/contour/entities/MilitaryAmount.json")) return;
 
                     var text = File.ReadAllText("data/contour/entities/MilitaryAmount.json");
-                    var militaryAmounts = JsonConvert.DeserializeObject<List<MilitaryAmountEntry>>(text);
+                    var jsonMilitaryAmounts = JsonConvert.DeserializeObject<List<MilitaryAmountEntry>>(text);
 
-                    foreach (var militaryAmount in militaryAmounts)
+                    foreach (var militaryAmount in jsonMilitaryAmounts)
                     {
-                        var nodes = ontologyService.GetEntitiesByUniqueValue(amountType.Id, militaryAmount.Name, "name")
-                            .GetAwaiter().GetResult();
-                        var amount = nodes.FirstOrDefault();
-                        if (amount == null) continue;
-                        amount.SetProperty("code", militaryAmount.Code);
-                        amount.SetProperty("name", militaryAmount.Name);
-                        ontologyService.SaveNodeAsync(amount).GetAwaiter().GetResult();
+                        var nodes = ontologyData.GetNodesByUniqueValue(amountType.Id, militaryAmount.Name, "name");
+                        var amountNode = nodes.FirstOrDefault();
+                        if (amountNode == null) continue;
 
-                        var redundantAmountIds = nodes.Skip(1).Select(p => p.Id).ToList();
-                        if (redundantAmountIds.Any())
+                        var codeNode = amountNode.GetSingleDirectProperty("code");
+                        if (codeNode?.Value == militaryAmount.Code) continue;
+
+                        if (codeNode != null) ontologyData.RemoveNode(codeNode.Id);
+                        ontologyData.CreateRelationWithAttribute(amountNode.Id, codeRelationType.Id, militaryAmount.Code);
+
+                        for (int i = 1; i < nodes.Count; i++)
                         {
-                            var relationsToUpdate = context.Relations.Where(p => redundantAmountIds.Contains(p.TargetNodeId));
-                            foreach (var relation in relationsToUpdate)
-                            {
-                                relation.TargetNodeId = amount.Id;
-                            }
-                            context.Nodes.RemoveRange(context.Nodes.Where(p => redundantAmountIds.Contains(p.Id)));
-                            context.SaveChanges();
+                            ontologyData.RemoveNode(nodes[i].Id);
                         }
                     }
                 }

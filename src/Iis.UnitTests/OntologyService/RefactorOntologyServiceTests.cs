@@ -122,7 +122,7 @@ namespace Iis.UnitTests.OntologyService
 
             var rawData = new NodesRawData(_context.Nodes, _context.Relations, _context.Attributes);
             _data = new OntologyNodesData(rawData, _schema, new OntologyPatchSaver(_context));
-            _newService = new OntologyServiceWithCache(_data, elasticService.Object, elasticState.Object);
+            _newService = new OntologyServiceWithCache(_data, elasticService.Object);
         }
         private void AssertIncomingRelations(IncomingRelation ir1, IncomingRelation ir2)
         {
