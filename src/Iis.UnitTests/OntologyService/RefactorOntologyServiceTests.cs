@@ -1,5 +1,4 @@
-﻿using DeepEqual.Syntax;
-using Iis.DataModel;
+﻿using Iis.DataModel;
 using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.OntologySchema;
