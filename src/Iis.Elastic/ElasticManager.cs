@@ -149,7 +149,7 @@ namespace Iis.Elastic
 
         public async Task<IElasticSearchResult> SearchAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default)
         {
-            var path = baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
+            var path = !baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
 
             var response = await GetAsync(path, queryData, cancellationToken);
 
@@ -158,7 +158,7 @@ namespace Iis.Elastic
 
         public async Task<int> CountAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default)
         {
-            var path = baseIndexNameList.Any() ? "_count" : $"{GetRealIndexNames(baseIndexNameList)}/_count";
+            var path = !baseIndexNameList.Any() ? "_count" : $"{GetRealIndexNames(baseIndexNameList)}/_count";
 
             var response = await GetAsync(path, queryData, cancellationToken);
 
