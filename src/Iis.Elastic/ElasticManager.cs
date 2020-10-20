@@ -149,7 +149,7 @@ namespace Iis.Elastic
 
         public async Task<IElasticSearchResult> SearchAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default)
         {
-            var path = baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
+            var path = !baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
 
             var response = await GetAsync(path, queryData, cancellationToken);
 
