@@ -15,5 +15,12 @@ namespace Iis.OntologyData.DataTypes
 
         internal List<AttributeData> _attributes = new List<AttributeData>();
         public IReadOnlyCollection<IAttributeBase> Attributes => _attributes;
+
+        public void Clear()
+        {
+            _nodes.Clear();
+            _relations.Clear();
+            _attributes.Clear();
+        }
     }
 }

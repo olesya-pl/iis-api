@@ -31,7 +31,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return await Context.Nodes.FirstOrDefaultAsync(_ => _.Id == id);
         }
 
-        private IQueryable<NodeEntity> GetGetNodeEntityWithIncludesQuery()
+        private IQueryable<NodeEntity> GetNodeEntityWithIncludesQuery()
         {
             return Context.Nodes
                 .Include(n => n.Attribute)
@@ -42,16 +42,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(rn => rn.NodeType)
                 .Include(n => n.OutgoingRelations)
                 .ThenInclude(r => r.TargetNode)
-                .ThenInclude(tn => tn.NodeType);
+                .ThenInclude(tn => tn.NodeType)
+                .Where(n => !n.IsArchived && !n.NodeType.IsArchived);
         }
         public async Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id)
         {
-            var query = GetGetNodeEntityWithIncludesQuery();
+            var query = GetNodeEntityWithIncludesQuery();
             return await query.SingleOrDefaultAsync(n => !n.IsArchived && n.Id == id);
         }
         public NodeEntity GetNodeEntityWithIncludesById(Guid id)
         {
-            var query = GetGetNodeEntityWithIncludesQuery();
+            var query = GetNodeEntityWithIncludesQuery();
             return query.SingleOrDefault(n => !n.IsArchived && n.Id == id);
         }
 
@@ -230,7 +231,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return Context.Relations
                 .AsNoTracking()
                 .Include(p => p.Node)
-                .Where(p => p.TargetNodeId == targetNodeId && p.Node.NodeTypeId == propertyId)
+                .Where(p => p.TargetNodeId == targetNodeId && p.Node.NodeTypeId == propertyId && !p.Node.IsArchived)
                 .Select(p => p.SourceNodeId)
                 .ToListAsync();
         }
@@ -243,7 +244,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(p => p.NodeType)
                 .Include(p => p.SourceNode)
                 .ThenInclude(p => p.NodeType)
-                .Where(p => p.TargetNodeId == entityId)
+                .Where(p => p.TargetNodeId == entityId 
+                    && !p.Node.IsArchived 
+                    && !p.SourceNode.IsArchived 
+                    && !p.SourceNode.NodeType.IsArchived)
                 .ToListAsync();
         }
 
@@ -255,7 +259,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ThenInclude(p => p.NodeType)
                 .Include(p => p.SourceNode)
                 .ThenInclude(p => p.NodeType)
-                .Where(p => entityIds.Contains(p.TargetNodeId))
+                .Where(p => entityIds.Contains(p.TargetNodeId) 
+                    && !p.Node.IsArchived
+                    && !p.SourceNode.IsArchived
+                    && !p.SourceNode.NodeType.IsArchived)
                 .ToListAsync();
         }
         public Task<List<RelationEntity>> GetIncomingRelationsAsync(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList)

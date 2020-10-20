@@ -137,26 +137,27 @@ namespace Iis.ThemeManagement
 
         public async Task UpdateQueryResultsAsync(CancellationToken ct)
         {
-            var themesByQuery = _context.Themes
-                .AsNoTracking()
-                .ToList()
-                .GroupBy(x => new { x.Query, x.TypeId });
+            //var themesByQuery = _context.Themes
+            //    .AsNoTracking()
+            //    .ToList()
+            //    .GroupBy(x => new { x.Query, x.TypeId });
 
-            foreach (var groupedTheme in themesByQuery)
-            {
-                ct.ThrowIfCancellationRequested();
-                var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query);
-                foreach (var theme in groupedTheme)
-                {
-                    if (theme.QueryResults != newCount)
-                    {
-                        theme.QueryResults = newCount;
-                        _context.Entry(theme).State = EntityState.Modified;
-                    }
-                }
-            }
+            //foreach (var groupedTheme in themesByQuery)
+            //{
+            //    ct.ThrowIfCancellationRequested();
+            //    var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query);
+            //    foreach (var theme in groupedTheme)
+            //    {
+            //        if (theme.QueryResults != newCount)
+            //        {
+            //            theme.QueryResults = newCount;
+            //            _context.Entry(theme).State = EntityState.Modified;
+            //        }
+            //    }
+            //}
 
-            await _context.SaveChangesAsync(ct);
+            //await _context.SaveChangesAsync(ct);
+            await Task.Yield();
         }
 
         private IQueryable<ThemeEntity> GetThemes()

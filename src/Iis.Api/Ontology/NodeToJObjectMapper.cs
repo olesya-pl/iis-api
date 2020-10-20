@@ -65,8 +65,8 @@ namespace Iis.Api.Ontology
             var importanceId = node.Nodes.FirstOrDefault(p => p.Type.Name == "importance").Nodes.First().Id;
             var stateId = node.Nodes.FirstOrDefault(p => p.Type.Name == "state").Nodes.First().Id;
 
-            var importanceAttributes = (await _ontologyService.LoadNodesAsync(importanceId, null)).GetChildAttributes();
-            var stateAttributes = (await _ontologyService.LoadNodesAsync(stateId, null)).GetChildAttributes();
+            var importanceAttributes = (await _ontologyService.LoadNodesAsync(importanceId)).GetChildAttributes();
+            var stateAttributes = (await _ontologyService.LoadNodesAsync(stateId)).GetChildAttributes();
 
             var attributies = node.GetChildAttributes();
 

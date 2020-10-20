@@ -14,17 +14,21 @@ namespace Iis.DbLayer.Repositories.Helpers
     {
         private readonly IElasticSerializer _elasticSerializer;
         private readonly IExtNodeService _extNodeService;
+        private readonly IOntologyNodesData _ontologyData;
 
         public NodeFlattener(IElasticSerializer elasticSerializer,
-            IExtNodeService extNodeService)
+            IExtNodeService extNodeService,
+            IOntologyNodesData ontologyData)
         {
             _elasticSerializer = elasticSerializer;
             _extNodeService = extNodeService;
+            _ontologyData = ontologyData;
         }
         
-        public async Task<FlattenNodeResult> FlattenNode(Guid id, CancellationToken cancellationToken = default)
+        public FlattenNodeResult FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {
-            var extNode = await _extNodeService.GetExtNodeAsync(id, cancellationToken);
+            var node = _ontologyData.GetNode(id);
+            var extNode = _extNodeService.GetExtNode(node);
 
             return new FlattenNodeResult
             {

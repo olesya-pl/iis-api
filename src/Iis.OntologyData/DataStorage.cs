@@ -20,12 +20,15 @@ namespace Iis.OntologyData
 
         IMapper _mapper;
         IOntologySchema _schema;
+        OntologyNodesData _data;
 
-        public DataStorage(INodesRawData rawData, IMapper mapper, IOntologySchema schema)
+        public DataStorage(INodesRawData rawData, IMapper mapper, IOntologySchema schema, OntologyNodesData data)
         {
             _mapper = mapper;
             _schema = schema;
+            _data = data;
             Initialize(rawData);
+            _patch = new OntologyPatch();
         }
         public void Initialize(INodesRawData rawData)
         {
@@ -50,7 +53,7 @@ namespace Iis.OntologyData
 
             foreach (var node in Nodes.Values.Where(n => n.IsArchived || n.NodeType == null))
             {
-                node.IsArchived = true;
+                SetNodeIsArchived(node);
                 MarkLinkedAsArchived(node);
             }
 
@@ -73,14 +76,17 @@ namespace Iis.OntologyData
             return node;
         }
 
-        internal RelationData CreateRelation(Guid id, Guid sourceNodeId, Guid targetNodeId)
+        internal RelationData CreateRelation(Guid sourceNodeId, Guid targetNodeId, Guid nodeTypeId, Guid? id = null)
         {
+            var node = CreateNode(nodeTypeId, id);
+
             var relation = new RelationData
             {
-                Id = id,
+                Id = node.Id,
                 SourceNodeId = sourceNodeId,
-                TargetNodeId = targetNodeId
+                TargetNodeId = targetNodeId,
             };
+            node._relation = relation;
             CompleteRelation(relation);
 
             Relations[relation.Id] = relation;
@@ -100,22 +106,42 @@ namespace Iis.OntologyData
             _patch._create._attributes.Add(attribute);
             return attribute;
         }
+        internal RelationData CreateRelationWithAttribute(Guid sourceNodeId, Guid nodeTypeId, string value)
+        {
+            var attributeTypeId = _schema.GetNodeTypeById(nodeTypeId).RelationType.TargetTypeId;
+            var node = CreateNode(attributeTypeId);
+            CreateAttribute(node.Id, value);
+            return CreateRelation(sourceNodeId, node.Id, nodeTypeId);
+        }
+        internal RelationData UpdateRelationTarget(Guid id, Guid targetId)
+        {
+            var relation = Relations[id];
+            if (relation.TargetNodeId == targetId) return relation;
+
+            relation._targetNode._incomingRelations.Remove(relation);
+            relation.TargetNodeId = targetId;
+            relation._targetNode = Nodes[targetId];
+            relation._targetNode._incomingRelations.Add(relation);
+            _patch._update._relations.Add(relation);
+            return relation;
+        }
 
         private void MarkLinkedAsArchived(NodeData node)
         {
             foreach (var relation in node._outgoingRelations)
             {
-                relation._node.IsArchived = true;
+                SetNodeIsArchived(relation._node);
                 if (relation.TargetNode.NodeType != null && !relation.IsLinkToSeparateObject && !relation.TargetNode.IsArchived)
                 {
                     relation._targetNode.IsArchived = true;
+                    _patch._update._nodes.Add(relation._targetNode);
                     MarkLinkedAsArchived(relation._targetNode);
                 }
             }
 
             foreach (var relation in node._incomingRelations)
             {
-                relation._node.IsArchived = true;
+                SetNodeIsArchived(relation._node);
             }
         }
 
@@ -146,13 +172,14 @@ namespace Iis.OntologyData
             relation._node = Nodes[relation.Id];
             relation._sourceNode = Nodes[relation.SourceNodeId];
             relation._targetNode = Nodes[relation.TargetNodeId];
-            relation._node.Relation = relation;
+            relation._node._relation = relation;
             relation._sourceNode._outgoingRelations.Add(relation);
             relation._targetNode._incomingRelations.Add(relation);
         }
         private void CompleteNode(NodeData node)
         {
             node.NodeType = _schema.GetNodeTypeById(node.NodeTypeId);
+            node.AllData = _data;
         }
         private void CompleteAttribute(AttributeData attribute)
         {
@@ -163,13 +190,13 @@ namespace Iis.OntologyData
         {
             _patch = new OntologyPatch();
         }
-        public void SetNodeIsArchived(Guid id)
+        public void SetNodeIsArchived(Guid id) => SetNodeIsArchived(Nodes[id]);
+        public void SetNodeIsArchived(NodeData node)
         {
-            var node = Nodes[id];
             node.IsArchived = true;
-            _patch._update._nodes.Add(Nodes[id]);
+            _patch._update._nodes.Add(node);
         }
-        public void DeleteEntity(Guid id, bool deleteOutcomingRelations, bool deleteIncomingRelations)
+        public void RemoveNode(Guid id)
         {
             SetNodeIsArchived(id);
             MarkLinkedAsArchived(Nodes[id]);

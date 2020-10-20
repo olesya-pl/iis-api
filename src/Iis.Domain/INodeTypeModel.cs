@@ -8,7 +8,6 @@ namespace Iis.Domain
 {
     public interface INodeTypeModel
     {
-        INodeTypeLinked Source { get;  }
         Guid Id { get; }
         string Name { get; }
         string Title { get; set; }
@@ -24,6 +23,7 @@ namespace Iis.Domain
         IEnumerable<IEmbeddingRelationTypeModel> DirectProperties { get; }
         IEnumerable<IEmbeddingRelationTypeModel> AllProperties { get; }
         bool IsObjectOfStudy { get; }
+        INodeTypeLinked Source { get; }
         
         
         void AddType(INodeTypeModel type);

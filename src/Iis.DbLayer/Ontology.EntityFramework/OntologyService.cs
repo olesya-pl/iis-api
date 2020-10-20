@@ -2,6 +2,7 @@ using Iis.DataModel;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
@@ -11,7 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Attribute = Iis.Domain.Attribute;
@@ -23,6 +26,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
         private readonly IElasticState _elasticState;
+        string _logFileName;
 
         public OntologyService(IOntologyModel ontology,
             IElasticService elasticService,
@@ -31,6 +35,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _elasticService = elasticService;
             _ontology = ontology;
             _elasticState = elasticState;
+            _logFileName = Path.Combine(Directory.GetCurrentDirectory(), "!refactortests.log");
+            File.WriteAllText(_logFileName, "");
         }
 
         public Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
@@ -246,7 +252,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public async Task<Node> LoadNodesAsync(Guid nodeId, IEnumerable<IRelationTypeModel> toLoad, CancellationToken cancellationToken = default)
+        public async Task<Node> LoadNodesAsync(Guid nodeId, CancellationToken cancellationToken = default)
         {
             var ctxSource = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetActiveNodeEntityById(nodeId));
 
@@ -266,7 +272,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds,
             IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
         {
-
             var nodes = await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.OntologyRepository.GetNodeEntitiesByIdsAsync(nodeIds));
 
@@ -307,7 +312,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         {
                             Id = rel.Id,
                             NodeTypeId = map[rel.Node.NodeTypeId],
-                            Relation = r
+                            Relation = r,
+                            CreatedAt = rel.Node.CreatedAt,
+                            UpdatedAt = rel.Node.UpdatedAt
                         };
                         relations.Add(r);
                     }
@@ -317,8 +324,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return nodes.Select(n => MapNode(n)).ToList();
         }
-
-
         private void FillRelations(List<NodeEntity> nodes, List<RelationEntity> relations)
         {
             var nodesDict = nodes.ToDictionary(n => n.Id);
@@ -329,7 +334,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         private Node MapNode(NodeEntity ctxNode)
         {
-            return MapNode(ctxNode, new List<Node>());
+            var result = MapNode(ctxNode, new List<Node>());
+            var id = ctxNode.Id.ToString("N");
+            return result;
         }
 
         private Node MapNode(NodeEntity ctxNode, List<Node> mappedNodes)
@@ -338,7 +345,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (m != null) return m;
 
             var type = _ontology.GetType(ctxNode.NodeTypeId)
-                       ?? throw new ArgumentException($"Ontology type with id {ctxNode.NodeTypeId} was not found.");
+                        ?? throw new ArgumentException($"Ontology type with id {ctxNode.NodeTypeId} was not found.");
             Node node;
             if (type is IAttributeTypeModel attrType)
             {
@@ -411,11 +418,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .FirstOrDefault();
         }
 
-        public Task<List<AttributeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
-            return RunWithoutCommitAsync(async unitOfWork =>
+            return await RunWithoutCommitAsync(async unitOfWork =>
                    await unitOfWork.OntologyRepository.GetAttributesByUniqueValue(nodeTypeId, value, valueTypeName, limit));
-
         }
 
 
@@ -423,7 +429,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             return RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.OntologyRepository.GetNodeIdListByFeatureIdListAsync(featureIdList));
-
         }
 
         public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
@@ -441,14 +446,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var relations = await RunWithoutCommitAsync(async unitOfWork =>
                    await unitOfWork.OntologyRepository.GetIncomingRelationsAsync(entityId));
-
-            return await MapRelations(relations);
-        }
-
-        public async Task<List<IncomingRelation>> GetIncomingEntities(IReadOnlyCollection<Guid> entityIds)
-        {
-            var relations = await RunWithoutCommitAsync(async unitOfWork =>
-                   await unitOfWork.OntologyRepository.GetIncomingRelationsAsync(entityIds));
 
             return await MapRelations(relations);
         }
@@ -482,6 +479,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             return RunWithoutCommit(unitOfWork =>
                        unitOfWork.OntologyRepository.GetAttributeValueByDotName(id, dotName));
+        }
+        private void Log(string text, int indent = 0)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < indent; i++) sb.Append("    ");
+            sb.AppendLine(text);
+            File.AppendAllText(_logFileName, sb.ToString());
         }
     }
 }

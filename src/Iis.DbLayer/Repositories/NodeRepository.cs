@@ -50,7 +50,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await _nodeFlattener.FlattenNode(id, cancellationToken);
+            var result = _nodeFlattener.FlattenNode(id, cancellationToken);
             return await _elasticManager.PutDocumentAsync(
                 result.NodeTypeName,
                 result.Id,
@@ -75,21 +75,20 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
         {
-            var getActualNode = _nodeFlattener.FlattenNode(id, ct);
+            var actualNode = _nodeFlattener.FlattenNode(id, ct);
             var getNodeChanges = requestId.HasValue ?
                 _changeHistoryService.GetChangeHistoryByRequest(requestId.Value) :
                 _changeHistoryService.GetChangeHistory(id, null);
 
-            await Task.WhenAll(getActualNode, getNodeChanges);
+            var nodeChanges = await getNodeChanges;
 
-            var changes = getNodeChanges.Result
+            var changes = nodeChanges
                 .Where(x => !string.IsNullOrWhiteSpace(x.OldValue) && !PropertiesToIgnore.Contains(x.PropertyName))
                 .GroupBy(x => x.RequestId)
                 .Where(x => x.Count() > 0)
                 .OrderByDescending(x => x.First().Date)
                 .ToList();
 
-            var actualNode = getActualNode.Result;
             var nodes = new List<FlattenNodeResult>();
             foreach (var changePack in changes)
             {
@@ -119,7 +118,7 @@ namespace Iis.DbLayer.Repositories
         {
             var flattenNodes = new List<FlattenNodeResult>(ids.Count());
             foreach (var id in ids)
-                flattenNodes.Add(await _nodeFlattener.FlattenNode(id, ct));
+                flattenNodes.Add(_nodeFlattener.FlattenNode(id, ct));
 
             var changes = await _changeHistoryService.GetChangeHistory(ids);
             var historicalNodes = flattenNodes.SelectMany(x => GetHistoricalNodes(x, changes));

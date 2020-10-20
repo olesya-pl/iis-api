@@ -122,6 +122,25 @@ namespace Iis.OntologySchema
                     && nt.Name == entityTypeName)
                 .SingleOrDefault();
         }
+        public IReadOnlyList<INodeTypeLinked> GetEntityTypesByName(IEnumerable<string> names, bool includeChildren)
+        {
+            IEnumerable<INodeTypeLinked> nodeTypes = _storage.NodeTypes.Values
+                .Where(nt => !nt.IsArchived
+                    && nt.Kind == Kind.Entity
+                    && names.Contains(nt.Name))
+                .ToList();
+
+            if (includeChildren)
+            {
+                nodeTypes = nodeTypes
+                    .SelectMany(nt => nt.GetAllDescendants())
+                    .Concat(nodeTypes)
+                    .Where(nt => nt.Kind == Kind.Entity && !nt.IsAbstract);
+            }
+
+            return nodeTypes.Distinct().ToList();
+
+        }
 
         private SchemaRelationType GetRelationType(string entityName, string relationName)
         {
@@ -484,6 +503,19 @@ namespace Iis.OntologySchema
         public bool IsFuzzyDateEntityAttribute(INodeTypeLinked nodeType)
         {
             return nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Any(i => i.SourceType.Name == FuzzyDateEntityTypeName);
+        }
+        public IReadOnlyList<INodeTypeLinked> GetNodeTypes(IEnumerable<Guid> ids, bool includeChildren = false)
+        {
+            var nodeTypes = ids.Select(id => _storage.NodeTypes[id]);
+            var result = new List<INodeTypeLinked>(nodeTypes);
+            if (includeChildren)
+            {
+                foreach (var nodeType in nodeTypes)
+                {
+                    result.AddRange(nodeType.GetAllDescendants());
+                }
+            }
+            return result.Distinct().ToList();
         }
         public IDotName GetDotName(string value)
         {

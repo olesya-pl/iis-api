@@ -14,7 +14,11 @@ namespace Iis.Interfaces.Ontology.Data
         IRelation Relation { get; }
 
         string Value { get; }
-        public IDotNameValues GetDotNameValues();
+        public IReadOnlyList<IRelation> GetDirectRelations();
+        public IReadOnlyList<IRelation> GetInversedRelations();
+        IDotNameValues GetDotNameValues();
+        INode GetChildNode(string childTypeName);
+        IReadOnlyList<INode> GetChildNodes(string childTypeName);
         bool HasPropertyWithValue(string propertyName, string value);
         INode GetSingleProperty(IDotName dotName);
         INode GetSingleProperty(string dotName);

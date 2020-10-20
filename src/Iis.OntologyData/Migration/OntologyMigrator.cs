@@ -82,7 +82,7 @@ namespace Iis.OntologyData.Migration
                     if (!string.IsNullOrEmpty(value))
                     {
                         var linkedId = Guid.Parse(value);
-                        var linkedNode = _data.GetNode(linkedId);
+                        var linkedNode = _data.GetNodeData(linkedId);
                         _migratedIds.Add(linkedId);
                         _hierarchyMapper[linkedId] = newEntityId;
                         Log($"Entity{linkedNode.NodeType.Name}.{linkedId}/view");
@@ -96,7 +96,7 @@ namespace Iis.OntologyData.Migration
             
             _migratedIds.Add(sourceNode.Id);
 
-            var entity = _data.GetNode(_hierarchyMapper[sourceNode.Id]);
+            var entity = _data.GetNodeData(_hierarchyMapper[sourceNode.Id]);
             Log("");
             Log($"Entity{sourceNode.NodeType.Name}.{sourceNode.Id}/view");
             
@@ -138,7 +138,7 @@ namespace Iis.OntologyData.Migration
                 if (!string.IsNullOrEmpty(options.TakeValueFrom))
                 {
                     var id = Guid.Parse(dotNameValue.Value);
-                    var node = _data.GetNode(id);
+                    var node = _data.GetNodeData(id);
                     value = node.GetDotNameValues().GetSingleValue(options.TakeValueFrom);
                 }
 
@@ -179,7 +179,7 @@ namespace Iis.OntologyData.Migration
                 }
                 foreach (var dotNameValue in items)
                 {
-                    var nodeData = _data.GetNode(entity.Id);
+                    var nodeData = _data.GetNodeData(entity.Id);
                     SetValue(dotNameValue, null, options, migrationReference.TargetDotName, nodeData);
                 }
             }

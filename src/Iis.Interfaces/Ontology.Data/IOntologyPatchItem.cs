@@ -9,5 +9,6 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyCollection<INodeBase> Nodes { get; }
         IReadOnlyCollection<IRelationBase> Relations { get; }
         IReadOnlyCollection<IAttributeBase> Attributes { get; }
+        void Clear();
     }
 }

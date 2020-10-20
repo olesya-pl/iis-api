@@ -12,5 +12,11 @@ namespace Iis.OntologyData.DataTypes
 
         internal OntologyPatchItem _update = new OntologyPatchItem();
         public IOntologyPatchItem Update => _update;
+
+        public void Clear()
+        {
+            _create.Clear();
+            _update.Clear();
+        }
     }
 }
