@@ -66,11 +66,9 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.DbLayer.OntologyData;
 using Iis.Api.Ontology;
 using Iis.OntologyData;
-using IIS.Core.FlightRadar;
 using Iis.FlightRadar.DataModel;
 using MediatR;
 using Iis.EventHandlers;
-using Iis.Api.BackgroundServices;
 
 namespace IIS.Core
 {
@@ -195,9 +193,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
-            services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
-            services.AddHostedService<FlightRadarHistorySyncJob>();
-
             services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
             services.AddTransient<IOntologySchemaSource, OntologySchemaSource>();
@@ -280,9 +275,10 @@ namespace IIS.Core
             // end of graphql engine registration
             services.AddDataLoaderRegistry();
 
-            /* message queue registration*/
             services.RegisterMqFactory(Configuration, out string mqConnectionString)
-                    .RegisterMaterialEventServices(Configuration);
+                    .RegisterMaterialEventServices(Configuration)
+                    .RegisterThemeCounterService()
+                    .RegisterFlightRadarServices();
 
 
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
@@ -309,7 +305,6 @@ namespace IIS.Core
                     Configuration["activeDirectory:password"]));
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
-            services.AddHostedService<ThemeCounterBackgroundService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
