@@ -23,7 +23,7 @@ namespace Iis.UnitTests.Iis.OntologyData
             sourceNode._outgoingRelations.Add(outgoingRelation);
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public void HasPropertyWithValue_NodeHasProperty_WithGivenValue_ReturnsTrue(NodeData sourceNode,
             NodeData node,
             NodeData targetNode,
@@ -40,7 +40,7 @@ namespace Iis.UnitTests.Iis.OntologyData
             Assert.True(sourceNode.HasPropertyWithValue(propertyName, value));
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public void HasPropertyWithValue_NodeHasProperty_WithWrongValue_ReturnsFalse(NodeData sourceNode,
             NodeData node,
             NodeData targetNode,
@@ -57,7 +57,7 @@ namespace Iis.UnitTests.Iis.OntologyData
             Assert.False(sourceNode.HasPropertyWithValue(propertyName, value));
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public void HasPropertyWithValue_NodeHasNoProperty_ReturnsFalse(NodeData sourceNode,
             string propertyName,
             string value)

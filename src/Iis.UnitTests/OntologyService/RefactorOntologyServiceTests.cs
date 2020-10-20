@@ -33,7 +33,7 @@ namespace Iis.UnitTests.OntologyService
         IOntologyService _newService;
         OntologyContext _context;
 
-        [Fact]
+        //[Fact]
         public async Task Test()
         {
             Initialize("Server=localhost;Database=contour_dev_net;Username=postgres;Password=123");
