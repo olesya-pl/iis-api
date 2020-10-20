@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Elastic;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
@@ -8,6 +8,8 @@ namespace Iis.Elastic.SearchQueryExtensions
     {
         public static JObject WithSearchJson(IEnumerable<string> resultFieldList, int from, int size)
         {
+            if(resultFieldList is null || !resultFieldList.Any()) resultFieldList = new [] {"*"};
+
             return new JObject(
                 new JProperty("_source", new JArray(resultFieldList)),
                 new JProperty("from", from),
