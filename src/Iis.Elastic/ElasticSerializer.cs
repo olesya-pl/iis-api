@@ -25,6 +25,7 @@ namespace Iis.Elastic
                 if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
                 {
                     json[nameof(extNode.NodeTypeTitle)] = extNode.NodeTypeTitle;
+                    json[$"{nameof(extNode.NodeTypeTitle)}{ElasticManager.AggregateSuffix}"] = extNode.NodeTypeTitle;
                 }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;

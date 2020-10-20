@@ -17,7 +17,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.String, null),
+                new AttributeInfoItem("name1", ScalarType.String, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -33,7 +33,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.File, null),
+                new AttributeInfoItem("name1", ScalarType.File, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -49,7 +49,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.IntegerRange, null),
+                new AttributeInfoItem("name1", ScalarType.IntegerRange, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -65,7 +65,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.FloatRange, null),
+                new AttributeInfoItem("name1", ScalarType.FloatRange, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -81,7 +81,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.File, null),
+                new AttributeInfoItem("name1", ScalarType.File, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -96,7 +96,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.IntegerRange, null),
+                new AttributeInfoItem("name1", ScalarType.IntegerRange, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -111,7 +111,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("name1", ScalarType.FloatRange, null),
+                new AttributeInfoItem("name1", ScalarType.FloatRange, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -126,7 +126,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("parent.child", ScalarType.String, null),
+                new AttributeInfoItem("parent.child", ScalarType.String, null, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -146,7 +146,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("parent.child", ScalarType.String, new List<string> { "alias1", "alias2" }),
+                new AttributeInfoItem("parent.child", ScalarType.String, new List<string> { "alias1", "alias2" }, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var result = new ElasticMappingConfiguration(attributeInfo);
@@ -194,7 +194,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var list = new List<AttributeInfoItem>
             {
-                new AttributeInfoItem("part1.part2", ScalarType.String, new List<string> { "alias1", "alias2" }),
+                new AttributeInfoItem("part1.part2", ScalarType.String, new List<string> { "alias1", "alias2" }, false),
             };
             var attributeInfo = new AttributeInfo("dummy", list);
             var configuration = new ElasticMappingConfiguration(attributeInfo);
@@ -206,7 +206,6 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var jPart1Properties = jPart1[PROPERTIES];
             Assert.Single(jPart1Properties.Children());
             var jPart2 = jPart1Properties["part2"];
-            Assert.Single(jPart2.Children());
             Assert.Equal("text", jPart2[TYPE]);
 
             var jAlias1 = jChildren["alias1"];

@@ -337,17 +337,21 @@ namespace Iis.OntologySchema.DataTypes
             }
             return result;
         }
-        public List<NodeAggregationInfo> GetAttributeDotNamesRecursiveWithLimit(string parentName = null, int recursionLevel = 0)
+        public List<NodeAggregationInfo> GetAttributeDotNamesRecursiveWithLimit(
+            string path = null, 
+            string  parent = null,
+            int recursionLevel = 0)
         {
             const int MaxRecursionLevel = 4;
             var result = new List<NodeAggregationInfo>();
 
             if (Kind == Kind.Attribute)
             {
+                var parentRelation = IncomingRelations.FirstOrDefault(p => p.SourceType.Name == parent);
                 result.Add(new NodeAggregationInfo 
                 { 
                     Name = Name, 
-                    IsAggregated = IncomingRelations.FirstOrDefault()?.NodeType?.MetaObject?.IsAggregated  == true 
+                    IsAggregated = parentRelation?.NodeType?.MetaObject?.IsAggregated  == true 
                 } );
             }
             var isTopLevel = recursionLevel == 0;
@@ -363,6 +367,11 @@ namespace Iis.OntologySchema.DataTypes
                     {
                         Name = "NodeTypeTitle",
                         IsAggregated = true
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "NodeTypeTitleAggregate",
+                        IsAggregated = false
                     },
                     new NodeAggregationInfo
                     {
@@ -386,12 +395,12 @@ namespace Iis.OntologySchema.DataTypes
                 string relationName = relation.Kind == RelationKind.Embedding && relation.TargetType.Kind == Kind.Entity
                     ? relation.NodeType.Name
                     : null;
-                result.AddRange(relation.TargetType.GetAttributeDotNamesRecursiveWithLimit(relationName, recursionLevel + 1));
+                result.AddRange(relation.TargetType.GetAttributeDotNamesRecursiveWithLimit(relationName, Name, recursionLevel + 1));
             }
 
             return result.Select(p => new NodeAggregationInfo 
             {
-                Name = (parentName == null ? p.Name : $"{parentName}.{p.Name}"),
+                Name = (path == null ? p.Name : $"{path}.{p.Name}"),
                 IsAggregated = p.IsAggregated
             } ).ToList();
         }

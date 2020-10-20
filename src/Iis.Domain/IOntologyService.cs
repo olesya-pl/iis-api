@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Elastic;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain
@@ -14,7 +15,7 @@ namespace Iis.Domain
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId);
         Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId);
-        Task<(IEnumerable<JObject> nodes, int count)> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
+        Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
         Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
         Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default);

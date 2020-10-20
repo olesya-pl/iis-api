@@ -17,6 +17,8 @@
     <Compile Remove="Migrations\20200721120237_MachineLearning_AddNewFields_Version_and_ProcessingDate.Designer.cs" />
     <Compile Remove="Migrations\20200917101642_AddFlightRadarHistory.cs" />
     <Compile Remove="Migrations\20200917101642_AddFlightRadarHistory.Designer.cs" />
+    <Compile Remove="Migrations\20201013101322_AddedQueryResults.cs" />
+    <Compile Remove="Migrations\20201013101322_AddedQueryResults.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

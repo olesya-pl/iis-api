@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Iis.DataModel;
-using Iis.Elastic;
+using Iis.Elastic.SearchResult;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;

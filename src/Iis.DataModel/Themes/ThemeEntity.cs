@@ -11,5 +11,6 @@ namespace Iis.DataModel.Themes
         public Guid UserId { get; set; }
         public UserEntity User { get; set; }
         public string Comment { get; set; }
+        public int QueryResults { get; set; }
     }
 }

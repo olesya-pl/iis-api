@@ -133,6 +133,9 @@ namespace Iis.Api
             CreateMap<IIisElasticField, ElasticFieldEntity>();
             CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();
             CreateMap<IIisElasticField, IIS.Core.GraphQL.ElasticConfig.ElasticField>();
+            CreateMap<ElasticFieldEntity, IIS.Core.GraphQL.ElasticConfig.ElasticField>()
+                .ForMember(dest => dest.IsAggregated, opts => opts.MapFrom(src => false));
+
             CreateMap<Iis.Domain.Materials.Material, Iis.DataModel.Materials.MaterialEntity>()
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string)null : src.Metadata.ToString(Formatting.None)))
@@ -335,6 +338,11 @@ namespace Iis.Api
 
             #endregion
 
+            CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
+            CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();
+            CreateMap<Iis.Interfaces.Elastic.SearchEntitiesByConfiguredFieldsResult, IIS.Core.GraphQL.Entities.ObjectOfStudyFilterableQueryResponse>()
+                .ForMember(dest => dest.Aggregations, opts => opts.MapFrom(src => src.Aggregations))
+                .ForMember(dest => dest.Items, opts => opts.MapFrom(src => src.Entities));
         }
     }
 }

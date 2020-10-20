@@ -70,6 +70,7 @@ using IIS.Core.FlightRadar;
 using Iis.FlightRadar.DataModel;
 using MediatR;
 using Iis.EventHandlers;
+using Iis.Api.BackgroundServices;
 
 namespace IIS.Core
 {
@@ -199,7 +200,7 @@ namespace IIS.Core
             services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
             services.AddHostedService<FlightRadarHistorySyncJob>();
 
-            services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
+            services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
             services.AddTransient<IOntologySchemaSource, OntologySchemaSource>();
             services.AddTransient<MutationUpdateResolver>();
@@ -296,7 +297,7 @@ namespace IIS.Core
 
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);
-            services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
+            services.AddTransient<IIisElasticConfigService, IisElasticConfigService<IIISUnitOfWork>>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();
@@ -309,6 +310,7 @@ namespace IIS.Core
                     Configuration["activeDirectory:password"]));
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
+            services.AddHostedService<ThemeCounterBackgroundService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));

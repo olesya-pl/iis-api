@@ -52,7 +52,7 @@ namespace Iis.Services
                 searchParams.SortOrder = search.SortOrder;
             }
 
-            var searchResult = await _elasticManager.Search(searchParams);
+            var searchResult = await _elasticManager.SearchAsync(searchParams);
             return (searchResult.Count, searchResult.Items.Select(x => x.SearchResult.ToObject<ReportDto>()).ToList());
         }
 

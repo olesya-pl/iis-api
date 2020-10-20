@@ -29,14 +29,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         List<RelationEntity> GetAllRelations();
         Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter);
         List<AttributeEntity> GetAllAttributes();
-        Task<List<AttributeEntity>> GetAttributesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName,
-            int limit);
-
+        Task<List<AttributeEntity>> GetAttributesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
         Task<List<NodeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task<NodeEntity> UpdateNodeAsync(Guid id, Action<NodeEntity> action);
         Task<List<Guid>> GetSourceNodeIdByTargetNodeId(Guid? propertyId, Guid entityId);
         Task<List<RelationEntity>> GetIncomingRelationsAsync(Guid entityId);
         Task<List<RelationEntity>> GetIncomingRelationsAsync(IReadOnlyCollection<Guid> entityIds);
+        Task<List<RelationEntity>> GetIncomingRelationsAsync(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);
         string GetAttributeValueByDotName(Guid id, string dotName);
     }
 }

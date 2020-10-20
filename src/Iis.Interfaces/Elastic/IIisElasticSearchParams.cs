@@ -4,14 +4,14 @@ namespace Iis.Interfaces.Elastic
 {
     public interface IIisElasticSearchParams
     {
-        List<string> BaseIndexNames { get; }
-        string Query { get; }
-        List<string> ResultFields { get; }
         IReadOnlyList<IIisElasticField> SearchFields { get; }
-        bool IsLenient { get; }
+        IEnumerable<string> BaseIndexNames { get; }
+        IEnumerable<string> ResultFields { get; }
+        string Query { get; }
         int From { get; }
         int Size { get; }
         string SortColumn { get; }
         string SortOrder { get; }
+        bool IsLenient { get; }
     }
 }

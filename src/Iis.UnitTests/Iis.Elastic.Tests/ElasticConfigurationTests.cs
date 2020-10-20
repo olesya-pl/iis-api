@@ -26,7 +26,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             }
             
             var nodeTypeMock = new Mock<INodeTypeLinked>();
-            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, 0)).Returns(ontologyFields);
+            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, null, 0)).Returns(ontologyFields);
             var ontologySchemaMock = new Mock<IOntologySchema>();
             ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
             var sut = new IisElasticConfiguration(ontologySchemaMock.Object);
@@ -59,7 +59,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             configuredField.IsExcluded = false;
 
             var nodeTypeMock = new Mock<INodeTypeLinked>();
-            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, 0))
+            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, null, 0))
                 .Returns(new List<NodeAggregationInfo> { ontologyField });
             var ontologySchemaMock = new Mock<IOntologySchema>();
             ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
@@ -85,7 +85,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             configuredField.IsExcluded = false;
 
             var nodeTypeMock = new Mock<INodeTypeLinked>();
-            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, 0))
+            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, null, 0))
                 .Returns(new List<NodeAggregationInfo> { ontologyField });
             var ontologySchemaMock = new Mock<IOntologySchema>();
             ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
@@ -113,7 +113,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             configuredField.IsExcluded = true;
 
             var nodeTypeMock = new Mock<INodeTypeLinked>();
-            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, 0))
+            nodeTypeMock.Setup(e => e.GetAttributeDotNamesRecursiveWithLimit(null, null, 0))
                 .Returns(new List<NodeAggregationInfo> { ontologyField });
             var ontologySchemaMock = new Mock<IOntologySchema>();
             ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);

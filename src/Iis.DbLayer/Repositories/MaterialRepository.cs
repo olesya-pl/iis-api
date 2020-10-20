@@ -177,7 +177,7 @@ namespace Iis.DbLayer.Repositories
                 From = filter.Offset,
                 Size = filter.Limit,
             };
-            var searchResult = await _elasticManager.Search(searchParams, cancellationToken);
+            var searchResult = await _elasticManager.SearchAsync(searchParams, cancellationToken);
             return new SearchResult
             {
                 Count = searchResult.Count,
@@ -185,6 +185,17 @@ namespace Iis.DbLayer.Repositories
                     .ToDictionary(k => new Guid(k.Identifier),
                     v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
+        }
+
+        public Task<int> CountMaterialsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
+        {
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = MaterialIndexes.ToList(),
+                Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL"
+            };
+
+            return _elasticManager.CountAsync(searchParams, cancellationToken);
         }
 
         public void AddMaterialEntity(MaterialEntity materialEntity)
@@ -237,7 +248,18 @@ namespace Iis.DbLayer.Repositories
                 .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material).ToList();
         }
-
+        public Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds)
+        {
+            return Context.Materials
+                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                    (Material, MaterialInfo) => new { Material, MaterialInfo })
+                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .AsNoTracking()
+                .Select(m => m.MaterialInfoJoined.Material)
+                .ToListAsync();
+        }
         public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds)
         {
             return Context.Materials

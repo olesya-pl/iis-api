@@ -2,9 +2,11 @@
 using Elasticsearch.Net;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
-namespace Iis.Elastic
+namespace Iis.Elastic.SearchResult
 {
     internal class SearchResultExtractor
     {
@@ -48,11 +50,22 @@ namespace Iis.Elastic
                 }
             }
             var total = json["hits"]?["total"]?["value"];
-            return new ElasticSearchResult
+            var res = new ElasticSearchResult
             {
                 Count = (int?)total ?? 0,
-                Items = items
+                Items = items                
             };
+            if (json.ContainsKey("aggregations"))
+            {
+                res.Aggregations = json["aggregations"].ToObject<Dictionary<string, AggregationItem>>(new JsonSerializer
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new SnakeCaseNamingStrategy()
+                    }
+                });
+            }
+            return res;
         }
 
         private JObject RemoveFieldsDuplicatedByAlias(JToken highlight, string nodeTypeName)

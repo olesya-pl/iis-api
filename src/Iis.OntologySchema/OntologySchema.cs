@@ -4,6 +4,7 @@ using Iis.OntologySchema.Comparison;
 using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -415,7 +416,7 @@ namespace Iis.OntologySchema
         public IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName)
         {
             var items = BuildAttributesBasedOnEntityFileds(entityName);
-            items.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null));
+            items.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null, false));
 
             return new AttributeInfo(historicalEntityName, items);
         }
@@ -481,7 +482,12 @@ namespace Iis.OntologySchema
                 var shortDotName = key.Substring(key.IndexOf('.') + 1);
                 var scalarType = isFuzzyDateEntity ? ScalarType.Date : nodeType.AttributeType.ScalarType;
 
-                var item = new AttributeInfoItem(shortDotName, scalarType, aliases);
+                var splitted = key.Split('.');
+                var parentDotName = string.Join('.', splitted.Take(splitted.Length - 1));
+
+                var parent = _storage.DotNameTypes[parentDotName].GetRelationTypeByName(splitted.Last());
+                var isRelationAggregated = parent?.NodeType?.MetaObject?.IsAggregated == true;
+                var item = new AttributeInfoItem(shortDotName, scalarType, aliases, isRelationAggregated);
 
                 items.Add(item);
             }

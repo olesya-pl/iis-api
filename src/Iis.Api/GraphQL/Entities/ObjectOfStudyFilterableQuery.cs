@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using HotChocolate;
 using Iis.Domain;
 using IIS.Core.GraphQL.Common;
@@ -11,6 +12,7 @@ namespace IIS.Core.GraphQL.Entities
     {
         public async Task<ObjectOfStudyFilterableQueryResponse> EntityObjectOfStudyFilterableList(
             [Service] IOntologyService ontologyService,
+            [Service] IMapper mapper,
             PaginationInput pagination,
             AllEntitiesFilterInput filter
             )
@@ -23,11 +25,7 @@ namespace IIS.Core.GraphQL.Entities
                 Offset = pagination.Offset(),
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery
             });
-            return new ObjectOfStudyFilterableQueryResponse
-            {
-                Items = response.nodes,
-                Count = response.count
-            };
+            return mapper.Map<ObjectOfStudyFilterableQueryResponse>(response);            
         }
     }
 }

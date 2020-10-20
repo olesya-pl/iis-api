@@ -249,18 +249,25 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             if (value != null)
             {
+                var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
                 var newRelation = await _mutationCreateResolver.CreateSingleProperty(embed, value);
                 node.AddNode(newRelation);
                 if (oldRelation == null)
                 {
-                    await SaveChangesForNewRelation(newRelation, requestId);
+                    if (newRelation.Target is Attribute)
+                    {
+                        await _changeHistoryService
+                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), string.Empty, stringifiedValue, requestId);
+                    }
+                    else 
+                    {
+                        await SaveChangesForNewRelation(newRelation, requestId);
+                    }   
                 }
                 else if (oldRelation.Target is Attribute)
                 {
                     var oldValueObj = (oldRelation.Target as Attribute).Value;
                     var oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);
-
-                    var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
 
                     if (oldValue != stringifiedValue)
                     {

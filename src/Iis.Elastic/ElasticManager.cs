@@ -1,4 +1,5 @@
 ﻿using Elasticsearch.Net;
+
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
@@ -10,7 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Iis.Elastic.SearchResult;
+using Iis.Elastic.ElasticMappingProperties;
 namespace Iis.Elastic
 {
     internal class ElasticManager: IElasticManager
@@ -18,6 +20,7 @@ namespace Iis.Elastic
         private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
         private const string RemoveSymbolsPattern = "№";
         public const string NullValue = "NULL";
+        public const string AggregateSuffix = "Aggregate";
         private readonly ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;
         private readonly SearchResultExtractor _resultExtractor;
@@ -116,26 +119,50 @@ namespace Iis.Elastic
             return searchResponse.Success;
         }
 
-        public async Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public Task<IElasticSearchResult> SearchAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetSearchJson(searchParams);
-            var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_search" :
-                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
-            var response = await GetAsync(path, jsonString, cancellationToken);
+            return SearchAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetCountJson(searchParams);
+
+            return CountAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public Task<IElasticSearchResult> SearchAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetSearchJson(searchParams);
+
+            return SearchAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        {
+            var jsonString = GetCountJson(searchParams);
+
+            return CountAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
+        }
+
+        public async Task<IElasticSearchResult> SearchAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default)
+        {
+            var path = baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
+
+            var response = await GetAsync(path, queryData, cancellationToken);
+
             return _resultExtractor.GetFromResponse(response);
         }
 
-        public async Task<IElasticSearchResult> Search(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public async Task<int> CountAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default)
         {
-            var jsonString = GetSearchJson(searchParams);
-            var path = searchParams.BaseIndexNames.Count == 0 ?
-                "_search" :
-                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
+            var path = baseIndexNameList.Any() ? "_count" : $"{GetRealIndexNames(baseIndexNameList)}/_count";
 
-            var response = await GetAsync(path, jsonString, cancellationToken);
-            return _resultExtractor.GetFromResponse(response);
+            var response = await GetAsync(path, queryData, cancellationToken);
+
+            return JObject.Parse(response.Body)["count"].Value<int>();
         }
 
         public async Task<IElasticSearchResult> SearchMoreLikeThisAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
@@ -171,7 +198,7 @@ namespace Iis.Elastic
 
             var query = json.ToString(Newtonsoft.Json.Formatting.None);
 
-            var path = searchParams.BaseIndexNames.Count == 0 ?
+            var path = searchParams.BaseIndexNames.Count() == 0 ?
                 "_search" :
                 $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
 
@@ -201,9 +228,7 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(searchResponse);
         }
 
-        public async Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames,
-            string documentId,
-            CancellationToken token = default)
+        public async Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames, string documentId, CancellationToken token = default)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(
                 GetRealIndexNames(indexNames),
@@ -259,6 +284,7 @@ namespace Iis.Elastic
         public async Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default)
         {
             var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
+            mappingConfiguration.Properties.Add(KeywordProperty.Create($"NodeTypeTitle{AggregateSuffix}", false));
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
@@ -321,7 +347,7 @@ namespace Iis.Elastic
                     script = new {
                         source = "1 / (l2norm(params.queryVector, doc['ImageVector']) + 1)",
                         @params = new {
-                            queryVector =  imageVector
+                            queryVector = imageVector
                         }
                     }
                 }
@@ -331,7 +357,6 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(searchResponse);
         }
 
-        
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
             var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
@@ -377,6 +402,55 @@ namespace Iis.Elastic
             json["query"]["bool"] = new JObject();
 
             PrepareHighlights(json);
+            PrepareAggregations(json, searchParams.SearchParams.SelectMany(p => p.Fields).Where(p => p.IsAggregated).ToList());
+
+            var shouldSections = new JArray();
+            foreach (var searchItem in searchParams.SearchParams)
+            {
+                if (IsExactQuery(searchItem.Query))
+                {
+                    var shouldSection = CreateExactShouldSection(searchItem.Query, searchParams.IsLenient);
+                    shouldSections.Add(shouldSection);
+                }
+                else if (searchItem.Fields?.Any() == true)
+                {
+                    var shouldSection = CreateMultiFieldShouldSection(searchItem.Query, searchItem.Fields, searchParams.IsLenient);
+                    shouldSections.Merge(shouldSection);
+                }
+                else
+                {
+                    var shouldSection = CreateFallbackShouldSection(searchItem.Query, searchParams.IsLenient);
+                    shouldSections.Add(shouldSection);
+                }
+            }
+
+            json["query"]["bool"]["should"] = shouldSections;
+            return json.ToString();
+        }
+
+        private void PrepareAggregations(JObject json, List<IIisElasticField> fields)
+        {
+            if (!fields.Any())
+            {
+                return;
+            }
+            var aggs = new JObject();
+            json["aggs"] = aggs;
+            foreach (var field in fields)
+            {
+                var fieldObj = new JObject();
+                fieldObj["field"] = $"{field.Name}{AggregateSuffix}";
+                var terms = new JObject();
+                terms["terms"] = fieldObj;
+                aggs[field.Name] = terms;
+            }
+        }
+
+        private string GetCountJson(IMultiElasticSearchParams searchParams)
+        {
+            var json = new JObject();
+            json["query"] = new JObject();
+            json["query"]["bool"] = new JObject();
 
             var shouldSections = new JArray();
             foreach (var searchItem in searchParams.SearchParams)
@@ -418,6 +492,27 @@ namespace Iis.Elastic
                     CreateSortSection(searchParams.SortColumn, searchParams.SortOrder)
                 };
             }
+
+            if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
+            {
+                PopulateExactQuery(searchParams, json);
+            }
+            else if (searchParams.SearchFields.Any())
+            {
+                PopulateFieldsIntoQuery(searchParams, json);
+            }
+            else
+            {
+                PrepareFallbackQuery(searchParams, json);
+            }
+
+            return json.ToString();
+        }
+
+        private string GetCountJson(IIisElasticSearchParams searchParams)
+        {
+            var json = new JObject();
+            json["query"] = new JObject();
 
             if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
             {
