@@ -33,7 +33,7 @@ namespace Iis.OntologyData.DataTypes
         public string Value => Attribute?.Value;
 
         public IReadOnlyList<IRelation> GetDirectRelations() =>
-            AllData.Locker.ReadLock(() => OutgoingRelations.ToList());
+            AllData.Locker.ReadLock(() => _outgoingRelations.ToList());
 
         public IReadOnlyList<IRelation> GetInversedRelations()
         {
@@ -106,7 +106,7 @@ namespace Iis.OntologyData.DataTypes
         }
         public bool HasPropertyWithValue(string propertyName, string value)
         {
-            return AllData.Locker.ReadLock(() => OutgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value));
+            return AllData.Locker.ReadLock(() => _outgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value));
         }
         public INode GetChildNode(string childTypeName)
         {
@@ -124,7 +124,7 @@ namespace Iis.OntologyData.DataTypes
         }
         public INode GetSingleDirectProperty(string name)
         {
-            return AllData.Locker.ReadLock(() => OutgoingRelations
+            return AllData.Locker.ReadLock(() => _outgoingRelations
                 .SingleOrDefault(r => r.Node.NodeType.Name == name)
                 ?.TargetNode);
         }
@@ -209,6 +209,25 @@ namespace Iis.OntologyData.DataTypes
                 });
             }
             return new DotNameValues(list);
+        }
+        public IReadOnlyList<INode> GetDirectAttributeNodes()
+        {
+            return _outgoingRelations
+                .Where(r => r.IsLinkToAttribute)
+                .Select(r => r.TargetNode)
+                .ToList();
+        }
+        public IReadOnlyList<INode> GetAllAttributeNodes()
+        {
+            var result = new List<INode>();
+
+            result.AddRange(GetDirectAttributeNodes());
+            foreach (var relation in _outgoingRelations.Where(r => !r.IsLinkToInternalObject))
+            {
+                result.AddRange(relation.TargetNode.GetDirectAttributeNodes());
+            }
+
+            return result;
         }
     }
 }

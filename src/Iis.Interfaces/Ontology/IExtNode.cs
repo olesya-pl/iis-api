@@ -18,7 +18,6 @@ namespace Iis.Interfaces.Ontology
         IReadOnlyList<IExtNode> Children { get; }
         bool IsAttribute { get; }
         List<IGeoCoordinates> GetCoordinatesWithoutNestedObjects();
-        List<(IExtNode Node, IGeoCoordinates Coordinates)> GetNodeCoordinates();
         List<IExtNode> GetAttributesRecursive(ScalarType scalarType);
         List<IExtNode> GetAttributesRecursiveWithoutNestedObjects(ScalarType scalarType);
         INodeTypeLinked NodeType { get; }

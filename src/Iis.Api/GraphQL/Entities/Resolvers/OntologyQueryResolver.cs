@@ -182,11 +182,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var extNodeService = ctx.Service<IExtNodeService>();
 
             var extNode = await extNodeService.GetExtNodeWithoutNestedObjectsAsync(parentNode.Id);
-            return extNode.GetNodeCoordinates().Select(x => new GeoCoordinate
+            return extNode.GetCoordinatesWithoutNestedObjects().Select(x => new GeoCoordinate
             {
-                Label = x.Node.NodeTypeTitle,
-                Lat = x.Coordinates.Latitude,
-                Long = x.Coordinates.Longitude
+                Label = extNode.NodeType.Title,
+                Lat = x.Latitude,
+                Long = x.Longitude
             }).ToList();
         }
     }

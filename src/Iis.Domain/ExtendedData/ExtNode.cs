@@ -35,15 +35,6 @@ namespace Iis.Domain.ExtendedData
 
         }
 
-        public List<(IExtNode Node, IGeoCoordinates Coordinates)> GetNodeCoordinates()
-        {
-            var geoNodes = GetAttributesRecursive(ScalarTypeEnum.Geo);
-            if (geoNodes.Count == 0)
-                return new List<(IExtNode Node, IGeoCoordinates Coordinates)>();
-
-            return geoNodes.Select(x => (x, ExtractCoordinates(x.AttributeValue.ToString()))).ToList();
-        }
-
         public List<IExtNode> GetAttributesRecursiveWithoutNestedObjects(ScalarType scalarType)
         {
             if (IsAttribute && ScalarType == scalarType)
