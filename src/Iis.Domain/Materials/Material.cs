@@ -42,5 +42,9 @@ namespace Iis.Domain.Materials
         public JObject ObjectsOfStudy { get; set; }
         public IEnumerable<JObject> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
+
+        public bool HasAttachedFile() => File != null;
+
+        public bool IsParentMaterial() => ParentId == null;
     }
 }
