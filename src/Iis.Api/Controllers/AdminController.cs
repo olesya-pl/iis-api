@@ -41,18 +41,6 @@ namespace Iis.Api.Controllers
             _adminElasticService = adminElasticService ?? throw new ArgumentNullException(nameof(adminElasticService));
         }
 
-        [HttpPost("CreateHistoricalIndexes/{indexNames}")]
-        public Task<IActionResult> CreateHistoricalIndexes(string indexNames, CancellationToken ct)
-        {
-            return RecreateOntologyIndexes(indexNames, true, false, ct);
-        }
-
-        [HttpGet("RecreateElasticOntologyIndexes/{indexNames}")]
-        public Task<IActionResult> RecreateElasticOntologyIndexes(string indexNames, CancellationToken ct)
-        {
-            return RecreateOntologyIndexes(indexNames, false, false, ct);
-        }
-
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
         public Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken ct)
         {
@@ -63,12 +51,6 @@ namespace Iis.Api.Controllers
         public Task<IActionResult> ReInitializeHistoricalOntologyIndexes(string indexNames, CancellationToken ct)
         {
             return RecreateOntologyIndexes(indexNames, true, true, ct);
-        }
-
-        [HttpGet("ReCreateSignIndexes/{indexNames}")]
-        public Task<IActionResult> ReCreateSignIndexes(string indexNames, CancellationToken ct)
-        {
-            return CreateOntologyIndexes(indexNames, _elasticState.SignIndexes, false, false, ct);
         }
 
         [HttpGet("ReInitializeSignIndexes/{indexNames}")]
@@ -98,11 +80,8 @@ namespace Iis.Api.Controllers
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
 
             await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
-
-            if (useNodesFromMemory)
-                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
-            else
-                await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
+            
+            await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 
@@ -194,10 +173,7 @@ namespace Iis.Api.Controllers
 
             await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
 
-            if(useMemoryCache)
-                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
-            else
-                await _adminElasticService.FillIndexesAsync(indexes, isHistorical, ct);
+            await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 

@@ -15,22 +15,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class OntologyRepository : RepositoryBase<OntologyContext>, IOntologyRepository
     {
-        public NodeEntity GetNodeEntityById(Guid id)
-        {
-            return Context.Nodes.FirstOrDefault(_ => _.Id == id);
-        }
-        public NodeEntity GetActiveNodeEntityById(Guid id)
-        {
-            return Context.Nodes
-                .Include(p => p.NodeType)
-                .FirstOrDefault(p => p.Id == id && !p.IsArchived && !p.NodeType.IsArchived);
-        }
-
-        public async Task<NodeEntity> GetNodeEntityByIdAsync(Guid id)
-        {
-            return await Context.Nodes.FirstOrDefaultAsync(_ => _.Id == id);
-        }
-
         private IQueryable<NodeEntity> GetNodeEntityWithIncludesQuery()
         {
             return Context.Nodes

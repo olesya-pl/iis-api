@@ -40,9 +40,8 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()), 
-                new Mock<IIISUnitOfWorkFactory>().Object, 
-                new Mock<IOntologySchema>().Object, 
+            var sut = new ExtNodeService(
+                new Mock<IOntologyNodesData>().Object,
                 new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
             var res = sut.GetExtNode(nodeMock.Object);
 
@@ -73,9 +72,8 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
-                new Mock<IIISUnitOfWorkFactory>().Object,
-                new Mock<IOntologySchema>().Object,
+            var sut = new ExtNodeService(
+                new Mock<IOntologyNodesData>().Object,
                 new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
             var res = sut.GetExtNode(nodeMock.Object);
 
@@ -106,9 +104,8 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
-                new Mock<IIISUnitOfWorkFactory>().Object,
-                new Mock<IOntologySchema>().Object,
+            var sut = new ExtNodeService(
+                new Mock<IOntologyNodesData>().Object,
                 new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
             var res = sut.GetExtNode(nodeMock.Object);
 
@@ -139,9 +136,8 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
-                new Mock<IIISUnitOfWorkFactory>().Object,
-                new Mock<IOntologySchema>().Object,
+            var sut = new ExtNodeService(
+                new Mock<IOntologyNodesData>().Object,
                 new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
             var res = sut.GetExtNode(nodeMock.Object);
 
@@ -172,9 +168,8 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
-                new Mock<IIISUnitOfWorkFactory>().Object,
-                new Mock<IOntologySchema>().Object,
+            var sut = new ExtNodeService(
+                new Mock<IOntologyNodesData>().Object,
                 new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
             var res = sut.GetExtNode(nodeMock.Object);
 
@@ -205,9 +200,8 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
-                new Mock<IIISUnitOfWorkFactory>().Object,
-                new Mock<IOntologySchema>().Object,
+            var sut = new ExtNodeService(
+                new Mock<IOntologyNodesData>().Object,
                 new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
             var res = sut.GetExtNode(nodeMock.Object);
 

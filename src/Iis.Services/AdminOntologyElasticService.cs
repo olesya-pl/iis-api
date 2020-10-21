@@ -88,34 +88,6 @@ namespace Iis.Services
             }
         }
 
-        public async Task FillIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
-        {
-            var nodeIds = await _extNodeService.GetExtNodesByTypeIdsAsync(indexes, ct);
-            if (isHistorical)
-            {
-                var response = await _nodeRepository.PutHistoricalNodesAsync(nodeIds, ct);
-                LogBulkResponse(response);
-            }
-            else
-            {
-                var results = new List<bool>(nodeIds.Count);
-                foreach (var id in nodeIds)
-                {
-                    ct.ThrowIfCancellationRequested();
-
-                    var result = await _nodeRepository.PutNodeAsync(id, ct);
-                    if (!result)
-                        TryLog($"node with id: {id} was not indexed");
-
-                    results.Add(result);
-                }
-
-                TryLog($"nodes: {results.Count}");
-                TryLog($"success indexed nodes: {results.Count(x => x)}");
-                TryLog($"failed indexed nodes: {results.Count(x => !x)}");
-            }
-        }
-
         public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var nodes = GetNodesFromMemory(indexes);
