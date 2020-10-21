@@ -27,7 +27,7 @@ namespace Iis.Interfaces.Ontology.Data
         bool HasTheSameValues(INode another, IEnumerable<string> dotNames);
         IDotNameValues GetComputedValues();
         string ResolveFormula(string formula);
-        IReadOnlyList<INode> GetDirectAttributeNodes();
-        IReadOnlyList<INode> GetAllAttributeNodes();
+        IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null);
+        IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null);
     }
 }

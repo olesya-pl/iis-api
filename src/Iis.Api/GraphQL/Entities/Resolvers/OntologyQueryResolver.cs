@@ -179,12 +179,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {
             var parentNode = ctx.Parent<Node>();
-            var extNodeService = ctx.Service<IExtNodeService>();
+            var geoCoordinates = parentNode.OriginalNode
+                .GetAllAttributeNodes(Iis.Interfaces.Ontology.Schema.ScalarType.Geo)
+                .Select(n => n.Attribute.ValueAsGeoCoordinates);
 
-            var extNode = await extNodeService.GetExtNodeWithoutNestedObjectsAsync(parentNode.Id);
-            return extNode.GetCoordinatesWithoutNestedObjects().Select(x => new GeoCoordinate
+            return geoCoordinates.Select(x => new GeoCoordinate
             {
-                Label = extNode.NodeType.Title,
+                Label = parentNode.OriginalNode.NodeType.Title,
                 Lat = x.Latitude,
                 Long = x.Longitude
             }).ToList();

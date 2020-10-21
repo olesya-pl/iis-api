@@ -210,21 +210,22 @@ namespace Iis.OntologyData.DataTypes
             }
             return new DotNameValues(list);
         }
-        public IReadOnlyList<INode> GetDirectAttributeNodes()
+        public IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null)
         {
             return _outgoingRelations
-                .Where(r => r.IsLinkToAttribute)
+                .Where(r => r.IsLinkToAttribute
+                    && (scalarType == null || r.TargetNode.NodeType.AttributeType.ScalarType == scalarType))
                 .Select(r => r.TargetNode)
                 .ToList();
         }
-        public IReadOnlyList<INode> GetAllAttributeNodes()
+        public IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null)
         {
             var result = new List<INode>();
 
             result.AddRange(GetDirectAttributeNodes());
             foreach (var relation in _outgoingRelations.Where(r => !r.IsLinkToInternalObject))
             {
-                result.AddRange(relation.TargetNode.GetDirectAttributeNodes());
+                result.AddRange(relation.TargetNode.GetDirectAttributeNodes(scalarType));
             }
 
             return result;

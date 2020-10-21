@@ -320,7 +320,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     }
                 }
             }
-
+            result.OriginalNode = node;
             return result;
         }
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)

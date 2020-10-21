@@ -33,20 +33,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _ontologyData = ontologyData;
         }
 
-        public async Task<IExtNode> GetExtNodeWithoutNestedObjectsAsync(Guid id, CancellationToken ct = default)
-        {
-            var node = _ontologyData.GetNode(id);
-
-            if (node == null) return null;
-
-            var extNode = await MapExtNodeWithoutNestedObjectsAsync(
-                node,
-                node.NodeType.Name,
-                node.NodeType.Title,
-                ct);
-            return extNode;
-        }
-
         public IExtNode GetExtNode(INode node)
         {
             var extNode = MapExtNode(

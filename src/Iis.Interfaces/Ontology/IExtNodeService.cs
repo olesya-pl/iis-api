@@ -10,7 +10,6 @@ namespace Iis.Interfaces.Ontology
     public interface IExtNodeService
     {
         List<IExtNode> GetExtNodes(IReadOnlyCollection<INode> itemsToUpdate);
-        Task<IExtNode> GetExtNodeWithoutNestedObjectsAsync(Guid id, CancellationToken ct = default);
         IExtNode GetExtNode(INode nodeEntity);
     }
 }
