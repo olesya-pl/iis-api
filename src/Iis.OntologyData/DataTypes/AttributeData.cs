@@ -17,19 +17,15 @@ namespace Iis.OntologyData.DataTypes
         public INode Node => _node;
         public ScalarType ScalarType => Node.NodeType.AttributeType.ScalarType;
 
-        private Lazy<IGeoCoordinates> _lazyGeoCoordinates;
-        public IGeoCoordinates ValueAsGeoCoordinates => _lazyGeoCoordinates.Value;
+        private IGeoCoordinates _coordinates;
+        public IGeoCoordinates ValueAsGeoCoordinates => _coordinates ?? (_coordinates = ExtractCoordinates(Value));
 
-        public AttributeData()
-        {
-            var _lazyCoordinates = new Lazy<IGeoCoordinates>(() =>
-                ScalarType == ScalarType.Geo ? ExtractCoordinates(Value) : null
-            );
-        }
         private IGeoCoordinates ExtractCoordinates(string json)
         {
             try
             {
+                if (ScalarType != ScalarType.Geo) return null;
+
                 var jObject = JObject.Parse(json);
                 var coordinatesJson = (JArray)jObject["coordinates"];
                 var lat = decimal.Parse(coordinatesJson[0].ToString());

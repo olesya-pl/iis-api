@@ -24,6 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
+using Iis.Interfaces.Ontology.Data;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -41,6 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
+        private readonly IOntologyNodesData _ontologyData;
         private readonly IElasticService _elasticService;
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
@@ -51,6 +53,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         public MaterialProvider(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
+            IOntologyNodesData ontologyData,
             IElasticService elasticService,
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
@@ -62,6 +65,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
+            _ontologyData = ontologyData;
             _elasticService = elasticService;
 
             _mLResponseRepository = mLResponseRepository;

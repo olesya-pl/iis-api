@@ -179,9 +179,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {
             var parentNode = ctx.Parent<Node>();
-            var geoCoordinates = parentNode.OriginalNode
-                .GetAllAttributeNodes(Iis.Interfaces.Ontology.Schema.ScalarType.Geo)
-                .Select(n => n.Attribute.ValueAsGeoCoordinates);
+            var attriburteNodes = parentNode.OriginalNode.GetAllAttributeNodes(Iis.Interfaces.Ontology.Schema.ScalarType.Geo);
+            var geoCoordinates = attriburteNodes.Select(n => n.Attribute.ValueAsGeoCoordinates);
 
             return geoCoordinates.Select(x => new GeoCoordinate
             {

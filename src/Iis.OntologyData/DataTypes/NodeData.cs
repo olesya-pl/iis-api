@@ -222,13 +222,21 @@ namespace Iis.OntologyData.DataTypes
         {
             var result = new List<INode>();
 
-            result.AddRange(GetDirectAttributeNodes());
-            foreach (var relation in _outgoingRelations.Where(r => !r.IsLinkToInternalObject))
+            result.AddRange(GetDirectAttributeNodes(scalarType));
+            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject))
             {
                 result.AddRange(relation.TargetNode.GetDirectAttributeNodes(scalarType));
             }
 
             return result;
+        }
+        public IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList)
+        {
+            return AllData.Locker.ReadLock(() => _incomingRelations
+                .Where(r => relationTypeNameList == null ||
+                    relationTypeNameList.Contains(r.Node.NodeType.Name))
+                .ToList()
+            );
         }
     }
 }

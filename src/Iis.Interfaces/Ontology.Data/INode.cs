@@ -29,5 +29,6 @@ namespace Iis.Interfaces.Ontology.Data
         string ResolveFormula(string formula);
         IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null);
         IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null);
+        IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList);
     }
 }

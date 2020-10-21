@@ -10,7 +10,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public interface IOntologyRepository
     {
-        Task<NodeEntity> GetNodeEntityWithIncludesByIdAsync(Guid id);
         Task<List<NodeEntity>> GetNodesWithSuggestionAsync(IEnumerable<Guid> derived, ElasticFilter filter);
         Task<List<NodeEntity>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Task<List<RelationEntity>> GetIncomingRelationsAsync(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);

@@ -26,6 +26,7 @@ using Iis.Interfaces.Ontology.Schema;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Iis.Utility;
+using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.UnitTests.Materials
 {
@@ -55,7 +56,9 @@ namespace Iis.UnitTests.Materials
             unitOfWorkFactoryMock.Setup(x => x.Create()).Returns(unitOfWorkMock.Object);
             unitOfWorkMock.Setup(x => x.MaterialRepository).Returns(materialRepositoryMock.Object);
             materialProvider = new MaterialProvider<IIISUnitOfWork>(new Mock<IOntologyService>().Object,
-                new Mock<IOntologySchema>().Object, new Mock<IElasticService>().Object,
+                new Mock<IOntologySchema>().Object,
+                new Mock<IOntologyNodesData>().Object,
+                new Mock<IElasticService>().Object,
                 new Mock<IMLResponseRepository>().Object,
                 new Mock<IMaterialSignRepository>().Object,
                 new Mock<IMapper>().Object,

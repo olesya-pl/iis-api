@@ -80,20 +80,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             extNode.Children = await GetExtNodesByRelations(node.OutgoingRelations, visitedNodeIds, cancellationToken);
             return extNode;
         }
-        private async Task<ExtNode> MapExtNodeWithoutNestedObjectsAsync(
-            INode node,
-            string nodeTypeName,
-            string nodeTypeTitle,
-            CancellationToken cancellationToken = default)
-        {
-            var extNode = MapExtNodeBase(node, nodeTypeName, nodeTypeTitle);
-            extNode.EntityTypeName = node.NodeType.Name;
-            extNode.AttributeValue = GetAttributeValue(node);
-            extNode.ScalarType = node.NodeType?.AttributeType?.ScalarType;
-            extNode.Children = await GetExtNodesByRelationsWithoutNestedObjects(node.OutgoingRelations, cancellationToken);
-            return extNode;
-        }
-
         private ExtNode MapExtNode(
             INode node,
             string nodeTypeName,
@@ -268,28 +254,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             return result;
         }
-
-        private async Task<List<ExtNode>> GetExtNodesByRelationsWithoutNestedObjects(
-            IEnumerable<IRelation> relations,
-            CancellationToken cancellationToken = default)
-        {
-            var result = new List<ExtNode>();
-            foreach (var relation in relations.Where(r => !r.Node.IsArchived && !r.Node.NodeType.IsArchived
-                && !r.TargetNode.IsArchived && !r.TargetNode.NodeType.IsArchived))
-            {
-                if (!relation.TargetNode.NodeType.IsObjectOfStudy)
-                {
-                    var extNode = await MapExtNodeWithoutNestedObjectsAsync(
-                        relation.TargetNode,
-                        relation.Node.NodeType.Name,
-                        relation.Node.NodeType.Title,
-                        cancellationToken);
-                    result.Add(extNode);
-                }
-            }
-            return result;
-        }
-
         private List<ExtNode> GetExtNodesByRelations(
             IEnumerable<IRelation> relations,
             List<Guid> visitedNodeIds)
@@ -322,10 +286,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return result;
         }
 
-        public List<IExtNode> GetExtNodes(IReadOnlyCollection<INode> itemsToUpdate)
+        public List<IExtNode> GetExtNodes(IReadOnlyCollection<INode> ids)
         {
-            return itemsToUpdate.Select(p => GetExtNode(p))
-                .ToList();
+            return ids.Select(p => GetExtNode(p)).ToList();
         }
     }
 }
