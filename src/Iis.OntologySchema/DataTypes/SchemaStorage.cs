@@ -37,6 +37,7 @@ namespace Iis.OntologySchema.DataTypes
                 if (IsArchived(relationType))
                 {
                     RelationTypes.Remove(relationId);
+                    NodeTypes.Remove(relationId);
                     continue;
                 }
 
