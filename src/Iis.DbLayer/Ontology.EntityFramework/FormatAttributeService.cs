@@ -5,7 +5,7 @@ using Iis.Utility;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
-    public class FormatAttributeService
+    public class FormatAttributeService : IFormatAttributeService
     {
         private readonly FileUrlGetter _fileUrlGetter;
 
