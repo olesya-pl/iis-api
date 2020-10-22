@@ -24,7 +24,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly OntologyContext _context;
         private readonly IOntologySchema _ontologySchema;
-        private readonly FormatAttributeService _formatAttributeService;
+        private readonly IFormatAttributeService _formatAttributeService;
 
         public ExtNodeService(OntologyContext context,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
