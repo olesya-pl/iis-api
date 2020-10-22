@@ -41,13 +41,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     };
                 case ScalarType.IntegerRange:
                 case ScalarType.FloatRange:
-                    return FormatRange(value);
+                    throw new NotSupportedException("Call FormatRangeService for ranges");
                 default:
                     return value;
             }
-        }
+        }        
+    }
 
-        private object FormatRange(string value)
+    public class FormatRangeService
+    {
+        public object FormatRange(string value)
         {
             var splitted = value.Split('-', ' ', StringSplitOptions.RemoveEmptyEntries);
             if (splitted.Count() == 1 || splitted.Count() == 2)

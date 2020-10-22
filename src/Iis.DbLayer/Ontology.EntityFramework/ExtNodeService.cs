@@ -25,6 +25,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private readonly OntologyContext _context;
         private readonly IOntologySchema _ontologySchema;
         private readonly FormatAttributeService _formatAttributeService;
+        private readonly FormatRangeService _formarRangeService;
+        private readonly FormatRangeService formatRangeService;
 
         public ExtNodeService(OntologyContext context,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
@@ -34,6 +36,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _context = context;
             _ontologySchema = ontologySchema;
             _formatAttributeService = new FormatAttributeService(fileUrlGetter);
+            _formarRangeService = new FormatRangeService();
         }
 
         public async Task<List<Guid>> GetExtNodesByTypeIdsAsync(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
@@ -219,7 +222,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
-            return _formatAttributeService.FormatValue(scalarType, value);
+            return scalarType == ScalarType.IntegerRange || scalarType == ScalarType.FloatRange
+                ? _formarRangeService.FormatRange(value)
+                : _formatAttributeService.FormatValue(scalarType, value);
         }
 
         private object GetAttributeValue(INode nodeEntity)
@@ -228,7 +233,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
-            return _formatAttributeService.FormatValue(scalarType, value);
+            return scalarType == ScalarType.IntegerRange || scalarType == ScalarType.FloatRange
+                ? _formarRangeService.FormatRange(value)
+                : _formatAttributeService.FormatValue(scalarType, value);
         }        
 
         
