@@ -29,11 +29,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public ExtNodeService(OntologyContext context,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IOntologySchema ontologySchema,
-            FileUrlGetter fileUrlGetter) : base(unitOfWorkFactory)
+            FormatAttributeService formatAttributeService) : base(unitOfWorkFactory)
         {
             _context = context;
             _ontologySchema = ontologySchema;
-            _formatAttributeService = new FormatAttributeService(fileUrlGetter);
+            _formatAttributeService = formatAttributeService;
         }
 
         public async Task<List<Guid>> GetExtNodesByTypeIdsAsync(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)

@@ -43,7 +43,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()), 
                 new Mock<IIISUnitOfWorkFactory>().Object, 
                 new Mock<IOntologySchema>().Object, 
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+                new FormatAttributeService(new FileUrlGetter(new Mock<IHttpContextAccessor>().Object)));
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -76,7 +76,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
                 new Mock<IIISUnitOfWorkFactory>().Object,
                 new Mock<IOntologySchema>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+                new FormatAttributeService(new FileUrlGetter(new Mock<IHttpContextAccessor>().Object)));
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -109,7 +109,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
                 new Mock<IIISUnitOfWorkFactory>().Object,
                 new Mock<IOntologySchema>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+                new FormatAttributeService(new FileUrlGetter(new Mock<IHttpContextAccessor>().Object)));
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -142,7 +142,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
                 new Mock<IIISUnitOfWorkFactory>().Object,
                 new Mock<IOntologySchema>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+                new FormatAttributeService(new FileUrlGetter(new Mock<IHttpContextAccessor>().Object)));
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -175,7 +175,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
                 new Mock<IIISUnitOfWorkFactory>().Object,
                 new Mock<IOntologySchema>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+                new FormatAttributeService(new FileUrlGetter(new Mock<IHttpContextAccessor>().Object)));
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -208,7 +208,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             var sut = new ExtNodeService<IIISUnitOfWork>(new OntologyContext(new DbContextOptions<OntologyContext>()),
                 new Mock<IIISUnitOfWorkFactory>().Object,
                 new Mock<IOntologySchema>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+                new FormatAttributeService(new FileUrlGetter(new Mock<IHttpContextAccessor>().Object)));
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
