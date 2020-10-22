@@ -14,7 +14,6 @@ namespace Iis.DbLayer.Repositories
     public interface IIISUnitOfWork : IUnitOfWork
     {
         IMaterialRepository MaterialRepository { get; }
-        IOntologyRepository OntologyRepository { get; }
         IAnnotationsRepository AnnotationsRepository {get; }
         IFlightRadarRepository FlightRadarRepository { get; }
         IReportRepository ReportRepository { get; }
@@ -28,8 +27,6 @@ namespace Iis.DbLayer.Repositories
         }
 
         public IMaterialRepository MaterialRepository => ResolveRepository<IMaterialRepository>();
-
-        public IOntologyRepository OntologyRepository => ResolveRepository<IOntologyRepository>();
 
         public IAnnotationsRepository AnnotationsRepository => ResolveRepository<IAnnotationsRepository>();
 

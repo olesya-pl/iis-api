@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="Iis.Ontology.OntologyEnum\" />
+    <Folder Include="Iis.OntologyModelWrapper\" />
     <Folder Include="OntologyService\" />
   </ItemGroup>
 

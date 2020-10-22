@@ -28,6 +28,6 @@ namespace Iis.Interfaces.Ontology.Data
         IRelation UpdateRelationTarget(Guid id, Guid targetId);
         IRelation CreateRelationWithAttribute(Guid sourceNodeId, Guid nodeTypeId, string value);
         void SetNodeIsArchived(Guid nodeId);
-        IReadOnlyList<IRelation> GetIncomingRelationsAsync(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);
+        IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);
     }
 }

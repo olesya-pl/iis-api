@@ -157,8 +157,6 @@ namespace IIS.Core
                 };
                 ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
                 using var context = OntologyContext.GetContext(dbConnectionString);
-                var ontologyProvider = new OntologyProvider(context);
-                //ontology = ontologyProvider.GetOntology();
                 ontology = new OntologyWrapper(ontologySchema);
                 services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
                 var ontologySaver = new OntologyPatchSaver(OntologyContext.GetContext(dbConnectionString));
@@ -189,7 +187,6 @@ namespace IIS.Core
 
             services.AddHttpContextAccessor();
 
-            services.AddTransient<IOntologyRepository, OntologyRepository>();
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
             //services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();

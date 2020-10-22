@@ -159,7 +159,7 @@ namespace Iis.OntologyData
         {
             return Locker.ReadLock(() => Nodes.Where(n => n.NodeTypeId == nodeTypeId).ToList());
         }
-        public IReadOnlyList<IRelation> GetIncomingRelationsAsync(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList)
+        public IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList)
         {
             return GetNodes(entityIdList).SelectMany(n => n.GetIncomingRelations(relationTypeNameList)).ToList();
         }

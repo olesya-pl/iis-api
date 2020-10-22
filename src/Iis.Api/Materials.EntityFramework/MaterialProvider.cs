@@ -313,7 +313,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 while(tempNodeIdList.Any())
                 {
-                    var relationList = await RunWithoutCommitAsync(uow => uow.OntologyRepository.GetIncomingRelationsAsync(tempNodeIdList, relationTypeNameList));
+                    var relationList = _ontologyData.GetIncomingRelations(tempNodeIdList, relationTypeNameList);
 
                     tempNodeIdList = relationList.Select(e => e.SourceNodeId).ToList();
 
