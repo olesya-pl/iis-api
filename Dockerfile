@@ -1,4 +1,8 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build
+ARG BUILD_VERSION=local
+
+
+ENV IIS_SOURCE_REVISION_ID=${BUILD_VERSION}
 WORKDIR /opt/core
 COPY . /opt/core/
 
