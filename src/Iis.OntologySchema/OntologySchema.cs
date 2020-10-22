@@ -119,7 +119,7 @@ namespace Iis.OntologySchema
             return _storage.NodeTypes.Values
                 .Where(nt => !nt.IsArchived 
                     && nt.Kind == Kind.Entity 
-                    && nt.Name == entityTypeName)
+                    && string.Equals(nt.Name, entityTypeName, StringComparison.OrdinalIgnoreCase))
                 .SingleOrDefault();
         }
         public IReadOnlyList<INodeTypeLinked> GetEntityTypesByName(IEnumerable<string> names, bool includeChildren)
@@ -127,7 +127,7 @@ namespace Iis.OntologySchema
             IEnumerable<INodeTypeLinked> nodeTypes = _storage.NodeTypes.Values
                 .Where(nt => !nt.IsArchived
                     && nt.Kind == Kind.Entity
-                    && names.Contains(nt.Name))
+                    && names.Contains(nt.Name, StringComparer.OrdinalIgnoreCase))
                 .ToList();
 
             if (includeChildren)
