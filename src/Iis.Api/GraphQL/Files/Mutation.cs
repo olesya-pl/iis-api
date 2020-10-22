@@ -45,7 +45,7 @@ namespace IIS.Core.GraphQL.Files
                     return new UploadResult
                     {
                         Success = false,
-                        Message = "File not supported"
+                        Message = "Формат не підтримується"
                     };
                 }
             }
@@ -71,7 +71,7 @@ namespace IIS.Core.GraphQL.Files
                     return new UploadResult
                     {
                         Success = false,
-                        Message = "File is duplicate"
+                        Message = "Данний файл вже завантажений до системи"
                     };
                 }
 
