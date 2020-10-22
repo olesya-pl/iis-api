@@ -21732,13 +21732,6 @@
       "TargetTypeId": "f245afe7-8ac5-490b-be4e-7bf18a2dd895"
     },
     {
-      "Id": "3e7ed282-efb9-4f89-bac0-0f08fa128b24",
-      "Kind": 0,
-      "EmbeddingOptions": 0,
-      "SourceTypeId": "30a373f5-470b-4df0-b8ba-fef817169499",
-      "TargetTypeId": "0e495c85-ebe7-4ece-8ff3-2d7e424fba40"
-    },
-    {
       "Id": "d4b60364-ab34-490e-bed8-f75bd43a71c4",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -21933,6 +21926,13 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451",
       "TargetTypeId": "b63d5602-88c6-421f-a975-7baad1b8d5bb"
+    },
+    {
+      "Id": "3e7ed282-efb9-4f89-bac0-0f08fa128b24",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "30a373f5-470b-4df0-b8ba-fef817169499",
+      "TargetTypeId": "0e495c85-ebe7-4ece-8ff3-2d7e424fba40"
     }
   ],
   "AttributeTypes": [
