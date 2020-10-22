@@ -118,11 +118,11 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }
 
-            return new SearchEntitiesByConfiguredFieldsResult 
+            return new SearchEntitiesByConfiguredFieldsResult
             {
                 Count = searchResult.Count,
                 Entities = searchResult.Items.Select(x => x.SearchResult).ToList(),
-                Aggregations = searchResult.Aggregations
+                Aggregations = searchResult.Aggregations.Where(p => p.Value.Buckets.Any()).ToDictionary(p => p.Key, p => p.Value)
             };
         }
 
