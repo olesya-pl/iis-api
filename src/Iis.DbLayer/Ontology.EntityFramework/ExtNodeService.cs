@@ -24,7 +24,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly OntologyContext _context;
         private readonly IOntologySchema _ontologySchema;
-        private readonly FileUrlGetter _fileUrlGetter;
+        private readonly FormatAttributeService _formatAttributeService;
 
         public ExtNodeService(OntologyContext context,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
@@ -33,7 +33,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             _context = context;
             _ontologySchema = ontologySchema;
-            _fileUrlGetter = fileUrlGetter;
+            _formatAttributeService = new FormatAttributeService(fileUrlGetter);
         }
 
         public async Task<List<Guid>> GetExtNodesByTypeIdsAsync(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
@@ -219,7 +219,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
-            return FormatValue(scalarType, value);
+            return _formatAttributeService.FormatValue(scalarType, value);
         }
 
         private object GetAttributeValue(INode nodeEntity)
@@ -228,59 +228,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
-            return FormatValue(scalarType, value);
-        }
+            return _formatAttributeService.FormatValue(scalarType, value);
+        }        
 
-        private object FormatValue(ScalarType scalarType, string value)
-        {
-            switch (scalarType)
-            {
-                case ScalarType.Int:
-                    return Convert.ToInt32(value);
-                case ScalarType.Date:
-                    {
-                        if (DateTime.TryParse(value, out DateTime dateTimeValue))
-                        {
-                            return dateTimeValue.ToString(Iso8601DateFormat);
-                        }
-                        else
-                        {
-                            return value;
-                        }
-                    }
-                case ScalarType.File:
-                    return new
-                    {
-                        fileId = value,
-                        url = _fileUrlGetter.GetFileUrl(new Guid(value))
-                    };
-                case ScalarType.IntegerRange:
-                case ScalarType.FloatRange:
-                    return FormatRange(value);
-                default:
-                    return value;
-            }
-        }
-
-        private object FormatRange(string value)
-        {
-            var splitted = value.Split('-', ' ', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Count() == 1 || splitted.Count() == 2)
-            {
-                var firstString = splitted.First();
-                var lastString = splitted.Last();
-
-                if (decimal.TryParse(firstString, out var first) && decimal.TryParse(lastString, out var last))
-                {
-                    return new
-                    {
-                        gte = first,
-                        lte = last
-                    };
-                }             
-            }
-            return null;
-        }
+        
 
         private async Task<List<ExtNode>> GetExtNodesByRelations(
             IEnumerable<RelationEntity> relations,
