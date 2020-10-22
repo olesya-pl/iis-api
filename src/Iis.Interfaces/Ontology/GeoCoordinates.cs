@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Iis.Interfaces.Ontology
 {
-    public class GeoCoordinates : IGeoCoordinates
+    public class GeoCoordinates
     {
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }

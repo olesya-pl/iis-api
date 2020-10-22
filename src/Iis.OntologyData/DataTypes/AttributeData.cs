@@ -17,10 +17,10 @@ namespace Iis.OntologyData.DataTypes
         public INode Node => _node;
         public ScalarType ScalarType => Node.NodeType.AttributeType.ScalarType;
 
-        private IGeoCoordinates _coordinates;
-        public IGeoCoordinates ValueAsGeoCoordinates => _coordinates ?? (_coordinates = ExtractCoordinates(Value));
+        private GeoCoordinates _coordinates;
+        public GeoCoordinates ValueAsGeoCoordinates => _coordinates ?? (_coordinates = ExtractCoordinates(Value));
 
-        private IGeoCoordinates ExtractCoordinates(string json)
+        private GeoCoordinates ExtractCoordinates(string json)
         {
             try
             {

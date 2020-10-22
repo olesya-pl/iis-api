@@ -9,6 +9,6 @@ namespace Iis.Interfaces.Ontology.Data
     {
         INode Node { get; }
         ScalarType ScalarType { get; }
-        IGeoCoordinates ValueAsGeoCoordinates { get; }
+        GeoCoordinates ValueAsGeoCoordinates { get; }
     }
 }

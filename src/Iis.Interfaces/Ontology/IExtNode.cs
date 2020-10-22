@@ -17,7 +17,7 @@ namespace Iis.Interfaces.Ontology
         DateTime UpdatedAt { get; }
         IReadOnlyList<IExtNode> Children { get; }
         bool IsAttribute { get; }
-        List<IGeoCoordinates> GetCoordinatesWithoutNestedObjects();
+        List<GeoCoordinates> GetCoordinatesWithoutNestedObjects();
         List<IExtNode> GetAttributesRecursive(ScalarType scalarType);
         List<IExtNode> GetAttributesRecursiveWithoutNestedObjects(ScalarType scalarType);
         INodeTypeLinked NodeType { get; }
