@@ -193,22 +193,20 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             foreach (var field in PrioritizedFields)
             {
-                var fieldName = field.ToLowerInvariant();
-
-                var fieldValue = feature.GetValue(fieldName, StringComparison.OrdinalIgnoreCase)?.Value<string>();
+                var fieldValue = feature.GetValue(field, StringComparison.OrdinalIgnoreCase)?.Value<string>();
 
                 if (string.IsNullOrWhiteSpace(fieldValue)) continue;
 
-                var searchResult = await SearchFeatureInElasticSearchAsync(fieldName, fieldValue);
+                var searchResult = await SearchFeatureInElasticSearchAsync(field, fieldValue);
 
-                if (searchResult.isExist) return (searchResult.isExist, fieldName, searchResult.featureId, searchResult.feature);
+                if (searchResult.isExist) return (searchResult.isExist, field, searchResult.featureId, searchResult.feature);
             }
             return (false, null, null, null);
         }
         protected virtual async Task<(bool isExist, Guid? featureId, JObject feature)> SearchFeatureInElasticSearchAsync(string fieldName, string fieldValue)
         {
-            var filter = new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:{fieldValue})" };
-            
+            var filter = new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:\"{fieldValue}\")" };
+
             var searchResult = await _elasticService.SearchSignsAsync(SignTypeIndexNames, filter);
 
             if (searchResult.Count == 0) return (false, null, null);
