@@ -71,7 +71,7 @@ namespace IIS.Core.GraphQL.Files
                     return new UploadResult
                     {
                         Success = false,
-                        Message = "Данний файл вже завантажений до системи"
+                        Message = "Даний файл вже завантажений до системи"
                     };
                 }
 
