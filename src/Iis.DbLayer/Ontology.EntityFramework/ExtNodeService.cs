@@ -29,7 +29,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public ExtNodeService(OntologyContext context,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IOntologySchema ontologySchema,
-            FormatAttributeService formatAttributeService) : base(unitOfWorkFactory)
+            IFormatAttributeService formatAttributeService) : base(unitOfWorkFactory)
         {
             _context = context;
             _ontologySchema = ontologySchema;
