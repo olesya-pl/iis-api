@@ -219,7 +219,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
-            return _formatAttributeService.FormatValue(scalarType, value);
+            return scalarType == ScalarType.FloatRange || scalarType == ScalarType.IntegerRange
+                ? _formatAttributeService.FormatRange(value)
+                : _formatAttributeService.FormatValue(scalarType, value);
         }
 
         private object GetAttributeValue(INode nodeEntity)
@@ -228,7 +230,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var scalarType = nodeEntity.NodeType.AttributeType.ScalarType;
             var value = nodeEntity.Attribute.Value;
-            return _formatAttributeService.FormatValue(scalarType, value);
+            return scalarType == ScalarType.FloatRange || scalarType == ScalarType.IntegerRange
+                ? _formatAttributeService.FormatRange(value)
+                : _formatAttributeService.FormatValue(scalarType, value);
         }        
 
         
