@@ -76,7 +76,7 @@ namespace Iis.OntologyData
         }
         internal IReadOnlyList<NodeData> GetNodesData(IEnumerable<Guid> ids)
         {
-            return Locker.ReadLock(() => ids.Select(id => _storage.Nodes[id]).ToList());
+            return Locker.ReadLock(() => ids.Where(id => _storage.Nodes.ContainsKey(id)).Select(id => _storage.Nodes[id]).ToList());
         }
         internal void AddValueByDotName(NodeData entity, string value, string[] dotNameParts)
         {

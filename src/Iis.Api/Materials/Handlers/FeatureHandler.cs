@@ -139,7 +139,7 @@ namespace IIS.Core.Materials.Handlers
                 result.Add(featureGuid);
             }
 
-            return result;
+            return result.Distinct();
         }
 
         private async Task<T> RunAsync<T>(Func<IIISUnitOfWork, Task<T>> action)

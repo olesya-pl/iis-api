@@ -68,9 +68,19 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [InlineData("fieldName:fieldValue", false)]
         public void SetupExactQuery_Success(string query, bool lenient)
         {
-            var expected = JObject.Parse("{\"query\":{\"query_string\":{\"query\":\"fieldName:fieldValue\", \"lenient\":"+lenient.ToString().ToLower()+"}}}");
+            var expected = JObject.Parse("{\"query\":{\"query_string\":{\"query\":\""+query+"\", \"lenient\":"+lenient.ToString().ToLower()+"}}}");
 
             var actual = new JObject().SetupExactQuery(query, lenient);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        [Theory]
+        [InlineData("fieldName:fieldValue")]
+        public void SetupExactQuery_Success_NoLenient(string query)
+        {
+            var expected = JObject.Parse("{\"query\":{\"query_string\":{\"query\":\""+query+"\"}}}");
+
+            var actual = new JObject().SetupExactQuery(query);
 
             actual.Should().BeEquivalentTo(expected);
         }
