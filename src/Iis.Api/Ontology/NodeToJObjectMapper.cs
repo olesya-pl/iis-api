@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 
 using Newtonsoft.Json.Linq;
@@ -52,6 +53,16 @@ namespace Iis.Api.Ontology
                 else
                 {
                     result.Add(new JProperty(attribute.Key, attribute.Select(p => p.Attribute.Value.ToString()).ToList()));
+                }
+            }
+            INodeTypeLinked nodeType = node.OriginalNode.NodeType;
+            var titleRelationType = nodeType.GetRelationTypeByName("__title");
+            if (titleRelationType != null)
+            {
+                var formula = titleRelationType.NodeType.MetaObject.Formula;
+                if (!string.IsNullOrWhiteSpace(formula))
+                {
+                    result.Add(new JProperty("__title", node.OriginalNode.ResolveFormula(formula)));
                 }
             }
 
