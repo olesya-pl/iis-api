@@ -68,7 +68,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!type.IsAssignableFrom(node.Type)) // no direct checking of types - we can update child as its base type
                 throw new ArgumentException($"Type {node.Type.Name} can not be updated as {type.Name}");
 
-            if (type.HasUniqueValues)
+            if (type.HasUniqueValues && properties.ContainsKey(type.UniqueValueFieldName) && node.GetProperty(type.UniqueValueFieldName) != null)
             {
                 var newNode = await _mutationCreateResolver.CreateEntity(type, properties);
                 if (newNode.Id != node.Id)
