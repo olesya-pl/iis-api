@@ -34,7 +34,14 @@ namespace Iis.Elastic
             var jProperties = new JObject();
             foreach (var property in Properties)
             {
-                jProperties[property.Name] = property.ToJObject();
+                if(jProperties.ContainsKey(property.Name))
+                {
+                    (jProperties[property.Name] as JObject).Merge(property.ToJObject());
+                }
+                else
+                {
+                    jProperties[property.Name] = property.ToJObject();
+                }
             }
             var inner = new JObject();
             inner["properties"] = jProperties;

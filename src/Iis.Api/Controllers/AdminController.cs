@@ -113,6 +113,7 @@ namespace Iis.Api.Controllers
                 TextProperty.Create("Content", ElasticConfiguration.DefaultTermVector),
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
                 DateProperty.Create("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("Metadata.RegDate", formats:ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
