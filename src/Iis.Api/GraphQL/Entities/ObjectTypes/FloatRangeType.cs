@@ -99,7 +99,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             value = null;
             try
             {
-                value = Deserialize(serialized);
+                value = serialized.ToString();
                 return true;
             }
             catch (ArgumentException e)
