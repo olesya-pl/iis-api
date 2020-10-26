@@ -62,6 +62,8 @@ namespace Iis.Domain
                 case ScalarType.Date: return DateTime.Parse(value).ToUniversalTime();
                 case ScalarType.Decimal: return decimal.Parse(value);
                 case ScalarType.Int: return int.Parse(value);
+                case ScalarType.FloatRange:
+                case ScalarType.IntegerRange:
                 case ScalarType.String: return value;
                 case ScalarType.Geo: return ValueToDict(value);
                 case ScalarType.File: return Guid.Parse(value);
