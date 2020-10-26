@@ -51,6 +51,11 @@ namespace Iis.OntologySchema.DataTypes
         }
         public bool HasUniqueValues => UniqueValueFieldName != null;
         public ISchemaMeta MetaObject => new SchemaMeta(GetMetaDeep());
+        public string Formula => 
+            Kind == Kind.Attribute ?
+                IncomingRelations.First().NodeType.MetaObject.Formula :
+                null;
+
         public string GetMetaDeep()
         {
             if (!string.IsNullOrEmpty(Meta)) return Meta;
