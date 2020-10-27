@@ -202,7 +202,7 @@ namespace IIS.Core
             services.AddTransient<MutationUpdateResolver>();
             services.AddTransient<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
-            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IFileService, FileService<IIISUnitOfWork>>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<OntologySchemaService>();

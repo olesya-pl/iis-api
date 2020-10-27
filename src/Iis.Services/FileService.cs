@@ -1,10 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Threading;
-using System.Threading.Tasks;
-using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Configurations;
@@ -12,23 +5,29 @@ using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace IIS.Core.Files.EntityFramework
 {
     public class FileService<TUnitOfWork> : BaseService<TUnitOfWork>, IFileService where TUnitOfWork : IIISUnitOfWork
     {
-        private OntologyContext _context;
         private readonly FilesConfiguration _configuration;
         private readonly ILogger _logger;
 
-        public FileService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, OntologyContext context, FilesConfiguration configuration, ILogger logger)
+        public FileService(
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, 
+            FilesConfiguration configuration, 
+            ILogger<FileService<IIISUnitOfWork>> logger)
             :base(unitOfWorkFactory)
         {
-            _context = context;
             _configuration = configuration;
-            _logger = logger<FileService<IIISUnitOfWork>>();
+            _logger = logger;
         }
 
         public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType, CancellationToken token)
@@ -42,18 +41,7 @@ namespace IIS.Core.Files.EntityFramework
 
             Guid hash = ComputeHash(contents);
 
-            // Check for duplicates
-            var query =
-                from f in _context.Files
-                where f.ContentHash == hash
-                select new
-                {
-                    f.Id,
-                    f.Contents
-                };
-
-            var files = await query.ToArrayAsync(token);
-
+            var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.ContentHash == hash));
             foreach (var fileData in files)
             {
                 var storedFileBody = Array.Empty<byte>();
@@ -69,7 +57,7 @@ namespace IIS.Core.Files.EntityFramework
                 {
                     var storedFilePath = Path.Combine(_configuration.Path, fileData.Id.ToString("D"));
 
-                    var storedFileInfo = new System.IO.FileInfo(storedFilePath);
+                    var storedFileInfo = new FileInfo(storedFilePath);
 
                     if (storedFileInfo.Exists)
                     {
@@ -107,9 +95,7 @@ namespace IIS.Core.Files.EntityFramework
                 file.Contents = contents;
             }
 
-            _context.Add(file);
-
-            await _context.SaveChangesAsync();
+            await RunAsync(uow => uow.FileRepository.Create(file));
 
             if (_configuration.Storage == Storage.Folder && !string.IsNullOrEmpty(_configuration.Path))
             {
@@ -137,8 +123,7 @@ namespace IIS.Core.Files.EntityFramework
 
         public async Task<FileDto> GetFileAsync(Guid id)
         {
-            FileEntity file;
-            file = _context.Files.SingleOrDefault(f => f.Id == id);
+            var file = await RunWithoutCommitAsync(uow => uow.FileRepository.GetAsync(f => f.Id == id));
             if (file == null) return null;
 
             byte[] contents;
@@ -168,18 +153,19 @@ namespace IIS.Core.Files.EntityFramework
 
         public async Task FlushTemporaryFilesAsync(Predicate<DateTime> predicate)
         {
-            var files = _context.Files.Where(f => f.IsTemporary && predicate(f.UploadTime));
-            _context.Files.RemoveRange(files);
-            await _context.SaveChangesAsync();
+            var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.IsTemporary && predicate(f.UploadTime), true));
+
+            await RunAsync(uow => uow.FileRepository.RemoveRange(files));
         }
 
         public async Task MarkFilePermanentAsync(Guid fileId)
         {
-            var file = await _context.Files.SingleOrDefaultAsync(f => f.IsTemporary && f.Id == fileId);
+            var file = await RunWithoutCommitAsync(uow => uow.FileRepository.GetAsync(f => f.IsTemporary && f.Id == fileId));
             if (file == null)
                 throw new ArgumentException($"There is no temporary file with id {fileId}");
             file.IsTemporary = false;
-            await _context.SaveChangesAsync();
+
+            await RunAsync(uow => uow.FileRepository.Update(file));
         }
 
         private static Guid ComputeHash(byte[] data)
