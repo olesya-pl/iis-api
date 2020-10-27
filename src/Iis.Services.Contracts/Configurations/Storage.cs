@@ -1,4 +1,4 @@
-﻿namespace Iis.Api.Configuration
+﻿namespace Iis.Services.Contracts.Configurations
 {
     public enum Storage : byte
     {

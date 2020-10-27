@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
 using Newtonsoft.Json.Linq;
-
-using IIS.Core.Files;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
@@ -18,6 +16,7 @@ using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using System.Threading;
 using Iis.DbLayer.MaterialEnum;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.Materials.EntityFramework
 {

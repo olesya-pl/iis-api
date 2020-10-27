@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace IIS.Core.Files
+namespace Iis.Services.Contracts.Dtos
 {
-    public class FileId
+    public class FileIdDto
     {
         public Guid Id { get; set; }
 

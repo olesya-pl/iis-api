@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
-using IIS.Core.Files;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Newtonsoft.Json.Linq;
@@ -10,6 +9,7 @@ using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

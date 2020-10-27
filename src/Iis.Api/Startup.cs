@@ -13,7 +13,6 @@ using HotChocolate.Execution.Configuration;
 using HotChocolate.Language;
 using HotChocolate.Types.Relay;
 using IIS.Core.Tools;
-using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
