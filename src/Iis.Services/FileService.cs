@@ -6,25 +6,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
+using IIS.Repository;
+using IIS.Repository.Factories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace IIS.Core.Files.EntityFramework
 {
-    public class FileService : IFileService
+    public class FileService<TUnitOfWork> : BaseService<TUnitOfWork>, IFileService where TUnitOfWork : IIISUnitOfWork
     {
         private OntologyContext _context;
         private readonly FilesConfiguration _configuration;
-        private readonly ILogger<FileService> _logger;
+        private readonly ILogger _logger;
 
-        public FileService(OntologyContext context, FilesConfiguration configuration, ILogger<FileService> logger)
+        public FileService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, OntologyContext context, FilesConfiguration configuration, ILogger logger)
+            :base(unitOfWorkFactory)
         {
             _context = context;
             _configuration = configuration;
-            _logger = logger;
+            _logger = logger<FileService<IIISUnitOfWork>>();
         }
 
         public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType, CancellationToken token)
