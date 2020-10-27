@@ -2,10 +2,8 @@ using System;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
-
+using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
-
-using IIS.Core.Files;
 using Microsoft.AspNetCore.Http;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes

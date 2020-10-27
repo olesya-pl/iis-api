@@ -6,13 +6,13 @@ using GeoJSON.Net.Converters;
 using GeoJSON.Net.Geometry;
 using HotChocolate.Execution;
 using HotChocolate.Resolvers;
-using IIS.Core.Files;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Entities
 {

@@ -13,12 +13,12 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System.Net.Http;
 using System.Net;
-using IIS.Core.Files;
 using Iis.DataModel.Materials;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Iis.DataModel;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.Materials
 {

@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using HotChocolate;
 using Iis.Api.Configuration;
 using Iis.Domain.Materials;
-using IIS.Core.Files;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
 using Newtonsoft.Json.Linq;
 
@@ -64,7 +65,7 @@ namespace IIS.Core.GraphQL.Files
         {
             using (var stream = new MemoryStream(input.Content))
             {
-                FileId fileSaveResult = await fileService
+                FileIdDto fileSaveResult = await fileService
                 .SaveFileAsync(stream, input.Name, "image/png", CancellationToken.None);
                 if (fileSaveResult.IsDuplicate)
                 {
@@ -87,7 +88,7 @@ namespace IIS.Core.GraphQL.Files
                         type = "image"
                     }),
                     LoadData = new MaterialLoadData(),
-                    File = new Iis.Domain.Materials.FileInfo(fileSaveResult.Id)
+                    File = new FileDto(fileSaveResult.Id)
                 };
 
                 await materialService.SaveAsync(material);

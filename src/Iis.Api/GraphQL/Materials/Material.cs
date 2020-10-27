@@ -6,7 +6,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Ontology.Schema;
-using IIS.Core.Files;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.GraphQL.Users;
 using Newtonsoft.Json.Linq;

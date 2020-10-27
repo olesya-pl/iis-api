@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 
-namespace Iis.Domain.Materials
+namespace Iis.Services.Contracts.Dtos
 {
-    public class FileInfo
+    public class FileDto
     {
         public Guid Id { get; }
         public string Name { get; }
@@ -21,7 +21,7 @@ namespace Iis.Domain.Materials
             }
         }
 
-        public FileInfo(Guid id, string name, string contentType, Stream contents, bool isTemporary)
+        public FileDto(Guid id, string name, string contentType, Stream contents, bool isTemporary)
         {
             Id = id;
             Name = name;
@@ -30,7 +30,7 @@ namespace Iis.Domain.Materials
             IsTemporary = isTemporary;
         }
 
-        public FileInfo(Guid id) : this(id, null, null, null, false)
+        public FileDto(Guid id) : this(id, null, null, null, false)
         {
         }
     }

@@ -4,12 +4,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.Api.Configuration;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.Services.Contracts.Configurations;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using FileInfo = Iis.Domain.Materials.FileInfo;
 
 namespace IIS.Core.Files.EntityFramework
 {
@@ -26,7 +27,7 @@ namespace IIS.Core.Files.EntityFramework
             _logger = logger;
         }
 
-        public async Task<FileId> SaveFileAsync(Stream stream, string fileName, string contentType, CancellationToken token)
+        public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType, CancellationToken token)
         {
             byte[] contents;
             using (var ms = new MemoryStream())
@@ -80,7 +81,7 @@ namespace IIS.Core.Files.EntityFramework
                 if (contents.SequenceEqual(storedFileBody))
                 {
                     // Duplicate found.
-                    return new FileId
+                    return new FileIdDto
                     {
                         Id = fileData.Id,
                         IsDuplicate = true
@@ -124,13 +125,13 @@ namespace IIS.Core.Files.EntityFramework
                 await File.WriteAllBytesAsync(path, contents);
             }
 
-            return new FileId
+            return new FileIdDto
             {
                 Id = file.Id
             };
         }
 
-        public async Task<FileInfo> GetFileAsync(Guid id)
+        public async Task<FileDto> GetFileAsync(Guid id)
         {
             FileEntity file;
             file = _context.Files.SingleOrDefault(f => f.Id == id);
@@ -158,7 +159,7 @@ namespace IIS.Core.Files.EntityFramework
             if (contents == null) return null;
 
             var ms = new MemoryStream(contents);
-            return new FileInfo(id, file.Name, file.ContentType, ms, file.IsTemporary);
+            return new FileDto(id, file.Name, file.ContentType, ms, file.IsTemporary);
         }
 
         public async Task FlushTemporaryFilesAsync(Predicate<DateTime> predicate)
