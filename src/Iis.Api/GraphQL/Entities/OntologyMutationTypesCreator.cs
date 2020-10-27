@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL.Entities
             var type = relationType.IsAttributeType
                 ? TypeRepository.GetInputAttributeType(relationType.AttributeType).WrapInputType(relationType)
                 : TypeRepository.GetType<EntityRelationInputType>().WrapInputType(relationType);
-            objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+            objectTypeDescriptor?.Field(relationType.Name).Type(type);
         }
     }
 
@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.Entities
             if (type == null)
                 base.OnRelation(relationType, objectTypeDescriptor);
             else
-                objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+                objectTypeDescriptor?.Field(relationType.Name).Type(type);
         }
     }
 
@@ -104,7 +104,7 @@ namespace IIS.Core.GraphQL.Entities
 //                    ? TypeRepository.GetInputAttributeType(relationType.IAttributeTypeModel)
 //                    : TypeRepository.GetType<EntityRelationInputType>();
 //            }
-            objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+            objectTypeDescriptor?.Field(relationType.Name).Type(type);
         }
     }
 

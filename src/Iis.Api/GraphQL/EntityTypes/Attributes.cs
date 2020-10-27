@@ -72,8 +72,21 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
         public EntityAttributeBase(IEmbeddingRelationTypeModel source)
         {
+            SourceOld = source;
+            MetaObjectOld = SourceOld.EmbeddingMeta;
+
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<IFormField, FormField>();
+                cfg.CreateMap<IContainerMeta, ContainerMeta>();
+                cfg.CreateMap<IValidation, Validation>();
+            });
+
+            _mapper = new Mapper(configuration);
+        }
+        public EntityAttributeBase(INodeTypeLinked source)
+        {
             Source = source;
-            MetaObject = Source.EmbeddingMeta;
 
             var configuration = new MapperConfiguration(cfg =>
             {
@@ -85,8 +98,9 @@ namespace IIS.Core.GraphQL.EntityTypes
             _mapper = new Mapper(configuration);
         }
         protected IMapper _mapper;
-        protected IEmbeddingRelationTypeModel Source { get; }
-        protected IRelationMetaBase MetaObject { get; }
+        protected IEmbeddingRelationTypeModel SourceOld { get; }
+        protected IRelationMetaBase MetaObjectOld { get; }
+        protected INodeTypeLinked Source { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -94,32 +108,32 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLType(typeof(NonNullType<EntityAttributeTypeEnum>))]
         public abstract string Type { get; }
 
-        [GraphQLNonNullType] public string Title => Source.Title ?? Source.TargetType.Title; // fallback to target type
+        [GraphQLNonNullType] public string Title => Source.Title ?? Source.RelationType.TargetType?.Title; // fallback to target type
 
-        [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type
+        [GraphQLNonNullType] public string Code => Source.Name ?? Source.RelationType.TargetType?.Name; // fallback to target type
 
-        public bool Editable => !(Source.IsInversed || Source.IsComputed());
+        public bool Editable => !(IsInversed || IsComputed);
         public bool IsInversed => Source.IsInversed;
-        public bool IsComputed => Source.IsComputed();
+        public bool IsComputed => Source.IsComputed;
 
-        public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
-        public string Format => (MetaObject as AttributeRelationMeta)?.Format;
-        [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.TargetType.IsObjectOfStudy;
-
-        [GraphQLType(typeof(AnyType))]
-        public FormField FormField => _mapper.Map<FormField>(MetaObject?.FormField);
+        public bool Multiple => Source.RelationType.EmbeddingOptions == EmbeddingOptions.Multiple;
+        public string Format => Source.MetaObject?.Format;
+        [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.RelationType.TargetType.IsObjectOfStudy;
 
         [GraphQLType(typeof(AnyType))]
-        public ContainerMeta Container => _mapper.Map<ContainerMeta>(MetaObject?.Container);
+        public FormField FormField => _mapper.Map<FormField>(Source.MetaObject.FormField);
 
-        public int? SortOrder => MetaObject?.SortOrder;
+        [GraphQLType(typeof(AnyType))]
+        public ContainerMeta Container => _mapper.Map<ContainerMeta>(Source.MetaObject.Container);
+
+        public int? SortOrder => Source.MetaObject.SortOrder;
 
         [GraphQLType(typeof(AnyType))]
         public Validation Validation {
             get {
-                var validation = _mapper.Map<Validation>(MetaObject?.Validation);
+                var validation = _mapper.Map<Validation>(Source.MetaObject.Validation);
 
-                if (Source.EmbeddingOptions == EmbeddingOptions.Required)
+                if (Source.RelationType.EmbeddingOptions == EmbeddingOptions.Required)
                 {
                     validation = validation ?? new Validation();
                     validation.Required = true;
@@ -135,53 +149,37 @@ namespace IIS.Core.GraphQL.EntityTypes
         public EntityAttributePrimitive(IEmbeddingRelationTypeModel source) : base(source)
         {
         }
+        public EntityAttributePrimitive(INodeTypeLinked source) : base(source)
+        {
+        }
 
-        public override string Type => Source.AttributeType.ScalarTypeEnum.ToString();
+        public override string Type => Source.RelationType.TargetType.AttributeType.ScalarType.ToString();
     }
 
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(IEmbeddingRelationTypeModel source, IOntologyModel ontology) : base(source)
-        {
-            _ontology = ontology;
-        }
-
-        private IOntologyModel _ontology;
-
-        protected new EntityRelationMeta MetaObject => (EntityRelationMeta) base.MetaObject;
+        public EntityAttributeRelation(INodeTypeLinked source): base(source) { }
 
         public override string Type => "relation";
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<StringType>>>))]
         public IEnumerable<string> AcceptsEntityOperations =>
-            (Source.GetOperations()?? new EntityOperation[]{})
+            (SourceOld.GetOperations()?? new EntityOperation[]{})
                 .Select(e => e.ToString().ToLower());
 
         [GraphQLNonNullType]
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]
-        public EntityType Target => new EntityType(Source.EntityType, _ontology);
+        public EntityType Target => new EntityType(Source.RelationType.TargetType);
 
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
         public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology,
             bool? concreteTypes = false)
         {
-            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<IEntityTypeModel>();
-            if (types == null)
-                types = new[] {Source.EntityType };
-            else if (!types.Any(t => t.Id == Source.EntityType.Id))
-                types = types.Union(new[] {Source.EntityType });
-
-            var metaTargetTypes = (Source.Meta as EntityRelationMeta)?.TargetTypes;
-            if (metaTargetTypes != null && metaTargetTypes.Length > 0)
-            {
-                types = types.Where(t => metaTargetTypes.Contains(t.Name));
-            }
-
-            if (concreteTypes == true)
-                types = types.Where(t => !t.IsAbstract);
-            return types.Select(t => new EntityType(t, _ontology));
+            var types = Source.GetAllDescendants()
+                .Where(nt => concreteTypes != true || !nt.IsAbstract);
+            return types.Select(nt => new EntityType(nt));
         }
     }
 }

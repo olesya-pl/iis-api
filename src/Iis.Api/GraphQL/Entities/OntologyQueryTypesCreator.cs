@@ -40,7 +40,7 @@ namespace IIS.Core.GraphQL.Entities
         {
             var type = GetType(relationType);
             if (objectTypeDescriptor == null) return;
-            var fd = objectTypeDescriptor.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
+            var fd = objectTypeDescriptor.Field(relationType.Name).Type(type.WrapOutputType(relationType));
             if (relationType.IsAttributeType)
             {
                 if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
@@ -87,7 +87,7 @@ namespace IIS.Core.GraphQL.Entities
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             var type = GetType(relationType);
-            interfaceTypeDescriptor?.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
+            interfaceTypeDescriptor?.Field(relationType.Name).Type(type.WrapOutputType(relationType));
         }
 
         private void OnRelation(IEntityTypeModel entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,

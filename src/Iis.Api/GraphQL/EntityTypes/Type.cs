@@ -6,35 +6,29 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
-    public class EntityTypeCollection : Collection<INodeTypeModel, EntityType>
+    public class EntityTypeCollection : Collection<INodeTypeLinked, EntityType>
     {
-        private IOntologyModel _ontology { get; }
-
-        public EntityTypeCollection(IEnumerable<INodeTypeModel> source, IOntologyModel ontology) : base(source)
+        public EntityTypeCollection(IEnumerable<INodeTypeLinked> source) : base(source)
         {
-            _ontology = ontology;
         }
 
-        protected override EntityType Select(INodeTypeModel arg)
+        protected override EntityType Select(INodeTypeLinked arg)
         {
-            return new EntityType(arg, _ontology);
+            return new EntityType(arg);
         }
     }
 
     public class EntityType
     {
-        public EntityType(INodeTypeModel source, IOntologyModel ontology)
+        public EntityType(INodeTypeLinked source)
         {
             Source = source;
-            _ontology = ontology;
         }
-
-        protected INodeTypeModel Source { get; }
-
-        private IOntologyModel _ontology { get; }
+        protected INodeTypeLinked Source { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -43,24 +37,24 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] public string Code => Source.Name;
 
-        public bool IsAbstract => Source is Iis.Domain.EntityType et && et.IsAbstract; // todo
+        public bool IsAbstract => Source.IsAbstract;
 
         [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
         public EntityType Parent =>
-            Source.DirectParents.Select(p => new EntityType(p, _ontology)).FirstOrDefault();
+            Source.GetDirectAncestors().Select(nt => new EntityType(nt)).FirstOrDefault();
 
         [GraphQLNonNullType]
-        public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p, _ontology));
+        public IEnumerable<EntityType> Parents => Source.GetDirectAncestors().Select(nt => new EntityType(nt));
 
         [GraphQLNonNullType]
-        public IEnumerable<EntityType> Children => _ontology.GetChildTypes(Source).Select(child => new EntityType(child, _ontology));
+        public IEnumerable<EntityType> Children => Source.GetAllDescendants().Select(nt => new EntityType(nt));
 
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]
         [GraphQLDescription("Get all type relations")]
         public IEnumerable<IEntityAttribute> GetAttributes()
         {
-            var props = Source.AllProperties.OrderBy(a => a.CreatedAt);
+            var props = Source.GetAllProperties().OrderBy(a => a.CreatedAt);
             return props.Select(CreateEntityAttribute);
         }
 
@@ -68,11 +62,11 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Entity contains unique values and needs dropdown tip on UI")]
         public bool HasUniqueValues => Source.HasUniqueValues;
 
-        protected IEntityAttribute CreateEntityAttribute(IEmbeddingRelationTypeModel relationType)
+        protected IEntityAttribute CreateEntityAttribute(INodeTypeLinked relationNodeType)
         {
-            return relationType.IsAttributeType
-                ? (IEntityAttribute) new EntityAttributePrimitive(relationType)
-                : new EntityAttributeRelation(relationType, _ontology);
+            return relationNodeType.RelationType.TargetType.Kind == Kind.Attribute
+                ? (IEntityAttribute) new EntityAttributePrimitive(relationNodeType)
+                : new EntityAttributeRelation(relationNodeType);
         }
     }
 }

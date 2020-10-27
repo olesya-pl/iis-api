@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public class SchemaNodeType: SchemaNodeTypeRaw, INodeType, INodeTypeLinked
+    public class SchemaNodeType : SchemaNodeTypeRaw, INodeType, INodeTypeLinked
     {
         private List<SchemaRelationType> _incomingRelations = new List<SchemaRelationType>();
         public IReadOnlyList<IRelationTypeLinked> IncomingRelations => _incomingRelations;
@@ -51,10 +51,22 @@ namespace Iis.OntologySchema.DataTypes
         }
         public bool HasUniqueValues => UniqueValueFieldName != null;
         public ISchemaMeta MetaObject => new SchemaMeta(GetMetaDeep());
-        public string Formula => 
-            Kind == Kind.Attribute ?
-                IncomingRelations.First().NodeType.MetaObject.Formula :
-                null;
+        public string Formula
+        {
+            get
+            {
+                switch(Kind)
+                {
+                    case Kind.Relation:
+                        return MetaObject.Formula;
+                    case Kind.Attribute:
+                        return IncomingRelations.First().NodeType.MetaObject.Formula;
+                    default:
+                        return null;
+                }
+            }
+        }
+        public bool IsComputed => !string.IsNullOrWhiteSpace(Formula);
 
         public string GetMetaDeep()
         {

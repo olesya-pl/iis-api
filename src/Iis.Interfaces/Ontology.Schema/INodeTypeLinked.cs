@@ -58,6 +58,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IOntologySchema Schema { get; }
         IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes();
         string Formula { get; }
+        bool IsComputed { get; }
     }
 
     public class NodeAggregationInfo

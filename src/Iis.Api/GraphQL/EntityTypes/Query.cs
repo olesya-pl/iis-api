@@ -6,6 +6,7 @@ using HotChocolate;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using IIS.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -13,32 +14,32 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
 
         [GraphQLNonNullType]
-        public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
+        public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologySchema schema,
             EntityTypesFilter filter = null)
         {
-            IEnumerable<INodeTypeModel> types;
+            IEnumerable<INodeTypeLinked> types;
             if (filter != null)
             {
-                var et = ontology.GetEntityType(filter.Parent);
-                if (et == null)
-                    types = new List<INodeTypeModel>();
-                else
-                    types = ontology.GetChildTypes(et);
+                var node = schema.GetEntityTypeByName(filter.Parent);
+                types = node == null ? new List<INodeTypeLinked>()
+                    : node.GetAllDescendants();
+
                 if (filter.ConcreteTypes)
-                    types = types.OfType<Iis.Domain.EntityType>().Where(t => !t.IsAbstract);
+                    types = types.Where(nt => !nt.IsAbstract);
             }
             else
             {
-                types = ontology.EntityTypes;
+                types = schema.GetEntityTypes();
             }
-            return Task.FromResult(new EntityTypeCollection(types, ontology));
+
+            return Task.FromResult(new EntityTypeCollection(types));
         }
 
-        public Task<EntityType> GetEntityType([Service]IOntologyModel ontology,
+        public Task<EntityType> GetEntityType([Service]IOntologySchema schema,
             [GraphQLNonNullType] string code)
         {
-            var type = ontology.GetEntityType(code);
-            return Task.FromResult(type == null ? null : new EntityType(type, ontology));
+            var type = schema.GetEntityTypeByName(code);
+            return Task.FromResult(type == null ? null : new EntityType(type));
         }
     }
 }
