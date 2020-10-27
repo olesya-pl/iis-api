@@ -35,6 +35,14 @@ namespace Iis.Elastic.SearchQueryExtensions
             return jsonQuery;
         }
 
+        public static bool IsExactQuery(string query)
+        {
+            return query.Contains(":", System.StringComparison.Ordinal)
+                || query.Contains(" AND ", System.StringComparison.Ordinal)
+                || query.Contains(" OR ", System.StringComparison.Ordinal)
+                || query.Contains("\"", System.StringComparison.Ordinal);
+        }
+
         public static JObject SetupExactQuery(this JObject jsonQuery, string query, bool? lenient = null)
         {
             if (jsonQuery is null) return jsonQuery;

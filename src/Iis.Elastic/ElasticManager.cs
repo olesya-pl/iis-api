@@ -13,6 +13,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Elastic.SearchResult;
 using Iis.Elastic.ElasticMappingProperties;
+using Iis.Elastic.SearchQueryExtensions;
+
 namespace Iis.Elastic
 {
     internal class ElasticManager: IElasticManager
@@ -407,7 +409,7 @@ namespace Iis.Elastic
             var shouldSections = new JArray();
             foreach (var searchItem in searchParams.SearchParams)
             {
-                if (IsExactQuery(searchItem.Query))
+                if (SearchQueryExtension.IsExactQuery(searchItem.Query))
                 {
                     var shouldSection = CreateExactShouldSection(searchItem.Query, searchParams.IsLenient);
                     shouldSections.Add(shouldSection);
@@ -455,7 +457,7 @@ namespace Iis.Elastic
             var shouldSections = new JArray();
             foreach (var searchItem in searchParams.SearchParams)
             {
-                if (IsExactQuery(searchItem.Query))
+                if (SearchQueryExtension.IsExactQuery(searchItem.Query))
                 {
                     var shouldSection = CreateExactShouldSection(searchItem.Query, searchParams.IsLenient);
                     shouldSections.Add(shouldSection);
@@ -493,7 +495,7 @@ namespace Iis.Elastic
                 };
             }
 
-            if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
+            if (SearchQueryExtension.IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
             {
                 PopulateExactQuery(searchParams, json);
             }
@@ -514,7 +516,7 @@ namespace Iis.Elastic
             var json = new JObject();
             json["query"] = new JObject();
 
-            if (IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
+            if (SearchQueryExtension.IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
             {
                 PopulateExactQuery(searchParams, json);
             }
@@ -535,15 +537,7 @@ namespace Iis.Elastic
             var result = new JObject();
             result.Add(sortColumName, new JObject() { new JProperty("order", sortOder) });
             return result;
-        }
-
-        private bool IsExactQuery(string query)
-        {
-            return query.Contains(":")
-                || query.Contains(" AND ")
-                || query.Contains(" OR ")
-                || query.Contains("\"");
-        }
+        }        
 
         private void PopulateExactQuery(IIisElasticSearchParams searchParams, JObject json)
         {
