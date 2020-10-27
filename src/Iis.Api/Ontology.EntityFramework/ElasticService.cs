@@ -266,15 +266,6 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutHistoricalNodesAsync(id, requestId, ct);
         }
 
-        public async Task<bool> PutFeatureAsync(string featureIndexName, Guid featureId, JObject featureDocument, CancellationToken ct = default)
-        {
-            if (!_runTimeSettings.PutSavedToElastic) return false;
-
-            if (featureDocument is null) return false;
-
-            return await _elasticManager.PutDocumentAsync(featureIndexName, featureId.ToString("N"), featureDocument.ToString(Formatting.None));
-        }
-
         public bool TypesAreSupported(IEnumerable<string> typeNames)
         {
             return OntologyIndexesAreSupported(typeNames);
@@ -333,8 +324,8 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             var queryData = SearchQueryExtension
                 .WithSearchJson(new []{ "*" }, filter.Offset, filter.Limit)
-                .SetupExactQuery(filter.Suggestion, true)
-                .SetupSorting("CreatedAt", "ASC")
+                .SetupExactQuery(filter.Suggestion)
+                .SetupSorting("CreatedAt", "asc")
                 .ToString(Formatting.None);
 
             var searchResult = await _elasticManager.SearchAsync(queryData, typeNames, ct);

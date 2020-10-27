@@ -26,6 +26,8 @@ namespace Iis.DbLayer.Repositories
     internal class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
         private const string ImageVectorMlHandlerCode = "imageVector";
+        private const string ImageVectorResultPropery = "result";
+        private const string ImageVectorEncodingProperty = "encoding";
 
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
@@ -128,10 +130,10 @@ namespace Iis.DbLayer.Repositories
                     .Select(p => MapEntityToDocument(p))
                     .Select(p =>
                     {
-                            if (!mlResponses.ContainsKey(p.Id))
-                            {
-                                return p;
-                            }
+                        if (!mlResponses.ContainsKey(p.Id))
+                        {
+                            return p;
+                        }
                         var mlResponsesByEntity = mlResponses[p.Id];
                         p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
                         string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
@@ -139,10 +141,10 @@ namespace Iis.DbLayer.Repositories
                         {
                             p.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
                         }
-                            return p;
-                        })
+                        return p;
+                    })
                     .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
-                
+
                 var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), materialDocuments, token);
                 responses.AddRange(response);
             }
@@ -358,10 +360,10 @@ namespace Iis.DbLayer.Repositories
         }
 
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(
-            int limit = 0, 
-            int offset = 0, 
-            Expression<Func<MaterialEntity, bool>> predicate = null, 
-            string sortColumnName = null, 
+            int limit = 0,
+            int offset = 0,
+            Expression<Func<MaterialEntity, bool>> predicate = null,
+            string sortColumnName = null,
             string sortOrder = null)
         {
             var materialQuery = predicate is null
@@ -447,10 +449,25 @@ namespace Iis.DbLayer.Repositories
 
         private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
         {
-            return mlResponsesByEntity
+            var response = mlResponsesByEntity
                                     .OrderByDescending(e => e.ProcessingDate)
                                     .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
                                     .OriginalResponse;
+
+            if(string.IsNullOrWhiteSpace(response)) return response;
+
+            var json = JToken.Parse(response);
+
+            if(json.GetType() == typeof(JArray))
+            {
+                return response;
+            }
+
+            var encodings = json[ImageVectorResultPropery].Children()[ImageVectorEncodingProperty];
+
+            if(!encodings.Any()) return string.Empty;
+
+            return encodings.First().ToString();
         }
     }
 }

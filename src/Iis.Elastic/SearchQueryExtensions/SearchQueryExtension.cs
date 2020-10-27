@@ -35,17 +35,18 @@ namespace Iis.Elastic.SearchQueryExtensions
             return jsonQuery;
         }
 
-        public static JObject SetupExactQuery(this JObject jsonQuery, string query, bool lenient)
+        public static JObject SetupExactQuery(this JObject jsonQuery, string query, bool? lenient = null)
         {
             if (jsonQuery is null) return jsonQuery;
 
             if (!jsonQuery.ContainsKey("query")) jsonQuery["query"] = new JObject();
 
+            var queryStringProperty = new JObject(new JProperty("query", query));
+
+            if(lenient.HasValue) queryStringProperty.Add("lenient", lenient.Value);
+
             var queryString = new JObject(
-                new JProperty("query_string", new JObject(
-                    new JProperty("query", query),
-                    new JProperty("lenient", lenient)
-                ))
+                new JProperty("query_string", queryStringProperty)
             );
 
             jsonQuery["query"] = queryString;

@@ -60,7 +60,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                 var feature = NormalizeFeatureProperties(originalFeature);
 
-                if (!feature.HasValues) continue;
+                if (!FeatureCouldBeProcessed(feature)) continue;
 
                 var searchResult = await SearchExistingFeatureAsync(feature);
 
@@ -72,13 +72,20 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                     if (!updatesResult.shouldBeUpdate) continue;
 
-                    var updatedFeature = MergeFeatures(searchResult.feature, updatesResult.updates);
-
                     var properties = GetPropertiesFromFeature(updatesResult.updates);
 
                     var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
 
-                    await _elasticService.PutFeatureAsync(SignTypeIndexName, searchResult.featureId.Value, updatedFeature);
+                    originalFeature[FeatureFields.featureId] = entity.Id.ToString();
+
+                    if(searchResult.featureId.Value != entity.Id)
+                    {
+                        var propertiesToAdd = GetPropertiesFromFeature(searchResult.feature)
+                            .Where(pair => !properties.ContainsKey(pair.Key))
+                            .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                        await _updateResolver.UpdateEntity(signType, entity.Id, propertiesToAdd);
+                    }
                 }
                 else
                 {
@@ -87,8 +94,6 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                     var entity = await _createResolver.CreateEntity(signType, properties);
 
                     originalFeature[FeatureFields.featureId] = entity.Id.ToString();
-
-                    await _elasticService.PutFeatureAsync(SignTypeIndexName, entity.Id, feature);
                 }
             }
             return metadata;
@@ -97,6 +102,15 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             metadata.ContainsKey(FeatureFields.FeaturesSection) &&
             metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
             metadata.SelectToken(FeatureFields.FeaturesSection).HasValues;
+
+        protected virtual bool FeatureCouldBeProcessed(JObject feature)
+        {
+            if(!feature.HasValues) return false;
+
+            var properties = feature.Properties().Select(p => p.Name);
+
+            return PrioritizedFields.Intersect(properties).Any();
+        }
         protected virtual JObject RemoveFeatureEmptyProperties(JObject feature)
         {
             var emptyPropsList = new List<string>();
@@ -127,7 +141,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             foreach (var (featureFieldName, signFieldName) in SignFieldsMapping)
             {
                 var property = feature.Property(featureFieldName);
-                
+
                 if(property is null) continue;
 
                 if (featureFieldName == FeatureFields.featureId) continue;
@@ -219,6 +233,5 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             return (true, featurePair.Key, feature);
         }
-
     }
 }
