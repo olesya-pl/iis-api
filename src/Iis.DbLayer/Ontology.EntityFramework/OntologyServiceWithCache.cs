@@ -34,9 +34,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
         {
             const string propertyName = "associatedWithEvent";
-            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
-            var property = eventType.GetNodeTypeByDotNameParts(new[] { propertyName });
-            if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event.ToString()}.{propertyName}");
+            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());            
+            var property = eventType.GetRelationTypeByName(propertyName);
+            if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event}.{propertyName}");
 
             var node = _data.GetNode(entityId);
             var events = node.IncomingRelations
