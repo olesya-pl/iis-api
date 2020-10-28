@@ -17,7 +17,7 @@ namespace Iis.Elastic
 {
     internal class ElasticManager: IElasticManager
     {
-        private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
+        private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/!";
         private const string RemoveSymbolsPattern = "№";
         public const string NullValue = "NULL";
         public const string AggregateSuffix = "Aggregate";
