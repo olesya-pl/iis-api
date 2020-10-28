@@ -43,25 +43,6 @@ namespace Iis.Elastic.SearchQueryExtensions
                 || query.Contains("\"", System.StringComparison.Ordinal);
         }
 
-        public static JObject SetupExactQuery(this JObject jsonQuery, string query, bool? lenient = null)
-        {
-            if (jsonQuery is null) return jsonQuery;
-
-            if (!jsonQuery.ContainsKey("query")) jsonQuery["query"] = new JObject();
-
-            var queryStringProperty = new JObject(new JProperty("query", query));
-
-            if(lenient.HasValue) queryStringProperty.Add("lenient", lenient.Value);
-
-            var queryString = new JObject(
-                new JProperty("query_string", queryStringProperty)
-            );
-
-            jsonQuery["query"] = queryString;
-
-            return jsonQuery;
-        }
-
         public static JObject SetupSorting(this JObject jsonQuery, string sortColumn, string sortOrder)
         {
             if(jsonQuery is null) return jsonQuery;
