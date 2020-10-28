@@ -20,6 +20,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IResolverContext _resolverContext;
         private Guid _rootNodeId;
+        private const string LastConfirmedFieldName = "lastConfirmedAt";
 
         public MutationUpdateResolver(IOntologyService ontologyService,
             IOntologyModel ontology,
@@ -45,6 +46,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var id = ctx.Argument<Guid>("id");
             var data = ctx.Argument<Dictionary<string, object>>("data");
+            if (!data.ContainsKey(LastConfirmedFieldName))
+                data.Add(LastConfirmedFieldName, DateTime.UtcNow);
 
             var type = _ontology.GetEntityType(typeName);
             _rootNodeId = id;
@@ -80,8 +83,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 foreach (var (key, value) in properties)
                 {
-                    var embed = node.Type.GetProperty(key) ??
-                                throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
+                    var embed = node.Type.GetProperty(key);
+                    if(embed == null) 
+                    {
+                        if (key == LastConfirmedFieldName)
+                            continue;
+                        else
+                            throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
+                    }
+                                
                     await UpdateRelations(node, embed, value,
                         string.IsNullOrEmpty(dotName) ? key : dotName + "." + key, requestId);
                 }

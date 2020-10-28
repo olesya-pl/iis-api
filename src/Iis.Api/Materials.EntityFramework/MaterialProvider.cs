@@ -185,9 +185,15 @@ namespace IIS.Core.Materials.EntityFramework
                                 .SelectMany(p => p.Features.Select(x => x.Node))
                                 .ToList();
 
-            result.Events = nodes.Where(x => IsEvent(x)).Select(x => _nodeToJObjectMapper.EventToJObject(x));
+            result.Events = nodes
+                .Where(x => IsEvent(x))
+                .Select(x => _nodeToJObjectMapper.EventToJObject(x))
+                .ToList();
 
-            result.Features = nodes.Where(x => IsObjectSign(x)).Select(x => _nodeToJObjectMapper.NodeToJObject(x));
+            result.Features = nodes
+                .Where(x => IsObjectSign(x))
+                .Select(x => _nodeToJObjectMapper.NodeToJObject(x))
+                .ToList();
 
             result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
 
