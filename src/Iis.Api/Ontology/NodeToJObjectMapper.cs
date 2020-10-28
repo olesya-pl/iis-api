@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 
 using Newtonsoft.Json.Linq;
@@ -54,6 +55,16 @@ namespace Iis.Api.Ontology
                     result.Add(new JProperty(attribute.Key, attribute.Select(p => p.Attribute.Value.ToString()).ToList()));
                 }
             }
+            INodeTypeLinked nodeType = node.OriginalNode.NodeType;
+            var titleRelationType = nodeType.GetRelationTypeByName("__title");
+            if (titleRelationType != null)
+            {
+                var formula = titleRelationType.NodeType.MetaObject.Formula;
+                if (!string.IsNullOrWhiteSpace(formula))
+                {
+                    result.Add(new JProperty("__title", node.OriginalNode.ResolveFormula(formula)));
+                }
+            }
 
             return result;
         }
@@ -65,8 +76,8 @@ namespace Iis.Api.Ontology
             var importanceId = node.Nodes.FirstOrDefault(p => p.Type.Name == "importance").Nodes.First().Id;
             var stateId = node.Nodes.FirstOrDefault(p => p.Type.Name == "state").Nodes.First().Id;
 
-            var importanceAttributes = (await _ontologyService.LoadNodesAsync(importanceId, null)).GetChildAttributes();
-            var stateAttributes = (await _ontologyService.LoadNodesAsync(stateId, null)).GetChildAttributes();
+            var importanceAttributes = (await _ontologyService.LoadNodesAsync(importanceId)).GetChildAttributes();
+            var stateAttributes = (await _ontologyService.LoadNodesAsync(stateId)).GetChildAttributes();
 
             var attributies = node.GetChildAttributes();
 

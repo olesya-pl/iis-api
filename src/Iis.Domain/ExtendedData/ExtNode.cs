@@ -26,22 +26,13 @@ namespace Iis.Domain.ExtendedData
 
         public INodeTypeLinked NodeType { get; set; }
 
-        public List<IGeoCoordinates> GetCoordinatesWithoutNestedObjects()
+        public List<GeoCoordinates> GetCoordinatesWithoutNestedObjects()
         {
             var geoNodes = GetAttributesRecursiveWithoutNestedObjects(ScalarTypeEnum.Geo);
             if (geoNodes.Count == 0) return null;
 
             return geoNodes.Select(gn => ExtractCoordinates(gn.AttributeValue.ToString())).ToList();
 
-        }
-
-        public List<(IExtNode Node, IGeoCoordinates Coordinates)> GetNodeCoordinates()
-        {
-            var geoNodes = GetAttributesRecursive(ScalarTypeEnum.Geo);
-            if (geoNodes.Count == 0)
-                return new List<(IExtNode Node, IGeoCoordinates Coordinates)>();
-
-            return geoNodes.Select(x => (x, ExtractCoordinates(x.AttributeValue.ToString()))).ToList();
         }
 
         public List<IExtNode> GetAttributesRecursiveWithoutNestedObjects(ScalarType scalarType)
@@ -64,7 +55,7 @@ namespace Iis.Domain.ExtendedData
             return children.ToList();
         }
 
-        private IGeoCoordinates ExtractCoordinates(string json)
+        private GeoCoordinates ExtractCoordinates(string json)
         {
             try
             {

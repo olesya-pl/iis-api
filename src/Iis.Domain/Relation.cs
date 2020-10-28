@@ -22,8 +22,8 @@ namespace Iis.Domain
             }
         }
 
-        public Attribute AttributeTarget => Nodes.OfType<Attribute>().Single();
-        public Entity EntityTarget => Nodes.OfType<Entity>().Single();
+        public Attribute AttributeTarget => Nodes.OfType<Attribute>().SingleOrDefault();
+        public Entity EntityTarget => Nodes.OfType<Entity>().SingleOrDefault();
 
         public Relation(Guid id, IRelationTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)

@@ -8,5 +8,6 @@ namespace Iis.Interfaces.Ontology.Data
     {
         IOntologyPatchItem Create { get; }
         IOntologyPatchItem Update { get; }
+        void Clear();
     }
 }

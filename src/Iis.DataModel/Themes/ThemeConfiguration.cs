@@ -36,6 +36,10 @@ namespace Iis.DataModel.Themes
             builder
                 .Property(p => p.Comment)
                 .IsRequired(false);
+
+            builder.Property(p => p.QueryResults)
+                .IsRequired()
+                .HasDefaultValue(0);
         }
     }
 }

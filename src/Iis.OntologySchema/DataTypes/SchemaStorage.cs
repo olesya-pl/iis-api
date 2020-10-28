@@ -37,6 +37,7 @@ namespace Iis.OntologySchema.DataTypes
                 if (IsArchived(relationType))
                 {
                     RelationTypes.Remove(relationId);
+                    NodeTypes.Remove(relationId);
                     continue;
                 }
 
@@ -94,6 +95,7 @@ namespace Iis.OntologySchema.DataTypes
             nodeType.SetIsInversed();
             inversed.SetNodeType(nodeType);
             inversed._directRelationType = directRelationType;
+            directRelationType._inversedRelationType = inversed;
             nodeType.SetRelationType(inversed);
 
             var sourceType = NodeTypes[inversed.TargetTypeId];

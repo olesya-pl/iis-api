@@ -22,7 +22,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
+using Iis.Interfaces.Ontology.Data;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -33,8 +35,14 @@ namespace IIS.Core.Materials.EntityFramework
         {
             DateParseHandling = DateParseHandling.None
         };
+        private static readonly IEnumerable<string> relationTypeNameList = new List<string>
+        {
+            "parent"
+        };
+
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
+        private readonly IOntologyNodesData _ontologyData;
         private readonly IElasticService _elasticService;
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
@@ -45,6 +53,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         public MaterialProvider(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
+            IOntologyNodesData ontologyData,
             IElasticService elasticService,
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
@@ -56,6 +65,7 @@ namespace IIS.Core.Materials.EntityFramework
         {
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
+            _ontologyData = ontologyData;
             _elasticService = elasticService;
 
             _mLResponseRepository = mLResponseRepository;
@@ -68,8 +78,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchResultItem> Highlights)>
             GetMaterialsAsync(int limit, int offset, string filterQuery,
-            IEnumerable<Guid> nodeIds = null, IEnumerable<string> types = null,
-            string sortColumnName = null, string sortOrder = null)
+            IEnumerable<string> types = null, string sortColumnName = null, string sortOrder = null)
         {
             IEnumerable<Task<Material>> mappingTasks;
             IEnumerable<Material> materials;
@@ -116,7 +125,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             res.Children = p.Children.Select(c => _mapper.Map<Material>(c)).ToList();
 
-            var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x, null)));
+            var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x)));
 
             res.Events = nodes.Where(x => IsEvent(x)).Select(x => _nodeToJObjectMapper.EventToJObject(x));
             res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => _nodeToJObjectMapper.NodeToJObject(x));
@@ -293,6 +302,42 @@ namespace IIS.Core.Materials.EntityFramework
             return JsonConvert.DeserializeObject<decimal[]>(contentJson);
         }
 
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntityAndDescendantsAsync(IEnumerable<Guid> nodeIdList, int limit = 0, int offset = 0, CancellationToken ct = default)
+        {
+            var entities = new List<MaterialEntity>();
+
+            foreach (var nodeId in nodeIdList)
+            {
+                var resultNodeIdList = new List<Guid>{ nodeId };
+                var tempNodeIdList = resultNodeIdList;
+
+                while(tempNodeIdList.Any())
+                {
+                    var relationList = _ontologyData.GetIncomingRelations(tempNodeIdList, relationTypeNameList);
+
+                    tempNodeIdList = relationList.Select(e => e.SourceNodeId).ToList();
+
+                    resultNodeIdList.AddRange(tempNodeIdList);
+                }
+
+                entities.AddRange(await RunWithoutCommitAsync((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQueryAsync(resultNodeIdList)));
+            }
+
+            var entityIdList = entities
+                .GroupBy(e => e.Id)
+                .Where(gr => gr.Count() == nodeIdList.Count())
+                .Select(gr => gr.Select(e => e.Id).FirstOrDefault());
+
+            var materialsResult = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetAllAsync(entityIdList, limit, offset));
+
+            var mappingTasks = materialsResult.Entities
+                                .Select(entity => MapAsync(entity));
+
+            var materials = await Task.WhenAll(mappingTasks);
+
+            return (Materials: materials, Count: materialsResult.TotalCount);
+        }
+
         private bool IsEvent(Node node)
         {
             if(node is null) return false;
@@ -348,7 +393,6 @@ namespace IIS.Core.Materials.EntityFramework
 
             return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList));
         }
-
 
         private async Task<JObject> GetObjectOfStudyListForMaterial(List<Node> nodeList)
         {
@@ -407,10 +451,8 @@ namespace IIS.Core.Materials.EntityFramework
         private async Task<MaterialFeature> MapAsync(MaterialFeatureEntity feature)
         {
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
-            result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId, null);
+            result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId);
             return result;
         }
-
-
     }
 }

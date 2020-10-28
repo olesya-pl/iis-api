@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
+using System.Threading;
 
 namespace Iis.ThemeManagement
 {
@@ -35,6 +36,7 @@ namespace Iis.ThemeManagement
         public async Task<Guid> CreateThemeAsync(Theme theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
+            entity.QueryResults = await GetQueryResultsAsync(entity.TypeId, entity.Query);
 
             _context.Themes.Add(entity);
 
@@ -81,7 +83,7 @@ namespace Iis.ThemeManagement
             var entity = await GetThemes()
                             .SingleOrDefaultAsync(e => e.Id == themeId);
 
-            if(entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
+            if (entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
             var theme = _mapper.Map<Theme>(entity);
 
@@ -100,7 +102,7 @@ namespace Iis.ThemeManagement
             var entity = await GetThemes()
                             .SingleOrDefaultAsync(e => e.Id == themeId);
 
-            if(entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
+            if (entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
             return _mapper.Map<Theme>(entity);
         }
@@ -111,21 +113,7 @@ namespace Iis.ThemeManagement
                                     .Where(e => e.UserId == userId)
                                     .ToListAsync();
 
-            var searchTasks = entities.Select(e => {
-                return ExecuteThemeQuery(e.Id, e.Type.Id, e.Query, _ontology);
-            });
-
-            var searchResults = await Task.WhenAll(searchTasks);
-
             var themes = _mapper.Map<IEnumerable<Theme>>(entities);
-
-            foreach (var theme in themes)
-            {
-                var result = searchResults.FirstOrDefault(r => r.Id == theme.Id);
-
-                theme.QueryResults = result.Count;
-            }
-
             return themes;
         }
 
@@ -134,7 +122,7 @@ namespace Iis.ThemeManagement
             var entity = await _context.ThemeTypes
                                     .SingleOrDefaultAsync(e => e.EntityTypeName == entityTypeName);
 
-            if(entity is null) throw new ArgumentException($"ThemeType does not exist for EntityTypeName = {entityTypeName}");
+            if (entity is null) throw new ArgumentException($"ThemeType does not exist for EntityTypeName = {entityTypeName}");
 
             return _mapper.Map<ThemeType>(entity);
         }
@@ -147,6 +135,31 @@ namespace Iis.ThemeManagement
             return _mapper.Map<IEnumerable<ThemeType>>(entities);
         }
 
+        public async Task UpdateQueryResultsAsync(CancellationToken ct)
+        {
+            //var themesByQuery = _context.Themes
+            //    .AsNoTracking()
+            //    .ToList()
+            //    .GroupBy(x => new { x.Query, x.TypeId });
+
+            //foreach (var groupedTheme in themesByQuery)
+            //{
+            //    ct.ThrowIfCancellationRequested();
+            //    var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query);
+            //    foreach (var theme in groupedTheme)
+            //    {
+            //        if (theme.QueryResults != newCount)
+            //        {
+            //            theme.QueryResults = newCount;
+            //            _context.Entry(theme).State = EntityState.Modified;
+            //        }
+            //    }
+            //}
+
+            //await _context.SaveChangesAsync(ct);
+            await Task.Yield();
+        }
+
         private IQueryable<ThemeEntity> GetThemes()
         {
             return _context.Themes
@@ -155,7 +168,7 @@ namespace Iis.ThemeManagement
                     .AsNoTracking();
         }
 
-        private async Task<(Guid Id, int Count)> ExecuteThemeQuery(Guid id, Guid typeId, string query, IOntologyModel ontology)
+        private Task<int> GetQueryResultsAsync(Guid typeId, string query)
         {
             var filter = new ElasticFilter
             {
@@ -166,35 +179,30 @@ namespace Iis.ThemeManagement
 
             var indexes = typeId switch
             {
-                _ when typeId == ThemeTypeEntity.EntityMaterialId  => _elasticState.MaterialIndexes,
-                _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(ontology, "ObjectOfStudy"),
-                _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(ontology, "Event"),
-                _   => (IEnumerable<string>) null
+                _ when typeId == ThemeTypeEntity.EntityMaterialId => _elasticState.MaterialIndexes,
+                _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(_ontology, "ObjectOfStudy"),
+                _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(_ontology, "Event"),
+                _ => (IEnumerable<string>)null
             };
 
-            if(indexes is null) return (Id: id, Count: 0);
+            if (indexes is null) return Task.FromResult(0);
 
-            if(typeId == ThemeTypeEntity.EntityEventId)
+            if (typeId == ThemeTypeEntity.EntityEventId)
             {
-                var searchResult = await _elasticService.SearchByAllFieldsAsync(indexes,filter);
-                return (Id: id, Count: searchResult.count);
-
+                return _elasticService.CountByAllFieldsAsync(indexes, filter);
             }
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
-                var searchResult = await _elasticService.SearchMaterialsByConfiguredFieldsAsync(filter);
-                return (Id: id, Count: searchResult.Count);
+                return _elasticService.CountMaterialsByConfiguredFieldsAsync(filter);
             }
             else
             {
-                if(typeId == ThemeTypeEntity.EntityMapId)
+                if (typeId == ThemeTypeEntity.EntityMapId)
                 {
-                    filter.Suggestion = filter.Suggestion.Contains(CoordinatesPrefix) ? filter.Suggestion : $"{CoordinatesPrefix} && {filter.Suggestion}"; 
+                    filter.Suggestion = filter.Suggestion.Contains(CoordinatesPrefix) ? filter.Suggestion : $"{CoordinatesPrefix} && {filter.Suggestion}";
                 }
 
-                var searchResult = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(indexes,filter);
-
-                return (Id: id, Count: searchResult.Count);
+                return _elasticService.CountEntitiesByConfiguredFieldsAsync(indexes, filter);
             }
         }
 

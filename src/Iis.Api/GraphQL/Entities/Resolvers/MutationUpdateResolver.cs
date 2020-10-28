@@ -62,18 +62,18 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             IEntityTypeModel type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
         {
-            var node = (Entity) await _ontologyService.LoadNodesAsync(id, null);
+            var node = (Entity) await _ontologyService.LoadNodesAsync(id);
             if (node == null)
                 throw new ArgumentException($"There is no entity with id {id}");
             if (!type.IsAssignableFrom(node.Type)) // no direct checking of types - we can update child as its base type
                 throw new ArgumentException($"Type {node.Type.Name} can not be updated as {type.Name}");
 
-            if (type.HasUniqueValues)
+            if (type.HasUniqueValues && properties.ContainsKey(type.UniqueValueFieldName) && node.GetProperty(type.UniqueValueFieldName) != null)
             {
                 var newNode = await _mutationCreateResolver.CreateEntity(type, properties);
                 if (newNode.Id != node.Id)
                 {
-                    node = (Entity)await _ontologyService.LoadNodesAsync(newNode.Id, null);
+                    node = (Entity)await _ontologyService.LoadNodesAsync(newNode.Id);
                 }
             }
             else
@@ -174,7 +174,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     {
                         node.RemoveNode(relation);
                         var newRelation = new Relation(Guid.NewGuid(), embed);
-                        var target = (Entity)await _ontologyService.LoadNodesAsync(updatedNode.Id, null);
+                        var target = (Entity)await _ontologyService.LoadNodesAsync(updatedNode.Id);
                         newRelation.AddNode(target);
                         node.AddNode(newRelation);
                     }
@@ -249,18 +249,25 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             if (value != null)
             {
+                var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
                 var newRelation = await _mutationCreateResolver.CreateSingleProperty(embed, value);
                 node.AddNode(newRelation);
                 if (oldRelation == null)
                 {
-                    await SaveChangesForNewRelation(newRelation, requestId);
+                    if (newRelation.Target is Attribute)
+                    {
+                        await _changeHistoryService
+                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), string.Empty, stringifiedValue, requestId);
+                    }
+                    else 
+                    {
+                        await SaveChangesForNewRelation(newRelation, requestId);
+                    }   
                 }
                 else if (oldRelation.Target is Attribute)
                 {
                     var oldValueObj = (oldRelation.Target as Attribute).Value;
                     var oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);
-
-                    var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
 
                     if (oldValue != stringifiedValue)
                     {
@@ -297,7 +304,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 await _changeHistoryService
                     .SaveChange(child.dotName, _rootNodeId,
-                        GetCurrentUserName(), (string)child.attribute.Value, string.Empty, requestId);
+                        GetCurrentUserName(), child.attribute.Value.ToString(), string.Empty, requestId);
             }
         }
     }

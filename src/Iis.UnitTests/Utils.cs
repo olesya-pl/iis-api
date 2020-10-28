@@ -1,4 +1,4 @@
-﻿ using System.Linq;
+﻿using System.Linq;
 using AutoMapper;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -13,11 +13,11 @@ using Iis.DataModel.Cache;
 using Iis.Interfaces.Elastic;
 using System;
 using IIS.Core.Materials;
-using IIS.Core.Files;
 using IIS.Domain;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DbLayer.OntologySchema;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.UnitTests
 {

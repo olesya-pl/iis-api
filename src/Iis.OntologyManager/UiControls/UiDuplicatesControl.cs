@@ -1,4 +1,5 @@
 ﻿using Iis.DbLayer.OntologyData;
+using Iis.Interfaces.Ontology.Data;
 using Iis.OntologyData;
 using Iis.OntologyManager.DuplicateSearch;
 using Iis.OntologySchema;
@@ -23,12 +24,12 @@ namespace Iis.OntologyManager.UiControls
         Label lblValuesCount;
         Label lblRecordsCount;
 
-        OntologyNodesData _data;
+        IOntologyNodesData _data;
         public OntologyPatchSaver PatchSaver { get; set; }
         const string RECORDS_COUNT_TEXT = "Знайдено записей: ";
         const string VALUES_COUNT_TEXT = "Різних значень: ";
 
-        public event Func<OntologyNodesData> OnGetData;
+        public event Func<IOntologyNodesData> OnGetData;
 
         DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
         object SelectedValue(string columnName) =>
@@ -100,7 +101,7 @@ namespace Iis.OntologyManager.UiControls
             }
 
             var id = (Guid)SelectedValue("Id");
-            _data.DeleteEntity(id, true, true);
+            _data.RemoveNode(id);
             PatchSaver.SavePatch(_data.Patch);
             Search(false);
         }

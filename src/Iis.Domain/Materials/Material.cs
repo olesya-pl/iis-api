@@ -1,4 +1,5 @@
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace Iis.Domain.Materials
         public MaterialSign SessionPriority { get; set; }
         public Guid? SessionPriorityId => SessionPriority?.Id;
         public List<Material> Children { get; set; } = new List<Material>();
-        public FileInfo File { get; set; }
+        public FileDto File { get; set; }
         public Guid? FileId => File?.Id;
         public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
         public DateTime CreatedDate { get; set; }
@@ -42,5 +43,9 @@ namespace Iis.Domain.Materials
         public JObject ObjectsOfStudy { get; set; }
         public IEnumerable<JObject> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
+
+        public bool HasAttachedFile() => File != null;
+
+        public bool IsParentMaterial() => ParentId == null;
     }
 }

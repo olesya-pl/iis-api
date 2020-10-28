@@ -9,29 +9,20 @@ namespace Iis.Interfaces.Elastic
 {
     public interface IElasticService
     {
-        Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken cancellationToken = default);
-        Task<bool> PutFeatureAsync(string featureIndexName, Guid featureId, JObject featureDocument, CancellationToken cancellation = default);
-        Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
-        Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
-        Task<(int Count, List<JObject> Entities)> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken cancellationToken = default);
-        Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
-        Task<SearchResult> SearchMoreLikeThisAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
-        Task<SearchResult> SearchByImageVector(decimal[] imageVector, int page, int pageSize, CancellationToken token);
+        Task<bool> PutNodeAsync(Guid id, CancellationToken ct = default);
+        Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default);
+        Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<SearchResult> SearchMoreLikeThisAsync(IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<SearchResult> SearchByImageVector(decimal[] imageVector, int page, int pageSize, CancellationToken ct = default);
+        Task<SearchResult> SearchSignsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
         bool TypesAreSupported(IEnumerable<string> typeNames);
-        Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken cancellationToken);
+        Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken ct);
         Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, string[] fieldNames, int size, CancellationToken ct = default);
-    }
-
-    public class SearchResult
-    {
-        public Dictionary<Guid, SearchResultItem> Items { get; set; }
-        public int Count { get; set; }
-    }
-
-    public class SearchResultItem
-    {
-        public JToken Highlight { get; set; }
-        public JObject SearchResult { get; set; }
+        Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<int> CountMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<int> CountEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
     }
 }

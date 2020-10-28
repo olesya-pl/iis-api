@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using IIS.Core.Files;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
 using IIS.Core.Materials.FeatureProcessors;
@@ -42,7 +43,7 @@ namespace IIS.Core.Controllers
         [DisableRequestSizeLimit]
         public async Task<object> Post([Required] IFormFile file, CancellationToken token)
         {
-            FileId fileId = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
+            FileIdDto fileId = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
             var url = Url.Action("Get", "Files", new { Id = fileId.Id }, Request.Scheme);
             return new
             {
@@ -60,7 +61,7 @@ namespace IIS.Core.Controllers
             CancellationToken token)
         {
             var material = JsonConvert.DeserializeObject<MaterialInput>(input);
-            FileId fileSaveResult = await _fileService
+            FileIdDto fileSaveResult = await _fileService
                 .SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
             material.FileId = fileSaveResult.Id;
             if (fileSaveResult.IsDuplicate)

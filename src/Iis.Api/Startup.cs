@@ -13,7 +13,6 @@ using HotChocolate.Execution.Configuration;
 using HotChocolate.Language;
 using HotChocolate.Types.Relay;
 using IIS.Core.Tools;
-using IIS.Core.Files;
 using IIS.Core.Files.EntityFramework;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
@@ -70,6 +69,7 @@ using IIS.Core.FlightRadar;
 using Iis.FlightRadar.DataModel;
 using MediatR;
 using Iis.EventHandlers;
+using Iis.Api.BackgroundServices;
 
 namespace IIS.Core
 {
@@ -156,14 +156,13 @@ namespace IIS.Core
                 };
                 ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
                 using var context = OntologyContext.GetContext(dbConnectionString);
-                var ontologyProvider = new OntologyProvider(context);
-                //ontology = ontologyProvider.GetOntology();
                 ontology = new OntologyWrapper(ontologySchema);
-
+                services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
+                var ontologySaver = new OntologyPatchSaver(OntologyContext.GetContext(dbConnectionString));
 
                 var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
-                var ontologyData = new OntologyNodesData(rawData, ontologySchema);
-                services.AddSingleton(ontologyData);
+                var ontologyData = new OntologyNodesData(rawData, ontologySchema, ontologySaver);
+                services.AddSingleton<IOntologyNodesData>(ontologyData);
                 //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
                 //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
                 //}
@@ -187,22 +186,22 @@ namespace IIS.Core
 
             services.AddHttpContextAccessor();
 
-            services.AddTransient<IOntologyRepository, OntologyRepository>();
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
-            services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
+            //services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
+            services.AddTransient<IOntologyService, OntologyServiceWithCache>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
             services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
             services.AddHostedService<FlightRadarHistorySyncJob>();
 
-            services.AddTransient<IElasticConfiguration, IisElasticConfiguration>();
+            services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
             services.AddTransient<IOntologySchemaSource, OntologySchemaSource>();
             services.AddTransient<MutationUpdateResolver>();
             services.AddTransient<MutationDeleteResolver>();
-            services.AddTransient<IExtNodeService, ExtNodeService<IIISUnitOfWork>>();
+            services.AddTransient<IExtNodeService, ExtNodeService>();
             services.AddTransient<IFileService, FileService>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
@@ -217,7 +216,6 @@ namespace IIS.Core
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
-            services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
 
@@ -295,7 +293,7 @@ namespace IIS.Core
 
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);
-            services.AddTransient<IIisElasticConfigService, IisElasticConfigService>();
+            services.AddTransient<IIisElasticConfigService, IisElasticConfigService<IIISUnitOfWork>>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();
@@ -308,6 +306,7 @@ namespace IIS.Core
                     Configuration["activeDirectory:password"]));
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
+            services.AddHostedService<ThemeCounterBackgroundService>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
@@ -365,6 +364,7 @@ namespace IIS.Core
             }
             UpdateDatabase(app);
             app.UpdateMilitaryAmmountCodes();
+            app.ReloadElasticFieldsConfiguration();
 
             if (!Configuration.GetValue<bool>("disableCORS", false))
             {

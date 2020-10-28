@@ -3,6 +3,7 @@ using HotChocolate.Types;
 using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
 using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.GraphQL.DataLoaders;
@@ -73,10 +74,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (relationType.IsComputed())
             {
                 var computedResolver = ctx.Service<IComputedPropertyResolver>();
-                var dependencies = computedResolver.GetRequiredFields(relationType).Select(s => parent.Type.GetProperty(s));
-                var result = await ctx.DataLoader<MultipleNodeDataLoader>()
-                    .LoadAsync(Tuple.Create(parent.Id, dependencies), default);
-                return computedResolver.Resolve(relationType, result);
+                var formula = (relationType.Meta as IAttributeRelationMeta)?.Formula;
+                return computedResolver.Resolve(parent.Id, formula);
             }
             var relation = node?.GetRelationOrDefault(relationType);
             if (relation == null) return null;
@@ -180,14 +179,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {
             var parentNode = ctx.Parent<Node>();
-            var extNodeService = ctx.Service<IExtNodeService>();
+            var attriburteNodes = parentNode.OriginalNode.GetAllAttributeNodes(Iis.Interfaces.Ontology.Schema.ScalarType.Geo);
+            var geoCoordinates = attriburteNodes.Select(n => n.Attribute.ValueAsGeoCoordinates);
 
-            var extNode = await extNodeService.GetExtNodeWithoutNestedObjectsAsync(parentNode.Id);
-            return extNode.GetNodeCoordinates().Select(x => new GeoCoordinate
+            return geoCoordinates.Select(x => new GeoCoordinate
             {
-                Label = x.Node.NodeTypeTitle,
-                Lat = x.Coordinates.Latitude,
-                Long = x.Coordinates.Longitude
+                Label = parentNode.OriginalNode.NodeType.Title,
+                Lat = x.Latitude,
+                Long = x.Longitude
             }).ToList();
         }
     }

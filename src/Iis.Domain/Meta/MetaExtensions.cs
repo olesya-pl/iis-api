@@ -61,7 +61,7 @@ namespace Iis.Domain.Meta
         public static bool IsComputed(this IEmbeddingRelationTypeModel type) => type.GetComputed() != null;
 
         public static string GetComputed(this IEmbeddingRelationTypeModel type)
-            => (type.Meta as AttributeRelationMeta)?.Formula;
+            => (type.Meta as IAttributeRelationMeta)?.Formula;
 
         public static bool HasInversed(this IEmbeddingRelationTypeModel type) => type.GetInversed() != null;
 

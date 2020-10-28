@@ -271,8 +271,8 @@ namespace Iis.OntologyManager
             _duplicatesControl.Initialize("DuplicatesControl", rootPanel);
             _duplicatesControl.OnGetData += GetOntologyData;
 
-            using var context = OntologyContext.GetContext(SelectedConnectionString);
-            _duplicatesControl.PatchSaver = new OntologyPatchSaver(context, _mapper);
+            var context = OntologyContext.GetContext(SelectedConnectionString);
+            _duplicatesControl.PatchSaver = new OntologyPatchSaver(context);
 
             form.ShowDialog();
             form.Close();
@@ -296,8 +296,8 @@ namespace Iis.OntologyManager
             var migrator = new OntologyMigrator(ontologyData, migration);
             var result = migrator.Migrate(migrationOptions);
 
-            using var context = OntologyContext.GetContext(SelectedConnectionString);
-            var ontologyPatchSaver = new OntologyPatchSaver(context, _mapper);
+            var context = OntologyContext.GetContext(SelectedConnectionString);
+            var ontologyPatchSaver = new OntologyPatchSaver(context);
             ontologyPatchSaver.SavePatch(ontologyData.Patch);
             return result;
         }
@@ -473,20 +473,22 @@ namespace Iis.OntologyManager
 
         public OntologyNodesData GetOntologyData(string connectionString)
         {
-            using var context = OntologyContext.GetContext(connectionString);
+            var context = OntologyContext.GetContext(connectionString);
             var schema = _schemaService.GetOntologySchema(SelectedSchemaSource);
+            var saver = new OntologyPatchSaver(context);
 
             var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
-            return new OntologyNodesData(rawData, schema);
+            return new OntologyNodesData(rawData, schema, saver);
         }
         public OntologyNodesData GetOntologyData()
         {
             if (SelectedConnectionString == null) return null;
             using var context = OntologyContext.GetContext(SelectedConnectionString);
             var schema = _schemaService.GetOntologySchema(SelectedSchemaSource);
+            var saver = new OntologyPatchSaver(context);
 
             var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
-            return new OntologyNodesData(rawData, schema);
+            return new OntologyNodesData(rawData, schema, saver);
         }
 
         #endregion

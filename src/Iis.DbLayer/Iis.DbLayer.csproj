@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />
     <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />

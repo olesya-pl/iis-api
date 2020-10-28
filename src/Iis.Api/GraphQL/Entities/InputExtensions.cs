@@ -6,13 +6,13 @@ using GeoJSON.Net.Converters;
 using GeoJSON.Net.Geometry;
 using HotChocolate.Execution;
 using HotChocolate.Resolvers;
-using IIS.Core.Files;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public static async Task<Node> LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeModel targetType)
         {
-            var existingNode = await service.LoadNodesAsync(targetId, null); // no fields needed, only type
+            var existingNode = await service.LoadNodesAsync(targetId); // no fields needed, only type
             if (existingNode == null)
                 throw new ArgumentException($"Node with id {targetId} not found");
             if (!targetType.IsAssignableFrom(existingNode.Type))

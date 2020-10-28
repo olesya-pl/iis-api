@@ -1,6 +1,6 @@
 ﻿using Iis.Interfaces.Elastic;
 using Microsoft.Extensions.DependencyInjection;
-
+using Iis.Elastic.SearchResult;
 namespace Iis.Elastic
 {
     public static class DI

@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Iis.Domain.Materials;
+using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public static class Extensions
     {
-        public static Files.FileInfo ToView(this FileInfo fileInfo)
+        public static Files.FileInfo ToView(this FileDto fileInfo)
         {
             if (fileInfo == default)
                 return null;

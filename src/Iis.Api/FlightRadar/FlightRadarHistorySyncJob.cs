@@ -44,12 +44,10 @@ namespace IIS.Core.FlightRadar
 
                     if (!routes.Any())
                     {
-                        _flightRadarService.SignalSynchronizationStop();
                         await Task.Delay(TimeSpan.FromMinutes(2));
                         continue;
                     }
 
-                    _flightRadarService.SignalSynchronizationStart();
                     await SyncRoutesAsync(routes);
                     await _flightRadarService.UpdateLastProcessedIdAsync(minId, routes.Max(p => p.Id));
                 }
