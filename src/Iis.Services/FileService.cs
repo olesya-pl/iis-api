@@ -153,7 +153,7 @@ namespace IIS.Core.Files.EntityFramework
 
         public async Task FlushTemporaryFilesAsync(Predicate<DateTime> predicate)
         {
-            var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.IsTemporary && predicate(f.UploadTime), true));
+            var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.IsTemporary && predicate(f.UploadTime)));
 
             await RunAsync(uow => uow.FileRepository.RemoveRange(files));
         }
