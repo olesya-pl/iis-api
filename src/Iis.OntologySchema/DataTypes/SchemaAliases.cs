@@ -11,9 +11,10 @@ namespace Iis.OntologySchema.DataTypes
         private Dictionary<string, SchemaAlias> _dict = new Dictionary<string, SchemaAlias>();
         public IEnumerable<IAlias> Items => _dict.Values;
 
-        public SchemaAliases(IEnumerable<IAlias> source)
+        public SchemaAliases(IEnumerable<IAlias> source = null)
         {
-            _dict = source.ToDictionary(a => a.DotName, a => new SchemaAlias(a));
+            if (source != null)
+                _dict = source.ToDictionary(a => a.DotName, a => new SchemaAlias(a));
         }
 
         public IAlias GetItem(string dotName)

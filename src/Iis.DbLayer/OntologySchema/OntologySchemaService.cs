@@ -32,13 +32,20 @@ namespace Iis.DbLayer.OntologySchema
         public IOntologySchema LoadFromDatabase(IOntologySchemaSource schemaSource)
         {
             using var context = OntologyContext.GetContext(schemaSource.Data);
-            var ontologyRawData = new OntologyRawData(
-                context.NodeTypes.AsNoTracking(),
-                context.RelationTypes.AsNoTracking(),
-                context.AttributeTypes.AsNoTracking(),
-                context.Aliases.AsNoTracking());
-            var ontologySchema = Iis.OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
-            return ontologySchema;
+            try
+            {
+                var ontologyRawData = new OntologyRawData(
+                    context.NodeTypes.AsNoTracking(),
+                    context.RelationTypes.AsNoTracking(),
+                    context.AttributeTypes.AsNoTracking(),
+                    context.Aliases.AsNoTracking());
+                var ontologySchema = Iis.OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
+                return ontologySchema;
+            }
+            catch
+            {
+                return Iis.OntologySchema.OntologySchema.GetInstance(null, schemaSource);
+            }
         }
 
         public IOntologySchema GetOntologySchema(IOntologySchemaSource schemaSource)

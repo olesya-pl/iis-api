@@ -119,7 +119,7 @@ namespace Iis.OntologyManager.UiControls
             ConfigureGrid(param);
             PopulateGrid(param, searchResult);
             lblRecordsCount.Text = RECORDS_COUNT_TEXT + searchResult.Items.Count.ToString();
-            lblValuesCount.Text = VALUES_COUNT_TEXT + searchResult.Items.Max(i => i.OrderNumber).ToString();
+            lblValuesCount.Text = VALUES_COUNT_TEXT + (searchResult.Items.Count == 0 ? "" : searchResult.Items.Max(i => i.OrderNumber).ToString());
         }
         private DataGridViewColumn AddTextColumn(string name, string headerText, int koef = 1)
         {
