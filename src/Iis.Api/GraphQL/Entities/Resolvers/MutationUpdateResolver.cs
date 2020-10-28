@@ -83,8 +83,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 foreach (var (key, value) in properties)
                 {
-                    var embed = node.Type.GetProperty(key) ??
-                                throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
+                    var embed = node.Type.GetProperty(key);
+                    if(embed == null) 
+                    {
+                        if (key == LastConfirmedFieldName)
+                            continue;
+                        else
+                            throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
+                    }
+                                
                     await UpdateRelations(node, embed, value,
                         string.IsNullOrEmpty(dotName) ? key : dotName + "." + key, requestId);
                 }
