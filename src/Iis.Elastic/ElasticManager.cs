@@ -432,6 +432,7 @@ namespace Iis.Elastic
 
         private void PrepareAggregations(JObject json, List<IIisElasticField> fields)
         {
+            const int MaxBucketsCount = 100;
             if (!fields.Any())
             {
                 return;
@@ -442,6 +443,7 @@ namespace Iis.Elastic
             {
                 var fieldObj = new JObject();
                 fieldObj["field"] = $"{field.Name}{AggregateSuffix}";
+                fieldObj["size"] = MaxBucketsCount;
                 var terms = new JObject();
                 terms["terms"] = fieldObj;
                 aggs[field.Name] = terms;
