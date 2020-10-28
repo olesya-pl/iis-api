@@ -1,10 +1,12 @@
-﻿using Iis.DbLayer.Repositories;
+﻿using Iis.DbLayer.OntologySchema;
+using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
@@ -25,6 +27,7 @@ namespace Iis.Api.Controllers
         INodeRepository _nodeRepository;
         IMaterialService _materialService;
         IElasticState _elasticState;
+        IConfiguration _configuration;
         private readonly IAdminOntologyElasticService _adminElasticService;
         
         public AdminController(
@@ -32,13 +35,15 @@ namespace Iis.Api.Controllers
             IElasticManager elasticManager,
             INodeRepository nodeRepository,
             IElasticState elasticState,
-            IAdminOntologyElasticService adminElasticService)
+            IAdminOntologyElasticService adminElasticService,
+            IConfiguration configuration)
         {
             _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
             _materialService = materialService ?? throw new ArgumentNullException(nameof(materialService));
             _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _adminElasticService = adminElasticService ?? throw new ArgumentNullException(nameof(adminElasticService));
+            _configuration = configuration;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -141,6 +146,22 @@ namespace Iis.Api.Controllers
             }
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
+        }
+        [HttpPost("UpdateOntologySchema")]
+        public string UpdateOntologySchema([FromBody] OntologyRawDataDeserializable rawData)
+        {
+            try
+            {
+                //Request.Body
+                var ontologySchemaService = new OntologySchemaService();
+                var connectionString = _configuration.GetConnectionString("db");
+                ontologySchemaService.UpdateOntologySchemaFromJson(rawData, connectionString);
+            }
+            catch (Exception ex)
+            {
+                return $"{ex.Message} {ex.InnerException?.Message}";
+            }
+            return "Updated Successfully";
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)

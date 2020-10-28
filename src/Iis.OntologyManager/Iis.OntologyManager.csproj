@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <Folder Include="Ontology\" />
+    <Folder Include="Parameters\" />
   </ItemGroup>
 
 </Project>

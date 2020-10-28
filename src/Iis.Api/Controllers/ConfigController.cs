@@ -14,16 +14,16 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class ConfigController: Controller
     {
-        IConfiguration _configufation;
+        IConfiguration _configuration;
         public ConfigController(IConfiguration configuration)
         {
-            _configufation = configuration;
+            _configuration = configuration;
         }
         [HttpGet("")]
         public async Task<IActionResult> Get(CancellationToken token)
         {
             var sb = new StringBuilder();
-            Format(sb, _configufation.GetChildren());
+            Format(sb, _configuration.GetChildren());
             return Content(sb.ToString());
         }
 

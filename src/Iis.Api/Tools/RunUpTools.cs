@@ -76,9 +76,6 @@ namespace IIS.Core.Tools
                 case "reset-passwords":
                     await tools.ResetPasswordsAsync();
                     break;
-                case "update-ontology":
-                    tools.UpdateOntology();
-                    break;
                 case "help":
                     Help();
                     break;
@@ -96,17 +93,7 @@ namespace IIS.Core.Tools
 
             List<string> actions = new List<string>
             {
-                "clear-types",
-                "migrate-legacy-types",
-                "migrate-legacy-entities",
-                "migrate-legacy-files",
-                "fill-odysseus-types",
-                "fill-contour-types",
-                "seed-contour-data",
-                "seed-odysseus-data",
                 "apply-ef-migrations",
-                "dump-contour-ontology",
-                "dump-odysseus-ontology",
                 "reset-passwords",
                 "help"
             };

@@ -1,7 +1,6 @@
 ﻿using Iis.DataModel;
 using Iis.DbLayer.OntologySchema;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyManager.Parameters;
 using Iis.OntologySchema.Saver;
 using System;
 using System.Collections.Generic;

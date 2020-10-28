@@ -33,6 +33,7 @@ namespace Iis.Api
                     var ontologyData = serviceProvider.GetRequiredService<IOntologyNodesData>();
 
                     var amountType = ontologyData.Schema.GetEntityTypeByName("MilitaryAmount");
+                    if (amountType == null) return;
                     var codeRelationType = amountType.GetRelationTypeByName("code");
                     if (amountType == null || codeRelationType == null) return;
                     if (!File.Exists("data/contour/entities/MilitaryAmount.json")) return;

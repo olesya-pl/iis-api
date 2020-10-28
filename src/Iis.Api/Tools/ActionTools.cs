@@ -62,30 +62,6 @@ namespace IIS.Core.Tools
             await _ontologyContext.SaveChangesAsync();
         }
 
-        public void UpdateOntology()
-        {
-            var schemaFileName = Path.Combine(Environment.CurrentDirectory, "data", "contour", "migrations", "002", "migration-002.ont");
-            var schemaFrom = _ontologySchemaService.GetOntologySchema(new OntologySchemaSource { SourceKind = SchemaSourceKind.File, Data = schemaFileName });
-            var connectionString = _configuration.GetConnectionString("db", "DB_");
-            var schemaTo = _ontologySchemaService.GetOntologySchema(new OntologySchemaSource { SourceKind = SchemaSourceKind.Database, Data = connectionString });
-            var compareResult = schemaFrom.CompareTo(schemaTo);
-            var schemaSaver = new OntologySchemaSaver(OntologyContext.GetContext(connectionString));
-            schemaSaver.SaveToDatabase(compareResult, schemaTo);
-            var ontologyMigration = new OntologyMigrationsEntity
-            {
-                Id = Guid.NewGuid(),
-                OrderNumber = 2,
-                StartTime = DateTime.Now
-            };
-            ontologyMigration.StructureBefore = JsonConvert.SerializeObject(schemaTo.GetRawData(), Formatting.Indented);
-            ontologyMigration.StructureAfter = JsonConvert.SerializeObject(schemaTo.GetRawData(), Formatting.Indented);
-            ontologyMigration.MigrationRules = string.Empty;
-            ontologyMigration.Log = string.Empty;
-            ontologyMigration.IsSuccess = true;
-            _ontologyContext.OntologyMigrations.Add(ontologyMigration);
-            _ontologyContext.SaveChanges();
-        }
-
         class AnalyticsIndicatorBuilder
         {
             public List<AnalyticIndicatorEntity> Indicators = new List<AnalyticIndicatorEntity>();
