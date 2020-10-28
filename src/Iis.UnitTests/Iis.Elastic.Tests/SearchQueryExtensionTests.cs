@@ -68,9 +68,12 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [InlineData("fieldName:fieldValue", false)]
         public void SetupExactQuery_Success(string query, bool lenient)
         {
-            var expected = JObject.Parse("{\"query\":{\"query_string\":{\"query\":\""+query+"\", \"lenient\":"+lenient.ToString().ToLower()+"}}}");
+            var expected = JObject.Parse("{\"_source\": [\"*\"], \"from\": 0, \"size\": 0,\"query\":{\"query_string\":{\"query\":\"" +query+"\", \"lenient\":"+lenient.ToString().ToLower()+"}}}");
 
-            var actual = new JObject().SetupExactQuery(query, lenient);
+            var actual = new ExactQueryBuilder()
+                .WithQueryString(query)
+                .WithLeniency(lenient)
+                .Build();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -78,31 +81,38 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [InlineData("fieldName:fieldValue")]
         public void SetupExactQuery_Success_NoLenient(string query)
         {
-            var expected = JObject.Parse("{\"query\":{\"query_string\":{\"query\":\""+query+"\"}}}");
+            var expected = JObject.Parse("{\"_source\": [\"*\"], \"from\": 0, \"size\": 0,\"query\":{\"query_string\":{\"query\":\"" + query+"\"}}}");
 
-            var actual = new JObject().SetupExactQuery(query);
+            var actual = new ExactQueryBuilder()
+                .WithQueryString(query)
+                .Build();
 
             actual.Should().BeEquivalentTo(expected);
         }
-        [Fact]
-        public void SetupExactQuery_Null()
+        [Theory]
+        [InlineData("fieldName:fieldValue", 14, 88)]
+        public void SetupExactQuery_Success_WithPagination(string query, int offset, int size)
         {
-            JObject stubValue = null;
+            var expected = JObject.Parse("{\"_source\": [\"*\"], \"from\": "+offset+", \"size\": "+size+",\"query\":{\"query_string\":{\"query\":\"" + query + "\"}}}");
 
-            var actual = stubValue.SetupExactQuery("fieldName:fieldValue", true);
+            var actual = new ExactQueryBuilder()
+                .WithQueryString(query)
+                .WithPagination(offset, size)
+                .Build();
 
-            actual.Should().BeNull();
+            actual.Should().BeEquivalentTo(expected);
         }
-        [Fact]
-        public void SetupExactQuery_UpdateExistingProperty()
+        [Theory]
+        [InlineData("fieldName:fieldValue", 21, 69, "Id")]
+        public void SetupExactQuery_Success_WithPagination_AndResultFields(string query, int offset, int size, string resultField)
         {
-            var expected = JObject.Parse("{\"query\":{\"query_string\":{\"query\":\"fieldName:fieldValue\", \"lenient\":true}}}");
+            var expected = JObject.Parse("{\"_source\": [\""+resultField+"\"], \"from\": " + offset + ", \"size\": " + size + ",\"query\":{\"query_string\":{\"query\":\"" + query + "\"}}}");
 
-            var stubValue = new JObject(
-                new JProperty("query", "query_stub_value")
-            );
-
-            var actual = stubValue.SetupExactQuery("fieldName:fieldValue", true);
+            var actual = new ExactQueryBuilder()
+                .WithQueryString(query)
+                .WithPagination(offset, size)
+                .WithResultFields(new [] { resultField})
+                .Build();
 
             actual.Should().BeEquivalentTo(expected);
         }

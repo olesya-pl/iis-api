@@ -138,23 +138,41 @@ namespace IIS.Core.Ontology.EntityFramework
         private async Task<(MultiElasticSearchParams MultiSearchParams, IElasticSearchResult HistoricalResult)> PrepareMultiElasticSearchParamsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default) 
         {
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
+
             var searchFields = _elasticConfiguration
-                .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p))).ToList();
+                        .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p))).ToList();
 
             IElasticSearchResult searchByHistoryResult = null;
             if (useHistoricalSearch)
             {
-                var searchByHistoryParams = new IisElasticSearchParams
-                {
-                    BaseIndexNames = typeNames.Select(GetHistoricalIndex).ToList(),
-                    Query = $"{filter.Suggestion}",
-                    From = 0,
-                    Size = filter.Limit,
-                    SearchFields = searchFields,
-                    ResultFields = new List<string> { "Id" }
-                };
+                var historicalIndexes = typeNames.Select(GetHistoricalIndex).ToList();
 
-                searchByHistoryResult = await _elasticManager.SearchAsync(searchByHistoryParams, ct);
+                if (SearchQueryExtension.IsExactQuery(filter.Suggestion))
+                {
+                    var exactQuery = new ExactQueryBuilder()
+                        .WithResultFields(new List<string> { "Id" })
+                        .WithPagination(0, filter.Limit)
+                        .WithQueryString(filter.Suggestion)
+                        .WithLeniency(true)
+                        .Build();
+
+                    searchByHistoryResult = await _elasticManager.SearchAsync(exactQuery.ToString(), historicalIndexes, ct);
+                }
+                else
+                {
+                    var searchByHistoryParams = new IisElasticSearchParams
+                    {
+                        BaseIndexNames = historicalIndexes,
+                        Query = $"{filter.Suggestion}",
+                        From = 0,
+                        Size = filter.Limit,
+                        SearchFields = searchFields,
+                        ResultFields = new List<string> { "Id" }
+                    };
+
+                    searchByHistoryResult = await _elasticManager.SearchAsync(searchByHistoryParams, ct);
+                }
+
             }
 
             var multiSearchParams = new MultiElasticSearchParams
@@ -322,9 +340,10 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchResult> SearchSignsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default)
         {
-            var queryData = SearchQueryExtension
-                .WithSearchJson(new []{ "*" }, filter.Offset, filter.Limit)
-                .SetupExactQuery(filter.Suggestion)
+            var queryData = new ExactQueryBuilder()
+                .WithPagination(filter.Offset, filter.Limit)
+                .WithQueryString(filter.Suggestion)
+                .Build()
                 .SetupSorting("CreatedAt", "asc")
                 .ToString(Formatting.None);
 
