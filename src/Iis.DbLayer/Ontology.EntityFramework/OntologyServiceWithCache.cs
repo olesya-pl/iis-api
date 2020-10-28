@@ -99,7 +99,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
+            var derivedTypes = _data.Schema
+                .GetNodeTypes(types.Select(t => t.Id))
+                .Where(type => !type.IsAbstract);
+
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
 
             if (isElasticSearch)
