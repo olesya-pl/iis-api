@@ -13,9 +13,9 @@ namespace Iis.Api.Modules
 
         public static IServiceCollection RegisterMqFactory(this IServiceCollection services, IConfiguration configuration, out string mqConnectionString)
         {
-    
+
             var mqConfig = configuration.GetSection(mqSectionName).Get<MqConfiguration>();
-            
+
             if (mqConfig == null) throw new InvalidOperationException($"No config was found with name \"{mqSectionName}\"");
 
             var connectionFactory = new ConnectionFactory
@@ -24,10 +24,11 @@ namespace Iis.Api.Modules
                 UserName = mqConfig.UserName ?? ConnectionFactory.DefaultUser,
                 Password = mqConfig.Password ?? ConnectionFactory.DefaultPass,
                 VirtualHost = mqConfig.VirtualHost ?? ConnectionFactory.DefaultVHost,
-                DispatchConsumersAsync = true
+                DispatchConsumersAsync = true,
+                Port = mqConfig.Port ?? AmqpTcpEndpoint.UseDefaultPort
             };
-            
-            mqConnectionString = $"amqp://{connectionFactory.UserName}:{connectionFactory.Password}@{connectionFactory.HostName}";
+
+            mqConnectionString = $"amqp://{connectionFactory.UserName}:{connectionFactory.Password}@{connectionFactory.HostName}:{connectionFactory.Port}/{connectionFactory.VirtualHost}";
 
             return services
                     .AddTransient<IConnectionFactory>(serviceProvider => connectionFactory);
