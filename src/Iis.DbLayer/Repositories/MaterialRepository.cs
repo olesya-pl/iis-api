@@ -136,6 +136,7 @@ namespace Iis.DbLayer.Repositories
                         }
                         var mlResponsesByEntity = mlResponses[p.Id];
                         p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
+                        p.ProcessedMlHandlersCount = mlResponsesByEntity.Count();
                         string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
                         if (!string.IsNullOrEmpty(imageVector))
                         {
@@ -160,6 +161,7 @@ namespace Iis.DbLayer.Repositories
             var materialDocument = MapEntityToDocument(material);
             var (mlResponses, imageVector) = await PopulateMLResponses(materialId);
             materialDocument.MLResponses = mlResponses;
+            materialDocument.ProcessedMlHandlersCount = mlResponses.Count;
             if (!string.IsNullOrEmpty(imageVector))
             {
                 materialDocument.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
