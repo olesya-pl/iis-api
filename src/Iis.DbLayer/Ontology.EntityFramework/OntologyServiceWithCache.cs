@@ -161,9 +161,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             IReadOnlyList<IAttributeBase> result = _data.Nodes
-                .Where(n => n.NodeType.Name == valueTypeName &&
-                       n.Value == value &&
-                       n.OutgoingRelations.Any(r => r.SourceNode.NodeTypeId == nodeTypeId))
+                .Where(n => string.Equals(n.NodeType.Name, valueTypeName, StringComparison.Ordinal) &&
+                       n.Value != null && n.Value.Contains(value, StringComparison.OrdinalIgnoreCase) &&
+                       n.IncomingRelations.Any(r => r.SourceNode.NodeTypeId == nodeTypeId))
                 .Select(n => (IAttributeBase)(n.Attribute))
                 .Take(limit)
                 .ToList();
