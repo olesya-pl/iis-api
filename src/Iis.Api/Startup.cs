@@ -285,11 +285,14 @@ namespace IIS.Core
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
             var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
             services.AddSingleton(maxOperatorsConfig);
-
-            services.AddHealthChecks()
+            
+            if (enableContext)
+            {
+                services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
                 .AddRabbitMQ(mqConnectionString, (SslOption)null)
                 .AddElasticsearch(elasticConfiguration.Uri);
+            }
 
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);

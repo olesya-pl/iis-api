@@ -36,8 +36,7 @@ namespace Iis.DbLayer.Repositories
         };
 
         private readonly IMLResponseRepository _mLResponseRepository;
-        private readonly IElasticManager _elasticManager;
-        private readonly IElasticConfiguration _elasticConfiguration;
+        private readonly IElasticManager _elasticManager;        
         private readonly IMapper _mapper;
         private readonly IOntologySchema ontologySchema;
 
@@ -45,12 +44,10 @@ namespace Iis.DbLayer.Repositories
 
         public MaterialRepository(IMLResponseRepository mLResponseRepository,
             IElasticManager elasticManager,
-            IElasticConfiguration elasticConfiguration,
             IMapper mapper, IOntologySchema ontologySchema)
         {
             _mLResponseRepository = mLResponseRepository;
             _elasticManager = elasticManager;
-            _elasticConfiguration = elasticConfiguration;
             _mapper = mapper;
             this.ontologySchema = ontologySchema;
 
@@ -136,6 +133,7 @@ namespace Iis.DbLayer.Repositories
                         }
                         var mlResponsesByEntity = mlResponses[p.Id];
                         p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
+                        p.ProcessedMlHandlersCount = mlResponsesByEntity.Count();
                         string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
                         if (!string.IsNullOrEmpty(imageVector))
                         {
@@ -160,6 +158,7 @@ namespace Iis.DbLayer.Repositories
             var materialDocument = MapEntityToDocument(material);
             var (mlResponses, imageVector) = await PopulateMLResponses(materialId);
             materialDocument.MLResponses = mlResponses;
+            materialDocument.ProcessedMlHandlersCount = mlResponses.Count;
             if (!string.IsNullOrEmpty(imageVector))
             {
                 materialDocument.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
