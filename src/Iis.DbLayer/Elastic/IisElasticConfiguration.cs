@@ -5,6 +5,7 @@ using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Iis.DbLayer.Elastic
 {
@@ -130,7 +131,43 @@ namespace Iis.DbLayer.Elastic
             var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
             if (nodeType != null)
             {
-                return nodeType.GetAttributeDotNamesRecursiveWithLimit();
+                var nodes = _ontologySchema.GetAttributesInfo(typeName)
+                    .Items
+                    .Select(p => new NodeAggregationInfo
+                    {
+                        Name = p.DotName,
+                        IsAggregated = p.IsAggregated
+                    }).ToList();
+
+                nodes.AddRange(new[] {
+                    new NodeAggregationInfo
+                    {
+                        Name = "NodeTypeName",
+                        IsAggregated = false
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "NodeTypeTitle",
+                        IsAggregated = true
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "NodeTypeTitleAggregate",
+                        IsAggregated = false
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "CreatedAt",
+                        IsAggregated = false
+                    },
+                    new NodeAggregationInfo
+                    {
+                        Name = "UpdatedAt",
+                        IsAggregated = false
+                    }
+                });
+
+                return nodes;
             }
 
             return new List<NodeAggregationInfo>();
