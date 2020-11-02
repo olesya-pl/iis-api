@@ -26,7 +26,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             {
                 types = ontology.EntityTypes;
             }
-            if (filter.ConcreteTypes)
+            if (filter?.ConcreteTypes == true)
             {
                 types = types.OfType<IEntityTypeModel>().Where(t => !t.IsAbstract);
             }                
