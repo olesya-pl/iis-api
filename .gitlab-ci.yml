@@ -221,7 +221,7 @@ deploy_dev3_nomad:
     - git init .
     - git remote add origin $NOMAD_REPO
     - git pull origin master
-    - sed -i s/$DOCKER_IMAGE_NAME:master/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA/g iis-dev/dev3/$NOMAD_JOB
+    - sed -i s/$DOCKER_IMAGE_NAME:latest/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA/g iis-dev/dev3/$NOMAD_JOB
     - nomad plan iis-dev/dev3/$NOMAD_JOB || if [ $? -eq 255 ]; then exit 255; else echo "success"; fi
     - nomad run iis-dev/dev3/$NOMAD_JOB
   tags:
