@@ -27,8 +27,9 @@ namespace Iis.Api.Modules
                 DispatchConsumersAsync = true,
                 Port = mqConfig.Port ?? AmqpTcpEndpoint.UseDefaultPort
             };
-
-            mqConnectionString = $"amqp://{connectionFactory.UserName}:{connectionFactory.Password}@{connectionFactory.HostName}:{connectionFactory.Port}/{connectionFactory.VirtualHost}";
+            var portString = connectionFactory.Port == -1 ? string.Empty :
+                ":" + connectionFactory.Port;
+            mqConnectionString = $"amqp://{connectionFactory.UserName}:{connectionFactory.Password}@{connectionFactory.HostName}{portString}/{connectionFactory.VirtualHost}";
 
             return services
                     .AddTransient<IConnectionFactory>(serviceProvider => connectionFactory);
