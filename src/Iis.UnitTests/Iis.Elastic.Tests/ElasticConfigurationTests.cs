@@ -11,6 +11,20 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 {
     public class ElasticConfigurationTests
     {
+        private static IisElasticConfiguration CreateSut(string typeName, List<AttributeInfoItem> ontologyFields)
+        {
+            var nodeTypeMock = new Mock<INodeTypeLinked>();
+
+            var attributeInfoListMock = new Mock<IAttributeInfoList>();
+            attributeInfoListMock.Setup(p => p.Items).Returns(ontologyFields);
+
+            var ontologySchemaMock = new Mock<IOntologySchema>();
+            ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
+            ontologySchemaMock.Setup(e => e.GetAttributesInfo(typeName)).Returns(attributeInfoListMock.Object);
+            var sut = new IisElasticConfiguration(ontologySchemaMock.Object);
+            return sut;
+        }
+
         [Theory, RecursiveAutoData]
         public void GetOntologyIncludedFields_AllFieldsAreIncluded(string typeName,
             List<AttributeInfoItem> ontologyFields,
@@ -18,7 +32,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             //arrange
             ontologyFields[0] = new AttributeInfoItem(
-                ontologyFields[0].DotName, 
+                ontologyFields[0].DotName,
                 ontologyFields[0].ScalarType,
                 ontologyFields[0].AliasesList,
                 true);
@@ -29,16 +43,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 configuredField.IsExcluded = false;
                 configuredField.TypeName = typeName;
             }
-            
-            var nodeTypeMock = new Mock<INodeTypeLinked>();
 
-            var attributeInfoListMock = new Mock<IAttributeInfoList>();
-            attributeInfoListMock.Setup(p => p.Items).Returns(ontologyFields);
-            
-            var ontologySchemaMock = new Mock<IOntologySchema>();
-            ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
-            ontologySchemaMock.Setup(e => e.GetAttributesInfo(typeName)).Returns(attributeInfoListMock.Object);
-            var sut = new IisElasticConfiguration(ontologySchemaMock.Object);
+            var sut = CreateSut(typeName, ontologyFields);
             sut.ReloadFields(configuredFields);
 
             //act
@@ -57,7 +63,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 Assert.Equal(configuredField.Fuzziness, item.Fuzziness);
                 Assert.Equal(configuredField.Boost, item.Boost);
             }
-        }
+        }        
 
         [Theory, RecursiveAutoData]
         public void GetOntologyIncludedFields_ConfiguredFieldsOfOtherType(string typeName,
@@ -67,16 +73,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             //arrange
             configuredField.IsExcluded = false;
 
-            var nodeTypeMock = new Mock<INodeTypeLinked>();
-
-            var attributeInfoListMock = new Mock<IAttributeInfoList>();
-            attributeInfoListMock.Setup(p => p.Items).Returns(new List<AttributeInfoItem> { ontologyField });
-            
-            var ontologySchemaMock = new Mock<IOntologySchema>();
-            ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
-            ontologySchemaMock.Setup(e => e.GetAttributesInfo(typeName)).Returns(attributeInfoListMock.Object);
-
-            var sut = new IisElasticConfiguration(ontologySchemaMock.Object);
+            var sut = CreateSut(typeName, new List<AttributeInfoItem> { ontologyField });
             sut.ReloadFields(new[] { configuredField });
 
             //act
@@ -101,15 +98,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             configuredField.Name = ontologyField.DotName;
             configuredField.IsExcluded = false;
 
-            var nodeTypeMock = new Mock<INodeTypeLinked>();
-
-            var attributeInfoListMock = new Mock<IAttributeInfoList>();
-            attributeInfoListMock.Setup(p => p.Items).Returns(new List<AttributeInfoItem> { ontologyField });
-
-            var ontologySchemaMock = new Mock<IOntologySchema>();
-            ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
-            ontologySchemaMock.Setup(e => e.GetAttributesInfo(typeName)).Returns(attributeInfoListMock.Object);
-            var sut = new IisElasticConfiguration(ontologySchemaMock.Object);
+            var sut = CreateSut(typeName, new List<AttributeInfoItem> { ontologyField });
             sut.ReloadFields(new[] { configuredField });
 
             //act
@@ -136,15 +125,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             configuredField.TypeName = typeName;
             configuredField.IsExcluded = true;
 
-            var nodeTypeMock = new Mock<INodeTypeLinked>();
-
-            var attributeInfoListMock = new Mock<IAttributeInfoList>();
-            attributeInfoListMock.Setup(p => p.Items).Returns(new List<AttributeInfoItem> { ontologyField });
-
-            var ontologySchemaMock = new Mock<IOntologySchema>();
-            ontologySchemaMock.Setup(e => e.GetEntityTypeByName(typeName)).Returns(nodeTypeMock.Object);
-            ontologySchemaMock.Setup(e => e.GetAttributesInfo(typeName)).Returns(attributeInfoListMock.Object);
-            var sut = new IisElasticConfiguration(ontologySchemaMock.Object);
+            var sut = CreateSut(typeName, new List<AttributeInfoItem> { ontologyField });
             sut.ReloadFields(new[] { configuredField });
 
             //act
