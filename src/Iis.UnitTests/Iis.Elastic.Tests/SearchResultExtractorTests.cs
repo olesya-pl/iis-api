@@ -2,7 +2,7 @@
 using System.Linq;
 using AutoFixture.Xunit2;
 using Elasticsearch.Net;
-using Iis.Elastic;
+using Iis.Elastic.SearchResult;
 using Xunit;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests

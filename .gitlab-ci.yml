@@ -4,6 +4,7 @@ stages:
   - deploy
   - build_docker
   - push_docker
+  - deploy_nomad
 
 build_job:
   stage: build
@@ -101,12 +102,12 @@ deploy_contour_dev_auto:
     - master
     - develop
 
-deploy_od_dev:
-  extends: .deploy_od_dev
-  only:
-    - /^Release_*/
-    - master
-    - develop
+#deploy_od_dev:
+#  extends: .deploy_od_dev
+#  only:
+#    - /^Release_*/
+#    - master
+#    - develop
 
 deploy_contour_dev_manual:
   extends: .deploy_contour_dev
@@ -157,12 +158,15 @@ deploy_contour_demo:
 variables:
   DOCKER_REGISTRY: "docker.contour.net:5000"
   DOCKER_IMAGE_NAME: "iis-core"
+  NOMAD_REPO: "git@git.warfare-tec.com:IIS/nomad.git"
+  NOMAD_ADDR: "http://iis-dev-srv1.contour.net:4646"
+  NOMAD_JOB: "iis_core.hcl"
 
 
 build_docker:
   stage: build_docker
   script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
+    - docker build --build-arg BUILD_VERSION=$PRODUCT_VERSION.$CI_PIPELINE_ID -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
     - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
   tags:
     - docker
@@ -206,3 +210,20 @@ push docker(tag):
     - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_REF_NAME
   tags:
     - docker
+
+deploy_dev3_nomad:
+  variables:
+    GIT_STRATEGY: none
+  stage: deploy_nomad
+  script:
+    - mkdir deploy_$CI_COMMIT_SHORT_SHA
+    - cd deploy_$CI_COMMIT_SHORT_SHA
+    - git init .
+    - git remote add origin $NOMAD_REPO
+    - git pull origin master
+    - sed -i s/$DOCKER_IMAGE_NAME:latest/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA/g iis-dev/dev3/$NOMAD_JOB
+    - nomad plan iis-dev/dev3/$NOMAD_JOB || if [ $? -eq 255 ]; then exit 255; else echo "success"; fi
+    - nomad run iis-dev/dev3/$NOMAD_JOB
+  tags:
+    - nomad
+  when: manual

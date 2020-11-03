@@ -164,8 +164,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
-        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology,
-            bool? concreteTypes = false)
+        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology)
         {
             var types = ontology.GetChildTypes(Source.EntityType)?.OfType<IEntityTypeModel>();
             if (types == null)
@@ -179,9 +178,7 @@ namespace IIS.Core.GraphQL.EntityTypes
                 types = types.Where(t => metaTargetTypes.Contains(t.Name));
             }
 
-            if (concreteTypes == true)
-                types = types.Where(t => !t.IsAbstract);
-            return types.Select(t => new EntityType(t, _ontology));
+            return types.Where(t => !t.IsAbstract).Select(t => new EntityType(t, _ontology));
         }
     }
 }

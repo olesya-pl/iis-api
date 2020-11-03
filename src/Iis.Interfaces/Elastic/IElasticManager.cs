@@ -11,8 +11,9 @@ namespace Iis.Interfaces.Elastic
         Task<bool> PutDocumentAsync(string indexName, string id, string jsonDocument, CancellationToken cancellationToken = default);
         Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, bool waitForIndexing, CancellationToken cancellationToken = default);
         Task<bool> DeleteDocumentAsync(string indexName, string documentId);
-        Task<IElasticSearchResult> Search(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
-        Task<IElasticSearchResult> Search(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<IElasticSearchResult> SearchAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<IElasticSearchResult> SearchAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<IElasticSearchResult> SearchAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default);
         Task<IElasticSearchResult> SearchMoreLikeThisAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName);
         Task<IElasticSearchResult> GetDocumentByIdAsync(IReadOnlyCollection<string> indexNames, string id, CancellationToken token = default);
@@ -22,5 +23,8 @@ namespace Iis.Interfaces.Elastic
         Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default);
         Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchByImageVector(decimal[] imageVector, IIisElasticSearchParams searchParams, CancellationToken token);
+        Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default);
+        Task<int> CountAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default);
     }
 }

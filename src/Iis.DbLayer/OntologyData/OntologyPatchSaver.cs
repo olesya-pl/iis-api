@@ -13,10 +13,21 @@ namespace Iis.DbLayer.OntologyData
     {
         IMapper _mapper;
         OntologyContext _context;
-        public OntologyPatchSaver(OntologyContext context, IMapper mapper)
+        public OntologyPatchSaver(OntologyContext context)
         {
             _context = context;
-            _mapper = mapper;
+            _mapper = GetMapper();
+        }
+        private IMapper GetMapper()
+        {
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<INodeBase, NodeEntity>();
+                cfg.CreateMap<IRelationBase, RelationEntity>();
+                cfg.CreateMap<IAttributeBase, AttributeEntity>();
+            });
+
+            return new Mapper(configuration);
         }
         private void ApplyPatch(IOntologyPatch patch)
         {
@@ -38,11 +49,13 @@ namespace Iis.DbLayer.OntologyData
         {
             ApplyPatch(patch);
             await _context.SaveChangesAsync();
+            patch.Clear();
         }
         public void SavePatch(IOntologyPatch patch)
         {
             ApplyPatch(patch);
             _context.SaveChanges();
+            patch.Clear();
         }
     }
 }

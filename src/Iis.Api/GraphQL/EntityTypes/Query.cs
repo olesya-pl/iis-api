@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
-using IIS.Core.Ontology;
 using Iis.Domain;
-using IIS.Domain;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -17,20 +14,22 @@ namespace IIS.Core.GraphQL.EntityTypes
             EntityTypesFilter filter = null)
         {
             IEnumerable<INodeTypeModel> types;
-            if (filter != null)
+            if (!string.IsNullOrEmpty(filter?.Parent))
             {
                 var et = ontology.GetEntityType(filter.Parent);
                 if (et == null)
                     types = new List<INodeTypeModel>();
                 else
-                    types = ontology.GetChildTypes(et);
-                if (filter.ConcreteTypes)
-                    types = types.OfType<Iis.Domain.EntityType>().Where(t => !t.IsAbstract);
+                    types = ontology.GetChildTypes(et);                
             }
             else
             {
                 types = ontology.EntityTypes;
             }
+            if (filter?.ConcreteTypes == true)
+            {
+                types = types.OfType<IEntityTypeModel>().Where(t => !t.IsAbstract);
+            }                
             return Task.FromResult(new EntityTypeCollection(types, ontology));
         }
 

@@ -11,7 +11,6 @@ namespace Iis.Services.Contracts.Interfaces
 
         Task CreateIndexWithMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
         Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
-        Task FillIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
         Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
         bool IsIndexesValid(IEnumerable<string> indexes);
         Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default);

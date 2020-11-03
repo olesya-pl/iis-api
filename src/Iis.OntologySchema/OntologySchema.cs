@@ -4,6 +4,7 @@ using Iis.OntologySchema.Comparison;
 using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -118,8 +119,27 @@ namespace Iis.OntologySchema
             return _storage.NodeTypes.Values
                 .Where(nt => !nt.IsArchived 
                     && nt.Kind == Kind.Entity 
-                    && nt.Name == entityTypeName)
+                    && string.Equals(nt.Name, entityTypeName, StringComparison.OrdinalIgnoreCase))
                 .SingleOrDefault();
+        }
+        public IReadOnlyList<INodeTypeLinked> GetEntityTypesByName(IEnumerable<string> names, bool includeChildren)
+        {
+            IEnumerable<INodeTypeLinked> nodeTypes = _storage.NodeTypes.Values
+                .Where(nt => !nt.IsArchived
+                    && nt.Kind == Kind.Entity
+                    && names.Contains(nt.Name, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (includeChildren)
+            {
+                nodeTypes = nodeTypes
+                    .SelectMany(nt => nt.GetAllDescendants())
+                    .Concat(nodeTypes)
+                    .Where(nt => nt.Kind == Kind.Entity && !nt.IsAbstract);
+            }
+
+            return nodeTypes.Distinct().ToList();
+
         }
 
         private SchemaRelationType GetRelationType(string entityName, string relationName)
@@ -396,7 +416,7 @@ namespace Iis.OntologySchema
         public IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName)
         {
             var items = BuildAttributesBasedOnEntityFileds(entityName);
-            items.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null));
+            items.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null, false));
 
             return new AttributeInfo(historicalEntityName, items);
         }
@@ -462,7 +482,12 @@ namespace Iis.OntologySchema
                 var shortDotName = key.Substring(key.IndexOf('.') + 1);
                 var scalarType = isFuzzyDateEntity ? ScalarType.Date : nodeType.AttributeType.ScalarType;
 
-                var item = new AttributeInfoItem(shortDotName, scalarType, aliases);
+                var splitted = key.Split('.');
+                var parentDotName = string.Join('.', splitted.Take(splitted.Length - 1));
+
+                var parent = _storage.DotNameTypes[parentDotName].GetRelationTypeByName(splitted.Last());
+                var isRelationAggregated = parent?.NodeType?.MetaObject?.IsAggregated == true;
+                var item = new AttributeInfoItem(shortDotName, scalarType, aliases, isRelationAggregated);
 
                 items.Add(item);
             }
@@ -478,6 +503,19 @@ namespace Iis.OntologySchema
         public bool IsFuzzyDateEntityAttribute(INodeTypeLinked nodeType)
         {
             return nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Any(i => i.SourceType.Name == FuzzyDateEntityTypeName);
+        }
+        public IReadOnlyList<INodeTypeLinked> GetNodeTypes(IEnumerable<Guid> ids, bool includeChildren = false)
+        {
+            var nodeTypes = ids.Select(id => _storage.NodeTypes[id]);
+            var result = new List<INodeTypeLinked>(nodeTypes);
+            if (includeChildren)
+            {
+                foreach (var nodeType in nodeTypes)
+                {
+                    result.AddRange(nodeType.GetAllDescendants());
+                }
+            }
+            return result.Distinct().ToList();
         }
         public IDotName GetDotName(string value)
         {

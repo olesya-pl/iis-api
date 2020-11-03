@@ -2,6 +2,7 @@
 using Iis.DataModel.Reports;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
+using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
@@ -25,7 +26,7 @@ namespace Iis.Services
         private readonly IOntologySchema _ontologySchema;
         private readonly IExtNodeService _extNodeService;
         private readonly INodeRepository _nodeRepository;
-        private readonly OntologyNodesData ontologyNodesData;
+        private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IReportElasticService _reportElasticService;
         private readonly IReportService _reportService;
 
@@ -37,14 +38,14 @@ namespace Iis.Services
             IOntologySchema ontologySchema,
             IExtNodeService extNodeService,
             INodeRepository nodeRepository,
-            OntologyNodesData ontologyNodesData, IReportElasticService reportElasticService, IReportService reportService)
+            IOntologyNodesData ontologyNodesData, IReportElasticService reportElasticService, IReportService reportService)
         {
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
             _ontologySchema = ontologySchema ?? throw new ArgumentNullException(nameof(ontologySchema));
             _extNodeService = extNodeService ?? throw new ArgumentNullException(nameof(extNodeService));
             _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
-            this.ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
+            _ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
             _reportElasticService = reportElasticService ?? throw new ArgumentNullException(nameof(reportElasticService));
             _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
         }
@@ -87,34 +88,6 @@ namespace Iis.Services
             }
         }
 
-        public async Task FillIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
-        {
-            var nodeIds = await _extNodeService.GetExtNodesByTypeIdsAsync(indexes, ct);
-            if (isHistorical)
-            {
-                var response = await _nodeRepository.PutHistoricalNodesAsync(nodeIds, ct);
-                LogBulkResponse(response);
-            }
-            else
-            {
-                var results = new List<bool>(nodeIds.Count);
-                foreach (var id in nodeIds)
-                {
-                    ct.ThrowIfCancellationRequested();
-
-                    var result = await _nodeRepository.PutNodeAsync(id, ct);
-                    if (!result)
-                        TryLog($"node with id: {id} was not indexed");
-
-                    results.Add(result);
-                }
-
-                TryLog($"nodes: {results.Count}");
-                TryLog($"success indexed nodes: {results.Count(x => x)}");
-                TryLog($"failed indexed nodes: {results.Count(x => !x)}");
-            }
-        }
-
         public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var nodes = GetNodesFromMemory(indexes);
@@ -139,11 +112,11 @@ namespace Iis.Services
         public async Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default)
         {
             var mappingConfiguration =  new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
-                ElasticMappingProperty.CreateKeywordProperty(nameof(ReportEntity.Id), false),
-                ElasticMappingProperty.CreateTextProperty(nameof(ReportEntity.Recipient), null),
-                ElasticMappingProperty.CreateTextProperty(nameof(ReportEntity.Title), null),
-                ElasticMappingProperty.CreateDateTimeProperty(nameof(ReportEntity.CreatedAt), ElasticConfiguration.DefaultDateFormats),
-                ElasticMappingProperty.CreateKeywordProperty("ReportEventIds", true)
+                KeywordProperty.Create(nameof(ReportEntity.Id), false),
+                TextProperty.Create(nameof(ReportEntity.Recipient), null),
+                TextProperty.Create(nameof(ReportEntity.Title), null),
+                DateProperty.Create(nameof(ReportEntity.CreatedAt), ElasticConfiguration.DefaultDateFormats),
+                KeywordProperty.Create("ReportEventIds", true)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { _elasticState.ReportIndex }, mappingConfiguration.ToJObject(), ct);
@@ -165,7 +138,7 @@ namespace Iis.Services
             foreach (var index in indexes)
             {
                 var type = _ontologySchema.GetEntityTypeByName(index);
-                var entities = ontologyNodesData.GetEntitiesByTypeName(type.Name);
+                var entities = _ontologyNodesData.GetEntitiesByTypeName(type.Name);
                 nodes.AddRange(entities);
             }
 

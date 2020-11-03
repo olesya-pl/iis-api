@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
 using Newtonsoft.Json.Linq;
-
-using IIS.Core.Files;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
@@ -18,6 +16,8 @@ using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using System.Threading;
 using Iis.DbLayer.MaterialEnum;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.Ontology.Data;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -29,6 +29,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialProvider _materialProvider;
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
         private readonly IMLResponseRepository _mLResponseRepository;
+        private readonly IOntologyNodesData _nodesData;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -36,6 +37,7 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialProvider materialProvider,
             IEnumerable<IMaterialProcessor> materialProcessors,
             IMLResponseRepository mLResponseRepository,
+            IOntologyNodesData nodesData,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
@@ -44,59 +46,24 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
             _mLResponseRepository = mLResponseRepository;
+            _nodesData = nodesData;
         }
 
         public async Task SaveAsync(Material material)
         {
-            if (material.File != null) // if material has attached file
-            {
-                var file = await _fileService.GetFileAsync(material.File.Id); // explicit file check in case of no FK to file service
-                if (file == null) throw new ArgumentException($"File with guid {material.File.Id} was not found");
-                if (!file.IsTemporary) throw new ArgumentException($"File with guid {material.File.Id} is already used");
-
-                await _fileService.MarkFilePermanentAsync(file.Id);
-
-                // todo: implement correct file type - material type compatibility checking
-                if (material.Type == "cell.voice" && !file.ContentType.StartsWith("audio/"))
-                    throw new ArgumentException($"\"{material.Type}\" material expects audio file to be attached. Got \"{file.ContentType}\"");
-            }
-
-            if (material.ParentId.HasValue && _materialProvider.GetMaterialAsync(material.ParentId.Value) == null)
-                throw new ArgumentException($"Material with guid {material.ParentId.Value} does not exist");
+            await MakeFilePermanent(material);
+            ValidateMaterialParent(material);
 
             var materialEntity = _mapper.Map<MaterialEntity>(material);
 
             Run(unitOfWork => { unitOfWork.MaterialRepository.AddMaterialEntity(materialEntity); });
-
-            foreach (var child in material.Children)
-            {
-                child.ParentId = material.Id;
-                await SaveAsync(child);
-            }
-            var materialInfoEntities = material.Infos.Select(info => Map(info, material.Id)).ToList();
-            var materialFeatures = new List<MaterialFeatureEntity>();
-            foreach (var featureId in GetNodeIdentitiesFromFeatures(material.Metadata))
-            {
-                materialFeatures.Add(new MaterialFeatureEntity
-                {
-                    NodeId = featureId,
-                    MaterialInfo = new MaterialInfoEntity
-                    {
-                        MaterialId = material.Id
-                    }
-                });
-            }
-
-            Run(unitOfWork =>
-            {
-                unitOfWork.MaterialRepository.AddMaterialInfos(materialInfoEntities);
-                unitOfWork.MaterialRepository.AddMaterialFeatures(materialFeatures);
-            });
+            await SaveMaterialChildren(material);
+            SaveMaterialInfoEntitites(material);
 
             await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
 
-            if (material.ParentId == null)
+            if (material.IsParentMaterial())
             {
                 _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
             }
@@ -120,6 +87,69 @@ namespace IIS.Core.Materials.EntityFramework
                     new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
         }
 
+        private async Task MakeFilePermanent(Material material)
+        {
+            if (material.HasAttachedFile())
+            {
+                var file = await _fileService.GetFileAsync(material.File.Id);
+                if (file == null) throw new ArgumentException($"File with guid {material.File.Id} was not found");
+                if (!file.IsTemporary) throw new ArgumentException($"File with guid {material.File.Id} is already used");
+
+                await _fileService.MarkFilePermanentAsync(file.Id);
+
+                // todo: implement correct file type - material type compatibility checking
+                if (material.Type == "cell.voice" && !file.ContentType.StartsWith("audio/"))
+                    throw new ArgumentException($"\"{material.Type}\" material expects audio file to be attached. Got \"{file.ContentType}\"");
+            }
+        }
+
+        private void ValidateMaterialParent(Material material)
+        {
+            if (material.ParentId.HasValue && _materialProvider.GetMaterialAsync(material.ParentId.Value) == null)
+                throw new ArgumentException($"Material with guid {material.ParentId.Value} does not exist");
+        }
+
+        private async Task SaveMaterialChildren(Material material)
+        {
+            foreach (var child in material.Children)
+            {
+                child.ParentId = material.Id;
+                await SaveAsync(child);
+            }
+        }
+
+        private void SaveMaterialInfoEntitites(Material material)
+        {
+            var materialInfoEntities = material.Infos.Select(info => Map(info, material.Id)).ToList();
+            var materialFeatures = new List<MaterialFeatureEntity>();
+
+            foreach (var featureId in GetNodeIdentitiesFromFeatures(material.Metadata))
+            {
+                if (string.Equals(material.Source, "osint.data.file", StringComparison.Ordinal))
+                {
+                    var node = _nodesData.GetNode(featureId);
+                    if (node == null)
+                    {
+                        continue;
+                    }
+                }
+
+                materialFeatures.Add(new MaterialFeatureEntity
+                {
+                    NodeId = featureId,
+                    MaterialInfo = new MaterialInfoEntity
+                    {
+                        MaterialId = material.Id
+                    }
+                });
+            }
+
+            Run(unitOfWork =>
+            {
+                unitOfWork.MaterialRepository.AddMaterialInfos(materialInfoEntities);
+                unitOfWork.MaterialRepository.AddMaterialFeatures(materialFeatures);
+            });
+        }
 
         public async Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response)
 
@@ -192,7 +222,7 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        public async Task UpdateMaterialAsync(MaterialEntity material)
+        private async Task UpdateMaterialAsync(MaterialEntity material)
         {
             Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
 

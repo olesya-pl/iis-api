@@ -52,13 +52,13 @@ namespace Iis.Services
                 searchParams.SortOrder = search.SortOrder;
             }
 
-            var searchResult = await _elasticManager.Search(searchParams);
+            var searchResult = await _elasticManager.SearchAsync(searchParams);
             return (searchResult.Count, searchResult.Items.Select(x => x.SearchResult.ToObject<ReportDto>()).ToList());
         }
 
         public async Task<ReportDto> GetAsync(Guid id) 
         {
-            var document = await _elasticManager.GetDocumentByIdAsync(new string[] { _elasticIndex }, id.ToString());
+            var document = await _elasticManager.GetDocumentByIdAsync(new string[] { _elasticIndex }, id.ToString("N"));
             var jsonReport = document.Items.FirstOrDefault()?.SearchResult;
             
             return jsonReport?.ToObject<ReportDto>();

@@ -63,8 +63,6 @@ namespace Iis.Api
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
-                .ForMember(dest => dest.Events, opts => opts.Ignore())
-                .ForMember(dest => dest.Features, opts => opts.Ignore())
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -133,6 +131,9 @@ namespace Iis.Api
             CreateMap<IIisElasticField, ElasticFieldEntity>();
             CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();
             CreateMap<IIisElasticField, IIS.Core.GraphQL.ElasticConfig.ElasticField>();
+            CreateMap<ElasticFieldEntity, IIS.Core.GraphQL.ElasticConfig.ElasticField>()
+                .ForMember(dest => dest.IsAggregated, opts => opts.MapFrom(src => false));
+
             CreateMap<Iis.Domain.Materials.Material, Iis.DataModel.Materials.MaterialEntity>()
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string)null : src.Metadata.ToString(Formatting.None)))
@@ -148,7 +149,7 @@ namespace Iis.Api
             CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => {
                     opts.PreCondition(src => (src.FileId.HasValue));
-                    opts.MapFrom(src => new FileInfo(src.FileId.Value));
+                    opts.MapFrom(src => new FileDto(src.FileId.Value));
                 })
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.Parse(src.Data)))
@@ -172,7 +173,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileInfo((Guid)src.FileId): null ))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileDto((Guid)src.FileId): null ))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))
                 .ForMember(dest => dest.CreatedDate,
                     opts => opts.MapFrom(src => !src.CreationDate.HasValue ? DateTime.Now : src.CreationDate))
@@ -220,7 +221,7 @@ namespace Iis.Api
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileInfo(src.FileId.Value): null))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileDto(src.FileId.Value): null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
@@ -335,6 +336,11 @@ namespace Iis.Api
 
             #endregion
 
+            CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
+            CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();
+            CreateMap<Iis.Interfaces.Elastic.SearchEntitiesByConfiguredFieldsResult, IIS.Core.GraphQL.Entities.ObjectOfStudyFilterableQueryResponse>()
+                .ForMember(dest => dest.Aggregations, opts => opts.MapFrom(src => src.Aggregations))
+                .ForMember(dest => dest.Items, opts => opts.MapFrom(src => src.Entities));
         }
     }
 }

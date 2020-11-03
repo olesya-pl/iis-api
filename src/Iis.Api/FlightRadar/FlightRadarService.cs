@@ -21,32 +21,19 @@ namespace IIS.Core.FlightRadar
         private readonly IMapper _mapper;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
-        private OntologyNodesData _ontologyNodesData;
+        private IOntologyNodesData _ontologyData;
 
         public FlightRadarService(IMapper mapper,
             IOntologySchema ontologySchema,
             IOntologyService ontologyService,
+            IOntologyNodesData ontologyData,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _mapper = mapper;
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
-
-            SignalSynchronizationStart();
+            _ontologyData = ontologyData;
         }
-
-        public void SignalSynchronizationStart()
-        {
-            if (_ontologyNodesData == null)
-            {
-                var nodes = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetAllNodes());
-                var relations = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetAllRelations());
-                var attributes = RunWithoutCommit(unitOfWork => unitOfWork.OntologyRepository.GetAllAttributes());
-                var rawData = new NodesRawData(nodes, relations, attributes);
-                _ontologyNodesData = new OntologyNodesData(rawData, _ontologySchema);
-            }
-        }
-
         public async Task SaveFlightRadarDataAsync(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems)
         {
             var signs = GetIcaoSigns(icao);
@@ -69,7 +56,7 @@ namespace IIS.Core.FlightRadar
                 return;
             foreach (var sign in signs)
             {
-                var node = (await _ontologyService.LoadNodesAsync(sign.Id, null)) as Entity;
+                var node = (await _ontologyService.LoadNodesAsync(sign.Id)) as Entity;
                 node.SetProperty("location", new Dictionary<string, object> {
                     { "type", "Point" },
                     { "coordinates", new [] {latestValue.Lat, latestValue.Long} }
@@ -105,12 +92,7 @@ namespace IIS.Core.FlightRadar
 
         private IEnumerable<INode> GetIcaoSigns(string icao)
         {
-            return _ontologyNodesData.GetEntitiesByTypeName(SignName).Where(p => NodeHasPropertyWithValue(p, "value", icao));
-        }
-
-        private bool NodeHasPropertyWithValue(INode node, string propertyName, string value)
-        {
-            return node.OutgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value);
+            return _ontologyData.GetEntitiesByTypeName(SignName).Where(p => p.HasPropertyWithValue("value", icao));
         }
 
         public Task UpdateLastProcessedIdAsync(FlightRadarHistorySyncJobConfig minId, int newMinId)
@@ -126,11 +108,6 @@ namespace IIS.Core.FlightRadar
         public async Task<FlightRadarHistorySyncJobConfig> GetLastProcessedIdAsync()
         {
             return await RunWithoutCommitAsync(async unitOfWork => await unitOfWork.FlightRadarRepository.GetLastProcessedIdAsync());
-        }
-
-        public void SignalSynchronizationStop()
-        {
-            _ontologyNodesData = null;
         }
 
         private class SignEntityRelation

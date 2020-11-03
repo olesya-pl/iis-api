@@ -2,6 +2,7 @@
 {
     public interface IAttributeRelationMeta : IMeta
     {
-        bool? IsAggregated { get; set; }
+        bool? IsAggregated { get; }
+        string Formula { get; }
     }
 }
