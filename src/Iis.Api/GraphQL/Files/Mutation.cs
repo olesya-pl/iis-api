@@ -88,7 +88,8 @@ namespace IIS.Core.GraphQL.Files
                         type = "image"
                     }),
                     LoadData = new MaterialLoadData(),
-                    File = new FileDto(fileSaveResult.Id)
+                    File = new FileDto(fileSaveResult.Id),
+                    CreatedDate = DateTime.UtcNow
                 };
 
                 await materialService.SaveAsync(material);
