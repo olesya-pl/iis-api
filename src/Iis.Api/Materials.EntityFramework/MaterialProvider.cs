@@ -3,6 +3,7 @@ using Iis.Api.Ontology;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories;
+using Iis.DbLayer.Repositories.Helpers;
 using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
@@ -39,7 +40,6 @@ namespace IIS.Core.Materials.EntityFramework
         {
             "parent"
         };
-
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly IOntologyNodesData _ontologyData;
@@ -275,16 +275,18 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string fileName, byte[] content)
         {
-            decimal[] resp;
+            decimal[] imageVector;
             try
             {
-                resp = await VectorizeImage(content, fileName);
+                imageVector = await VectorizeImage(content, fileName);
+
+                if(imageVector == FaceAPIResponseParser.EmptyImageVector) throw new Exception("Image vector is empty.");
             }
             catch (Exception e)
             {
                 throw new Exception("Failed to vectorize image", e);
             }
-            var searchResult = await _elasticService.SearchByImageVector(resp, offset, pageSize, CancellationToken.None);
+            var searchResult = await _elasticService.SearchByImageVector(imageVector, offset, pageSize, CancellationToken.None);
 
             var materialTasks = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -305,7 +307,7 @@ namespace IIS.Core.Materials.EntityFramework
             var response = await httpClient.PostAsync(_imageVectorizerUrl, form);
             response.EnsureSuccessStatusCode();
             var contentJson = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<decimal[]>(contentJson);
+            return FaceAPIResponseParser.GetEncoding(contentJson);
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntityAndDescendantsAsync(IEnumerable<Guid> nodeIdList, int limit = 0, int offset = 0, CancellationToken ct = default)
