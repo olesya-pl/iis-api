@@ -117,7 +117,8 @@ namespace Iis.Api.Controllers
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
-                DenseVectorProperty.Create("ImageVector", MaterialDocument.ImageVectorDimensionsCount)
+                DenseVectorProperty.Create("ImageVector", MaterialDocument.ImageVectorDimensionsCount),
+                KeywordProperty.Create("ProcessedStatus.Title", false)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
