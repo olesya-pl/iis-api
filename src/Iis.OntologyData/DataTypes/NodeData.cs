@@ -4,8 +4,8 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Iis.OntologyData.DataTypes
@@ -177,12 +177,12 @@ namespace Iis.OntologyData.DataTypes
         public string ResolveFormula(string formula)
         {
             var replaced = ReplaceVariables(formula);
-
             var context = new ExpressionContext();
             context.Imports.AddType(typeof(ComputedPropertyFunctions));
+            context.Options.ParseCulture = CultureInfo.InvariantCulture;
             var eDynamic = context.CompileDynamic(replaced);
             var result = eDynamic.Evaluate();
-            return result.ToString();
+            return result.ToString();          
         }
         private string ReplaceVariables(string formula)
         {
