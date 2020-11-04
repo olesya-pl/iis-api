@@ -95,7 +95,7 @@ namespace Iis.Api.Controllers
             var index = _elasticState.ReportIndex;
 
             await _adminElasticService.DeleteIndexesAsync(new string[] { index }, ct);
-
+            await _adminElasticService.CreateReportIndexWithMappingsAsync(ct);            
             await _adminElasticService.FillReportIndexAsync(ct);
 
             return Content(_adminElasticService.Logger.ToString());
