@@ -1,30 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public class ExactQueryBuilder
+    public class ExactQueryBuilder : BaseQueryBuilder<ExactQueryBuilder>
     {
-        private IReadOnlyCollection<string> ResultFields = new[] { "*" };
-        private int Offset;
-        private int Limit;
         private string Query = string.Empty;
         private bool? IsLenient;
-
-        public ExactQueryBuilder WithResultFields(IReadOnlyCollection<string> resultFields)
-        {
-            ResultFields = resultFields;
-            return this;
-        }
-
-        public ExactQueryBuilder WithPagination(int offset, int limit)
-        {
-            Offset = offset;
-            Limit = limit;
-            return this;
-        }
 
         public ExactQueryBuilder WithQueryString(string query)
         {
@@ -40,7 +21,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         public JObject Build()
         {
-            var jsonQuery = SearchQueryExtension.WithSearchJson(ResultFields, Offset, Limit);
+            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _offset, _limit);
 
             jsonQuery["query"] = new JObject();
 

@@ -264,6 +264,7 @@ namespace IIS.Core.Materials.EntityFramework
             };
 
             var searchResult = await _elasticService.SearchMoreLikeThisAsync(filter);
+
             var materialTasks = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
                     .Select(p => MapMaterialDocumentAsync(p));
