@@ -11,7 +11,7 @@ namespace Iis.DbLayer.Repositories.Helpers
         private const string ImageVectorEncodingProperty = "encoding";
         public static decimal[] GetEncoding(string content)
         {
-            if(string.IsNullOrWhiteSpace(content)) return EmptyImageVector;
+            if(string.IsNullOrWhiteSpace(content)) return null;
 
             var json = JToken.Parse(content);
 
@@ -23,11 +23,11 @@ namespace Iis.DbLayer.Repositories.Helpers
 
             var encodings = resultProperty.Children()[ImageVectorEncodingProperty];
 
-            if(!encodings.Any()) return EmptyImageVector;
+            if(!encodings.Any()) return null;
 
             content = encodings.First().ToString();
 
-            if(string.IsNullOrWhiteSpace(content)) return EmptyImageVector;
+            if(string.IsNullOrWhiteSpace(content)) return null;
 
             return JsonConvert.DeserializeObject<decimal[]>(content);
         }

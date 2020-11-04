@@ -280,7 +280,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 imageVector = await VectorizeImage(content, fileName);
 
-                if(imageVector == FaceAPIResponseParser.EmptyImageVector) throw new Exception("Image vector is empty.");
+                if(imageVector is null) throw new Exception("Image vector is empty.");
             }
             catch (Exception e)
             {
