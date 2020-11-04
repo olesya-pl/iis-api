@@ -10,6 +10,7 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
+using Iis.DbLayer.Repositories.Helpers;
 using Iis.Interfaces.Elastic;
 using AutoMapper;
 using Newtonsoft.Json;
@@ -26,8 +27,6 @@ namespace Iis.DbLayer.Repositories
     internal class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
         private const string ImageVectorMlHandlerCode = "imageVector";
-        private const string ImageVectorResultPropery = "result";
-        private const string ImageVectorEncodingProperty = "encoding";
 
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
@@ -132,12 +131,16 @@ namespace Iis.DbLayer.Repositories
                             return p;
                         }
                         var mlResponsesByEntity = mlResponses[p.Id];
+
                         p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
+
                         p.ProcessedMlHandlersCount = mlResponsesByEntity.Count();
-                        string imageVector = ExtractLatestImageVector(mlResponsesByEntity);
-                        if (!string.IsNullOrEmpty(imageVector))
+
+                        decimal[] imageVector = ExtractLatestImageVector(mlResponsesByEntity);
+
+                        if (imageVector != null)
                         {
-                            p.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
+                            p.ImageVector = imageVector;
                         }
                         return p;
                     })
@@ -155,13 +158,18 @@ namespace Iis.DbLayer.Repositories
         {
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .SingleOrDefaultAsync(p => p.Id == materialId);
+
             var materialDocument = MapEntityToDocument(material);
+
             var (mlResponses, imageVector) = await PopulateMLResponses(materialId);
+
             materialDocument.MLResponses = mlResponses;
+
             materialDocument.ProcessedMlHandlersCount = mlResponses.Count;
-            if (!string.IsNullOrEmpty(imageVector))
+
+            if (imageVector != null)
             {
-                materialDocument.ImageVector = JsonConvert.DeserializeObject<decimal[]>(imageVector);
+                materialDocument.ImageVector = imageVector;
             }
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
@@ -321,10 +329,10 @@ namespace Iis.DbLayer.Repositories
             return materialDocument;
         }
 
-        private async Task<(JObject mlResponses, string imageVector)> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject mlResponses, decimal[] imageVector)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
-            var imageVector = ExtractLatestImageVector(mlResponses);
+            decimal[] imageVector = ExtractLatestImageVector(mlResponses);
             return (MapMlResponseEntities(mlResponses), imageVector);
         }
 
@@ -446,31 +454,14 @@ namespace Iis.DbLayer.Repositories
             return resultQuery;
         }
 
-        private static string ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        private static decimal[] ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
         {
             var response = mlResponsesByEntity
                                     .OrderByDescending(e => e.ProcessingDate)
                                     .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
                                     .OriginalResponse;
 
-            if(string.IsNullOrWhiteSpace(response)) return response;
-
-            var json = JToken.Parse(response);
-
-            if(json.GetType() == typeof(JArray))
-            {
-                return response;
-            }
-
-            var resultProperty = json[ImageVectorResultPropery];
-
-            if(resultProperty is null) return null;
-
-            var encodings = resultProperty.Children()[ImageVectorEncodingProperty];
-
-            if(!encodings.Any()) return string.Empty;
-
-            return encodings.First().ToString();
+            return FaceAPIResponseParser.GetEncoding(response);
        }
     }
 }
