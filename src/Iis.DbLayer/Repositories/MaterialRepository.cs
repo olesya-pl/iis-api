@@ -462,11 +462,15 @@ namespace Iis.DbLayer.Repositories
                 return response;
             }
 
-            var encodings = json[ImageVectorResultPropery].Children()[ImageVectorEncodingProperty];
+            var resultProperty = json[ImageVectorResultPropery];
+
+            if(resultProperty is null) return null;
+
+            var encodings = resultProperty.Children()[ImageVectorEncodingProperty];
 
             if(!encodings.Any()) return string.Empty;
 
             return encodings.First().ToString();
-        }
+       }
     }
 }
