@@ -251,6 +251,11 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchResult> SearchMoreLikeThisAsync(IElasticNodeFilter filter, CancellationToken ct = default)
         {
+            var queryData = new MoreLikeThisQueryBuilder()
+                        .WithPagination(filter.Offset, filter.Limit)
+                        .WithMaterialId(filter.Suggestion)
+                        .Build()
+                        .ToString(Formatting.None);
             var searchParameters = new IisElasticSearchParams
             {
                 BaseIndexNames = _elasticState.MaterialIndexes,
@@ -259,7 +264,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = filter.Limit
             };
 
-            var searchResult = await _elasticManager.SearchMoreLikeThisAsync(searchParameters, ct);
+            var searchResult = await _elasticManager.SearchAsync(queryData, _elasticState.MaterialIndexes, ct);
 
             return new SearchResult
             {
