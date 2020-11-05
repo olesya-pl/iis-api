@@ -64,6 +64,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await Task.Yield();
             return result;
         }
+
+        public int GetRelationsCount(Guid entityId)
+        {
+            var node = _data.GetNode(entityId);
+            return node.IncomingRelations.Count(r => r.RelationKind == RelationKind.Embedding)
+                + node.OutgoingRelations.Count(r => r.RelationKind == RelationKind.Embedding && r.IsLinkToSeparateObject);
+        }
+
         public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
