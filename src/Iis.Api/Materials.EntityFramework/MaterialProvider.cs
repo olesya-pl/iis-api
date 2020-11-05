@@ -124,7 +124,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             res.Children = p.Children.Select(c => _mapper.Map<Material>(c)).ToList();
 
-            var nodes = await Task.WhenAll(p.NodeIds.Select(x => _ontologyService.LoadNodesAsync(x)));
+            var nodes = p.NodeIds.Select(x => _ontologyService.LoadNodes(x));
 
             res.Events = nodes.Where(x => IsEvent(x)).Select(x => _nodeToJObjectMapper.EventToJObject(x));
             res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => _nodeToJObjectMapper.NodeToJObject(x));
@@ -174,7 +174,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             var result = _mapper.Map<Material>(material);
 
-            result.Infos.AddRange(await MapInfos(material));
+            result.Infos.AddRange(MapInfos(material));
 
             result.Children.AddRange(await MapChildren(material));
 
@@ -418,7 +418,7 @@ namespace IIS.Core.Materials.EntityFramework
                                     .Select(x => x.Id)
                                     .ToList();
 
-            var featureList = await _ontologyService.GetNodeIdListByFeatureIdListAsync(featureIdList);
+            var featureList = _ontologyService.GetNodeIdListByFeatureIdListAsync(featureIdList);
 
             featureList = featureList.Except(directIdList).ToList();
 
@@ -438,28 +438,28 @@ namespace IIS.Core.Materials.EntityFramework
             return await Task.WhenAll(mapChildrenTasks);
         }
 
-        private async Task<MaterialInfo[]> MapInfos(MaterialEntity material)
+        private IReadOnlyCollection<MaterialInfo> MapInfos(MaterialEntity material)
         {
-            var mapInfoTasks = new List<Task<MaterialInfo>>();
+            var mapInfoTasks = new List<MaterialInfo>();
             foreach (var info in material.MaterialInfos ?? new List<MaterialInfoEntity>())
             {
-                mapInfoTasks.Add(MapAsync(info));
+                mapInfoTasks.Add(Map(info));
             }
-            return await Task.WhenAll(mapInfoTasks);
+            return mapInfoTasks;
         }
 
-        private async Task<MaterialInfo> MapAsync(MaterialInfoEntity info)
+        private MaterialInfo Map(MaterialInfoEntity info)
         {
             var result = new MaterialInfo(info.Id, JObject.Parse(info.Data), info.Source, info.SourceType, info.SourceVersion);
             foreach (var feature in info.MaterialFeatures)
-                result.Features.Add(await MapAsync(feature));
+                result.Features.Add(Map(feature));
             return result;
         }
 
-        private async Task<MaterialFeature> MapAsync(MaterialFeatureEntity feature)
+        private MaterialFeature Map(MaterialFeatureEntity feature)
         {
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
-            result.Node = await _ontologyService.LoadNodesAsync(feature.NodeId);
+            result.Node = _ontologyService.LoadNodes(feature.NodeId);
             return result;
         }
     }

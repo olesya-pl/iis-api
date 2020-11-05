@@ -1,18 +1,12 @@
-﻿using Iis.DataModel;
-using Iis.DbLayer.Repositories;
-using Iis.Domain;
+﻿using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyModelWrapper;
-using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
-using IIS.Repository.Factories;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,7 +25,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _data = data;
             _elasticService = elasticService;
         }
-        public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
+        public IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId)
         {
             const string propertyName = "associatedWithEvent";
             var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());            
@@ -43,10 +37,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(r => r.Node.NodeTypeId == property.Id)
                 .Select(r => r.SourceNode);
 
-            await Task.Yield();
             return events.Select(ev => MapNode(ev)).AsEnumerable();
         }
-        public async Task<List<IncomingRelation>> GetIncomingEntities(Guid entityId)
+        public IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId)
         {
             var node = _data.GetNode(entityId);
             var result = node.IncomingRelations
@@ -61,7 +54,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     Entity = MapNode(r.SourceNode)
                 }).ToList();
 
-            await Task.Yield();
             return result;
         }
 
@@ -72,7 +64,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 + node.OutgoingRelations.Count(r => r.RelationKind == RelationKind.Embedding && r.IsLinkToSeparateObject);
         }
 
-        public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        public IReadOnlyCollection<Entity> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
 
@@ -80,10 +72,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Select(n => (Entity)MapNode(n))
                 .ToList();
 
-            await Task.Yield();
             return result;
         }
-        public async Task<Node> GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
+        public Node GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
 
@@ -91,10 +82,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Select(n => MapNode(n))
                 .FirstOrDefault();
 
-            await Task.Yield();
             return result;
         }
-        public async Task<List<Guid>> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
+        public List<Guid> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
         {
             var result = _data.Relations
                 .Where(r => featureIdList.Contains(r.TargetNodeId))
@@ -102,7 +92,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Distinct()
                 .ToList();
 
-            await Task.Yield();
             return result;
         }
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
@@ -160,13 +149,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 return GetNodesCountWithSuggestion(derivedTypes.Select(nt => nt.Id), filter);
             }
         }
-        public async Task<(IEnumerable<Node> nodes, int count)> GetNodesAsync(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
+        public (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
         {
             var nodes = _data.GetNodes(matchList);
-            await Task.Yield();
             return (nodes.Select(n => MapNode(n)), nodes.Count);
         }
-        public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
+        public IReadOnlyList<IAttributeBase> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             IReadOnlyList<IAttributeBase> result = _data.Nodes
                 .Where(n => string.Equals(n.NodeType.Name, valueTypeName, StringComparison.Ordinal) &&
@@ -176,25 +164,20 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Take(limit)
                 .ToList();
 
-            await Task.Yield();
             return result;
         }
-        public async Task<Node> LoadNodesAsync(Guid nodeId, CancellationToken cancellationToken = default)
+        public Node LoadNodes(Guid nodeId)
         {
             var node = _data.GetNode(nodeId);
-
-            await Task.Yield();
             return MapNode(node);
         }
-        public async Task<IEnumerable<Node>> LoadNodesAsync(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes, CancellationToken cancellationToken = default)
+        public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes)
         {
             var nodes = _data.GetNodes(nodeIds.Distinct());
-            await Task.Yield();
             return nodes.Select(n => MapNode(n, relationTypes)).ToList();
         }
-        public async Task RemoveNodeAsync(Node source, CancellationToken cancellationToken = default)
+        public void RemoveNode(Node source)
         {
-            await Task.Yield();
             _data.RemoveNode(source.Id);
         }
         public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)

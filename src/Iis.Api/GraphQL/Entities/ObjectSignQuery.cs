@@ -13,9 +13,9 @@ namespace IIS.Core.GraphQL.Entities
     public class ObjectSignQuery
     {
         [GraphQLNonNullType]
-        public async Task<GraphQLCollection<OntologyValue>> GetValuesByEntityType(
-            [Service]IOntologyService ontologyService,
-            [Service]IOntologySchema schema,
+        public GraphQLCollection<OntologyValue> GetValuesByEntityType(
+            [Service] IOntologyService ontologyService,
+            [Service] IOntologySchema schema,
             string entityType,
             string value,
             int limit)
@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL.Entities
             {
                 throw new Exception($"Node type is not found: {entityType}");
             }
-            var list = (await ontologyService.GetNodesByUniqueValue(nodeType.Id, value, "value", limit))
+            var list = (ontologyService.GetNodesByUniqueValue(nodeType.Id, value, "value", limit))
                 .Select(a => new OntologyValue { Id = a.Id, Value = a.Value })
                 .ToList();
             return new GraphQLCollection<OntologyValue>(list, list.Count);

@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                     
                     if(matchList != null && matchList.Any())
                     {
-                        var result = await service.GetNodesAsync(matchList);
+                        var result = service.GetNodesByIds(matchList);
                         return result.count;
                     }
                     return await service.GetNodesCountAsync(types, filter);
@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                     
                     if(matchList != null && matchList.Any())
                     {
-                        var result = await service.GetNodesAsync(matchList);
+                        var result = service.GetNodesByIds(matchList);
                         return result.nodes.Cast<Entity>();
                     }
                     

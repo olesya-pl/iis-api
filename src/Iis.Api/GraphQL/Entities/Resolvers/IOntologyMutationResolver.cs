@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Entity> DeleteEntity(IResolverContext ctx, string typeName)
         {
-            return new MutationDeleteResolver(ctx).DeleteEntity(ctx, typeName);
+            return Task.FromResult(new MutationDeleteResolver(ctx).DeleteEntity(ctx, typeName));
         }
     }
 }

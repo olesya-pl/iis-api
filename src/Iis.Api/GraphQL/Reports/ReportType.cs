@@ -45,7 +45,7 @@ namespace IIS.Core.GraphQL.Reports
                 {
                     var service = ctx.Service<IOntologyService>();
                     var report = ctx.Parent<Report>();
-                    var nodes = await service.LoadNodesAsync(report.EventIds, null);
+                    var nodes = service.LoadNodes(report.EventIds, null);
                     return nodes.Cast<Entity>();
                 });
             descriptor

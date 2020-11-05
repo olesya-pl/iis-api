@@ -8,7 +8,6 @@ using HotChocolate.Execution;
 using HotChocolate.Resolvers;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
-using IIS.Core.Ontology;
 using Iis.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -40,9 +39,9 @@ namespace IIS.Core.GraphQL.Entities
             return source.Name == target.Name || source.AllParents.Any(t => t.Name == target.Name);
         }
 
-        public static async Task<Node> LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeModel targetType)
+        public static Node LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeModel targetType)
         {
-            var existingNode = await service.LoadNodesAsync(targetId); // no fields needed, only type
+            var existingNode = service.LoadNodes(targetId); // no fields needed, only type
             if (existingNode == null)
                 throw new ArgumentException($"Node with id {targetId} not found");
             if (!targetType.IsAssignableFrom(existingNode.Type))
