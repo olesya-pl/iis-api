@@ -41,7 +41,7 @@ namespace Iis.Services
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = new List<string> { _elasticIndex },
-                Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"*{search.Suggestion}*",
+                Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"{search.Suggestion}",
                 From = search.Offset,
                 Size = search.PageSize,
             };

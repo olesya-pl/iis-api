@@ -33,7 +33,7 @@ namespace IIS.Core.Ontology.ComputedProperties
             {
                 var dotName = match.Groups[1].ToString();
                 var value = _ontologyService.GetAttributeValueByDotName(nodeId, dotName)
-                    ?.Replace("\"", "\\\""); 
+                    ?.Replace("\"", "\\\"");
                 result = result.Replace("{" + dotName + "}", "\"" + value + "\"");
             }
             return result;

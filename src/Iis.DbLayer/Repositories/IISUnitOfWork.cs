@@ -18,6 +18,7 @@ namespace Iis.DbLayer.Repositories
         IFlightRadarRepository FlightRadarRepository { get; }
         IReportRepository ReportRepository { get; }
         IElasticFieldsRepository ElasticFieldsRepository { get; }
+        IFileRepository FileRepository { get; }
     }
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
         where TContext : DbContext
@@ -33,7 +34,10 @@ namespace Iis.DbLayer.Repositories
         public IFlightRadarRepository FlightRadarRepository => ResolveRepository<IFlightRadarRepository>();
 
         public IReportRepository ReportRepository => ResolveRepository<IReportRepository>();
+        
         public IElasticFieldsRepository ElasticFieldsRepository => ResolveRepository<IElasticFieldsRepository>();
+
+        public IFileRepository FileRepository => ResolveRepository<IFileRepository>();
 
         protected override T ResolveRepository<T>()
         {

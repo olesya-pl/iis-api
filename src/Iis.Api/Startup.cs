@@ -135,51 +135,27 @@ namespace IIS.Core
                                     optionsLifetime: ServiceLifetime.Transient);
 #endif
 
-                //using var context = OntologyContext.GetContext(dbConnectionString);
-
-                IOntologySchema ontologySchema;
-                IOntologyCache ontologyCache;
-                IOntologyModel ontology;
-                IisElasticConfiguration iisElasticConfiguration;
-
-                //if (Program.IsStartedFromMain)
-                //{
-                //    context.Database.Migrate();
-                //    (new FillDataForRoles(context)).Execute();
-                //    ontologyCache = new OntologyCache(context);
-
                 var schemaSource = new OntologySchemaSource
                 {
                     Title = "DB",
                     SourceKind = SchemaSourceKind.Database,
                     Data = dbConnectionString
                 };
-                ontologySchema = (new OntologySchemaService()).GetOntologySchema(schemaSource);
-                using var context = OntologyContext.GetContext(dbConnectionString);
-                ontology = new OntologyWrapper(ontologySchema);
                 services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
-                var ontologySaver = new OntologyPatchSaver(OntologyContext.GetContext(dbConnectionString));
+                services.AddSingleton<IOntologyNodesData, OntologyNodesData>(provider => 
+                {
+                    using var context = OntologyContext.GetContext(dbConnectionString);
 
-                var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
-                var ontologyData = new OntologyNodesData(rawData, ontologySchema, ontologySaver);
-                services.AddSingleton<IOntologyNodesData>(ontologyData);
-                //    iisElasticConfiguration = new IisElasticConfiguration(ontologySchema, ontologyCache);
-                //    iisElasticConfiguration.ReloadFields(context.ElasticFields.AsEnumerable());
-                //}
-                //else
-                //{
-                //    ontologyCache = new OntologyCache(null);
-                //    ontologySchema = (new OntologySchemaService()).GetOntologySchema(null);
-                //    iisElasticConfiguration = new IisElasticConfiguration(null, null);
-                //    ontology = new OntologyModel(new List<Iis.Domain.INodeTypeModel>());
-                //}
+                    var ontologySaver = new OntologyPatchSaver(OntologyContext.GetContext(dbConnectionString));
+                    var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
+                    var ontologySchema = provider.GetRequiredService<IOntologySchema>();
 
+                    return new OntologyNodesData(rawData, ontologySchema, ontologySaver);
+                });
                 services.AddTransient<IOntologyCache, OntologyCache>();
-                //services.AddTransient<IOntologySchema, OntologySchema>();
-                //services.AddTransient<IFieldToAliasMapper>(ontologySchema);
-                services.AddTransient<IFieldToAliasMapper>(provider => ontologySchema);
-                services.AddSingleton(ontologySchema);
-                services.AddSingleton(ontology);
+                services.AddSingleton<IOntologySchema>(provider => (new OntologySchemaService()).GetOntologySchema(schemaSource));
+                services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
+                services.AddSingleton<IOntologyModel>(provider => new OntologyWrapper(provider.GetRequiredService<IOntologySchema>()));
                 services.AddTransient<INodeRepository, NodeRepository>();
                 services.AddTransient<ElasticConfiguration>();
             }
@@ -202,7 +178,7 @@ namespace IIS.Core
             services.AddTransient<MutationUpdateResolver>();
             services.AddTransient<MutationDeleteResolver>();
             services.AddTransient<IExtNodeService, ExtNodeService>();
-            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IFileService, FileService<IIISUnitOfWork>>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<OntologySchemaService>();
@@ -285,11 +261,14 @@ namespace IIS.Core
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
             var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
             services.AddSingleton(maxOperatorsConfig);
-
-            services.AddHealthChecks()
+            
+            if (enableContext)
+            {
+                services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
                 .AddRabbitMQ(mqConnectionString, (SslOption)null)
                 .AddElasticsearch(elasticConfiguration.Uri);
+            }
 
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
             services.AddSingleton(elasticConfiguration);

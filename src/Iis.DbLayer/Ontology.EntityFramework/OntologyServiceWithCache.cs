@@ -34,9 +34,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<IEnumerable<Node>> GetEventsAssociatedWithEntity(Guid entityId)
         {
             const string propertyName = "associatedWithEvent";
-            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
-            var property = eventType.GetNodeTypeByDotNameParts(new[] { propertyName });
-            if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event.ToString()}.{propertyName}");
+            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());            
+            var property = eventType.GetRelationTypeByName(propertyName);
+            if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event}.{propertyName}");
 
             var node = _data.GetNode(entityId);
             var events = node.IncomingRelations
@@ -64,6 +64,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await Task.Yield();
             return result;
         }
+
+        public int GetRelationsCount(Guid entityId)
+        {
+            var node = _data.GetNode(entityId);
+            return node.IncomingRelations.Count(r => r.RelationKind == RelationKind.Embedding)
+                + node.OutgoingRelations.Count(r => r.RelationKind == RelationKind.Embedding && r.IsLinkToSeparateObject);
+        }
+
         public async Task<List<Entity>> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
@@ -99,7 +107,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
-            var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
+            var derivedTypes = _data.Schema
+                .GetNodeTypes(types.Select(t => t.Id))
+                .Where(type => !type.IsAbstract);
+
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
 
             if (isElasticSearch)
@@ -158,9 +169,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<IReadOnlyList<IAttributeBase>> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit)
         {
             IReadOnlyList<IAttributeBase> result = _data.Nodes
-                .Where(n => n.NodeType.Name == valueTypeName &&
-                       n.Value == value &&
-                       n.OutgoingRelations.Any(r => r.SourceNode.NodeTypeId == nodeTypeId))
+                .Where(n => string.Equals(n.NodeType.Name, valueTypeName, StringComparison.Ordinal) &&
+                       n.Value != null && n.Value.Contains(value, StringComparison.OrdinalIgnoreCase) &&
+                       n.IncomingRelations.Any(r => r.SourceNode.NodeTypeId == nodeTypeId))
                 .Select(n => (IAttributeBase)(n.Attribute))
                 .Take(limit)
                 .ToList();

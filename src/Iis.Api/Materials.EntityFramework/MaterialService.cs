@@ -17,6 +17,7 @@ using System.Threading;
 using Iis.DbLayer.MaterialEnum;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.Ontology.Data;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -28,6 +29,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialProvider _materialProvider;
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
         private readonly IMLResponseRepository _mLResponseRepository;
+        private readonly IOntologyNodesData _nodesData;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -35,6 +37,7 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialProvider materialProvider,
             IEnumerable<IMaterialProcessor> materialProcessors,
             IMLResponseRepository mLResponseRepository,
+            IOntologyNodesData nodesData,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
@@ -43,6 +46,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProvider = materialProvider;
             _materialProcessors = materialProcessors;
             _mLResponseRepository = mLResponseRepository;
+            _nodesData = nodesData;
         }
 
         public async Task SaveAsync(Material material)
@@ -118,8 +122,18 @@ namespace IIS.Core.Materials.EntityFramework
         {
             var materialInfoEntities = material.Infos.Select(info => Map(info, material.Id)).ToList();
             var materialFeatures = new List<MaterialFeatureEntity>();
+
             foreach (var featureId in GetNodeIdentitiesFromFeatures(material.Metadata))
             {
+                if (string.Equals(material.Source, "osint.data.file", StringComparison.Ordinal))
+                {
+                    var node = _nodesData.GetNode(featureId);
+                    if (node == null)
+                    {
+                        continue;
+                    }
+                }
+
                 materialFeatures.Add(new MaterialFeatureEntity
                 {
                     NodeId = featureId,

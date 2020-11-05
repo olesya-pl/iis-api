@@ -164,6 +164,23 @@ namespace Iis.OntologySchema.DataTypes
             }
             return result;
         }
+        public IEnumerable<IRelationTypeLinked> GetAllOutgoingRelations()
+        {
+            var result = OutgoingRelations.ToList();
+            var ancestors = GetAllAncestors();
+            foreach (var ancestor in ancestors)
+            {
+                foreach (var relation in ancestor.OutgoingRelations)
+                {
+                    if (!result.Any(r => r.NodeType.Name == relation.NodeType.Name))
+                    {
+                        result.Add(relation);
+                    }
+                }
+            }
+            return result;
+
+        }
         public IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded()
         {
             return IncomingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(r => r.SourceType).ToList();
@@ -443,7 +460,7 @@ namespace Iis.OntologySchema.DataTypes
 
         public IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes()
         {
-            return OutgoingRelations.Where(r => r.NodeType.MetaObject.Formula != null).ToList();
+            return GetAllOutgoingRelations().Where(r => r.NodeType.MetaObject.Formula != null).ToList();
         }
     }
 }

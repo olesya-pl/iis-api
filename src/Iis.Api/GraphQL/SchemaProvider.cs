@@ -68,6 +68,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Annotations.Query>();
                 d.Include<AssociatedEventsQuery>();
                 d.Include<IncomingEntitiesQuery>();
+                d.Include<RelationsCountQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {

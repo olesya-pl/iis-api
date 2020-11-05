@@ -19,7 +19,7 @@ namespace Iis.Elastic
 {
     internal class ElasticManager: IElasticManager
     {
-        private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/";
+        private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/!";
         private const string RemoveSymbolsPattern = "№";
         public const string NullValue = "NULL";
         public const string AggregateSuffix = "Aggregate";
@@ -165,48 +165,6 @@ namespace Iis.Elastic
             var response = await GetAsync(path, queryData, cancellationToken);
 
             return JObject.Parse(response.Body)["count"].Value<int>();
-        }
-
-        public async Task<IElasticSearchResult> SearchMoreLikeThisAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
-        {
-            var json = JObject.Parse(
-                @"{
-                    '_source': ['_id'],
-                    'from':0,
-                    'size':10,
-                    'query':{
-                        'bool':{
-                            'must':[
-                                {'term': {'ParentId':'NULL'}},
-                                {'more_like_this': {
-                                        'fields': [ 'Content' ],
-                                        'like' : [ { '_id': '' } ],
-                                        'min_term_freq' : 1
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }"
-            );
-
-            json["_source"] = new JArray(searchParams.ResultFields);
-
-            json["from"] = searchParams.From;
-
-            json["size"] = searchParams.Size;
-
-            json["query"]["bool"]["must"][1]["more_like_this"]["like"][0]["_id"] = searchParams.Query;
-
-            var query = json.ToString(Newtonsoft.Json.Formatting.None);
-
-            var path = searchParams.BaseIndexNames.Count() == 0 ?
-                "_search" :
-                $"{GetRealIndexNames(searchParams.BaseIndexNames)}/_search";
-
-            var response = await GetAsync(path, query, cancellationToken);
-
-            return _resultExtractor.GetFromResponse(response);
         }
 
         public async Task<IElasticSearchResult> GetDocumentIdListFromIndexAsync(string indexName)
@@ -432,6 +390,7 @@ namespace Iis.Elastic
 
         private void PrepareAggregations(JObject json, List<IIisElasticField> fields)
         {
+            const int MaxBucketsCount = 100;
             if (!fields.Any())
             {
                 return;
@@ -442,6 +401,7 @@ namespace Iis.Elastic
             {
                 var fieldObj = new JObject();
                 fieldObj["field"] = $"{field.Name}{AggregateSuffix}";
+                fieldObj["size"] = MaxBucketsCount;
                 var terms = new JObject();
                 terms["terms"] = fieldObj;
                 aggs[field.Name] = terms;

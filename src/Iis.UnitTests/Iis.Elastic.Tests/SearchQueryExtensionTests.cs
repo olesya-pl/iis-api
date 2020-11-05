@@ -37,7 +37,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var expected = JObject.Parse("{\"highlight\":{\"fields\":{\"*\":{\"type\":\"unified\"}}}}"); 
 
-            var actual = new JObject().SetupHighlights();
+            var actual = new JObject().WithHighlights();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -46,7 +46,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             JObject stubValue = null;
 
-            var actual = stubValue.SetupHighlights();
+            var actual = stubValue.WithHighlights();
 
             actual.Should().BeNull();
         }
@@ -59,7 +59,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 new JProperty("highlight", "stub_value")
             );
 
-            var actual = stubValue.SetupHighlights();
+            var actual = stubValue.WithHighlights();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -159,6 +159,39 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             );
 
             var actual = stubValue.SetupSorting("fieldName", "fieldValue");
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        [Fact]
+        public void SetupAggregation_EmptyFieldNameList()
+        {
+            var expected = new JObject();
+
+            var aggregationFieldNameList = new List<string>().AsReadOnly();
+
+            var actual = new JObject().WithAggregation(aggregationFieldNameList);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        [Fact]
+        public void SetupAggregation_OneField_Success()
+        {
+            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"size\": 100}}}}");
+
+            var aggregationFieldNameList = new []{"NodeType"}.ToList().AsReadOnly();
+
+            var actual = new JObject().WithAggregation(aggregationFieldNameList);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        [Fact]
+        public void SetupAggregation_TwoField_Success()
+        {
+            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"size\": 100}}, \"NodeName\":{\"terms\":{\"field\":\"NodeNameAggregate\", \"size\": 100}}}}");
+
+            var aggregationFieldNameList = new []{"NodeType", "NodeName"}.ToList().AsReadOnly();
+
+            var actual = new JObject().WithAggregation(aggregationFieldNameList);
 
             actual.Should().BeEquivalentTo(expected);
         }
