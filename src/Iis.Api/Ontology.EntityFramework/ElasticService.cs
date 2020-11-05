@@ -99,6 +99,27 @@ namespace IIS.Core.Ontology.EntityFramework
             IElasticNodeFilter filter, 
             CancellationToken ct = default)
         {
+            if(SearchQueryExtension.IsMatchAll(filter.Suggestion))
+            {
+                var aggregadionFieldNameList = _elasticConfiguration
+                    .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p)))
+                    .Where(f => f.IsAggregated)
+                    .Select(f => f.Name)
+                    .ToList()
+                    .AsReadOnly();
+
+                var query = new MatchAllQueryBuilder()
+                            .WithPagination(filter.Offset, filter.Limit)
+                            .Build()
+                            .WithHighlights()
+                            .WithAggregation(aggregadionFieldNameList)
+                            .ToString(Formatting.None);
+
+                var results = await _elasticManager.SearchAsync(query, typeNames, ct);
+
+                return results.ToOutputSearchResult();
+            }
+
             var (multiSearchParams, historicalResult) = await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
 
             var searchResult = await _elasticManager.SearchAsync(multiSearchParams, ct);
@@ -118,12 +139,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }
 
-            return new SearchEntitiesByConfiguredFieldsResult
-            {
-                Count = searchResult.Count,
-                Entities = searchResult.Items.Select(x => x.SearchResult).ToList(),
-                Aggregations = searchResult.Aggregations.Where(p => p.Value.Buckets.Any()).ToDictionary(p => p.Key, p => p.Value)
-            };
+            return searchResult.ToOutputSearchResult();
         }
 
         public async Task<int> CountEntitiesByConfiguredFieldsAsync(
