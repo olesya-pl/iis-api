@@ -17,16 +17,18 @@ namespace Iis.OntologySchema.DataTypes
             _mapper = mapper;
             _schema = schema;
         }
-        
-        public Dictionary<Guid, SchemaNodeType> NodeTypes { get; private set; }
-        public Dictionary<Guid, SchemaRelationType> RelationTypes { get; private set; }
+
+        public Dictionary<Guid, SchemaNodeType> NodeTypes { get; private set; } = new Dictionary<Guid, SchemaNodeType>();
+        public Dictionary<Guid, SchemaRelationType> RelationTypes { get; private set; } = new Dictionary<Guid, SchemaRelationType>();
         public Dictionary<Guid, SchemaRelationType> InversedRelationTypes { get; private set; } = new Dictionary<Guid, SchemaRelationType>();
-        public Dictionary<Guid, SchemaAttributeType> AttributeTypes { get; private set; }
-        public SchemaAliases Aliases { get; private set; }
+        public Dictionary<Guid, SchemaAttributeType> AttributeTypes { get; private set; } = new Dictionary<Guid, SchemaAttributeType>();
+        public SchemaAliases Aliases { get; private set; } = new SchemaAliases();
         public Dictionary<string, SchemaNodeType> DotNameTypes { get; private set; } = new Dictionary<string, SchemaNodeType>();
         public IEnumerable<SchemaNodeType> Entities => NodeTypes.Values.Where(nt => !nt.IsArchived && nt.Kind == Kind.Entity);
         public void Initialize(IOntologyRawData ontologyRawData)
         {
+            if (ontologyRawData == null) return;
+
             NodeTypes = ontologyRawData.NodeTypes.Where(nt => !nt.IsArchived).ToDictionary(nt => nt.Id, nt => _mapper.Map<SchemaNodeType>(nt));
             RelationTypes = ontologyRawData.RelationTypes.ToDictionary(r => r.Id, r => _mapper.Map<SchemaRelationType>(r));
             AttributeTypes = ontologyRawData.AttributeTypes.ToDictionary(at => at.Id, at => _mapper.Map<SchemaAttributeType>(at));

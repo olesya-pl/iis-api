@@ -29,7 +29,7 @@ namespace Iis.OntologyManager.DuplicateSearch
 
             foreach (var item in allValues)
             {
-                if (item.Value == previousItem?.Value && item.Node.HasTheSameValues(previousItem.Node, param.DistinctNames))
+                if (item.Value == previousItem?.Value && item.Node.HasTheSameValues(previousItem?.Node, param.DistinctNames))
                 {
                     if (isNew)
                     {
@@ -62,19 +62,16 @@ namespace Iis.OntologyManager.DuplicateSearch
                 var dotNameValues = entity.GetDotNameValues();
                 foreach (var dotName in param.DotNames)
                 {
-                    var values = dotNameValues.GetItems(dotName);
-                    foreach (var value in values)
+                    var value = entity.GetSingleProperty(dotName)?.Value;
+                    if (!string.IsNullOrEmpty(value) && !addedValues.Contains(value))
                     {
-                        if (!addedValues.Contains(value.Value))
+                        list.Add(new DuplicateSearchResultItem
                         {
-                            list.Add(new DuplicateSearchResultItem
-                            {
-                                Value = value.Value,
-                                DotName = dotName,
-                                Node = entity
-                            });
-                            addedValues.Add(value.Value);
-                        }
+                            Value = value,
+                            DotName = dotName,
+                            Node = entity
+                        });
+                        addedValues.Add(value);
                     }
                 }
             }

@@ -21,9 +21,13 @@ namespace Iis.OntologyManager.UiControls
         Button btnSearch;
         DataGridView grid;
         ContextMenuStrip menuGrid;
+        Label lblValuesCount;
+        Label lblRecordsCount;
 
         IOntologyNodesData _data;
         public OntologyPatchSaver PatchSaver { get; set; }
+        const string RECORDS_COUNT_TEXT = "Знайдено записей: ";
+        const string VALUES_COUNT_TEXT = "Різних значень: ";
 
         public event Func<IOntologyNodesData> OnGetData;
 
@@ -37,13 +41,15 @@ namespace Iis.OntologyManager.UiControls
             var container = new UiContainerManager("DuplicateSearchOptions", panels.panelTop);
             container.SetColWidth(500);
             container.Add(txtSearch = new TextBox(), "Параметри пошуку");
-            txtSearch.Text = "MilitaryOrganization: title, commonInfo.OpenName, commonInfo.RealNameShort (parent.title)";
+            txtSearch.Text = "MilitaryOrganization: title, commonInfo.OpenName, commonInfo.RealNameShort (parent.title, parent.parent.title, parent.parent.parent.title)";
             container.Add(txtUrl = new TextBox(), "Базовий Урл");
             txtUrl.Text = "http://qa.contour.net";
 
             container.Add(btnSearch = new Button { Text = "Шукати" });
             btnSearch.Width = _style.ButtonWidthDefault;
             btnSearch.Click += (sender, e) => { Search(true); };
+            container.Add(lblRecordsCount = new Label { Text = RECORDS_COUNT_TEXT });
+            container.Add(lblValuesCount = new Label { Text = VALUES_COUNT_TEXT });
 
             grid = _uiControlsCreator.GetDataGridView("gridDuplicateResult", null, new List<string>());
             grid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -112,8 +118,10 @@ namespace Iis.OntologyManager.UiControls
             var searchResult = duplicateSearcher.Search(param);
             ConfigureGrid(param);
             PopulateGrid(param, searchResult);
+            lblRecordsCount.Text = RECORDS_COUNT_TEXT + searchResult.Items.Count.ToString();
+            lblValuesCount.Text = VALUES_COUNT_TEXT + (searchResult.Items.Count == 0 ? "" : searchResult.Items.Max(i => i.OrderNumber).ToString());
         }
-        private DataGridViewColumn AddTextColumn(string name, string headerText)
+        private DataGridViewColumn AddTextColumn(string name, string headerText, int koef = 1)
         {
             var column = new DataGridViewColumn
             {
@@ -121,23 +129,24 @@ namespace Iis.OntologyManager.UiControls
                 HeaderText = headerText,
                 CellTemplate = new DataGridViewTextBoxCell()
             };
+            column.Width *= koef;
             grid.Columns.Add(column);
             return column;
         }
         private void ConfigureGrid(DuplicateSearchParameter param)
         {
             grid.Columns.Clear();
-            AddTextColumn("Value", "Значення");
+            AddTextColumn("Value", "Значення", 2);
 
             foreach (var dotName in param.DotNames.Union(param.DistinctNames))
             {
-                AddTextColumn("Data_" + dotName, dotName);
+                AddTextColumn("Data_" + dotName, dotName, 2);
             }
 
-            AddTextColumn("Url", "Урл");
+            AddTextColumn("Url", "Урл", 2);
             AddTextColumn("LinksCount", "Вхідні зв'язки");
-            AddTextColumn("OrderNumber", "OrderNumber").Visible = true;
-            AddTextColumn("Id", "Id").Visible = true;
+            AddTextColumn("OrderNumber", "OrderNumber").Visible = false;
+            AddTextColumn("Id", "Id").Visible = false;
         }
         private void PopulateGrid(DuplicateSearchParameter param, DuplicateSearchResult result)
         {
