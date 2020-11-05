@@ -23,7 +23,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 using Iis.Interfaces.Ontology.Data;
 

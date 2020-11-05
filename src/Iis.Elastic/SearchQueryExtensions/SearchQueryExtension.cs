@@ -6,6 +6,20 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public static class SearchQueryExtension
     {
+        private const string Wildcard = "*";
+        private const int MaxBucketsCount = 100;
+        private const string AggregateSuffix = "Aggregate";
+
+        public static bool IsExactQuery(string query)
+        {
+            return query.Contains(":", System.StringComparison.Ordinal)
+                || query.Contains(" AND ", System.StringComparison.Ordinal)
+                || query.Contains(" OR ", System.StringComparison.Ordinal)
+                || query.Contains("\"", System.StringComparison.Ordinal);
+        }
+
+        public static bool IsMatchAll(string query) => string.IsNullOrWhiteSpace(query) || query.Equals(Wildcard);
+
         public static JObject WithSearchJson(IEnumerable<string> resultFieldList, int from, int size)
         {
             if(resultFieldList is null || !resultFieldList.Any()) resultFieldList = new [] {"*"};
@@ -18,7 +32,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             );
         }
 
-        public static JObject SetupHighlights(this JObject jsonQuery)
+        public static JObject WithHighlights(this JObject jsonQuery)
         {
             if (jsonQuery is null) return jsonQuery;
 
@@ -35,14 +49,6 @@ namespace Iis.Elastic.SearchQueryExtensions
             return jsonQuery;
         }
 
-        public static bool IsExactQuery(string query)
-        {
-            return query.Contains(":", System.StringComparison.Ordinal)
-                || query.Contains(" AND ", System.StringComparison.Ordinal)
-                || query.Contains(" OR ", System.StringComparison.Ordinal)
-                || query.Contains("\"", System.StringComparison.Ordinal);
-        }
-
         public static JObject SetupSorting(this JObject jsonQuery, string sortColumn, string sortOrder)
         {
             if(jsonQuery is null) return jsonQuery;
@@ -54,6 +60,30 @@ namespace Iis.Elastic.SearchQueryExtensions
             if(jsonQuery["sort"].GetType() != typeof(JArray)) return jsonQuery;
 
             (jsonQuery["sort"] as JArray).Add(CreateSortingProperty(sortColumn, sortOrder));
+
+            return jsonQuery;
+        }
+
+        public static JObject WithAggregation(this JObject jsonQuery, IReadOnlyCollection<string> aggregationFieldNameList)
+        {
+            if(!aggregationFieldNameList.Any()) return jsonQuery;
+
+            var aggregations = new JObject();
+
+            jsonQuery["aggs"] = aggregations;
+
+            foreach (var fieldName in aggregationFieldNameList)
+            {
+                var field = new JObject
+                (
+                    new JProperty("field", $"{fieldName}{AggregateSuffix}"),
+                    new JProperty("size", MaxBucketsCount)
+                );
+                aggregations[fieldName] = new JObject
+                (
+                    new JProperty("terms", field)
+                );
+            }
 
             return jsonQuery;
         }
