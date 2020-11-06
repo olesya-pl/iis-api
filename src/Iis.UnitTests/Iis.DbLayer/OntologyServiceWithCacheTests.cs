@@ -60,26 +60,26 @@ namespace Iis.UnitTests.Iis.DbLayer
         }
 
         [Theory, RecursiveAutoData]
-        public async Task GetNodesByUniqueValue_MatchesExactValue(Guid nodeTypeId,
+        public void GetNodesByUniqueValue_MatchesExactValue(Guid nodeTypeId,
             string attributeValue,
             int limit,
             Guid nodeId,
             List<RelationData> incomingRelations,
             List<RelationData> outgoingRelations)
         {
-            Mock<IOntologyNodesData> nodesDataMock = 
+            Mock<IOntologyNodesData> nodesDataMock =
                 SetupNodesData(nodeTypeId, attributeValue, nodeId, incomingRelations, outgoingRelations);
 
             var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
 
-            var res = await sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
+            var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
             Assert.Single(res);
             Assert.Equal(nodeId, res.First().Id);
             Assert.Equal(attributeValue, res.First().Value);
         }
 
         [Theory, RecursiveAutoData]
-        public async Task GetNodesByUniqueValue_MatchesStartValue(Guid nodeTypeId,
+        public void GetNodesByUniqueValue_MatchesStartValue(Guid nodeTypeId,
             string attributeValue,
             int limit,
             Guid nodeId,
@@ -91,14 +91,14 @@ namespace Iis.UnitTests.Iis.DbLayer
 
             var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
 
-            var res = await sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
+            var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
             Assert.Single(res);
             Assert.Equal(nodeId, res.First().Id);
             Assert.Equal(attributeValue + "hitler", res.First().Value);
         }
 
         [Theory, RecursiveAutoData]
-        public async Task GetNodesByUniqueValue_MatchesEndValue(Guid nodeTypeId,
+        public void GetNodesByUniqueValue_MatchesEndValue(Guid nodeTypeId,
             string attributeValue,
             int limit,
             Guid nodeId,
@@ -110,14 +110,14 @@ namespace Iis.UnitTests.Iis.DbLayer
 
             var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
 
-            var res = await sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
+            var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
             Assert.Single(res);
             Assert.Equal(nodeId, res.First().Id);
             Assert.Equal("bandera" + attributeValue, res.First().Value);
         }
 
         [Theory, RecursiveAutoData]
-        public async Task GetNodesByUniqueValue_NodeValueNull_DoesNotThrow(Guid nodeTypeId,
+        public void GetNodesByUniqueValue_NodeValueNull_DoesNotThrow(Guid nodeTypeId,
             string attributeValue,
             int limit,
             Guid nodeId,
@@ -129,8 +129,8 @@ namespace Iis.UnitTests.Iis.DbLayer
 
             var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
 
-            var res = await sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
-            Assert.Empty(res);            
+            var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
+            Assert.Empty(res);
         }
     }
 }

@@ -78,7 +78,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (properties.ContainsKey(type.UniqueValueFieldName))
             {
                 var value = properties[type.UniqueValueFieldName].ToString();
-                return (Entity)await _ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName);
+                return (Entity)_ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName);
             }
             return null;
         }
@@ -144,7 +144,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (props.TryGetValue("targetId", out var strTargetId))
                 {
                     var targetId = InputExtensions.ParseGuid(strTargetId);
-                    return await _ontologyService.LoadNodeOfType(targetId, embed.TargetType);
+                    return _ontologyService.LoadNodeOfType(targetId, embed.TargetType);
                 }
 
                 if (props.TryGetValue("target", out var dictTarget))

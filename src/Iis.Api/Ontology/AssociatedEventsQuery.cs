@@ -15,7 +15,7 @@ namespace Iis.Api.Ontology
             [GraphQLNonNullType] Guid entityId
         )
         {
-            var entities = await ontologyService.GetEventsAssociatedWithEntity(entityId);
+            var entities = ontologyService.GetEventsAssociatedWithEntity(entityId);
 
             var res = await Task.WhenAll(entities.Select(p => nodeToJObjectMapper.EventToAssociatedWithEntity(p)));
             return new GraphQLCollection<EventAssociatedWithEntity>(res, res.Count());

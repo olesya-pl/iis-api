@@ -18,15 +18,15 @@ namespace IIS.Core.GraphQL.DataLoaders
             _ontologyService = ontologyService;
         }
 
-        protected override async Task<IReadOnlyList<Result<Node>>> FetchAsync(IReadOnlyList<Tuple<Guid, IEmbeddingRelationTypeModel>> keys, CancellationToken cancellationToken)
+        protected override Task<IReadOnlyList<Result<Node>>> FetchAsync(IReadOnlyList<Tuple<Guid, IEmbeddingRelationTypeModel>> keys, CancellationToken cancellationToken)
         {
             var nodeIds = keys.Select(k => k.Item1).ToArray();
             var relationTypes = keys.All(k => k.Item2 != null)
                 ? keys.GroupBy(k => k.Item2.Id).Select(g => g.First().Item2).ToArray()
                 : null;
-            var nodes = await _ontologyService.LoadNodesAsync(nodeIds, relationTypes, cancellationToken);
+            var nodes = _ontologyService.LoadNodes(nodeIds, relationTypes);
             var nodesDict = nodes.ToDictionary(n => n.Id);
-            return nodeIds.Select(id => (Result<Node>)nodesDict.GetOrDefault(id)).ToList();
+            return Task.FromResult((IReadOnlyList<Result<Node>>)nodeIds.Select(id => (Result<Node>)nodesDict.GetOrDefault(id)).ToList());
         }
     }
 }
