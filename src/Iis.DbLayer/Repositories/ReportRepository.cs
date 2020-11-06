@@ -54,7 +54,7 @@ namespace Iis.DbLayer.Repositories
             var query = Context.ReportEvents.Where(x => x.ReportId == id);
 
             if (eventIds != null)
-                query.Where(x => eventIds.Contains(x.EventId));
+                query = query.Where(x => eventIds.Contains(x.EventId));
 
             return query.ToListAsync();
         }
