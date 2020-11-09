@@ -43,6 +43,8 @@ namespace Iis.Services
 
         public async Task<List<AutocompleteEntityDto>> GetEntitiesAsync(string query, int? size, CancellationToken ct = default)
         {
+            if(query.Trim().Equals("*")) return new List<AutocompleteEntityDto>();
+
             var response = await _elasticService.SearchByFieldsAsync(query, SearchableFileds, size.GetValueOrDefault(DefaultSize), ct);
 
             return response.Select(x => new AutocompleteEntityDto

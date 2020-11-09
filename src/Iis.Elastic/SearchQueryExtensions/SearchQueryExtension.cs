@@ -18,7 +18,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 || query.Contains("\"", System.StringComparison.Ordinal);
         }
 
-        public static bool IsMatchAll(string query) => string.IsNullOrWhiteSpace(query) || query.Equals(Wildcard);
+        public static bool IsMatchAll(string query) => string.IsNullOrWhiteSpace(query) || query.Trim().Equals(Wildcard);
 
         public static JObject WithSearchJson(IEnumerable<string> resultFieldList, int from, int size)
         {
