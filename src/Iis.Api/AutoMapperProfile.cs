@@ -29,6 +29,7 @@ using Iis.Interfaces.Ontology.Data;
 using Contracts = Iis.Services.Contracts;
 using Iis.DataModel.Reports;
 using Iis.Events.Reports;
+using Iis.Api.GraphQL.Aliases;
 
 namespace Iis.Api
 {
@@ -333,6 +334,16 @@ namespace Iis.Api
             CreateMap<ReportCreatedEvent, ReportDto>();
             CreateMap<ReportUpdatedEvent, ReportDto>();
             CreateMap<ReportRemovedEvent, ReportDto>();
+
+            #endregion
+
+            #region Aliases
+
+            CreateMap<AliasEntity, AliasDto>();
+            CreateMap<AliasDto, AliasEntity>();
+
+            CreateMap<Alias, AliasDto>();
+            CreateMap<AliasDto, Alias>();
 
             #endregion
 

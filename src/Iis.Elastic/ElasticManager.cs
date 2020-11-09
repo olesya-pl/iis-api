@@ -74,10 +74,10 @@ namespace Iis.Elastic
             var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
             var response = await PostAsync(indexUrl, documents, ct);
 
-            return ParseBody(response.Body);
+            return ParseBulkBodyResponse(response.Body);
         }
 
-        private List<ElasticBulkResponse> ParseBody(string body)
+        private List<ElasticBulkResponse> ParseBulkBodyResponse(string body)
         {
 
             var jBody = JObject.Parse(body);
@@ -104,6 +104,23 @@ namespace Iis.Elastic
                         SuccessOperation = item["index"]["result"].Value<string>()
                     });
                 }
+            }
+
+            return result;
+        }
+
+        private ElasticResponse ParseResponse(StringResponse response) 
+        {
+            var result = new ElasticResponse
+            {
+                IsSuccess = response.Success
+            };
+
+            if (!result.IsSuccess) 
+            {
+                var jBody = JObject.Parse(response.Body);
+                result.ErrorType = jBody["error"]["type"].Value<string>();
+                result.ErrorReason = jBody["error"]["reason"].Value<string>();
             }
 
             return result;
@@ -340,7 +357,18 @@ namespace Iis.Elastic
             ApplyMappingConfiguration(request, mappingConfiguration);
             var response =
                 await DoRequestAsync(HttpMethod.PUT, GetRealIndexName(indexName), request.ToString(), token);
+            
             return response.Success;
+        }
+
+        public async Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default) 
+        {
+            if (!await IndexExistsAsync(indexName, ct))
+                throw new ArgumentException($"{indexName} does not exist", nameof(indexName));
+
+            var response = await DoRequestAsync(HttpMethod.PUT, $"{GetRealIndexName(indexName)}/_mapping", mappingConfiguration.ToString(), ct);
+
+            return ParseResponse(response);
         }
 
         private void ApplyMappingConfiguration(JObject request, JObject mappingConfiguration)

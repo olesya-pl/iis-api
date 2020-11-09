@@ -27,10 +27,18 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("DotName")
                         .HasColumnType("text");
 
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("Value")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DotName", "Type")
+                        .IsUnique();
 
                     b.ToTable("Aliases");
                 });
@@ -1234,7 +1242,7 @@ namespace Iis.DataModel.Migrations
             modelBuilder.Entity("Iis.DataModel.AttributeTypeEntity", b =>
                 {
                     b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
-                        .WithOne("IAttributeTypeModel")
+                        .WithOne("AttributeType")
                         .HasForeignKey("Iis.DataModel.AttributeTypeEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

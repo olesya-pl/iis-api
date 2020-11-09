@@ -31,10 +31,17 @@ namespace Iis.Elastic
 
         public JObject ToJObject()
         {
+            var result = new JObject();
+            result["mappings"] = GetPropertiesJObject();
+            return result;
+        }
+
+        public JObject GetPropertiesJObject()
+        {
             var jProperties = new JObject();
             foreach (var property in Properties)
             {
-                if(jProperties.ContainsKey(property.Name))
+                if (jProperties.ContainsKey(property.Name))
                 {
                     (jProperties[property.Name] as JObject).Merge(property.ToJObject());
                 }
@@ -45,10 +52,9 @@ namespace Iis.Elastic
             }
             var inner = new JObject();
             inner["properties"] = jProperties;
-            var result = new JObject();
-            result["mappings"] = inner;
-            return result;
+            return inner;
         }
+
 
         public static ElasticMappingPropertyType ToMappingType(ScalarType scalarType)
         {
