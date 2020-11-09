@@ -29,7 +29,11 @@ namespace Iis.DbLayer.Repositories.Helpers
 
             if(string.IsNullOrWhiteSpace(content)) return null;
 
-            return JsonConvert.DeserializeObject<decimal[]>(content);
+            var vector = JsonConvert.DeserializeObject<decimal[]>(content);
+
+            if(!vector.Any()) return null;
+
+            return vector;
         }
         public static decimal[] EmptyImageVector => Array.Empty<decimal>();
     }
