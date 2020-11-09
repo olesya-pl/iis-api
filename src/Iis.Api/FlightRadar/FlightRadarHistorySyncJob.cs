@@ -54,6 +54,7 @@ namespace IIS.Core.FlightRadar
                 catch (Exception e)
                 {
                     _logger.LogError("FlightRadarHistorySyncJob. Exception={e}", e);
+                    await Task.Delay(TimeSpan.FromMinutes(2));
                 }
             }
         }
