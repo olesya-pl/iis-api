@@ -19,7 +19,7 @@ namespace Iis.AcceptanceTests.UISteps
         [Given(@"I sign in with the user (.*) and password (.*) in the Contour")]
         public void IWantToAuthorizeInTheContour(string login, string password)
         {
-            var loginPage = new LoginPage(driver);
+            var loginPage = new LoginPageObjects(driver);
             loginPage.Navigate();
             loginPage.LoginField.SendKeys(login);
             loginPage.PasswordField.SendKeys(password);
@@ -37,7 +37,7 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"Login button is active")]
         public void LoginButtonMustMeActive()
         {
-            var loginPage = new LoginPage(driver);
+            var loginPage = new LoginPageObjects(driver);
             Assert.True(loginPage.LoginButton.Enabled);
         }
 
@@ -51,7 +51,7 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I see the error message that login or password is incorrect")]
         public void ThenISeeTheLoginErrorMessage()
         {
-            var loginPage = new LoginPage(driver);
+            var loginPage = new LoginPageObjects(driver);
             Assert.True(loginPage.ErrorMessage.Displayed);
         }
     }

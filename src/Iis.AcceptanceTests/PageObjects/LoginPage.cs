@@ -6,13 +6,13 @@ using SeleniumExtras.PageObjects;
 
 namespace Iis.AcceptanceTests.PageObjects
 {
-    public class LoginPage
+    public class LoginPageObjects
     {
         private IWebDriver driver;
         private WebDriverWait wait;
         private string LoginPageUrl = TestData.BaseAddress + "/login";
 
-        public LoginPage(IWebDriver driver)
+        public LoginPageObjects(IWebDriver driver)
         {
             this.driver = driver;
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
