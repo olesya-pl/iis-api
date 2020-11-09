@@ -17,6 +17,7 @@ namespace Iis.DbLayer.Repositories
             services.AddTransient<IReportRepository, ReportRepository>();
             services.AddTransient<IElasticFieldsRepository, ElasticFieldsRepository>();
             services.AddTransient<IFileRepository, FileRepository>();
+            services.AddTransient<IAliasRepository, AliasRepository>();
         }
     }
 }

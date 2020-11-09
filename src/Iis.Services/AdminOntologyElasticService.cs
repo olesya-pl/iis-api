@@ -1,15 +1,12 @@
-﻿using Iis.DataModel;
-using Iis.DataModel.Reports;
+﻿using Iis.DataModel.Reports;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyData;
 using Iis.Services.Contracts.Interfaces;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +21,13 @@ namespace Iis.Services
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IOntologySchema _ontologySchema;
-        private readonly IExtNodeService _extNodeService;
         private readonly INodeRepository _nodeRepository;
         private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IReportElasticService _reportElasticService;
         private readonly IReportService _reportService;
+        private readonly IAliasService _aliasService;
+
+        private readonly Dictionary<AliasType, string> _elasticIndexByAliasType;
 
         public StringBuilder Logger { get; set; }
 
@@ -36,18 +35,25 @@ namespace Iis.Services
             IElasticState elasticState,
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
-            IExtNodeService extNodeService,
             INodeRepository nodeRepository,
-            IOntologyNodesData ontologyNodesData, IReportElasticService reportElasticService, IReportService reportService)
+            IOntologyNodesData ontologyNodesData,
+            IReportElasticService reportElasticService,
+            IReportService reportService, 
+            IAliasService aliasService)
         {
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
             _ontologySchema = ontologySchema ?? throw new ArgumentNullException(nameof(ontologySchema));
-            _extNodeService = extNodeService ?? throw new ArgumentNullException(nameof(extNodeService));
             _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
             _ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
             _reportElasticService = reportElasticService ?? throw new ArgumentNullException(nameof(reportElasticService));
             _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
+            _aliasService = aliasService ?? throw new ArgumentNullException(nameof(aliasService));
+
+            _elasticIndexByAliasType = new Dictionary<AliasType, string>()
+            {
+                { AliasType.Material, _elasticState.MaterialIndexes.First() }
+            };
         }
 
         public bool IsIndexesValid(IEnumerable<string> indexes)
@@ -122,7 +128,7 @@ namespace Iis.Services
             await _elasticManager.CreateIndexesAsync(new[] { _elasticState.ReportIndex }, mappingConfiguration.ToJObject(), ct);
         }
 
-        public async Task FillReportIndexAsync(CancellationToken ct = default) 
+        public async Task FillReportIndexAsync(CancellationToken ct = default)
         {
             var reports = await _reportService.GetAllAsync();
             
@@ -130,6 +136,27 @@ namespace Iis.Services
 
             var response = await _reportElasticService.PutAsync(reports);
             LogBulkResponse(response);
+        }
+
+        public async Task AddAliasesToIndexAsync(AliasType type, CancellationToken ct = default) 
+        {
+            if (!_elasticIndexByAliasType.ContainsKey(type))
+                throw new NotImplementedException($"{type} is not supported");
+
+            var index = _elasticIndexByAliasType[type];
+            var aliasProperties = (await _aliasService.GetByTypeAsync(type))
+                .Select(x => AliasProperty.Create(x.Value, x.DotName))
+                .ToList();
+
+            foreach (var property in aliasProperties)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var aliasMappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> { property });
+                var elasticResponse = await _elasticManager.AddMappingPropertyToIndexAsync(index, aliasMappingConfiguration.GetPropertiesJObject(), ct);
+                if (!elasticResponse.IsSuccess)
+                    TryLog($"{property.Name} was not created due to {elasticResponse.ErrorType}: {elasticResponse.ErrorReason}");
+            }
         }
 
         private List<INode> GetNodesFromMemory(IEnumerable<string> indexes)

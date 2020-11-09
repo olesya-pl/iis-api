@@ -13,8 +13,8 @@ namespace Iis.OntologyModelWrapper
         {
             _schema = schema;
         }
-        public IEnumerable<IEntityTypeModel> EntityTypes => _schema.GetEntityTypes().Select(et => new EntityTypeWrapper(et));
 
+        public IEnumerable<IEntityTypeModel> EntityTypes => _schema.GetEntityTypes().Select(et => new EntityTypeWrapper(et));
 
         public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type)
         {
@@ -28,7 +28,6 @@ namespace Iis.OntologyModelWrapper
             }
             return result.Distinct();
         }
-
 
         public IEntityTypeModel GetEntityType(string name)
         {

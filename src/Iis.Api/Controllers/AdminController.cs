@@ -2,6 +2,7 @@
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Enums;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ namespace Iis.Api.Controllers
         IMaterialService _materialService;
         IElasticState _elasticState;
         private readonly IAdminOntologyElasticService _adminElasticService;
-        
+
         public AdminController(
             IMaterialService materialService,
             IElasticManager elasticManager,
@@ -105,11 +106,14 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> RecreateElasticMaterialIndexes(CancellationToken cancellationToken)
         {
             var log = new StringBuilder();
+            _adminElasticService.Logger = log;
+
             var materialIndex = _elasticState.MaterialIndexes.First();
 
             await _elasticManager.DeleteIndexAsync(materialIndex, cancellationToken);
 
-            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty>
+            {
                 TextProperty.Create("Content", ElasticConfiguration.DefaultTermVector),
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
                 DateProperty.Create("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
@@ -126,6 +130,8 @@ namespace Iis.Api.Controllers
                 cancellationToken);
 
             var response = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
+
+            await _adminElasticService.AddAliasesToIndexAsync(AliasType.Material, cancellationToken);
 
             LogElasticResult(log, response);
             return Content(log.ToString());

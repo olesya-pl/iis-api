@@ -1,4 +1,5 @@
 ﻿using Iis.DataModel;
+using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,7 @@ namespace Iis.DbLayer.OntologySchema
                     context.NodeTypes.AsNoTracking(),
                     context.RelationTypes.AsNoTracking(),
                     context.AttributeTypes.AsNoTracking(),
-                    context.Aliases.AsNoTracking());
+                    context.Aliases.Where(x => x.Type == AliasType.Ontology).AsNoTracking());
                 var ontologySchema = Iis.OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
                 return ontologySchema;
             }

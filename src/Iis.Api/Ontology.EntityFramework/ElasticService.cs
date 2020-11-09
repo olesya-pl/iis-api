@@ -4,7 +4,9 @@ using Iis.Domain.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Interfaces.Elastic;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -24,7 +26,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly INodeRepository _nodeRepository;
         private readonly IMaterialRepository _materialRepository;
         private readonly IElasticState _elasticState;
-        private const string ELASTIC_IS_NOT_USING_MSG = "Elastic is not using in current configuration";
+        private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
         private const decimal HistoricalSearchBoost = 0.05m;
 
         public ElasticService(
@@ -32,8 +34,9 @@ namespace IIS.Core.Ontology.EntityFramework
             IElasticConfiguration elasticConfiguration,
             INodeRepository nodeRepository,
             IMaterialRepository materialRepository,
-            RunTimeSettings runTimeSettings, 
-            IElasticState elasticState)
+            RunTimeSettings runTimeSettings,
+            IElasticState elasticState, 
+            IElasticResponseManagerFactory elasticResponseManagerFactory)
         {
             _elasticManager = elasticManager;
             _runTimeSettings = runTimeSettings;
@@ -41,7 +44,7 @@ namespace IIS.Core.Ontology.EntityFramework
             _nodeRepository = nodeRepository;
             _materialRepository = materialRepository;
             _elasticState = elasticState;
-            
+            _elasticResponseManagerFactory = elasticResponseManagerFactory;
         }
 
         public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default)
@@ -255,9 +258,17 @@ namespace IIS.Core.Ontology.EntityFramework
             return $"historical_{typeName}";
         }
 
-        public Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken ct = default)
         {
-            return _materialRepository.SearchMaterials(filter, ct);
+            var searchResponse = await _materialRepository.SearchMaterials(filter, ct);
+
+            foreach (var item in searchResponse.Items)
+            {
+                item.Value.Highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
+                 .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
+            }
+
+            return searchResponse;
         }
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken ct = default)

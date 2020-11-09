@@ -25,5 +25,6 @@ namespace Iis.Interfaces.Elastic
         Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<int> CountAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default);
+        Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default);
     }
 }

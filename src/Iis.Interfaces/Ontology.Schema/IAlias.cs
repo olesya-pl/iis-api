@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Iis.Interfaces.Enums;
 
 namespace Iis.Interfaces.Ontology.Schema
 {

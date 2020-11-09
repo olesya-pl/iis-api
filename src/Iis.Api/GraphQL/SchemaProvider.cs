@@ -12,6 +12,7 @@ using Iis.Domain;
 using Microsoft.Extensions.Configuration;
 using IIS.Domain;
 using Iis.Api.Ontology;
+using Iis.Api.GraphQL;
 
 namespace IIS.Core.GraphQL
 {
@@ -65,6 +66,7 @@ namespace IIS.Core.GraphQL
                 d.Include<ChangeHistory.Query>();
                 d.Include<Themes.Query>();
                 d.Include<Autocomplete.Query>();
+                d.Include<Iis.Api.GraphQL.Aliases.Query>();
                 d.Include<Annotations.Query>();
                 d.Include<AssociatedEventsQuery>();
                 d.Include<IncomingEntitiesQuery>();
@@ -91,6 +93,7 @@ namespace IIS.Core.GraphQL
                 d.Include<Themes.Mutation>();
                 d.Include<Files.Mutation>();
                 d.Include<Annotations.Mutation>();
+                d.Include<Iis.Api.GraphQL.Aliases.Mutation>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {

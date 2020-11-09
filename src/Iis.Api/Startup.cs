@@ -70,6 +70,7 @@ using Iis.FlightRadar.DataModel;
 using MediatR;
 using Iis.EventHandlers;
 using Iis.Api.BackgroundServices;
+using Iis.Services.DI;
 
 namespace IIS.Core
 {
@@ -286,6 +287,7 @@ namespace IIS.Core
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
             services.AddHostedService<ThemeCounterBackgroundService>();
+            services.AddServices();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
