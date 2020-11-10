@@ -6,6 +6,7 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using Iis.Domain.Meta;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -60,7 +61,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Get all type relations")]
         public IEnumerable<IEntityAttribute> GetAttributes()
         {
-            var props = Source.AllProperties.OrderBy(a => a.CreatedAt);
+            var props = Source.AllProperties.Where(p => !p.IsComputed()).OrderBy(a => a.CreatedAt);
             return props.Select(CreateEntityAttribute);
         }
 

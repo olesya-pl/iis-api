@@ -105,6 +105,14 @@ namespace Iis.OntologyManager.UiControls
             PatchSaver.SavePatch(_data.Patch);
             Search(false);
         }
+        private void SearchNoTitles()
+        {
+            var nodes = _data.GetEntitiesByTypeName(null);
+            var notitleNodes = nodes
+                .Where(n => n.NodeType.IsObjectOfStudy &&
+                    string.IsNullOrWhiteSpace(n.GetComputedValue("__title")))
+                .ToList();
+        }
         private void Search(bool reloadData)
         {
             if (reloadData)

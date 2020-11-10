@@ -170,6 +170,10 @@ build_docker:
     - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
   tags:
     - docker
+  only:
+    - /^rc-*/
+    - master
+    - develop
 
 push docker(master):
   variables:

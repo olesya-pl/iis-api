@@ -247,6 +247,29 @@ namespace Iis.DbLayer.Repositories
                 .ToList();
         }
 
+        public async Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds)
+        {
+            var type = ontologySchema.GetEntityTypeByName("ObjectSign");
+
+            var typeIdList = new List<Guid>();
+
+            if (type != null)
+            {
+                typeIdList = type.IncomingRelations
+                    .Select(p => p.SourceTypeId)
+                    .ToList();
+            }
+            return await Context.Nodes
+                .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
+                .Where(e => (!typeIdList.Any() 
+                    || typeIdList.Contains(e.Node.NodeTypeId)) 
+                    && nodeIds.Contains(e.Relation.SourceNodeId)  
+                    && !e.Relation.Node.IsArchived)
+                .AsNoTracking()
+                .Select(e => new ObjectFeatureRelation { ObjectId = e.Relation.SourceNodeId, FeatureId = e.Node.Id })
+                .ToListAsync();
+        }
+
         public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds)
         {
             return Context.Materials
@@ -256,6 +279,17 @@ namespace Iis.DbLayer.Repositories
                     (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
                 .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material).ToList();
+        }
+        public async Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds)
+        {
+            return await Context.Materials
+                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                    (Material, MaterialInfo) => new { Material, MaterialInfo })
+                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .Select(m => m.MaterialFeature.NodeId)
+                .ToListAsync();
         }
         public Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds)
         {
