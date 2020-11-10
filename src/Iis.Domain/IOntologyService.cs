@@ -13,6 +13,7 @@ namespace Iis.Domain
         Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId);
         IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId);
+        Dictionary<Guid, int> CountEventsAssociatedWithEntities(HashSet<Guid> entityIds);
         Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
         (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         Task SaveNodeAsync(Node node, CancellationToken cancellationToken = default);
@@ -25,6 +26,6 @@ namespace Iis.Domain
         IReadOnlyList<IAttributeBase> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
         List<Guid> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
         string GetAttributeValueByDotName(Guid id, string dotName);
-        int GetRelationsCount(Guid entityId);
+        Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds);
     }
 }

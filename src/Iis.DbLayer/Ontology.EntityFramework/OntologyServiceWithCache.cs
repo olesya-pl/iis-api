@@ -27,8 +27,27 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         public IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId)
         {
+            IEnumerable<INode> events = GetEventsAssociatedWithEntityCore(entityId);
+
+            return events.Select(ev => MapNode(ev)).AsEnumerable();
+        }
+
+        public Dictionary<Guid, int> CountEventsAssociatedWithEntities(HashSet<Guid> entityIds)
+        {
+            var res = new Dictionary<Guid, int>();
+
+            foreach (var entityId in entityIds)
+            {
+                res.Add(entityId, GetEventsAssociatedWithEntityCore(entityId).Count());
+            }
+
+            return res;
+        }
+
+        private IEnumerable<INode> GetEventsAssociatedWithEntityCore(Guid entityId)
+        {
             const string propertyName = "associatedWithEvent";
-            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());            
+            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
             var property = eventType.GetRelationTypeByName(propertyName);
             if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event}.{propertyName}");
 
@@ -36,9 +55,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var events = node.IncomingRelations
                 .Where(r => r.Node.NodeTypeId == property.Id)
                 .Select(r => r.SourceNode);
-
-            return events.Select(ev => MapNode(ev)).AsEnumerable();
+            return events;
         }
+
+        
+
         public IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId)
         {
             var node = _data.GetNode(entityId);
@@ -62,6 +83,18 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var node = _data.GetNode(entityId);
             return node.IncomingRelations.Count(r => r.RelationKind == RelationKind.Embedding)
                 + node.OutgoingRelations.Count(r => r.RelationKind == RelationKind.Embedding && r.IsLinkToSeparateObject);
+        }
+
+        public Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds)
+        {
+            var res = new Dictionary<Guid, int>();
+
+            foreach (var entityId in entityIds)
+            {
+                res.Add(entityId, GetRelationsCount(entityId));
+            }
+
+            return res;
         }
 
         public IReadOnlyCollection<Entity> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
