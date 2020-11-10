@@ -8,7 +8,7 @@ using Xunit;
 namespace Iis.AcceptanceTests.UISteps
 {
     [Binding]
-    public class EventsSteps 
+    public class EventsSteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
@@ -24,7 +24,7 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var eventsPage = new EventsPageObjects(context);
             eventsPage.EventsPage.Click();
-            
+
             driver.WaitFor(10);
         }
 

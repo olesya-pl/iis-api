@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class AdministrationSectionUI_SmokeFeature : object, Xunit.IClassFixture<AdministrationSectionUI_SmokeFeature.FixtureData>, System.IDisposable
+    public partial class MaterialsSearchUI_ZeroResults_SmokeFeature : object, Xunit.IClassFixture<MaterialsSearchUI_ZeroResults_SmokeFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "AdministrationSectionUI.feature"
+#line 1 "MaterialsSearchUI.feature"
 #line hidden
         
-        public AdministrationSectionUI_SmokeFeature(AdministrationSectionUI_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public MaterialsSearchUI_ZeroResults_SmokeFeature(MaterialsSearchUI_ZeroResults_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,8 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "AdministrationSectionUI - Smoke", "\t- Open Administration section", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "MaterialsSearchUI - Zero Results - Smoke", "    - Search by using ! symbol in Materials section. Results should be equal to 0" +
+                    ".", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -78,9 +79,9 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public virtual void FeatureBackground()
         {
 #line 5
- #line hidden
+    #line hidden
 #line 6
-  testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+        testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
         
@@ -89,22 +90,22 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Ensure that Administration section is opened")]
-        [Xunit.TraitAttribute("FeatureTitle", "AdministrationSectionUI - Smoke")]
-        [Xunit.TraitAttribute("Description", "Ensure that Administration section is opened")]
+        [Xunit.SkippableFactAttribute(DisplayName="Ensure that search by using ! symbol gives 0 search results")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSearchUI - Zero Results - Smoke")]
+        [Xunit.TraitAttribute("Description", "Ensure that search by using ! symbol gives 0 search results")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
-        [Xunit.TraitAttribute("Category", "AdministrationUI")]
-        public virtual void EnsureThatAdministrationSectionIsOpened()
+        [Xunit.TraitAttribute("Category", "MaterialsSearchUI")]
+        public virtual void EnsureThatSearchByUsingSymbolGives0SearchResults()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
                     "UI",
-                    "AdministrationUI"};
+                    "MaterialsSearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that Administration section is opened", null, tagsOfScenario, argumentsOfScenario);
-#line 9
- this.ScenarioInitialize(scenarioInfo);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that search by using ! symbol gives 0 search results", null, tagsOfScenario, argumentsOfScenario);
+#line 10
+    this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -124,16 +125,19 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             {
                 this.ScenarioStart();
 #line 5
- this.FeatureBackground();
-#line hidden
-#line 10
-  testRunner.When("I navigated to Administration page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    this.FeatureBackground();
 #line hidden
 #line 11
-  testRunner.Then("I must see the Administration page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 12
-  testRunner.Then("I must see first user in the user list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.And("I clicked Search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 13
+        testRunner.And("I entered ! data in the search field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 14
+        testRunner.Then("I must see zero results", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -146,12 +150,12 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             
             public FixtureData()
             {
-                AdministrationSectionUI_SmokeFeature.FeatureSetup();
+                MaterialsSearchUI_ZeroResults_SmokeFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                AdministrationSectionUI_SmokeFeature.FeatureTearDown();
+                MaterialsSearchUI_ZeroResults_SmokeFeature.FeatureTearDown();
             }
         }
     }
