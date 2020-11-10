@@ -249,6 +249,65 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, materials.Count());
         }
 
+        public async Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds)
+        {
+            var nodeFeatureRelationsList = await RunWithoutCommitAsync(async (unitOfWork) =>
+                await unitOfWork.MaterialRepository.GetFeatureIdListThatRelatesToObjectIdsAsync(nodeIds));
+
+            var nodeIdsForCountQuery = new List<Guid>(nodeIds);
+            nodeIdsForCountQuery.AddRange(nodeFeatureRelationsList.Select(p => p.FeatureId));
+
+            var nodesWithMaterials = await RunWithoutCommitAsync(
+                    async (unitOfWork) =>
+                    await unitOfWork.MaterialRepository.GetNodeIsWithMaterials(nodeIdsForCountQuery));
+
+            var parentNodesMap = PrepareNodesMap(nodeIds, nodeFeatureRelationsList);
+
+            return PrepareResult(nodesWithMaterials, parentNodesMap);
+        }
+
+        private static Dictionary<Guid, int> PrepareResult(List<Guid> nodesWithMaterials, Dictionary<Guid, List<Guid>> parentNodesMap)
+        {
+            var res = new Dictionary<Guid, int>();
+
+            foreach (var nodeWithMaterial in nodesWithMaterials)
+            {
+                var nodesToIncrement = parentNodesMap[nodeWithMaterial];
+                foreach (var nodeToIncrement in nodesToIncrement)
+                {
+                    if (res.ContainsKey(nodeToIncrement))
+                    {
+                        res[nodeToIncrement]++;
+                    }
+                    else
+                    {
+                        res.Add(nodeToIncrement, 1);
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        private static Dictionary<Guid, List<Guid>> PrepareNodesMap(HashSet<Guid> nodeIds, List<ObjectFeatureRelation> nodeFeatureRelationsList)
+        {
+            var parentNodesMap = nodeIds.ToDictionary(k => k, v => new List<Guid> { v });
+
+            foreach (var relation in nodeFeatureRelationsList)
+            {
+                if (parentNodesMap.ContainsKey(relation.FeatureId))
+                {
+                    parentNodesMap[relation.FeatureId].Add(relation.ObjectId);
+                }
+                else
+                {
+                    parentNodesMap.Add(relation.FeatureId, new List<Guid> { relation.ObjectId });
+                }
+            }
+
+            return parentNodesMap;
+        }
+
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset)
         {
             var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));

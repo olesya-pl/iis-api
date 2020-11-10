@@ -41,12 +41,15 @@ namespace Iis.DbLayer.Repositories
         void EditMaterial(MaterialEntity materialEntity);
 
         List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
+        Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds);
 
         Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds);
 
         Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds);
 
         List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
+
+        Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds);
 
         void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
 
