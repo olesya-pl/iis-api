@@ -105,6 +105,16 @@ namespace Iis.OntologyManager.UiControls
             PatchSaver.SavePatch(_data.Patch);
             Search(false);
         }
+        private void SearchNoTitles()
+        {
+            var nodes = _data.GetEntitiesByTypeName(null);
+            var node = _data.GetNode(new Guid("d295b801-90a4-49b4-b822-08f3c3d360aa"));
+            var title = node.GetSingleProperty("__title");
+            var notitleNodes = nodes
+                .Where(n => n.NodeType.IsObjectOfStudy &&
+                    string.IsNullOrWhiteSpace(n.GetComputedValue("__title")))
+                .ToList();
+        }
         private void Search(bool reloadData)
         {
             if (reloadData)
@@ -112,6 +122,7 @@ namespace Iis.OntologyManager.UiControls
                 _data = OnGetData();
             }
             if (_data == null) return;
+            SearchNoTitles();
 
             var param = new DuplicateSearchParameter(txtSearch.Text, txtUrl.Text);
             var duplicateSearcher = new DuplicateSearcher(_data);

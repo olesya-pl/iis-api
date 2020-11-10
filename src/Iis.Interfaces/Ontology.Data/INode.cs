@@ -30,5 +30,6 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null);
         IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null);
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList);
+        string GetComputedValue(string name);
     }
 }

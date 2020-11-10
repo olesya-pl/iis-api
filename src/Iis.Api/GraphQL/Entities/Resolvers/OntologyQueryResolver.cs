@@ -4,12 +4,10 @@ using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
-using IIS.Core.Ontology.ComputedProperties;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -73,9 +71,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
             if (relationType.IsComputed())
             {
-                var computedResolver = ctx.Service<IComputedPropertyResolver>();
+
                 var formula = (relationType.Meta as IAttributeRelationMeta)?.Formula;
-                return computedResolver.Resolve(parent.Id, formula);
+                return parent.OriginalNode.ResolveFormula(formula);
             }
             var relation = node?.GetRelationOrDefault(relationType);
             if (relation == null) return null;
