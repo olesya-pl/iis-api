@@ -195,6 +195,7 @@ namespace Iis.OntologyData.DataTypes
 
             var context = new ExpressionContext();
             context.Imports.AddType(typeof(ComputedPropertyFunctions));
+            context.Options.ParseCulture = CultureInfo.InvariantCulture;
             var eDynamic = context.CompileDynamic(replaced);
             var result = eDynamic.Evaluate();
             return result;
