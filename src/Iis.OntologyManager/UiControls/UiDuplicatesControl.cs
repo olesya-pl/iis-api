@@ -122,7 +122,6 @@ namespace Iis.OntologyManager.UiControls
                 _data = OnGetData();
             }
             if (_data == null) return;
-            SearchNoTitles();
 
             var param = new DuplicateSearchParameter(txtSearch.Text, txtUrl.Text);
             var duplicateSearcher = new DuplicateSearcher(_data);
