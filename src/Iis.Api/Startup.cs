@@ -18,7 +18,6 @@ using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
-using IIS.Core.Ontology.ComputedProperties;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.NodeMaterialRelation;
@@ -199,8 +198,6 @@ namespace IIS.Core
             // material processors
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
             services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
-
-            services.AddTransient<IComputedPropertyResolver, ComputedPropertyResolver>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();

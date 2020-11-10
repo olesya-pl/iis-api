@@ -29,5 +29,7 @@ namespace Iis.OntologyData.DataTypes
         public bool IsLinkToAttribute => _targetNode.NodeType.Kind == Kind.Attribute;
         public bool IsLinkToInternalObject => !IsLinkToAttribute && !IsLinkToObjectOfStudy;
         public string TypeName => _node.NodeType.Name;
+        public override string ToString() => $"{Node.NodeType.Name} {Id}";
+
     }
 }

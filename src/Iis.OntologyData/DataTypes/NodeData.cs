@@ -35,6 +35,7 @@ namespace Iis.OntologyData.DataTypes
         public IReadOnlyList<IRelation> GetDirectRelations() =>
             AllData.Locker.ReadLock(() => _outgoingRelations.ToList());
 
+        public override string ToString() => $"{NodeType.Name} {Id}";
         public IReadOnlyList<IRelation> GetInversedRelations()
         {
             return AllData.Locker.ReadLock(() =>
@@ -124,9 +125,12 @@ namespace Iis.OntologyData.DataTypes
         }
         public INode GetSingleDirectProperty(string name)
         {
-            return AllData.Locker.ReadLock(() => _outgoingRelations
-                .SingleOrDefault(r => r.Node.NodeType.Name == name)
-                ?.TargetNode);
+            return AllData.Locker.ReadLock(() => 
+            {
+                return _outgoingRelations
+                    .SingleOrDefault(r => r.Node.NodeType.Name == name)
+                    ?.TargetNode;
+            });
         }
         public INode GetSingleProperty(IDotName dotName)
         {
@@ -176,13 +180,25 @@ namespace Iis.OntologyData.DataTypes
         }
         public string ResolveFormula(string formula)
         {
+            var singleFormulas = formula.Split(';').Select(s => s.Trim());
+            string value = null;
+            foreach (var singleFormula in singleFormulas)
+            {
+                value = ResolveSingleFormula(singleFormula)?.ToString();
+                if (!string.IsNullOrWhiteSpace(value)) return value;
+            }
+            return value;
+        }
+        private object ResolveSingleFormula(string formula)
+        {
             var replaced = ReplaceVariables(formula);
+
             var context = new ExpressionContext();
             context.Imports.AddType(typeof(ComputedPropertyFunctions));
             context.Options.ParseCulture = CultureInfo.InvariantCulture;
             var eDynamic = context.CompileDynamic(replaced);
             var result = eDynamic.Evaluate();
-            return result.ToString();          
+            return result;
         }
         private string ReplaceVariables(string formula)
         {
@@ -196,6 +212,12 @@ namespace Iis.OntologyData.DataTypes
                 result = result.Replace("{" + dotName + "}", "\"" + value + "\"");
             }
             return result;
+        }
+        public string GetComputedValue(string name)
+        {
+            var computedRelationType = NodeType.GetComputedRelationTypes().Where(rt => rt.NodeType.Name == name).SingleOrDefault();
+            return computedRelationType == null ? null
+                : ResolveFormula(computedRelationType.NodeType.MetaObject.Formula);
         }
         public IDotNameValues GetComputedValues()
         {

@@ -52,7 +52,7 @@ namespace Iis.OntologyData
             return Locker.ReadLock(() => 
                 _storage.Nodes.Values
                 .Where(n => n.NodeType.Kind == Kind.Entity
-                    && n.NodeType.Name == typeName)
+                    && (typeName == null || n.NodeType.Name == typeName))
                 .ToList());
         }
         public INode CreateNode(Guid nodeTypeId, Guid? id = null) =>
