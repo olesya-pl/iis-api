@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Iis.ThemeManagement;
+using Iis.DbLayer.Repositories;
 
 namespace Iis.Api.BackgroundServices
 {
@@ -22,7 +23,7 @@ namespace Iis.Api.BackgroundServices
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {
-                    var themeService = scope.ServiceProvider.GetRequiredService<ThemeService>();
+                    var themeService = scope.ServiceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
                     await themeService.UpdateQueryResultsAsync(stoppingToken);
                 } 
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);

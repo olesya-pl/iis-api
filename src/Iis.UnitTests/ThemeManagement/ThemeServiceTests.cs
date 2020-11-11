@@ -11,6 +11,7 @@ using Iis.DataModel.Themes;
 using Iis.Services.Contracts;
 using Iis.ThemeManagement;
 using Iis.ThemeManagement.Models;
+using Iis.DbLayer.Repositories;
 
 namespace Iis.UnitTests.ThemeManagement
 {
@@ -40,7 +41,7 @@ namespace Iis.UnitTests.ThemeManagement
             ThemeTypeEntity themeType3)
         {
             //arrange: begin
-            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
             context.ThemeTypes.Add(themeType1);
@@ -67,7 +68,7 @@ namespace Iis.UnitTests.ThemeManagement
             Theme theme)
         {
             //arrange: begin
-            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
             //arrange: end
 
             var themeId = await service.CreateThemeAsync(theme);
@@ -84,7 +85,7 @@ namespace Iis.UnitTests.ThemeManagement
             context.SaveChanges();
 
             //act
-            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
             await service.UpdateThemeAsync(new Theme {
                 Title = "Updated",
                 Query = theme.Query,
@@ -110,7 +111,7 @@ namespace Iis.UnitTests.ThemeManagement
             context.SaveChanges();
 
             //act
-            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
             await service.UpdateThemeAsync(new Theme
             {
                 Title = "Updated",
@@ -131,7 +132,7 @@ namespace Iis.UnitTests.ThemeManagement
             ThemeEntity themeEntity)
         {
             //arrange: begin
-            var service = _serviceProvider.GetRequiredService<ThemeService>();
+            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 

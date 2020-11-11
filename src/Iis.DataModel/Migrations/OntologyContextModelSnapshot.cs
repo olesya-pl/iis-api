@@ -1084,6 +1084,9 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
 
+                    b.Property<int>("ReadQueryResults")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("character varying(1024)")
