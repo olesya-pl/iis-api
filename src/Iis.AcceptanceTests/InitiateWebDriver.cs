@@ -26,8 +26,8 @@ namespace Iis.AcceptanceTests.UISteps
 
 			context = injectedContext;
 			//var driver = new ChromeDriver();
-			var driver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), driverOptions);
-			//homeUrl = "http://qa.contour.net/";
+			var driver = new RemoteWebDriver(new Uri("http://iis-test-selenoid1.contour.net:4444/wd/hub"), driverOptions);
+			homeUrl = "http://qa.contour.net/";
 			pageTitle = "Контур";
 			driver.Manage().Window.Maximize();
 			
