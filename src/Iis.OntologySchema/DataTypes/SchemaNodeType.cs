@@ -101,11 +101,16 @@ namespace Iis.OntologySchema.DataTypes
         public IReadOnlyList<IChildNodeType> GetAllChildren()
         {
             var result = new List<IChildNodeType>();
-            result.AddRange(GetDirectChildren(false));
+            var directChildren = GetDirectChildren(false);
+            var directChildrenNames = directChildren.Select(p => p.Name).ToList();
+            result.AddRange(directChildren);
             var ancestors = GetAllAncestors();
             foreach (var ancestor in ancestors)
             {
-                result.AddRange(ancestor.GetDirectChildren(true));
+                result.AddRange(ancestor
+                    .GetDirectChildren(true)
+                    .Where(p => !directChildrenNames.Contains(p.Name)));
+
             }
 
             return result;

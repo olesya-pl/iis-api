@@ -11,9 +11,13 @@ namespace Iis.Utility
 
         public static string FullTitle(object first, object second)
         {
-            if (first != null && second != null)
-                return $"{first} ({second})";
-            return (first ?? second)?.ToString();
+            if (first == null 
+                || second == null 
+                || (first is string && first.ToString() == string.Empty)
+                || (second is string && second.ToString() == string.Empty))
+                return (first ?? second)?.ToString() ?? string.Empty;
+            return $"{first} ({second})";
+            
         }
         public static string ShortFio(object firstName, object fatherName, object lastName)
         {
