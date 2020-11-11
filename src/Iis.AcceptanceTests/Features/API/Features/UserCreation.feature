@@ -3,7 +3,7 @@
 
 @mytag
 Scenario: Create a new user
-	Given I want to sign in with the user olya and password hammer69 in the Contour
+	Given I want to sign in with the user olya and password 123 in the Contour
 	And I click .sidebar__nav-item[name="admin"] button
 	And I click .users-page__header .add-button button
 	And I complete the userform with TestUser, TestSurname, TestPatronym, TestUserAuto, TestPassW00rd and TestPassW00rd

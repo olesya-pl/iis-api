@@ -111,7 +111,7 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 5
- testRunner.Given("Authorized user with login olya and password hammer69", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("Authorized user with login olya and password 123", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 6
  testRunner.When("I want to request materials for page 1 and get 10 materials per page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
@@ -154,7 +154,7 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 11
- testRunner.Given("Authorized user with login olya and password hammer69", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("Authorized user with login olya and password 123", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 12
  testRunner.When("I want to set importance 1356a6b3c63f49858b74372236fe744f for the first material " +

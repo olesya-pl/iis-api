@@ -1,7 +1,7 @@
 ﻿Feature: Events
 
 Background: 
-	Given Authorized user with login olya and password hammer69
+	Given Authorized user with login olya and password 123
 	Given fetch required dictionaties
 
 @mytag

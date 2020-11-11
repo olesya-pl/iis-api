@@ -155,7 +155,7 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 13
- testRunner.Given("I sign in with the user olya and password hammer691 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I sign in with the user olya and password 1231 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 14
  testRunner.Then("Login button is active", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

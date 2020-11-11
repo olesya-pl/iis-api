@@ -2,7 +2,7 @@
 
 @authorization
 Scenario: Success login
-	Given I want to authenticate with the user olya and password hammer69 in the Odysseus
+	Given I want to authenticate with the user olya and password 123 in the Odysseus
 	When I send login request to the Odysseus
 	Then The result should contain authorization token from the Odysseus
 

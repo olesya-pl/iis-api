@@ -80,7 +80,7 @@ namespace AcceptanceTests.Features.API.Features
 #line 3
 #line hidden
 #line 4
- testRunner.Given("Authorized user with login olya and password hammer69", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("Authorized user with login olya and password 123", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 5
  testRunner.Given("fetch required dictionaties", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
