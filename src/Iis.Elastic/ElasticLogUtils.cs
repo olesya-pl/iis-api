@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -13,16 +14,21 @@ namespace Iis.Elastic
 
         public (LogLevel LogLevel, string Message) PrepareLog(StringResponse response)
         {
-            var json = JObject.Parse(response.Body);
+            
             var sb = new StringBuilder($"Request {response.HttpMethod} with path {response.Uri} completed. Success:{response.Success} ");
-            if (json["took"] != null)
+            try
             {
-                sb.Append($"Took:{json["took"]}. ");
+                var json = JObject.Parse(response.Body);
+                if (json["took"] != null)
+                {
+                    sb.Append($"Took:{json["took"]}. ");
+                }
+                if (json["timed_out"] != null)
+                {
+                    sb.Append($"Timed out:{json["timed_out"]}.");
+                }
             }
-            if (json["timed_out"] != null)
-            {
-                sb.Append($"Timed out:{json["timed_out"]}.");
-            }
+            catch (Exception) { }
             if (response.Success)
             {
                 return (LogLevel.Information, sb.ToString());
