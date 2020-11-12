@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Reflection;
 using Iis.AcceptanceTests.Helpers;
 using Iis.AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
@@ -28,6 +30,21 @@ namespace Iis.AcceptanceTests.UISteps
             driver.WaitFor(10);
         }
 
+        [When(@"I clicked on the first material in the Materials list")]
+        public void IClieckedOnTheFirstMaterialInTheMaterialsList()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            materialsPage.FirstMaterialInTheMaterialsList.Click();
+        }
+
+        [When(@"I clicked on the events tab in the material card")]
+        public void IClickedOnTheEventsTabInTheMaterialCard()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            materialsPage.EventsTab.Click();
+        }
+
+
         [When(@"I clicked Search button")]
         public void IFilledInfoInTheMaterialsSearchField()
         {
@@ -57,6 +74,61 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var materialsPage = new MaterialsPageObjects(context);
             Assert.True(materialsPage.FirstMaterialInTheMaterialsList.Displayed);
+        }
+
+        [Then(@"I must see processed button in the materials card")]
+        public void IMustSeeProcessedButtonOnTheMaterialCard()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            Assert.True(materialsPage.ProcessedButton.Displayed);
+        }
+
+        [Then(@"I must see events search in the materials card")]
+        public void IMustSeeEventsSearchInTheMaterialsCard()
+        {
+            var materialPage = new MaterialsPageObjects(context);
+            Assert.True(materialPage.EventsTabSearch.Displayed);
+        }
+
+        [Then(@"I must see importance drop down in the materials card")]
+        public void IMustSeeImportanceDropDownInTheMaterialsCard()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            Assert.True(materialsPage.ImportanceDropDown.Displayed);
+        }
+
+        [Then(@"I must see relevance drop down in the materials card")]
+        public void IMustSeeRelevanceDropDownInTheMaterialsCard()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            Assert.True(materialsPage.RelevanceDropDown.Displayed);
+        }
+
+        // [Then(@"I must see these elements")]
+        // public void IMustSeeTheseDropDownElements(Table table)
+        // {
+        //     foreach (TableRow row in table.Rows)
+        //     {
+        //         var materialPage = new MaterialsPageObjects(context);
+        //         var tableValue = row.Values.First();
+
+        //         var success = cover.GetType().GetProperty(input).GetValue(cover, null)
+
+
+        //         Assert.True($"{materialPage}{tableValue}");
+        //     }
+        // }
+
+
+        [Then(@"I must I must see at least one user in the originator drop down menu")]
+        public void IMustSeeAtLeastOneUserInTheOriginatorDropDonwMenu()
+        {
+            var materialPage = new MaterialsPageObjects(context);
+            materialPage.Originator.Click();
+            materialPage.Originator.SendKeys(Keys.Down);
+            materialPage.Originator.SendKeys(Keys.Enter);
+
+            Assert.True(materialPage.OriginatorList.Displayed);
         }
 
         [Then(@"I must see zero results")]
