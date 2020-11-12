@@ -12,5 +12,6 @@ namespace Iis.DataModel.Themes
         public UserEntity User { get; set; }
         public string Comment { get; set; }
         public int QueryResults { get; set; }
+        public int ReadQueryResults { get; set; }
     }
 }

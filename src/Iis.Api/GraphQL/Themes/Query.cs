@@ -8,13 +8,14 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 
 using ThemeMng = Iis.ThemeManagement;
+using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.GraphQL.Themes
 {
     public class Query
     {
         public async Task<GraphQLCollection<Theme>> GetThemesForUser(
-            [Service] ThemeMng.ThemeService themeService,
+            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid userId)
         {
@@ -26,7 +27,7 @@ namespace IIS.Core.GraphQL.Themes
         }
 
         public async Task<Theme> GetTheme(
-            [Service] ThemeMng.ThemeService themeService,
+            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
@@ -36,7 +37,7 @@ namespace IIS.Core.GraphQL.Themes
         }
 
         public async Task<GraphQLCollection<ThemeType>> GetThemeTypes(
-            [Service] ThemeMng.ThemeService themeService,
+            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
             [Service] IMapper mapper)
         {
             var themeTypes = await themeService.GetThemeTypesAsync();

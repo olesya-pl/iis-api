@@ -7,6 +7,7 @@ namespace Iis.ThemeManagement.Models
     {
         public Guid Id { get; set; }
         public int QueryResults {get;set;}
+        public int ReadQueryResults { get; set; }
         public string Title { get; set; }
         public string Query { get; set; }
         public ThemeType Type { get; set; }
