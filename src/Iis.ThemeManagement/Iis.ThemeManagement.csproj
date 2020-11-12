@@ -10,9 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
+    <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
   </ItemGroup>
 
 </Project>

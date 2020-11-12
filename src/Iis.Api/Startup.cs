@@ -187,7 +187,7 @@ namespace IIS.Core
             services.AddTransient<ExportToJsonService>();
             services.AddTransient<RoleService>();
             services.AddTransient<UserService>();
-            services.AddTransient<ThemeService>();
+            services.AddTransient<ThemeService<IIISUnitOfWork>>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();

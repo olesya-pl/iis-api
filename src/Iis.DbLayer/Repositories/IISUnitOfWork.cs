@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Iis.DataModel;
-using Iis.DbLayer.Ontology.EntityFramework;
 using IIS.Repository;
-using IIS.Repository.Factories;
 using IIS.Repository.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -20,6 +14,7 @@ namespace Iis.DbLayer.Repositories
         IElasticFieldsRepository ElasticFieldsRepository { get; }
         IFileRepository FileRepository { get; }
         IAliasRepository AliasRepository { get; }
+        IThemeRepository ThemeRepository { get; }
     }
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
         where TContext : DbContext
@@ -41,6 +36,7 @@ namespace Iis.DbLayer.Repositories
         public IFileRepository FileRepository => ResolveRepository<IFileRepository>();
         
         public IAliasRepository AliasRepository => ResolveRepository<IAliasRepository>();
+        public IThemeRepository ThemeRepository => ResolveRepository<IThemeRepository>();
 
         protected override T ResolveRepository<T>()
         {
