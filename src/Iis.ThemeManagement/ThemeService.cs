@@ -12,10 +12,13 @@ using System.Threading.Tasks;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using System.Threading;
+using IIS.Repository;
+using Iis.DbLayer.Repositories;
+using IIS.Repository.Factories;
 
 namespace Iis.ThemeManagement
 {
-    public class ThemeService
+    public class ThemeService<TUnitOfWork> : BaseService<TUnitOfWork> where TUnitOfWork : IIISUnitOfWork
     {
         private const string CoordinatesPrefix = "__coordinates:*";
         private readonly OntologyContext _context;
@@ -24,7 +27,12 @@ namespace Iis.ThemeManagement
         private readonly IElasticService _elasticService;
         private readonly IElasticState _elasticState;
 
-        public ThemeService(OntologyContext context, IMapper mapper, IOntologyModel ontology, IElasticService elasticService, IElasticState elasticState)
+        public ThemeService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            OntologyContext context, 
+            IMapper mapper, 
+            IOntologyModel ontology, 
+            IElasticService elasticService, 
+            IElasticState elasticState) : base(unitOfWorkFactory)
         {
             _context = context;
             _mapper = mapper;
@@ -36,7 +44,7 @@ namespace Iis.ThemeManagement
         public async Task<Guid> CreateThemeAsync(Theme theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
-            entity.QueryResults = await GetQueryResultsAsync(entity.TypeId, entity.Query);
+            entity.QueryResults = entity.ReadQueryResults = await GetQueryResultsAsync(entity.TypeId, entity.Query);
 
             _context.Themes.Add(entity);
 
@@ -76,6 +84,20 @@ namespace Iis.ThemeManagement
                     theme.Type = new ThemeType { Id = existingEntity.TypeId };
                 }
             }
+        }
+
+        public async Task<Theme> SetReadCount(Guid themeId, int readCount)
+        {
+            var entity = await RunWithoutCommitAsync(async uow => await uow.ThemeRepository.GetByIdAsync(themeId));
+
+            if (entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
+
+            entity.ReadQueryResults = readCount;
+            var theme = _mapper.Map<Theme>(entity);
+
+            await RunAsync(uow => uow.ThemeRepository.Update(entity));
+
+            return theme;
         }
 
         public async Task<Theme> DeleteThemeAsync(Guid themeId)
@@ -134,30 +156,28 @@ namespace Iis.ThemeManagement
 
             return _mapper.Map<IEnumerable<ThemeType>>(entities);
         }
-
         public async Task UpdateQueryResultsAsync(CancellationToken ct)
         {
-            //var themesByQuery = _context.Themes
-            //    .AsNoTracking()
-            //    .ToList()
-            //    .GroupBy(x => new { x.Query, x.TypeId });
+            var themesByQuery = _context.Themes
+                .AsNoTracking()
+                .ToList()
+                .GroupBy(x => new { x.Query, x.TypeId });
 
-            //foreach (var groupedTheme in themesByQuery)
-            //{
-            //    ct.ThrowIfCancellationRequested();
-            //    var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query);
-            //    foreach (var theme in groupedTheme)
-            //    {
-            //        if (theme.QueryResults != newCount)
-            //        {
-            //            theme.QueryResults = newCount;
-            //            _context.Entry(theme).State = EntityState.Modified;
-            //        }
-            //    }
-            //}
+            foreach (var groupedTheme in themesByQuery)
+            {
+                ct.ThrowIfCancellationRequested();
+                var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query);
+                foreach (var theme in groupedTheme)
+                {
+                    if (theme.QueryResults != newCount)
+                    {
+                        theme.QueryResults = newCount;
+                        _context.Entry(theme).State = EntityState.Modified;
+                    }
+                }
+            }
 
-            //await _context.SaveChangesAsync(ct);
-            await Task.Yield();
+            await _context.SaveChangesAsync(ct);
         }
 
         private IQueryable<ThemeEntity> GetThemes()

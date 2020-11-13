@@ -11,6 +11,7 @@ namespace IIS.Core.GraphQL.Themes
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id {get;set;}
         public int QueryResults {get;set;}
+        public int ReadQueryResults { get; set; }
         public string Title {get;set;}
         public string Query {get;set;}
         public User User {get;set;}

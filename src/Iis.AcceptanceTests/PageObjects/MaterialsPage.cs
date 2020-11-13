@@ -39,5 +39,46 @@ namespace Iis.AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
         [CacheLookup]
         public IWebElement EmptySearchField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-button--success")]
+        [CacheLookup]
+        public IWebElement ProcessedButton;
+
+        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(5)")]
+        [CacheLookup]
+        public IWebElement EventsTab;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-header.material-relations__header > .el-select.material-relations-input")]
+        [CacheLookup]
+        public IWebElement EventsTabSearch;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > .general-container > div:nth-of-type(1) > .el-form-item__content > .el-select.el-tooltip")]
+        [CacheLookup]
+        public IWebElement ImportanceDropDown;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(2) > .el-form-item__content > .el-select.el-tooltip")]
+        [CacheLookup]
+        public IWebElement AuthenticityDropDown;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .el-form-item__content > .el-select.el-tooltip  .el-input__inner")]
+        [CacheLookup]
+        public IWebElement RelevanceDropDown;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(4) > .el-form-item__content > .el-select.el-tooltip")]
+        [CacheLookup]
+        public IWebElement СompletenessOfInformation;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(2) > .general-container > .el-form-item > .el-form-item__content > .el-select.el-tooltip")]
+        [CacheLookup]
+        public IWebElement SourceCredibility;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .general-container > .el-form-item > .el-form-item__content > .el-select.el-tooltip")]
+        [CacheLookup]
+        public IWebElement Originator;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(6) > .el-scrollbar")]
+        [CacheLookup]
+        public IWebElement OriginatorList;
+
     }
 }
