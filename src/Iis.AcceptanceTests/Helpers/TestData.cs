@@ -11,8 +11,8 @@ namespace Iis.AcceptanceTests.Helpers
 
         static TestData()
         {
-            BaseAddress = "http://qa.contour.net";
-            BaseApiAddress = "http://qa.contour.net:5000";
+            BaseAddress = "http://dev3.contour.net";
+            BaseApiAddress = "http://dev3.contour.net:5000";
         }
     }
 
