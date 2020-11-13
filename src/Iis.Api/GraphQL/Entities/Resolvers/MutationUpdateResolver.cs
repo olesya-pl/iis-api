@@ -9,6 +9,9 @@ using IIS.Domain;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json;
+using Iis.Api.BackgroundServices;
+using MediatR;
+using Iis.Events.Entities;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -18,6 +21,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyModel _ontology;
         private readonly IChangeHistoryService _changeHistoryService;
+        private readonly IMediator _mediator;
         private readonly IResolverContext _resolverContext;
         private Guid _rootNodeId;
         private const string LastConfirmedFieldName = "lastConfirmedAt";
@@ -25,13 +29,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public MutationUpdateResolver(IOntologyService ontologyService,
             IOntologyModel ontology,
             IChangeHistoryService changeHistoryService,
-            MutationCreateResolver mutationCreateResolver,
-            MutationDeleteResolver mutationDeleteResolver)
+            IMediator mediator,
+            MutationCreateResolver mutationCreateResolver)
         {
             _mutationCreateResolver = mutationCreateResolver;
             _ontology = ontology;
             _ontologyService = ontologyService;
             _changeHistoryService = changeHistoryService;
+            _mediator = mediator;
         }
         public MutationUpdateResolver(IResolverContext ctx)
         {
@@ -40,6 +45,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _resolverContext = ctx;
+            
         }
 
         public async Task<Entity> UpdateEntity(IResolverContext ctx, string typeName)
@@ -97,7 +103,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 }
                 await _ontologyService.SaveNodeAsync(node, requestId);
             }
-
+            await _mediator.Publish(new EntityUpdatedEvent());
             return node;
         }
 

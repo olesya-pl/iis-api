@@ -2,29 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
-using IIS.Core.Ontology;
 using Iis.Domain;
-using Newtonsoft.Json.Linq;
 using Attribute = Iis.Domain.Attribute;
-using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Api.BackgroundServices;
+using MediatR;
+using Iis.Events.Entities;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
     public class MutationCreateResolver
     {
         private readonly IFileService _fileService;
+        private readonly IMediator _mediator;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyModel _ontology;
 
-        public MutationCreateResolver(IOntologyModel ontology, IOntologyService ontologyService,
-            IFileService fileService)
+        public MutationCreateResolver(IOntologyModel ontology, 
+            IOntologyService ontologyService,
+            IFileService fileService,
+            IMediator mediator)
         {
             _ontology = ontology;
             _ontologyService = ontologyService;
             _fileService = fileService;
+            _mediator = mediator;
         }
 
         public MutationCreateResolver(IResolverContext ctx)
@@ -58,6 +61,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             node = new Entity(Guid.NewGuid(), type);
             await CreateProperties(node, properties);
             await _ontologyService.SaveNodeAsync(node);
+            await _mediator.Publish(new EntityCreatedEvent());
             return node;
         }
 
