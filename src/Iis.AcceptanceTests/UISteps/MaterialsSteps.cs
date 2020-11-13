@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Reflection;
 using Iis.AcceptanceTests.Helpers;
 using Iis.AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
@@ -42,6 +41,20 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var materialsPage = new MaterialsPageObjects(context);
             materialsPage.EventsTab.Click();
+        }
+
+        [When(@"I clicked on the objects tab in the material card")]
+        public void IClickedOnTheObjectsTabInTheMaterialCard()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            materialsPage.ObjectsTab.Click();
+        }
+
+        [When(@"I clicked on the ML tab in the material card")]
+        public void IClickedOnTheMLTabInTheMaterialCard()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            materialsPage.MLTab.Click();
         }
 
 
@@ -90,11 +103,11 @@ namespace Iis.AcceptanceTests.UISteps
             Assert.True(materialPage.EventsTabSearch.Displayed);
         }
 
-        [Then(@"I must see importance drop down in the materials card")]
-        public void IMustSeeImportanceDropDownInTheMaterialsCard()
+        [Then(@"I must see objects search in the materials card")]
+        public void IMustSeeObjectsSearchInTheMaterialsCard()
         {
-            var materialsPage = new MaterialsPageObjects(context);
-            Assert.True(materialsPage.ImportanceDropDown.Displayed);
+            var materialPage = new MaterialsPageObjects(context);
+            Assert.True(materialPage.ObjectsTabSearch.Displayed);
         }
 
         [Then(@"I must see relevance drop down in the materials card")]
@@ -104,31 +117,27 @@ namespace Iis.AcceptanceTests.UISteps
             Assert.True(materialsPage.RelevanceDropDown.Displayed);
         }
 
-        // [Then(@"I must see these elements")]
-        // public void IMustSeeTheseDropDownElements(Table table)
-        // {
-        //     foreach (TableRow row in table.Rows)
-        //     {
-        //         var materialPage = new MaterialsPageObjects(context);
-        //         var tableValue = row.Values.First();
+        [Then(@"I must see these elements")]
+        public void IMustSeeTheseDropDownElements(Table table)
+        {
+            foreach (TableRow row in table.Rows)
+            {
 
-        //         var success = cover.GetType().GetProperty(input).GetValue(cover, null)
+                var materialPage = new MaterialsPageObjects(context);
+                var tableValue = row.Values.First();
 
-
-        //         Assert.True($"{materialPage}{tableValue}");
-        //     }
-        // }
-
+                Assert.True((typeof(MaterialsPageObjects).GetField(tableValue).GetValue(materialPage) as IWebElement).Displayed);
+            }
+        }
 
         [Then(@"I must I must see at least one user in the originator drop down menu")]
         public void IMustSeeAtLeastOneUserInTheOriginatorDropDonwMenu()
         {
             var materialPage = new MaterialsPageObjects(context);
             materialPage.Originator.Click();
-            materialPage.Originator.SendKeys(Keys.Down);
-            materialPage.Originator.SendKeys(Keys.Enter);
-
-            Assert.True(materialPage.OriginatorList.Displayed);
+            //materialPage.Originator.SendKeys(Keys.Down);
+            var list = driver.FindElements(By.ClassName("el-select-dropdown__item"));
+            Assert.True(list.Count() > 0);
         }
 
         [Then(@"I must see zero results")]
@@ -136,6 +145,13 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var materialsPage = new MaterialsPageObjects(context);
             Assert.True(materialsPage.EmptySearchField.Displayed);
+        }
+
+        [Then(@"I must see Show button in the ML tab")]
+        public void ThenIMustSeeShowButtonInTheMLTab()
+        {
+            var materialsPage = new MaterialsPageObjects(context);
+            Assert.True(materialsPage.ShowMLResultsButton.Displayed);
         }
         #endregion
     }
