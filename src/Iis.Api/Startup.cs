@@ -292,7 +292,9 @@ namespace IIS.Core
 
             services.RegisterRepositories();
             services.RegisterElasticModules();
-            services.AddMediatR(typeof(ReportEventHandler));
+            services.AddMediatR(typeof(ReportEventHandler), 
+                typeof(EntityEventHander), 
+                typeof(MaterialEventHandler));
         }
 
 

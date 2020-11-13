@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Iis.ThemeManagement;
 using Iis.DbLayer.Repositories;
+using Newtonsoft.Json.Bson;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace Iis.Api.BackgroundServices
 {
@@ -13,6 +15,12 @@ namespace Iis.Api.BackgroundServices
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<ThemeCounterBackgroundService> _logger;
+        private static bool _updateNeeded = false;
+
+        public static void SignalThemeUpdateNeeded()
+        {
+            _updateNeeded = true;
+        }
 
         public ThemeCounterBackgroundService(IServiceProvider serviceProvider, ILogger<ThemeCounterBackgroundService> logger)
         {
@@ -24,19 +32,29 @@ namespace Iis.Api.BackgroundServices
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                try
+                if (_updateNeeded)
                 {
-                    using (var scope = _serviceProvider.CreateScope())
+                    try
                     {
-                        var themeService = scope.ServiceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
-                        await themeService.UpdateQueryResultsAsync(stoppingToken);
+                        using (var scope = _serviceProvider.CreateScope())
+                        {
+                            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                            _updateNeeded = false;
+                            var themeService = scope.ServiceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
+                            await themeService.UpdateQueryResultsAsync(stoppingToken);
+                            var sleepInterval = configuration.GetValue("themesRefreshInterval", 120);
+                            await Task.Delay(TimeSpan.FromSeconds(sleepInterval), stoppingToken);
+                        }
                     }
-                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                    catch (Exception e) 
+                    {
+                        _logger.LogError(e, $"Error occur while {nameof(ThemeCounterBackgroundService)} excution");
+                        await Task.Delay(TimeSpan.FromMinutes(2));
+                    }
                 }
-                catch (Exception e) 
+                else
                 {
-                    _logger.LogError(e, $"Error occur while {nameof(ThemeCounterBackgroundService)} excution");
-                    await Task.Delay(TimeSpan.FromMinutes(2));
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
                 }
             }
         }

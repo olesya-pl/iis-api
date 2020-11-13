@@ -18,6 +18,9 @@ using Iis.DbLayer.MaterialEnum;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Api.BackgroundServices;
+using MediatR;
+using Iis.Events.Materials;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -30,6 +33,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IOntologyNodesData _nodesData;
+        private readonly IMediator _mediatr;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -38,6 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
             IEnumerable<IMaterialProcessor> materialProcessors,
             IMLResponseRepository mLResponseRepository,
             IOntologyNodesData nodesData,
+            IMediator mediator,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
@@ -47,6 +52,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProcessors = materialProcessors;
             _mLResponseRepository = mLResponseRepository;
             _nodesData = nodesData;
+            _mediatr = mediator;
         }
 
         public async Task SaveAsync(Material material)
@@ -85,6 +91,8 @@ namespace IIS.Core.Materials.EntityFramework
             if (material.File != null && material.Type == "cell.voice")
                 _eventProducer.SendMaterialAddedEventAsync(
                     new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
+
+            await _mediatr.Publish(new MaterialCreatedEvent());
         }
 
         private async Task MakeFilePermanent(Material material)
