@@ -14,6 +14,7 @@ namespace Iis.Services.DI
             services.AddScoped<OntologyElasticResponseManager>();
             services.AddScoped<MaterialElasticResponseManager>();
             services.AddTransient<IElasticResponseManagerFactory, ElasticResponseManagerFactory>();
+            services.AddTransient<IMaterialElasticService, MaterialElasticService>();
 
             return services;
         }
