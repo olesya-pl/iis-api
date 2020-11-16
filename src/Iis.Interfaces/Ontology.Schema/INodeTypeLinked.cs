@@ -33,12 +33,16 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom);
         IReadOnlyList<IChildNodeType> GetAllChildren();
         IReadOnlyList<INodeTypeLinked> GetDirectAncestors();
+        IReadOnlyList<INodeTypeLinked> DirectParents => GetDirectAncestors();
         IReadOnlyList<INodeTypeLinked> GetAllAncestors();
+        IReadOnlyList<INodeTypeLinked> AllParents => GetAllAncestors();
         IReadOnlyList<INodeTypeLinked> GetDirectDescendants();
         IReadOnlyList<INodeTypeLinked> GetAllDescendants();
         IReadOnlyList<INodeTypeLinked> GetNodeTypesThatEmbedded();
-        IEnumerable<INodeTypeLinked> GetDirectProperties();
-        IEnumerable<INodeTypeLinked> GetAllProperties();
+        IReadOnlyList<INodeTypeLinked> GetDirectProperties();
+        IReadOnlyList<INodeTypeLinked> DirectProperties => GetDirectProperties();
+        IReadOnlyList<INodeTypeLinked> GetAllProperties();
+        IEnumerable<INodeTypeLinked> AllProperties => GetAllProperties();
         bool IsIdentical(INodeTypeLinked nodeType);
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();

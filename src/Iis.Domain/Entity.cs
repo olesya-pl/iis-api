@@ -15,14 +15,13 @@ namespace Iis.Domain
 
         public override void AddNode(Node node)
         {
-            var relationType = (IRelationTypeModel)node.Type;
-            if (relationType is IEmbeddingRelationTypeModel)
+            if (node.Type is IEmbeddingRelationTypeModel)
             {
-                var embeddingRelationType = (IEmbeddingRelationTypeModel)relationType;
+                var embeddingRelationType = (IEmbeddingRelationTypeModel)(node.Type);
                 if (embeddingRelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
-                    var existingNode = Nodes.SingleOrDefault(e => e.Type == relationType);
-                    if (existingNode != null) throw new Exception($"Relation '{relationType.Name}' supports single value only.");
+                    var existingNode = Nodes.SingleOrDefault(e => e.Type == node.Type);
+                    if (existingNode != null) throw new Exception($"Relation '{node.Type.Name}' supports single value only.");
                 }
             }
 
@@ -32,7 +31,7 @@ namespace Iis.Domain
         public object GetProperty(string relationName)
         {
             var embed = GetRelationType(relationName);
-            var nodes = GetRelations(embed).Select(r => r.Target);
+            var nodes = GetRelations(embed.Name).Select(r => r.Target);
             if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
             {
                 if (embed.IsAttributeType)
@@ -48,7 +47,7 @@ namespace Iis.Domain
         public void SetProperty(string relationName, object value)
         {
             var embed = GetRelationType(relationName);
-            var existingRelations = GetRelations(embed).ToList();
+            var existingRelations = GetRelations(embed.Name).ToList();
             List<object> targets;
             if (value == null)
             {

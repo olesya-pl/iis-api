@@ -21,7 +21,6 @@ namespace Iis.Domain
         public IAttributeTypeModel AttributeType => RelatedTypes.OfType<IAttributeTypeModel>().SingleOrDefault();
         public IEntityTypeModel EntityType => RelatedTypes.OfType<IEntityTypeModel>().SingleOrDefault();
         public INodeTypeModel TargetType => (INodeTypeModel)AttributeType ?? EntityType;
-        public IEnumerable<IRelationTypeModel> RelationTypes => RelatedTypes.OfType<IRelationTypeModel>();
         public bool IsAttributeType => RelatedTypes.OfType<IAttributeTypeModel>().Any();
         public bool IsEntityType => RelatedTypes.OfType<IEntityTypeModel>().Any();
         public IEmbeddingRelationTypeModel DirectRelationType => RelatedTypes.OfType<IEmbeddingRelationTypeModel>().SingleOrDefault();

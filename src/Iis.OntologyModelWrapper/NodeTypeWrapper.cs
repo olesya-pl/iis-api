@@ -27,65 +27,26 @@ namespace Iis.OntologyModelWrapper
 
         public IEnumerable<IEmbeddingRelationTypeModel> AllProperties => _source.GetAllProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
 
-        public Type ClrType
-        {
-            get
-            {
-                if (this is IEntityTypeModel) return typeof(Entity);
-                if (this is IEmbeddingRelationTypeModel) return typeof(Relation);
-                return _source.ClrType;
-            }
-        }
+        public DateTime CreatedAt => _source.CreatedAt;
 
-        public DateTime CreatedAt
-        {
-            get { return _source.CreatedAt; }
-            set { throw new NotImplementedException(); }
-        }
+        public IEnumerable<IEntityTypeModel> DirectParents => _source.DirectParents.Select(nt => new EntityTypeWrapper(nt));
 
-        public IEnumerable<IEntityTypeModel> DirectParents => _source.GetDirectAncestors().Select(nt => new EntityTypeWrapper(nt));
-
-        public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties => _source.GetDirectProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
+        public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties => _source.DirectProperties.Select(nt => new EmbeddingRelationTypeWrapper(nt));
 
         public bool HasUniqueValues => _source.HasUniqueValues;
-        public string UniqueValueFieldName
-        {
-            get { return _source.UniqueValueFieldName; }
-            set { throw new NotImplementedException(); }
-        }
-
+        public string UniqueValueFieldName => _source.UniqueValueFieldName;
         public Guid Id => _source.Id;
 
         public bool IsObjectOfStudy => _source.IsObjectOfStudy;
 
-        public IMeta Meta
-        {
-            get
-            {
-                return _source.MetaObject;
-            }
-            set { throw new NotImplementedException(); }
-        }
+        public IMeta Meta => _source.MetaObject;
         public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public string Name => _source.Name;
 
-        public string Title
-        {
-            get { return _source.Title; }
-            set { throw new NotImplementedException(); }
-        }
+        public string Title => _source.Title;
 
-        public DateTime UpdatedAt
-        {
-            get { return _source.UpdatedAt; }
-            set { throw new NotImplementedException(); }
-        }
-
-        public void AddType(INodeTypeModel type)
-        {
-            throw new NotImplementedException();
-        }
+        public DateTime UpdatedAt => _source.UpdatedAt;
 
         public IEmbeddingRelationTypeModel GetProperty(string typeName)
         {

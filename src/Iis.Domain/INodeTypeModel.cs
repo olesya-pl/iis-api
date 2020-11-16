@@ -10,23 +10,19 @@ namespace Iis.Domain
     {
         Guid Id { get; }
         string Name { get; }
-        string Title { get; set; }
-        IMeta Meta { get; set; }
-        JObject MetaSource { get; set; }
-        DateTime CreatedAt { get; set; }
-        DateTime UpdatedAt { get; set; }
+        string Title { get; }
+        IMeta Meta { get; }
+        JObject MetaSource { get; }
+        DateTime CreatedAt { get; }
+        DateTime UpdatedAt { get; }
         bool HasUniqueValues { get; }
-        string UniqueValueFieldName { get; set; }
-        Type ClrType { get; }
+        string UniqueValueFieldName { get; }
         IEnumerable<IEntityTypeModel> DirectParents { get; }
         IEnumerable<IEntityTypeModel> AllParents { get; }
         IEnumerable<IEmbeddingRelationTypeModel> DirectProperties { get; }
         IEnumerable<IEmbeddingRelationTypeModel> AllProperties { get; }
         bool IsObjectOfStudy { get; }
         INodeTypeLinked Source { get; }
-        
-        
-        void AddType(INodeTypeModel type);
         IEmbeddingRelationTypeModel GetProperty(string typeName);
         bool IsSubtypeOf(INodeTypeModel type);
         string ToString();

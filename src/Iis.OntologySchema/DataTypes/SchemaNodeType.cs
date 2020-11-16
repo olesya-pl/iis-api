@@ -147,13 +147,13 @@ namespace Iis.OntologySchema.DataTypes
 
             return result;
         }
-        public IEnumerable<INodeTypeLinked> GetDirectProperties()
+        public IReadOnlyList<INodeTypeLinked> GetDirectProperties()
         {
             return IsInversed ?
                 new List<INodeTypeLinked> { RelationType.DirectRelationType.NodeType } :
-                OutgoingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(rt => rt.NodeType);
+                OutgoingRelations.Where(r => r.Kind == RelationKind.Embedding).Select(rt => rt.NodeType).ToList();
         }
-        public IEnumerable<INodeTypeLinked> GetAllProperties()
+        public IReadOnlyList<INodeTypeLinked> GetAllProperties()
         {
             var result = GetDirectProperties().ToList();
             var ancestors = GetAllAncestors();

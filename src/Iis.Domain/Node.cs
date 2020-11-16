@@ -44,8 +44,8 @@ namespace Iis.Domain
             return attribute?.Value;
         }
 
-        public IEnumerable<Relation> GetRelations(IRelationTypeModel relationType) =>
-            Nodes.OfType<Relation>().Where(r => r.Type.Name == relationType.Name);
+        public IEnumerable<Relation> GetRelations(string relationTypeName) =>
+            Nodes.OfType<Relation>().Where(r => r.Type.Name == relationTypeName);
 
         public IEmbeddingRelationTypeModel GetRelationType(string relationTypeName) =>
             Type.GetProperty(relationTypeName) ??
@@ -53,15 +53,15 @@ namespace Iis.Domain
 
         // Only single relations
         public Relation GetRelation(IEmbeddingRelationTypeModel relationType) =>
-            GetRelations(relationType).SingleOrDefault()
+            GetRelations(relationType.Name).SingleOrDefault()
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name}");
 
         public Relation GetRelationOrDefault(IEmbeddingRelationTypeModel relationType) =>
-            GetRelations(relationType).SingleOrDefault();
+            GetRelations(relationType.Name).SingleOrDefault();
 
         // For single or multiple relations
         public Relation GetRelation(IEmbeddingRelationTypeModel relationType, Guid relationId) =>
-            GetRelations(relationType).SingleOrDefault(r => r.Id == relationId)
+            GetRelations(relationType.Name).SingleOrDefault(r => r.Id == relationId)
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name} with id {relationId}");
 
         public override string ToString()

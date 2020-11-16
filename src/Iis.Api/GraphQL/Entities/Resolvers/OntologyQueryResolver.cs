@@ -69,10 +69,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
-            if (relationType.IsComputed())
+            var formula = (relationType.Meta as IAttributeRelationMeta)?.Formula;
+            if (formula != null)
             {
-
-                var formula = (relationType.Meta as IAttributeRelationMeta)?.Formula;
                 return parent.OriginalNode.ResolveFormula(formula);
             }
             var relation = node?.GetRelationOrDefault(relationType);
@@ -85,7 +84,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
-            return node.GetRelations(relationType);
+            return node.GetRelations(relationType.Name);
         }
 
         // Parent - embedding relation to attribute, resolve attribute value here
@@ -109,7 +108,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var ontologyService = ctx.Service<IOntologyService>();
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
-            var relations = node.GetRelations(relationType);
+            var relations = node.GetRelations(relationType.Name);
             if (!relations.GroupBy(r => r.EntityTarget).All(g => g.Count() == 1))
                 return relations.Select(r => r.EntityTarget); // Non-unique targets breaks our _relation !!!
             var relationsInfo = relations.ToDictionary(r => r.EntityTarget);
