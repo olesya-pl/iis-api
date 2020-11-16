@@ -4,7 +4,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public class MatchAllQueryBuilder : BaseQueryBuilder<MatchAllQueryBuilder>
     {
-        public JObject Build()
+        public override JObject Build()
         {
             var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _offset, _limit);
 

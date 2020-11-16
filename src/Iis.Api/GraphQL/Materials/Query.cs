@@ -23,7 +23,7 @@ namespace IIS.Core.GraphQL.Materials
             FilterInput filter,
             SortingInput sorting,
             SearchByImageInput searchByImageInput,
-            IEnumerable<Guid> relationNodeIdList = null,
+            SearchByRelationInput searchByRelation = null,
             IEnumerable<string> types = null)
         {
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
@@ -37,9 +37,9 @@ namespace IIS.Core.GraphQL.Materials
                 return (mapped, result.Count);
             }
 
-            if(relationNodeIdList != null && relationNodeIdList.Any())
+            if(searchByRelation != null && searchByRelation.ShoudBeExecuted)
             {
-                var materialsResults = await materialProvider.GetMaterialsCommonForEntityAndDescendantsAsync(relationNodeIdList, pagination.PageSize, pagination.Offset());
+                var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(searchByRelation.NodeIdentityList, searchByRelation.IncludeDescendants, filterQuery, pagination.PageSize, pagination.Offset());
 
                 var mapped = materialsResults.Materials
                                 .Select(m => mapper.Map<Material>(m))

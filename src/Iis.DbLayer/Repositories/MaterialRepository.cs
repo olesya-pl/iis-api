@@ -35,7 +35,7 @@ namespace Iis.DbLayer.Repositories
         };
 
         private readonly IMLResponseRepository _mLResponseRepository;
-        private readonly IElasticManager _elasticManager;        
+        private readonly IElasticManager _elasticManager;
         private readonly IMapper _mapper;
         private readonly IOntologySchema ontologySchema;
 
