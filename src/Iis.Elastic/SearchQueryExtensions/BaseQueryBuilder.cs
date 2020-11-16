@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
@@ -21,5 +21,6 @@ namespace Iis.Elastic.SearchQueryExtensions
             _resultFields = resultFields;
             return this as T;
         }
+        public abstract JObject Build();
     }
 }

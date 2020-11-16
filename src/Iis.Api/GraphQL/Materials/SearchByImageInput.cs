@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace IIS.Core.GraphQL.Materials
+﻿namespace IIS.Core.GraphQL.Materials
 {
     public class SearchByImageInput
     {
