@@ -344,6 +344,7 @@ namespace IIS.Core
             }
             UpdateDatabase(app);
             app.UpdateMilitaryAmmountCodes();
+            app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
             if (!Configuration.GetValue<bool>("disableCORS", false))
