@@ -11,13 +11,27 @@ namespace Iis.EventHandlers
     {
         public Task Handle(EntityCreatedEvent notification, CancellationToken cancellationToken)
         {
-            ThemeCounterBackgroundService.SignalThemeUpdateNeeded();
+            if (string.Equals(notification.Type, "Event", System.StringComparison.Ordinal))
+            {
+                ThemeCounterBackgroundService.SignalEventUpdateNeeded();
+            }
+            else
+            {
+                ThemeCounterBackgroundService.SignalObjectUpdateNeeded();
+            }
             return Task.CompletedTask;
         }
 
         public Task Handle(EntityUpdatedEvent notification, CancellationToken cancellationToken)
         {
-            ThemeCounterBackgroundService.SignalThemeUpdateNeeded();
+            if (string.Equals(notification.Type, "Event", System.StringComparison.Ordinal))
+            {
+                ThemeCounterBackgroundService.SignalEventUpdateNeeded();
+            }
+            else
+            {
+                ThemeCounterBackgroundService.SignalObjectUpdateNeeded();
+            }
             return Task.CompletedTask;
         }
     }

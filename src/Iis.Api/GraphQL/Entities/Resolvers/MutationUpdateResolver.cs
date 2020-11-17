@@ -44,6 +44,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _ontology = ctx.Service<IOntologyModel>();
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
+            _mediator = ctx.Service<IMediator>();
             _resolverContext = ctx;
             
         }
@@ -103,8 +104,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 }
                 await _ontologyService.SaveNodeAsync(node, requestId);
             }
-            if (_mediator != null)
-                await _mediator.Publish(new EntityUpdatedEvent());
+            await _mediator.Publish(new EntityUpdatedEvent() { Type = type.Name });
             return node;
         }
 
