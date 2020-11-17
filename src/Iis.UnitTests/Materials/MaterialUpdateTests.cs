@@ -1,32 +1,25 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 
 using Xunit;
-using Iis.Domain.Materials;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
-using IIS.Core.Materials;
-using IIS.Core.GraphQL.Materials;
-using IIS.Core;
 using Microsoft.Extensions.Configuration;
 using Iis.DbLayer.Repositories;
 using Moq;
-using IIS.Core.Files;
-using System.Threading;
 using AutoFixture.Xunit2;
 using IIS.Core.Materials.EntityFramework;
-using Iis.DbLayer.MaterialEnum;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Interfaces;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Iis.Utility;
-using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.UnitTests.Materials
 {
@@ -59,6 +52,7 @@ namespace Iis.UnitTests.Materials
                 new Mock<IOntologySchema>().Object,
                 new Mock<IOntologyNodesData>().Object,
                 new Mock<IElasticService>().Object,
+                new Mock<IMaterialElasticService>().Object,
                 new Mock<IMLResponseRepository>().Object,
                 new Mock<IMaterialSignRepository>().Object,
                 new Mock<IMapper>().Object,

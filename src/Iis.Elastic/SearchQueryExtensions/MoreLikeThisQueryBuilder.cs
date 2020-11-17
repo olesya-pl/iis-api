@@ -10,7 +10,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             guid = materialId;
             return this;
         }
-        public JObject Build()
+        public override JObject Build()
         {
             var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _offset, _limit);
 

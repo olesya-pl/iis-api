@@ -8,8 +8,11 @@ using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 using Iis.Utility;
 using IIS.Repository;
 using IIS.Repository.Factories;
@@ -24,7 +27,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
-using Iis.Interfaces.Ontology.Data;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -35,14 +37,16 @@ namespace IIS.Core.Materials.EntityFramework
         {
             DateParseHandling = DateParseHandling.None
         };
-        private static readonly IEnumerable<string> relationTypeNameList = new List<string>
+        private static readonly IReadOnlyCollection<string> RelationTypeNameList = new List<string>
         {
             "parent"
         };
+        private static readonly (IEnumerable<Material> Materials, int Count) EmptMaterialResult = (Materials: Array.Empty<Material>(), 0);
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly IOntologyNodesData _ontologyData;
         private readonly IElasticService _elasticService;
+        private readonly IMaterialElasticService _materialElasticService;
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMaterialSignRepository _materialSignRepository;
@@ -54,6 +58,7 @@ namespace IIS.Core.Materials.EntityFramework
             IOntologySchema ontologySchema,
             IOntologyNodesData ontologyData,
             IElasticService elasticService,
+            IMaterialElasticService materialElasticService,
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
             IMapper mapper,
@@ -66,7 +71,7 @@ namespace IIS.Core.Materials.EntityFramework
             _ontologySchema = ontologySchema;
             _ontologyData = ontologyData;
             _elasticService = elasticService;
-
+            _materialElasticService = materialElasticService;
             _mLResponseRepository = mLResponseRepository;
             _materialSignRepository = materialSignRepository;
             _mapper = mapper;
@@ -369,46 +374,65 @@ namespace IIS.Core.Materials.EntityFramework
             return FaceAPIResponseParser.GetEncoding(contentJson);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntityAndDescendantsAsync(IEnumerable<Guid> nodeIdList, int limit = 0, int offset = 0, CancellationToken ct = default)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, bool includeDescendants, string suggestion, int limit = 0, int offset = 0, CancellationToken ct = default)
         {
-            var entities = new List<MaterialEntity>();
+            var materialEntityList = new List<MaterialEntity>();
 
             foreach (var nodeId in nodeIdList)
             {
-                var resultNodeIdList = new List<Guid>{ nodeId };
-                var tempNodeIdList = resultNodeIdList;
+                var objectIdList = new List<Guid>{ nodeId };
 
-                while(tempNodeIdList.Any())
-                {
-                    var relationList = _ontologyData.GetIncomingRelations(tempNodeIdList, relationTypeNameList);
+                if(includeDescendants) objectIdList.AddRange(GetDescendantsByGivenRelationTypeNameList(objectIdList, RelationTypeNameList));
 
-                    tempNodeIdList = relationList.Select(e => e.SourceNodeId).ToList();
+                var materialEntities = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQueryAsync(objectIdList));
 
-                    resultNodeIdList.AddRange(tempNodeIdList);
-                }
+                materialEntities = materialEntities.GroupBy(e => e.Id).Select(gr => gr.FirstOrDefault()).ToList();
 
-                entities.AddRange(await RunWithoutCommitAsync((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQueryAsync(resultNodeIdList)));
+                materialEntityList.AddRange(materialEntities);
             }
 
-            var entityIdList = entities
+            if(!materialEntityList.Any()) return EmptMaterialResult;
+
+            var materialEntitiesIdList = materialEntityList
                 .GroupBy(e => e.Id)
                 .Where(gr => gr.Count() == nodeIdList.Count())
                 .Select(gr => gr.Select(e => e.Id).FirstOrDefault());
 
-            var materialsResult = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetAllAsync(entityIdList, limit, offset));
+            var searchParams = new SearchParams{Offset = offset, Limit = limit, Suggestion = suggestion};
 
-            var mappingTasks = materialsResult.Entities
-                                .Select(entity => MapAsync(entity));
+            var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList);
 
-            var materials = await Task.WhenAll(mappingTasks);
+            var materialTasks = searchResult.Items.Values
+                .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                .Select(p => MapMaterialDocumentAsync(p));
 
-            return (Materials: materials, Count: materialsResult.TotalCount);
+            var materials = await Task.WhenAll(materialTasks);
+
+            return (materials, searchResult.Count);
         }
 
+        private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)
+        {
+            var result = new List<Guid>();
+
+            var tempValues = entityIdList.ToList();
+
+            while (tempValues.Any())
+            {
+                var relationList = _ontologyData.GetIncomingRelations(tempValues, relationTypeNameList);
+
+                tempValues = relationList
+                            .Select(e => e.SourceNodeId)
+                            .ToList();
+
+                result.AddRange(tempValues);
+            }
+            return result.AsReadOnly();
+        }
         private bool IsEvent(Node node)
         {
             if(node is null) return false;
-            
+
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 
             return nodeType.IsEvent;

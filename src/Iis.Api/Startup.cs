@@ -163,8 +163,8 @@ namespace IIS.Core
             services.AddHttpContextAccessor();
 
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
+            services.AddTransient<IMaterialElasticService, MaterialElasticService>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
-            //services.AddTransient<IOntologyService, OntologyService<IIISUnitOfWork>>();
             services.AddTransient<IOntologyService, OntologyServiceWithCache>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
@@ -344,6 +344,7 @@ namespace IIS.Core
             }
             UpdateDatabase(app);
             app.UpdateMilitaryAmmountCodes();
+            app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
             if (!Configuration.GetValue<bool>("disableCORS", false))

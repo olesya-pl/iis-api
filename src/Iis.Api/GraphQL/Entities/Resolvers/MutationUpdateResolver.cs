@@ -103,7 +103,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 }
                 await _ontologyService.SaveNodeAsync(node, requestId);
             }
-            await _mediator.Publish(new EntityUpdatedEvent());
+            if (_mediator != null)
+                await _mediator.Publish(new EntityUpdatedEvent());
             return node;
         }
 
