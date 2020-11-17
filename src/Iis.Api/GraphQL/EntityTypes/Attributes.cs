@@ -172,7 +172,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             else if (!types.Any(t => t.Id == Source.EntityType.Id))
                 types = types.Union(new[] {Source.EntityType });
 
-            var metaTargetTypes = (Source.Meta as EntityRelationMeta)?.TargetTypes;
+            var metaTargetTypes = (Source.Meta as IEntityRelationMeta)?.TargetTypes;
             if (metaTargetTypes != null && metaTargetTypes.Length > 0)
             {
                 types = types.Where(t => metaTargetTypes.Contains(t.Name));
