@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace AcceptanceTests.Features.UI.SmokeTest
+namespace AcceptanceTests.Features.UI.SmokeTests
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class MaterialsCardUI_SmokeFeature : object, Xunit.IClassFixture<MaterialsCardUI_SmokeFeature.FixtureData>, System.IDisposable
+    public partial class MaterialsSectionUI_SmokeFeature : object, Xunit.IClassFixture<MaterialsSectionUI_SmokeFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "MaterialsCardUI.feature"
+#line 1 "MaterialsSectionUI.feature"
 #line hidden
         
-        public MaterialsCardUI_SmokeFeature(MaterialsCardUI_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public MaterialsSectionUI_SmokeFeature(MaterialsSectionUI_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,8 +40,13 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "MaterialsCardUI - Smoke", "    - Open the material card\n    - Open events tab\n    - Open general tab\n    - O" +
-                    "pen objects tab", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "MaterialsSectionUI - Smoke", @"    - IIS-6187 - Ensure that Materials section is opened
+    - IIS-6205 - Ensure that search by using ! symbol gives 0 search results
+    - IIS-6188 - Ensure that the material card can be opened
+    - IIS-6192 - Open events tab relation in the materials card
+    - IIS-6189 - Open general tab in the materials card
+    - IIS-6191 - Open objects tab in the materials card
+    - IIS-6190 - Open ML tab in the materials card", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -78,9 +83,9 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         public virtual void FeatureBackground()
         {
-#line 8
+#line 11
     #line hidden
-#line 9
+#line 12
         testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -90,8 +95,111 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             this.TestTearDown();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6187 - Ensure that Materials section is opened")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Smoke")]
+        [Xunit.TraitAttribute("Description", "IIS-6187 - Ensure that Materials section is opened")]
+        [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "UI")]
+        [Xunit.TraitAttribute("Category", "MaterialsUI")]
+        public virtual void IIS_6187_EnsureThatMaterialsSectionIsOpened()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "smoke",
+                    "UI",
+                    "MaterialsUI"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6187 - Ensure that Materials section is opened", null, tagsOfScenario, argumentsOfScenario);
+#line 16
+    this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 11
+    this.FeatureBackground();
+#line hidden
+#line 17
+        testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 18
+        testRunner.Then("I must see the Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 19
+        testRunner.Then("I must see first user in the user list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6205 - Ensure that search by using ! symbol gives 0 search results")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Smoke")]
+        [Xunit.TraitAttribute("Description", "IIS-6205 - Ensure that search by using ! symbol gives 0 search results")]
+        [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "UI")]
+        [Xunit.TraitAttribute("Category", "MaterialsSearchUI")]
+        public virtual void IIS_6205_EnsureThatSearchByUsingSymbolGives0SearchResults()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "smoke",
+                    "UI",
+                    "MaterialsSearchUI"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6205 - Ensure that search by using ! symbol gives 0 search results", null, tagsOfScenario, argumentsOfScenario);
+#line 22
+    this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 11
+    this.FeatureBackground();
+#line hidden
+#line 23
+        testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 24
+        testRunner.And("I clicked Search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 25
+        testRunner.And("I searched ! data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 26
+        testRunner.Then("I must see zero results", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [Xunit.SkippableFactAttribute(DisplayName="IIS-6188 - Ensure that the material card can be opened")]
-        [Xunit.TraitAttribute("FeatureTitle", "MaterialsCardUI - Smoke")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Smoke")]
         [Xunit.TraitAttribute("Description", "IIS-6188 - Ensure that the material card can be opened")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
@@ -104,7 +212,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
                     "MaterialsCardUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6188 - Ensure that the material card can be opened", null, tagsOfScenario, argumentsOfScenario);
-#line 13
+#line 29
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -124,19 +232,19 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 11
     this.FeatureBackground();
 #line hidden
-#line 14
+#line 30
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 31
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 32
         testRunner.Then("I must see processed button in the materials card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 17
+#line 33
         testRunner.Then("I must see relevance drop down in the materials card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -144,7 +252,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="IIS-6192 - Open events tab relation in the materials card")]
-        [Xunit.TraitAttribute("FeatureTitle", "MaterialsCardUI - Smoke")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Smoke")]
         [Xunit.TraitAttribute("Description", "IIS-6192 - Open events tab relation in the materials card")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
@@ -157,7 +265,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
                     "MaterialsCardEventsTabUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6192 - Open events tab relation in the materials card", null, tagsOfScenario, argumentsOfScenario);
-#line 20
+#line 36
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -177,19 +285,19 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 11
     this.FeatureBackground();
 #line hidden
-#line 21
+#line 37
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 38
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 23
+#line 39
         testRunner.And("I clicked on the events tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 24
+#line 40
         testRunner.Then("I must see events search in the materials card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -197,7 +305,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="IIS-6189 - Open general tab in the materials card")]
-        [Xunit.TraitAttribute("FeatureTitle", "MaterialsCardUI - Smoke")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Smoke")]
         [Xunit.TraitAttribute("Description", "IIS-6189 - Open general tab in the materials card")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
@@ -210,7 +318,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
                     "MaterialsCardGeneralTabUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6189 - Open general tab in the materials card", null, tagsOfScenario, argumentsOfScenario);
-#line 27
+#line 43
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -230,13 +338,13 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 11
     this.FeatureBackground();
 #line hidden
-#line 28
+#line 44
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 29
+#line 45
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
@@ -249,10 +357,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
                             "SourceCredibility"});
                 table1.AddRow(new string[] {
                             "Originator"});
-#line 30
+#line 46
         testRunner.Then("I must see these elements", ((string)(null)), table1, "Then ");
 #line hidden
-#line 38
+#line 54
         testRunner.Then("I must I must see at least one user in the originator drop down menu", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -260,7 +368,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="IIS-6191 - Open objects tab in the materials card")]
-        [Xunit.TraitAttribute("FeatureTitle", "MaterialsCardUI - Smoke")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Smoke")]
         [Xunit.TraitAttribute("Description", "IIS-6191 - Open objects tab in the materials card")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
@@ -273,7 +381,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
                     "MaterialsCardGeneralTabUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6191 - Open objects tab in the materials card", null, tagsOfScenario, argumentsOfScenario);
-#line 41
+#line 57
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -293,19 +401,19 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 11
     this.FeatureBackground();
 #line hidden
-#line 42
+#line 58
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 43
+#line 59
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 44
+#line 60
         testRunner.And("I clicked on the objects tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 45
+#line 61
         testRunner.Then("I must see objects search in the materials card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -313,7 +421,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="IIS-6190 - Open ML tab in the materials card")]
-        [Xunit.TraitAttribute("FeatureTitle", "MaterialsCardUI - Smoke")]
+        [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Smoke")]
         [Xunit.TraitAttribute("Description", "IIS-6190 - Open ML tab in the materials card")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
@@ -326,7 +434,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
                     "MaterialsCardGeneralTabUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6190 - Open ML tab in the materials card", null, tagsOfScenario, argumentsOfScenario);
-#line 48
+#line 64
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -346,19 +454,19 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 11
     this.FeatureBackground();
 #line hidden
-#line 49
+#line 65
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 50
+#line 66
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 51
+#line 67
         testRunner.And("I clicked on the ML tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 52
+#line 68
         testRunner.Then("I must see Show button in the ML tab", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -372,12 +480,12 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             
             public FixtureData()
             {
-                MaterialsCardUI_SmokeFeature.FeatureSetup();
+                MaterialsSectionUI_SmokeFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                MaterialsCardUI_SmokeFeature.FeatureTearDown();
+                MaterialsSectionUI_SmokeFeature.FeatureTearDown();
             }
         }
     }

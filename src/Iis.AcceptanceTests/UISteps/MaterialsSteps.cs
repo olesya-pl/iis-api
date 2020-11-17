@@ -65,7 +65,7 @@ namespace Iis.AcceptanceTests.UISteps
             materialsPage.SearchButton.Click();
         }
 
-        [When(@"I entered (.*) data in the search field")]
+        [When(@"I searched (.*) data in the materials")]
 
         public void IEnteredDataInTheSearchField(string input)
         {

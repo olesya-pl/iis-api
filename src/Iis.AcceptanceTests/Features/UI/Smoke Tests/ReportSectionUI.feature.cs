@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace AcceptanceTests.Features.UI.SmokeTest
+namespace AcceptanceTests.Features.UI.SmokeTests
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class EventsTabUI_SmokeFeature : object, Xunit.IClassFixture<EventsTabUI_SmokeFeature.FixtureData>, System.IDisposable
+    public partial class ReportSectionUI_SmokeFeature : object, Xunit.IClassFixture<ReportSectionUI_SmokeFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "EventsSectionUI.feature"
+#line 1 "ReportSectionUI.feature"
 #line hidden
         
-        public EventsTabUI_SmokeFeature(EventsTabUI_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ReportSectionUI_SmokeFeature(ReportSectionUI_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "EventsTabUI - Smoke", "\t- Open Event section", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "ReportSectionUI - Smoke", "\thttps://jira.infozahyst.com/browse/IIS-6325", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,7 +80,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
 #line 5
 #line hidden
 #line 6
- testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I want to sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
         
@@ -89,20 +89,16 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Ensure that Events section is opened")]
-        [Xunit.TraitAttribute("FeatureTitle", "EventsTabUI - Smoke")]
-        [Xunit.TraitAttribute("Description", "Ensure that Events section is opened")]
+        [Xunit.SkippableFactAttribute(DisplayName="Ensure that Reports section is opened")]
+        [Xunit.TraitAttribute("FeatureTitle", "ReportSectionUI - Smoke")]
+        [Xunit.TraitAttribute("Description", "Ensure that Reports section is opened")]
         [Xunit.TraitAttribute("Category", "smoke")]
-        [Xunit.TraitAttribute("Category", "UI")]
-        [Xunit.TraitAttribute("Category", "EventsUI")]
-        public virtual void EnsureThatEventsSectionIsOpened()
+        public virtual void EnsureThatReportsSectionIsOpened()
         {
             string[] tagsOfScenario = new string[] {
-                    "smoke",
-                    "UI",
-                    "EventsUI"};
+                    "smoke"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that Events section is opened", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that Reports section is opened", null, tagsOfScenario, argumentsOfScenario);
 #line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -127,13 +123,10 @@ this.ScenarioInitialize(scenarioInfo);
 this.FeatureBackground();
 #line hidden
 #line 10
- testRunner.When("I navigated to Events page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.And("I click div:nth-of-type(1) > li:nth-of-type(3) button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 11
- testRunner.Then("I must see the Events page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 12
- testRunner.Then("I must see first event in the events list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I must see the .infinity-table > div:nth-of-type(1) element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -146,12 +139,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                EventsTabUI_SmokeFeature.FeatureSetup();
+                ReportSectionUI_SmokeFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                EventsTabUI_SmokeFeature.FeatureTearDown();
+                ReportSectionUI_SmokeFeature.FeatureTearDown();
             }
         }
     }

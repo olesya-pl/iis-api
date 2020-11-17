@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace AcceptanceTests.Features.UI.SmokeTest
+namespace AcceptanceTests.Features.UI.SmokeTests
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ObjectsTab_SmokeFeature : object, Xunit.IClassFixture<ObjectsTab_SmokeFeature.FixtureData>, System.IDisposable
+    public partial class ObjectsSectionEmptySearchUIFeature : object, Xunit.IClassFixture<ObjectsSectionEmptySearchUIFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ObjectsSectionUI.feature"
+#line 1 "ObjectsSectionEmptySearchUI.feature"
 #line hidden
         
-        public ObjectsTab_SmokeFeature(ObjectsTab_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ObjectsSectionEmptySearchUIFeature(ObjectsSectionEmptySearchUIFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "Objects tab - Smoke", "\thttps://jira.infozahyst.com/browse/IIS-6206", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "ObjectsSectionEmptySearchUI", "\thttps://jira.infozahyst.com/browse/IIS-6210", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -89,16 +89,16 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Ensure that Objects tab is opened")]
-        [Xunit.TraitAttribute("FeatureTitle", "Objects tab - Smoke")]
-        [Xunit.TraitAttribute("Description", "Ensure that Objects tab is opened")]
+        [Xunit.SkippableFactAttribute(DisplayName="Enter ! in the search field and get 0 results")]
+        [Xunit.TraitAttribute("FeatureTitle", "ObjectsSectionEmptySearchUI")]
+        [Xunit.TraitAttribute("Description", "Enter ! in the search field and get 0 results")]
         [Xunit.TraitAttribute("Category", "smoke")]
-        public virtual void EnsureThatObjectsTabIsOpened()
+        public virtual void EnterInTheSearchFieldAndGet0Results()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that Objects tab is opened", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Enter ! in the search field and get 0 results", null, tagsOfScenario, argumentsOfScenario);
 #line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -123,7 +123,14 @@ this.ScenarioInitialize(scenarioInfo);
 this.FeatureBackground();
 #line hidden
 #line 10
- testRunner.Then("I must see the tbody > tr:nth-of-type(1) element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Given("I click .entity-search__toggle .el-button--default button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 11
+ testRunner.When("I entered ! in the .entity-search__body .el-input__inner text field and press Ent" +
+                        "er key", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 12
+ testRunner.Then("I must see the .infinity-table__no-results element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -136,12 +143,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                ObjectsTab_SmokeFeature.FeatureSetup();
+                ObjectsSectionEmptySearchUIFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ObjectsTab_SmokeFeature.FeatureTearDown();
+                ObjectsSectionEmptySearchUIFeature.FeatureTearDown();
             }
         }
     }

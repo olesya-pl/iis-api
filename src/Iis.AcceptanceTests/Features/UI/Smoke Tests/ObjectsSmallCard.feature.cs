@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace AcceptanceTests.Features.UI.SmokeTest
+namespace AcceptanceTests.Features.UI.SmokeTests
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class IOBigCard_SmokeFeature : object, Xunit.IClassFixture<IOBigCard_SmokeFeature.FixtureData>, System.IDisposable
+    public partial class IOSmallCard_SmokeFeature : object, Xunit.IClassFixture<IOSmallCard_SmokeFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ObjectsBigCardUI.feature"
+#line 1 "ObjectsSmallCard.feature"
 #line hidden
         
-        public IOBigCard_SmokeFeature(IOBigCard_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public IOSmallCard_SmokeFeature(IOSmallCard_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "IOBigCard - Smoke", "\thttps://jira.infozahyst.com/browse/IIS-6208", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "IOSmallCard - Smoke", "\thttps://jira.infozahyst.com/browse/IIS-6207", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -89,16 +89,16 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Intelligence objective - big card is opened")]
-        [Xunit.TraitAttribute("FeatureTitle", "IOBigCard - Smoke")]
-        [Xunit.TraitAttribute("Description", "Intelligence objective - big card is opened")]
-        [Xunit.TraitAttribute("Category", "mytag")]
-        public virtual void IntelligenceObjective_BigCardIsOpened()
+        [Xunit.SkippableFactAttribute(DisplayName="Intelligence objective - small card is opened")]
+        [Xunit.TraitAttribute("FeatureTitle", "IOSmallCard - Smoke")]
+        [Xunit.TraitAttribute("Description", "Intelligence objective - small card is opened")]
+        [Xunit.TraitAttribute("Category", "smoke")]
+        public virtual void IntelligenceObjective_SmallCardIsOpened()
         {
             string[] tagsOfScenario = new string[] {
-                    "mytag"};
+                    "smoke"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Intelligence objective - big card is opened", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Intelligence objective - small card is opened", null, tagsOfScenario, argumentsOfScenario);
 #line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -126,10 +126,7 @@ this.FeatureBackground();
  testRunner.Given("I click .el-table__row:nth-of-type(1) .text-ellipsis.title button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 11
- testRunner.And("I click button[name=\'btn-full-screen\'] button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 12
- testRunner.Then("I must see the div[name=\'affiliation\'] div[name=\'view-item-relation\'] element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I must see the .aside-card window", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -142,12 +139,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                IOBigCard_SmokeFeature.FeatureSetup();
+                IOSmallCard_SmokeFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                IOBigCard_SmokeFeature.FeatureTearDown();
+                IOSmallCard_SmokeFeature.FeatureTearDown();
             }
         }
     }
