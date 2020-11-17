@@ -40,13 +40,25 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistory(Guid targetId, string propertyName)
+        public async Task<IReadOnlyList<IChangeHistoryItem>> GetChangeHistory(Guid targetId, string propertyName, DateTime? dateFrom = null, DateTime? dateTo = null)
         {
             var query = _context.ChangeHistory.Where(ch => ch.TargetId == targetId);
+
             if (!string.IsNullOrEmpty(propertyName))
             {
                 query = query.Where(ch => ch.PropertyName == propertyName);
             }
+
+            if(dateFrom.HasValue)
+            {
+                query = query.Where(e => e.Date >= dateFrom);
+            }
+
+            if(dateTo.HasValue)
+            {
+                query = query.Where(e => e.Date <= dateTo);
+            }
+
             return await query.OrderByDescending(ch => ch.Date).ToListAsync();
         }
 
