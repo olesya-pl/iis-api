@@ -35,6 +35,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _fileService = ctx.Service<IFileService>();
             _ontology = ctx.Service<IOntologyModel>();
             _ontologyService = ctx.Service<IOntologyService>();
+            _mediator = ctx.Service<IMediator>();
         }
 
         public async Task<Entity> CreateEntity(IResolverContext ctx, string typeName)
@@ -61,8 +62,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             node = new Entity(Guid.NewGuid(), type);
             await CreateProperties(node, properties);
             await _ontologyService.SaveNodeAsync(node);
-            if (_mediator != null)
-                await _mediator.Publish(new EntityCreatedEvent());
+            await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name });
             return node;
         }
 
