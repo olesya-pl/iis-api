@@ -153,7 +153,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
                     n.OutgoingRelations.Any(
                         r => r.TargetNode.Value != null && 
-                        r.TargetNode.Value.Contains(filter.Suggestion)))
+                        r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)))
                 .Skip(filter.Offset)
                 .Take(filter.Limit)
                 .ToList();
@@ -164,7 +164,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
                     n.OutgoingRelations.Any(
                         r => r.TargetNode.Value != null &&
-                        r.TargetNode.Value.Contains(filter.Suggestion)))
+                        r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)))
                 .Count();
         }
         public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
