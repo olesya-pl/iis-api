@@ -25,10 +25,6 @@ namespace Iis.AcceptanceTests.Helpers
             scenarioContext.Add(key, value);
         }
 
-        public static void SetDriver(this ScenarioContext scenarioContext, IWebDriver driver)
-        {
-            scenarioContext.Add("webDriver", driver);
-        }
         public static IWebDriver GetDriver(this ScenarioContext scenarioContext)
         {
             return scenarioContext.Get<IWebDriver>("webDriver");

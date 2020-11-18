@@ -8,14 +8,12 @@ namespace Iis.AcceptanceTests.PageObjects
 
     public class EventsPageObjects
     {
-        private readonly ScenarioContext context;
         private readonly IWebDriver driver;
 
-        public EventsPageObjects(ScenarioContext injectedContext)
+        public EventsPageObjects(IWebDriver driver)
         {
-            context = injectedContext;
 
-            driver = context.GetDriver();
+            this.driver = driver;
 
             PageFactory.InitElements(driver, this);
         }
