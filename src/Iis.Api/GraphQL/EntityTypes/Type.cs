@@ -44,7 +44,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] public string Code => Source.Name;
 
-        public bool IsAbstract => Source is Iis.Domain.EntityType et && et.IsAbstract; // todo
+        public bool IsAbstract => Source is IEntityTypeModel et && et.IsAbstract; // todo
 
         [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
         public EntityType Parent =>
