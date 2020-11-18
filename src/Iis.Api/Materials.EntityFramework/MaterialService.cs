@@ -30,7 +30,6 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IFileService _fileService;
         private readonly IMaterialEventProducer _eventProducer;
         private readonly IMaterialProvider _materialProvider;
-        private readonly IEnumerable<IMaterialProcessor> _materialProcessors;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IOntologyNodesData _nodesData;
         private readonly IMediator _mediatr;
@@ -39,7 +38,6 @@ namespace IIS.Core.Materials.EntityFramework
             IMapper mapper,
             IMaterialEventProducer eventProducer,
             IMaterialProvider materialProvider,
-            IEnumerable<IMaterialProcessor> materialProcessors,
             IMLResponseRepository mLResponseRepository,
             IOntologyNodesData nodesData,
             IMediator mediator,
@@ -49,7 +47,6 @@ namespace IIS.Core.Materials.EntityFramework
             _mapper = mapper;
             _eventProducer = eventProducer;
             _materialProvider = materialProvider;
-            _materialProcessors = materialProcessors;
             _mLResponseRepository = mLResponseRepository;
             _nodesData = nodesData;
             _mediatr = mediator;
@@ -80,13 +77,6 @@ namespace IIS.Core.Materials.EntityFramework
 
             _eventProducer.SendMaterialFeatureEvent(message);
 
-            // todo: put message to rabbit instead of calling another service directly
-            if (material.Metadata.SelectToken("Features.Nodes") != null)
-            {
-                foreach (var processor in _materialProcessors)
-                    await processor.ExtractInfoAsync(material);
-            }
-            // end
             // todo: multiple queues for different material types
             if (material.File != null && material.Type == "cell.voice")
                 _eventProducer.SendMaterialAddedEventAsync(
