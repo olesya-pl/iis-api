@@ -4,7 +4,6 @@ using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
 
-
 namespace Iis.AcceptanceTests.UISteps
 {
     [Binding]
@@ -13,16 +12,16 @@ namespace Iis.AcceptanceTests.UISteps
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
 
-        public AdministrationSteps(ScenarioContext injectedContext)
+        public AdministrationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             context = injectedContext;
-            driver = context.GetDriver();
+            this.driver = driver;
         }
 
         [When(@"I navigated to Administration page")]
         public void IWantNavigateToAdministrationPage()
         {
-            var administrationPage = new AdministrationPageObjects(context);
+            var administrationPage = new AdministrationPageObjects(driver);
             administrationPage.AdministrationPage.Click();
 
             driver.WaitFor(5);
@@ -37,7 +36,7 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see first user in the user list")]
         public void ThenIMustSeeFirstUserInTheUsersList()
         {
-            var eventsPage = new AdministrationPageObjects(context);
+            var eventsPage = new AdministrationPageObjects(driver);
             Assert.True(eventsPage.FirstUserOnTheAdminPage.Displayed);
         }
     }

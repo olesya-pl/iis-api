@@ -7,15 +7,12 @@ namespace Iis.AcceptanceTests.PageObjects
 {
     public class MaterialsPageObjects
     {
-        private readonly ScenarioContext context;
-
         private readonly IWebDriver driver;
 
-        public MaterialsPageObjects(ScenarioContext injectedContext)
+        public MaterialsPageObjects(IWebDriver driver)
         {
-            context = injectedContext;
 
-            driver = context.GetDriver();
+            this.driver = driver;
 
             PageFactory.InitElements(driver, this);
         }

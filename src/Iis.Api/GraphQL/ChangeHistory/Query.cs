@@ -11,11 +11,22 @@ namespace IIS.Core.GraphQL.ChangeHistory
 {
     public class Query
     {
-        public async Task<GraphQLCollection<ChangeHistoryItemGroup>> GetChangeHistory([Service] IChangeHistoryService service, [Service] IMapper mapper,
+        public async Task<GraphQLCollection<ChangeHistoryItemGroup>> GetChangeHistory(
+            [Service] IChangeHistoryService service,
+            [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid targetId,
-            string propertyName = "")
+            string propertyName = "",
+            DateRangeFilter dateRangeFilter = null)
         {
-            var items = await service.GetChangeHistory(targetId, propertyName);
+            DateTime? dateFrom = null;
+            DateTime? dateTo = null;
+
+            if(dateRangeFilter != null)
+            {
+                (dateFrom, dateTo) = dateRangeFilter.ToRange();
+            }
+
+            var items = await service.GetChangeHistory(targetId, propertyName, dateFrom, dateTo);
             var graphQLItems = items.Select(item => mapper.Map<ChangeHistoryItem>(item))
                 .GroupBy(p => p.RequestId)
                 .Select(p => new ChangeHistoryItemGroup()

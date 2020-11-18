@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace AcceptanceTests.Features.UI.SmokeTest
+namespace AcceptanceTests.Features.UI.SmokeTests
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class MaterialMLTabUI_SmokeFeature : object, Xunit.IClassFixture<MaterialMLTabUI_SmokeFeature.FixtureData>, System.IDisposable
+    public partial class MapSectionUIFeature : object, Xunit.IClassFixture<MapSectionUIFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "MaterialMLTabUI.feature"
+#line 1 "MapSectionUI.feature"
 #line hidden
         
-        public MaterialMLTabUI_SmokeFeature(MaterialMLTabUI_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public MapSectionUIFeature(MapSectionUIFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "MaterialMLTabUI - Smoke", "\thttps://jira.infozahyst.com/browse/IIS-6190", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "MapSectionUI", "\thttps://jira.infozahyst.com/browse/IIS-6216", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -77,9 +77,9 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         public virtual void FeatureBackground()
         {
-#line 5
+#line 4
 #line hidden
-#line 6
+#line 5
  testRunner.Given("I want to sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -89,17 +89,17 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="ML tab contains ML output")]
-        [Xunit.TraitAttribute("FeatureTitle", "MaterialMLTabUI - Smoke")]
-        [Xunit.TraitAttribute("Description", "ML tab contains ML output")]
+        [Xunit.SkippableFactAttribute(DisplayName="Ensure that Objects tab is opened")]
+        [Xunit.TraitAttribute("FeatureTitle", "MapSectionUI")]
+        [Xunit.TraitAttribute("Description", "Ensure that Objects tab is opened")]
         [Xunit.TraitAttribute("Category", "smoke")]
-        public virtual void MLTabContainsMLOutput()
+        public virtual void EnsureThatObjectsTabIsOpened()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("ML tab contains ML output", null, tagsOfScenario, argumentsOfScenario);
-#line 9
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that Objects tab is opened", null, tagsOfScenario, argumentsOfScenario);
+#line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -119,20 +119,15 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 5
+#line 4
 this.FeatureBackground();
 #line hidden
+#line 9
+ testRunner.Given("I click div:nth-of-type(1) > li:nth-of-type(5) button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
 #line 10
- testRunner.Given("I click li:nth-of-type(8) > .sidebar__nav-item-title button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 11
- testRunner.And("I click tbody .el-table__row:nth-of-type(1) button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 12
- testRunner.And("I click ul[role=\'menubar\'] > li:nth-of-type(2) button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 13
- testRunner.Then("I must see the div:nth-of-type(1) > .meta-data-card > .meta-data-expand element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I must see the .measurement-widget > button[title=\'Інструмент вимірювання площі\']" +
+                        " element in 15 seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -145,12 +140,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                MaterialMLTabUI_SmokeFeature.FeatureSetup();
+                MapSectionUIFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                MaterialMLTabUI_SmokeFeature.FeatureTearDown();
+                MapSectionUIFeature.FeatureTearDown();
             }
         }
     }

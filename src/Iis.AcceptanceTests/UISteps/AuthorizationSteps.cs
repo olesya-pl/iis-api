@@ -7,13 +7,15 @@ using Xunit;
 namespace Iis.AcceptanceTests.UISteps
 {
     [Binding]
-    public class AuthorizationSteps : InitiateWebDriver
+    public class AuthorizationSteps
     {
+        private readonly ScenarioContext context;
         private readonly IWebDriver driver;
 
-        public AuthorizationSteps(ScenarioContext injectedContext) : base(injectedContext)
+        public AuthorizationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
-            driver = context.GetDriver();
+            context = injectedContext;
+            this.driver = driver;
         }
 
         [Given(@"I sign in with the user (.*) and password (.*) in the Contour")]

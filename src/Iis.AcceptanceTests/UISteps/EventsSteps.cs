@@ -13,16 +13,16 @@ namespace Iis.AcceptanceTests.UISteps
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
 
-        public EventsSteps(ScenarioContext injectedContext)
+        public EventsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             context = injectedContext;
-            driver = context.GetDriver();
+            this.driver = driver;
         }
 
         [When(@"I navigated to Events page")]
         public void IWantNavigateToEventsPage()
         {
-            var eventsPage = new EventsPageObjects(context);
+            var eventsPage = new EventsPageObjects(driver);
             eventsPage.EventsPage.Click();
 
             driver.WaitFor(10);
@@ -37,7 +37,7 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see first event in the events list")]
         public void ThenIMustSeeFirstEventInTheEventsList()
         {
-            var eventsPage = new EventsPageObjects(context);
+            var eventsPage = new EventsPageObjects(driver);
             Assert.True(eventsPage.FirstEventInTheEventsList.Displayed);
         }
     }

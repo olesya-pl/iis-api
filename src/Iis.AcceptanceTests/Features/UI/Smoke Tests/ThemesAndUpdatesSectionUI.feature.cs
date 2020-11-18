@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace AcceptanceTests.Features.UI.SmokeTest
+namespace AcceptanceTests.Features.UI.SmokeTests
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ObjectsSectionEmptySearchUIFeature : object, Xunit.IClassFixture<ObjectsSectionEmptySearchUIFeature.FixtureData>, System.IDisposable
+    public partial class ThemesAndUpdatesSectionUIFeature : object, Xunit.IClassFixture<ThemesAndUpdatesSectionUIFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ObjectsSectionEmptySearchUI.feature"
+#line 1 "ThemesAndUpdatesSectionUI.feature"
 #line hidden
         
-        public ObjectsSectionEmptySearchUIFeature(ObjectsSectionEmptySearchUIFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ThemesAndUpdatesSectionUIFeature(ThemesAndUpdatesSectionUIFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Test", "ObjectsSectionEmptySearchUI", "\thttps://jira.infozahyst.com/browse/IIS-6210", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "ThemesAndUpdatesSectionUI", "\thttps://jira.infozahyst.com/browse/IIS-6326", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -77,9 +77,9 @@ namespace AcceptanceTests.Features.UI.SmokeTest
         
         public virtual void FeatureBackground()
         {
-#line 5
+#line 4
 #line hidden
-#line 6
+#line 5
  testRunner.Given("I want to sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -89,17 +89,17 @@ namespace AcceptanceTests.Features.UI.SmokeTest
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Enter ! in the search field and get 0 results")]
-        [Xunit.TraitAttribute("FeatureTitle", "ObjectsSectionEmptySearchUI")]
-        [Xunit.TraitAttribute("Description", "Enter ! in the search field and get 0 results")]
+        [Xunit.SkippableFactAttribute(DisplayName="Themes And Updates section is opened")]
+        [Xunit.TraitAttribute("FeatureTitle", "ThemesAndUpdatesSectionUI")]
+        [Xunit.TraitAttribute("Description", "Themes And Updates section is opened")]
         [Xunit.TraitAttribute("Category", "smoke")]
-        public virtual void EnterInTheSearchFieldAndGet0Results()
+        public virtual void ThemesAndUpdatesSectionIsOpened()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Enter ! in the search field and get 0 results", null, tagsOfScenario, argumentsOfScenario);
-#line 9
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Themes And Updates section is opened", null, tagsOfScenario, argumentsOfScenario);
+#line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -119,18 +119,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 5
+#line 4
 this.FeatureBackground();
 #line hidden
+#line 9
+ testRunner.Given("I click li:nth-of-type(4) > .sidebar__nav-item-title button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
 #line 10
- testRunner.Given("I click .entity-search__toggle .el-button--default button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 11
- testRunner.When("I entered ! in the .entity-search__body .el-input__inner text field and press Ent" +
-                        "er key", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 12
- testRunner.Then("I must see the .infinity-table__no-results element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I must see the tbody > tr:nth-of-type(1) element in 15 seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -143,12 +139,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                ObjectsSectionEmptySearchUIFeature.FeatureSetup();
+                ThemesAndUpdatesSectionUIFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ObjectsSectionEmptySearchUIFeature.FeatureTearDown();
+                ThemesAndUpdatesSectionUIFeature.FeatureTearDown();
             }
         }
     }

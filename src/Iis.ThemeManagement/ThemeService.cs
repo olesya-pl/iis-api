@@ -44,7 +44,7 @@ namespace Iis.ThemeManagement
         public async Task<Guid> CreateThemeAsync(Theme theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
-            entity.QueryResults = entity.ReadQueryResults = await GetQueryResultsAsync(entity.TypeId, entity.Query);
+            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.TypeId, entity.Query)).Count;
 
             _context.Themes.Add(entity);
 
@@ -156,17 +156,43 @@ namespace Iis.ThemeManagement
 
             return _mapper.Map<IEnumerable<ThemeType>>(entities);
         }
-        public async Task UpdateQueryResultsAsync(CancellationToken ct)
+        public async Task UpdateQueryResultsAsync(CancellationToken ct, params Guid[] themeTypes)
         {
-            var themesByQuery = _context.Themes
-                .AsNoTracking()
+            var themesQuery = _context.Themes
+                .AsNoTracking();
+
+            if (themeTypes != null && themeTypes.Any())
+            {
+                themesQuery = themesQuery.Where(p => themeTypes.Contains(p.TypeId));
+            }
+
+            var themesByQuery = themesQuery
                 .ToList()
                 .GroupBy(x => new { x.Query, x.TypeId });
+
+            var tasks = new List<Task<QueryResult>>();
 
             foreach (var groupedTheme in themesByQuery)
             {
                 ct.ThrowIfCancellationRequested();
-                var newCount = await GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query);
+                tasks.Add(GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query));                
+            }
+
+            var results = await Task.WhenAll(tasks);
+
+            foreach (var result in results)
+            {
+                var groupedTheme = themesByQuery.FirstOrDefault(p => 
+                    string.Equals(p.Key.Query, result.Query, StringComparison.Ordinal) 
+                    && p.Key.TypeId == result.TypeId);
+
+                if (groupedTheme == null)
+                {
+                    continue;
+                }
+
+                var newCount = result.Count;
+
                 foreach (var theme in groupedTheme)
                 {
                     if (theme.QueryResults != newCount)
@@ -188,7 +214,7 @@ namespace Iis.ThemeManagement
                     .AsNoTracking();
         }
 
-        private Task<int> GetQueryResultsAsync(Guid typeId, string query)
+        private async Task<QueryResult> GetQueryResultsAsync(Guid typeId, string query)
         {
             var filter = new ElasticFilter
             {
@@ -205,24 +231,48 @@ namespace Iis.ThemeManagement
                 _ => (IEnumerable<string>)null
             };
 
-            if (indexes is null) return Task.FromResult(0);
+            if (indexes is null) return new QueryResult { 
+                Count = 0,
+                Query = query,
+                TypeId = typeId
+            };
 
             if (typeId == ThemeTypeEntity.EntityEventId)
             {
-                return _elasticService.CountByAllFieldsAsync(indexes, filter);
+                var count = await _elasticService.CountByAllFieldsAsync(indexes, filter);
+                return new QueryResult
+                {
+                    Count = count,
+                    Query = query,
+                    TypeId = typeId
+                };
             }
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
-                return _elasticService.CountMaterialsByConfiguredFieldsAsync(filter);
+                var count = await _elasticService.CountMaterialsByConfiguredFieldsAsync(filter);
+                return new QueryResult
+                {
+                    Count = count,
+                    Query = query,
+                    TypeId = typeId
+                };
             }
             else
             {
                 if (typeId == ThemeTypeEntity.EntityMapId)
                 {
-                    filter.Suggestion = filter.Suggestion.Contains(CoordinatesPrefix) ? filter.Suggestion : $"{CoordinatesPrefix} && {filter.Suggestion}";
+                    filter.Suggestion = filter.Suggestion.Contains(CoordinatesPrefix) 
+                        ? filter.Suggestion 
+                        : $"{CoordinatesPrefix} && {filter.Suggestion}";
                 }
 
-                return _elasticService.CountEntitiesByConfiguredFieldsAsync(indexes, filter);
+                var count = await _elasticService.CountEntitiesByConfiguredFieldsAsync(indexes, filter);
+                return new QueryResult
+                {
+                    Count = count,
+                    Query = query,
+                    TypeId = typeId
+                };
             }
         }
 
@@ -237,6 +287,13 @@ namespace Iis.ThemeManagement
                 .Select(e => e.Name)
                 .Distinct()
                 .ToArray();
+        }
+
+        private struct QueryResult
+        {
+            public int Count { get; set; }
+            public string Query { get; set; }
+            public Guid TypeId { get; set; }
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Iis.EventHandlers
     {
         public Task Handle(MaterialCreatedEvent notification, CancellationToken cancellationToken)
         {
-            ThemeCounterBackgroundService.SignalThemeUpdateNeeded();
+            ThemeCounterBackgroundService.SignalMaterialUpdateNeeded();
             return Task.CompletedTask;
         }
     }
