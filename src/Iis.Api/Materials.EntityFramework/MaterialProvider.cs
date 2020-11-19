@@ -45,7 +45,6 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly IOntologyNodesData _ontologyData;
-        private readonly IElasticService _elasticService;
         private readonly IMaterialElasticService _materialElasticService;
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
@@ -70,7 +69,6 @@ namespace IIS.Core.Materials.EntityFramework
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
             _ontologyData = ontologyData;
-            _elasticService = elasticService;
             _materialElasticService = materialElasticService;
             _mLResponseRepository = mLResponseRepository;
             _materialSignRepository = materialSignRepository;
@@ -90,7 +88,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             if (!string.IsNullOrWhiteSpace(filterQuery) && filterQuery != WildCart)
             {
-                var searchResult = await _elasticService.SearchMaterialsByConfiguredFieldsAsync(
+                var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(
                     new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery });
 
                 materials = searchResult.Items.Values
@@ -325,14 +323,14 @@ namespace IIS.Core.Materials.EntityFramework
 
             if(!isEligible) return (new List<Material>(), 0);
 
-            var filter = new ElasticFilter
+            var searchParams = new SearchParams
             {
-                Suggestion = materialId.ToString("N"),
+                Offset = offset,
                 Limit = limit,
-                Offset = offset
+                Suggestion = materialId.ToString("N")
             };
 
-            var searchResult = await _elasticService.SearchMoreLikeThisAsync(filter);
+            var searchResult = await _materialElasticService.SearchMoreLikeThisAsync(searchParams);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -354,7 +352,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 throw new Exception("Failed to vectorize image", e);
             }
-            var searchResult = await _elasticService.SearchByImageVector(imageVector, offset, pageSize, CancellationToken.None);
+            var searchResult = await _materialElasticService.SearchByImageVector(imageVector, offset, pageSize, CancellationToken.None);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
