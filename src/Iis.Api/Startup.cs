@@ -194,10 +194,6 @@ namespace IIS.Core
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
 
-            // material processors
-            services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.MetadataExtractor>();
-            services.AddTransient<IMaterialProcessor, Materials.EntityFramework.Workers.Odysseus.PersonForm5Processor>();
-
             services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
