@@ -73,9 +73,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 nodeRepositoryMock.Object,
                 materialRepositoryMock.Object,
                 new RunTimeSettings(),
-                new ElasticState(ontologySchemaMock.Object),
-                elasticResponseManagerFactory.Object
-                );
+                new ElasticState(ontologySchemaMock.Object));
             return sut;
         }
     }
