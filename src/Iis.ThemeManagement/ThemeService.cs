@@ -25,6 +25,7 @@ namespace Iis.ThemeManagement
         private readonly IMapper _mapper;
         private readonly IOntologyModel _ontology;
         private readonly IElasticService _elasticService;
+        private readonly IMaterialElasticService _materialElasticService;
         private readonly IElasticState _elasticState;
 
         public ThemeService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
@@ -32,12 +33,14 @@ namespace Iis.ThemeManagement
             IMapper mapper, 
             IOntologyModel ontology, 
             IElasticService elasticService, 
+            IMaterialElasticService materialElasticService,
             IElasticState elasticState) : base(unitOfWorkFactory)
         {
             _context = context;
             _mapper = mapper;
             _ontology = ontology;
             _elasticService = elasticService;
+            _materialElasticService = materialElasticService;
             _elasticState = elasticState;
         }
 
@@ -249,7 +252,7 @@ namespace Iis.ThemeManagement
             }
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
-                var count = await _elasticService.CountMaterialsByConfiguredFieldsAsync(filter);
+                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(filter);
                 return new QueryResult
                 {
                     Count = count,
