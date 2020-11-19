@@ -2,7 +2,7 @@
 
 @authorization
 Scenario: Success login
-	Given I want to authenticate with the user olya and password hammer69 in the Contour
+	Given I want to authenticate with the user olya and password 123 in the Contour
 	When I send login request to the Contour
 	Then The result should contain authorization token from the Countour
 
