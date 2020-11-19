@@ -42,8 +42,54 @@ namespace Iis.AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = "tbody > tr:nth-of-type(1)")]
         [CacheLookup]
+        public IWebElement ObjectOfStudySmallCardWindow;
 
-        public IWebElement ObjectOfStudySmallCard;
+        [FindsBy(How = How.CssSelector, Using = ".text-ellipsis span")]
+        [CacheLookup]
+        public IWebElement ObjectTitleInTheSmallCard;
 
+        [FindsBy(How = How.CssSelector, Using = "button[name='btn-full-screen']")]
+        [CacheLookup]
+        public IWebElement EnlargeObjectOfStudySmallCardButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-menu > [role='menuitem']:nth-of-type(1)")]
+        [CacheLookup]
+        public IWebElement BigCardProfileTab;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(2)")]
+        [CacheLookup]
+        public IWebElement BigCardMaterialsTab;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(3)")]
+        [CacheLookup]
+        public IWebElement BigCardEventsTab;
+
+        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(4)")]
+        [CacheLookup]
+        public IWebElement BigCardChangeHistoryTab;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(5)")]
+        [CacheLookup]
+        public IWebElement BigCardMapTab;
+
+        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(6)")]
+        [CacheLookup]
+        public IWebElement BigCardRelationsTab;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='affiliation'] div[name='view-item-relation']")]
+        [CacheLookup]
+        public IWebElement BigCardAffiliation;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='importance'] div[name='view-item-relation']")]
+        [CacheLookup]
+        public IWebElement BigCardImportance;
+
+        [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
+        [CacheLookup]
+        public IWebElement OOSSearchCounter;
+
+        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
+        [CacheLookup]
+        public IWebElement OOSEmptySearchResults;
     }
 }

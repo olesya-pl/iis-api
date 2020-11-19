@@ -2,6 +2,7 @@ Feature: MaterialsSectionUI - Smoke
 
     - IIS-6187 - Ensure that Materials section is opened
     - IIS-6205 - Ensure that search by using ! symbol gives 0 search results
+    - IIS-6204 - Ensure that search by using * symbol gives all possible search results
     - IIS-6188 - Ensure that the material card can be opened
     - IIS-6192 - Open events tab relation in the materials card
     - IIS-6189 - Open general tab in the materials card
@@ -21,9 +22,17 @@ Feature: MaterialsSectionUI - Smoke
     @smoke @UI @MaterialsSearchUI
     Scenario: IIS-6205 - Ensure that search by using ! symbol gives 0 search results
         When I navigated to Materials page
-        And I clicked Search button
+        And I clicked search button in the Materials section
         And I searched ! data in the materials
-        Then I must see zero results
+        Then I must see zero results in the Materials section
+
+    @smoke @UI @MaterialsSearchUI
+    Scenario: IIS-6204 - Ensure that search by using * symbol gives all possible search results
+        When I navigated to Materials page
+        And I clicked search button in the Materials section
+        And I got search counter value in the Materials section
+        And I searched * data in the materials
+        Then I must see that search counter values are equal in the Materials section
 
     @smoke @UI @MaterialsCardUI
     Scenario: IIS-6188 - Ensure that the material card can be opened

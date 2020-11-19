@@ -131,10 +131,10 @@ namespace AcceptanceTests.Features.UI.RegressionTests
     this.FeatureBackground();
 #line hidden
 #line 15
-        testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 16
-        testRunner.And("I searched Олександр OR Іванович data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched Олександр OR Іванович data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 17
         testRunner.Then("I must see object of study ОТРОЩЕНКО Олександр Іванович as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -181,10 +181,10 @@ namespace AcceptanceTests.Features.UI.RegressionTests
     this.FeatureBackground();
 #line hidden
 #line 21
-        testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 22
-        testRunner.And("I searched Олександр NOT Іванович data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched Олександр NOT Іванович data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 23
         testRunner.Then("I must not see object of study ОТРОЩЕНКО Олександр Іванович as first search resul" +
@@ -232,10 +232,10 @@ namespace AcceptanceTests.Features.UI.RegressionTests
     this.FeatureBackground();
 #line hidden
 #line 27
-        testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 28
-        testRunner.And("I searched Ткачук AND \"3 омсбр\" data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched Ткачук AND \"3 омсбр\" data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 29
         testRunner.Then("I must see object of study ТКАЧУК Руслан Юрійович as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -285,10 +285,10 @@ namespace AcceptanceTests.Features.UI.RegressionTests
     this.FeatureBackground();
 #line hidden
 #line 34
-        testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 35
-        testRunner.And("I searched в/ч 85683-А data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched в/ч 85683-А data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 36
         testRunner.Then("I must see object of study радіотехнічний батальойн в/ч 85683-А as first search r" +
