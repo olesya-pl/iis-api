@@ -231,3 +231,19 @@ deploy_dev3_nomad:
   tags:
     - nomad
   when: manual
+
+
+acceptance_test:
+  stage: test
+  script:
+    - dotnet test --test-adapter-path:. --logger:"junit;LogFilePath=../../{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose" src/Iis.AcceptanceTests/Iis.AcceptanceTests.csproj
+  artifacts:
+    when: always
+    paths:
+      - ./AcceptanceTests-test-result.xml
+    reports:
+      junit:
+        - ./AcceptanceTests-test-result.xml
+  allow_failure: true
+  tags:
+    - ci

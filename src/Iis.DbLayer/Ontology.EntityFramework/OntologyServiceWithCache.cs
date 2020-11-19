@@ -117,15 +117,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public List<Guid> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
+        public IReadOnlyCollection<Guid> GetNodeIdListByFeatureIdList(IEnumerable<Guid> featureIdList)
         {
-            var result = _data.Relations
+            return _data.Relations
                 .Where(r => featureIdList.Contains(r.TargetNodeId))
                 .Select(r => r.SourceNodeId)
                 .Distinct()
-                .ToList();
-
-            return result;
+                .ToArray();
         }
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
