@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ObjectsTab_SmokeFeature : object, Xunit.IClassFixture<ObjectsTab_SmokeFeature.FixtureData>, System.IDisposable
+    public partial class ObjectsOfStudySearch_SmokeFeature : object, Xunit.IClassFixture<ObjectsOfStudySearch_SmokeFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ObjectsSectionUI.feature"
+#line 1 "ObjectsOfStudySection.feature"
 #line hidden
         
-        public ObjectsTab_SmokeFeature(ObjectsTab_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ObjectsOfStudySearch_SmokeFeature(ObjectsOfStudySearch_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "Objects tab - Smoke", "\thttps://jira.infozahyst.com/browse/IIS-6206", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "ObjectsOfStudySearch - smoke", "    - IIS-6207 - Open a small object of study card", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -78,9 +78,9 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         public virtual void FeatureBackground()
         {
 #line 5
-#line hidden
+    #line hidden
 #line 6
- testRunner.Given("I want to sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+        testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
         
@@ -89,18 +89,22 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Ensure that Objects tab is opened")]
-        [Xunit.TraitAttribute("FeatureTitle", "Objects tab - Smoke")]
-        [Xunit.TraitAttribute("Description", "Ensure that Objects tab is opened")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6207 - Open a small object of study card")]
+        [Xunit.TraitAttribute("FeatureTitle", "ObjectsOfStudySearch - smoke")]
+        [Xunit.TraitAttribute("Description", "IIS-6207 - Open a small object of study card")]
         [Xunit.TraitAttribute("Category", "smoke")]
-        public virtual void EnsureThatObjectsTabIsOpened()
+        [Xunit.TraitAttribute("Category", "UI")]
+        [Xunit.TraitAttribute("Category", "ObjectOfStudySmallCardUI")]
+        public virtual void IIS_6207_OpenASmallObjectOfStudyCard()
         {
             string[] tagsOfScenario = new string[] {
-                    "smoke"};
+                    "smoke",
+                    "UI",
+                    "ObjectOfStudySmallCardUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that Objects tab is opened", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6207 - Open a small object of study card", null, tagsOfScenario, argumentsOfScenario);
 #line 9
-this.ScenarioInitialize(scenarioInfo);
+    this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -120,10 +124,13 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 5
-this.FeatureBackground();
+    this.FeatureBackground();
 #line hidden
 #line 10
- testRunner.Then("I must see the tbody > tr:nth-of-type(1) element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.When("I clicked on first object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 11
+        testRunner.Then("I must see the object of study small card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -136,12 +143,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                ObjectsTab_SmokeFeature.FeatureSetup();
+                ObjectsOfStudySearch_SmokeFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ObjectsTab_SmokeFeature.FeatureTearDown();
+                ObjectsOfStudySearch_SmokeFeature.FeatureTearDown();
             }
         }
     }

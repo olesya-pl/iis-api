@@ -1,10 +1,11 @@
-﻿Feature: MapSectionUI
-	https://jira.infozahyst.com/browse/IIS-6216
+﻿Feature: MapSection - smoke
 
-Background: 
-	Given I want to sign in with the user olya and password 123 in the Contour
+	- IIS-6216 - Map section can be opened
 
-@smoke
-Scenario: Ensure that Objects tab is opened
-	Given I click div:nth-of-type(1) > li:nth-of-type(5) button
-	Then I must see the .measurement-widget > button[title='Інструмент вимірювання площі'] element in 15 seconds
+	Background:
+		Given I sign in with the user olya and password 123 in the Contour
+
+	@smoke @UI @MapSectionUI
+	Scenario: IIS-6140 - Map section can be opened
+		When I navigated to Map page
+		Then I must see Map block

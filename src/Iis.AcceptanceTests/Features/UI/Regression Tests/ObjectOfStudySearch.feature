@@ -4,6 +4,7 @@ Feature: ObjectsOfStudySearch - functional
     - IIS-6139 - Search by two criteria by using NOT operator
     - IIS-6138 - Search by two criteria by using AND operator
     - IIS-6082 - Search object of study by full name
+    - IIS-6207 - Open a small object of study card
 
     Background:
         Given I sign in with the user olya and password 123 in the Contour
@@ -33,3 +34,8 @@ Feature: ObjectsOfStudySearch - functional
         When I clicked on search button
         And I searched в/ч 85683-А data in the objects section
         Then I must see object of study радіотехнічний батальойн в/ч 85683-А as first search result
+
+    @smoke @UI @ObjectOfStudySmallCardUI
+    Scenario: IIS-6207 - Open a small object of study card
+        When I clicked on first object of study
+        Then I must see the object of study small card

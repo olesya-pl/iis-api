@@ -7,18 +7,14 @@ namespace Iis.AcceptanceTests.PageObjects
 {
     public class ObjectsOfStudyPageObjects
     {
-        private readonly ScenarioContext context;
+        public IWebDriver driver;
 
-        private readonly IWebDriver driver;
-
-        public ObjectsOfStudyPageObjects(ScenarioContext injectedContext)
+        public ObjectsOfStudyPageObjects(IWebDriver driver)
         {
-            context = injectedContext;
-
-            driver = context.GetDriver();
-
+            this.driver = driver;
             PageFactory.InitElements(driver, this);
         }
+
 
         [FindsBy(How = How.CssSelector, Using = ".el-button.el-button--default.el-tooltip")]
         [CacheLookup]
@@ -28,7 +24,7 @@ namespace Iis.AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-table__row:nth-of-type(1) .el-table_2_column_6 .title")]
+        [FindsBy(How = How.CssSelector, Using = ".el-table__row:nth-of-type(1) .text-ellipsis.title")]
         [CacheLookup]
         public IWebElement TitleOfTheFirstObject;
 
@@ -39,6 +35,15 @@ namespace Iis.AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
         [CacheLookup]
         public IWebElement SearchCounterInOOSSearchField;
+
+        [FindsBy(How = How.CssSelector, Using = "tbody > tr:nth-of-type(1)")]
+        [CacheLookup]
+        public IWebElement FirstElementInTheOOSList;
+
+        [FindsBy(How = How.CssSelector, Using = "tbody > tr:nth-of-type(1)")]
+        [CacheLookup]
+
+        public IWebElement ObjectOfStudySmallCard;
 
     }
 }

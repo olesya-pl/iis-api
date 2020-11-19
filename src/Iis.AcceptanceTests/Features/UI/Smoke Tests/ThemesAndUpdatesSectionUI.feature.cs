@@ -19,7 +19,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ThemesAndUpdatesSectionUIFeature : object, Xunit.IClassFixture<ThemesAndUpdatesSectionUIFeature.FixtureData>, System.IDisposable
+    public partial class ThemesAndUpdate_SmokeFeature : object, Xunit.IClassFixture<ThemesAndUpdate_SmokeFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -31,7 +31,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 1 "ThemesAndUpdatesSectionUI.feature"
 #line hidden
         
-        public ThemesAndUpdatesSectionUIFeature(ThemesAndUpdatesSectionUIFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ThemesAndUpdate_SmokeFeature(ThemesAndUpdate_SmokeFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "ThemesAndUpdatesSectionUI", "\thttps://jira.infozahyst.com/browse/IIS-6326", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "ThemesAndUpdate - smoke", "\t- IIS-6326 - Themes and updates section can be opened", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -77,10 +77,10 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         
         public virtual void FeatureBackground()
         {
-#line 4
-#line hidden
 #line 5
- testRunner.Given("I want to sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ #line hidden
+#line 6
+  testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
         
@@ -89,18 +89,22 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Themes And Updates section is opened")]
-        [Xunit.TraitAttribute("FeatureTitle", "ThemesAndUpdatesSectionUI")]
-        [Xunit.TraitAttribute("Description", "Themes And Updates section is opened")]
+        [Xunit.SkippableFactAttribute(DisplayName="IS-6326 - Themes and updates section can be opened")]
+        [Xunit.TraitAttribute("FeatureTitle", "ThemesAndUpdate - smoke")]
+        [Xunit.TraitAttribute("Description", "IS-6326 - Themes and updates section can be opened")]
         [Xunit.TraitAttribute("Category", "smoke")]
-        public virtual void ThemesAndUpdatesSectionIsOpened()
+        [Xunit.TraitAttribute("Category", "UI")]
+        [Xunit.TraitAttribute("Category", "ThemesAndUpdatesSectionUI")]
+        public virtual void IS_6326_ThemesAndUpdatesSectionCanBeOpened()
         {
             string[] tagsOfScenario = new string[] {
-                    "smoke"};
+                    "smoke",
+                    "UI",
+                    "ThemesAndUpdatesSectionUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Themes And Updates section is opened", null, tagsOfScenario, argumentsOfScenario);
-#line 8
-this.ScenarioInitialize(scenarioInfo);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IS-6326 - Themes and updates section can be opened", null, tagsOfScenario, argumentsOfScenario);
+#line 9
+ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -119,14 +123,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 4
-this.FeatureBackground();
-#line hidden
-#line 9
- testRunner.Given("I click li:nth-of-type(4) > .sidebar__nav-item-title button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 5
+ this.FeatureBackground();
 #line hidden
 #line 10
- testRunner.Then("I must see the tbody > tr:nth-of-type(1) element in 15 seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+  testRunner.When("I navigated to Themes and updates section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 11
+  testRunner.Then("I must see first theme in the Themes list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -139,12 +143,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                ThemesAndUpdatesSectionUIFeature.FeatureSetup();
+                ThemesAndUpdate_SmokeFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ThemesAndUpdatesSectionUIFeature.FeatureTearDown();
+                ThemesAndUpdate_SmokeFeature.FeatureTearDown();
             }
         }
     }

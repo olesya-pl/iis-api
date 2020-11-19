@@ -28,7 +28,7 @@ namespace AcceptanceTests.Features.UI.RegressionTests
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ObjectOfStudySearchOROperatorUI.feature"
+#line 1 "ObjectOfStudySearch.feature"
 #line hidden
         
         public ObjectsOfStudySearch_FunctionalFeature(ObjectsOfStudySearch_FunctionalFeature.FixtureData fixtureData, AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
@@ -40,9 +40,11 @@ namespace AcceptanceTests.Features.UI.RegressionTests
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Regression Tests", "ObjectsOfStudySearch - functional", "    - IIS-6140 - Search by two criteria by using OR operator\n    - IIS-6139 - Sea" +
-                    "rch by two criteria by using NOT operator\n    - IIS-6138 - Search by two criteri" +
-                    "a by using AND operator\n    - IIS-6082 - Search object of study by full name", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Regression Tests", "ObjectsOfStudySearch - functional", @"    - IIS-6140 - Search by two criteria by using OR operator
+    - IIS-6139 - Search by two criteria by using NOT operator
+    - IIS-6138 - Search by two criteria by using AND operator
+    - IIS-6082 - Search object of study by full name
+    - IIS-6207 - Open a small object of study card", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -79,9 +81,9 @@ namespace AcceptanceTests.Features.UI.RegressionTests
         
         public virtual void FeatureBackground()
         {
-#line 8
-    #line hidden
 #line 9
+    #line hidden
+#line 10
         testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -105,7 +107,7 @@ namespace AcceptanceTests.Features.UI.RegressionTests
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6140 - Search by two criteria by using OR operator", null, tagsOfScenario, argumentsOfScenario);
-#line 13
+#line 14
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -125,16 +127,16 @@ namespace AcceptanceTests.Features.UI.RegressionTests
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 9
     this.FeatureBackground();
 #line hidden
-#line 14
+#line 15
         testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 16
         testRunner.And("I searched Олександр OR Іванович data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 17
         testRunner.Then("I must see object of study ОТРОЩЕНКО Олександр Іванович as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -155,7 +157,7 @@ namespace AcceptanceTests.Features.UI.RegressionTests
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6139 - Search by two criteria by using NOT operator", null, tagsOfScenario, argumentsOfScenario);
-#line 19
+#line 20
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -175,16 +177,16 @@ namespace AcceptanceTests.Features.UI.RegressionTests
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 9
     this.FeatureBackground();
 #line hidden
-#line 20
+#line 21
         testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 21
+#line 22
         testRunner.And("I searched Олександр NOT Іванович data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
+#line 23
         testRunner.Then("I must not see object of study ОТРОЩЕНКО Олександр Іванович as first search resul" +
                         "t", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -206,7 +208,7 @@ namespace AcceptanceTests.Features.UI.RegressionTests
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6138 - Search by two criteria by using AND operator", null, tagsOfScenario, argumentsOfScenario);
-#line 25
+#line 26
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -226,19 +228,19 @@ namespace AcceptanceTests.Features.UI.RegressionTests
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 9
     this.FeatureBackground();
 #line hidden
-#line 26
+#line 27
         testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 27
+#line 28
         testRunner.And("I searched Ткачук AND \"3 омсбр\" data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 28
+#line 29
         testRunner.Then("I must see object of study ТКАЧУК Руслан Юрійович as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 29
+#line 30
         testRunner.Then("I must see search results counter value that equal to 1 value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -259,7 +261,7 @@ namespace AcceptanceTests.Features.UI.RegressionTests
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6082 - Search object of study by full name", null, tagsOfScenario, argumentsOfScenario);
-#line 32
+#line 33
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -279,18 +281,65 @@ namespace AcceptanceTests.Features.UI.RegressionTests
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 9
     this.FeatureBackground();
 #line hidden
-#line 33
+#line 34
         testRunner.When("I clicked on search button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 34
+#line 35
         testRunner.And("I searched в/ч 85683-А data in the objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 35
+#line 36
         testRunner.Then("I must see object of study радіотехнічний батальойн в/ч 85683-А as first search r" +
                         "esult", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6207 - Open a small object of study card")]
+        [Xunit.TraitAttribute("FeatureTitle", "ObjectsOfStudySearch - functional")]
+        [Xunit.TraitAttribute("Description", "IIS-6207 - Open a small object of study card")]
+        [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "UI")]
+        [Xunit.TraitAttribute("Category", "ObjectOfStudySmallCardUI")]
+        public virtual void IIS_6207_OpenASmallObjectOfStudyCard()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "smoke",
+                    "UI",
+                    "ObjectOfStudySmallCardUI"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6207 - Open a small object of study card", null, tagsOfScenario, argumentsOfScenario);
+#line 39
+    this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 9
+    this.FeatureBackground();
+#line hidden
+#line 40
+        testRunner.When("I clicked on first object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 41
+        testRunner.Then("I must see the object of study small card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
