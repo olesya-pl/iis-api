@@ -24,7 +24,7 @@ namespace Iis.Domain
         IReadOnlyCollection<Entity> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Node GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         IReadOnlyList<IAttributeBase> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);
-        List<Guid> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList);
+        IReadOnlyCollection<Guid> GetNodeIdListByFeatureIdList(IEnumerable<Guid> featureIdList);
         string GetAttributeValueByDotName(Guid id, string dotName);
         Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds);
     }
