@@ -93,11 +93,9 @@ namespace IIS.Core.Materials.EntityFramework
                 var searchResult = await _elasticService.SearchMaterialsByConfiguredFieldsAsync(
                     new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery });
 
-                var materialTasks = searchResult.Items.Values
+                materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                    .Select(p => MapMaterialDocumentAsync(p));
-
-                materials = await Task.WhenAll(materialTasks);
+                    .Select(MapMaterialDocument);
 
                 return (materials, searchResult.Count, searchResult.Items);
             }
@@ -123,19 +121,29 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, materialResult.TotalCount, new Dictionary<Guid, SearchResultItem>());
         }
 
-        private async Task<Material> MapMaterialDocumentAsync(MaterialDocument p)
+        private Material MapMaterialDocument(MaterialDocument document)
         {
-            var res = _mapper.Map<Material>(p);
+            var material = _mapper.Map<Material>(document);
 
-            res.Children = p.Children.Select(c => _mapper.Map<Material>(c)).ToList();
+            material.Children = document.Children
+                                            .Select(_mapper.Map<Material>)
+                                            .ToList();
 
-            var nodes = p.NodeIds.Select(x => _ontologyService.LoadNodes(x));
+            var nodes = document.NodeIds
+                                    .Select(_ontologyService.LoadNodes)
+                                    .ToArray();
 
-            res.Events = nodes.Where(x => IsEvent(x)).Select(x => _nodeToJObjectMapper.EventToJObject(x));
-            res.Features = nodes.Where(x => IsObjectSign(x)).Select(x => _nodeToJObjectMapper.NodeToJObject(x));
-            res.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes.ToList());
+            material.Events = nodes
+                                .Where(IsEvent)
+                                .Select(_nodeToJObjectMapper.EventToJObject);
 
-            return res;
+            material.Features = nodes
+                                .Where(IsObjectSign)
+                                .Select(_nodeToJObjectMapper.NodeToJObject);
+
+            material.ObjectsOfStudy = GetObjectOfStudyListForMaterial(nodes);
+
+            return material;
         }
 
         public async Task<Material> GetMaterialAsync(Guid id)
@@ -190,16 +198,14 @@ namespace IIS.Core.Materials.EntityFramework
                                 .ToList();
 
             result.Events = nodes
-                .Where(x => IsEvent(x))
-                .Select(x => _nodeToJObjectMapper.EventToJObject(x))
-                .ToList();
+                                .Where(IsEvent)
+                                .Select(_nodeToJObjectMapper.EventToJObject);
 
             result.Features = nodes
-                .Where(x => IsObjectSign(x))
-                .Select(x => _nodeToJObjectMapper.NodeToJObject(x))
-                .ToList();
+                                .Where(IsObjectSign)
+                                .Select(_nodeToJObjectMapper.NodeToJObject);
 
-            result.ObjectsOfStudy = await GetObjectOfStudyListForMaterial(nodes);
+            result.ObjectsOfStudy = GetObjectOfStudyListForMaterial(nodes);
 
             return result;
         }
@@ -328,11 +334,9 @@ namespace IIS.Core.Materials.EntityFramework
 
             var searchResult = await _elasticService.SearchMoreLikeThisAsync(filter);
 
-            var materialTasks = searchResult.Items.Values
+            var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                    .Select(p => MapMaterialDocumentAsync(p));
-
-            var materials = await Task.WhenAll(materialTasks);
+                    .Select(MapMaterialDocument);
 
             return (materials, searchResult.Count);
         }
@@ -352,11 +356,9 @@ namespace IIS.Core.Materials.EntityFramework
             }
             var searchResult = await _elasticService.SearchByImageVector(imageVector, offset, pageSize, CancellationToken.None);
 
-            var materialTasks = searchResult.Items.Values
+            var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                    .Select(p => MapMaterialDocumentAsync(p));
-
-            var materials = await Task.WhenAll(materialTasks);
+                    .Select(MapMaterialDocument);
 
             return (materials, searchResult.Count);
         }
@@ -402,11 +404,9 @@ namespace IIS.Core.Materials.EntityFramework
 
             var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList);
 
-            var materialTasks = searchResult.Items.Values
+            var materials = searchResult.Items.Values
                 .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                .Select(p => MapMaterialDocumentAsync(p));
-
-            var materials = await Task.WhenAll(materialTasks);
+                .Select(MapMaterialDocument);
 
             return (materials, searchResult.Count);
         }
@@ -485,7 +485,7 @@ namespace IIS.Core.Materials.EntityFramework
             return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList));
         }
 
-        private async Task<JObject> GetObjectOfStudyListForMaterial(List<Node> nodeList)
+        private JObject GetObjectOfStudyListForMaterial(IEnumerable<Node> nodeList)
         {
             var result = new JObject();
 
@@ -494,16 +494,16 @@ namespace IIS.Core.Materials.EntityFramework
             var directIdList = nodeList
                                 .Where(x => IsObjectOfStudy(x))
                                 .Select(x => x.Id)
-                                .ToList();
+                                .ToArray();
 
             var featureIdList = nodeList
                                     .Where(x => IsObjectSign(x))
                                     .Select(x => x.Id)
-                                    .ToList();
+                                    .ToArray();
 
-            var featureList = _ontologyService.GetNodeIdListByFeatureIdListAsync(featureIdList);
+            var featureList = _ontologyService.GetNodeIdListByFeatureIdList(featureIdList);
 
-            featureList = featureList.Except(directIdList).ToList();
+            featureList = featureList.Except(directIdList).ToArray();
 
             result.Add(featureList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Feature)));
             result.Add(directIdList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Direct)));
