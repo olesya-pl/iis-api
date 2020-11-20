@@ -215,21 +215,42 @@ push docker(tag):
   tags:
     - docker
 
-deploy_dev3_nomad:
+.deploy_nomad:
   variables:
     GIT_STRATEGY: none
+    DEFAULT_IMAGE: latest
   stage: deploy_nomad
   script:
-    - mkdir deploy_$CI_COMMIT_SHORT_SHA
+    - mkdir deploy_$CI_COMMIT_SHORT_SHA || if [ $? -eq 1 ]; then rm -rf deploy_$CI_COMMIT_SHORT_SHA && mkdir deploy_$CI_COMMIT_SHORT_SHA; fi
     - cd deploy_$CI_COMMIT_SHORT_SHA
     - git init .
     - git remote add origin $NOMAD_REPO
     - git pull origin master
-    - sed -i s/$DOCKER_IMAGE_NAME:latest/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA/g iis-dev/dev3/$NOMAD_JOB
-    - nomad plan iis-dev/dev3/$NOMAD_JOB || if [ $? -eq 255 ]; then exit 255; else echo "success"; fi
-    - nomad run iis-dev/dev3/$NOMAD_JOB
+    - sed -i s/$DOCKER_IMAGE_NAME:$DEFAULT_IMAGE/$DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA/g iis-dev/$NOMAD_ENV/$NOMAD_JOB
+    - nomad plan iis-dev/$NOMAD_ENV/$NOMAD_JOB || if [ $? -eq 255 ]; then exit 255; else echo "success"; fi
+    - nomad run iis-dev/$NOMAD_ENV/$NOMAD_JOB
   tags:
     - nomad
+
+deploy_dev_nomad_auto:
+  extends: .deploy_nomad
+  variables:
+    NOMAD_ENV: dev
+  only:
+    - /^Release_*/
+    - master
+    - develop
+
+deploy_dev_nomad_manual:
+  extends: .deploy_nomad
+  variables:
+    NOMAD_ENV: dev
+  when: manual
+
+deploy_dev3_nomad_manual:
+  extends: .deploy_nomad
+  variables:
+    NOMAD_ENV: dev3
   when: manual
 
 
