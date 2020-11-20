@@ -6,12 +6,12 @@ using HotChocolate.Resolvers;
 using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json;
 using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
