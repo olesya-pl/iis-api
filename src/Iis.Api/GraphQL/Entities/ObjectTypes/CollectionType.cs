@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 {
                     var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter,IEnumerable<Guid>>>();
                     var service = ctx.Service<IOntologyService>();
-                    
+
                     if(matchList != null && matchList.Any())
                     {
                         var result = service.GetNodesByIds(matchList);
@@ -39,13 +39,13 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 {
                     var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>>();
                     var service = ctx.Service<IOntologyService>();
-                    
+
                     if(matchList != null && matchList.Any())
                     {
                         var result = service.GetNodesByIds(matchList);
                         return result.nodes.Cast<Entity>();
                     }
-                    
+
                     var nodes = await service.GetNodesAsync(types, filter);
                     return nodes.Cast<Entity>();
                 });

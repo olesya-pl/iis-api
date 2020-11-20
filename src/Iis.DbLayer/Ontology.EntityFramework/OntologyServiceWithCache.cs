@@ -135,8 +135,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
-                var nodes = _data.GetNodes(searchResult.ids);
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
+                var nodes = _data.GetNodes(searchResult.Items.Select(e => e.Key));
                 return nodes.Select(n => MapNode(n));
             }
             else
@@ -172,8 +172,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                return searchResult.count;
+                return await _elasticService.CountByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
             }
             else
             {

@@ -6,7 +6,6 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -43,20 +42,6 @@ namespace IIS.Core.Ontology.EntityFramework
             _elasticState = elasticState;
         }
 
-        public async Task<(List<Guid> ids, int count)> SearchByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default)
-        {
-            var searchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = typeNames.ToList(),
-                Query = $"*{filter.Suggestion}*",
-                From = filter.Offset,
-                Size = filter.Limit
-            };
-
-            var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
-            return (searchResult.Items.Select(p => new Guid(p.Identifier)).ToList(), searchResult.Count);
-        }
-
         public Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default)
         {
             var searchParams = new IisElasticSearchParams
@@ -70,10 +55,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default)
         {
-            var searchFields = new List<IisElasticField>();
             var ontologyFields
                 = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p)));
-            var materialFields = _elasticConfiguration.GetMaterialsIncludedFields(typeNames.Where(p => _elasticState.MaterialIndexes.Contains(p)));
 
             var searchParams = new IisElasticSearchParams
             {
@@ -81,7 +64,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Query = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}",
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchFields = ontologyFields.Union(materialFields).ToList()
+                SearchFields = ontologyFields
             };
             var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
             return new SearchResult
@@ -91,6 +74,22 @@ namespace IIS.Core.Ontology.EntityFramework
                     .ToDictionary(k => new Guid(k.Identifier),
                     v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
+        }
+
+        public Task<int> CountByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default)
+        {
+            var ontologyFields
+                = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p)));
+
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = typeNames.ToList(),
+                Query = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}",
+                From = filter.Offset,
+                Size = filter.Limit,
+                SearchFields = ontologyFields
+            };
+            return _elasticManager.CountAsync(searchParams, ct);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(
