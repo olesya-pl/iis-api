@@ -8,6 +8,9 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 using Iis.Utility;
 using MoreLinq;
 using Newtonsoft.Json.Linq;
@@ -78,7 +81,10 @@ namespace Iis.DbLayer.Repositories
             var actualNode = _nodeFlattener.FlattenNode(id, ct);
             var getNodeChanges = requestId.HasValue ?
                 _changeHistoryService.GetChangeHistoryByRequest(requestId.Value) :
-                _changeHistoryService.GetChangeHistory(id, null);
+                _changeHistoryService.GetChangeHistory(new ChangeHistoryParams 
+                {
+                    TargetId = id
+                });
 
             var nodeChanges = await getNodeChanges;
 
@@ -146,7 +152,7 @@ namespace Iis.DbLayer.Repositories
             return responses;
         }
 
-        private List<FlattenNodeResult> GetHistoricalNodes(FlattenNodeResult node, IEnumerable<IChangeHistoryItem> changes)
+        private List<FlattenNodeResult> GetHistoricalNodes(FlattenNodeResult node, IEnumerable<ChangeHistoryDto> changes)
         {
             var changesByRequestId = changes
                     .Where(x => x.TargetId.ToString("N") == node.Id && !PropertiesToIgnore.Contains(x.PropertyName))

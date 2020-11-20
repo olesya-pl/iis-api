@@ -30,6 +30,7 @@ using Contracts = Iis.Services.Contracts;
 using Iis.DataModel.Reports;
 using Iis.Events.Reports;
 using Iis.Api.GraphQL.Aliases;
+using Iis.DataModel.ChangeHistory;
 
 namespace Iis.Api
 {
@@ -226,9 +227,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
-
-            CreateMap<IChangeHistoryItem, Iis.DataModel.ChangeHistory.ChangeHistoryEntity>();
-            CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
+            
 
             //mapping: GraphQl.UserInput -> Roles.User
             CreateMap<BaseUserInput, Services.Contracts.User>()
@@ -346,6 +345,9 @@ namespace Iis.Api
             CreateMap<AliasDto, Alias>();
 
             #endregion
+
+            CreateMap<ChangeHistoryEntity, ChangeHistoryDto>();
+            CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
 
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
             CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();

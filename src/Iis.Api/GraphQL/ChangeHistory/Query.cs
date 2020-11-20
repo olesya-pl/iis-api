@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
-using Iis.Interfaces.Ontology;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 using IIS.Core.GraphQL.Common;
 using System;
 using System.Linq;
@@ -26,7 +27,14 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 (dateFrom, dateTo) = dateRangeFilter.ToRange();
             }
 
-            var items = await service.GetChangeHistory(targetId, propertyName, dateFrom, dateTo);
+            var items = await service.GetChangeHistory(new ChangeHistoryParams 
+            {
+                DateFrom = dateFrom,
+                DateTo = dateTo,
+                PropertyName = propertyName,
+                TargetId = targetId,
+                ApplyAliases = true
+            });
             var graphQLItems = items.Select(item => mapper.Map<ChangeHistoryItem>(item))
                 .GroupBy(p => p.RequestId)
                 .Select(p => new ChangeHistoryItemGroup()
