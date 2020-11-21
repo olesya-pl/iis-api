@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         }
         protected IMapper _mapper;
         protected IEmbeddingRelationTypeModel Source { get; }
-        protected IRelationMetaBase MetaObject { get; }
+        protected IMeta MetaObject { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -172,7 +172,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             else if (!types.Any(t => t.Id == Source.EntityType.Id))
                 types = types.Union(new[] {Source.EntityType });
 
-            var metaTargetTypes = (Source.Meta as IEntityRelationMeta)?.TargetTypes;
+            var metaTargetTypes = Source.Meta?.TargetTypes;
             if (metaTargetTypes != null && metaTargetTypes.Length > 0)
             {
                 types = types.Where(t => metaTargetTypes.Contains(t.Name));

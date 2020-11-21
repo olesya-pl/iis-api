@@ -19,7 +19,7 @@ namespace Iis.Interfaces.Meta
         IValidation Validation { get; }
         EntityOperation[] AcceptsEntityOperations { get; set; }
         string Type { get; set; }
-        IInversedRelationMeta Inversed { get; }
+        IMeta Inversed { get; }
         string[] TargetTypes { get; set; }
         string Code { get; set; }
         bool Editable { get; set; }

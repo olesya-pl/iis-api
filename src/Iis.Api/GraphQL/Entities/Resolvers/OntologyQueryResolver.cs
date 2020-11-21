@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
-            var formula = (relationType.Meta as IAttributeRelationMeta)?.Formula;
+            var formula = relationType.Meta?.Formula;
             if (formula != null)
             {
                 return parent.OriginalNode.ResolveFormula(formula);

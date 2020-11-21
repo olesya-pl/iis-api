@@ -3,10 +3,6 @@ using System;
 
 namespace Iis.Domain.Meta
 {
-    public class EntityMeta: MetaBase
-    {
-    }
-
     public class ContainerMeta: IContainerMeta
     {
         public Guid Id { get; set; }

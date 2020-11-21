@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Iis.Domain.Meta
 {
-    public class MetaBase: IEntityMeta, IAttributeMeta, IAttributeRelationMeta, IEntityRelationMeta, IInversedRelationMeta
+    public class MetaBase: IMeta
     {
         public string Title { get; set; }
         public int? SortOrder { get; set; }
@@ -29,6 +29,6 @@ namespace Iis.Domain.Meta
         IFormField IMeta.FormField => FormField;
         IContainerMeta IMeta.Container => Container;
         IValidation IMeta.Validation => Validation;
-        IInversedRelationMeta IMeta.Inversed => Inversed;
+        IMeta IMeta.Inversed => Inversed;
     }
 }

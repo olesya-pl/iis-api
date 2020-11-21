@@ -67,9 +67,9 @@ namespace IIS.Core.GraphQL
         public static EntityOperation[] GetOperations(this IEmbeddingRelationTypeModel relationType)
         {
             if (relationType.IsAttributeType) throw new ArgumentException("Can not check attribute relations for EntityOperations");
-            return ((IEntityRelationMeta) relationType.Meta)?.AcceptsEntityOperations // check relation meta
-                   ?? ((IEntityMeta) relationType.TargetType.Meta)?.AcceptsEmbeddedOperations // check target meta
-                   ?? relationType.TargetType.AllParents.Reverse().Select(t => t.Meta as IEntityMeta) // check target parents meta
+            return relationType.Meta.AcceptsEntityOperations // check relation meta
+                   ?? relationType.TargetType.Meta.AcceptsEmbeddedOperations // check target meta
+                   ?? relationType.TargetType.AllParents.Reverse().Select(t => t.Meta) // check target parents meta
                        .FirstOrDefault()?.AcceptsEmbeddedOperations;
         }
 

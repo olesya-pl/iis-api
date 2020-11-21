@@ -8,7 +8,7 @@ namespace Iis.Domain
     public interface IEmbeddingRelationTypeModel: IRelationTypeModel
     {
         IEmbeddingRelationTypeModel DirectRelationType { get; }
-        IRelationMetaBase EmbeddingMeta { get; }
+        IMeta EmbeddingMeta { get; }
         EmbeddingOptions EmbeddingOptions { get; }
         IEntityTypeModel EntityType { get; }
         IAttributeTypeModel AttributeType { get; }

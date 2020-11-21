@@ -2,7 +2,7 @@
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public interface ISchemaMeta: IRelationMetaBase, IEntityMeta, IEntityRelationMeta, IAttributeRelationMeta
+    public interface ISchemaMeta: IMeta
     {
         bool? ExposeOnApi { get; set; }
         bool? HasFewEntities { get; set; }
@@ -18,6 +18,6 @@ namespace Iis.OntologySchema.DataTypes
         IContainerMeta Container { get; set; }
         bool Multiple { get; set; }
         IValidation Validation { get; set; }
-        IInversedRelationMeta Inversed { get; set; }
+        IMeta Inversed { get; set; }
     }
 }
