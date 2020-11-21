@@ -4,41 +4,22 @@ using System;
 namespace Iis.Domain.Meta
 {
 
-    public class RelationMetaBase: IRelationMetaBase, IMeta
+    public class RelationMetaBase: MetaBase
     {
-        public int? SortOrder { get; set; }
-        public string Title { get; set; }
-        public FormField FormField { get; set; }
-        public ContainerMeta Container { get; set; }
-        public bool Multiple { get; set; }
-        public Validation Validation { get; set; }
-        IFormField IRelationMetaBase.FormField => FormField;
-        IContainerMeta IRelationMetaBase.Container => Container;
-        IValidation IRelationMetaBase.Validation => Validation;
     }
 
     // Entity to entity relation
-    public class EntityRelationMeta : RelationMetaBase, IEntityRelationMeta
+    public class EntityRelationMeta : RelationMetaBase
     {
-        public EntityOperation[] AcceptsEntityOperations { get; set; } // remake to flags
-        public string Type { get; set; }
-        public InversedRelationMeta Inversed { get; set; }
-        public string[] TargetTypes { get; set; }
-        IInversedRelationMeta IEntityRelationMeta.Inversed => Inversed;
     }
 
-    public class AttributeRelationMeta : RelationMetaBase, IAttributeRelationMeta
+    public class AttributeRelationMeta : RelationMetaBase
     {
-        public string Formula { get; set; }
-        public string Format { get; set; }
-        public bool? IsAggregated { get; set; }
     }
 
     // Describes virtual inversed relation
-    public class InversedRelationMeta : RelationMetaBase, IInversedRelationMeta
+    public class InversedRelationMeta : RelationMetaBase
     {
-        public string Code { get; set; }
-        public bool Editable { get; set; }
     }
 
     // TODO: this should be an anonymous object, something like JObject

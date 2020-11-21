@@ -1,9 +1,5 @@
 namespace Iis.Interfaces.Meta
 {
-    public enum SearchType : byte
-    {
-        Keyword
-    }
     public enum EntityOperation : byte
     {
         Create, Update, Delete
@@ -25,7 +21,6 @@ namespace Iis.Interfaces.Meta
         string Type { get; set; }
         IInversedRelationMeta Inversed { get; }
         string[] TargetTypes { get; set; }
-        SearchType? Kind { get; set; }
         string Code { get; set; }
         bool Editable { get; set; }
     }

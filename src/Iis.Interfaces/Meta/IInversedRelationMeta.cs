@@ -6,6 +6,5 @@ namespace Iis.Interfaces.Meta
 {
     public interface IInversedRelationMeta: IRelationMetaBase
     {
-        
     }
 }
