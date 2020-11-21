@@ -6,7 +6,5 @@ namespace Iis.Interfaces.Meta
 {
     public interface IAttributeMeta : IMeta
     {
-        IValidation Validation { get; set; }
-        SearchType? Kind { get; set; }
     }
 }
