@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Iis.Domain
         Guid Id { get; }
         string Name { get; }
         string Title { get; }
-        IMeta Meta { get; }
+        ISchemaMeta Meta { get; }
         JObject MetaSource { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }

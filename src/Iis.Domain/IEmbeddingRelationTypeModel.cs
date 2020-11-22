@@ -1,6 +1,7 @@
 ﻿using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using System.Collections.Generic;
 
 namespace Iis.Domain
@@ -8,7 +9,7 @@ namespace Iis.Domain
     public interface IEmbeddingRelationTypeModel: IRelationTypeModel
     {
         IEmbeddingRelationTypeModel DirectRelationType { get; }
-        IMeta EmbeddingMeta { get; }
+        ISchemaMeta EmbeddingMeta { get; }
         EmbeddingOptions EmbeddingOptions { get; }
         IEntityTypeModel EntityType { get; }
         IAttributeTypeModel AttributeType { get; }

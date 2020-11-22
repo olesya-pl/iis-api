@@ -2,6 +2,7 @@
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,7 +17,7 @@ namespace Iis.OntologyModelWrapper
                 null : 
                 new EmbeddingRelationTypeWrapper(_source.RelationType.DirectRelationType?.NodeType); 
 
-        public IMeta EmbeddingMeta => _source.MetaObject;
+        public ISchemaMeta EmbeddingMeta => _source.MetaObject;
 
         public EmbeddingOptions EmbeddingOptions => _source.RelationType.EmbeddingOptions;
 

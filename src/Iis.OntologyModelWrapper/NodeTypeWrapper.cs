@@ -2,6 +2,7 @@
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyModelWrapper.Meta;
+using Iis.OntologySchema.DataTypes;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace Iis.OntologyModelWrapper
 
         public bool IsObjectOfStudy => _source.IsObjectOfStudy;
 
-        public IMeta Meta => _source.MetaObject;
+        public ISchemaMeta Meta => _source.MetaObject;
         public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public string Name => _source.Name;

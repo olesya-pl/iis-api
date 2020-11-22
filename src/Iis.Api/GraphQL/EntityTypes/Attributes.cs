@@ -15,6 +15,7 @@ using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Meta;
 using AutoMapper;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -86,7 +87,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         }
         protected IMapper _mapper;
         protected IEmbeddingRelationTypeModel Source { get; }
-        protected IMeta MetaObject { get; }
+        protected ISchemaMeta MetaObject { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;

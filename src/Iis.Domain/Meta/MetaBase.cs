@@ -1,11 +1,12 @@
 ﻿using Iis.Interfaces.Meta;
+using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Iis.Domain.Meta
 {
-    public class MetaBase: IMeta
+    public class MetaBase: ISchemaMeta
     {
         public string Title { get; set; }
         public int? SortOrder { get; set; }
@@ -26,9 +27,9 @@ namespace Iis.Domain.Meta
         public string Format { get; set; }
         public bool? IsAggregated { get; set; }
 
-        IFormField IMeta.FormField => FormField;
-        IContainerMeta IMeta.Container => Container;
-        IValidation IMeta.Validation => Validation;
-        IMeta IMeta.Inversed => Inversed;
+        IFormField ISchemaMeta.FormField => FormField;
+        IContainerMeta ISchemaMeta.Container => Container;
+        IValidation ISchemaMeta.Validation => Validation;
+        ISchemaMeta ISchemaMeta.Inversed => Inversed;
     }
 }

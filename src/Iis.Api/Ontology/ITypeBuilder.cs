@@ -3,6 +3,7 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -11,7 +12,7 @@ namespace IIS.Core.Ontology
     {
         ITypeBuilder WithName(string name);
         ITypeBuilder WithTitle(string name);
-        ITypeBuilder WithMeta(IMeta meta);
+        ITypeBuilder WithMeta(ISchemaMeta meta);
         ITypeBuilder Is(string name);
         ITypeBuilder Is(Action<ITypeBuilder> buildAction);
         ITypeBuilder HasRequired(string targetName);
