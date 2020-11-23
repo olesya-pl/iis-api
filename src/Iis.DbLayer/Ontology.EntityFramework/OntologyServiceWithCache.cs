@@ -117,15 +117,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public List<Guid> GetNodeIdListByFeatureIdListAsync(IEnumerable<Guid> featureIdList)
+        public IReadOnlyCollection<Guid> GetNodeIdListByFeatureIdList(IEnumerable<Guid> featureIdList)
         {
-            var result = _data.Relations
+            return _data.Relations
                 .Where(r => featureIdList.Contains(r.TargetNodeId))
                 .Select(r => r.SourceNodeId)
                 .Distinct()
-                .ToList();
-
-            return result;
+                .ToArray();
         }
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
@@ -137,8 +135,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
-                var nodes = _data.GetNodes(searchResult.ids);
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
+                var nodes = _data.GetNodes(searchResult.Items.Select(e => e.Key));
                 return nodes.Select(n => MapNode(n));
             }
             else
@@ -174,8 +172,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByAllFieldsAsync(derivedTypes.Select(t => t.Name), filter);
-                return searchResult.count;
+                return await _elasticService.CountByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
             }
             else
             {

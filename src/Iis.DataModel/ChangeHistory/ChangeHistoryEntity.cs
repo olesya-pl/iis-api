@@ -1,9 +1,8 @@
-﻿using Iis.Interfaces.Ontology;
-using System;
+﻿using System;
 
 namespace Iis.DataModel.ChangeHistory
 {
-    public class ChangeHistoryEntity : BaseEntity, IChangeHistoryItem
+    public class ChangeHistoryEntity : BaseEntity
     {
         public Guid TargetId { get; set; }
         public string UserName { get; set; }

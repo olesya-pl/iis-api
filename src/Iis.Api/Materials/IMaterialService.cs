@@ -13,7 +13,7 @@ namespace IIS.Core.Materials
     {
         Task SaveAsync(Material material);
         Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response);
-        Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input);
+        Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, Guid userId);
         Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);

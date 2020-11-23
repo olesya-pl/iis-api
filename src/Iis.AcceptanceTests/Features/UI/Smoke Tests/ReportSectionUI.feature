@@ -1,11 +1,11 @@
-﻿Feature: ReportSectionUI - Smoke
+﻿Feature: Report - smoke
 
-	https://jira.infozahyst.com/browse/IIS-6325
+	- IIS-6325 - Report section can be opened
 
-Background: 
-	Given I want to sign in with the user olya and password 123 in the Contour
+	Background:
+		Given I sign in with the user olya and password 123 in the Contour
 
-@smoke
-Scenario: Ensure that Reports section is opened
-	And I click div:nth-of-type(1) > li:nth-of-type(3) button
-	Then I must see the .infinity-table > div:nth-of-type(1) element
+	@smoke @UI @ReportSectionUI
+	Scenario: IS-6326 - Report section can be opened
+		When I navigated to Report section
+		Then I must see first report in the report list

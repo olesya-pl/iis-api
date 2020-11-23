@@ -11,7 +11,7 @@ namespace IIS.Core.Materials
 {
     public interface IMaterialProvider
     {
-        Task<Material> GetMaterialAsync(Guid id);
+        Task<Material> GetMaterialAsync(Guid id, Guid userId);
 
         Task<(IEnumerable<Material> Materials,
             int Count,
@@ -34,5 +34,6 @@ namespace IIS.Core.Materials
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset);
+        Task<bool> MaterialExists(Guid value);
     }
 }

@@ -57,8 +57,14 @@ namespace Iis.AcceptanceTests.UISteps
             materialsPage.MLTab.Click();
         }
 
+        [When(@"I got search counter value in the Materials section")]
+        public void IGetSearchCounterValueInTheMaterialsSection()
+        {
+            var materialPage = new MaterialsPageObjects(driver);
+            context.SetResponse("counterValue", materialPage.MaterialsSearchResultCounter.Text);
+        }
 
-        [When(@"I clicked Search button")]
+        [When(@"I clicked search button in the Materials section")]
         public void IFilledInfoInTheMaterialsSearchField()
         {
             var materialsPage = new MaterialsPageObjects(driver);
@@ -66,7 +72,6 @@ namespace Iis.AcceptanceTests.UISteps
         }
 
         [When(@"I searched (.*) data in the materials")]
-
         public void IEnteredDataInTheSearchField(string input)
         {
             var materialsPage = new MaterialsPageObjects(driver);
@@ -135,12 +140,11 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var materialPage = new MaterialsPageObjects(driver);
             materialPage.Originator.Click();
-            //materialPage.Originator.SendKeys(Keys.Down);
             var list = driver.FindElements(By.ClassName("el-select-dropdown__item"));
             Assert.True(list.Count() > 0);
         }
 
-        [Then(@"I must see zero results")]
+        [Then(@"I must see zero results in the Materials section")]
         public void ThenIMustSeeZeroResults()
         {
             var materialsPage = new MaterialsPageObjects(driver);
@@ -152,6 +156,15 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var materialsPage = new MaterialsPageObjects(driver);
             Assert.True(materialsPage.ShowMLResultsButton.Displayed);
+        }
+
+        [Then(@"I must see that search counter values are equal in the Materials section")]
+        public void ThenIMustSeeThatSearchCounterValuesAreEqualInTheMaterialsSection()
+        {
+            var materialPage = new MaterialsPageObjects(driver);
+            var actualValue = materialPage.MaterialsSearchResultCounter.Text;
+            var expectedValue = context.GetResponse<string>("counterValue");
+            Assert.Equal(actualValue, expectedValue);
         }
         #endregion
     }

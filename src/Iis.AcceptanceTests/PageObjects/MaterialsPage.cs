@@ -92,5 +92,14 @@ namespace Iis.AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .general-container > .el-form-item > .el-form-item__content > .el-select.el-tooltip")]
         [CacheLookup]
         public IWebElement Originator;
+
+        [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
+        [CacheLookup]
+        public IWebElement MaterialsSearchResultCounter;
+
+
+
+
+
     }
 }
