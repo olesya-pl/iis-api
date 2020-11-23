@@ -20,7 +20,7 @@ namespace IIS.Core.GraphQL.Reports
         private readonly TypeRepository _typeRepository;
         private readonly IOntologyModel _ontology;
         IOntologyType objectType;
-        IEntityTypeModel type;
+        INodeTypeModel type;
 
         public ReportType(TypeRepository typeRepository, IOntologyModel ontology)
         {

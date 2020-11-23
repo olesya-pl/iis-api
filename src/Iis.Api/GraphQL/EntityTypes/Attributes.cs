@@ -99,9 +99,9 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] public string Code => Source.Name ?? Source.TargetType.Name; // fallback to target type
 
-        public bool Editable => !(Source.IsInversed || Source.IsComputed());
+        public bool Editable => !(Source.IsInversed || Source.IsComputed);
         public bool IsInversed => Source.IsInversed;
-        public bool IsComputed => Source.IsComputed();
+        public bool IsComputed => Source.IsComputed;
 
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
         public string Format => MetaObject?.Format;
@@ -165,7 +165,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
         public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology)
         {
-            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<IEntityTypeModel>();
+            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<INodeTypeModel>();
             if (types == null)
                 types = new[] {Source.EntityType };
             else if (!types.Any(t => t.Id == Source.EntityType.Id))

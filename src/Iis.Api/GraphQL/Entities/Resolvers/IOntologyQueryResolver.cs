@@ -13,8 +13,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         ObjectType ResolveAbstractType(IResolverContext context, object resolverResult);
         Task<Guid> ResolveId(IResolverContext ctx);
-        Task<Entity> ResolveEntity(IResolverContext ctx, IEntityTypeModel type);
-        Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, IEntityTypeModel type);
+        Task<Entity> ResolveEntity(IResolverContext ctx, INodeTypeModel type);
+        Task<Tuple<IEnumerable<INodeTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, INodeTypeModel type);
         Task<object> ResolveAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
         Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
         Task<object> ResolveMultipleAttributeRelationTarget(IResolverContext ctx);
@@ -23,7 +23,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
-        Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
+        Task<Tuple<IEnumerable<INodeTypeModel>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
         Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx);
     }
 }

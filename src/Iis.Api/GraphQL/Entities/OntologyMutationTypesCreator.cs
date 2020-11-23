@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.Entities
             var configure = new Action<IInputObjectTypeDescriptor>(d =>
             {
                 d?.Name(MutatorInputType.GetName(Operation, type.Name));
-                foreach (var attr in type.AllProperties.Where(p => !(p.IsInversed || p.IsComputed())))
+                foreach (var attr in type.AllProperties.Where(p => !(p.IsInversed || p.IsComputed)))
                     OnRelation(attr, d);
             });
             configure(null); // Ensure creation of types before descriptor is called

@@ -39,14 +39,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return ctx.Parent<Node>().Id;
         }
 
-        public async Task<Entity> ResolveEntity(IResolverContext ctx, IEntityTypeModel type)
+        public async Task<Entity> ResolveEntity(IResolverContext ctx, INodeTypeModel type)
         {
             var id = ctx.Argument<Guid>("id");
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, IEmbeddingRelationTypeModel>(id, null), default);
             return node as Entity; // return null if node was not entity
         }
 
-        public async Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, IEntityTypeModel type)
+        public async Task<Tuple<IEnumerable<INodeTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, INodeTypeModel type)
         {
             var nf = ctx.CreateNodeFilter(type);
 
@@ -59,7 +59,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 ids = filter.MatchList;
             }
 
-            return Tuple.Create((IEnumerable<IEntityTypeModel>) new[] {type}, nf, ids);
+            return Tuple.Create((IEnumerable<INodeTypeModel>) new[] {type}, nf, ids);
         }
 
         // ----- Relations to attributes ----- //
@@ -154,7 +154,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ------ All entities ----- //
 
-        public Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
+        public Task<Tuple<IEnumerable<INodeTypeModel>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
             var ontology = ctx.Service<IOntologyModel>();

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Iis.OntologyModelWrapper
 {
-    public class EmbeddingRelationTypeWrapper : RelationTypeWrapper, IEmbeddingRelationTypeModel
+    public class EmbeddingRelationTypeWrapper : NodeTypeWrapper, IEmbeddingRelationTypeModel
     {
         public EmbeddingRelationTypeWrapper(INodeTypeLinked source) : base(source) { }
         public IEmbeddingRelationTypeModel DirectRelationType =>
@@ -21,9 +21,9 @@ namespace Iis.OntologyModelWrapper
 
         public EmbeddingOptions EmbeddingOptions => _source.RelationType.EmbeddingOptions;
 
-        public IEntityTypeModel EntityType =>
+        public INodeTypeModel EntityType =>
             _source.RelationType.TargetType.Kind == Kind.Entity ?
-                    new EntityTypeWrapper(_source.RelationType.TargetType) :
+                    new NodeTypeWrapper(_source.RelationType.TargetType) :
                     null;
 
         public IAttributeTypeModel AttributeType =>

@@ -61,7 +61,7 @@ namespace IIS.Core.Ontology {
 
         private void _tryToAddNode(Ast ast, string value)
         {
-            var (name, types, conditions) = _parseChunk<IEntityTypeModel>(value);
+            var (name, types, conditions) = _parseChunk<INodeTypeModel>(value);
             var type = types == null ? null : types.FirstOrDefault();
 
             if (conditions != null)
@@ -81,7 +81,7 @@ namespace IIS.Core.Ontology {
 
         private void _tryToAddRelation(Ast ast, string value, bool isDirect)
         {
-            var (name, relationTypes, _) = _parseChunk<IRelationTypeModel>(value);
+            var (name, relationTypes, _) = _parseChunk<INodeTypeModel>(value);
 
             ast.Add(new AstRelation(relationTypes, isDirect) {
                 Name = name
@@ -186,14 +186,14 @@ namespace IIS.Core.Ontology {
         public class AstRelation : AstNode {
             public readonly bool IsDirect;
 
-            public readonly IEnumerable<IRelationTypeModel> Types;
+            public readonly IEnumerable<INodeTypeModel> Types;
 
             public override Guid[] TypeIds
             {
                 get { return Types.Select(type => type.Id).ToArray(); }
             }
 
-            public AstRelation(IEnumerable<IRelationTypeModel> types, bool isDirect): base(null) {
+            public AstRelation(IEnumerable<INodeTypeModel> types, bool isDirect): base(null) {
                 Types = types;
                 IsDirect = isDirect;
             }

@@ -18,8 +18,10 @@ namespace Iis.Domain
         DateTime UpdatedAt { get; }
         bool HasUniqueValues { get; }
         string UniqueValueFieldName { get; }
-        IEnumerable<IEntityTypeModel> DirectParents { get; }
-        IEnumerable<IEntityTypeModel> AllParents { get; }
+        bool IsAbstract { get; }
+        bool IsComputed { get; }
+        IEnumerable<INodeTypeModel> DirectParents { get; }
+        IEnumerable<INodeTypeModel> AllParents { get; }
         IEnumerable<IEmbeddingRelationTypeModel> DirectProperties { get; }
         IEnumerable<IEmbeddingRelationTypeModel> AllProperties { get; }
         bool IsObjectOfStudy { get; }

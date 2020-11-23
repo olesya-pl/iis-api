@@ -3,7 +3,7 @@ using IIS.Core.GraphQL.Entities.Resolvers;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
-    // Explicit interface declaration, that would be implemented by each IEntityTypeModel
+    // Explicit interface declaration, that would be implemented by each INodeTypeModel
     public class EntityInterface : InterfaceType
     {
         protected override void Configure(IInterfaceTypeDescriptor descriptor)

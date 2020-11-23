@@ -11,7 +11,7 @@ namespace Iis.Domain
         IEmbeddingRelationTypeModel DirectRelationType { get; }
         ISchemaMeta EmbeddingMeta { get; }
         EmbeddingOptions EmbeddingOptions { get; }
-        IEntityTypeModel EntityType { get; }
+        INodeTypeModel EntityType { get; }
         IAttributeTypeModel AttributeType { get; }
         bool IsAttributeType { get; }
         bool IsEntityType { get; }

@@ -7,7 +7,7 @@ namespace Iis.Domain
 {
     public sealed class Entity : Node
     {
-        public Entity(Guid id, IEntityTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
+        public Entity(Guid id, INodeTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
 

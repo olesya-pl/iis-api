@@ -19,7 +19,7 @@ namespace IIS.Core.GraphQL
     {
         public static IObjectTypeDescriptor PopulateFields(this IOntologyFieldPopulator populator,
             IObjectTypeDescriptor descriptor,
-            IEnumerable<IEntityTypeModel> entityTypes, params Operation[] operations)
+            IEnumerable<INodeTypeModel> entityTypes, params Operation[] operations)
         {
             foreach (var type in entityTypes)
             foreach (var operation in operations)
@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL
 
         public static IOutputType WrapOutputType(this IOutputType type, IEmbeddingRelationTypeModel relationType)
         {
-            if (relationType.IsComputed())
+            if (relationType.IsComputed)
                 return type;
             switch (relationType.EmbeddingOptions)
             {
@@ -71,12 +71,6 @@ namespace IIS.Core.GraphQL
                    ?? relationType.TargetType.Meta.AcceptsEmbeddedOperations // check target meta
                    ?? relationType.TargetType.AllParents.Reverse().Select(t => t.Meta) // check target parents meta
                        .FirstOrDefault()?.AcceptsEmbeddedOperations;
-        }
-
-        public static bool AcceptsOperation(this IEmbeddingRelationTypeModel relationType, EntityOperation operation)
-        {
-            var ops = relationType.GetOperations();
-            return ops?.Contains(operation) == true;
         }
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d)

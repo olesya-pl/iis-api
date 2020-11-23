@@ -286,7 +286,7 @@ namespace Iis.ThemeManagement
             return types
                 .SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types)
-                .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
+                .Where(e => e.IsAbstract)
                 .Select(e => e.Name)
                 .Distinct()
                 .ToArray();

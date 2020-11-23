@@ -14,14 +14,14 @@ namespace Iis.OntologyModelWrapper
             _schema = schema;
         }
 
-        public IEnumerable<IEntityTypeModel> EntityTypes => _schema.GetEntityTypes().Select(et => new EntityTypeWrapper(et));
+        public IEnumerable<INodeTypeModel> EntityTypes => _schema.GetEntityTypes().Select(et => new NodeTypeWrapper(et));
 
         public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type)
         {
             var nodeType = _schema.GetNodeTypeById(type.Id);
             var result = new List<INodeTypeModel>();
             
-            result.AddRange(nodeType.GetAllDescendants().Distinct().Select(nt => new EntityTypeWrapper(nt)));
+            result.AddRange(nodeType.GetAllDescendants().Distinct().Select(nt => new NodeTypeWrapper(nt)));
             if (!result.Any(nt => nt.Id == type.Id))
             {
                 result.Add(type);
@@ -29,9 +29,9 @@ namespace Iis.OntologyModelWrapper
             return result.Distinct();
         }
 
-        public IEntityTypeModel GetEntityType(string name)
+        public INodeTypeModel GetEntityType(string name)
         {
-            return new EntityTypeWrapper(_schema.GetEntityTypeByName(name));
+            return new NodeTypeWrapper(_schema.GetEntityTypeByName(name));
         }
 
         public INodeTypeModel GetType(Guid id)
@@ -43,7 +43,7 @@ namespace Iis.OntologyModelWrapper
             switch (nodeType.Kind)
             {
                 case Kind.Entity:
-                    return new EntityTypeWrapper(nodeType);
+                    return new NodeTypeWrapper(nodeType);
                 case Kind.Attribute:
                     return new AttributeTypeWrapper(nodeType);
                 case Kind.Relation:
@@ -62,7 +62,7 @@ namespace Iis.OntologyModelWrapper
                 switch (nodeType.Kind)
                 {
                     case Kind.Entity: 
-                        list.Add(new EntityTypeWrapper(nodeType));
+                        list.Add(new NodeTypeWrapper(nodeType));
                         break;
                     case Kind.Attribute:
                         list.Add(new AttributeTypeWrapper(nodeType));

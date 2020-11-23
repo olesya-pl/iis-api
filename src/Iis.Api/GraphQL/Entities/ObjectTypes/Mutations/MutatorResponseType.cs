@@ -12,14 +12,14 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes.Mutations
 
         private readonly Operation _operation;
 
-        public MutatorResponseType(Operation operation, IEntityTypeModel entityType, IOutputType ontologyType)
+        public MutatorResponseType(Operation operation, INodeTypeModel entityType, IOutputType ontologyType)
         {
             _operation = operation;
             _name = GetName(operation, entityType);
             _ontologyType = ontologyType;
         }
 
-        public static string GetName(Operation operation, IEntityTypeModel entityType)
+        public static string GetName(Operation operation, INodeTypeModel entityType)
         {
             return $"{operation}{OntologyObjectType.GetName(entityType)}Response";
         }

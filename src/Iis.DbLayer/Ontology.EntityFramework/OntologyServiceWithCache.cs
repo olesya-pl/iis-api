@@ -307,13 +307,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else if (nodeType.Kind == Kind.Entity)
             {
-                var entityType = new EntityTypeWrapper(nodeType);
+                var entityType = new NodeTypeWrapper(nodeType);
                 result = new Entity(node.Id, entityType, node.CreatedAt, node.UpdatedAt);
                 mappedNodes.Add(result);
             }
             else if (nodeType.Kind == Kind.Relation)
             {
-                var relationType = new RelationTypeWrapper(nodeType);
+                var relationType = new NodeTypeWrapper(nodeType);
                 result = new Relation(node.Id, relationType, node.CreatedAt, node.UpdatedAt);
                 var target = MapNode(node.Relation.TargetNode, mappedNodes);
                 result.AddNode(target);

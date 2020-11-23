@@ -24,13 +24,13 @@ namespace Iis.OntologyModelWrapper
             _source = source;
         }
 
-        public IEnumerable<IEntityTypeModel> AllParents => _source.GetAllAncestors().Select(nt => new EntityTypeWrapper(nt));
+        public IEnumerable<INodeTypeModel> AllParents => _source.GetAllAncestors().Select(nt => new NodeTypeWrapper(nt));
 
         public IEnumerable<IEmbeddingRelationTypeModel> AllProperties => _source.GetAllProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
 
         public DateTime CreatedAt => _source.CreatedAt;
 
-        public IEnumerable<IEntityTypeModel> DirectParents => _source.DirectParents.Select(nt => new EntityTypeWrapper(nt));
+        public IEnumerable<INodeTypeModel> DirectParents => _source.DirectParents.Select(nt => new NodeTypeWrapper(nt));
 
         public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties => _source.DirectProperties.Select(nt => new EmbeddingRelationTypeWrapper(nt));
 
@@ -39,6 +39,7 @@ namespace Iis.OntologyModelWrapper
         public Guid Id => _source.Id;
 
         public bool IsObjectOfStudy => _source.IsObjectOfStudy;
+        public bool IsAbstract => _source.IsAbstract;
 
         public ISchemaMeta Meta => _source.MetaObject;
         public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -48,6 +49,7 @@ namespace Iis.OntologyModelWrapper
         public string Title => _source.Title;
 
         public DateTime UpdatedAt => _source.UpdatedAt;
+        public bool IsComputed => !string.IsNullOrWhiteSpace(_source.MetaObject?.Formula);
 
         public IEmbeddingRelationTypeModel GetProperty(string typeName)
         {

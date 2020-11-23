@@ -10,17 +10,17 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
     public class EntityUnionInputType : InputObjectType
     {
         private readonly Operation _operation;
-        private readonly IEntityTypeModel _type;
+        private readonly INodeTypeModel _type;
         private readonly TypeRepository _typeRepository;
 
-        public EntityUnionInputType(Operation operation, IEntityTypeModel type, TypeRepository typeRepository)
+        public EntityUnionInputType(Operation operation, INodeTypeModel type, TypeRepository typeRepository)
         {
             _operation = operation;
             _type = type;
             _typeRepository = typeRepository;
         }
 
-        public static string GetName(Operation operation, IEntityTypeModel type)
+        public static string GetName(Operation operation, INodeTypeModel type)
         {
             return $"UnionInput_{operation.Short()}_{OntologyObjectType.GetName(type)}";
         }
@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             d.Description("Unites multiple input types. Specify only single field.");
             if (_type.IsAbstract)
             {
-                foreach (var child in _typeRepository.GetChildTypes(_type).OfType<IEntityTypeModel>().Where(t => !t.IsAbstract))
+                foreach (var child in _typeRepository.GetChildTypes(_type).OfType<INodeTypeModel>().Where(t => !t.IsAbstract))
                 {
                     var type = _typeRepository.GetMutatorInputType(_operation, child);
                     d.Field(child.Name).Type(type);

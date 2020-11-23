@@ -57,7 +57,7 @@ namespace IIS.Core.GraphQL.Entities
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery};
         }
 
-        public static ElasticFilter CreateNodeFilter(this IResolverContext ctx, IEntityTypeModel criteriaType)
+        public static ElasticFilter CreateNodeFilter(this IResolverContext ctx, INodeTypeModel criteriaType)
         {
             var result = ctx.CreateNodeFilter();
             return result;

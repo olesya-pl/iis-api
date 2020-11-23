@@ -61,7 +61,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
         }
-        public Task<Entity> UpdateEntity(IEntityTypeModel type, Guid id, Dictionary<string, object> properties)
+        public Task<Entity> UpdateEntity(INodeTypeModel type, Guid id, Dictionary<string, object> properties)
         {
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return UpdateEntity(type, id, properties, string.Empty, requestId);
         }
         private async Task<Entity> UpdateEntity(
-            IEntityTypeModel type, Guid id,
+            INodeTypeModel type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
         {
             var node = (Entity) _ontologyService.LoadNodes(id);

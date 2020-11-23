@@ -44,7 +44,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType] public string Code => Source.Name;
 
-        public bool IsAbstract => Source is IEntityTypeModel et && et.IsAbstract; // todo
+        public bool IsAbstract => Source.IsAbstract;
 
         [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
         public EntityType Parent =>
@@ -61,7 +61,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Get all type relations")]
         public IEnumerable<IEntityAttribute> GetAttributes()
         {
-            var props = Source.AllProperties.Where(p => !p.IsComputed()).OrderBy(a => a.CreatedAt);
+            var props = Source.AllProperties.Where(p => !p.IsComputed).OrderBy(a => a.CreatedAt);
             return props.Select(CreateEntityAttribute);
         }
 

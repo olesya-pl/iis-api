@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- READ QUERY TYPES ----- //
 
-        public IOntologyType GetOntologyType(IEntityTypeModel type)
+        public IOntologyType GetOntologyType(INodeTypeModel type)
         {
             return GetOrCreate(type.Name, () => _creator.NewOntologyType(type));
         }
@@ -91,7 +91,7 @@ namespace IIS.Core.GraphQL.Entities
                 new MultipleOutputType(name, GetScalarOutputType(scalarType)));
         }
 
-        public OutputUnionType GetOutputUnionType(IEntityTypeModel source, string propertyName,
+        public OutputUnionType GetOutputUnionType(INodeTypeModel source, string propertyName,
             IEnumerable<ObjectType> outputTypes)
         {
             var name = OutputUnionType.GetName(source, propertyName);
@@ -120,21 +120,21 @@ namespace IIS.Core.GraphQL.Entities
             return GetOrCreate(name, () => GetMutator(operation).NewMutatorInputType(type));
         }
 
-        public MutatorResponseType GetMutatorResponseType(Operation operation, IEntityTypeModel type)
+        public MutatorResponseType GetMutatorResponseType(Operation operation, INodeTypeModel type)
         {
             var name = MutatorResponseType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new MutatorResponseType(GetMutator(operation).Operation, type, GetOntologyType(type)));
         }
 
-        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, IEntityTypeModel type)
+        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, INodeTypeModel type)
         {
             var name = EntityRelationToInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new EntityRelationToInputType(operation, type, GetEntityUnionInputType(operation, type)));
         }
 
-        public EntityUnionInputType GetEntityUnionInputType(Operation operation, IEntityTypeModel type)
+        public EntityUnionInputType GetEntityUnionInputType(Operation operation, INodeTypeModel type)
         {
             var name = EntityUnionInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
