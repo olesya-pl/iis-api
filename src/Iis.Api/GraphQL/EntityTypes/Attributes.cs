@@ -104,7 +104,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public bool IsComputed => Source.IsComputed();
 
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
-        public string Format => (MetaObject as AttributeRelationMeta)?.Format;
+        public string Format => MetaObject?.Format;
         [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.TargetType.IsObjectOfStudy;
 
         [GraphQLType(typeof(AnyType))]
@@ -149,8 +149,6 @@ namespace IIS.Core.GraphQL.EntityTypes
         }
 
         private IOntologyModel _ontology;
-
-        protected new EntityRelationMeta MetaObject => (EntityRelationMeta) base.MetaObject;
 
         public override string Type => "relation";
 

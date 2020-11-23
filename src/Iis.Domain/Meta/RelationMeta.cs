@@ -3,25 +3,6 @@ using System;
 
 namespace Iis.Domain.Meta
 {
-
-    public class RelationMetaBase: MetaBase
-    {
-    }
-
-    // Entity to entity relation
-    public class EntityRelationMeta : RelationMetaBase
-    {
-    }
-
-    public class AttributeRelationMeta : RelationMetaBase
-    {
-    }
-
-    // Describes virtual inversed relation
-    public class InversedRelationMeta : RelationMetaBase
-    {
-    }
-
     // TODO: this should be an anonymous object, something like JObject
     //       different clients will have different UI components and their configuration cannot be statically described in code!
     public class FormField : IFormField

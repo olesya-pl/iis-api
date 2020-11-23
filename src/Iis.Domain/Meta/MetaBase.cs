@@ -19,7 +19,7 @@ namespace Iis.Domain.Meta
         public Validation Validation { get; set; }
         public EntityOperation[] AcceptsEntityOperations { get; set; }
         public string Type { get; set; }
-        public InversedRelationMeta Inversed { get; set; }
+        public ISchemaMeta Inversed { get; set; }
         public string[] TargetTypes { get; set; }
         public string Code { get; set; }
         public bool Editable { get; set; }
