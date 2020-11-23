@@ -9,6 +9,7 @@ using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
+using HotChocolate.Resolvers;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -70,11 +71,13 @@ namespace IIS.Core.GraphQL.Materials
         }
 
         public async Task<Material> GetMaterial(
+            IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             Guid materialId)
         {
-            var material = await materialProvider.GetMaterialAsync(materialId);
+            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var material = await materialProvider.GetMaterialAsync(materialId, tokenPayload.UserId);
             var res = mapper.Map<Material>(material);
             return res;
         }

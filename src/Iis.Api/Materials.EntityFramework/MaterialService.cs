@@ -55,7 +55,7 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task SaveAsync(Material material)
         {
             await MakeFilePermanent(material);
-            ValidateMaterialParent(material);
+            await ValidateMaterialParent(material);
 
             var materialEntity = _mapper.Map<MaterialEntity>(material);
 
@@ -101,9 +101,9 @@ namespace IIS.Core.Materials.EntityFramework
             }
         }
 
-        private void ValidateMaterialParent(Material material)
+        private async Task ValidateMaterialParent(Material material)
         {
-            if (material.ParentId.HasValue && _materialProvider.GetMaterialAsync(material.ParentId.Value) == null)
+            if (material.ParentId.HasValue && (await _materialProvider.MaterialExists(material.ParentId.Value)) == false)
                 throw new ArgumentException($"Material with guid {material.ParentId.Value} does not exist");
         }
 
@@ -162,54 +162,63 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MLResponse>(responseEntity);
         }
 
-        public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input)
+        public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, Guid userId)
         {
             var material = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(input.Id, new[] { MaterialIncludeEnum.WithChildren }));
 
-            if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
-            if (input.ImportanceId.HasValue) {
-                material.ImportanceSignId = input.ImportanceId.Value;
-                material.Importance = null;
-            }
-            if (input.ReliabilityId.HasValue) {
-                material.ReliabilitySignId = input.ReliabilityId.Value;
-                material.Reliability = null;
-            }
-            if (input.RelevanceId.HasValue) {
-                material.RelevanceSignId = input.RelevanceId.Value;
-                material.Relevance = null;
-            }
-            if (input.CompletenessId.HasValue) {
-                material.CompletenessSignId = input.CompletenessId.Value;
-                material.Completeness = null;
-            }
-            if (input.SourceReliabilityId.HasValue) {
-                material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
-                material.SourceReliability = null;
-            }
-            if (input.ProcessedStatusId.HasValue) {
-                material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
-                material.ProcessedStatus = null;
-            }
-            if (input.SessionPriorityId.HasValue) {
-                material.SessionPriorityId = input.SessionPriorityId.Value;
-                material.SessionPriority = null;
-            }
-            if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
-            if (input.Content != null) material.Content = input.Content;
+            if (material.CanBeEdited(userId))
+            {
+                if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
+                if (input.ImportanceId.HasValue)
+                {
+                    material.ImportanceSignId = input.ImportanceId.Value;
+                    material.Importance = null;
+                }
+                if (input.ReliabilityId.HasValue)
+                {
+                    material.ReliabilitySignId = input.ReliabilityId.Value;
+                    material.Reliability = null;
+                }
+                if (input.RelevanceId.HasValue)
+                {
+                    material.RelevanceSignId = input.RelevanceId.Value;
+                    material.Relevance = null;
+                }
+                if (input.CompletenessId.HasValue)
+                {
+                    material.CompletenessSignId = input.CompletenessId.Value;
+                    material.Completeness = null;
+                }
+                if (input.SourceReliabilityId.HasValue)
+                {
+                    material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
+                    material.SourceReliability = null;
+                }
+                if (input.ProcessedStatusId.HasValue)
+                {
+                    material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
+                    material.ProcessedStatus = null;
+                }
+                if (input.SessionPriorityId.HasValue)
+                {
+                    material.SessionPriorityId = input.SessionPriorityId.Value;
+                    material.SessionPriority = null;
+                }
+                if (input.AssigneeId.HasValue) material.AssigneeId = input.AssigneeId;
+                if (input.Content != null) material.Content = input.Content;
 
-            var loadData = MaterialLoadData.MapLoadData(material.LoadData);
+                var loadData = MaterialLoadData.MapLoadData(material.LoadData);
 
-            if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
-            if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
-            if (input.States != null) loadData.States = new List<string>(input.States);
+                if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
+                if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
+                if (input.States != null) loadData.States = new List<string>(input.States);
 
-            material.LoadData = loadData.ToJson();
+                material.LoadData = loadData.ToJson();
 
-            await UpdateMaterialAsync(material);
-            QueueMaterialChildrenForMl(material);
-
-            return await _materialProvider.GetMaterialAsync(input.Id);
+                await UpdateMaterialAsync(material);
+                QueueMaterialChildrenForMl(material);                
+            }
+            return await _materialProvider.GetMaterialAsync(input.Id, userId);
         }
 
         private void QueueMaterialChildrenForMl(MaterialEntity material)
