@@ -11,6 +11,12 @@ namespace Iis.DataModel.Materials
         public static readonly Guid ProcessingStatusProcessedSignId
             = new Guid("c85a76f4-3c04-46f7-aed9-f865243b058e");
 
+        public static readonly Guid ProcessingStatusProcessingSignId
+            = new Guid("AB3B68F3-42BB-4C43-8121-ED0DC2B0BAD1");
+
+        public static readonly Guid ProcessingStatusPrimaryProcessingSignId
+            = new Guid("5164D448-8709-4839-9907-F5205CA384D1");        
+
         public static readonly Guid ProcessingStatusNotProcessedSignId
             = new Guid("0a641312-abb7-4b40-a766-0781308eb077");
 
@@ -45,5 +51,14 @@ namespace Iis.DataModel.Materials
         public Guid? AssigneeId { get; set; }
         public virtual UserEntity Assignee { get; set; }
         public int MlHandlersCount { get; set; }
+
+        public bool CanBeEdited(Guid userId)
+        {
+            if (ProcessedStatusSignId == ProcessingStatusProcessingSignId)
+            {
+                return AssigneeId == userId;
+            }
+            return true;
+        }
     }
 }

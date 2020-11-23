@@ -58,6 +58,7 @@ namespace IIS.Core.GraphQL.Materials
         public User Assignee { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
+        public bool CanBeEdited { get; set; }
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
             if (FileId == null) return null;

@@ -144,12 +144,14 @@ namespace IIS.Core.Materials.EntityFramework
             return material;
         }
 
-        public async Task<Material> GetMaterialAsync(Guid id)
+        public async Task<Material> GetMaterialAsync(Guid id, Guid userId)
         {
             var entity = await RunWithoutCommitAsync(async (unitOfWork) =>
                 await unitOfWork.MaterialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
 
-            return await MapAsync(entity);
+            var mapped = await MapAsync(entity);
+            mapped.CanBeEdited = entity.CanBeEdited(userId);
+            return mapped;
         }
 
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
@@ -542,6 +544,14 @@ namespace IIS.Core.Materials.EntityFramework
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
             result.Node = _ontologyService.LoadNodes(feature.NodeId);
             return result;
+        }
+
+        public async Task<bool> MaterialExists(Guid id)
+        {
+            var entity = await RunWithoutCommitAsync((unitOfWork) =>
+                unitOfWork.MaterialRepository.GetByIdAsync(id));
+
+            return entity != null;
         }
     }
 }
