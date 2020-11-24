@@ -17,7 +17,7 @@ namespace Iis.Services
         private readonly IElasticService _elasticService;
         private const int DefaultSize = 10;
         private static readonly List<string> KeyWords = new List<string>();
-        private static readonly string[] SearchableFileds = new string[] { "title", "commonInfo.RealNameShort" };
+        private static readonly string[] SearchableFileds = new string[] { "__title", "title", "commonInfo.RealNameShort" };
 
         public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService)
         {
@@ -60,9 +60,17 @@ namespace Iis.Services
         {
             foreach (var item in SearchableFileds)
             {
-                var result = jObject.SelectToken(item)?.Value<string>();
-                if (!string.IsNullOrEmpty(result))
-                    return result;
+                try
+                {
+                    var result = jObject.SelectToken(item)?.Value<string>();
+                    if (!string.IsNullOrEmpty(result))
+                        return result;
+                }
+
+                catch (InvalidCastException)
+                {
+                    continue;
+                }
             }
 
             return null;
