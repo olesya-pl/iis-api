@@ -17,7 +17,7 @@ namespace Iis.Services
         private readonly IElasticService _elasticService;
         private const int DefaultSize = 10;
         private static readonly List<string> KeyWords = new List<string>();
-        private static readonly string[] SearchableFileds = new string[] { "title", "commonInfo.RealNameShort" };
+        private static readonly string[] SearchableFields = new string[] { "__title" };
 
         public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService)
         {
@@ -45,7 +45,9 @@ namespace Iis.Services
         {
             if(query.Trim().Equals("*")) return new List<AutocompleteEntityDto>();
 
-            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFileds, size.GetValueOrDefault(DefaultSize), ct);
+            if (!query.Contains('*')) query = $"*{query}*";
+
+            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFields, size.GetValueOrDefault(DefaultSize), ct);
 
             return response.Select(x => new AutocompleteEntityDto
             {
@@ -58,7 +60,7 @@ namespace Iis.Services
 
         private string GetFirstNotNullField(JObject jObject) 
         {
-            foreach (var item in SearchableFileds)
+            foreach (var item in SearchableFields)
             {
                 var result = jObject.SelectToken(item)?.Value<string>();
                 if (!string.IsNullOrEmpty(result))
