@@ -60,13 +60,24 @@ namespace Iis.Services
 
         private string GetFirstNotNullField(JObject jObject) 
         {
+            string result = null;
             foreach (var item in SearchableFields)
             {
                 try
                 {
-                    var result = jObject.SelectToken(item)?.Value<string>();
-                    if (!string.IsNullOrEmpty(result))
-                        return result;
+                    var value = jObject[item];
+                    if (value is JArray)
+                    {
+                        result = value.FirstOrDefault(item => !string.IsNullOrEmpty(item.ToString())).ToString();
+                        if (!string.IsNullOrEmpty(result))
+                            return result;
+                    }
+                    else
+                    {
+                        result = jObject.SelectToken(item)?.Value<string>();
+                        if (!string.IsNullOrEmpty(result))
+                            return result;
+                    }
                 }
 
                 catch (InvalidCastException)
