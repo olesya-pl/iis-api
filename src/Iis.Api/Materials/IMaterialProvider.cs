@@ -13,14 +13,12 @@ namespace IIS.Core.Materials
     {
         Task<Material> GetMaterialAsync(Guid id, Guid userId);
 
-        Task<(IEnumerable<Material> Materials,
-            int Count,
-            Dictionary<Guid, SearchResultItem> Highlights)> GetMaterialsAsync(int limit,
+        Task<MaterialsDto> GetMaterialsAsync(int limit,
             int offset,
             string filterQuery,
-            IEnumerable<string> types = null,
             string sortColumnName = null,
-            string order = null);
+            string order = null,
+            IEnumerable<string> types = null);
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(string signValue);
@@ -29,7 +27,12 @@ namespace IIS.Core.Materials
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string name, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
-        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, bool includeDescendants, string suggestion, int limit = 0, int offset = 0, CancellationToken ct = default);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
+            bool includeDescendants, 
+            string suggestion, 
+            int limit = 0, int offset = 0, 
+            string sortColumnName = null, string order = null,
+            CancellationToken ct = default);
         Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
