@@ -25,8 +25,7 @@ namespace IIS.Core.GraphQL.Materials
             FilterInput filter,
             SortingInput sorting,
             SearchByImageInput searchByImageInput,
-            SearchByRelationInput searchByRelation = null,
-            IEnumerable<string> types = null)
+            SearchByRelationInput searchByRelation = null)
         {
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
 
@@ -58,7 +57,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var materialsResult = await materialProvider
-                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, sortingParam, types);
+                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, sortingParam);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);

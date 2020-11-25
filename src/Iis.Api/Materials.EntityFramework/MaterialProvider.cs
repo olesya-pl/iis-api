@@ -84,46 +84,23 @@ namespace IIS.Core.Materials.EntityFramework
             int offset,
             string filterQuery,
             SortingParams sorting,
-            IEnumerable<string> types = null)
+            CancellationToken ct = default)
         {
-            IEnumerable<Task<Material>> mappingTasks;
-            IReadOnlyCollection<Material> materials;
+            var searchParams = new SearchParams{
+                Offset = offset,
+                Limit = limit,
+                Suggestion = string.IsNullOrWhiteSpace(filterQuery) || filterQuery == WildCart ? null : filterQuery,
+                Sorting = sorting
+            };
 
-            (IEnumerable<MaterialEntity> Materials, int Count) materialResult;
+            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(searchParams);
 
-            switch (types, filterQuery)
-            {
-                case (IEnumerable<string> array, _) when array != null && array.Any():
-                {
-                    materialResult = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetAllAsync(types, limit, offset, sorting.ColumnName, sorting.Order));
+            var materials = searchResult.Items.Values
+                .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                .Select(MapMaterialDocument)
+                .ToArray();
 
-                    mappingTasks = materialResult.Materials.Select(async entity => await MapAsync(entity));
-
-                    materials = await Task.WhenAll(mappingTasks);
-
-                    materials = await UpdateProcessedMLHandlersCountAsync(materials);
-
-                    return MaterialsDto.Create(materials, materialResult.Count, EmptyHighLightCollection);
-                }
-                case (_, _):
-                {
-                    var searchParams = new SearchParams{
-                        Offset = offset,
-                        Limit = limit,
-                        Suggestion = string.IsNullOrWhiteSpace(filterQuery) || filterQuery == WildCart ? null : filterQuery,
-                        Sorting = sorting
-                    };
-
-                    var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(searchParams);
-
-                    materials = searchResult.Items.Values
-                        .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                        .Select(MapMaterialDocument)
-                        .ToArray();
-
-                    return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items);
-                }
-            }
+            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items);
         }
 
         private Material MapMaterialDocument(MaterialDocument document)
