@@ -40,7 +40,12 @@ namespace IIS.Core.GraphQL.Materials
 
             if(searchByRelation != null && searchByRelation.ShoudBeExecuted)
             {
-                var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(searchByRelation.NodeIdentityList, searchByRelation.IncludeDescendants, filterQuery, pagination.PageSize, pagination.Offset());
+                var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(
+                    searchByRelation.NodeIdentityList,
+                    searchByRelation.IncludeDescendants, 
+                    filterQuery,
+                    pagination.PageSize, pagination.Offset(),
+                    sorting.ColumnName, sorting.Order);
 
                 var mapped = materialsResults.Materials
                                 .Select(m => mapper.Map<Material>(m))
@@ -50,8 +55,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var materialsResult = await materialProvider
-                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, types,
-                    sorting?.ColumnName, sorting?.Order);
+                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, sorting?.ColumnName, sorting?.Order, types);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
