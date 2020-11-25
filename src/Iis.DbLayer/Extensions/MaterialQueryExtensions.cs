@@ -49,8 +49,6 @@ namespace Iis.DbLayer.Extensions
                 (MaterialSortingFields.Type, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.Type),
                 (MaterialSortingFields.Source, SortDirections.ASC) => materialsQuery.OrderBy(p => p.Source),
                 (MaterialSortingFields.Source, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.Source),
-                (MaterialSortingFields.Title, SortDirections.ASC) => materialsQuery.OrderBy(p => p.Title),
-                (MaterialSortingFields.Title, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.Title),
                 (MaterialSortingFields.Importance, SortDirections.ASC) => materialsQuery.OrderBy(p => p.ImportanceSignId),
                 (MaterialSortingFields.Importance, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.ImportanceSignId),
                 (MaterialSortingFields.ProcessedStatus, SortDirections.ASC) => materialsQuery.OrderBy(p => p.ProcessedStatusSignId),

@@ -47,5 +47,37 @@ namespace Iis.Services
 
             return _mapper.Map<AliasDto>(alias);
         }
+
+        public async Task<AliasDto> UpdateAsync(AliasDto aliasDto)
+        {
+            if (aliasDto.Id == Guid.Empty)
+                throw new ArgumentException($"{aliasDto.Id} should not be null", nameof(aliasDto.Id));
+
+            var alias = await RunWithoutCommitAsync(uow => uow.AliasRepository.GetByIdAsync(aliasDto.Id));
+            if (alias == null)
+                throw new ArgumentException($"Cannot find alias with id = {alias.Id}");
+
+            alias.DotName = aliasDto.DotName;
+            alias.Type = aliasDto.Type;
+            alias.Value = aliasDto.Value;
+
+            await RunAsync(uow => uow.AliasRepository.Update(alias));
+
+            return _mapper.Map<AliasDto>(alias);
+        }
+
+        public async Task<AliasDto> RemoveAsync(Guid id) 
+        {
+            if (id == Guid.Empty)
+                throw new ArgumentException($"{id} should not be empty", nameof(id));
+
+            var alias = await RunWithoutCommitAsync(uow => uow.AliasRepository.GetByIdAsync(id));
+            if (alias == null)
+                throw new ArgumentException($"Cannot find alias with id = {id}");
+
+            await RunAsync(uow => uow.AliasRepository.Remove(alias));
+
+            return _mapper.Map<AliasDto>(alias);
+        }
     }
 }

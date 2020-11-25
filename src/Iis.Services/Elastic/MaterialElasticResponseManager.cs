@@ -23,7 +23,9 @@ namespace Iis.Services.Elastic
         public async Task<JObject> GenerateHighlightsWithoutDublications(JObject source, JToken highlights)
         {
             var aliasesByName = await GetAliasesByNameAsync();
+
             var result = new JObject();
+
             foreach (JProperty child in highlights.Children())
             {
                 if (!aliasesByName.ContainsKey(child.Name))

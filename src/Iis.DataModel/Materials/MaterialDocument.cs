@@ -31,6 +31,7 @@ namespace Iis.DbLayer.Repositories
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public Guid[] NodeIds { get; set; }
+        public int NodesCount { get; set; }
         public Assignee Assignee { get; set; }
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
@@ -42,7 +43,7 @@ namespace Iis.DbLayer.Repositories
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string ShortTitle { get; set; }
-
+        public int OrderNumber { get; set; }
     }
 
     public class Assignee

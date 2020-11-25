@@ -62,9 +62,17 @@ namespace Iis.Services
         {
             foreach (var item in SearchableFields)
             {
-                var result = jObject.SelectToken(item)?.Value<string>();
-                if (!string.IsNullOrEmpty(result))
-                    return result;
+                try
+                {
+                    var result = jObject.SelectToken(item)?.Value<string>();
+                    if (!string.IsNullOrEmpty(result))
+                        return result;
+                }
+
+                catch (InvalidCastException)
+                {
+                    continue;
+                }
             }
 
             return null;

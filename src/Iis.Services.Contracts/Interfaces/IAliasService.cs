@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Enums;
 using Iis.Services.Contracts.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,5 +11,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<AliasDto> CreateAsync(AliasDto aliasDto);
         Task<List<AliasDto>> GetAllAsync();
         Task<List<AliasDto>> GetByTypeAsync(AliasType type);
+        Task<AliasDto> UpdateAsync(AliasDto aliasDto);
+        Task<AliasDto> RemoveAsync(Guid id);
     }
 }

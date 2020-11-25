@@ -177,36 +177,6 @@ namespace Iis.DbLayer.Repositories
                 token);
         }
 
-        public async Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
-        {
-            var searchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = MaterialIndexes.ToList(),
-                Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL",
-                From = filter.Offset,
-                Size = filter.Limit,
-            };
-            var searchResult = await _elasticManager.SearchAsync(searchParams, cancellationToken);
-            return new SearchResult
-            {
-                Count = searchResult.Count,
-                Items = searchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
-            };
-        }
-
-        public Task<int> CountMaterialsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
-        {
-            var searchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = MaterialIndexes.ToList(),
-                Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL"
-            };
-
-            return _elasticManager.CountAsync(searchParams, cancellationToken);
-        }
-
         public void AddMaterialEntity(MaterialEntity materialEntity)
         {
             Context.Materials.Add(materialEntity);
@@ -360,6 +330,9 @@ namespace Iis.DbLayer.Repositories
                 .SelectMany(p => p.MaterialFeatures)
                 .Select(p => p.NodeId)
                 .ToArray();
+
+            materialDocument.NodesCount = materialDocument.NodeIds.Count();
+
             return materialDocument;
         }
 
