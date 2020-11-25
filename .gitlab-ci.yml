@@ -247,6 +247,12 @@ deploy_dev_nomad_manual:
     NOMAD_ENV: dev
   when: manual
 
+deploy_dev2_nomad_manual:
+  extends: .deploy_nomad
+  variables:
+    NOMAD_ENV: dev2
+  when: manual
+
 deploy_dev3_nomad_manual:
   extends: .deploy_nomad
   variables:
