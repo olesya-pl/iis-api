@@ -84,8 +84,7 @@ namespace IIS.Core.Materials.EntityFramework
             int limit,
             int offset,
             string filterQuery,
-            string sortColumnName = null, 
-            string sortOrder = null,
+            SortingParams sorting,
             IEnumerable<string> types = null)
         {
             IEnumerable<Task<Material>> mappingTasks;
@@ -97,7 +96,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 case (IEnumerable<string> array, _) when array != null && array.Any():
                 {
-                    materialResult = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetAllAsync(types, limit, offset, sortColumnName, sortOrder));
+                    materialResult = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetAllAsync(types, limit, offset, sorting.ColumnName, sorting.Order));
 
                     mappingTasks = materialResult.Materials.Select(async entity => await MapAsync(entity));
 
@@ -113,8 +112,7 @@ namespace IIS.Core.Materials.EntityFramework
                         Offset = offset,
                         Limit = limit,
                         Suggestion = string.IsNullOrWhiteSpace(filterQuery) || filterQuery == WildCart ? null : filterQuery,
-                        SortColumn = sortColumnName,
-                        SortOrder = sortOrder
+                        Sorting = sorting
                     };
 
                     var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(searchParams);
@@ -389,8 +387,8 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
             bool includeDescendants, 
             string suggestion, 
-            int limit = 0, int offset = 0, 
-            string sortColumnName = null, string order = null,
+            int limit, int offset, 
+            SortingParams sorting,
             CancellationToken ct = default)
         {
             var materialEntityList = new List<MaterialEntity>();
@@ -415,7 +413,7 @@ namespace IIS.Core.Materials.EntityFramework
                 .Where(gr => gr.Count() == nodeIdList.Count())
                 .Select(gr => gr.Select(e => e.Id).FirstOrDefault());
 
-            var searchParams = new SearchParams{Offset = offset, Limit = limit, Suggestion = suggestion, SortColumn = sortColumnName, SortOrder = order};
+            var searchParams = new SearchParams{Offset = offset, Limit = limit, Suggestion = suggestion, Sorting = sorting};
 
             var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList);
 

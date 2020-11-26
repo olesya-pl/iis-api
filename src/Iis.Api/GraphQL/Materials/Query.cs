@@ -10,6 +10,7 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
 using HotChocolate.Resolvers;
+using Iis.Services.Contracts.Params;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -29,6 +30,8 @@ namespace IIS.Core.GraphQL.Materials
         {
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
 
+            var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
+
             if (searchByImageInput != null)
             {
                 var content = Convert.FromBase64String(searchByImageInput.Content);
@@ -45,7 +48,7 @@ namespace IIS.Core.GraphQL.Materials
                     searchByRelation.IncludeDescendants, 
                     filterQuery,
                     pagination.PageSize, pagination.Offset(),
-                    sorting.ColumnName, sorting.Order);
+                    sortingParam);
 
                 var mapped = materialsResults.Materials
                                 .Select(m => mapper.Map<Material>(m))
@@ -55,7 +58,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var materialsResult = await materialProvider
-                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, sorting?.ColumnName, sorting?.Order, types);
+                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, sortingParam, types);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
