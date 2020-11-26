@@ -36,7 +36,7 @@ namespace Iis.Elastic
         {
             _configuration = configuration;
 
-            var connectionPool = new SniffingConnectionPool(new[] { new Uri(_configuration.Uri) });
+            var connectionPool = new StaticConnectionPool(new[] { new Uri(_configuration.Uri) });
 
             var config = new ConnectionConfiguration(connectionPool);
 
@@ -357,7 +357,6 @@ namespace Iis.Elastic
             ApplyMappingConfiguration(request, mappingConfiguration);
             var response =
                 await DoRequestAsync(HttpMethod.PUT, GetRealIndexName(indexName), request.ToString(), token);
-            
             return response.Success;
         }
 
