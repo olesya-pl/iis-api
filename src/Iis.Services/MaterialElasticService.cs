@@ -41,7 +41,7 @@ namespace Iis.Services
         {
             var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
-            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.SortColumn, searchParams.SortOrder);
+            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
 
             var elasticSearchParams = new IisElasticSearchParams
             {
@@ -80,7 +80,7 @@ namespace Iis.Services
                 queryBuilder.WithExactQuery(searchParams.Suggestion);
             }
 
-            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.SortColumn, searchParams.SortOrder);
+            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
 
             var query = queryBuilder
                             .Build()
@@ -139,17 +139,17 @@ namespace Iis.Services
             return _elasticManager.CountAsync(elasticSearchParams, ct);
         }
 
-        private static (string SortColumn, string SortOrder) MapSortingToElastic(string sortColumn, string sortOrder = "asc")
+        private static (string SortColumn, string SortOrder) MapSortingToElastic(SortingParams sorting)
         {
-            return sortColumn switch
+            return sorting.ColumnName switch
             {
-                "createdDate" => ("CreatedDate", sortOrder),
-                "type" => ("Type.keyword", sortOrder),
-                "source" => ("Source.keyword", sortOrder),
-                "processedStatus" => ("ProcessedStatus.OrderNumber", sortOrder),
-                "sessionPriority" => ("SessionPriority.OrderNumber", sortOrder),
-                "importance" => ("Importance.OrderNumber", sortOrder),
-                "nodes" => ("NodesCount", sortOrder),
+                "createdDate" => ("CreatedDate", sorting.Order),
+                "type" => ("Type.keyword", sorting.Order),
+                "source" => ("Source.keyword", sorting.Order),
+                "processedStatus" => ("ProcessedStatus.OrderNumber", sorting.Order),
+                "sessionPriority" => ("SessionPriority.OrderNumber", sorting.Order),
+                "importance" => ("Importance.OrderNumber", sorting.Order),
+                "nodes" => ("NodesCount", sorting.Order),
                 _ => (null, null)
             };
         }

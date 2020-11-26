@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
-using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Params;
 
 namespace IIS.Core.Materials
 {
@@ -16,8 +16,7 @@ namespace IIS.Core.Materials
         Task<MaterialsDto> GetMaterialsAsync(int limit,
             int offset,
             string filterQuery,
-            string sortColumnName = null,
-            string order = null,
+            SortingParams sorting,
             IEnumerable<string> types = null);
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
@@ -30,8 +29,8 @@ namespace IIS.Core.Materials
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
             bool includeDescendants, 
             string suggestion, 
-            int limit = 0, int offset = 0, 
-            string sortColumnName = null, string order = null,
+            int limit, int offset, 
+            SortingParams sorting,
             CancellationToken ct = default);
         Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
