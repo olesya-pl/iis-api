@@ -48,6 +48,16 @@ namespace Iis.Services
             return _mapper.Map<AliasDto>(alias);
         }
 
+        public async Task<List<AliasDto>> CreateAsync(List<AliasDto> aliasDtos)
+        {
+            var aliases = _mapper.Map<List<AliasEntity>>(aliasDtos);
+            aliases.ForEach(a => a.Id = Guid.NewGuid());
+            
+            await RunAsync(uow => uow.AliasRepository.CreateRange(aliases));
+
+            return _mapper.Map<List<AliasDto>>(aliases);
+        }
+
         public async Task<AliasDto> UpdateAsync(AliasDto aliasDto)
         {
             if (aliasDto.Id == Guid.Empty)
