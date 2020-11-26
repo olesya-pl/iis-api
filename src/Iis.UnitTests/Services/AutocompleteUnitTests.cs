@@ -131,7 +131,7 @@ namespace Iis.UnitTests.Services
             });
 
             _elasticServiceMock
-                .Setup(x => x.SearchByFieldsAsync("some text", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.SearchByFieldsAsync("*some text*", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ElasticSearchResultItem>()
                 {
                     new ElasticSearchResultItem
@@ -161,7 +161,7 @@ namespace Iis.UnitTests.Services
                 });
 
             _elasticServiceMock
-                .Setup(x => x.SearchByFieldsAsync("rpg", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.SearchByFieldsAsync("*rpg*", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ElasticSearchResultItem>()
                 {
                     new ElasticSearchResultItem
