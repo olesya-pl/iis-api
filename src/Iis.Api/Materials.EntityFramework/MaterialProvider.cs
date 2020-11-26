@@ -58,7 +58,6 @@ namespace IIS.Core.Materials.EntityFramework
         public MaterialProvider(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
             IOntologyNodesData ontologyData,
-            IElasticService elasticService,
             IMaterialElasticService materialElasticService,
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
