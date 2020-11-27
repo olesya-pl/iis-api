@@ -3,7 +3,6 @@ using Iis.DataModel;
 using Iis.DataModel.Themes;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
-using Iis.ThemeManagement.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,10 +15,11 @@ using IIS.Repository;
 using Iis.DbLayer.Repositories;
 using IIS.Repository.Factories;
 using Iis.Services.Contracts.Params;
+using Iis.Services.Contracts.Dtos;
 
-namespace Iis.ThemeManagement
+namespace Iis.Services
 {
-    public class ThemeService<TUnitOfWork> : BaseService<TUnitOfWork> where TUnitOfWork : IIISUnitOfWork
+    public class ThemeService<TUnitOfWork> : BaseService<TUnitOfWork>, IThemeService where TUnitOfWork : IIISUnitOfWork
     {
         private const string CoordinatesPrefix = "__coordinates:*";
         private readonly OntologyContext _context;
@@ -30,10 +30,10 @@ namespace Iis.ThemeManagement
         private readonly IElasticState _elasticState;
 
         public ThemeService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
-            OntologyContext context, 
-            IMapper mapper, 
-            IOntologyModel ontology, 
-            IElasticService elasticService, 
+            OntologyContext context,
+            IMapper mapper,
+            IOntologyModel ontology,
+            IElasticService elasticService,
             IMaterialElasticService materialElasticService,
             IElasticState elasticState) : base(unitOfWorkFactory)
         {
@@ -45,7 +45,7 @@ namespace Iis.ThemeManagement
             _elasticState = elasticState;
         }
 
-        public async Task<Guid> CreateThemeAsync(Theme theme)
+        public async Task<Guid> CreateThemeAsync(ThemeDto theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
             entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.TypeId, entity.Query)).Count;
@@ -57,7 +57,7 @@ namespace Iis.ThemeManagement
             return entity.Id;
         }
 
-        public async Task<Guid> UpdateThemeAsync(Theme theme)
+        public async Task<Guid> UpdateThemeAsync(ThemeDto theme)
         {
             PopulateOptionalFields(theme);
             var entity = _mapper.Map<ThemeEntity>(theme);
@@ -66,7 +66,7 @@ namespace Iis.ThemeManagement
             return entity.Id;
         }
 
-        private void PopulateOptionalFields(Theme theme)
+        private void PopulateOptionalFields(ThemeDto theme)
         {
             if (theme.User == null || theme.Type == null)
             {
@@ -85,33 +85,33 @@ namespace Iis.ThemeManagement
 
                 if (theme.Type == null)
                 {
-                    theme.Type = new ThemeType { Id = existingEntity.TypeId };
+                    theme.Type = new ThemeTypeDto { Id = existingEntity.TypeId };
                 }
             }
         }
 
-        public async Task<Theme> SetReadCount(Guid themeId, int readCount)
+        public async Task<ThemeDto> SetReadCount(Guid themeId, int readCount)
         {
             var entity = await RunWithoutCommitAsync(async uow => await uow.ThemeRepository.GetByIdAsync(themeId));
 
             if (entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
             entity.ReadQueryResults = readCount;
-            var theme = _mapper.Map<Theme>(entity);
+            var theme = _mapper.Map<ThemeDto>(entity);
 
             await RunAsync(uow => uow.ThemeRepository.Update(entity));
 
             return theme;
         }
 
-        public async Task<Theme> DeleteThemeAsync(Guid themeId)
+        public async Task<ThemeDto> DeleteThemeAsync(Guid themeId)
         {
             var entity = await GetThemes()
                             .SingleOrDefaultAsync(e => e.Id == themeId);
 
             if (entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
-            var theme = _mapper.Map<Theme>(entity);
+            var theme = _mapper.Map<ThemeDto>(entity);
 
             entity.Type = null;
             entity.User = null;
@@ -123,42 +123,42 @@ namespace Iis.ThemeManagement
             return theme;
         }
 
-        public async Task<Theme> GetThemeAsync(Guid themeId)
+        public async Task<ThemeDto> GetThemeAsync(Guid themeId)
         {
             var entity = await GetThemes()
                             .SingleOrDefaultAsync(e => e.Id == themeId);
 
             if (entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
-            return _mapper.Map<Theme>(entity);
+            return _mapper.Map<ThemeDto>(entity);
         }
 
-        public async Task<IEnumerable<Theme>> GetThemesByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<ThemeDto>> GetThemesByUserIdAsync(Guid userId)
         {
             var entities = await GetThemes()
                                     .Where(e => e.UserId == userId)
                                     .ToListAsync();
 
-            var themes = _mapper.Map<IEnumerable<Theme>>(entities);
+            var themes = _mapper.Map<IEnumerable<ThemeDto>>(entities);
             return themes;
         }
 
-        public async Task<ThemeType> GetThemeTypeByEntityTypeNameAsync(string entityTypeName)
+        public async Task<ThemeTypeDto> GetThemeTypeByEntityTypeNameAsync(string entityTypeName)
         {
             var entity = await _context.ThemeTypes
                                     .SingleOrDefaultAsync(e => e.EntityTypeName == entityTypeName);
 
             if (entity is null) throw new ArgumentException($"ThemeType does not exist for EntityTypeName = {entityTypeName}");
 
-            return _mapper.Map<ThemeType>(entity);
+            return _mapper.Map<ThemeTypeDto>(entity);
         }
 
-        public async Task<IEnumerable<ThemeType>> GetThemeTypesAsync()
+        public async Task<IEnumerable<ThemeTypeDto>> GetThemeTypesAsync()
         {
             var entities = await _context.ThemeTypes
                                             .ToListAsync();
 
-            return _mapper.Map<IEnumerable<ThemeType>>(entities);
+            return _mapper.Map<IEnumerable<ThemeTypeDto>>(entities);
         }
         public async Task UpdateQueryResultsAsync(CancellationToken ct, params Guid[] themeTypes)
         {
@@ -179,15 +179,15 @@ namespace Iis.ThemeManagement
             foreach (var groupedTheme in themesByQuery)
             {
                 ct.ThrowIfCancellationRequested();
-                tasks.Add(GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query));                
+                tasks.Add(GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query));
             }
 
             var results = await Task.WhenAll(tasks);
 
             foreach (var result in results)
             {
-                var groupedTheme = themesByQuery.FirstOrDefault(p => 
-                    string.Equals(p.Key.Query, result.Query, StringComparison.Ordinal) 
+                var groupedTheme = themesByQuery.FirstOrDefault(p =>
+                    string.Equals(p.Key.Query, result.Query, StringComparison.Ordinal)
                     && p.Key.TypeId == result.TypeId);
 
                 if (groupedTheme == null)
@@ -235,7 +235,8 @@ namespace Iis.ThemeManagement
                 _ => (IEnumerable<string>)null
             };
 
-            if (indexes is null) return new QueryResult { 
+            if (indexes is null) return new QueryResult
+            {
                 Count = 0,
                 Query = query,
                 TypeId = typeId
@@ -253,7 +254,7 @@ namespace Iis.ThemeManagement
             }
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
-                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(new SearchParams{Limit = filter.Limit, Offset = filter.Offset, Suggestion = filter.Suggestion});
+                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(new SearchParams { Limit = filter.Limit, Offset = filter.Offset, Suggestion = filter.Suggestion });
                 return new QueryResult
                 {
                     Count = count,
@@ -265,8 +266,8 @@ namespace Iis.ThemeManagement
             {
                 if (typeId == ThemeTypeEntity.EntityMapId)
                 {
-                    filter.Suggestion = filter.Suggestion.Contains(CoordinatesPrefix) 
-                        ? filter.Suggestion 
+                    filter.Suggestion = filter.Suggestion.Contains(CoordinatesPrefix)
+                        ? filter.Suggestion
                         : $"{CoordinatesPrefix} && {filter.Suggestion}";
                 }
 

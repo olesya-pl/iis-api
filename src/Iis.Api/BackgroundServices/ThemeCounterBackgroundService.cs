@@ -1,15 +1,13 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Iis.DataModel.Themes;
+using Iis.Services.Contracts.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Iis.ThemeManagement;
-using Iis.DbLayer.Repositories;
-using Newtonsoft.Json.Bson;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using Iis.DataModel.Themes;
 
 namespace Iis.Api.BackgroundServices
 {
@@ -59,7 +57,7 @@ namespace Iis.Api.BackgroundServices
                             var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                             var typesToUpdate = GetTypesToUpdate();
                             ResetFlags();
-                            var themeService = scope.ServiceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
+                            var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
                             await themeService.UpdateQueryResultsAsync(stoppingToken, typesToUpdate);
                             var sleepInterval = configuration.GetValue("themesRefreshInterval", 120);
                             await Task.Delay(TimeSpan.FromSeconds(sleepInterval), stoppingToken);

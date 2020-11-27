@@ -37,7 +37,6 @@ using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.DI;
-using Iis.ThemeManagement;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.Files.EntityFramework;
@@ -193,7 +192,7 @@ namespace IIS.Core
             services.AddTransient<ExportToJsonService>();
             services.AddTransient<RoleService>();
             services.AddTransient<UserService>();
-            services.AddTransient<ThemeService<IIISUnitOfWork>>();
+            services.AddTransient<IThemeService, ThemeService<IIISUnitOfWork>>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
