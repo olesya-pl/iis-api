@@ -11,5 +11,6 @@ namespace Iis.Services.Contracts.Dtos
         public Guid TargetId { get; set; }
         public string UserName { get; set; }
         public Guid RequestId { get; set; }
+        public int Type { get; set; }
     }
 }

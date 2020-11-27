@@ -2,6 +2,13 @@
 
 namespace Iis.DataModel.ChangeHistory
 {
+    public enum ChangeHistoryEntityType
+    {
+        Node = 0,
+        Material = 1
+    }
+
+
     public class ChangeHistoryEntity : BaseEntity
     {
         public Guid TargetId { get; set; }
@@ -11,5 +18,6 @@ namespace Iis.DataModel.ChangeHistory
         public string OldValue { get; set; }
         public string NewValue { get; set; }
         public Guid RequestId { get; set; }
+        public ChangeHistoryEntityType Type { get; set; }
     }
 }

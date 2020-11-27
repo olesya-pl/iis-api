@@ -16,6 +16,11 @@ namespace Iis.DbLayer.Repositories
             Context.Aliases.Add(entity);
         }
 
+        public void CreateRange(List<AliasEntity> entities)
+        {
+            Context.Aliases.AddRange(entities);
+        }
+
         public Task<List<AliasEntity>> GetByTypeAsync(AliasType type)
         {
             return Context.Aliases.Where(x => x.Type == type).ToListAsync();

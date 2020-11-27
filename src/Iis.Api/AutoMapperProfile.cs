@@ -16,6 +16,7 @@ using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Themes;
 using IIS.Core.GraphQL.Users;
+using Iis.Api.GraphQL.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -23,6 +24,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Params;
 using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
 using Iis.Interfaces.Ontology.Data;
@@ -346,7 +348,7 @@ namespace Iis.Api
 
             #endregion
 
-            CreateMap<ChangeHistoryEntity, ChangeHistoryDto>();
+            CreateMap<ChangeHistoryEntity, ChangeHistoryDto>().ReverseMap();
             CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
 
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
@@ -354,6 +356,8 @@ namespace Iis.Api
             CreateMap<Iis.Interfaces.Elastic.SearchEntitiesByConfiguredFieldsResult, IIS.Core.GraphQL.Entities.ObjectOfStudyFilterableQueryResponse>()
                 .ForMember(dest => dest.Aggregations, opts => opts.MapFrom(src => src.Aggregations))
                 .ForMember(dest => dest.Items, opts => opts.MapFrom(src => src.Entities));
+
+            CreateMap<SortingInput, SortingParams>();
         }
     }
 }

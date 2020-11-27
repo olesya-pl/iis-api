@@ -51,7 +51,6 @@ namespace Iis.UnitTests.Materials
             materialProvider = new MaterialProvider<IIISUnitOfWork>(new Mock<IOntologyService>().Object,
                 new Mock<IOntologySchema>().Object,
                 new Mock<IOntologyNodesData>().Object,
-                new Mock<IElasticService>().Object,
                 new Mock<IMaterialElasticService>().Object,
                 new Mock<IMLResponseRepository>().Object,
                 new Mock<IMaterialSignRepository>().Object,

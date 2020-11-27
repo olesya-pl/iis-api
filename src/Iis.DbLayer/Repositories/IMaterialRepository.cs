@@ -30,8 +30,6 @@ namespace Iis.DbLayer.Repositories
 
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default);
 
-        Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
-
         void AddMaterialEntity(MaterialEntity materialEntity);
 
         void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntities);
@@ -41,6 +39,7 @@ namespace Iis.DbLayer.Repositories
         void EditMaterial(MaterialEntity materialEntity);
 
         List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
+
         Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds);
 
         Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds);
@@ -56,7 +55,5 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId);
 
         Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
-
-        Task<int> CountMaterialsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default);
     }
 }

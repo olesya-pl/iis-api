@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Iis.DataModel.ChangeHistory;
 using Iis.DbLayer.Repositories;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -24,7 +23,7 @@ namespace Iis.Services
             _ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
         }
 
-        public async Task SaveChange(
+        public async Task SaveNodeChange(
             string attributeDotName,
             Guid targetId,
             string userName,
@@ -41,10 +40,22 @@ namespace Iis.Services
                 Date = DateTime.Now,
                 OldValue = oldValue,
                 NewValue = newValue,
-                RequestId = requestId
+                RequestId = requestId,
+                Type = ChangeHistoryEntityType.Node
             };
 
             await RunAsync(uow => uow.ChangeHistoryRepository.Add(changeHistoryEntity));
+        }
+
+        public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes)
+        {
+            var entities = _mapper.Map<List<ChangeHistoryEntity>>(changes);
+            foreach (var entity in entities)
+            {
+                entity.Id = Guid.NewGuid();
+                entity.Type = ChangeHistoryEntityType.Material;
+            }
+            await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
         }
 
         public async Task<List<ChangeHistoryDto>> GetChangeHistory(ChangeHistoryParams parameters)

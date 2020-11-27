@@ -15,6 +15,7 @@ using System.Threading;
 using IIS.Repository;
 using Iis.DbLayer.Repositories;
 using IIS.Repository.Factories;
+using Iis.Services.Contracts.Params;
 
 namespace Iis.ThemeManagement
 {
@@ -252,7 +253,7 @@ namespace Iis.ThemeManagement
             }
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
-                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(filter);
+                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(new SearchParams{Limit = filter.Limit, Offset = filter.Offset, Suggestion = filter.Suggestion});
                 return new QueryResult
                 {
                     Count = count,
