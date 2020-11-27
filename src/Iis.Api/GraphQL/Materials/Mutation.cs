@@ -15,7 +15,7 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
-            var material = await materialService.UpdateMaterialAsync(input, tokenPayload.UserId);
+            var material = await materialService.UpdateMaterialAsync(input, tokenPayload.UserId, tokenPayload.User.UserName);
             return mapper.Map<Material>(material);
         }
     }

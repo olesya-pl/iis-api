@@ -198,6 +198,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("TargetId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
                     b.Property<string>("UserName")
                         .HasColumnType("text");
 

@@ -53,5 +53,10 @@ namespace Iis.DbLayer.Repositories
         {
             Context.Add(entity);
         }
+
+        public void AddRange(IReadOnlyCollection<ChangeHistoryEntity> entities)
+        {
+            Context.AddRange(entities);
+        }
     }
 }
