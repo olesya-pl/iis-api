@@ -17,7 +17,7 @@ namespace IIS.Core.Materials
             int offset,
             string filterQuery,
             SortingParams sorting,
-            IEnumerable<string> types = null);
+            CancellationToken ct = default);
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(string signValue);
