@@ -45,7 +45,7 @@ namespace Iis.OntologyModelWrapper
                 case Kind.Entity:
                     return new NodeTypeWrapper(nodeType);
                 case Kind.Attribute:
-                    return new AttributeTypeWrapper(nodeType);
+                    return new NodeTypeWrapper(nodeType);
                 case Kind.Relation:
                     return new EmbeddingRelationTypeWrapper(nodeType);
             }
@@ -65,7 +65,7 @@ namespace Iis.OntologyModelWrapper
                         list.Add(new NodeTypeWrapper(nodeType));
                         break;
                     case Kind.Attribute:
-                        list.Add(new AttributeTypeWrapper(nodeType));
+                        list.Add(new NodeTypeWrapper(nodeType));
                         break;
                     case Kind.Relation:
                         list.Add(new EmbeddingRelationTypeWrapper(nodeType));

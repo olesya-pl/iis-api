@@ -60,5 +60,20 @@ namespace Iis.OntologyModelWrapper
         {
             return Id == type.Id || _source.IsInheritedFrom(type.Name);
         }
+
+        public ScalarType ScalarTypeEnum => _source.AttributeType?.ScalarType ?? default;
+
+        public bool AcceptsScalar(object value)
+        {
+            return (value is int || value is long) && ScalarTypeEnum == ScalarType.Int
+                || value is bool && ScalarTypeEnum == ScalarType.Boolean
+                || value is decimal && ScalarTypeEnum == ScalarType.Decimal
+                || value is string && ScalarTypeEnum == ScalarType.String
+                || value is string && ScalarTypeEnum == ScalarType.IntegerRange
+                || value is string && ScalarTypeEnum == ScalarType.FloatRange
+                || value is DateTime && ScalarTypeEnum == ScalarType.Date
+                || value is Dictionary<string, object> && ScalarTypeEnum == ScalarType.Geo
+                || value is Guid && ScalarTypeEnum == ScalarType.File;
+        }
     }
 }

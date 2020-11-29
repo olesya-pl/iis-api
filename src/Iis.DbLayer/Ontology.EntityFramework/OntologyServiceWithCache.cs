@@ -280,7 +280,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (relation.Target is Attribute)
             {
                 var attribute = relation.Target as Attribute;
-                var value = AttributeType.ValueToString(attribute.Value, ((IAttributeTypeModel)attribute.Type).ScalarTypeEnum);
+                var value = AttributeType.ValueToString(attribute.Value, attribute.Type.ScalarTypeEnum);
                 return _data.CreateRelationWithAttribute(sourceId, relation.Type.Id, value);
             }
             else
@@ -302,7 +302,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (nodeType.Kind == Kind.Attribute)
             {
                 var value = AttributeType.ParseValue(node.Value, nodeType.AttributeType.ScalarType);
-                var attributeType = new AttributeTypeWrapper(nodeType);
+                var attributeType = new NodeTypeWrapper(nodeType);
                 result = new Attribute(node.Id, attributeType, value, node.CreatedAt, node.UpdatedAt);
             }
             else if (nodeType.Kind == Kind.Entity)

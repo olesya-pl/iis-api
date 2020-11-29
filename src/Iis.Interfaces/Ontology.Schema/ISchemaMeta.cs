@@ -11,7 +11,6 @@ namespace Iis.OntologySchema.DataTypes
         string Formula { get; }
         string Format { get; }
         EntityOperation[] AcceptsEntityOperations { get; }
-        EntityOperation[] AcceptsEmbeddedOperations { get; }
         string Type { get; }
         string[] TargetTypes { get; }
         IFormField FormField { get; }

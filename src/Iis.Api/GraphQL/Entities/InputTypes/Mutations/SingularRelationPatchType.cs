@@ -54,7 +54,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
                 return relationType.AttributeType.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
-                var ops = relationType.GetOperations();
+                var ops = relationType.Meta.AcceptsEntityOperations;
                 if (ops == null || ops.Length == 0)
                     return "EntityRelationInput";
                 return $"{OntologyObjectType.GetName(relationType.EntityType)}_{RelationPatchType.GetAbbreviation(ops)}";

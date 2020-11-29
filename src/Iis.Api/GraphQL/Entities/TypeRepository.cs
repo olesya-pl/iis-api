@@ -102,7 +102,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC SCHEMA TYPES ----- //
 
-        public IInputType GetInputAttributeType(IAttributeTypeModel attributeType)
+        public IInputType GetInputAttributeType(INodeTypeModel attributeType)
         {
             IInputType type;
             if (attributeType.ScalarTypeEnum == OScalarType.File)
@@ -141,7 +141,7 @@ namespace IIS.Core.GraphQL.Entities
                 new EntityUnionInputType(operation, type, this));
         }
 
-        public MultipleInputType GetMultipleInputType(Operation operation, IAttributeTypeModel type)
+        public MultipleInputType GetMultipleInputType(Operation operation, INodeTypeModel type)
         {
             var scalarName = type.ScalarTypeEnum.ToString();
             var name = MultipleInputType.GetName(operation, scalarName);

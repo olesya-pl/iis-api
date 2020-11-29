@@ -18,7 +18,6 @@ namespace Iis.OntologySchema.DataTypes
         public string Formula { get; set; }
         public string Format { get; set; }
         public EntityOperation[] AcceptsEntityOperations { get; set; } 
-        public EntityOperation[] AcceptsEmbeddedOperations { get; set; }
         public string Type { get; set; }
         public string[] TargetTypes { get; set; }
         public IFormField FormField { get; set; }
@@ -73,11 +72,6 @@ namespace Iis.OntologySchema.DataTypes
             if (jObj.ContainsKey("AcceptsEntityOperations"))
             {
                 AcceptsEntityOperations = ((JArray)jObj["AcceptsEntityOperations"])
-                    .Select(n => (EntityOperation)byte.Parse(n.ToString())).ToArray();
-            }
-            if (jObj.ContainsKey("AcceptsEmbeddedOperations"))
-            {
-                AcceptsEmbeddedOperations = ((JArray)jObj["AcceptsEmbeddedOperations"])
                     .Select(n => (EntityOperation)byte.Parse(n.ToString())).ToArray();
             }
             if (jObj.ContainsKey("TargetTypes"))

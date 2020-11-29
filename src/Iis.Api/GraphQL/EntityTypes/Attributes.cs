@@ -154,7 +154,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<StringType>>>))]
         public IEnumerable<string> AcceptsEntityOperations =>
-            (Source.GetOperations()?? new EntityOperation[]{})
+            (Source.Meta.AcceptsEntityOperations ?? new EntityOperation[]{})
                 .Select(e => e.ToString().ToLower());
 
         [GraphQLNonNullType]

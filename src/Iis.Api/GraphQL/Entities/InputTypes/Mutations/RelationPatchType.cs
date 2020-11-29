@@ -43,7 +43,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
                 return relationType.AttributeType.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
-                var ops = relationType.GetOperations();
+                var ops = relationType.Meta.AcceptsEntityOperations;
                 if (ops == null || ops.Length == 0)
                     return "EntityRelationInput";
                 return $"{OntologyObjectType.GetName(relationType.EntityType)}_{GetAbbreviation(ops)}";
@@ -81,7 +81,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             }
             else
             {
-                var ops = _relationType.GetOperations();
+                var ops = _relationType.Meta.AcceptsEntityOperations;
                 var description = $"Patch array of {_relationType.EntityType.Name} entity type.";
                 if (ops != null)
                     description += $" Accepts entity operations: {string.Join(", ", ops)}";

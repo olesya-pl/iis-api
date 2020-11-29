@@ -12,10 +12,6 @@ namespace Iis.OntologyModelWrapper
     public class EmbeddingRelationTypeWrapper : NodeTypeWrapper, IEmbeddingRelationTypeModel
     {
         public EmbeddingRelationTypeWrapper(INodeTypeLinked source) : base(source) { }
-        public IEmbeddingRelationTypeModel DirectRelationType =>
-            _source.RelationType.DirectRelationType?.NodeType == null ?
-                null : 
-                new EmbeddingRelationTypeWrapper(_source.RelationType.DirectRelationType?.NodeType); 
 
         public ISchemaMeta EmbeddingMeta => _source.MetaObject;
 
@@ -26,9 +22,9 @@ namespace Iis.OntologyModelWrapper
                     new NodeTypeWrapper(_source.RelationType.TargetType) :
                     null;
 
-        public IAttributeTypeModel AttributeType =>
+        public INodeTypeModel AttributeType =>
             _source.RelationType.TargetType.Kind == Kind.Attribute ?
-                new AttributeTypeWrapper(_source.RelationType.TargetType) :
+                new NodeTypeWrapper(_source.RelationType.TargetType) :
                 null;
 
         public bool IsAttributeType => _source.RelationType.TargetType.Kind == Kind.Attribute;
@@ -40,7 +36,7 @@ namespace Iis.OntologyModelWrapper
         public INodeTypeModel TargetType =>
             _source?.RelationType.TargetType == null ?
                 null :
-                new AttributeTypeWrapper(_source.RelationType.TargetType);
+                new NodeTypeWrapper(_source.RelationType.TargetType);
 
         public bool AcceptsOperation(EntityOperation create) => true;
 

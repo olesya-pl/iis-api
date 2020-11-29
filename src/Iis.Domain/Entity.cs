@@ -15,12 +15,11 @@ namespace Iis.Domain
 
         public override void AddNode(Node node)
         {
-            if (node.Type is IEmbeddingRelationTypeModel)
+            if (node.Type.Source.Kind == Kind.Relation)
             {
-                var embeddingRelationType = (IEmbeddingRelationTypeModel)(node.Type);
-                if (embeddingRelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                if (node.Type.Source.RelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
-                    var existingNode = Nodes.SingleOrDefault(e => e.Type == node.Type);
+                    var existingNode = Nodes.SingleOrDefault(e => e.Type.Id == node.Type.Id);
                     if (existingNode != null) throw new Exception($"Relation '{node.Type.Name}' supports single value only.");
                 }
             }

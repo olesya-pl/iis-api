@@ -8,11 +8,10 @@ namespace Iis.Domain
 {
     public interface IEmbeddingRelationTypeModel: IRelationTypeModel
     {
-        IEmbeddingRelationTypeModel DirectRelationType { get; }
         ISchemaMeta EmbeddingMeta { get; }
         EmbeddingOptions EmbeddingOptions { get; }
         INodeTypeModel EntityType { get; }
-        IAttributeTypeModel AttributeType { get; }
+        INodeTypeModel AttributeType { get; }
         bool IsAttributeType { get; }
         bool IsEntityType { get; }
         bool IsInversed { get; }

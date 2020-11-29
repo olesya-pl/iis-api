@@ -55,7 +55,7 @@ namespace IIS.Core.Ontology {
 
         private void _tryToAddAttribute(Ast ast, string value)
         {
-            var (name, types, conditions) = _parseChunk<IAttributeTypeModel>(value);
+            var (name, types, conditions) = _parseChunk<INodeTypeModel>(value);
             ast.Add(new AstAttribute(types.FirstOrDefault(), conditions) { Name = name });
         }
 
@@ -227,11 +227,11 @@ namespace IIS.Core.Ontology {
         {
             public readonly JObject Conditions;
 
-            public AstAttribute(IAttributeTypeModel type): base(type)
+            public AstAttribute(INodeTypeModel type): base(type)
             {
             }
 
-            public AstAttribute(IAttributeTypeModel type, string conditions): base(type)
+            public AstAttribute(INodeTypeModel type, string conditions): base(type)
             {
                 try {
                     Conditions = conditions == null ? null : JObject.Parse(conditions);

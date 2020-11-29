@@ -28,6 +28,15 @@ namespace Iis.Domain
         INodeTypeLinked Source { get; }
         IEmbeddingRelationTypeModel GetProperty(string typeName);
         bool IsSubtypeOf(INodeTypeModel type);
-        string ToString();
+                string ToString();
+        
+        #region AttributeType
+        ScalarType ScalarTypeEnum { get; }
+        bool AcceptsScalar(object value);
+        #endregion
+
+
+
+
     }
 }
