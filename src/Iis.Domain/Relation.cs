@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,12 +11,12 @@ namespace Iis.Domain
         {
             get
             {
-                return Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(IRelationTypeModel))
+                return Nodes.SingleOrDefault(e => e.Type.Source.Kind != Kind.Relation)
                        ?? throw new Exception("Relation does not have a target.");
             }
             set
             {
-                var currentValue = Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(IRelationTypeModel));
+                var currentValue = Nodes.SingleOrDefault(e => e.Type.Source.Kind != Kind.Relation);
                 if (currentValue != null)
                     RemoveNode(currentValue);
                 AddNode(value);

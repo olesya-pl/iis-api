@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<Entity> ResolveEntity(IResolverContext ctx, INodeTypeModel type)
         {
             var id = ctx.Argument<Guid>("id");
-            var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, IEmbeddingRelationTypeModel>(id, null), default);
+            var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, INodeTypeModel>(id, null), default);
             return node as Entity; // return null if node was not entity
         }
 
@@ -65,7 +65,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         // ----- Relations to attributes ----- //
 
         // Resolve single entity-attribute relation. Return any scalar type.
-        public async Task<object> ResolveAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType)
+        public async Task<object> ResolveAttributeRelation(IResolverContext ctx, INodeTypeModel relationType)
         {
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
@@ -80,7 +80,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         // resolve multiple entity-[attribute] relation
-        public async Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType)
+        public async Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, INodeTypeModel relationType)
         {
             var parent = ctx.Parent<Node>();
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create(parent.Id, relationType), default);
@@ -103,7 +103,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         // ----- Relations to entities ----- //
 
         // Resolve one or multiple relations to entity. Return either Entity or IEnumerable<Entity>
-        public async Task<object> ResolveEntityRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType)
+        public async Task<object> ResolveEntityRelation(IResolverContext ctx, INodeTypeModel relationType)
         {
             var ontologyService = ctx.Service<IOntologyService>();
             var parent = ctx.Parent<Node>();

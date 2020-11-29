@@ -35,7 +35,7 @@ namespace IIS.Core.GraphQL.Entities
             return new MutatorInputType(configure);
         }
 
-        protected virtual void OnRelation(IEmbeddingRelationTypeModel relationType,
+        protected virtual void OnRelation(INodeTypeModel relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             var type = relationType.IsAttributeType
@@ -53,7 +53,7 @@ namespace IIS.Core.GraphQL.Entities
         {
         }
 
-        protected override void OnRelation(IEmbeddingRelationTypeModel relationType,
+        protected override void OnRelation(INodeTypeModel relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type = null;
@@ -81,7 +81,7 @@ namespace IIS.Core.GraphQL.Entities
         {
         }
 
-        protected override void OnRelation(IEmbeddingRelationTypeModel relationType,
+        protected override void OnRelation(INodeTypeModel relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type;

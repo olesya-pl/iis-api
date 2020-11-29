@@ -15,11 +15,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<Guid> ResolveId(IResolverContext ctx);
         Task<Entity> ResolveEntity(IResolverContext ctx, INodeTypeModel type);
         Task<Tuple<IEnumerable<INodeTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, INodeTypeModel type);
-        Task<object> ResolveAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
-        Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
+        Task<object> ResolveAttributeRelation(IResolverContext ctx, INodeTypeModel relationType);
+        Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, INodeTypeModel relationType);
         Task<object> ResolveMultipleAttributeRelationTarget(IResolverContext ctx);
         Task<object> ResolveAttributeValue(IResolverContext ctx, Attribute attribute);
-        Task<object> ResolveEntityRelation(IResolverContext ctx, IEmbeddingRelationTypeModel relationType);
+        Task<object> ResolveEntityRelation(IResolverContext ctx, INodeTypeModel relationType);
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);

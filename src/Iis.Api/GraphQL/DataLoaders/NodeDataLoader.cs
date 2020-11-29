@@ -9,7 +9,7 @@ using Iis.Domain;
 
 namespace IIS.Core.GraphQL.DataLoaders
 {
-    public class NodeDataLoader : DataLoaderBase<Tuple<Guid, IEmbeddingRelationTypeModel>, Node>
+    public class NodeDataLoader : DataLoaderBase<Tuple<Guid, INodeTypeModel>, Node>
     {
         private readonly IOntologyService _ontologyService;
 
@@ -18,7 +18,7 @@ namespace IIS.Core.GraphQL.DataLoaders
             _ontologyService = ontologyService;
         }
 
-        protected override Task<IReadOnlyList<Result<Node>>> FetchAsync(IReadOnlyList<Tuple<Guid, IEmbeddingRelationTypeModel>> keys, CancellationToken cancellationToken)
+        protected override Task<IReadOnlyList<Result<Node>>> FetchAsync(IReadOnlyList<Tuple<Guid, INodeTypeModel>> keys, CancellationToken cancellationToken)
         {
             var nodeIds = keys.Select(k => k.Item1).ToArray();
             var relationTypes = keys.All(k => k.Item2 != null)

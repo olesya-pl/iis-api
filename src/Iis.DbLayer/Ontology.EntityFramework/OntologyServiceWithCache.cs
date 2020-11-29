@@ -201,7 +201,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var node = _data.GetNode(nodeId);
             return MapNode(node);
         }
-        public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes)
+        public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<INodeTypeModel> relationTypes)
         {
             var nodes = _data.GetNodes(nodeIds.Distinct());
             return nodes.Select(n => MapNode(n, relationTypes)).ToList();
@@ -231,7 +231,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         private void SaveRelations(Node source, INode existing)
         {
-            foreach (IEmbeddingRelationTypeModel relationType in source.Type.AllProperties)
+            foreach (INodeTypeModel relationType in source.Type.AllProperties)
             {
                 if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
@@ -288,11 +288,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 return _data.CreateRelation(sourceId, relation.Target.Id, relation.Type.Id);
             }
         }
-        private Node MapNode(INode node, IEnumerable<IEmbeddingRelationTypeModel> relationTypes = null)
+        private Node MapNode(INode node, IEnumerable<INodeTypeModel> relationTypes = null)
         {
             return MapNode(node, new List<Node>(), relationTypes);
         }
-        private Node MapNode(INode node, List<Node> mappedNodes, IEnumerable<IEmbeddingRelationTypeModel> relationTypes = null)
+        private Node MapNode(INode node, List<Node> mappedNodes, IEnumerable<INodeTypeModel> relationTypes = null)
         {
             var m = mappedNodes.SingleOrDefault(e => e.Id == node.Id);
             if (m != null) return m;

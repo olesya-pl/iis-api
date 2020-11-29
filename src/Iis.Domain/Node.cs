@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,20 +48,20 @@ namespace Iis.Domain
         public IEnumerable<Relation> GetRelations(string relationTypeName) =>
             Nodes.OfType<Relation>().Where(r => r.Type.Name == relationTypeName);
 
-        public IEmbeddingRelationTypeModel GetRelationType(string relationTypeName) =>
+        public INodeTypeModel GetRelationType(string relationTypeName) =>
             Type.GetProperty(relationTypeName) ??
             throw new ArgumentException($"Relation with name {relationTypeName} does not exist");
 
         // Only single relations
-        public Relation GetRelation(IEmbeddingRelationTypeModel relationType) =>
+        public Relation GetRelation(INodeTypeModel relationType) =>
             GetRelations(relationType.Name).SingleOrDefault()
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name}");
 
-        public Relation GetRelationOrDefault(IEmbeddingRelationTypeModel relationType) =>
+        public Relation GetRelationOrDefault(INodeTypeModel relationType) =>
             GetRelations(relationType.Name).SingleOrDefault();
 
         // For single or multiple relations
-        public Relation GetRelation(IEmbeddingRelationTypeModel relationType, Guid relationId) =>
+        public Relation GetRelation(INodeTypeModel relationType, Guid relationId) =>
             GetRelations(relationType.Name).SingleOrDefault(r => r.Id == relationId)
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name} with id {relationId}");
 
@@ -90,7 +91,7 @@ namespace Iis.Domain
         private string GetDotName((Attribute attribute, string dotName) child)
         {
             var sb = new StringBuilder();
-            if (this.Type is IRelationTypeModel)
+            if (this.Type.Source.Kind == Kind.Relation)
             {
                 sb.Append(this.Type.Name);
             }

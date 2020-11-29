@@ -22,21 +22,28 @@ namespace Iis.Domain
         bool IsComputed { get; }
         IEnumerable<INodeTypeModel> DirectParents { get; }
         IEnumerable<INodeTypeModel> AllParents { get; }
-        IEnumerable<IEmbeddingRelationTypeModel> DirectProperties { get; }
-        IEnumerable<IEmbeddingRelationTypeModel> AllProperties { get; }
+        IEnumerable<INodeTypeModel> DirectProperties { get; }
+        IEnumerable<INodeTypeModel> AllProperties { get; }
         bool IsObjectOfStudy { get; }
         INodeTypeLinked Source { get; }
-        IEmbeddingRelationTypeModel GetProperty(string typeName);
+        INodeTypeModel GetProperty(string typeName);
         bool IsSubtypeOf(INodeTypeModel type);
-                string ToString();
         
         #region AttributeType
         ScalarType ScalarTypeEnum { get; }
         bool AcceptsScalar(object value);
         #endregion
 
-
-
-
+        #region RelationType
+        ISchemaMeta EmbeddingMeta { get; }
+        EmbeddingOptions EmbeddingOptions { get; }
+        INodeTypeModel EntityType { get; }
+        INodeTypeModel AttributeType { get; }
+        bool IsAttributeType { get; }
+        bool IsEntityType { get; }
+        bool IsInversed { get; }
+        INodeTypeModel TargetType { get; }
+        bool AcceptsOperation(EntityOperation create);
+        #endregion
     }
 }

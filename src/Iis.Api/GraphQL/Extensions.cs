@@ -27,7 +27,7 @@ namespace IIS.Core.GraphQL
             return descriptor;
         }
 
-        public static IOutputType WrapOutputType(this IOutputType type, IEmbeddingRelationTypeModel relationType)
+        public static IOutputType WrapOutputType(this IOutputType type, INodeTypeModel relationType)
         {
             if (relationType.IsComputed)
                 return type;
@@ -44,7 +44,7 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        public static IInputType WrapInputType(this IInputType type, IEmbeddingRelationTypeModel relationType)
+        public static IInputType WrapInputType(this IInputType type, INodeTypeModel relationType)
         {
             switch (relationType.EmbeddingOptions)
             {

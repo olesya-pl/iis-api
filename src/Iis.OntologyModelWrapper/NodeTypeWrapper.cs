@@ -26,13 +26,13 @@ namespace Iis.OntologyModelWrapper
 
         public IEnumerable<INodeTypeModel> AllParents => _source.GetAllAncestors().Select(nt => new NodeTypeWrapper(nt));
 
-        public IEnumerable<IEmbeddingRelationTypeModel> AllProperties => _source.GetAllProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
+        public IEnumerable<INodeTypeModel> AllProperties => _source.GetAllProperties().Select(nt => new NodeTypeWrapper(nt));
 
         public DateTime CreatedAt => _source.CreatedAt;
 
         public IEnumerable<INodeTypeModel> DirectParents => _source.DirectParents.Select(nt => new NodeTypeWrapper(nt));
 
-        public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties => _source.DirectProperties.Select(nt => new EmbeddingRelationTypeWrapper(nt));
+        public IEnumerable<INodeTypeModel> DirectProperties => _source.DirectProperties.Select(nt => new NodeTypeWrapper(nt));
 
         public bool HasUniqueValues => _source.HasUniqueValues;
         public string UniqueValueFieldName => _source.UniqueValueFieldName;
@@ -45,13 +45,14 @@ namespace Iis.OntologyModelWrapper
         public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public string Name => _source.Name;
+        public override string ToString() => Name;
 
         public string Title => _source.Title;
 
         public DateTime UpdatedAt => _source.UpdatedAt;
         public bool IsComputed => !string.IsNullOrWhiteSpace(_source.MetaObject?.Formula);
 
-        public IEmbeddingRelationTypeModel GetProperty(string typeName)
+        public INodeTypeModel GetProperty(string typeName)
         {
             return AllProperties.FirstOrDefault(p => p.Name == typeName);
         }
@@ -75,5 +76,33 @@ namespace Iis.OntologyModelWrapper
                 || value is Dictionary<string, object> && ScalarTypeEnum == ScalarType.Geo
                 || value is Guid && ScalarTypeEnum == ScalarType.File;
         }
+
+
+        public ISchemaMeta EmbeddingMeta => _source.MetaObject;
+
+        public EmbeddingOptions EmbeddingOptions => _source.RelationType.EmbeddingOptions;
+
+        public INodeTypeModel EntityType =>
+            _source.RelationType.TargetType.Kind == Kind.Entity ?
+                    new NodeTypeWrapper(_source.RelationType.TargetType) :
+                    null;
+
+        public INodeTypeModel AttributeType =>
+            _source.RelationType.TargetType.Kind == Kind.Attribute ?
+                new NodeTypeWrapper(_source.RelationType.TargetType) :
+                null;
+
+        public bool IsAttributeType => _source.RelationType.TargetType.Kind == Kind.Attribute;
+
+        public bool IsEntityType => _source.RelationType.TargetType.Kind == Kind.Entity;
+
+        public bool IsInversed => _source.IsInversed;
+
+        public INodeTypeModel TargetType =>
+            _source?.RelationType.TargetType == null ?
+                null :
+                new NodeTypeWrapper(_source.RelationType.TargetType);
+
+        public bool AcceptsOperation(EntityOperation create) => true;
     }
 }

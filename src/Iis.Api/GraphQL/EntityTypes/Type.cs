@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Entity contains unique values and needs dropdown tip on UI")]
         public bool HasUniqueValues => Source.HasUniqueValues;
 
-        protected IEntityAttribute CreateEntityAttribute(IEmbeddingRelationTypeModel relationType)
+        protected IEntityAttribute CreateEntityAttribute(INodeTypeModel relationType)
         {
             return relationType.IsAttributeType
                 ? (IEntityAttribute) new EntityAttributePrimitive(relationType)

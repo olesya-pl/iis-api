@@ -71,7 +71,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public abstract class EntityAttributeBase : IEntityAttribute
     {
-        public EntityAttributeBase(IEmbeddingRelationTypeModel source)
+        public EntityAttributeBase(INodeTypeModel source)
         {
             Source = source;
             MetaObject = Source.EmbeddingMeta;
@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             _mapper = new Mapper(configuration);
         }
         protected IMapper _mapper;
-        protected IEmbeddingRelationTypeModel Source { get; }
+        protected INodeTypeModel Source { get; }
         protected ISchemaMeta MetaObject { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
@@ -133,7 +133,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributePrimitive : EntityAttributeBase
     {
-        public EntityAttributePrimitive(IEmbeddingRelationTypeModel source) : base(source)
+        public EntityAttributePrimitive(INodeTypeModel source) : base(source)
         {
         }
 
@@ -143,7 +143,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(IEmbeddingRelationTypeModel source, IOntologyModel ontology) : base(source)
+        public EntityAttributeRelation(INodeTypeModel source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
