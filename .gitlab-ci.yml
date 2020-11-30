@@ -222,6 +222,12 @@ deploy_dev3_nomad_manual:
     NOMAD_ENV: dev3
   when: manual
 
+deploy_qa_nomad_manual:
+  extends: .deploy_nomad
+  variables:
+    NOMAD_ENV: qa
+  when: manual
+
 
 acceptance_test:
   stage: test
