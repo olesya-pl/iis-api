@@ -208,7 +208,7 @@ namespace IIS.Core.Materials.EntityFramework
                 input.ImportanceId.DoIfHasValue(p => {
                     CreateChangeHistory(material.ImportanceSignId,
                         nameof(material.SessionPriority),
-                        p, changesList);
+                        p, username, changeRequestId, changesList);
                     material.Importance = null;
                     material.ImportanceSignId = p;
                 });
@@ -216,7 +216,7 @@ namespace IIS.Core.Materials.EntityFramework
                 input.ReliabilityId.DoIfHasValue(p => {
                     CreateChangeHistory(material.ReliabilitySignId,
                         nameof(material.SessionPriority),
-                        p, changesList);
+                        p, username, changeRequestId, changesList);
                     material.Reliability = null;
                     material.ReliabilitySignId = p;
                 });
@@ -224,7 +224,7 @@ namespace IIS.Core.Materials.EntityFramework
                 input.RelevanceId.DoIfHasValue(p => {
                     CreateChangeHistory(material.RelevanceSignId,
                         nameof(material.SessionPriority),
-                        p, changesList);
+                        p, username, changeRequestId, changesList);
                     material.Relevance = null;
                     material.RelevanceSignId = p;
                 });
@@ -232,7 +232,7 @@ namespace IIS.Core.Materials.EntityFramework
                 input.CompletenessId.DoIfHasValue(p => {
                     CreateChangeHistory(material.CompletenessSignId,
                         nameof(material.SessionPriority),
-                        p, changesList);
+                        p, username, changeRequestId, changesList);
                     material.Completeness = null;
                     material.CompletenessSignId = p;
                 });
@@ -240,7 +240,7 @@ namespace IIS.Core.Materials.EntityFramework
                 input.SourceReliabilityId.DoIfHasValue(p => {
                     CreateChangeHistory(material.SourceReliabilitySignId,
                         nameof(material.SessionPriority),
-                        p, changesList);
+                        p, username, changeRequestId, changesList);
                     material.SourceReliability = null;
                     material.SourceReliabilitySignId = p;
                 });
@@ -248,7 +248,7 @@ namespace IIS.Core.Materials.EntityFramework
                 input.ProcessedStatusId.DoIfHasValue(p => {
                     CreateChangeHistory(material.ProcessedStatusSignId,
                         nameof(material.SessionPriority),
-                        p, changesList);
+                        p, username, changeRequestId, changesList);
                     material.ProcessedStatus = null;
                     material.ProcessedStatusSignId = p;
                 });
@@ -256,7 +256,7 @@ namespace IIS.Core.Materials.EntityFramework
                 input.SessionPriorityId.DoIfHasValue(p => {
                     CreateChangeHistory(material.SessionPriorityId,
                         nameof(material.SessionPriority),
-                        p, changesList);
+                        p, username, changeRequestId, changesList);
                     material.SessionPriority = null;
                     material.SessionPriorityId = p;
                 });
@@ -289,7 +289,7 @@ namespace IIS.Core.Materials.EntityFramework
                     material.Content = input.Content;
                 } 
 
-                var loadData = MaterialLoadData.MapLoadData(material.LoadData);               
+                var loadData = MaterialLoadData.MapLoadData(material.LoadData);
 
                 var loadDataStringified = loadData.ToJson();
                 if (!string.Equals(loadDataStringified, material.LoadData, StringComparison.Ordinal))
@@ -311,15 +311,18 @@ namespace IIS.Core.Materials.EntityFramework
                     material.LoadData = loadDataStringified;
                 }
 
-                foreach (var item in changesList)
-                {
-                    item.UserName = username;
-                    item.RequestId = changeRequestId;
-                }
+                Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
 
-                await _changeHistoryService.SaveMaterialChanges(changesList);
-                await UpdateMaterialAsync(material);
-                QueueMaterialChildrenForMl(material);                
+                var fillElasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+
+                var addHistoryTask = _changeHistoryService.SaveMaterialChanges(changesList);
+
+                await Task.WhenAll(new []{fillElasticTask, addHistoryTask});
+
+                if(MaterialShouldBeQueuedForMachineLearning(material))
+                {
+                    QueueMaterialForMachineLearning(material);
+                }
             }
             return await _materialProvider.GetMaterialAsync(input.Id, userId);
         }
@@ -327,6 +330,8 @@ namespace IIS.Core.Materials.EntityFramework
         private void CreateChangeHistory(Guid? destinationId,
             string destinationName,
             Guid value,
+            string userName,
+            Guid requestId,
             List<ChangeHistoryDto> changesList)
         {
             changesList.Add(new ChangeHistoryDto
@@ -336,26 +341,25 @@ namespace IIS.Core.Materials.EntityFramework
                 OldValue = destinationId.HasValue
                                 ? _materialSignRepository.GetById(destinationId.Value).Title
                                 : string.Empty,
-                PropertyName = destinationName
+                PropertyName = destinationName,
+                UserName = userName,
+                RequestId = requestId
             });
         }
 
-        private void QueueMaterialChildrenForMl(MaterialEntity material)
+        private void QueueMaterialForMachineLearning(MaterialEntity material)
         {
+            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+
             foreach (var child in material.Children)
             {
                 _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = child.Id, Source = child.Source, Type = child.Type });
             }
         }
 
-        private async Task UpdateMaterialAsync(MaterialEntity material)
+        private bool MaterialShouldBeQueuedForMachineLearning(MaterialEntity material)
         {
-            Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
-
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
-
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+            return material.ProcessedStatusSignId.HasValue && material.ProcessedStatusSignId == MaterialEntity.ProcessingStatusProcessedSignId;
         }
 
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
