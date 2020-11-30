@@ -15,9 +15,10 @@ namespace IIS.Core.GraphQL.Themes
         public string Title { get; set; }
         [GraphQLNonNullType]
         [Required]
-        public string Query { get; set; }
+        public string QueryRequest { get; set; }
         public Guid? UserId { get; set; }
         public string EntityTypeName { get; set; }
         public string Comment { get; set; }
+        public string Meta { get; set; }
     }
 }
