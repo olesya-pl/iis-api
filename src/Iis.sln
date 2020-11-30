@@ -27,8 +27,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologySchema", "Iis.O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologySchema.Saver", "Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj", "{6F190731-7F7D-4D5D-959E-AC687A729BB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.ThemeManagement", "Iis.ThemeManagement\Iis.ThemeManagement.csproj", "{588BDD66-7785-42A3-8718-92ADE68E9426}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.OntologyModelWrapper", "Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj", "{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IIS.Repository", "IIS.Repository\IIS.Repository.csproj", "{3EAE32A3-17A4-4883-A48B-9E34F71B1D4D}"
@@ -101,10 +99,6 @@ Global
 		{6F190731-7F7D-4D5D-959E-AC687A729BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F190731-7F7D-4D5D-959E-AC687A729BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F190731-7F7D-4D5D-959E-AC687A729BB8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{588BDD66-7785-42A3-8718-92ADE68E9426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{588BDD66-7785-42A3-8718-92ADE68E9426}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{588BDD66-7785-42A3-8718-92ADE68E9426}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{588BDD66-7785-42A3-8718-92ADE68E9426}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFEAF3F8-E171-48C2-B5F9-03F63CBBC2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU

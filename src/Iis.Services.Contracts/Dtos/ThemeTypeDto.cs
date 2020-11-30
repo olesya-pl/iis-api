@@ -1,8 +1,8 @@
 using System;
 
-namespace Iis.ThemeManagement.Models
+namespace Iis.Services.Contracts.Dtos
 {
-    public class ThemeType
+    public class ThemeTypeDto
     {
         public Guid Id { get; set; }
         public string ShortTitle { get; set; }

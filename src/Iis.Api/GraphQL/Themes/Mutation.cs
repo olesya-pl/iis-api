@@ -1,26 +1,25 @@
-using System;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-
-using ThemeMng = Iis.ThemeManagement;
-using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.GraphQL.Themes
 {
     public class Mutation
     {
         public async Task<Theme> CreateTheme(
-            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
+            [Service] IThemeService themeService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] ThemeInput themeInput)
         {
             Validator.ValidateObject(themeInput, new ValidationContext(themeInput), true);
 
-            var theme = mapper.Map<ThemeMng.Models.Theme>(themeInput);
+            var theme = mapper.Map<ThemeDto>(themeInput);
 
             var themeType = await themeService.GetThemeTypeByEntityTypeNameAsync(themeInput.EntityTypeName);
 
@@ -34,13 +33,13 @@ namespace IIS.Core.GraphQL.Themes
         }
 
         public async Task<Theme> UpdateTheme(
-            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
+            [Service] IThemeService themeService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] UpdateThemeInput themeInput)
         {
             Validator.ValidateObject(themeInput, new ValidationContext(themeInput), true);
 
-            var theme = mapper.Map<ThemeMng.Models.Theme>(themeInput);
+            var theme = mapper.Map<ThemeDto>(themeInput);
             if (!string.IsNullOrEmpty(themeInput.EntityTypeName))
             {
                 var themeType = await themeService.GetThemeTypeByEntityTypeNameAsync(themeInput.EntityTypeName);
@@ -54,7 +53,7 @@ namespace IIS.Core.GraphQL.Themes
         }
 
         public async Task<Theme> DeleteTheme(
-            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
+            [Service] IThemeService themeService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
@@ -64,7 +63,7 @@ namespace IIS.Core.GraphQL.Themes
         }
 
         public async Task<Theme> SetThemeReadCount(
-            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
+            [Service] IThemeService themeService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] SetThemeReadCountInput themeInput)
         {

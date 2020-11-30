@@ -1,21 +1,18 @@
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
-
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Common;
-
-using ThemeMng = Iis.ThemeManagement;
-using Iis.DbLayer.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IIS.Core.GraphQL.Themes
 {
     public class Query
     {
         public async Task<GraphQLCollection<Theme>> GetThemesForUser(
-            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
+            [Service] IThemeService themeService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid userId)
         {
@@ -27,7 +24,7 @@ namespace IIS.Core.GraphQL.Themes
         }
 
         public async Task<Theme> GetTheme(
-            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
+            [Service] IThemeService themeService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
@@ -37,7 +34,7 @@ namespace IIS.Core.GraphQL.Themes
         }
 
         public async Task<GraphQLCollection<ThemeType>> GetThemeTypes(
-            [Service] ThemeMng.ThemeService<IIISUnitOfWork> themeService,
+            [Service] IThemeService themeService,
             [Service] IMapper mapper)
         {
             var themeTypes = await themeService.GetThemeTypesAsync();
