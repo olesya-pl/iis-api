@@ -229,6 +229,11 @@ deploy_qa_nomad_manual:
     NOMAD_ENV: qa
   when: manual
 
+deploy_demo_nomad_manual:
+  extends: .deploy_nomad
+  variables:
+    NOMAD_ENV: demo
+  when: manual
 
 acceptance_test:
   stage: test
