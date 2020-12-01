@@ -25,6 +25,7 @@ build_job:
   #   - /^v.+$/
   #   - /^sprint\..+$/
   #   - /^Release_*/
+  when: manual
 
 unit_test:
   stage: test
@@ -85,15 +86,15 @@ deploy_od_dev_manual:
   when: manual
 
 
-deploy_contour_qa:
-  extends: .deploy
-  variables:
-    DEPLOYMENT_FILE: qa_con.yml
+#deploy_contour_qa:
+#  extends: .deploy
+#  variables:
+#    DEPLOYMENT_FILE: qa_con.yml
 ##    EXTRA_VARS: "tag_name=$CI_COMMIT_TAG ontology_clear='$ONTOLOGY_CLEAR'"
-  environment:
-    name: qa_contour
-    url: http://qa-app.contour.net
-  when: manual
+#  environment:
+#    name: qa_contour
+#    url: http://qa-app.contour.net
+#  when: manual
 
 
 deploy_od_qa:
