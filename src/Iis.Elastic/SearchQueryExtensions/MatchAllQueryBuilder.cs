@@ -6,7 +6,7 @@ namespace Iis.Elastic.SearchQueryExtensions
     {
         public override JObject Build()
         {
-            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _offset, _limit);
+            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
 
             var matchAll = new JObject{
                 new JProperty("match_all", new JObject())

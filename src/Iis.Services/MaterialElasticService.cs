@@ -43,12 +43,14 @@ namespace Iis.Services
 
             var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
 
+            var (from, size) = searchParams.Page.ToElasticPage();
+
             var elasticSearchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = MaterialIndexes.ToList(),
                 Query = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL",
-                From = searchParams.Offset,
-                Size = searchParams.Limit,
+                From = from,
+                Size = size,
                 SortColumn = sortColumn,
                 SortOrder = sortOrder
             };
@@ -70,9 +72,11 @@ namespace Iis.Services
 
         public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, IEnumerable<Guid> materialList, CancellationToken ct = default)
         {
+            var (from, size) = searchParams.Page.ToElasticPage();
+
             var queryBuilder = new BoolQueryBuilder()
                                 .WithMust()
-                                .WithPagination(searchParams.Offset, searchParams.Limit)
+                                .WithPagination(from, size)
                                 .WithDocumentList(materialList);
 
             if (!SearchQueryExtension.IsMatchAll(searchParams.Suggestion))
@@ -105,8 +109,10 @@ namespace Iis.Services
 
         public async Task<SearchResult> SearchMoreLikeThisAsync(SearchParams searchParams, CancellationToken ct = default)
         {
+            var (from, size) = searchParams.Page.ToElasticPage();
+
             var queryData = new MoreLikeThisQueryBuilder()
-                        .WithPagination(searchParams.Offset, searchParams.Limit)
+                        .WithPagination(from, size)
                         .WithMaterialId(searchParams.Suggestion)
                         .Build()
                         .ToString(Formatting.None);
@@ -116,12 +122,14 @@ namespace Iis.Services
             return MapToSearchResult(searchResult);
         }
 
-        public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, int offset, int size, CancellationToken ct = default)
+        public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
         {
+            var (from, size) = page.ToElasticPage();
+            
             var searchResult = await _elasticManager.SearchByImageVector(imageVector, new IisElasticSearchParams
             {
                 BaseIndexNames = _elasticState.MaterialIndexes,
-                From = offset,
+                From = from,
                 Size = size
             }, ct);
 
