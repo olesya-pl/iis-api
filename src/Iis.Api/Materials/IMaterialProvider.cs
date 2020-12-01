@@ -13,9 +13,8 @@ namespace IIS.Core.Materials
     {
         Task<Material> GetMaterialAsync(Guid id, Guid userId);
 
-        Task<MaterialsDto> GetMaterialsAsync(int limit,
-            int offset,
-            string filterQuery,
+        Task<MaterialsDto> GetMaterialsAsync(string filterQuery,
+            PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
@@ -24,18 +23,18 @@ namespace IIS.Core.Materials
         MaterialSign GetMaterialSign(Guid id);
         Task<Material> MapAsync(MaterialEntity material);
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
-        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string name, byte[] content);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
-            bool includeDescendants, 
-            string suggestion, 
-            int limit, int offset, 
+            bool includeDescendants,
+            string suggestion,
+            PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);
         Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
-        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, PaginationParams page);
         Task<bool> MaterialExists(Guid value);
     }
 }

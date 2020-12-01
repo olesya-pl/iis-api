@@ -80,16 +80,15 @@ namespace IIS.Core.Materials.EntityFramework
         }
 
         public async Task<MaterialsDto> GetMaterialsAsync(
-            int limit,
-            int offset,
             string filterQuery,
+            PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default)
         {
-            var searchParams = new SearchParams{
-                Offset = offset,
-                Limit = limit,
+            var searchParams = new SearchParams
+            {
                 Suggestion = string.IsNullOrWhiteSpace(filterQuery) || filterQuery == WildCart ? null : filterQuery,
+                Page = page,
                 Sorting = sorting
             };
 
@@ -303,7 +302,7 @@ namespace IIS.Core.Materials.EntityFramework
             return parentNodesMap;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, PaginationParams page)
         {
             var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
 
@@ -311,9 +310,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             var searchParams = new SearchParams
             {
-                Offset = offset,
-                Limit = limit,
-                Suggestion = materialId.ToString("N")
+                Suggestion = materialId.ToString("N"),
+                Page = page
             };
 
             var searchResult = await _materialElasticService.SearchMoreLikeThisAsync(searchParams);
@@ -325,20 +323,20 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, searchResult.Count);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string fileName, byte[] content)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content)
         {
             decimal[] imageVector;
             try
             {
                 imageVector = await VectorizeImage(content, fileName);
 
-                if(imageVector is null) throw new Exception("Image vector is empty.");
+                if (imageVector is null) throw new Exception("Image vector is empty.");
             }
             catch (Exception e)
             {
                 throw new Exception("Failed to vectorize image", e);
             }
-            var searchResult = await _materialElasticService.SearchByImageVector(imageVector, offset, pageSize, CancellationToken.None);
+            var searchResult = await _materialElasticService.SearchByImageVector(imageVector, page);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -360,10 +358,10 @@ namespace IIS.Core.Materials.EntityFramework
             return FaceAPIResponseParser.GetEncoding(contentJson);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
-            bool includeDescendants, 
-            string suggestion, 
-            int limit, int offset, 
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList,
+            bool includeDescendants,
+            string suggestion,
+            PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default)
         {
@@ -371,9 +369,9 @@ namespace IIS.Core.Materials.EntityFramework
 
             foreach (var nodeId in nodeIdList)
             {
-                var objectIdList = new List<Guid>{ nodeId };
+                var objectIdList = new List<Guid> { nodeId };
 
-                if(includeDescendants) objectIdList.AddRange(GetDescendantsByGivenRelationTypeNameList(objectIdList, RelationTypeNameList));
+                if (includeDescendants) objectIdList.AddRange(GetDescendantsByGivenRelationTypeNameList(objectIdList, RelationTypeNameList));
 
                 var materialEntities = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQueryAsync(objectIdList));
 
@@ -382,14 +380,14 @@ namespace IIS.Core.Materials.EntityFramework
                 materialEntityList.AddRange(materialEntities);
             }
 
-            if(!materialEntityList.Any()) return EmptMaterialResult;
+            if (!materialEntityList.Any()) return EmptMaterialResult;
 
             var materialEntitiesIdList = materialEntityList
                 .GroupBy(e => e.Id)
                 .Where(gr => gr.Count() == nodeIdList.Count())
                 .Select(gr => gr.Select(e => e.Id).FirstOrDefault());
 
-            var searchParams = new SearchParams{Offset = offset, Limit = limit, Suggestion = suggestion, Sorting = sorting};
+            var searchParams = new SearchParams { Suggestion = suggestion, Page = page, Sorting = sorting };
 
             var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList);
 
@@ -420,7 +418,7 @@ namespace IIS.Core.Materials.EntityFramework
         }
         private bool IsEvent(Node node)
         {
-            if(node is null) return false;
+            if (node is null) return false;
 
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 

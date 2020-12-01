@@ -6,13 +6,13 @@ namespace Iis.Elastic.SearchQueryExtensions
     public abstract class BaseQueryBuilder<T> where T : BaseQueryBuilder<T>
     {
         protected IReadOnlyCollection<string> _resultFields = new[] { "*" };
-        protected int _offset;
-        protected int _limit;
+        protected int _from;
+        protected int _size;
 
-        public T WithPagination(int offset, int limit)
+        public T WithPagination(int from, int size)
         {
-            _offset = offset;
-            _limit = limit;
+            _from = from;
+            _size = size;
             return this as T;
         }
 

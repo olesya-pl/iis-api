@@ -254,7 +254,8 @@ namespace Iis.Services
             }
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
-                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(new SearchParams { Limit = filter.Limit, Offset = filter.Offset, Suggestion = filter.Suggestion });
+                var page = new PaginationParams(1, 50);
+                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(new SearchParams { Page = page, Suggestion = filter.Suggestion });
                 return new QueryResult
                 {
                     Count = count,
