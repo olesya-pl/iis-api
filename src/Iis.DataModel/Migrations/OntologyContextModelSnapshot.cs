@@ -1077,10 +1077,11 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("text");
 
-                    b.Property<string>("Query")
-                        .IsRequired()
-                        .HasColumnType("character varying(1024)")
-                        .HasMaxLength(1024);
+                    b.Property<string>("Meta")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("QueryRequest")
+                        .HasColumnType("jsonb");
 
                     b.Property<int>("QueryResults")
                         .ValueGeneratedOnAdd()

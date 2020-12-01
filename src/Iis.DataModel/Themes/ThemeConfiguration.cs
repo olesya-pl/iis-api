@@ -20,11 +20,6 @@ namespace Iis.DataModel.Themes
                 .HasMaxLength(1024);
 
             builder
-                .Property(p => p.Query)
-                .IsRequired()
-                .HasMaxLength(1024);
-
-            builder
                 .HasOne(p => p.Type)
                 .WithMany()
                 .HasForeignKey(p => p.TypeId);
@@ -40,6 +35,12 @@ namespace Iis.DataModel.Themes
             builder.Property(p => p.QueryResults)
                 .IsRequired()
                 .HasDefaultValue(0);
+
+            builder.Property(p => p.Meta)
+                .HasColumnType("jsonb");
+
+            builder.Property(p => p.QueryRequest)
+                .HasColumnType("jsonb");
         }
     }
 }

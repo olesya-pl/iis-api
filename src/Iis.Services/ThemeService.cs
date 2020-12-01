@@ -16,6 +16,7 @@ using Iis.DbLayer.Repositories;
 using IIS.Repository.Factories;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Dtos;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.Services
 {
@@ -48,7 +49,7 @@ namespace Iis.Services
         public async Task<Guid> CreateThemeAsync(ThemeDto theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
-            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.TypeId, entity.Query)).Count;
+            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.TypeId, GetQuery(entity.QueryRequest))).Count;
 
             _context.Themes.Add(entity);
 
@@ -172,7 +173,11 @@ namespace Iis.Services
 
             var themesByQuery = themesQuery
                 .ToList()
-                .GroupBy(x => new { x.Query, x.TypeId });
+                .GroupBy(x => new 
+                {
+                    Query = GetQuery(x.QueryRequest), 
+                    x.TypeId 
+                });
 
             var tasks = new List<Task<QueryResult>>();
 
@@ -300,6 +305,18 @@ namespace Iis.Services
             public int Count { get; set; }
             public string Query { get; set; }
             public Guid TypeId { get; set; }
+        }
+
+        private string GetQuery(string queryRequest) 
+        {
+            try
+            {
+                return JObject.Parse(queryRequest)?["suggestion"].Value<string>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }
