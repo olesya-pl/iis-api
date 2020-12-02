@@ -13,8 +13,10 @@ namespace Iis.Api.BackgroundServices
 {
     public class ThemeCounterBackgroundService : BackgroundService
     {
+        private const string RefreshIntervalInSecondsParamName = "themesRefreshIntervalInSeconds";
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<ThemeCounterBackgroundService> _logger;
+        private readonly int _refreshIntervalInSeconds;
 
         private static bool _objectUpdateNeeded = false;
         private static bool _eventUpdateNeeded = false;
@@ -27,7 +29,7 @@ namespace Iis.Api.BackgroundServices
         {
             _materialUpdateNeeded = true;
         }
-        
+
         public static void SignalObjectUpdateNeeded()
         {
             _objectUpdateNeeded = true;
@@ -42,6 +44,9 @@ namespace Iis.Api.BackgroundServices
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+
+            var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
+            _refreshIntervalInSeconds = configuration.GetValue(RefreshIntervalInSecondsParamName, 100);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -54,13 +59,11 @@ namespace Iis.Api.BackgroundServices
                     {
                         using (var scope = _serviceProvider.CreateScope())
                         {
-                            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                             var typesToUpdate = GetTypesToUpdate();
                             ResetFlags();
                             var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
                             await themeService.UpdateQueryResultsAsync(stoppingToken, typesToUpdate);
-                            var sleepInterval = configuration.GetValue("themesRefreshInterval", 120);
-                            await Task.Delay(TimeSpan.FromSeconds(sleepInterval), stoppingToken);
+                            await Task.Delay(TimeSpan.FromSeconds(_refreshIntervalInSeconds), stoppingToken);
                         }
                     }
                     catch (Exception e) 
