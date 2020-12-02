@@ -89,7 +89,7 @@ namespace Iis.UnitTests.ThemeManagement
             var service = _serviceProvider.GetRequiredService<IThemeService>();
             await service.UpdateThemeAsync(new ThemeDto {
                 Title = "Updated",
-                Query = theme.Query,
+                QueryRequest = theme.QueryRequest,
                 Id = theme.Id
             });
 
@@ -116,7 +116,7 @@ namespace Iis.UnitTests.ThemeManagement
             await service.UpdateThemeAsync(new ThemeDto
             {
                 Title = "Updated",
-                Query = theme.Query,
+                QueryRequest = theme.QueryRequest,
                 Id = theme.Id,
                 Type = new ThemeTypeDto { Id = themeType.Id},
                 User = new User { Id = user.Id}

@@ -36,7 +36,7 @@ namespace Iis.UnitTests.ThemeManagement
         [Theory(DisplayName = "Checks validation attributes: Query."), RecursiveAutoData]
         public void CheckValidationQuery(ThemeInput theme)
         {
-            theme.Query = null;
+            theme.QueryRequest = null;
 
             var exception = Assert.Throws<ValidationException>(() => Validator.ValidateObject(theme, new ValidationContext(theme), true));
 
