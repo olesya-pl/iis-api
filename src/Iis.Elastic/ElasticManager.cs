@@ -298,15 +298,15 @@ namespace Iis.Elastic
 
         private void ApplyIndexMappingSettings(JObject request)
         {
-            var mappingSettigns = @"{
-                    'total_fields': {
-                        'limit': 4000
-                    }
-                }";
+		    var mappingValue = new JObject(
+			    new JProperty("total_fields", new JObject(
+				    new JProperty("limit", _configuration.TotalFieldsLimit)
+			    ))
+		    );
 
             var settigns = request["settings"];
 
-            settigns["mapping"] = JObject.Parse(mappingSettigns);
+            settigns["mapping"] = mappingValue;
         }
 
         public async Task<IElasticSearchResult> SearchByImageVector(decimal[] imageVector, IIisElasticSearchParams searchParams, CancellationToken token)

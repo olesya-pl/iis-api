@@ -161,11 +161,11 @@ namespace Iis.DbLayer.Repositories
 
             var materialDocument = MapEntityToDocument(material);
 
-            var (mlResponses, imageVector) = await PopulateMLResponses(materialId);
+            var (mlResponses, mlResponsesCount, imageVector) = await PopulateMLResponses(materialId);
 
             materialDocument.MLResponses = mlResponses;
 
-            materialDocument.ProcessedMlHandlersCount = mlResponses.Count;
+            materialDocument.ProcessedMlHandlersCount = mlResponsesCount;
 
             if (imageVector != null)
             {
@@ -336,11 +336,13 @@ namespace Iis.DbLayer.Repositories
             return materialDocument;
         }
 
-        private async Task<(JObject mlResponses, decimal[] imageVector)> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject mlResponses, int mlResponsesCount, decimal[] imageVector)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
+
             decimal[] imageVector = ExtractLatestImageVector(mlResponses);
-            return (MapMlResponseEntities(mlResponses), imageVector);
+
+            return (MapMlResponseEntities(mlResponses), mlResponses.Count, imageVector);
         }
 
         private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)

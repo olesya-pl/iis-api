@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
 
-namespace Iis.AcceptanceTests.PageObjects
+namespace AcceptanceTests.PageObjects
 {
     public class LoginPageObjects
     {

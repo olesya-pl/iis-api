@@ -1,4 +1,4 @@
-using Iis.AcceptanceTests.PageObjects;
+using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;

@@ -1,7 +1,8 @@
-using System.Linq;
+﻿using System.Linq;
+using AcceptanceTests.PageObjects;
 using Iis.AcceptanceTests.Helpers;
-using Iis.AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -12,9 +13,12 @@ namespace Iis.AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
+        private MaterialsSectionPage materialsSectionPage;
 
         public MaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
+            materialsSectionPage = new MaterialsSectionPage(driver);
+
             context = injectedContext;
             this.driver = driver;
         }
@@ -23,8 +27,8 @@ namespace Iis.AcceptanceTests.UISteps
         [When(@"I navigated to Materials page")]
         public void IWantNavigateToMaterialsPage()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            materialsPage.MaterialsSection.Click();
+
+            materialsSectionPage.MaterialsSection.Click();
 
             driver.WaitFor(10);
         }
@@ -32,51 +36,80 @@ namespace Iis.AcceptanceTests.UISteps
         [When(@"I clicked on the first material in the Materials list")]
         public void IClieckedOnTheFirstMaterialInTheMaterialsList()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            materialsPage.FirstMaterialInTheMaterialsList.Click();
+
+            materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
         }
 
         [When(@"I clicked on the events tab in the material card")]
         public void IClickedOnTheEventsTabInTheMaterialCard()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            materialsPage.EventsTab.Click();
+
+            materialsSectionPage.EventsTab.Click();
         }
 
         [When(@"I clicked on the objects tab in the material card")]
         public void IClickedOnTheObjectsTabInTheMaterialCard()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            materialsPage.ObjectsTab.Click();
+
+            materialsSectionPage.ObjectsTab.Click();
         }
 
         [When(@"I clicked on the ML tab in the material card")]
         public void IClickedOnTheMLTabInTheMaterialCard()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            materialsPage.MLTab.Click();
+
+            materialsSectionPage.MLTab.Click();
         }
 
         [When(@"I got search counter value in the Materials section")]
         public void IGetSearchCounterValueInTheMaterialsSection()
         {
-            var materialPage = new MaterialsPageObjects(driver);
-            context.SetResponse("counterValue", materialPage.MaterialsSearchResultCounter.Text);
+            context.SetResponse("counterValue", materialsSectionPage.MaterialsSearchResultCounter.Text);
         }
 
         [When(@"I clicked search button in the Materials section")]
         public void IFilledInfoInTheMaterialsSearchField()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            materialsPage.SearchButton.Click();
+
+            materialsSectionPage.SearchButton.Click();
         }
 
         [When(@"I searched (.*) data in the materials")]
         public void IEnteredDataInTheSearchField(string input)
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            materialsPage.SearchField.SendKeys(input);
-            materialsPage.SearchField.SendKeys(Keys.Enter);
+
+            materialsSectionPage.SearchField.SendKeys(input);
+            materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I set importance (.*)")]
+        public void WhenIClickedOnTheDropDownMenuInTheMaterials(string value)
+        {
+
+            materialsSectionPage.MaterialPage.ImportanceDropDown.Select(value);
+        }
+
+        [When(@"I set priority (.*)")]
+        public void WhenISetPriority(string priority)
+        {
+
+            materialsSectionPage.MaterialPage.PriorityDropDown.Select(priority);
+        }
+
+
+        [When(@"I press Processed button")]
+        public void WhenIPressProcessedButton()
+        {
+
+            materialsSectionPage.ProcessedButton.Click();
+        }
+
+
+        [When(@"I clicked on the first element in the Importance drop down menu in a material card")]
+        public void WhenIChoseThirdElementInTheImportanceDropDownMenuInAMaterialCard()
+        {
+
+            materialsSectionPage.ImportanceDropDownFirstValue.Click();
         }
         #endregion When
 
@@ -90,36 +123,36 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see first material in the Materials list")]
         public void ThenIMustSeeFirstMaterialInTheMaterialsList()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            Assert.True(materialsPage.FirstMaterialInTheMaterialsList.Displayed);
+
+            Assert.True(materialsSectionPage.FirstMaterialInTheMaterialsList.Displayed);
         }
 
         [Then(@"I must see processed button in the materials card")]
         public void IMustSeeProcessedButtonOnTheMaterialCard()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            Assert.True(materialsPage.ProcessedButton.Displayed);
+
+            Assert.True(materialsSectionPage.ProcessedButton.Displayed);
         }
 
         [Then(@"I must see events search in the materials card")]
         public void IMustSeeEventsSearchInTheMaterialsCard()
         {
-            var materialPage = new MaterialsPageObjects(driver);
-            Assert.True(materialPage.EventsTabSearch.Displayed);
+
+            Assert.True(materialsSectionPage.EventsTabSearch.Displayed);
         }
 
         [Then(@"I must see objects search in the materials card")]
         public void IMustSeeObjectsSearchInTheMaterialsCard()
         {
-            var materialPage = new MaterialsPageObjects(driver);
-            Assert.True(materialPage.ObjectsTabSearch.Displayed);
+
+            Assert.True(materialsSectionPage.ObjectsTabSearch.Displayed);
         }
 
         [Then(@"I must see relevance drop down in the materials card")]
         public void IMustSeeRelevanceDropDownInTheMaterialsCard()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            Assert.True(materialsPage.RelevanceDropDown.Displayed);
+
+            Assert.True(materialsSectionPage.RelevanceDropDown.Displayed);
         }
 
         [Then(@"I must see these elements")]
@@ -128,18 +161,18 @@ namespace Iis.AcceptanceTests.UISteps
             foreach (TableRow row in table.Rows)
             {
 
-                var materialPage = new MaterialsPageObjects(driver);
+
                 var tableValue = row.Values.First();
 
-                Assert.True((typeof(MaterialsPageObjects).GetField(tableValue).GetValue(materialPage) as IWebElement).Displayed);
+                Assert.True((typeof(MaterialsSectionPage).GetField(tableValue).GetValue(materialsSectionPage) as IWebElement).Displayed);
             }
         }
 
         [Then(@"I must I must see at least one user in the originator drop down menu")]
         public void IMustSeeAtLeastOneUserInTheOriginatorDropDonwMenu()
         {
-            var materialPage = new MaterialsPageObjects(driver);
-            materialPage.Originator.Click();
+
+            materialsSectionPage.Originator.Click();
             var list = driver.FindElements(By.ClassName("el-select-dropdown__item"));
             Assert.True(list.Count() > 0);
         }
@@ -147,22 +180,22 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see zero results in the Materials section")]
         public void ThenIMustSeeZeroResults()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            Assert.True(materialsPage.EmptySearchField.Displayed);
+
+            Assert.True(materialsSectionPage.EmptySearchField.Displayed);
         }
 
         [Then(@"I must see Show button in the ML tab")]
         public void ThenIMustSeeShowButtonInTheMLTab()
         {
-            var materialsPage = new MaterialsPageObjects(driver);
-            Assert.True(materialsPage.ShowMLResultsButton.Displayed);
+
+            Assert.True(materialsSectionPage.ShowMLResultsButton.Displayed);
         }
 
         [Then(@"I must see that search counter values are equal in the Materials section")]
         public void ThenIMustSeeThatSearchCounterValuesAreEqualInTheMaterialsSection()
         {
-            var materialPage = new MaterialsPageObjects(driver);
-            var actualValue = materialPage.MaterialsSearchResultCounter.Text;
+
+            var actualValue = materialsSectionPage.MaterialsSearchResultCounter.Text;
             var expectedValue = context.GetResponse<string>("counterValue");
             Assert.Equal(actualValue, expectedValue);
         }

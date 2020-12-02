@@ -31,11 +31,13 @@ namespace IIS.Core.GraphQL.Materials
 
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
 
+            var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
+
             if (searchByImageInput != null)
             {
                 var content = Convert.FromBase64String(searchByImageInput.Content);
                 var result = await materialProvider
-                    .GetMaterialsByImageAsync(pagination.PageSize, pagination.Offset(), searchByImageInput.Name, content.ToArray());
+                    .GetMaterialsByImageAsync(pageParam, searchByImageInput.Name, content.ToArray());
                 var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
                 return (mapped, result.Count);
             }
@@ -46,7 +48,7 @@ namespace IIS.Core.GraphQL.Materials
                     searchByRelation.NodeIdentityList,
                     searchByRelation.IncludeDescendants, 
                     filterQuery,
-                    pagination.PageSize, pagination.Offset(),
+                    pageParam,
                     sortingParam);
 
                 var mapped = materialsResults.Materials
@@ -57,7 +59,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var materialsResult = await materialProvider
-                .GetMaterialsAsync(pagination.PageSize, pagination.Offset(), filterQuery, sortingParam);
+                .GetMaterialsAsync(filterQuery, pageParam, sortingParam);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
@@ -161,7 +163,9 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLNonNullType] Guid materialId,
             [GraphQLNonNullType] PaginationInput pagination)
         {
-            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId, pagination.PageSize, pagination.Offset());
+            var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
+
+            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId, pageParam);
 
             var materials = materialsResult.Materials
                                 .Select(m => mapper.Map<Material>(m))

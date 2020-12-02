@@ -21,6 +21,7 @@ using Iis.Interfaces.Ontology.Data;
 using MediatR;
 using Iis.Events.Materials;
 using Iis.Services.Contracts.Dtos;
+using Iis.Utility;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -203,140 +204,80 @@ namespace IIS.Core.Materials.EntityFramework
                 var changesList = new List<ChangeHistoryDto>();
                 
                 if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
-                if (input.ImportanceId.HasValue)
-                {
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = _materialSignRepository.GetById(input.ImportanceId.Value).Title,
-                        OldValue = material.ImportanceSignId.HasValue
-                            ? _materialSignRepository.GetById(material.ImportanceSignId.Value).Title
-                            : string.Empty,
-                        PropertyName = nameof(material.Importance),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.ImportanceSignId = input.ImportanceId.Value;
+                
+                input.ImportanceId.DoIfHasValue(p => {
+                    CreateChangeHistory(material.ImportanceSignId,
+                        nameof(material.SessionPriority),
+                        p, username, changeRequestId, changesList);
                     material.Importance = null;
-                    
-                }
-                if (input.ReliabilityId.HasValue)
-                {
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = _materialSignRepository.GetById(input.ReliabilityId.Value).Title,
-                        OldValue = material.ReliabilitySignId.HasValue
-                            ? _materialSignRepository.GetById(material.ReliabilitySignId.Value).Title
-                            : string.Empty,
-                        PropertyName = nameof(material.Reliability),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.ReliabilitySignId = input.ReliabilityId.Value;
+                    material.ImportanceSignId = p;
+                });
+
+                input.ReliabilityId.DoIfHasValue(p => {
+                    CreateChangeHistory(material.ReliabilitySignId,
+                        nameof(material.SessionPriority),
+                        p, username, changeRequestId, changesList);
                     material.Reliability = null;
-                }
-                if (input.RelevanceId.HasValue)
-                {
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = _materialSignRepository.GetById(input.RelevanceId.Value).Title,
-                        OldValue = material.RelevanceSignId.HasValue
-                            ? _materialSignRepository.GetById(material.RelevanceSignId.Value).Title
-                            : string.Empty,
-                        PropertyName = nameof(material.Relevance),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.RelevanceSignId = input.RelevanceId.Value;
+                    material.ReliabilitySignId = p;
+                });
+
+                input.RelevanceId.DoIfHasValue(p => {
+                    CreateChangeHistory(material.RelevanceSignId,
+                        nameof(material.SessionPriority),
+                        p, username, changeRequestId, changesList);
                     material.Relevance = null;
-                }
-                if (input.CompletenessId.HasValue)
-                {
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = _materialSignRepository.GetById(input.CompletenessId.Value).Title,
-                        OldValue = material.CompletenessSignId.HasValue
-                            ? _materialSignRepository.GetById(material.CompletenessSignId.Value).Title
-                            : string.Empty,
-                        PropertyName = nameof(material.Completeness),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.CompletenessSignId = input.CompletenessId.Value;
+                    material.RelevanceSignId = p;
+                });
+
+                input.CompletenessId.DoIfHasValue(p => {
+                    CreateChangeHistory(material.CompletenessSignId,
+                        nameof(material.SessionPriority),
+                        p, username, changeRequestId, changesList);
                     material.Completeness = null;
-                }
-                if (input.SourceReliabilityId.HasValue)
-                {
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = _materialSignRepository.GetById(input.SourceReliabilityId.Value).Title,
-                        OldValue = material.SourceReliabilitySignId.HasValue
-                            ? _materialSignRepository.GetById(material.SourceReliabilitySignId.Value).Title
-                            : string.Empty,
-                        PropertyName = nameof(material.SourceReliability),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.SourceReliabilitySignId = input.SourceReliabilityId.Value;
+                    material.CompletenessSignId = p;
+                });
+
+                input.SourceReliabilityId.DoIfHasValue(p => {
+                    CreateChangeHistory(material.SourceReliabilitySignId,
+                        nameof(material.SessionPriority),
+                        p, username, changeRequestId, changesList);
                     material.SourceReliability = null;
-                }
-                if (input.ProcessedStatusId.HasValue)
-                {
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = _materialSignRepository.GetById(input.ProcessedStatusId.Value).Title,
-                        OldValue = material.ProcessedStatusSignId.HasValue
-                            ? _materialSignRepository.GetById(material.ProcessedStatusSignId.Value).Title
-                            : string.Empty,
-                        PropertyName = nameof(material.ProcessedStatus),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.ProcessedStatusSignId = input.ProcessedStatusId.Value;
+                    material.SourceReliabilitySignId = p;
+                });
+
+                input.ProcessedStatusId.DoIfHasValue(p => {
+                    CreateChangeHistory(material.ProcessedStatusSignId,
+                        nameof(material.SessionPriority),
+                        p, username, changeRequestId, changesList);
                     material.ProcessedStatus = null;
-                }
-                if (input.SessionPriorityId.HasValue)
-                {
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = _materialSignRepository.GetById(input.SessionPriorityId.Value).Title,
-                        OldValue = material.SessionPriorityId.HasValue
-                            ? _materialSignRepository.GetById(material.SessionPriorityId.Value).Title
-                            : string.Empty,
-                        PropertyName = nameof(material.SessionPriority),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.SessionPriorityId = input.SessionPriorityId.Value;
+                    material.ProcessedStatusSignId = p;
+                });
+
+                input.SessionPriorityId.DoIfHasValue(p => {
+                    CreateChangeHistory(material.SessionPriorityId,
+                        nameof(material.SessionPriority),
+                        p, username, changeRequestId, changesList);
                     material.SessionPriority = null;
-                }
-                if (input.AssigneeId.HasValue) 
-                {
+                    material.SessionPriorityId = p;
+                });
+
+                await input.AssigneeId.DoIfHasValueAsync(async p => {
+
+                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p));
+
                     changesList.Add(new ChangeHistoryDto
                     {
                         Date = DateTime.UtcNow,
-                        NewValue = input.AssigneeId.Value.ToString(),
-                        OldValue = material.AssigneeId.ToString(),
+                        NewValue = user.Username,
+                        OldValue = material.Assignee?.Username?.ToString(),
                         PropertyName = nameof(material.Assignee),
                         RequestId = changeRequestId,
                         TargetId = material.Id,
                         UserName = username
                     });
+                    material.Assignee = null;
                     material.AssigneeId = input.AssigneeId;
-                }
+                });
                 if (input.Content != null) 
                 {
                     changesList.Add(new ChangeHistoryDto
@@ -352,7 +293,7 @@ namespace IIS.Core.Materials.EntityFramework
                     material.Content = input.Content;
                 } 
 
-                var loadData = MaterialLoadData.MapLoadData(material.LoadData);               
+                var loadData = MaterialLoadData.MapLoadData(material.LoadData);
 
                 var loadDataStringified = loadData.ToJson();
                 if (!string.Equals(loadDataStringified, material.LoadData, StringComparison.Ordinal))
@@ -374,29 +315,55 @@ namespace IIS.Core.Materials.EntityFramework
                     material.LoadData = loadDataStringified;
                 }
 
-                await _changeHistoryService.SaveMaterialChanges(changesList);
-                await UpdateMaterialAsync(material);
-                QueueMaterialChildrenForMl(material);                
+                Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
+
+                var fillElasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+
+                var addHistoryTask = _changeHistoryService.SaveMaterialChanges(changesList);
+
+                await Task.WhenAll(new []{fillElasticTask, addHistoryTask});
+
+                if(MaterialShouldBeQueuedForMachineLearning(material))
+                {
+                    QueueMaterialForMachineLearning(material);
+                }
             }
             return await _materialProvider.GetMaterialAsync(input.Id, userId);
         }
 
-        private void QueueMaterialChildrenForMl(MaterialEntity material)
+        private void CreateChangeHistory(Guid? destinationId,
+            string destinationName,
+            Guid value,
+            string userName,
+            Guid requestId,
+            List<ChangeHistoryDto> changesList)
         {
+            changesList.Add(new ChangeHistoryDto
+            {
+                Date = DateTime.UtcNow,
+                NewValue = _materialSignRepository.GetById(value).Title,
+                OldValue = destinationId.HasValue
+                                ? _materialSignRepository.GetById(destinationId.Value).Title
+                                : string.Empty,
+                PropertyName = destinationName,
+                UserName = userName,
+                RequestId = requestId
+            });
+        }
+
+        private void QueueMaterialForMachineLearning(MaterialEntity material)
+        {
+            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+
             foreach (var child in material.Children)
             {
                 _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = child.Id, Source = child.Source, Type = child.Type });
             }
         }
 
-        private async Task UpdateMaterialAsync(MaterialEntity material)
+        private bool MaterialShouldBeQueuedForMachineLearning(MaterialEntity material)
         {
-            Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
-
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
-
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+            return material.ProcessedStatusSignId.HasValue && material.ProcessedStatusSignId == MaterialEntity.ProcessingStatusProcessedSignId;
         }
 
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
@@ -471,5 +438,5 @@ namespace IIS.Core.Materials.EntityFramework
             return RunWithoutCommitAsync(async (unitOfWork)
                 => await unitOfWork.MaterialRepository.PutAllMaterialsToElasticSearchAsync(cancellationToken));
         }
-    }
+    }    
 }

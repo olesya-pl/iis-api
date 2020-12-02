@@ -1,15 +1,13 @@
-using Iis.AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
-using TechTalk.SpecFlow;
 
-namespace Iis.AcceptanceTests.PageObjects
+namespace AcceptanceTests.PageObjects
 {
-    public class MaterialsPageObjects
+    public class MaterialsSectionPage
     {
         private readonly IWebDriver driver;
 
-        public MaterialsPageObjects(IWebDriver driver)
+        public MaterialsSectionPage(IWebDriver driver)
         {
 
             this.driver = driver;
@@ -69,9 +67,7 @@ namespace Iis.AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement ObjectsTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > .general-container > div:nth-of-type(1) > .el-form-item__content > .el-select.el-tooltip")]
-        [CacheLookup]
-        public IWebElement ImportanceDropDown;
+        public MaterialPage MaterialPage => new MaterialPage(driver);
 
         [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(2) > .el-form-item__content > .el-select.el-tooltip")]
         [CacheLookup]
@@ -97,9 +93,9 @@ namespace Iis.AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSearchResultCounter;
 
-
-
-
+        [FindsBy(How = How.CssSelector, Using = "body > div:last-child ul > li:nth-child(1)")]
+        [CacheLookup]
+        public IWebElement ImportanceDropDownFirstValue;
 
     }
 }
