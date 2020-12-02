@@ -2,6 +2,7 @@ using System.Linq;
 using Iis.AcceptanceTests.Helpers;
 using Iis.AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -77,6 +78,20 @@ namespace Iis.AcceptanceTests.UISteps
             var materialsPage = new MaterialsPageObjects(driver);
             materialsPage.SearchField.SendKeys(input);
             materialsPage.SearchField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I clicked on the Importance drop down menu in a material card")]
+        public void WhenIClickedOnTheDropDownMenuInTheMaterials()
+        {
+            var materialsPage = new MaterialsPageObjects(driver);
+            materialsPage.ImportanceDropDown.Click();
+        }
+
+        [When(@"I clicked on the first element in the Importance drop down menu in a material card")]
+        public void WhenIChoseThirdElementInTheImportanceDropDownMenuInAMaterialCard()
+        {
+            var materialsPage = new MaterialsPageObjects(driver);
+            materialsPage.ImportanceDropDownFirstValue.Click();
         }
         #endregion When
 

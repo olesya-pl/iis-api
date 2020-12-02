@@ -97,9 +97,9 @@ namespace Iis.AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSearchResultCounter;
 
-
-
-
+        [FindsBy(How = How.CssSelector, Using = "body > div:last-child ul > li:nth-child(1)")]
+        [CacheLookup]
+        public IWebElement ImportanceDropDownFirstValue;
 
     }
 }
