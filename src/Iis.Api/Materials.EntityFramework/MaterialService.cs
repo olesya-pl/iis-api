@@ -261,17 +261,21 @@ namespace IIS.Core.Materials.EntityFramework
                     material.SessionPriorityId = p;
                 });
 
-                input.AssigneeId.DoIfHasValue(p => {
+                await input.AssigneeId.DoIfHasValueAsync(async p => {
+
+                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p));
+
                     changesList.Add(new ChangeHistoryDto
                     {
                         Date = DateTime.UtcNow,
-                        NewValue = input.AssigneeId.Value.ToString(),
-                        OldValue = material.AssigneeId.ToString(),
+                        NewValue = user.Username,
+                        OldValue = material.Assignee?.Username?.ToString(),
                         PropertyName = nameof(material.Assignee),
                         RequestId = changeRequestId,
                         TargetId = material.Id,
                         UserName = username
                     });
+                    material.Assignee = null;
                     material.AssigneeId = input.AssigneeId;
                 });
                 if (input.Content != null) 
