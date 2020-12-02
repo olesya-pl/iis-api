@@ -176,16 +176,27 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public async Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {
+            var result = new List<GeoCoordinate>();
             var parentNode = ctx.Parent<Node>();
-            var attriburteNodes = parentNode.OriginalNode.GetAllAttributeNodes(Iis.Interfaces.Ontology.Schema.ScalarType.Geo);
-            var geoCoordinates = attriburteNodes.Select(n => n.Attribute.ValueAsGeoCoordinates);
+            var attributeNodes = parentNode.OriginalNode.GetAllAttributeNodes(Iis.Interfaces.Ontology.Schema.ScalarType.Geo);
+            var geoCoordinates = attributeNodes.Select(n => n.Attribute.ValueAsGeoCoordinates);
 
-            return geoCoordinates.Select(x => new GeoCoordinate
+            foreach (var attributeNode in attributeNodes)
             {
-                Label = parentNode.OriginalNode.NodeType.Title,
-                Lat = x.Latitude,
-                Long = x.Longitude
-            }).ToList();
+                var relation = attributeNode.IncomingRelations.Single();
+                var geoCoordinate = attributeNode.Attribute.ValueAsGeoCoordinates;
+                var label = relation.SourceNodeId == parentNode.Id ?
+                    relation.Node.NodeType.Title :
+                    relation.SourceNode.IncomingRelations.Single().Node.NodeType.Title;
+
+                result.Add(new GeoCoordinate
+                {
+                    Label = label,
+                    Lat = geoCoordinate.Latitude,
+                    Long = geoCoordinate.Longitude
+                });
+            }
+            return result;
         }
     }
 }
