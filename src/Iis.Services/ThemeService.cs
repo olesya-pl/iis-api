@@ -294,7 +294,7 @@ namespace Iis.Services
             return types
                 .SelectMany(e => _ontology.GetChildTypes(e))
                 .Concat(types)
-                .Where(e => e.IsAbstract)
+                .Where(e => !e.IsAbstract)
                 .Select(e => e.Name)
                 .Distinct()
                 .ToArray();

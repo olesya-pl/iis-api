@@ -178,7 +178,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var result = new List<GeoCoordinate>();
             var parentNode = ctx.Parent<Node>();
             var attributeNodes = parentNode.OriginalNode.GetAllAttributeNodes(Iis.Interfaces.Ontology.Schema.ScalarType.Geo);
-            var geoCoordinates = attributeNodes.Select(n => n.Attribute.ValueAsGeoCoordinates);
 
             foreach (var attributeNode in attributeNodes)
             {
