@@ -1,7 +1,7 @@
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
-namespace Iis.AcceptanceTests.PageObjects
+namespace AcceptanceTests.PageObjects
 {
     public class ThemesAndUpdatesPageObjects
     {
