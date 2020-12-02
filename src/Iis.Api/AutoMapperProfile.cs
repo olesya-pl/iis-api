@@ -16,6 +16,7 @@ using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Themes;
 using IIS.Core.GraphQL.Users;
+using Iis.Api.GraphQL.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -23,6 +24,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Params;
 using Role = Iis.Services.Contracts.Role;
 using User = IIS.Core.GraphQL.Users.User;
 using Iis.Interfaces.Ontology.Data;
@@ -30,6 +32,7 @@ using Contracts = Iis.Services.Contracts;
 using Iis.DataModel.Reports;
 using Iis.Events.Reports;
 using Iis.Api.GraphQL.Aliases;
+using Iis.DataModel.ChangeHistory;
 
 namespace Iis.Api
 {
@@ -226,9 +229,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
-
-            CreateMap<IChangeHistoryItem, Iis.DataModel.ChangeHistory.ChangeHistoryEntity>();
-            CreateMap<IChangeHistoryItem, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
+            
 
             //mapping: GraphQl.UserInput -> Roles.User
             CreateMap<BaseUserInput, Services.Contracts.User>()
@@ -258,33 +259,33 @@ namespace Iis.Api
             CreateMap<Iis.Domain.Materials.MaterialsCountByType, IIS.Core.GraphQL.Materials.MaterialsCountByType>();
 
             //theme: graphQl input -> domain
-            CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, Iis.ThemeManagement.Models.Theme>()
+            CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, ThemeDto>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Services.Contracts.User{ Id = src.UserId.Value }));
 
-            CreateMap<IIS.Core.GraphQL.Themes.UpdateThemeInput, Iis.ThemeManagement.Models.Theme>()
+            CreateMap<IIS.Core.GraphQL.Themes.UpdateThemeInput, ThemeDto>()
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src =>
                     src.UserId.HasValue ? new Services.Contracts.User { Id = src.UserId.Value } : null));
 
             // theme: domain -> entity
-            CreateMap<Iis.ThemeManagement.Models.Theme, ThemeEntity>()
+            CreateMap<ThemeDto, ThemeEntity>()
                 .ForMember(dest => dest.User, opts => opts.Ignore())
                 .ForMember(dest => dest.Type, opts => opts.Ignore());
 
             // theme: entity -> domain
-            CreateMap<ThemeEntity, Iis.ThemeManagement.Models.Theme>();
+            CreateMap<ThemeEntity, ThemeDto>();
 
             //theme: domain -> graphQl
-            CreateMap<Iis.ThemeManagement.Models.Theme, Theme>();
+            CreateMap<ThemeDto, Theme>();
 
             // themeType: domain -> entity
-            CreateMap<Iis.ThemeManagement.Models.ThemeType, ThemeTypeEntity>();
+            CreateMap<ThemeTypeDto, ThemeTypeEntity>();
 
             // themeType: entity -> domain
-            CreateMap<ThemeTypeEntity, Iis.ThemeManagement.Models.ThemeType>();
+            CreateMap<ThemeTypeEntity, ThemeTypeDto>();
 
             //theme: domain -> graphQl
-            CreateMap<Iis.ThemeManagement.Models.ThemeType, ThemeType>();
+            CreateMap<ThemeTypeDto, ThemeType>();
 
             CreateMap<IIS.Core.GraphQL.ML.MachineLearningHadnlersCountInput, IIS.Core.GraphQL.ML.MachineLearningHadnlersCountResult>();
 
@@ -347,11 +348,16 @@ namespace Iis.Api
 
             #endregion
 
+            CreateMap<ChangeHistoryEntity, ChangeHistoryDto>().ReverseMap();
+            CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
+
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
             CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();
             CreateMap<Iis.Interfaces.Elastic.SearchEntitiesByConfiguredFieldsResult, IIS.Core.GraphQL.Entities.ObjectOfStudyFilterableQueryResponse>()
                 .ForMember(dest => dest.Aggregations, opts => opts.MapFrom(src => src.Aggregations))
                 .ForMember(dest => dest.Items, opts => opts.MapFrom(src => src.Entities));
+
+            CreateMap<SortingInput, SortingParams>();
         }
     }
 }

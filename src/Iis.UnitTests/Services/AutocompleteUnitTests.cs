@@ -82,6 +82,23 @@ namespace Iis.UnitTests.Services
             entities.Should().OnlyContain(x => x.TypeTitle == "Військовий підрозділ");
         }
 
+        [Fact]
+        public async Task GetEntities_ArrayInTitle_ShouldReturnOtherField()
+        {
+            //Arrange
+            var service = GetService();
+
+            //Act
+            var entities = await service.GetEntitiesAsync("rpg", 5);
+
+            //Assert
+            entities.Should().HaveCount(2);
+            entities.Should().ContainSingle(x => x.Title == "RPG-5");
+            entities.Should().ContainSingle(x => x.Title == "RPG-4");
+            entities.Should().OnlyContain(x => x.TypeName == "Ammunition");
+            entities.Should().OnlyContain(x => x.TypeTitle == "Озброєння");
+        }
+
         private AutocompleteService GetService()
         {
             return new AutocompleteService(_ontologySchemaMock.Object, _elasticServiceMock.Object);
@@ -114,7 +131,7 @@ namespace Iis.UnitTests.Services
             });
 
             _elasticServiceMock
-                .Setup(x => x.SearchByFieldsAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.SearchByFieldsAsync("*some text*", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ElasticSearchResultItem>()
                 {
                     new ElasticSearchResultItem
@@ -141,7 +158,35 @@ namespace Iis.UnitTests.Services
                                 }
                          }")
                     }
-                }); ;
+                });
+
+            _elasticServiceMock
+                .Setup(x => x.SearchByFieldsAsync("*rpg*", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<ElasticSearchResultItem>()
+                {
+                    new ElasticSearchResultItem
+                    {
+                        Identifier = Guid.NewGuid().ToString("N"),
+                        SearchResult = JObject.Parse(@"{
+                            ""NodeTypeName"" : ""Ammunition"",
+                            ""NodeTypeTitle"" : ""Озброєння"",
+                            ""title"" : ["""",""RPG-5""],
+                            ""__title"" : ""RPG-5""
+                         }")
+                    },
+                    new ElasticSearchResultItem
+                    {
+                        Identifier = Guid.NewGuid().ToString("N"),
+                         SearchResult = JObject.Parse(@"{
+                            ""NodeTypeName"" : ""Ammunition"",
+                            ""NodeTypeTitle"" : ""Озброєння"",
+                            ""title"" : ["""",""RPG-4""],
+                            ""commonInfo"" : {
+                                ""RealNameShort"" : ""RPG-4""
+                                }
+                         }")
+                    }
+                });
         }
     }
 }

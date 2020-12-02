@@ -6,12 +6,12 @@ using HotChocolate.Resolvers;
 using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 using IIS.Domain;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json;
 using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -274,7 +274,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     if (newRelation.Target is Attribute)
                     {
                         await _changeHistoryService
-                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), string.Empty, stringifiedValue, requestId);
+                            .SaveNodeChange(dotName, _rootNodeId, GetCurrentUserName(), string.Empty, stringifiedValue, requestId);
                     }
                     else 
                     {
@@ -289,7 +289,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     if (oldValue != stringifiedValue)
                     {
                         await _changeHistoryService
-                            .SaveChange(dotName, _rootNodeId, GetCurrentUserName(), oldValue, stringifiedValue, requestId);
+                            .SaveNodeChange(dotName, _rootNodeId, GetCurrentUserName(), oldValue, stringifiedValue, requestId);
                     }
                 }
             }
@@ -309,7 +309,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var child in children)
             {
                 await _changeHistoryService
-                    .SaveChange(child.dotName, _rootNodeId,
+                    .SaveNodeChange(child.dotName, _rootNodeId,
                         GetCurrentUserName(), string.Empty, child.attribute.Value?.ToString(), requestId);
             }
         }
@@ -320,7 +320,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var child in children)
             {
                 await _changeHistoryService
-                    .SaveChange(child.dotName, _rootNodeId,
+                    .SaveNodeChange(child.dotName, _rootNodeId,
                         GetCurrentUserName(), child.attribute.Value.ToString(), string.Empty, requestId);
             }
         }

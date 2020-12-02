@@ -108,12 +108,12 @@ namespace Iis.Api.Ontology
         {
             var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
 
-            var attributies = node.GetChildAttributes()
-                .Where(a => EventDotNames.Contains(a.dotName));
+            var attributies = node.GetChildAttributesExcludingNestedObjects()
+                .Where(a => EventDotNames.Contains(a.DotName));
 
             foreach (var attribute in attributies)
             {
-                result.Add(new JProperty(attribute.dotName, attribute.attribute.Value));
+                result.Add(new JProperty(attribute.DotName, attribute.Attribute.Value));
             }
 
             return result;

@@ -37,6 +37,8 @@ namespace IIS.Core.Materials.EntityFramework
         {
             DateParseHandling = DateParseHandling.None
         };
+        private static readonly Dictionary<Guid, SearchResultItem> EmptyHighLightCollection = new Dictionary<Guid, SearchResultItem>();
+        private static readonly IEnumerable<Material> EmptyMaterialCollection = Array.Empty<Material>();
         private static readonly IReadOnlyCollection<string> RelationTypeNameList = new List<string>
         {
             "parent"
@@ -56,7 +58,6 @@ namespace IIS.Core.Materials.EntityFramework
         public MaterialProvider(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
             IOntologyNodesData ontologyData,
-            IElasticService elasticService,
             IMaterialElasticService materialElasticService,
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
@@ -78,45 +79,27 @@ namespace IIS.Core.Materials.EntityFramework
             _nodeToJObjectMapper = nodeToJObjectMapper;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count, Dictionary<Guid, SearchResultItem> Highlights)>
-            GetMaterialsAsync(int limit, int offset, string filterQuery,
-            IEnumerable<string> types = null, string sortColumnName = null, string sortOrder = null)
+        public async Task<MaterialsDto> GetMaterialsAsync(
+            string filterQuery,
+            PaginationParams page,
+            SortingParams sorting,
+            CancellationToken ct = default)
         {
-            IEnumerable<Task<Material>> mappingTasks;
-            IEnumerable<Material> materials;
-            (IEnumerable<MaterialEntity> Materials, int TotalCount) materialResult;
-
-            if (!string.IsNullOrWhiteSpace(filterQuery) && filterQuery != WildCart)
+            var searchParams = new SearchParams
             {
-                var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(
-                    new ElasticFilter { Limit = limit, Offset = offset, Suggestion = filterQuery });
+                Suggestion = string.IsNullOrWhiteSpace(filterQuery) || filterQuery == WildCart ? null : filterQuery,
+                Page = page,
+                Sorting = sorting
+            };
 
-                materials = searchResult.Items.Values
-                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                    .Select(MapMaterialDocument);
+            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(searchParams);
 
-                return (materials, searchResult.Count, searchResult.Items);
-            }
+            var materials = searchResult.Items.Values
+                .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                .Select(MapMaterialDocument)
+                .ToArray();
 
-            if (types != null)
-            {
-                materialResult = await RunWithoutCommitAsync(async (unitOfWork) =>
-                    await unitOfWork.MaterialRepository.GetAllAsync(types, limit, offset, sortColumnName, sortOrder));
-            }
-            else
-            {
-                materialResult = await RunWithoutCommitAsync(async (unitOfWork) =>
-                    await unitOfWork.MaterialRepository.GetAllAsync(limit, offset, sortColumnName, sortOrder));
-            }
-
-            mappingTasks = materialResult.Materials
-                                .Select(async entity => await MapAsync(entity));
-
-            materials = await Task.WhenAll(mappingTasks);
-
-            materials = await UpdateProcessedMLHandlersCount(materials);
-
-            return (materials, materialResult.TotalCount, new Dictionary<Guid, SearchResultItem>());
+            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items);
         }
 
         private Material MapMaterialDocument(MaterialDocument document)
@@ -144,12 +127,14 @@ namespace IIS.Core.Materials.EntityFramework
             return material;
         }
 
-        public async Task<Material> GetMaterialAsync(Guid id)
+        public async Task<Material> GetMaterialAsync(Guid id, Guid userId)
         {
             var entity = await RunWithoutCommitAsync(async (unitOfWork) =>
                 await unitOfWork.MaterialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
 
-            return await MapAsync(entity);
+            var mapped = await MapAsync(entity);
+            mapped.CanBeEdited = entity.CanBeEdited(userId);
+            return mapped;
         }
 
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
@@ -317,17 +302,16 @@ namespace IIS.Core.Materials.EntityFramework
             return parentNodesMap;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, int limit, int offset)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, PaginationParams page)
         {
             var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
 
-            if(!isEligible) return (new List<Material>(), 0);
+            if (!isEligible) return (EmptyMaterialCollection, 0);
 
             var searchParams = new SearchParams
             {
-                Offset = offset,
-                Limit = limit,
-                Suggestion = materialId.ToString("N")
+                Suggestion = materialId.ToString("N"),
+                Page = page
             };
 
             var searchResult = await _materialElasticService.SearchMoreLikeThisAsync(searchParams);
@@ -339,20 +323,20 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, searchResult.Count);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(int pageSize, int offset, string fileName, byte[] content)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content)
         {
             decimal[] imageVector;
             try
             {
                 imageVector = await VectorizeImage(content, fileName);
 
-                if(imageVector is null) throw new Exception("Image vector is empty.");
+                if (imageVector is null) throw new Exception("Image vector is empty.");
             }
             catch (Exception e)
             {
                 throw new Exception("Failed to vectorize image", e);
             }
-            var searchResult = await _materialElasticService.SearchByImageVector(imageVector, offset, pageSize, CancellationToken.None);
+            var searchResult = await _materialElasticService.SearchByImageVector(imageVector, page);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -374,15 +358,20 @@ namespace IIS.Core.Materials.EntityFramework
             return FaceAPIResponseParser.GetEncoding(contentJson);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, bool includeDescendants, string suggestion, int limit = 0, int offset = 0, CancellationToken ct = default)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList,
+            bool includeDescendants,
+            string suggestion,
+            PaginationParams page,
+            SortingParams sorting,
+            CancellationToken ct = default)
         {
             var materialEntityList = new List<MaterialEntity>();
 
             foreach (var nodeId in nodeIdList)
             {
-                var objectIdList = new List<Guid>{ nodeId };
+                var objectIdList = new List<Guid> { nodeId };
 
-                if(includeDescendants) objectIdList.AddRange(GetDescendantsByGivenRelationTypeNameList(objectIdList, RelationTypeNameList));
+                if (includeDescendants) objectIdList.AddRange(GetDescendantsByGivenRelationTypeNameList(objectIdList, RelationTypeNameList));
 
                 var materialEntities = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQueryAsync(objectIdList));
 
@@ -391,14 +380,14 @@ namespace IIS.Core.Materials.EntityFramework
                 materialEntityList.AddRange(materialEntities);
             }
 
-            if(!materialEntityList.Any()) return EmptMaterialResult;
+            if (!materialEntityList.Any()) return EmptMaterialResult;
 
             var materialEntitiesIdList = materialEntityList
                 .GroupBy(e => e.Id)
                 .Where(gr => gr.Count() == nodeIdList.Count())
                 .Select(gr => gr.Select(e => e.Id).FirstOrDefault());
 
-            var searchParams = new SearchParams{Offset = offset, Limit = limit, Suggestion = suggestion};
+            var searchParams = new SearchParams { Suggestion = suggestion, Page = page, Sorting = sorting };
 
             var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList);
 
@@ -429,7 +418,7 @@ namespace IIS.Core.Materials.EntityFramework
         }
         private bool IsEvent(Node node)
         {
-            if(node is null) return false;
+            if (node is null) return false;
 
             var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
 
@@ -454,7 +443,7 @@ namespace IIS.Core.Materials.EntityFramework
             return nodeType.IsObjectSign;
         }
 
-        private async Task<IEnumerable<Material>> UpdateProcessedMLHandlersCount(IEnumerable<Material> materials)
+        private async Task<IReadOnlyCollection<Material>> UpdateProcessedMLHandlersCountAsync(IReadOnlyCollection<Material> materials)
         {
             var materialIds = Array.AsReadOnly(materials.Select(p => p.Id).ToArray());
 
@@ -468,7 +457,7 @@ namespace IIS.Core.Materials.EntityFramework
                 {
                     material.ProcessedMlHandlersCount = result.Count;
                     return material;
-                }).ToList();
+                }).ToArray();
 
             return materials;
         }
@@ -542,6 +531,14 @@ namespace IIS.Core.Materials.EntityFramework
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
             result.Node = _ontologyService.LoadNodes(feature.NodeId);
             return result;
+        }
+
+        public async Task<bool> MaterialExists(Guid id)
+        {
+            var entity = await RunWithoutCommitAsync((unitOfWork) =>
+                unitOfWork.MaterialRepository.GetByIdAsync(id));
+
+            return entity != null;
         }
     }
 }

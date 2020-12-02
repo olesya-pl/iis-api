@@ -9,9 +9,10 @@ using Xunit;
 using Iis.DataModel;
 using Iis.DataModel.Themes;
 using Iis.Services.Contracts;
-using Iis.ThemeManagement;
-using Iis.ThemeManagement.Models;
 using Iis.DbLayer.Repositories;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.UnitTests.ThemeManagement
 {
@@ -41,7 +42,7 @@ namespace Iis.UnitTests.ThemeManagement
             ThemeTypeEntity themeType3)
         {
             //arrange: begin
-            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IThemeService>();
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
             context.ThemeTypes.Add(themeType1);
@@ -65,10 +66,10 @@ namespace Iis.UnitTests.ThemeManagement
 
         [Theory(DisplayName = "Create Theme"), RecursiveAutoData]
         public async Task CreateTheme(
-            Theme theme)
+            ThemeDto theme)
         {
             //arrange: begin
-            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IThemeService>();
             //arrange: end
 
             var themeId = await service.CreateThemeAsync(theme);
@@ -85,10 +86,10 @@ namespace Iis.UnitTests.ThemeManagement
             context.SaveChanges();
 
             //act
-            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
-            await service.UpdateThemeAsync(new Theme {
+            var service = _serviceProvider.GetRequiredService<IThemeService>();
+            await service.UpdateThemeAsync(new ThemeDto {
                 Title = "Updated",
-                Query = theme.Query,
+                QueryRequest = theme.QueryRequest,
                 Id = theme.Id
             });
 
@@ -111,13 +112,13 @@ namespace Iis.UnitTests.ThemeManagement
             context.SaveChanges();
 
             //act
-            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
-            await service.UpdateThemeAsync(new Theme
+            var service = _serviceProvider.GetRequiredService<IThemeService>();
+            await service.UpdateThemeAsync(new ThemeDto
             {
                 Title = "Updated",
-                Query = theme.Query,
+                QueryRequest = theme.QueryRequest,
                 Id = theme.Id,
-                Type = new ThemeType { Id = themeType.Id},
+                Type = new ThemeTypeDto { Id = themeType.Id},
                 User = new User { Id = user.Id}
             });
 
@@ -132,7 +133,7 @@ namespace Iis.UnitTests.ThemeManagement
             ThemeEntity themeEntity)
         {
             //arrange: begin
-            var service = _serviceProvider.GetRequiredService<ThemeService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IThemeService>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 

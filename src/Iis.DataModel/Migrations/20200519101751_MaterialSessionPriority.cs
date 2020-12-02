@@ -1,4 +1,5 @@
 ﻿using System;
+using Iis.DataModel.Materials;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IIS.Core.Migrations
@@ -42,10 +43,10 @@ namespace IIS.Core.Migrations
                 columns: new[] { "Id", "MaterialSignTypeId", "OrderNumber", "ShortTitle", "Title" },
                 values: new object[,]
                 {
-                    { new Guid("6051013d-846b-4409-9da0-9414b103b396"), new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 1, "В", "Важливий" },
-                    { new Guid("60536b3c-e78d-40cf-9199-37f112184f69"), new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 2, "Н", "Негайна доповідь" },
-                    { new Guid("60560b14-195c-4605-816e-983118ab9ed9"), new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 3, "П", "Пропустити" },
-                    { new Guid("6071f9f3-1988-4b14-9f6a-c0514fc795d0"), new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 4, "ПЕР", "Переклад" }
+                    { MaterialEntity.SessionPriorityImportantSignId, new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 1, "В", "Важливий" },
+                    { MaterialEntity.SessionPriorityImmediateReportSignId, new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 2, "Н", "Негайна доповідь" },
+                    { MaterialEntity.SessionPrioritySkipSignId, new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 3, "П", "Пропустити" },
+                    { MaterialEntity.SessionPriorityTranslateSignId, new Guid("6037bd7a-97df-4fa2-9c94-20468453a534"), 4, "ПЕР", "Переклад" }
                 });
         }
 

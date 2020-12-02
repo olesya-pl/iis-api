@@ -161,11 +161,11 @@ namespace Iis.DbLayer.Repositories
 
             var materialDocument = MapEntityToDocument(material);
 
-            var (mlResponses, imageVector) = await PopulateMLResponses(materialId);
+            var (mlResponses, mlResponsesCount, imageVector) = await PopulateMLResponses(materialId);
 
             materialDocument.MLResponses = mlResponses;
 
-            materialDocument.ProcessedMlHandlersCount = mlResponses.Count;
+            materialDocument.ProcessedMlHandlersCount = mlResponsesCount;
 
             if (imageVector != null)
             {
@@ -175,36 +175,6 @@ namespace Iis.DbLayer.Repositories
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 token);
-        }
-
-        public async Task<SearchResult> SearchMaterials(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
-        {
-            var searchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = MaterialIndexes.ToList(),
-                Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL",
-                From = filter.Offset,
-                Size = filter.Limit,
-            };
-            var searchResult = await _elasticManager.SearchAsync(searchParams, cancellationToken);
-            return new SearchResult
-            {
-                Count = searchResult.Count,
-                Items = searchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
-            };
-        }
-
-        public Task<int> CountMaterialsAsync(IElasticNodeFilter filter, CancellationToken cancellationToken = default)
-        {
-            var searchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = MaterialIndexes.ToList(),
-                Query = string.IsNullOrEmpty(filter.Suggestion) ? "ParentId:NULL" : $"{filter.Suggestion} AND ParentId:NULL"
-            };
-
-            return _elasticManager.CountAsync(searchParams, cancellationToken);
         }
 
         public void AddMaterialEntity(MaterialEntity materialEntity)
@@ -360,14 +330,19 @@ namespace Iis.DbLayer.Repositories
                 .SelectMany(p => p.MaterialFeatures)
                 .Select(p => p.NodeId)
                 .ToArray();
+
+            materialDocument.NodesCount = materialDocument.NodeIds.Count();
+
             return materialDocument;
         }
 
-        private async Task<(JObject mlResponses, decimal[] imageVector)> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject mlResponses, int mlResponsesCount, decimal[] imageVector)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
+
             decimal[] imageVector = ExtractLatestImageVector(mlResponses);
-            return (MapMlResponseEntities(mlResponses), imageVector);
+
+            return (MapMlResponseEntities(mlResponses), mlResponses.Count, imageVector);
         }
 
         private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)

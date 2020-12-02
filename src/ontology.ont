@@ -433,6 +433,30 @@
       "UniqueValueFieldName": null
     },
     {
+      "Id": "35248db1-aa07-404b-b34c-a6fd4818d910",
+      "Name": "street",
+      "Title": "Вулиця",
+      "Meta": "{}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "19c164db-582f-495f-99d9-293c01d2b242",
+      "Name": "tmsi",
+      "Title": "TMSI",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
       "Id": "1a2b6345-4afb-41f9-919c-2e533a52852d",
       "Name": "duration",
       "Title": "Термін навчання",
@@ -961,18 +985,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "35248db1-aa07-404b-b34c-a6fd4818d910",
-      "Name": "street",
-      "Title": "Вулиця",
-      "Meta": "{}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "35304af6-2545-483e-b681-2c65944c3e6d",
       "Name": "currentLocation",
       "Title": "Поточне місце перебування",
@@ -1461,18 +1473,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "19c164db-582f-495f-99d9-293c01d2b242",
-      "Name": "tmsi",
-      "Title": "TMSI",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -3217,18 +3217,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "664650b5-edd2-431b-9b36-26823a5cbd0c",
-      "Name": "CredPersonDocument",
-      "Title": "Посвідчення особи",
-      "Meta": "{\r\n  \"SortOrder\": 181\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "66b04537-02ea-47ac-aa22-3eb89976d09f",
       "Name": "otherPersonId",
       "Title": "Інші номери",
@@ -3345,6 +3333,30 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "82ffcdc7-c406-4727-9030-5835b508a44b",
+      "Name": "code",
+      "Title": "Код",
+      "Meta": "{\r\n  \"SortOrder\": 1,\r\n  \"Multiple\": false\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "99dad4a6-49fb-4b69-9d56-37d23394a4da",
+      "Name": "text",
+      "Title": "",
+      "Meta": "{}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -3793,18 +3805,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "82ffcdc7-c406-4727-9030-5835b508a44b",
-      "Name": "code",
-      "Title": "Код",
-      "Meta": "{\r\n  \"SortOrder\": 1,\r\n  \"Multiple\": false\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "83985a1b-b32f-433c-8fb3-48e052fd22de",
       "Name": "currentLocation",
       "Title": "Поточне місце перебування",
@@ -4221,18 +4221,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "99dad4a6-49fb-4b69-9d56-37d23394a4da",
-      "Name": "text",
-      "Title": "",
-      "Meta": "{}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -15217,6 +15205,18 @@
       "UniqueValueFieldName": null
     },
     {
+      "Id": "fe314a4d-c969-4881-bc91-4fdb46bd2eab",
+      "Name": "crew",
+      "Title": "Розрахунок, осіб",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
       "Id": "d9071b8c-0d28-4533-8779-fcbf9c43da45",
       "Name": "deploymentAndFoldingTime",
       "Title": "Час розгортання/згортання, год.",
@@ -15741,18 +15741,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "fe314a4d-c969-4881-bc91-4fdb46bd2eab",
-      "Name": "crew",
-      "Title": "Розрахунок, осіб",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -16429,54 +16417,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "a6ec2c93-27e8-49e7-aa25-d7d81c02ba1a",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"{title}\"\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "dcea2215-8642-4347-a7ae-5a8390647e74",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "d6ece51c-9f5b-488b-86ef-99c266b666d0",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"shortFio({realName.firstName.ukr}, {realName.fatherName.ukr}, {realName.lastName.ukr})\"\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "b63d5602-88c6-421f-a975-7baad1b8d5bb",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "0e495c85-ebe7-4ece-8ff3-2d7e424fba40",
       "Name": "location",
       "Title": "Розташування",
@@ -16497,30 +16437,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "51a2baef-14db-47ce-959b-294632240a89",
-      "Name": "__title",
-      "Title": "Повна назва",
-      "Meta": "{\n    \"Formula\": \"{shortName.ukr};{shortName.original};{shortName.translit};{fullName.ukr};{fullName.original};{fullName.translit};{title}\"\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd",
-      "Name": "__title",
-      "Title": "Повна назва",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -16549,50 +16465,14 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "3f78adbc-d473-4149-b338-9e19dd5a6c54",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"{shortName};{name};{title}\"\n}",
+      "Id": "664650b5-edd2-431b-9b36-26823a5cbd0c",
+      "Name": "CredPersonDocument",
+      "Title": "Посвідчення особи",
+      "Meta": "{\r\n  \"SortOrder\": 181\r\n}",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "b5570e2b-a8ed-4725-8362-d186af6ece72",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "05090d4d-8e58-446a-bff0-a52364bf1733",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"{commonInfo.RealNameShort};{commonInfo.OpenName};{title}\"\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "e020390d-3dd1-48dc-a8b7-a1b493fd7030",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
+      "Kind": 0,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -16612,11 +16492,131 @@
       "Id": "81de6407-969e-4406-bacd-2725fca00bbe",
       "Name": "__title",
       "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"{shortName};{name};{title}\"\n}",
+      "Meta": "{\n    \"Formula\": \"{shortName};{name};{title};\\\"Техніка без назви\\\"\"\n}",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "05090d4d-8e58-446a-bff0-a52364bf1733",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": "{\n    \"Formula\": \"{commonInfo.RealNameShort};{commonInfo.OpenName};{title};\\\"Підрозділ без назви\\\"\"\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "3f78adbc-d473-4149-b338-9e19dd5a6c54",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": "{\n    \"Formula\": \"{shortName};{name};{title};\\\"Інфраструктура без назви\\\"\"\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "51a2baef-14db-47ce-959b-294632240a89",
+      "Name": "__title",
+      "Title": "Повна назва",
+      "Meta": "{\n    \"Formula\": \"{shortName.ukr};{shortName.original};{shortName.translit};{fullName.ukr};{fullName.original};{fullName.translit};{title};\\\"Організація без назви\\\"\"\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a6ec2c93-27e8-49e7-aa25-d7d81c02ba1a",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": "{\n    \"Formula\": \"{title};\\\"Об'єкт без назви\\\"\"\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "d6ece51c-9f5b-488b-86ef-99c266b666d0",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": "{\n    \"Formula\": \"shortFio({realName.firstName.ukr}, {realName.fatherName.ukr}, {realName.lastName.ukr});\\\"Особа без імені\\\"\"\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd",
+      "Name": "__title",
+      "Title": "Повна назва",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b5570e2b-a8ed-4725-8362-d186af6ece72",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b63d5602-88c6-421f-a975-7baad1b8d5bb",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "dcea2215-8642-4347-a7ae-5a8390647e74",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e020390d-3dd1-48dc-a8b7-a1b493fd7030",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     }
@@ -21845,13 +21845,6 @@
       "TargetTypeId": "f245afe7-8ac5-490b-be4e-7bf18a2dd895"
     },
     {
-      "Id": "81de6407-969e-4406-bacd-2725fca00bbe",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "49b0f55d-1284-4358-867a-0c3011f765b8",
-      "TargetTypeId": "9c71b881-f0ef-49e6-be6d-2756e3222be4"
-    },
-    {
       "Id": "d4b60364-ab34-490e-bed8-f75bd43a71c4",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -22034,20 +22027,6 @@
       "TargetTypeId": "957d10a8-0bd0-44da-92b3-bf4ed056072c"
     },
     {
-      "Id": "a6ec2c93-27e8-49e7-aa25-d7d81c02ba1a",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "12714279-135c-4e93-af46-43235f9f94b9",
-      "TargetTypeId": "dcea2215-8642-4347-a7ae-5a8390647e74"
-    },
-    {
-      "Id": "d6ece51c-9f5b-488b-86ef-99c266b666d0",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451",
-      "TargetTypeId": "b63d5602-88c6-421f-a975-7baad1b8d5bb"
-    },
-    {
       "Id": "3e7ed282-efb9-4f89-bac0-0f08fa128b24",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -22062,18 +22041,18 @@
       "TargetTypeId": "a443e425-68eb-48f7-9a22-44656c2b11be"
     },
     {
-      "Id": "51a2baef-14db-47ce-959b-294632240a89",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "077946f8-c103-4238-ab29-b3d6b96ba349",
-      "TargetTypeId": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd"
-    },
-    {
       "Id": "d0bee8fa-4b99-412b-bd97-25f7b3af901b",
       "Kind": 0,
       "EmbeddingOptions": 1,
       "SourceTypeId": "428a7162-f518-4fa1-9238-0410e9e62ee5",
       "TargetTypeId": "a28e31ac-a558-49fd-9e2e-e1cb3ec29fee"
+    },
+    {
+      "Id": "05090d4d-8e58-446a-bff0-a52364bf1733",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
+      "TargetTypeId": "e020390d-3dd1-48dc-a8b7-a1b493fd7030"
     },
     {
       "Id": "3f78adbc-d473-4149-b338-9e19dd5a6c54",
@@ -22083,11 +22062,32 @@
       "TargetTypeId": "b5570e2b-a8ed-4725-8362-d186af6ece72"
     },
     {
-      "Id": "05090d4d-8e58-446a-bff0-a52364bf1733",
+      "Id": "51a2baef-14db-47ce-959b-294632240a89",
       "Kind": 0,
       "EmbeddingOptions": 1,
-      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
-      "TargetTypeId": "e020390d-3dd1-48dc-a8b7-a1b493fd7030"
+      "SourceTypeId": "077946f8-c103-4238-ab29-b3d6b96ba349",
+      "TargetTypeId": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd"
+    },
+    {
+      "Id": "a6ec2c93-27e8-49e7-aa25-d7d81c02ba1a",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "12714279-135c-4e93-af46-43235f9f94b9",
+      "TargetTypeId": "dcea2215-8642-4347-a7ae-5a8390647e74"
+    },
+    {
+      "Id": "d6ece51c-9f5b-488b-86ef-99c266b666d0",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451",
+      "TargetTypeId": "b63d5602-88c6-421f-a975-7baad1b8d5bb"
+    },
+    {
+      "Id": "81de6407-969e-4406-bacd-2725fca00bbe",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "49b0f55d-1284-4358-867a-0c3011f765b8",
+      "TargetTypeId": "9c71b881-f0ef-49e6-be6d-2756e3222be4"
     }
   ],
   "AttributeTypes": [
@@ -23784,14 +23784,6 @@
       "ScalarType": 0
     },
     {
-      "Id": "dcea2215-8642-4347-a7ae-5a8390647e74",
-      "ScalarType": 0
-    },
-    {
-      "Id": "b63d5602-88c6-421f-a975-7baad1b8d5bb",
-      "ScalarType": 0
-    },
-    {
       "Id": "0e495c85-ebe7-4ece-8ff3-2d7e424fba40",
       "ScalarType": 5
     },
@@ -23804,15 +23796,23 @@
       "ScalarType": 1
     },
     {
-      "Id": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd",
-      "ScalarType": 0
-    },
-    {
       "Id": "a28e31ac-a558-49fd-9e2e-e1cb3ec29fee",
       "ScalarType": 0
     },
     {
+      "Id": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd",
+      "ScalarType": 0
+    },
+    {
       "Id": "b5570e2b-a8ed-4725-8362-d186af6ece72",
+      "ScalarType": 0
+    },
+    {
+      "Id": "b63d5602-88c6-421f-a975-7baad1b8d5bb",
+      "ScalarType": 0
+    },
+    {
+      "Id": "dcea2215-8642-4347-a7ae-5a8390647e74",
       "ScalarType": 0
     },
     {
@@ -23824,5 +23824,90 @@
       "ScalarType": 0
     }
   ],
-  "Aliases": []
+  "Aliases": [
+    {
+      "DotName": "Corps.name",
+      "Value": "Род_войск",
+      "Values": [
+        "Род_войск"
+      ]
+    },
+    {
+      "DotName": "Person.deathCircumstances",
+      "Value": "Как_дуба_дал",
+      "Values": [
+        "Как_дуба_дал"
+      ]
+    },
+    {
+      "DotName": "Person.realName.firstName.rus",
+      "Value": "Ім'я",
+      "Values": [
+        "Ім'я"
+      ]
+    },
+    {
+      "DotName": "Person.realName.firstName.ukr",
+      "Value": "Имя",
+      "Values": [
+        "Имя"
+      ]
+    },
+    {
+      "DotName": "Person.realName.firstName.eng",
+      "Value": "Name",
+      "Values": [
+        "Name"
+      ]
+    },
+    {
+      "DotName": "Person.realName.lastName.rus",
+      "Value": "Фамилия",
+      "Values": [
+        "Фамилия"
+      ]
+    },
+    {
+      "DotName": "Person.realName.lastName.ukr",
+      "Value": "Прізвище",
+      "Values": [
+        "Прізвище"
+      ]
+    },
+    {
+      "DotName": "Person.realName.lastName.eng",
+      "Value": "Surname",
+      "Values": [
+        "Surname"
+      ]
+    },
+    {
+      "DotName": "Person.militaryRank",
+      "Value": "Звання",
+      "Values": [
+        "Звання"
+      ]
+    },
+    {
+      "DotName": "MilitaryOrganization.classifiers.corps.name",
+      "Value": "Рід_військ",
+      "Values": [
+        "Рід_військ"
+      ]
+    },
+    {
+      "DotName": "MilitaryOrganization.amount.name",
+      "Value": "Чисельність",
+      "Values": [
+        "Чисельність"
+      ]
+    },
+    {
+      "DotName": "MilitaryOrganization.commonInfo.RealNameShort",
+      "Value": "Назва_підрозділа",
+      "Values": [
+        "Назва_підрозділа"
+      ]
+    }
+  ]
 }

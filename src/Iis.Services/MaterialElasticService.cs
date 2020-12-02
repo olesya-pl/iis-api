@@ -37,86 +37,140 @@ namespace Iis.Services
             _elasticResponseManagerFactory = elasticResponseManagerFactory;
         }
 
-        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default)
         {
-            var searchResponse = await _materialRepository.SearchMaterials(filter, ct);
+            var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
-            foreach (var item in searchResponse.Items)
+            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+
+            var (from, size) = searchParams.Page.ToElasticPage();
+
+            var elasticSearchParams = new IisElasticSearchParams
             {
+                BaseIndexNames = MaterialIndexes.ToList(),
+                Query = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL",
+                From = from,
+                Size = size,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder
+            };
+
+            var elasticResult = await _elasticManager.SearchAsync(elasticSearchParams, ct);
+
+            var searchResult = MapToSearchResult(elasticResult);
+
+            foreach (var item in searchResult.Items)
+            {
+                if (item.Value.Highlight is null) continue;
+
                 item.Value.Highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
                  .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
             }
 
-            return searchResponse;
+            return searchResult;
         }
 
         public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, IEnumerable<Guid> materialList, CancellationToken ct = default)
         {
+            var (from, size) = searchParams.Page.ToElasticPage();
+
             var queryBuilder = new BoolQueryBuilder()
                                 .WithMust()
-                                .WithPagination(searchParams.Offset, searchParams.Limit)
+                                .WithPagination(from, size)
                                 .WithDocumentList(materialList);
 
-            if(!SearchQueryExtension.IsMatchAll(searchParams.Suggestion))
+            if (!SearchQueryExtension.IsMatchAll(searchParams.Suggestion))
             {
                 queryBuilder.WithExactQuery(searchParams.Suggestion);
             }
 
+            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+
             var query = queryBuilder
                             .Build()
                             .WithHighlights()
+                            .SetupSorting(sortColumn, sortOrder)
                             .ToString(Formatting.None);
 
-            var searchResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);
+            var elasticResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);
 
-            return new SearchResult
+            var searchResult = MapToSearchResult(elasticResult);
+
+            foreach (var item in searchResult.Items)
             {
-                Count = searchResult.Count,
-                Items = searchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
-            };
+                if (item.Value.Highlight is null) continue;
+
+                item.Value.Highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
+                 .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
+            }
+
+            return searchResult;
         }
 
         public async Task<SearchResult> SearchMoreLikeThisAsync(SearchParams searchParams, CancellationToken ct = default)
         {
+            var (from, size) = searchParams.Page.ToElasticPage();
+
             var queryData = new MoreLikeThisQueryBuilder()
-                        .WithPagination(searchParams.Offset, searchParams.Limit)
+                        .WithPagination(from, size)
                         .WithMaterialId(searchParams.Suggestion)
                         .Build()
                         .ToString(Formatting.None);
 
             var searchResult = await _elasticManager.SearchAsync(queryData, _elasticState.MaterialIndexes, ct);
 
-            return new SearchResult
-            {
-                Count = searchResult.Count,
-                Items = searchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
-            };
+            return MapToSearchResult(searchResult);
         }
 
-        public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, int offset, int size, CancellationToken ct = default)
+        public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
         {
+            var (from, size) = page.ToElasticPage();
+            
             var searchResult = await _elasticManager.SearchByImageVector(imageVector, new IisElasticSearchParams
             {
                 BaseIndexNames = _elasticState.MaterialIndexes,
-                From = offset,
+                From = from,
                 Size = size
             }, ct);
-            return new SearchResult
+
+            return MapToSearchResult(searchResult);
+        }
+
+        public Task<int> CountMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default)
+        {
+            var elasticSearchParams = new IisElasticSearchParams
             {
-                Count = searchResult.Count,
-                Items = searchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                BaseIndexNames = MaterialIndexes.ToList(),
+                Query = string.IsNullOrEmpty(searchParams.Suggestion) ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL"
+            };
+
+            return _elasticManager.CountAsync(elasticSearchParams, ct);
+        }
+
+        private static (string SortColumn, string SortOrder) MapSortingToElastic(SortingParams sorting)
+        {
+            return sorting.ColumnName switch
+            {
+                "createdDate" => ("CreatedDate", sorting.Order),
+                "type" => ("Type.keyword", sorting.Order),
+                "source" => ("Source.keyword", sorting.Order),
+                "processedStatus" => ("ProcessedStatus.OrderNumber", sorting.Order),
+                "sessionPriority" => ("SessionPriority.OrderNumber", sorting.Order),
+                "importance" => ("Importance.OrderNumber", sorting.Order),
+                "nodes" => ("NodesCount", sorting.Order),
+                _ => (null, null)
             };
         }
 
-        public Task<int> CountMaterialsByConfiguredFieldsAsync(IElasticNodeFilter filter, CancellationToken ct = default)
+        private static SearchResult MapToSearchResult(IElasticSearchResult elasticSearchResult)
         {
-            return _materialRepository.CountMaterialsAsync(filter, ct);
+            return new SearchResult
+            {
+                Count = elasticSearchResult.Count,
+                Items = elasticSearchResult.Items
+                    .ToDictionary(k => new Guid(k.Identifier),
+                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+            };
         }
     }
 }

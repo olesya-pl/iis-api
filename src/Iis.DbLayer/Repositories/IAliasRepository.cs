@@ -14,6 +14,8 @@ namespace Iis.DbLayer.Repositories
         
         void Create(AliasEntity entity);
 
+        void CreateRange(List<AliasEntity> entities);
+
         void Update(AliasEntity entity);
 
         void Remove(AliasEntity entity);

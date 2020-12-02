@@ -19,6 +19,8 @@ namespace Iis.DbLayer.Repositories
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IAliasRepository, AliasRepository>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
+            services.AddTransient<IChangeHistoryRepository, ChangeHistoryRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
         }
     }
 }

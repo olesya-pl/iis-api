@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Security.Authentication;
+﻿using AutoMapper;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -12,64 +7,69 @@ using HotChocolate.Execution.Batching;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.Language;
 using HotChocolate.Types.Relay;
-using IIS.Core.Tools;
+using Iis.Api;
+using Iis.Api.BackgroundServices;
+using Iis.Api.Bootstrap;
+using Iis.Api.Configuration;
+using Iis.Api.Export;
+using Iis.Api.GraphQL.Access;
+using Iis.Api.Modules;
+using Iis.Api.Ontology;
+using Iis.DataModel;
+using Iis.DataModel.Cache;
+using Iis.DbLayer.Elastic;
+using Iis.DbLayer.Ontology.EntityFramework;
+using Iis.DbLayer.OntologyData;
+using Iis.DbLayer.OntologySchema;
+using Iis.DbLayer.Repositories;
+using Iis.Domain;
+using Iis.Elastic;
+using Iis.EventHandlers;
+using Iis.FlightRadar.DataModel;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.Roles;
+using Iis.OntologyData;
+using Iis.OntologyModelWrapper;
+using Iis.Services;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Services.DI;
+using Iis.Utility;
+using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.Files.EntityFramework;
+using IIS.Core.FlightRadar;
+using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
-using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
-using IIS.Core.Ontology.EntityFramework;
-using IIS.Core.GraphQL.Entities.Resolvers;
+using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.NodeMaterialRelation;
-using IIS.Core.Analytics.EntityFramework;
+using IIS.Core.Ontology.EntityFramework;
+using IIS.Core.Tools;
+using IIS.Repository.Factories;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMQ.Client;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using AutoMapper;
-using Iis.Api;
-using Iis.Api.Export;
-using Iis.Api.Modules;
-using Iis.Api.Bootstrap;
-using Iis.Api.Configuration;
-using Iis.Api.GraphQL.Access;
-using Iis.Interfaces.Roles;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.DataModel;
-using Iis.DataModel.Cache;
-using Iis.Domain;
-using Iis.Elastic;
-using Iis.DbLayer.Elastic;
-using Iis.DbLayer.Repositories;
-using Iis.DbLayer.OntologySchema;
-using Iis.DbLayer.Ontology.EntityFramework;
-using Iis.ThemeManagement;
-using Iis.OntologyModelWrapper;
-using IIS.Repository.Factories;
-using Iis.Services;
-using Iis.Utility;
-using Iis.Services.Contracts;
-using Iis.Services.Contracts.Interfaces;
 using Microsoft.Extensions.Logging;
-using Iis.Interfaces.Ontology.Data;
-using Iis.DbLayer.OntologyData;
-using Iis.Api.Ontology;
-using Iis.OntologyData;
-using IIS.Core.FlightRadar;
-using Iis.FlightRadar.DataModel;
-using MediatR;
-using Iis.EventHandlers;
-using Iis.Api.BackgroundServices;
-using Iis.Services.DI;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using RabbitMQ.Client;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace IIS.Core
 {
@@ -95,11 +95,17 @@ namespace IIS.Core
 
         public void RegisterServices(IServiceCollection services, bool enableContext)
         {
+            services.AddMvc().AddNewtonsoftJson(x =>
+            {
+                x.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
+
             services
                 .RegisterRunUpTools()
                 .RegisterSeederTools()
                 .AddConfigurations(Configuration);
 
+            
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
@@ -186,7 +192,7 @@ namespace IIS.Core
             services.AddTransient<ExportToJsonService>();
             services.AddTransient<RoleService>();
             services.AddTransient<UserService>();
-            services.AddTransient<ThemeService<IIISUnitOfWork>>();
+            services.AddTransient<IThemeService, ThemeService<IIISUnitOfWork>>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService>();
@@ -194,7 +200,7 @@ namespace IIS.Core
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
 
-            services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
+            services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
