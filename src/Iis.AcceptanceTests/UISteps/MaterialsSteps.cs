@@ -27,7 +27,6 @@ namespace Iis.AcceptanceTests.UISteps
         [When(@"I navigated to Materials page")]
         public void IWantNavigateToMaterialsPage()
         {
-
             materialsSectionPage.MaterialsSection.Click();
 
             driver.WaitFor(10);
@@ -36,28 +35,24 @@ namespace Iis.AcceptanceTests.UISteps
         [When(@"I clicked on the first material in the Materials list")]
         public void IClieckedOnTheFirstMaterialInTheMaterialsList()
         {
-
             materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
         }
 
         [When(@"I clicked on the events tab in the material card")]
         public void IClickedOnTheEventsTabInTheMaterialCard()
         {
-
             materialsSectionPage.EventsTab.Click();
         }
 
         [When(@"I clicked on the objects tab in the material card")]
         public void IClickedOnTheObjectsTabInTheMaterialCard()
         {
-
             materialsSectionPage.ObjectsTab.Click();
         }
 
         [When(@"I clicked on the ML tab in the material card")]
         public void IClickedOnTheMLTabInTheMaterialCard()
         {
-
             materialsSectionPage.MLTab.Click();
         }
 
@@ -70,47 +65,41 @@ namespace Iis.AcceptanceTests.UISteps
         [When(@"I clicked search button in the Materials section")]
         public void IFilledInfoInTheMaterialsSearchField()
         {
-
             materialsSectionPage.SearchButton.Click();
         }
 
         [When(@"I searched (.*) data in the materials")]
         public void IEnteredDataInTheSearchField(string input)
         {
-
             materialsSectionPage.SearchField.SendKeys(input);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
         }
 
-        [When(@"I set importance (.*)")]
+        [When(@"I set importance (.*) value")]
         public void WhenIClickedOnTheDropDownMenuInTheMaterials(string value)
         {
-
             materialsSectionPage.MaterialPage.ImportanceDropDown.Select(value);
         }
 
-        [When(@"I set priority (.*)")]
+        [When(@"I set relevance (.*) value")]
         public void WhenISetPriority(string priority)
         {
-
-            materialsSectionPage.MaterialPage.PriorityDropDown.Select(priority);
+            materialsSectionPage.MaterialPage.RelevanceDropDown.Select(priority);
         }
 
 
-        [When(@"I press Processed button")]
+        [When(@"I pressed Processed button")]
         public void WhenIPressProcessedButton()
         {
-
             materialsSectionPage.ProcessedButton.Click();
         }
 
-
-        [When(@"I clicked on the first element in the Importance drop down menu in a material card")]
-        public void WhenIChoseThirdElementInTheImportanceDropDownMenuInAMaterialCard()
+        [When(@"I pressed Back button")]
+        public void WhenIPressBackButton()
         {
-
-            materialsSectionPage.ImportanceDropDownFirstValue.Click();
+            materialsSectionPage.BackButton.Click();
         }
+
         #endregion When
 
         #region Then
@@ -144,14 +133,12 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see objects search in the materials card")]
         public void IMustSeeObjectsSearchInTheMaterialsCard()
         {
-
             Assert.True(materialsSectionPage.ObjectsTabSearch.Displayed);
         }
 
         [Then(@"I must see relevance drop down in the materials card")]
         public void IMustSeeRelevanceDropDownInTheMaterialsCard()
         {
-
             Assert.True(materialsSectionPage.RelevanceDropDown.Displayed);
         }
 
@@ -160,10 +147,7 @@ namespace Iis.AcceptanceTests.UISteps
         {
             foreach (TableRow row in table.Rows)
             {
-
-
                 var tableValue = row.Values.First();
-
                 Assert.True((typeof(MaterialsSectionPage).GetField(tableValue).GetValue(materialsSectionPage) as IWebElement).Displayed);
             }
         }
@@ -171,7 +155,6 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must I must see at least one user in the originator drop down menu")]
         public void IMustSeeAtLeastOneUserInTheOriginatorDropDonwMenu()
         {
-
             materialsSectionPage.Originator.Click();
             var list = driver.FindElements(By.ClassName("el-select-dropdown__item"));
             Assert.True(list.Count() > 0);
@@ -180,24 +163,28 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see zero results in the Materials section")]
         public void ThenIMustSeeZeroResults()
         {
-
             Assert.True(materialsSectionPage.EmptySearchField.Displayed);
         }
 
         [Then(@"I must see Show button in the ML tab")]
         public void ThenIMustSeeShowButtonInTheMLTab()
         {
-
             Assert.True(materialsSectionPage.ShowMLResultsButton.Displayed);
         }
 
         [Then(@"I must see that search counter values are equal in the Materials section")]
         public void ThenIMustSeeThatSearchCounterValuesAreEqualInTheMaterialsSection()
         {
-
             var actualValue = materialsSectionPage.MaterialsSearchResultCounter.Text;
             var expectedValue = context.GetResponse<string>("counterValue");
             Assert.Equal(actualValue, expectedValue);
+        }
+
+        [Then(@"I must see that importance value must be set to (.*) value")]
+        public void ThemIMustSeeThatImportanceValueMustBeSetToValue(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.ImportanceDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
         }
         #endregion
     }

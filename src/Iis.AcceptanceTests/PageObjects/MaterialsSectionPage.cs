@@ -93,9 +93,9 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSearchResultCounter;
 
-        [FindsBy(How = How.CssSelector, Using = "body > div:last-child ul > li:nth-child(1)")]
+        [FindsBy(How = How.CssSelector, Using = "button:nth-of-type(3) > span")]
         [CacheLookup]
-        public IWebElement ImportanceDropDownFirstValue;
+        public IWebElement BackButton;
 
     }
 }

@@ -8,11 +8,12 @@ namespace AcceptanceTests.PageObjects.Controls
         private IWebElement dropDown;
         private IWebDriver driver;
 
+        public string Text => dropDown.Text;
+
         public DropDown(IWebDriver driver, By by)
         {
             this.driver = driver;
             dropDown = driver.FindElement(by);
-
         }
 
         public void Select(string value)
@@ -21,7 +22,5 @@ namespace AcceptanceTests.PageObjects.Controls
             driver.WaitFor(0.5);
             driver.FindElement(By.XPath($@"//li//span[text()[contains(.,""{value}"")]]")).Click();
         }
-
-
     }
 }

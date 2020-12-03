@@ -17,5 +17,10 @@ Feature: MaterialsSectionUI - Sanity
     Scenario: IS-6375 - Material processing, priority and importance setup
         When I navigated to Materials page
         And I clicked on the first material in the Materials list
-        And I clicked on the Importance drop down menu in a material card
-        And I clicked on the first element in the Importance drop down menu in a material card
+        And I set importance Друга категорія value
+        And I set relevance Посередня value
+        And I pressed Processed button
+        When I pressed Back button
+        Then I must see that importance value must be set to Важливий value
+        Then I must see that importance value must be set to Сумнівна value
+

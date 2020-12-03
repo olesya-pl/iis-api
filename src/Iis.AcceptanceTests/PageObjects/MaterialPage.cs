@@ -12,7 +12,7 @@ namespace AcceptanceTests.PageObjects
             this.driver = driver;
         }
         public DropDown ImportanceDropDown => new DropDown(driver, By.CssSelector("div:nth-of-type(1) > .general-container > div:nth-of-type(1) > .el-form-item__content > .el-select.el-tooltip"));
-        public DropDown PriorityDropDown => new DropDown(driver, By.CssSelector("[_lpchecked] .el-select"));
+        public DropDown RelevanceDropDown => new DropDown(driver, By.CssSelector("div:nth-of-type(3) > .el-form-item__content > .el-select.el-tooltip  .el-input__inner"));
 
     }
 }
