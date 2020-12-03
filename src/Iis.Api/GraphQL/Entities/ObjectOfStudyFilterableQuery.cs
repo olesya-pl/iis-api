@@ -9,6 +9,7 @@ using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
+using Iis.Utility;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -51,7 +52,7 @@ namespace IIS.Core.GraphQL.Entities
                         .Name;
                     if (!string.IsNullOrEmpty(nodeTypeName))
                     {
-                        bucket.TypeName = $"Entity{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(nodeTypeName)}";
+                        bucket.TypeName = $"Entity{nodeTypeName.Capitalize()}";
                     }
 
                 }
