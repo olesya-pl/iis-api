@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -50,7 +51,7 @@ namespace IIS.Core.GraphQL.Entities
                         .Name;
                     if (!string.IsNullOrEmpty(nodeTypeName))
                     {
-                        bucket.TypeName = $"Entity{nodeTypeName}";
+                        bucket.TypeName = $"Entity{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(nodeTypeName)}";
                     }
 
                 }
