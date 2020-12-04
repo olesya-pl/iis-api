@@ -174,6 +174,7 @@ namespace Iis.DbLayer.Repositories
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
+                true,
                 token);
         }
 
