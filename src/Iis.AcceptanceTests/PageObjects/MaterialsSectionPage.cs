@@ -63,7 +63,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .material-relations-input")]
+        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .el-input__inner")]
         [CacheLookup]
         public IWebElement ObjectsTabSearch;
 
@@ -96,6 +96,30 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "button:nth-of-type(3) > span")]
         [CacheLookup]
         public IWebElement BackButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-table.el-table--enable-row-transition.el-table--fit.el-table--medium.el-table--striped  .el-table__body  .el-table__row")]
+        [CacheLookup]
+        public IWebElement FirstSearchResult;
+
+        [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .el-button--default")]
+        [CacheLookup]
+        public IWebElement TextClassifierMLOutputButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .meta-data-card__result-body")]
+        [CacheLookup]
+        public IWebElement TextClassifierMLOutputForm;
+
+        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none")]
+        [CacheLookup]
+        public IWebElement EmptyAreInTheMaterialList;
+
+        [FindsBy(How = How.CssSelector, Using = ".material-objects .el-table table tr:nth-of-type(1) td:nth-of-type(1) a")]
+        [CacheLookup]
+        public IWebElement ConnectedObjectLink;
+
+        [FindsBy(How = How.CssSelector, Using = ".cell > div:nth-of-type(2)")]
+        [CacheLookup]
+        public IWebElement FirstSearchResultContentBlock;
 
     }
 }

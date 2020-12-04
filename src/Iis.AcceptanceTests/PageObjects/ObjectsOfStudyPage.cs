@@ -89,5 +89,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
         [CacheLookup]
         public IWebElement OOSEmptySearchResults;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-header.theme.theme-grey > .title")]
+        [CacheLookup]
+        public IWebElement OOSTitle;
     }
 }

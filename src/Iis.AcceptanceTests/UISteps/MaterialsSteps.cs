@@ -72,6 +72,7 @@ namespace Iis.AcceptanceTests.UISteps
         public void IEnteredDataInTheSearchField(string input)
         {
             materialsSectionPage.SearchField.SendKeys(input);
+            driver.WaitFor(2);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
         }
 
@@ -100,6 +101,32 @@ namespace Iis.AcceptanceTests.UISteps
             materialsSectionPage.BackButton.Click();
         }
 
+        [When(@"I clicked on the first search result in the Materials section")]
+        public void WhenIClickedOnTheFirstSearchResultInTheMaterialsSection()
+        {
+            materialsSectionPage.FirstSearchResult.Click();
+        }
+
+        [When(@"I pressed Show button to show Text classifier ML output")]
+        public void WhenIPressedShowButtonToShowTextClassifierMLOutput()
+        {
+            materialsSectionPage.TextClassifierMLOutputButton.Click();
+        }
+
+        [When(@"I enter (.*) value in the search object field")]
+        public void WhenIEnterValueInTheSearchObjectField(string inputValue)
+        {
+            materialsSectionPage.ObjectsTabSearch.SendKeys(inputValue);
+            driver.WaitFor(2);
+            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Down);
+            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I clicked on the connected object")]
+        public void WhenIClickedOnTheConnectedObject()
+        {
+            materialsSectionPage.ConnectedObjectLink.Click();
+        }
         #endregion When
 
         #region Then
@@ -185,6 +212,19 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var actualValue = materialsSectionPage.MaterialPage.ImportanceDropDown.Text;
             Assert.Equal(expectedValue, actualValue);
+        }
+
+        [Then(@"I must see Text classifier ML output form")]
+        public void IMustSeeTextClassifierMLOutPutFor()
+        {
+            Assert.True(materialsSectionPage.TextClassifierMLOutputForm.Displayed);
+        }
+
+        [Then(@"I must see a material that contains (.*) word in the Materials search result")]
+        public void ThenIMustSeeAMaterialThatContainsWordInTheMaterialSearchResult(string keyword)
+        {
+            var actualContentText = materialsSectionPage.FirstSearchResultContentBlock.Text;
+            Assert.True(actualContentText.Contains(keyword));
         }
         #endregion
     }
