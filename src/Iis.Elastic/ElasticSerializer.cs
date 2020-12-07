@@ -18,9 +18,13 @@ namespace Iis.Elastic
         {
             var json = new JObject();
 
-            if (IsHeadNode)
+            if(extNode.NodeType.IsObjectOfStudy)
             {
                 json[nameof(extNode.Id)] = extNode.Id;
+            }
+
+            if (IsHeadNode)
+            {
                 json[nameof(extNode.NodeTypeName)] = extNode.NodeTypeName;
                 if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
                 {
@@ -29,7 +33,7 @@ namespace Iis.Elastic
                 }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
-            }
+            } 
 
             var coordinates = extNode.GetCoordinatesWithoutNestedObjects();
             if (coordinates != null && coordinates.Count > 0)
@@ -51,6 +55,7 @@ namespace Iis.Elastic
                 if (childGroup.Count() == 1)
                 {
                     var child = childGroup.First();
+
                     json[key] = GetExtNodeValue(child);
                 }
                 else

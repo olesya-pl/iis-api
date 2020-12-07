@@ -6,10 +6,6 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 
-using IIS.Repository;
-using IIS.Repository.Factories;
-
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -22,6 +18,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public class ExtNodeService: IExtNodeService
     {
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
+        private readonly IReadOnlyCollection<string> _filterNodeTypeNames = new [] {"__title", "title", "lastConfirmedAt"};
         private readonly IOntologyNodesData _ontologyData;
         private readonly FileUrlGetter _fileUrlGetter;
 
@@ -41,6 +38,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 node.NodeType.Title,
                 new List<Guid> { node.Id });
             return extNode;
+        }
+
+        public List<IExtNode> GetExtNodes(IReadOnlyCollection<INode> ids)
+        {
+            return ids.Select(p => GetExtNode(p)).ToList();
         }
 
         private async Task<ExtNode> MapExtNodeWithoutChildRelationsAsync(
@@ -84,7 +86,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             INode node,
             string nodeTypeName,
             string nodeTypeTitle,
-            List<Guid> visitedNodeIds)
+            List<Guid> visitedNodeIds,
+            IReadOnlyCollection<string> filterRelationList = null)
         {
             if (node.NodeType.IsObjectOfStudy)
             {
@@ -95,11 +98,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             extNode.AttributeValue = GetAttributeValue(node);
             extNode.ScalarType = node.NodeType?.AttributeType?.ScalarType;
 
+            IReadOnlyCollection<IRelation> filteredRelations = node.OutgoingRelations;
+
+            if(filterRelationList != null && filterRelationList.Any())
+            {
+                filteredRelations = filteredRelations
+                                    .Where(e => _filterNodeTypeNames.Contains(e.RelationTypeName))
+                                    .ToArray();
+            }
+
             var children = MapComputedProperties(node, node.NodeType.GetComputedRelationTypes());
-            children.AddRange(GetExtNodesByRelations(node.OutgoingRelations, visitedNodeIds));
+            children.AddRange(GetExtNodesByRelations(filteredRelations, visitedNodeIds));
             extNode.Children = children;
             return extNode;
         }
+
         private List<ExtNode> MapComputedProperties(INode node, IEnumerable<IRelationTypeLinked> computedRelationTypes)
         {
             var list = new List<ExtNode>();
@@ -211,7 +224,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         gte = first,
                         lte = last
                     };
-                }             
+                }
             }
             return null;
         }
@@ -249,13 +262,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                             result.Add(aggregateNode);
                         }
                     }
-                    
                 }
             }
             return result;
         }
         private List<ExtNode> GetExtNodesByRelations(
-            IEnumerable<IRelation> relations,
+            IReadOnlyCollection<IRelation> relations,
             List<Guid> visitedNodeIds)
         {
             var result = new List<ExtNode>();
@@ -263,15 +275,25 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 && !r.TargetNode.IsArchived && !r.TargetNode.NodeType.IsArchived))
             {
                 var node = relation.TargetNode;
+
                 if (!visitedNodeIds.Contains(node.Id))
                 {
+                    IReadOnlyCollection<string> relationFitler = null;
+
+                    if(node.NodeType.IsObjectOfStudy)
+                    {
+                        relationFitler = _filterNodeTypeNames;
+                    }
+
                     var extNode = MapExtNode(
                         node,
                         relation.Node.NodeType.Name,
                         relation.Node.NodeType.Title,
-                        visitedNodeIds);
+                        visitedNodeIds,
+                        relationFitler);
+
                     result.Add(extNode);
-                    
+
                     if (relation.Node.NodeType.MetaObject.IsAggregated == true)
                     {
                         var aggregateNode = MapExtNodeWithoutChildRelations(
@@ -284,11 +306,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                  }
             }
             return result;
-        }
-
-        public List<IExtNode> GetExtNodes(IReadOnlyCollection<INode> ids)
-        {
-            return ids.Select(p => GetExtNode(p)).ToList();
         }
     }
 }
