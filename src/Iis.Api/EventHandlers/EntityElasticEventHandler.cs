@@ -18,8 +18,8 @@ namespace Iis.Api.EventHandlers
 
         public EntityElasticEventHandler(IElasticService elasticService, IElasticState elasticState)
         {
-            _elasticService = elasticService ?? throw new ArgumentNullException(nameof(elasticService));
-            _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
+            _elasticService = elasticService;
+            _elasticState = elasticState;
         }
 
         public Task Handle(EntityCreatedEvent notification, CancellationToken cancellationToken)
@@ -50,7 +50,7 @@ namespace Iis.Api.EventHandlers
                 
             if (!string.Equals(notification.Type, "Event", StringComparison.OrdinalIgnoreCase))
             {
-                tasks.Add(_elasticService.PutHistoricalNodesAsync(notification.Id, notification.RequestId));
+                tasks.Add(_elasticService.PutHistoricalNodesAsync(notification.Id, notification.RequestId, cancellationToken));
             }
 
             return Task.WhenAll(tasks);
