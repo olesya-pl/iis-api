@@ -212,7 +212,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     return string.Empty;
                 }
-                return $"{createdByUser?.LastName} {createdByUser.FirstName}";
+                return $"{createdByUser.LastName} {createdByUser.FirstName}";
             }
             return string.Empty;
         }
