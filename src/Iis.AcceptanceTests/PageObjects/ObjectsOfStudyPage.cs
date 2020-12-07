@@ -93,5 +93,13 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".el-header.theme.theme-grey > .title")]
         [CacheLookup]
         public IWebElement OOSTitle;
+
+        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(2)")]
+        [CacheLookup]
+        public IWebElement HierarchyTab;
+
+        [FindsBy(How = How.CssSelector, Using = "div:nth-child(1) > div:nth-child(4) > div:nth-of-type(1) .hierarchy-card__expand")]
+        [CacheLookup]
+        public IWebElement RussianMilitaryForcesExpandButton;
     }
 }

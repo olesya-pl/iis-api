@@ -2,6 +2,7 @@ using System.Linq;
 using AcceptanceTests.PageObjects;
 using Iis.AcceptanceTests.Helpers;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -13,12 +14,15 @@ namespace Iis.AcceptanceTests.UISteps
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
 
+        private readonly Actions actions;
+
         private ObjectsOfStudyPageObjects objectsOfStudyPage;
+
 
         public ObjectsOfStudySteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             objectsOfStudyPage = new ObjectsOfStudyPageObjects(driver);
-
+            actions = new Actions(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -56,6 +60,18 @@ namespace Iis.AcceptanceTests.UISteps
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
             driver.WaitFor(7);
 
+        }
+
+        [When(@"I clicked on Hierarchy tab in the Object of study section")]
+        public void WhenIClickedOnHierarchyTabInTheObjectOfStudySectiion()
+        {
+            objectsOfStudyPage.HierarchyTab.Click();
+        }
+
+        [When(@"I double clicked on Russian military forces expand button")]
+        public void WhenIClickedOnRussianMilitaryForcesExpendButton()
+        {
+            actions.DoubleClick(objectsOfStudyPage.RussianMilitaryForcesExpandButton).Perform();
         }
         #endregion
 
