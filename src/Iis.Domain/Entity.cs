@@ -69,7 +69,7 @@ namespace Iis.Domain
                 throw new ArgumentException($"Unable to set non-Entity and non-Guid value to attribute {Type.Name}.{embed.Name}");
 
             var targetNodes = embed.IsAttributeType
-                ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.AttributeType, t))
+                ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.AttributeTypeModel, t))
                 : targets.Select(t => t is Guid guid
                     ? new Entity(guid, embed.EntityType) // Convert guids to node instances
                     : t).Cast<Node>();

@@ -42,8 +42,6 @@ namespace Iis.OntologyModelWrapper
         public bool IsAbstract => _source.IsAbstract;
 
         public ISchemaMeta Meta => _source.MetaObject;
-        public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
         public string Name => _source.Name;
         public override string ToString() => Name;
 
@@ -78,8 +76,6 @@ namespace Iis.OntologyModelWrapper
         }
 
 
-        public ISchemaMeta EmbeddingMeta => _source.MetaObject;
-
         public EmbeddingOptions EmbeddingOptions => _source.RelationType.EmbeddingOptions;
 
         public INodeTypeModel EntityType =>
@@ -87,7 +83,7 @@ namespace Iis.OntologyModelWrapper
                     new NodeTypeWrapper(_source.RelationType.TargetType) :
                     null;
 
-        public INodeTypeModel AttributeType =>
+        public INodeTypeModel AttributeTypeModel =>
             _source.RelationType.TargetType.Kind == Kind.Attribute ?
                 new NodeTypeWrapper(_source.RelationType.TargetType) :
                 null;
@@ -104,5 +100,7 @@ namespace Iis.OntologyModelWrapper
                 new NodeTypeWrapper(_source.RelationType.TargetType);
 
         public bool AcceptsOperation(EntityOperation create) => true;
+        public IAttributeType AttributeType => Source.AttributeType;
+        public IRelationTypeLinked RelationType => Source.RelationType;
     }
 }

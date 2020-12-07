@@ -13,7 +13,6 @@ namespace Iis.Domain
         string Name { get; }
         string Title { get; }
         ISchemaMeta Meta { get; }
-        JObject MetaSource { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }
         bool HasUniqueValues { get; }
@@ -28,6 +27,9 @@ namespace Iis.Domain
         INodeTypeLinked Source { get; }
         INodeTypeModel GetProperty(string typeName);
         bool IsSubtypeOf(INodeTypeModel type);
+
+        IAttributeType AttributeType { get; }
+        IRelationTypeLinked RelationType { get; }
         
         #region AttributeType
         ScalarType ScalarTypeEnum { get; }
@@ -35,10 +37,9 @@ namespace Iis.Domain
         #endregion
 
         #region RelationType
-        ISchemaMeta EmbeddingMeta { get; }
         EmbeddingOptions EmbeddingOptions { get; }
         INodeTypeModel EntityType { get; }
-        INodeTypeModel AttributeType { get; }
+        INodeTypeModel AttributeTypeModel { get; }
         bool IsAttributeType { get; }
         bool IsEntityType { get; }
         bool IsInversed { get; }

@@ -133,14 +133,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (embed.IsAttributeType)
             {
-                if (embed.AttributeType.ScalarTypeEnum == ScalarType.File)
+                if (embed.AttributeTypeModel.ScalarTypeEnum == ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.AttributeType.ScalarTypeEnum == ScalarType.Geo)
+                else if (embed.AttributeTypeModel.ScalarTypeEnum == ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
-                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum);
-                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
+                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeTypeModel.ScalarTypeEnum);
+                return new Attribute(Guid.NewGuid(), embed.AttributeTypeModel, value);
             }
 
             if (embed.IsEntityType)

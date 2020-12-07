@@ -133,7 +133,7 @@ namespace IIS.Core.GraphQL.Entities
 
         private IOutputType GetAttributeType(INodeTypeModel relationType)
         {
-            var type = relationType.AttributeType;
+            var type = relationType.AttributeTypeModel;
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
                 return _repository.GetMultipleOutputType(type.ScalarTypeEnum);
             return _repository.GetScalarOutputType(type.ScalarTypeEnum);

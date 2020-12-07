@@ -21,8 +21,8 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             _typeName = GetName(relationType);
             if (relationType.IsAttributeType)
             {
-                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeType);
-                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.AttributeType);
+                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeTypeModel);
+                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.AttributeTypeModel);
             }
             else if (relationType.IsEntityType)
             {
@@ -51,7 +51,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         public static string GetName(INodeTypeModel relationType)
         {
             if (relationType.IsAttributeType)
-                return relationType.AttributeType.ScalarTypeEnum.ToString();
+                return relationType.AttributeTypeModel.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
                 var ops = relationType.Meta.AcceptsEntityOperations;

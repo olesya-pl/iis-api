@@ -27,7 +27,7 @@ namespace Iis.Interfaces.Ontology.Schema
         ISchemaMeta MetaObject { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
-        IAttributeType AttributeType { get; }
+        IAttributeType  AttributeType { get; }
         IRelationTypeLinked RelationType { get; }
         string GetMetaDeep();
         IReadOnlyList<IChildNodeType> GetDirectChildren(bool setInheritedFrom);
@@ -61,7 +61,9 @@ namespace Iis.Interfaces.Ontology.Schema
         IRelationTypeLinked GetRelationTypeByName(string name);
         IOntologySchema Schema { get; }
         IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes();
+        bool IsComputed { get; }
         string Formula { get; }
+        EmbeddingOptions EmbeddingOptions { get; }
     }
 
     public class NodeAggregationInfo

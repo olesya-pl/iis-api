@@ -55,6 +55,8 @@ namespace Iis.OntologySchema.DataTypes
             Kind == Kind.Attribute ?
                 IncomingRelations.First().NodeType.MetaObject.Formula :
                 null;
+        public bool IsComputed => !string.IsNullOrWhiteSpace(Formula);
+        public EmbeddingOptions EmbeddingOptions => RelationType?.EmbeddingOptions ?? EmbeddingOptions.None;
 
         public string GetMetaDeep()
         {

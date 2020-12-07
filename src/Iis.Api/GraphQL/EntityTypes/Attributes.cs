@@ -74,7 +74,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public EntityAttributeBase(INodeTypeModel source)
         {
             Source = source;
-            MetaObject = Source.EmbeddingMeta;
+            MetaObject = Source.Meta;
 
             var configuration = new MapperConfiguration(cfg =>
             {
@@ -137,7 +137,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
         }
 
-        public override string Type => Source.AttributeType.ScalarTypeEnum.ToString();
+        public override string Type => Source.AttributeTypeModel.ScalarTypeEnum.ToString();
     }
 
 
