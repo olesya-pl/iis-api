@@ -61,7 +61,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("ReInitializeEventIndexes")]
-        public async Task<IActionResult> ReInitializeEventIndexe(CancellationToken ct)
+        public async Task<IActionResult> ReInitializeEventIndexes(CancellationToken ct)
         {
             var stopwatch = Stopwatch.StartNew();
 
