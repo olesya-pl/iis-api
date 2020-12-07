@@ -24,29 +24,13 @@ namespace Iis.Api.EventHandlers
 
         public Task Handle(EntityCreatedEvent notification, CancellationToken cancellationToken)
         {
-            if (_elasticState.FieldsToExcludeByIndex.TryGetValue(notification.Type, out var fieldsToExclude))
-            {
-                return _elasticService.PutNodeAsync(notification.Id, fieldsToExclude, cancellationToken);
-            }
-            else
-            {
-                return _elasticService.PutNodeAsync(notification.Id, cancellationToken);
-            }
-
-            
+            return PutActualNodeAsync(notification, cancellationToken);
         }
 
         public Task Handle(EntityUpdatedEvent notification, CancellationToken cancellationToken)
         {
             var tasks = new List<Task>();
-            if (_elasticState.FieldsToExcludeByIndex.TryGetValue(notification.Type, out var fieldsToExclude))
-            {
-                tasks.Add(_elasticService.PutNodeAsync(notification.Id, fieldsToExclude, cancellationToken));
-            }
-            else 
-            {
-                tasks.Add(_elasticService.PutNodeAsync(notification.Id, cancellationToken));
-            }
+            tasks.Add(PutActualNodeAsync(notification, cancellationToken));
                 
             if (!string.Equals(notification.Type, "Event", StringComparison.OrdinalIgnoreCase))
             {
@@ -54,6 +38,16 @@ namespace Iis.Api.EventHandlers
             }
 
             return Task.WhenAll(tasks);
+        }
+        
+        private Task PutActualNodeAsync(EntityEvent notification, CancellationToken cancellationToken)
+        {
+            if (_elasticState.FieldsToExcludeByIndex.TryGetValue(notification.Type, out var fieldsToExclude))
+            {
+                return _elasticService.PutNodeAsync(notification.Id, fieldsToExclude, cancellationToken);
+            }
+
+            return _elasticService.PutNodeAsync(notification.Id, cancellationToken);
         }
     }
 }

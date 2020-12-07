@@ -3,10 +3,8 @@ using System;
 
 namespace Iis.Events.Entities
 {
-    public class EntityUpdatedEvent : INotification
+    public class EntityUpdatedEvent : EntityEvent, INotification
     {
-        public Guid Id { get; set; }
-        public string Type { get; set; }
         public Guid RequestId { get; set; }
     }
 }

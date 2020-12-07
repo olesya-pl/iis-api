@@ -203,9 +203,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 }
                 else // targetId only
                 {
-                    // todo: look at it again and refactor
-                    var targetId = InputExtensions.ParseGuid(uvdict["targetId"]); // just check
-                                                                                  //                    var targetRelation = node.GetRelation(embed, relation.Id);
                     node.RemoveNode(relation);
                     var newRel = await _mutationCreateResolver.CreateSingleProperty(embed, uvdict);
                     node.AddNode(newRel);
