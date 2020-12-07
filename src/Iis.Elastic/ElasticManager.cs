@@ -612,7 +612,7 @@ namespace Iis.Elastic
             queryString["lenient"] = isLenient;
             shouldSection["query_string"] = queryString;
 
-            return queryString;
+            return shouldSection;
         }
 
         private static void PrepareHighlights(JObject json)
