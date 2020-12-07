@@ -17,7 +17,7 @@ namespace Iis.Services
         private readonly IElasticService _elasticService;
         private const int DefaultSize = 10;
         private static readonly List<string> KeyWords = new List<string>();
-        private static readonly string[] SearchableFields = new string[] { "__title", "commonInfo.RealNameShort", "title" };
+        private static readonly string[] SearchableFields = { "__title", "commonInfo.RealNameShort", "title" };
 
         public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService)
         {

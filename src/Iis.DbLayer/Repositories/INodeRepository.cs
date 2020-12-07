@@ -13,6 +13,8 @@ namespace Iis.DbLayer.Repositories
     {
         Task<JObject> GetJsonNodeByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExclude, CancellationToken cancellationToken = default);
+        Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, IEnumerable<string> fieldsToExclude, CancellationToken ct);
         Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, CancellationToken ct);
         Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(IReadOnlyCollection<INode> items, CancellationToken ct = default);
         Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default);

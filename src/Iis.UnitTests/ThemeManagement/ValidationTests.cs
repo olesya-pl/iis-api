@@ -33,14 +33,14 @@ namespace Iis.UnitTests.ThemeManagement
             Assert.Equal("The Title field is required.", exception.Message);
         }
 
-        [Theory(DisplayName = "Checks validation attributes: Query."), RecursiveAutoData]
+        [Theory(DisplayName = "Checks validation attributes: QueryRequest."), RecursiveAutoData]
         public void CheckValidationQuery(ThemeInput theme)
         {
             theme.QueryRequest = null;
 
             var exception = Assert.Throws<ValidationException>(() => Validator.ValidateObject(theme, new ValidationContext(theme), true));
 
-            Assert.Equal("The Query field is required.", exception.Message);
+            Assert.Equal("The QueryRequest field is required.", exception.Message);
         }
 
         [Theory(DisplayName = "Checks validation attributes: UserId."), RecursiveAutoData]

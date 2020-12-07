@@ -71,8 +71,6 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 elasticServiceMock.Object,
                 elasticConfigurationMock.Object,
                 nodeRepositoryMock.Object,
-                materialRepositoryMock.Object,
-                new RunTimeSettings(),
                 new ElasticState(ontologySchemaMock.Object));
             return sut;
         }

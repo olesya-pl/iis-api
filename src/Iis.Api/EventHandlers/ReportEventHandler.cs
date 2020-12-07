@@ -7,7 +7,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Iis.EventHandlers
+namespace Iis.Api.EventHandlers
 {
     public class ReportEventHandler :
         INotificationHandler<ReportCreatedEvent>,
