@@ -38,7 +38,7 @@ namespace Iis.Services
             INodeRepository nodeRepository,
             IOntologyNodesData ontologyNodesData,
             IReportElasticService reportElasticService,
-            IReportService reportService, 
+            IReportService reportService,
             IAliasService aliasService)
         {
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
@@ -104,6 +104,14 @@ namespace Iis.Services
             LogBulkResponse(response);
         }
 
+        public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, IEnumerable<string> fieldsToExclude, CancellationToken ct = default)
+        {
+            var nodes = GetNodesFromMemory(indexes);
+            var response = await _nodeRepository.PutNodesAsync(nodes, fieldsToExclude, ct);
+
+            LogBulkResponse(response);
+        }
+
         public async Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default)
         {
             foreach (var index in indexes)
@@ -117,7 +125,7 @@ namespace Iis.Services
 
         public async Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default)
         {
-            var mappingConfiguration =  new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
                 KeywordProperty.Create(nameof(ReportEntity.Id), false),
                 TextProperty.Create(nameof(ReportEntity.Recipient), null),
                 TextProperty.Create(nameof(ReportEntity.Title), null),
@@ -131,14 +139,14 @@ namespace Iis.Services
         public async Task FillReportIndexAsync(CancellationToken ct = default)
         {
             var reports = await _reportService.GetAllAsync();
-            
+
             TryLog($"Found {reports.Count} reports");
 
             var response = await _reportElasticService.PutAsync(reports);
             LogBulkResponse(response);
         }
 
-        public async Task AddAliasesToIndexAsync(AliasType type, CancellationToken ct = default) 
+        public async Task AddAliasesToIndexAsync(AliasType type, CancellationToken ct = default)
         {
             if (!_elasticIndexByAliasType.ContainsKey(type))
                 throw new NotImplementedException($"{type} is not supported");

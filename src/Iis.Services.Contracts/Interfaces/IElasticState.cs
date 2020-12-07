@@ -10,5 +10,6 @@ namespace Iis.Services.Contracts.Interfaces
         List<string> OntologyIndexes { get; }
         string ReportIndex { get; }
         List<string> SignIndexes { get; }
+        Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
     }
 }

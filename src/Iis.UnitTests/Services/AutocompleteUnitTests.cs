@@ -152,10 +152,7 @@ namespace Iis.UnitTests.Services
                          SearchResult = JObject.Parse(@"{
                             ""NodeTypeName"" : ""MilitaryOrganization"",
                             ""NodeTypeTitle"" : ""Військовий підрозділ"",
-                            ""title"" : ""1 армійський корпус"",
-                            ""commonInfo"" : {
-                                ""RealNameShort"" : ""1 АК""
-                                }
+                            ""title"" : ""1 армійський корпус""
                          }")
                     }
                 });
