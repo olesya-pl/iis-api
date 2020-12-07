@@ -1,11 +1,9 @@
-﻿using Iis.Api;
-using Iis.DbLayer.Repositories;
+﻿using Iis.DbLayer.Repositories;
 using Iis.Domain.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Interfaces.Elastic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -20,9 +18,7 @@ namespace IIS.Core.Ontology.EntityFramework
     {
         private readonly IElasticManager _elasticManager;
         private readonly IElasticConfiguration _elasticConfiguration;
-        private readonly RunTimeSettings _runTimeSettings;
         private readonly INodeRepository _nodeRepository;
-        private readonly IMaterialRepository _materialRepository;
         private readonly IElasticState _elasticState;
         private const decimal HistoricalSearchBoost = 0.05m;
 
@@ -30,15 +26,11 @@ namespace IIS.Core.Ontology.EntityFramework
             IElasticManager elasticManager,
             IElasticConfiguration elasticConfiguration,
             INodeRepository nodeRepository,
-            IMaterialRepository materialRepository,
-            RunTimeSettings runTimeSettings,
             IElasticState elasticState)
         {
             _elasticManager = elasticManager;
-            _runTimeSettings = runTimeSettings;
             _elasticConfiguration = elasticConfiguration;
             _nodeRepository = nodeRepository;
-            _materialRepository = materialRepository;
             _elasticState = elasticState;
         }
 
@@ -255,15 +247,16 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<bool> PutNodeAsync(Guid id, CancellationToken ct = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic) return Task.FromResult(true);
-
             return _nodeRepository.PutNodeAsync(id, ct);
+        }
+
+        public Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExtract, CancellationToken ct = default)
+        {
+            return _nodeRepository.PutNodeAsync(id, fieldsToExtract, ct);
         }
 
         public Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
         {
-            if (!_runTimeSettings.PutSavedToElastic) return Task.FromResult(true);
-
             return _nodeRepository.PutHistoricalNodesAsync(id, requestId, ct);
         }
 
@@ -284,8 +277,6 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<bool> PutNodesAsync(IReadOnlyCollection<INode> itemsToUpdate, CancellationToken ct)
         {
-            if (!_runTimeSettings.PutSavedToElastic) return true;
-
             var response = await _nodeRepository.PutNodesAsync(itemsToUpdate, ct);
 
             return response.All(x => x.IsSuccess);

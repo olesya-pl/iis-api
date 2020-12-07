@@ -61,8 +61,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             node = new Entity(Guid.NewGuid(), type);
             await CreateProperties(node, properties);
-            await _ontologyService.SaveNodeAsync(node);
-            await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name });
+            _ontologyService.SaveNode(node);
+            await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name, Id = node.Id });
             return node;
         }
 

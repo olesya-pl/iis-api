@@ -60,9 +60,31 @@ namespace Iis.DbLayer.Repositories
                 result.SerializedNode, cancellationToken);
         }
 
+        public async Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExclude, CancellationToken cancellationToken = default)
+        {
+            var result = _nodeFlattener.FlattenNode(id, cancellationToken);
+            result.SerializedNode = ExcludeFields(result.SerializedNode, fieldsToExclude);
+
+            return await _elasticManager.PutDocumentAsync(
+                result.NodeTypeName,
+                result.Id,
+                result.SerializedNode, cancellationToken);
+        }
+
         public Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, CancellationToken ct)
         {
             var flattenNodes = _nodeFlattener.FlattenNodes(nodes);
+            return PutNodesToElasticAsync(flattenNodes, false, ct);
+        }
+
+        public Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, IEnumerable<string> fieldsToExclude, CancellationToken ct)
+        {
+            var flattenNodes = _nodeFlattener.FlattenNodes(nodes);
+            flattenNodes.ForEach(node => 
+            {
+                node.SerializedNode = ExcludeFields(node.SerializedNode, fieldsToExclude);
+            });
+             
             return PutNodesToElasticAsync(flattenNodes, false, ct);
         }
 
@@ -182,6 +204,18 @@ namespace Iis.DbLayer.Repositories
         {
             Func<string, string> getIdFunc =  id => isHistoricalIndex ? Guid.NewGuid().ToString("N") : id;
             return nodes.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{getIdFunc(p.Id):N}\" }} }}\n{p.SerializedNode.RemoveNewLinesCharacter()}\n");
+        }
+
+        private string ExcludeFields(string json, IEnumerable<string> fieldsToExclude) 
+        {
+            var jObject = JObject.Parse(json);
+            foreach (var field in fieldsToExclude)
+            {
+                var propertyToExclude = jObject.Property(field, StringComparison.OrdinalIgnoreCase);
+                propertyToExclude?.Remove();
+            }
+
+            return jObject.ToString();
         }
     }
 }

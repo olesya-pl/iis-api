@@ -11,6 +11,7 @@ using Iis.Api;
 using Iis.Api.BackgroundServices;
 using Iis.Api.Bootstrap;
 using Iis.Api.Configuration;
+using Iis.Api.EventHandlers;
 using Iis.Api.Export;
 using Iis.Api.GraphQL.Access;
 using Iis.Api.Modules;
@@ -187,7 +188,6 @@ namespace IIS.Core
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
             services.AddTransient<OntologySchemaService>();
-            services.AddTransient<RunTimeSettings>();
             services.AddTransient<ExportService>();
             services.AddTransient<ExportToJsonService>();
             services.AddTransient<RoleService>();
@@ -293,9 +293,7 @@ namespace IIS.Core
 
             services.RegisterRepositories();
             services.RegisterElasticModules();
-            services.AddMediatR(typeof(ReportEventHandler), 
-                typeof(EntityEventHander), 
-                typeof(MaterialEventHandler));
+            services.AddMediatR(typeof(ReportEventHandler));
         }
 
 

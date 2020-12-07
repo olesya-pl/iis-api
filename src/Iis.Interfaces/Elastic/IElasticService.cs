@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Iis.Interfaces.Ontology.Data;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.Interfaces.Elastic
 {
     public interface IElasticService
     {
         Task<bool> PutNodeAsync(Guid id, CancellationToken ct = default);
+        Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExtract, CancellationToken ct = default);
         Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default);
         Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
         Task<int> CountByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);

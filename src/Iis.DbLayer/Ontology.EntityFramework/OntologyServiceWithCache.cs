@@ -210,24 +210,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             _data.RemoveNode(source.Id);
         }
-        public async Task SaveNodeAsync(Node source, CancellationToken cancellationToken = default)
-        {
-            await SaveNodeAsync(source, null, cancellationToken);
-        }
-        public async Task SaveNodeAsync(Node source, Guid? requestId, CancellationToken cancellationToken = default)
+        public void SaveNode(Node source)
         {
             _data.WriteLock(() =>
             {
                 var node = _data.GetNode(source.Id) ?? _data.CreateNode(source.Type.Id, source.Id);
                 SaveRelations(source, node);
             });
-
-            if (requestId.HasValue)
-            {
-                await Task.WhenAll(_elasticService.PutNodeAsync(source.Id), _elasticService.PutHistoricalNodesAsync(source.Id, requestId));
-            }
-            else
-                await _elasticService.PutNodeAsync(source.Id);
         }
         private void SaveRelations(Node source, INode existing)
         {
