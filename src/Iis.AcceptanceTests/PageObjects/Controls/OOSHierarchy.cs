@@ -1,7 +1,7 @@
-using Iis.AcceptanceTests.Helpers;
+using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 
-namespace Iis.AcceptanceTests.PageObjects.Controls
+namespace AcceptanceTests.PageObjects.Controls
 {
     public class OOSHierarchy
     {

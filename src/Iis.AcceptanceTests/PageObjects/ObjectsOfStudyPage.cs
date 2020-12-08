@@ -1,4 +1,4 @@
-using Iis.AcceptanceTests.PageObjects;
+using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
@@ -22,6 +22,26 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "span > .el-input > .el-input__inner")]
         [CacheLookup]
         public IWebElement SearchField;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='text-ellipsis title']")]
+        [CacheLookup]
+        public IWebElement FirstSearchResultTitle;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
+        [CacheLookup]
+        public IWebElement EditObjectOfStudyButton;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Класифікатори')]")]
+        [CacheLookup]
+        public IWebElement ClassifierBlock;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Загальна інформація')]")]
+        [CacheLookup]
+        public IWebElement GeneralInfoBlock;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='readonly tag link']")]
+        [CacheLookup]
+        public IWebElement DirectReportingRelationshipLink;
 
         [FindsBy(How = How.CssSelector, Using = ".el-table__row:nth-of-type(1) .text-ellipsis.title")]
         [CacheLookup]
@@ -91,7 +111,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement OOSEmptySearchResults;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-header.theme.theme-grey > .title")]
+        [FindsBy(How = How.XPath, Using = "//h3[@class='title']")]
         [CacheLookup]
         public IWebElement OOSTitle;
 

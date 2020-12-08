@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Iis.AcceptanceTests.Helpers
+﻿namespace AcceptanceTests.Helpers
 {
     public static class TestData
     {

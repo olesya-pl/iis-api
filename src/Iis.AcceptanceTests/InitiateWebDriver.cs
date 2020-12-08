@@ -1,12 +1,11 @@
 ﻿using System;
 using BoDi;
-using Iis.AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 using TechTalk.SpecFlow;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests
 {
     [Binding]
     public class InitiateWebDriver

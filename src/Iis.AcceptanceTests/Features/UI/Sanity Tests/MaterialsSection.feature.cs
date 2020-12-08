@@ -92,20 +92,20 @@ namespace AcceptanceTests.Features.UI.SanityTests
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="IS-6375 - Material processing, priority and importance setup")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6375 - Material processing, priority and importance setup")]
         [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Sanity")]
-        [Xunit.TraitAttribute("Description", "IS-6375 - Material processing, priority and importance setup")]
+        [Xunit.TraitAttribute("Description", "IIS-6375 - Material processing, priority and importance setup")]
         [Xunit.TraitAttribute("Category", "sanity")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "MaterialsSanityUI")]
-        public virtual void IS_6375_MaterialProcessingPriorityAndImportanceSetup()
+        public virtual void IIS_6375_MaterialProcessingPriorityAndImportanceSetup()
         {
             string[] tagsOfScenario = new string[] {
                     "sanity",
                     "UI",
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IS-6375 - Material processing, priority and importance setup", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6375 - Material processing, priority and importance setup", null, tagsOfScenario, argumentsOfScenario);
 #line 12
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -139,7 +139,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.And("I set importance Друга категорія value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 16
-        testRunner.And("I set relevance Посередня value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I set reliability Достовірна value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 17
         testRunner.And("I pressed Processed button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -148,10 +148,10 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.When("I pressed Back button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 19
-        testRunner.Then("I must see that importance value must be set to Важливий value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must see that importance value must be set to Друга категорія value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 20
-        testRunner.Then("I must see that importance value must be set to Сумнівна value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must see that reliability value must be set to Достовірна value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -274,6 +274,22 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 40
         testRunner.Then("I must see РОМАНОВ А.Г title of the object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
+#line 41
+        testRunner.When("I clicked Back button in the browser", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 42
+        testRunner.And("I clicked on the objects tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 43
+        testRunner.And("I clicked delete related object from the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 44
+        testRunner.When("I pressed the Confirm button to confirm the delete relation between material and " +
+                        "object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 45
+        testRunner.Then("I must not see the related object in the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
             }
             this.ScenarioCleanup();
         }
@@ -292,7 +308,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6363 - Search a material by keyword from the material", null, tagsOfScenario, argumentsOfScenario);
-#line 43
+#line 49
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -315,16 +331,16 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 8
     this.FeatureBackground();
 #line hidden
-#line 44
+#line 50
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 45
+#line 51
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 46
+#line 52
         testRunner.And("I searched проект data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 47
+#line 53
         testRunner.Then("I must see a material that contains Проект word in the Materials search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

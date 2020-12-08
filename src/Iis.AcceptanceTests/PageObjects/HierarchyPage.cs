@@ -1,9 +1,9 @@
-using Iis.AcceptanceTests.Helpers;
-using Iis.AcceptanceTests.PageObjects.Controls;
+using AcceptanceTests.Helpers;
+using AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 
-namespace Iis.AcceptanceTests.PageObjects
+namespace AcceptanceTests.PageObjects
 {
     public class HierarchyCard
     {

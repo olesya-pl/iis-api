@@ -1,9 +1,9 @@
 ﻿using System;
-using Iis.AcceptanceTests.Helpers;
+using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.ToRefactor
 {
     [Binding]
     public class TextFields

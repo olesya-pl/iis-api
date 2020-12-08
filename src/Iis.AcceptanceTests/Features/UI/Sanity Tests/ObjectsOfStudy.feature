@@ -2,8 +2,7 @@ Feature: ObjectsOfStudySection - sanity
 
     - IIS-6119 - Possibility to switch between hierarchy objects in the OOS section
     - IIS-6211 - Search results must contain a specific result
-    - IIS-6207 - Open a small object of study card
-    - IIS-6208 - Open a big object of study card
+    - IIS-6370 - View and interact with data in profile in the objects section
 
     Background:
         Given I sign in with the user olya and password 123 in the Contour
@@ -33,6 +32,19 @@ Feature: ObjectsOfStudySection - sanity
         When I clicked on search button in the Object of study section
         And I searched 3 омсбр data in the Objects of study section
         Then I must see third brigade Berkut as one of the search results
+
+
+    @sanity @UI @ObjectOfStudySectionUI
+    Scenario: IIS-6370 - View and interact with data in profile in the objects section
+        When I clicked on search button in the Object of study section
+        And I searched 3 омсбр data in the Objects of study section
+        And I clicked on the first search result title in the Objects of study section
+        And I clicked on enlarge small card button
+        And I clicked on the Classifier block in the big card window
+        And I clicked on the Direct reporting relationship link in the big card window
+        Then I must see the title 1 армійський корпус in the small card
+        When I clicked on the General info block in the big card window
+        Then I must see name real full is equal to the 3 окрема мотострілецька бригада Беркут value
 
 
 

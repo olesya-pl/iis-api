@@ -9,15 +9,15 @@ Feature: MaterialsSectionUI - Sanity
         Given I sign in with the user olya and password 123 in the Contour
 
     @sanity @UI @MaterialsSanityUI
-    Scenario: IS-6375 - Material processing, priority and importance setup
+    Scenario: IIS-6375 - Material processing, priority and importance setup
         When I navigated to Materials page
         And I clicked on the first material in the Materials list
         And I set importance Друга категорія value
-        And I set relevance Посередня value
+        And I set reliability Достовірна value
         And I pressed Processed button
         When I pressed Back button
-        Then I must see that importance value must be set to Важливий value
-        Then I must see that importance value must be set to Сумнівна value
+        Then I must see that importance value must be set to Друга категорія value
+        Then I must see that reliability value must be set to Достовірна value
 
 
     @sanity @UI @MaterialsSanityUI
@@ -38,6 +38,12 @@ Feature: MaterialsSectionUI - Sanity
         And I enter Романов value in the search object field
         When I clicked on the connected object
         Then I must see РОМАНОВ А.Г title of the object
+        When I clicked Back button in the browser
+        And I clicked on the objects tab in the material card
+        And I clicked delete related object from the material
+        When I pressed the Confirm button to confirm the delete relation between material and object
+        Then I must not see the related object in the material
+
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6363 - Search a material by keyword from the material

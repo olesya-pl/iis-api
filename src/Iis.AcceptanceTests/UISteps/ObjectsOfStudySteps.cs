@@ -1,13 +1,12 @@
 using System.Linq;
+using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
-using Iis.AcceptanceTests.Helpers;
-using Iis.AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.UISteps
 {
     [Binding]
     public class ObjectsOfStudySteps
@@ -55,6 +54,36 @@ namespace Iis.AcceptanceTests.UISteps
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
             driver.WaitFor(7);
 
+        }
+
+        [When(@"I clicked on the first search result title in the Objects of study section")]
+        public void WhenIClickedOnTheFirstSearchResultTitle()
+        {
+            objectsOfStudyPage.FirstSearchResultTitle.Click();
+        }
+
+        [When(@"I clicked on the Edit button in the Objects of study section")]
+        public void WhenIClickedOnTheEditButtonInTheObjectsOfStudySection()
+        {
+            objectsOfStudyPage.EditObjectOfStudyButton.Click();
+        }
+
+        [When(@"I clicked on the Classifier block in the big card window")]
+        public void WhenIClickedOnTheClassifierBlockInTheBigCardWindow()
+        {
+            objectsOfStudyPage.ClassifierBlock.Click();
+        }
+
+        [When(@"I clicked on the General info block in the big card window")]
+        public void WhenIClickedOnTheGeneralInfoBlockInTheBigCardWindow()
+        {
+            objectsOfStudyPage.GeneralInfoBlock.Click();
+        }
+
+        [When(@"I clicked on the Direct reporting relationship link in the big card window")]
+        public void WhenIClickedOnTheDirectReportingRelationshipLinkInTheBigCardWindow()
+        {
+            objectsOfStudyPage.ClassifierBlock.Click();
         }
 
         [When(@"I clicked on the relations tab")]
@@ -164,6 +193,7 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see (.*) title of the object")]
         public void ThenIMustSeeObjectBigCard(string expectedObjectTitle)
         {
+            driver.WaitFor(2);
             var actualObjectTitle = objectsOfStudyPage.OOSTitle.Text;
             Assert.Contains(expectedObjectTitle, actualObjectTitle);
         }
@@ -177,11 +207,20 @@ namespace Iis.AcceptanceTests.UISteps
                 Assert.True(objectsOfStudyPage.GetHierarchyCardByTitle(tableValue).Displayed);
             }
         }
+
         [Then(@"I must see third brigade Berkut as one of the search results")]
         public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResults()
         {
             Assert.True(objectsOfStudyPage.ThirdBrigadeSearchResult.Displayed);
         }
+
+        [Then(@"I must see name real full is equal to the (.*) value")]
+        public void ThenIMustSeeNameRealFullIsEqualToTheValue(string expectedValue)
+        {
+            var actualValue = objectsOfStudyPage.ThirdBrigadeSearchResult.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
+
         #endregion
     }
 }

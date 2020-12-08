@@ -1,12 +1,11 @@
 ﻿using System.Linq;
+using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
-using Iis.AcceptanceTests.Helpers;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.UISteps
 {
     [Binding]
     public class MaterialsSteps
@@ -47,6 +46,7 @@ namespace Iis.AcceptanceTests.UISteps
         [When(@"I clicked on the objects tab in the material card")]
         public void IClickedOnTheObjectsTabInTheMaterialCard()
         {
+            driver.WaitFor(2);
             materialsSectionPage.ObjectsTab.Click();
         }
 
@@ -82,10 +82,10 @@ namespace Iis.AcceptanceTests.UISteps
             materialsSectionPage.MaterialPage.ImportanceDropDown.Select(value);
         }
 
-        [When(@"I set relevance (.*) value")]
+        [When(@"I set reliability (.*) value")]
         public void WhenISetPriority(string priority)
         {
-            materialsSectionPage.MaterialPage.RelevanceDropDown.Select(priority);
+            materialsSectionPage.MaterialPage.ReliabilityDropDown.Select(priority);
         }
 
 
@@ -93,12 +93,14 @@ namespace Iis.AcceptanceTests.UISteps
         public void WhenIPressProcessedButton()
         {
             materialsSectionPage.ProcessedButton.Click();
+            driver.WaitFor(1);
         }
 
         [When(@"I pressed Back button")]
         public void WhenIPressBackButton()
         {
-            materialsSectionPage.BackButton.Click();
+            driver.Navigate().Back();
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the first search result in the Materials section")]
@@ -126,6 +128,30 @@ namespace Iis.AcceptanceTests.UISteps
         public void WhenIClickedOnTheConnectedObject()
         {
             materialsSectionPage.ConnectedObjectLink.Click();
+        }
+
+        [When(@"I clicked Back button in the browser")]
+        public void WhenIClickedBackButtonInTheBrowser()
+        {
+            driver.Navigate().Back();
+        }
+
+        [When(@"I clicked delete related object from the material")]
+        public void WhenIClickedDeleteRelatedObjectFromTheMaterial()
+        {
+            materialsSectionPage.DeleteRelatedObjectOfStudy.Click();
+        }
+
+        [When(@"I refreshed the page in the browser")]
+        public void WhenIRefreshedThePageInTheBrowser()
+        {
+            driver.Navigate().Refresh();
+        }
+
+        [When(@"I pressed the Confirm button to confirm the delete relation between material and object")]
+        public void WhenIPressedConfirmButton()
+        {
+            materialsSectionPage.ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy.Click();
         }
         #endregion When
 
@@ -202,8 +228,8 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see that search counter values are equal in the Materials section")]
         public void ThenIMustSeeThatSearchCounterValuesAreEqualInTheMaterialsSection()
         {
-            var actualValue = materialsSectionPage.MaterialsSearchResultCounter.Text;
-            var expectedValue = context.GetResponse<string>("counterValue");
+            string actualValue = materialsSectionPage.MaterialsSearchResultCounter.Text;
+            string expectedValue = context.GetResponse<string>("counterValue");
             Assert.Equal(actualValue, expectedValue);
         }
 
@@ -211,6 +237,13 @@ namespace Iis.AcceptanceTests.UISteps
         public void ThemIMustSeeThatImportanceValueMustBeSetToValue(string expectedValue)
         {
             var actualValue = materialsSectionPage.MaterialPage.ImportanceDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
+
+        [Then(@"I must see that reliability value must be set to (.*) value")]
+        public void ThemIMustSeeThatRelevanceValueMustBeSetToValue(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.ReliabilityDropDown.Text;
             Assert.Equal(expectedValue, actualValue);
         }
 
@@ -225,6 +258,12 @@ namespace Iis.AcceptanceTests.UISteps
         {
             var actualContentText = materialsSectionPage.FirstSearchResultContentBlock.Text;
             Assert.Contains(keyword, actualContentText);
+        }
+
+        [Then(@"I must not see the related object in the material")]
+        public void ThenIMustNotSeeTheRelatedObjectInTheMaterial()
+        {
+            Assert.False(materialsSectionPage.ConnectedObjectLink.Displayed);
         }
         #endregion
     }

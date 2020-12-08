@@ -47,8 +47,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement EventsTab;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(4)")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
         public IWebElement ObjectsTab;
 
         [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(2)")]
@@ -113,13 +112,18 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement EmptyAreInTheMaterialList;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-objects .el-table table tr:nth-of-type(1) td:nth-of-type(1) a")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//b")]
         public IWebElement ConnectedObjectLink;
+
+        [FindsBy(How = How.XPath, Using = "//button[@class='el-button el-button--default el-button--small el-button--primary ']")]
+        public IWebElement ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy;
 
         [FindsBy(How = How.CssSelector, Using = ".cell > div:nth-of-type(2)")]
         [CacheLookup]
         public IWebElement FirstSearchResultContentBlock;
 
+        [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
+        [CacheLookup]
+        public IWebElement DeleteRelatedObjectOfStudy;
     }
 }
