@@ -46,7 +46,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
             _resolverContext = ctx;
-
         }
 
         public async Task<Entity> UpdateEntity(IResolverContext ctx, string typeName)

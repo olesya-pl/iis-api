@@ -3217,6 +3217,18 @@
       "UniqueValueFieldName": null
     },
     {
+      "Id": "664650b5-edd2-431b-9b36-26823a5cbd0c",
+      "Name": "CredPersonDocument",
+      "Title": "Посвідчення особи",
+      "Meta": "{\r\n  \"SortOrder\": 181\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
       "Id": "66b04537-02ea-47ac-aa22-3eb89976d09f",
       "Name": "otherPersonId",
       "Title": "Інші номери",
@@ -16465,42 +16477,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "664650b5-edd2-431b-9b36-26823a5cbd0c",
-      "Name": "CredPersonDocument",
-      "Title": "Посвідчення особи",
-      "Meta": "{\r\n  \"SortOrder\": 181\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "9c71b881-f0ef-49e6-be6d-2756e3222be4",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "81de6407-969e-4406-bacd-2725fca00bbe",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"{shortName};{name};{title};\\\"Техніка без назви\\\"\"\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "05090d4d-8e58-446a-bff0-a52364bf1733",
       "Name": "__title",
       "Title": "Заголовок",
@@ -16537,30 +16513,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "a6ec2c93-27e8-49e7-aa25-d7d81c02ba1a",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"{title};\\\"Об'єкт без назви\\\"\"\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "d6ece51c-9f5b-488b-86ef-99c266b666d0",
-      "Name": "__title",
-      "Title": "Заголовок",
-      "Meta": "{\n    \"Formula\": \"shortFio({realName.firstName.ukr}, {realName.fatherName.ukr}, {realName.lastName.ukr});\\\"Особа без імені\\\"\"\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd",
       "Name": "__title",
       "Title": "Повна назва",
@@ -16569,6 +16521,42 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "81de6407-969e-4406-bacd-2725fca00bbe",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": "{\n    \"Formula\": \"{shortName};{name};{title};\\\"Техніка без назви\\\"\"\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "9c71b881-f0ef-49e6-be6d-2756e3222be4",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a6ec2c93-27e8-49e7-aa25-d7d81c02ba1a",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": "{\n    \"Formula\": \"{title};\\\"Об'єкт без назви\\\"\"\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -16597,6 +16585,18 @@
       "UniqueValueFieldName": null
     },
     {
+      "Id": "d6ece51c-9f5b-488b-86ef-99c266b666d0",
+      "Name": "__title",
+      "Title": "Заголовок",
+      "Meta": "{\n    \"Formula\": \"shortFio({realName.firstName.ukr}, {realName.fatherName.ukr}, {realName.lastName.ukr});\\\"Особа без імені\\\"\"\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
       "Id": "dcea2215-8642-4347-a7ae-5a8390647e74",
       "Name": "__title",
       "Title": "Заголовок",
@@ -16617,6 +16617,30 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4b60e9e5-1405-43c4-98bd-a48a13221095",
+      "Name": "createdBy",
+      "Title": "Ким створено",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "d76bbd48-0549-4477-b7b6-559ae57c3d59",
+      "Name": "createdBy",
+      "Title": "Ким створено",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     }
@@ -21845,6 +21869,13 @@
       "TargetTypeId": "f245afe7-8ac5-490b-be4e-7bf18a2dd895"
     },
     {
+      "Id": "d76bbd48-0549-4477-b7b6-559ae57c3d59",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "1ca66464-4b0c-4d46-8b7a-36a8fed863ca",
+      "TargetTypeId": "4b60e9e5-1405-43c4-98bd-a48a13221095"
+    },
+    {
       "Id": "d4b60364-ab34-490e-bed8-f75bd43a71c4",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -22069,6 +22100,13 @@
       "TargetTypeId": "7bb6ac35-4e48-4b57-be3e-9ce55a43d1bd"
     },
     {
+      "Id": "81de6407-969e-4406-bacd-2725fca00bbe",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "49b0f55d-1284-4358-867a-0c3011f765b8",
+      "TargetTypeId": "9c71b881-f0ef-49e6-be6d-2756e3222be4"
+    },
+    {
       "Id": "a6ec2c93-27e8-49e7-aa25-d7d81c02ba1a",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -22081,13 +22119,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451",
       "TargetTypeId": "b63d5602-88c6-421f-a975-7baad1b8d5bb"
-    },
-    {
-      "Id": "81de6407-969e-4406-bacd-2725fca00bbe",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "49b0f55d-1284-4358-867a-0c3011f765b8",
-      "TargetTypeId": "9c71b881-f0ef-49e6-be6d-2756e3222be4"
     }
   ],
   "AttributeTypes": [
@@ -23804,6 +23835,10 @@
       "ScalarType": 0
     },
     {
+      "Id": "9c71b881-f0ef-49e6-be6d-2756e3222be4",
+      "ScalarType": 0
+    },
+    {
       "Id": "b5570e2b-a8ed-4725-8362-d186af6ece72",
       "ScalarType": 0
     },
@@ -23820,7 +23855,7 @@
       "ScalarType": 0
     },
     {
-      "Id": "9c71b881-f0ef-49e6-be6d-2756e3222be4",
+      "Id": "4b60e9e5-1405-43c4-98bd-a48a13221095",
       "ScalarType": 0
     }
   ],
