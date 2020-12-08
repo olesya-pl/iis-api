@@ -9,6 +9,7 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
+using Iis.Services.Contracts;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -18,6 +19,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IMediator _mediator;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyModel _ontology;
+        private readonly IResolverContext _resolverContext;
 
         public MutationCreateResolver(IOntologyModel ontology, 
             IOntologyService ontologyService,
@@ -27,7 +29,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _ontology = ontology;
             _ontologyService = ontologyService;
             _fileService = fileService;
-            _mediator = mediator;
+            _mediator = mediator;            
         }
 
         public MutationCreateResolver(IResolverContext ctx)
@@ -36,6 +38,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _ontology = ctx.Service<IOntologyModel>();
             _ontologyService = ctx.Service<IOntologyService>();
             _mediator = ctx.Service<IMediator>();
+            _resolverContext = ctx;
         }
 
         public async Task<Entity> CreateEntity(IResolverContext ctx, string typeName)
@@ -44,8 +47,20 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             var type = _ontology.GetEntityType(typeName);
             var entity = await CreateEntity(type, data);
-
             return entity;
+        }
+
+        private void TrySetCreatedBy(Entity entity)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUser()?.Id;
+                if (currentUserId.HasValue)
+                {
+                    entity.SetProperty("createdBy", currentUserId.Value.ToString("N"));
+                }
+            }
+            catch (ArgumentException) { }
         }
 
         public async Task<Entity> CreateEntity(IEntityTypeModel type, Dictionary<string, object> properties)
@@ -61,6 +76,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             node = new Entity(Guid.NewGuid(), type);
             await CreateProperties(node, properties);
+            TrySetCreatedBy(node);
             _ontologyService.SaveNode(node);
             await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name, Id = node.Id });
             return node;
@@ -164,5 +180,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             throw new ArgumentException(nameof(embed));
          }
+
+        private User GetCurrentUser()
+        {
+            if (_resolverContext is null) return null;
+
+            var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
+            return tokenPayload?.User;
+        }
     }
+
+    
 }
