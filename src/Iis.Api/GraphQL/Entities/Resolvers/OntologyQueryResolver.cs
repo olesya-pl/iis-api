@@ -5,6 +5,7 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services;
 using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
@@ -197,6 +198,23 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 });
             }
             return result;
+        }
+
+        public async Task<string> ResolveCreatedBy(IResolverContext ctx)
+        {
+            var node = ctx.Parent<Node>();
+            var createdBy = node.GetAttributeValue("createdBy");
+            if (Guid.TryParse(createdBy.ToString(), out var createdById))
+            {
+                var userService = ctx.Service<IUserService>();
+                var createdByUser = await userService.GetUserAsync(createdById);
+                if (createdByUser == null)
+                {
+                    return string.Empty;
+                }
+                return $"{createdByUser.LastName} {createdByUser.FirstName}";
+            }
+            return string.Empty;
         }
     }
 }
