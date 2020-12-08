@@ -176,7 +176,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void SetupAggregation_OneField_Success()
         {
-            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"size\": 100}}}}");
+            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"missing\":\"__hasNoValue\",\"size\": 100}}}}");
 
             var aggregationFieldNameList = new []{"NodeType"}.ToList().AsReadOnly();
 
@@ -187,7 +187,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void SetupAggregation_TwoField_Success()
         {
-            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"size\": 100}}, \"NodeName\":{\"terms\":{\"field\":\"NodeNameAggregate\", \"size\": 100}}}}");
+            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\",\"missing\":\"__hasNoValue\", \"size\": 100}}, \"NodeName\":{\"terms\":{\"field\":\"NodeNameAggregate\", \"missing\":\"__hasNoValue\", \"size\": 100}}}}");
 
             var aggregationFieldNameList = new []{"NodeType", "NodeName"}.ToList().AsReadOnly();
 

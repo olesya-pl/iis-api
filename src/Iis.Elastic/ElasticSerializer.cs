@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
-using System;
+using Iis.Elastic.SearchQueryExtensions;
 
 namespace Iis.Elastic
 {
@@ -29,7 +30,7 @@ namespace Iis.Elastic
                 if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
                 {
                     json[nameof(extNode.NodeTypeTitle)] = extNode.NodeTypeTitle;
-                    json[$"{nameof(extNode.NodeTypeTitle)}{ElasticManager.AggregateSuffix}"] = extNode.NodeTypeTitle;
+                    json[$"{nameof(extNode.NodeTypeTitle)}{SearchQueryExtension.AggregateSuffix}"] = extNode.NodeTypeTitle;
                 }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;

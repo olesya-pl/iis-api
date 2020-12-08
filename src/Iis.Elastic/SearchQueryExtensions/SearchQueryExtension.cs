@@ -8,7 +8,8 @@ namespace Iis.Elastic.SearchQueryExtensions
     {
         private const string Wildcard = "*";
         private const int MaxBucketsCount = 100;
-        private const string AggregateSuffix = "Aggregate";
+        public const string AggregateSuffix = "Aggregate";
+        public const string MissingValueKey = "__hasNoValue";
 
         public static bool IsExactQuery(string query)
         {
@@ -77,6 +78,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 var field = new JObject
                 (
                     new JProperty("field", $"{fieldName}{AggregateSuffix}"),
+                    new JProperty("missing", MissingValueKey),
                     new JProperty("size", MaxBucketsCount)
                 );
                 aggregations[fieldName] = new JObject
