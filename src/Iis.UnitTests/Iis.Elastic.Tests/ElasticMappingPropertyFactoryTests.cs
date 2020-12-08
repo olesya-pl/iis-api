@@ -37,8 +37,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             Assert.Equal(2, prop.Count());
             Assert.Contains(prop, p => p.Type == ElasticMappingPropertyType.Text && p.Name == namePart1);
             Assert.Contains(prop, p => p.Type == ElasticMappingPropertyType.Keyword 
-                && p.Name == $"{namePart1}Aggregate"
-                && !((KeywordProperty)p).SupportsNullValue);
+                && p.Name == $"{namePart1}Aggregate");
         }
 
         [Theory, AutoData]
