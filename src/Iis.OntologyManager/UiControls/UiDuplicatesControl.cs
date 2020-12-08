@@ -129,32 +129,20 @@ namespace Iis.OntologyManager.UiControls
             lblRecordsCount.Text = RECORDS_COUNT_TEXT + searchResult.Items.Count.ToString();
             lblValuesCount.Text = VALUES_COUNT_TEXT + (searchResult.Items.Count == 0 ? "" : searchResult.Items.Max(i => i.OrderNumber).ToString());
         }
-        private DataGridViewColumn AddTextColumn(string name, string headerText, int koef = 1)
-        {
-            var column = new DataGridViewColumn
-            {
-                Name = name,
-                HeaderText = headerText,
-                CellTemplate = new DataGridViewTextBoxCell()
-            };
-            column.Width *= koef;
-            grid.Columns.Add(column);
-            return column;
-        }
         private void ConfigureGrid(DuplicateSearchParameter param)
         {
             grid.Columns.Clear();
-            AddTextColumn("Value", "Значення", 2);
+            grid.AddTextColumn("Value", "Значення", 2);
 
             foreach (var dotName in param.DotNames.Union(param.DistinctNames))
             {
-                AddTextColumn("Data_" + dotName, dotName, 2);
+                grid.AddTextColumn("Data_" + dotName, dotName, 2);
             }
 
-            AddTextColumn("Url", "Урл", 2);
-            AddTextColumn("LinksCount", "Вхідні зв'язки");
-            AddTextColumn("OrderNumber", "OrderNumber").Visible = false;
-            AddTextColumn("Id", "Id").Visible = false;
+            grid.AddTextColumn("Url", "Урл", 2);
+            grid.AddTextColumn("LinksCount", "Вхідні зв'язки");
+            grid.AddTextColumn("OrderNumber", "OrderNumber").Visible = false;
+            grid.AddTextColumn("Id", "Id").Visible = false;
         }
         private void PopulateGrid(DuplicateSearchParameter param, DuplicateSearchResult result)
         {
