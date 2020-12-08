@@ -9,15 +9,15 @@ Feature: MaterialsSectionUI - Sanity
         Given I sign in with the user olya and password 123 in the Contour
 
     @sanity @UI @MaterialsSanityUI
-    Scenario: IS-6375 - Material processing, priority and importance setup
+    Scenario: IIS-6375 - Material processing, priority and importance setup
         When I navigated to Materials page
         And I clicked on the first material in the Materials list
         And I set importance Друга категорія value
-        And I set relevance Посередня value
+        #And I set relevance Посередня value
         And I pressed Processed button
         When I pressed Back button
-        Then I must see that importance value must be set to Важливий value
-        Then I must see that importance value must be set to Сумнівна value
+        Then I must see that importance value must be set to Друга категорія value
+        #Then I must see that importance value must be set to Сумнівна value
 
 
     @sanity @UI @MaterialsSanityUI

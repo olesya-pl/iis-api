@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.UISteps
 {
     [Binding]
     public class ReportSteps

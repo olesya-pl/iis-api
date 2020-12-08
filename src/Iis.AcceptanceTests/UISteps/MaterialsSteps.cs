@@ -1,12 +1,11 @@
 ﻿using System.Linq;
+using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
-using Iis.AcceptanceTests.Helpers;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.UISteps
 {
     [Binding]
     public class MaterialsSteps
@@ -98,7 +97,8 @@ namespace Iis.AcceptanceTests.UISteps
         [When(@"I pressed Back button")]
         public void WhenIPressBackButton()
         {
-            materialsSectionPage.BackButton.Click();
+            driver.Navigate().Back();
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the first search result in the Materials section")]
@@ -202,8 +202,8 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I must see that search counter values are equal in the Materials section")]
         public void ThenIMustSeeThatSearchCounterValuesAreEqualInTheMaterialsSection()
         {
-            var actualValue = materialsSectionPage.MaterialsSearchResultCounter.Text;
-            var expectedValue = context.GetResponse<string>("counterValue");
+            string actualValue = materialsSectionPage.MaterialsSearchResultCounter.Text;
+            string expectedValue = context.GetResponse<string>("counterValue");
             Assert.Equal(actualValue, expectedValue);
         }
 

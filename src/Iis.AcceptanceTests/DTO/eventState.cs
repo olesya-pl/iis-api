@@ -2,7 +2,7 @@
 using HotChocolate.Types;
 using Newtonsoft.Json.Linq;
 
-namespace Iis.AcceptanceTests.DTO
+namespace AcceptanceTests.DTO
 {
     public class EventStateListResponse
     {

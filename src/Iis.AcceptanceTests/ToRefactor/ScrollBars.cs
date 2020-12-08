@@ -1,9 +1,9 @@
-﻿using Iis.AcceptanceTests.Helpers;
+﻿using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using TechTalk.SpecFlow;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.ToRefactor
 {
 	[Binding]
 	public class ScrollBars

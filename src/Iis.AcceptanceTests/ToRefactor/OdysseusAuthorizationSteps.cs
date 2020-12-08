@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Iis.AcceptanceTests.Helpers;
+using AcceptanceTests.Helpers;
 using FluentAssertions;
 using GraphQL;
 using GraphQL.Client.Http;
@@ -8,7 +8,7 @@ using IIS.Core.GraphQL.Users;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.ToRefactor
 {
     [Binding]
     public sealed class OdysseusAuthorizationSteps : IisApiUtils

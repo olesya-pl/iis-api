@@ -1,11 +1,11 @@
 using System.Linq;
+using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
-using Iis.AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.UISteps
 {
     [Binding]
     public class ObjectsOfStudySteps

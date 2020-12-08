@@ -1,5 +1,5 @@
 ﻿using System;
-using Iis.AcceptanceTests.Helpers;
+using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;

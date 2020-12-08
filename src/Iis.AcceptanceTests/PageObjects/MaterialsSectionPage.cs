@@ -63,7 +63,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .el-input__inner")]
+        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .material-relations-input")]
         [CacheLookup]
         public IWebElement ObjectsTabSearch;
 
@@ -121,5 +121,8 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement FirstSearchResultContentBlock;
 
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > .general-container > div:nth-of-type(1) > .el-form-item__content > .el-select.el-tooltip input")]
+        [CacheLookup]
+        public IWebElement ImpDd;
     }
 }
