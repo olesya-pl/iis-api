@@ -204,6 +204,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var node = ctx.Parent<Node>();
             var createdBy = node.GetAttributeValue("createdBy");
+            
+            if (createdBy == null)
+            {
+                return string.Empty;
+            }
+            
             if (Guid.TryParse(createdBy.ToString(), out var createdById))
             {
                 var userService = ctx.Service<IUserService>();
