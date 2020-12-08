@@ -1,6 +1,7 @@
 using System.Linq;
 using AcceptanceTests.PageObjects;
 using Iis.AcceptanceTests.Helpers;
+using Iis.AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using TechTalk.SpecFlow;
@@ -13,16 +14,10 @@ namespace Iis.AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
-
-        private readonly Actions actions;
-
         private ObjectsOfStudyPageObjects objectsOfStudyPage;
-
-
         public ObjectsOfStudySteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             objectsOfStudyPage = new ObjectsOfStudyPageObjects(driver);
-            actions = new Actions(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -62,16 +57,29 @@ namespace Iis.AcceptanceTests.UISteps
 
         }
 
+        [When(@"I clicked on the relations tab")]
+        public void WhenIClickedOnTheRelationTab()
+        {
+            objectsOfStudyPage.RelationsTab.Click();
+        }
+
         [When(@"I clicked on Hierarchy tab in the Object of study section")]
         public void WhenIClickedOnHierarchyTabInTheObjectOfStudySectiion()
         {
             objectsOfStudyPage.HierarchyTab.Click();
         }
 
-        [When(@"I double clicked on Russian military forces expand button")]
-        public void WhenIClickedOnRussianMilitaryForcesExpendButton()
+        [When(@"I double clicked on the (.*) card in the hierarchy")]
+        public void WhenIDoubleClickedOnTheExpandButton(string cardName)
         {
-            actions.DoubleClick(objectsOfStudyPage.RussianMilitaryForcesExpandButton).Perform();
+            driver.WaitFor(1);
+            objectsOfStudyPage.GetHierarchyCardByTitle(cardName).DoubleClickOnCard();
+        }
+
+        [When(@"I double clicked on the (.*) expand button in the hierarchy")]
+        public void WhenIDoubleClickedOnTheExpandButtonInTheHierarchy(string cardName)
+        {
+            objectsOfStudyPage.GetHierarchyCardByTitle(cardName).Expand();
         }
         #endregion
 
@@ -157,9 +165,23 @@ namespace Iis.AcceptanceTests.UISteps
         public void ThenIMustSeeObjectBigCard(string expectedObjectTitle)
         {
             var actualObjectTitle = objectsOfStudyPage.OOSTitle.Text;
-            Assert.True(actualObjectTitle.Contains(expectedObjectTitle));
+            Assert.Contains(expectedObjectTitle, actualObjectTitle);
         }
 
+        [Then(@"I must see these cards in hierarchy")]
+        public void ThenIMustNotSeeTheseCardInHierarchy(Table table)
+        {
+            foreach (TableRow row in table.Rows)
+            {
+                var tableValue = row.Values.First();
+                Assert.True(objectsOfStudyPage.GetHierarchyCardByTitle(tableValue).Displayed);
+            }
+        }
+        [Then(@"I must see third brigade Berkut as one of the search results")]
+        public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResults()
+        {
+            Assert.True(objectsOfStudyPage.ThirdBrigadeSearchResult.Displayed);
+        }
         #endregion
     }
 }

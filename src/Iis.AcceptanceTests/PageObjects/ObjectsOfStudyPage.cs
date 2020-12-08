@@ -1,3 +1,4 @@
+using Iis.AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
@@ -101,5 +102,17 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div:nth-child(1) > div:nth-child(4) > div:nth-of-type(1) .hierarchy-card__expand")]
         [CacheLookup]
         public IWebElement RussianMilitaryForcesExpandButton;
+
+        [FindsBy(How = How.XPath, Using = "//ul[@class='el-menu--horizontal el-menu']/li[contains(text(), 'Звʼязки')]")]
+        [CacheLookup]
+        public IWebElement RelationsTab;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'3 окрема мотострілецька бригада \"Беркут\"')]")]
+        [CacheLookup]
+        public IWebElement ThirdBrigadeSearchResult;
+        public HierarchyCard GetHierarchyCardByTitle(string title)
+        {
+            return new HierarchyCard(driver, title);
+        }
     }
 }

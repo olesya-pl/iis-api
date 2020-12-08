@@ -40,10 +40,10 @@ namespace AcceptanceTests.Features.UI.SanityTests
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Sanity Tests", "ObjectsOfStudySection - sanity", @"    - IIS-6119 - Possibility to switch between hierarchy objects in the OOS section
-    - IIS-6210 - Ensure that search by using ! symbol gives 0 search results
-    - IIS-6207 - Open a small object of study card
-    - IIS-6208 - Open a big object of study card", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Sanity Tests", "ObjectsOfStudySection - sanity", "    - IIS-6119 - Possibility to switch between hierarchy objects in the OOS secti" +
+                    "on\n    - IIS-6211 - Search results must contain a specific result\n    - IIS-6207" +
+                    " - Open a small object of study card\n    - IIS-6208 - Open a big object of study" +
+                    " card", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -133,7 +133,82 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.When("I clicked on Hierarchy tab in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 14
-        testRunner.And("I double clicked on Russian military forces expand button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I double clicked on the Силові структури card in the hierarchy", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                            "ФСБ РФ"});
+                table1.AddRow(new string[] {
+                            "СЗР РФ"});
+                table1.AddRow(new string[] {
+                            "ФСВНГ РФ"});
+                table1.AddRow(new string[] {
+                            "ЗС РФ"});
+#line 15
+        testRunner.Then("I must see these cards in hierarchy", ((string)(null)), table1, "Then ");
+#line hidden
+#line 22
+        testRunner.When("I double clicked on the ЗС РФ expand button in the hierarchy", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                            "ЗВО"});
+                table2.AddRow(new string[] {
+                            "ГШ ЗС РФ"});
+                table2.AddRow(new string[] {
+                            "Центральні органи військового управління"});
+                table2.AddRow(new string[] {
+                            "ОСК Північ"});
+#line 23
+        testRunner.Then("I must see these cards in hierarchy", ((string)(null)), table2, "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6211 - Search results must contain a specific result")]
+        [Xunit.TraitAttribute("FeatureTitle", "ObjectsOfStudySection - sanity")]
+        [Xunit.TraitAttribute("Description", "IIS-6211 - Search results must contain a specific result")]
+        [Xunit.TraitAttribute("Category", "sanity")]
+        [Xunit.TraitAttribute("Category", "UI")]
+        [Xunit.TraitAttribute("Category", "ObjectOfStudySectionUI")]
+        public virtual void IIS_6211_SearchResultsMustContainASpecificResult()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "sanity",
+                    "UI",
+                    "ObjectOfStudySectionUI"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6211 - Search results must contain a specific result", null, tagsOfScenario, argumentsOfScenario);
+#line 32
+    this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 8
+    this.FeatureBackground();
+#line hidden
+#line 33
+        testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 34
+        testRunner.And("I searched 3 омсбр data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 35
+        testRunner.Then("I must see third brigade Berkut as one of the search results", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

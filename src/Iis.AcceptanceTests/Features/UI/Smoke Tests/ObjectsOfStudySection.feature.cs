@@ -291,25 +291,25 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 33
         testRunner.And("I clicked on enlarge small card button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
                             "BigCardProfileTab"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "BigCardMaterialsTab"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "BigCardEventsTab"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "BigCardChangeHistoryTab"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "BigCardRelationsTab"});
 #line 34
-        testRunner.Then("I must see these tabs in the big object of study card", ((string)(null)), table2, "Then ");
+        testRunner.Then("I must see these tabs in the big object of study card", ((string)(null)), table4, "Then ");
 #line hidden
-                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                             "BigCardAffiliation"});
-                table3.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "BigCardImportance"});
 #line 42
-        testRunner.Then("I must see the specific text blocks in big object of study card", ((string)(null)), table3, "Then ");
+        testRunner.Then("I must see the specific text blocks in big object of study card", ((string)(null)), table5, "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

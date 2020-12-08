@@ -224,7 +224,7 @@ namespace Iis.AcceptanceTests.UISteps
         public void ThenIMustSeeAMaterialThatContainsWordInTheMaterialSearchResult(string keyword)
         {
             var actualContentText = materialsSectionPage.FirstSearchResultContentBlock.Text;
-            Assert.True(actualContentText.Contains(keyword));
+            Assert.Contains(keyword, actualContentText);
         }
         #endregion
     }
