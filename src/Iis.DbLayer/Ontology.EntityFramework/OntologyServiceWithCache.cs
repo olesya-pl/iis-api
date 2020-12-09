@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
@@ -18,12 +18,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         readonly IOntologyNodesData _data;
         readonly IElasticService _elasticService;
+        readonly IElasticState _elasticState;
         public OntologyServiceWithCache(
             IOntologyNodesData data,
-            IElasticService elasticService)
+            IElasticService elasticService, 
+            IElasticState elasticState)
         {
             _data = data;
             _elasticService = elasticService;
+            _elasticState = elasticState;
         }
         public IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId)
         {
@@ -353,6 +356,37 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 return new SearchEntitiesByConfiguredFieldsResult();
             }
         }
+
+        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter)
+        {
+            if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortOrder))
+            {
+                filter.SortColumn = GetSortColumnForElastic(filter.SortColumn);
+                filter.SortOrder = filter.SortOrder;
+            }
+            
+            var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter);
+            
+            return new SearchEntitiesByConfiguredFieldsResult()
+            {
+                Count = response.Count,
+                Entities = response.Items.Select(x => x.Value.SearchResult).ToList()
+            };
+        }
+        
+        private static string GetSortColumnForElastic(string sortColumn)
+        {
+            return sortColumn switch
+            {
+                "name" => "name.keyword",
+                "eventImportance" => "importance.code.keyword",
+                "eventState" => "state.code.keyword",
+                "startAt" => "startsAt",
+                "updatedAt" => "UpdatedAt",
+                _ => null
+            };
+        }
+
         public string GetAttributeValueByDotName(Guid id, string dotName)
         {
             var node = _data.GetNode(id);
