@@ -122,7 +122,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 case EmbeddingOptions.Optional:
                 case EmbeddingOptions.Required:
-                    return new[] {await CreateSingleProperty(entityId, embed, value, requestId)};
+                    return new[] {await CreateSinglePropertyAsync(entityId, embed, value, requestId)};
                 case EmbeddingOptions.Multiple:
                     return await CreateMultipleProperties(entityId, embed, value, requestId);
                 default:
@@ -141,13 +141,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var v in values)
                 if (embed.IsEntityType)
                 {
-                    result.Add(CreateSingleProperty(entityId, embed, v, requestId));
+                    result.Add(CreateSinglePropertyAsync(entityId, embed, v, requestId));
                 }
                 else
                 {
                     var dict = (Dictionary<string, object>)v;
                     var attrValue = dict["value"];
-                    result.Add(CreateSingleProperty(entityId, embed, attrValue, requestId));
+                    result.Add(CreateSinglePropertyAsync(entityId, embed, attrValue, requestId));
                 }
 
             return Task.WhenAll(result);
@@ -160,19 +160,19 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var v in values)
                 if (embed.IsEntityType)
                 {
-                    result.Add(CreateSingleProperty(embed, v));
+                    result.Add(CreateSinglePropertyAsync(embed, v));
                 }
                 else
                 {
                     var dict = (Dictionary<string, object>) v;
                     var attrValue = dict["value"];
-                    result.Add(CreateSingleProperty(embed, attrValue));
+                    result.Add(CreateSinglePropertyAsync(embed, attrValue));
                 }
 
             return Task.WhenAll(result);
         }
 
-        public async Task<Relation> CreateSingleProperty(
+        public async Task<Relation> CreateSinglePropertyAsync(
             Guid entityId,
             IEmbeddingRelationTypeModel embed, 
             object value,
@@ -184,7 +184,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return prop;
         }
 
-        public async Task<Relation> CreateSingleProperty(
+        public async Task<Relation> CreateSinglePropertyAsync(
             IEmbeddingRelationTypeModel embed,
             object value)
         {
