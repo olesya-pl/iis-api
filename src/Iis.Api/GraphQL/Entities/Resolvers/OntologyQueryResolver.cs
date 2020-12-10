@@ -10,10 +10,8 @@ using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Attribute = Iis.Domain.Attribute;
@@ -35,9 +33,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ----- Root Entity resolvers ----- //
 
-        public async Task<Guid> ResolveId(IResolverContext ctx)
+        public Task<Guid> ResolveId(IResolverContext ctx)
         {
-            return ctx.Parent<Node>().Id;
+            return Task.FromResult(ctx.Parent<Node>().Id);
         }
 
         public async Task<Entity> ResolveEntity(IResolverContext ctx, IEntityTypeModel type)
@@ -47,7 +45,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node as Entity; // return null if node was not entity
         }
 
-        public async Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, IEntityTypeModel type)
+        public Task<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, IEntityTypeModel type)
         {
             var nf = ctx.CreateNodeFilter(type);
 
@@ -60,7 +58,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 ids = filter.MatchList;
             }
 
-            return Tuple.Create((IEnumerable<IEntityTypeModel>) new[] {type}, nf, ids);
+            var result = Tuple.Create((IEnumerable<IEntityTypeModel>) new[] {type}, nf, ids);
+
+            return Task.FromResult(result);
         }
 
         // ----- Relations to attributes ----- //
@@ -97,9 +97,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         // Return any scalar type for given attribute
-        public async Task<object> ResolveAttributeValue(IResolverContext ctx, Attribute attribute)
+        public Task<object> ResolveAttributeValue(IResolverContext ctx, Attribute attribute)
         {
-            return attribute.Value;
+            return Task.FromResult(attribute.Value);
         }
 
         // ----- Relations to entities ----- //
@@ -121,10 +121,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         // resolver for "_relation" field on schema, passed through context
-        public async Task<Relation> ResolveParentRelation(IResolverContext ctx)
+        public Task<Relation> ResolveParentRelation(IResolverContext ctx)
         {
             var parent = ctx.Parent<Entity>();
-            return GetRelationInfo(ctx, parent);
+            return Task.FromResult(GetRelationInfo(ctx, parent));
         }
 
         // ----- Context operations ----- //
@@ -142,16 +142,16 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ----- Created-updated ----- //
 
-        public async Task<DateTime> ResolveCreatedAt(IResolverContext ctx)
+        public Task<DateTime> ResolveCreatedAt(IResolverContext ctx)
         {
             var parent = ctx.Parent<Entity>();
-            return parent.CreatedAt;
+            return Task.FromResult(parent.CreatedAt);
         }
 
-        public async Task<DateTime> ResolveUpdatedAt(IResolverContext ctx)
+        public Task<DateTime> ResolveUpdatedAt(IResolverContext ctx)
         {
             var parent = ctx.Parent<Entity>();
-            return parent.UpdatedAt;
+            return Task.FromResult(parent.UpdatedAt);
         }
 
         // ------ All entities ----- //
@@ -175,7 +175,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids));
         }
 
-        public async Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
+        public Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {
             var result = new List<GeoCoordinate>();
             var parentNode = ctx.Parent<Node>();
@@ -197,19 +197,19 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     Long = geoCoordinate.Longitude
                 });
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         public async Task<string> ResolveCreatedBy(IResolverContext ctx)
         {
             var node = ctx.Parent<Node>();
             var createdBy = node.GetAttributeValue("createdBy");
-            
+
             if (createdBy == null)
             {
                 return string.Empty;
             }
-            
+
             if (Guid.TryParse(createdBy.ToString(), out var createdById))
             {
                 var userService = ctx.Service<IUserService>();

@@ -6,7 +6,6 @@ using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts;
@@ -32,7 +31,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _ontologyService = ontologyService;
             _fileService = fileService;
             _changeHistoryService = changeHistoryService;
-            _mediator = mediator;            
+            _mediator = mediator;
         }
 
         public MutationCreateResolver(IResolverContext ctx)
@@ -76,7 +75,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             Entity node;
             if (type.HasUniqueValues)
             {
-                node = await GetUniqueValueEntity(type, properties);
+                node = GetUniqueValueEntity(type, properties);
                 if (node != null) return node;
             }
 
@@ -103,12 +102,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
             return node;
         }
-        private async Task<Entity> GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
+
+        private Entity GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
         {
             if (properties.ContainsKey(type.UniqueValueFieldName))
             {
                 var value = properties[type.UniqueValueFieldName].ToString();
-                return (Entity)_ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName);
+                return _ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName) as Entity;
             }
             return null;
         }
@@ -260,6 +260,4 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return tokenPayload?.User;
         }
     }
-
-    
 }
