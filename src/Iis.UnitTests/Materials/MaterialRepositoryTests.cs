@@ -51,7 +51,6 @@ namespace Iis.UnitTests.Materials
                 .ReturnsAsync(responses);
 
             var elasticManagerMock = new Mock<IElasticManager>();
-            
 
             _serviceProvider = Utils.GetServiceProviderWithCustomSetup(
                 serviceCollection =>
@@ -66,15 +65,15 @@ namespace Iis.UnitTests.Materials
 
             var sut = _serviceProvider.GetRequiredService<IMaterialRepository>() as MaterialRepository;
             sut.SetContext(context);
-            
-            
+
             var res = await sut.PutMaterialToElasticSearchAsync(materialId, CancellationToken.None);
 
             elasticManagerMock
                 .Verify(
                     e => e.PutDocumentAsync("Materials", 
-                        materialId.ToString("N"), 
+                        materialId.ToString("N"),
                         It.Is<string>(s => JObject.Parse(s).Value<int>("ProcessedMlHandlersCount") == responses.Count), 
+                        It.IsAny<bool>(),
                         It.IsAny<CancellationToken>()), 
                     Times.Once);
         } 
