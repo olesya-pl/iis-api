@@ -203,7 +203,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 else // targetId only
                 {
                     node.RemoveNode(relation);
-                    var newRel = await _mutationCreateResolver.CreateSingleProperty(embed, uvdict);
+                    var newRel = await _mutationCreateResolver.CreateSinglePropertyAsync(embed, uvdict);
                     node.AddNode(newRel);
                 }
             }
@@ -268,7 +268,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (value != null)
             {
                 var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
-                var newRelation = await _mutationCreateResolver.CreateSingleProperty(embed, value);
+                var newRelation = await _mutationCreateResolver.CreateSinglePropertyAsync(embed, value);
                 node.AddNode(newRelation);
                 if (oldRelation == null)
                 {
