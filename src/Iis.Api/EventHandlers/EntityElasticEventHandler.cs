@@ -11,7 +11,8 @@ namespace Iis.Api.EventHandlers
 {
     public class EntityElasticEventHandler :
         INotificationHandler<EntityCreatedEvent>,
-        INotificationHandler<EntityUpdatedEvent>
+        INotificationHandler<EntityUpdatedEvent>,
+        INotificationHandler<EntityDeleteEvent>
     {
         private readonly IElasticService _elasticService;
         private readonly IElasticState _elasticState;
@@ -31,7 +32,7 @@ namespace Iis.Api.EventHandlers
         {
             var tasks = new List<Task>();
             tasks.Add(PutActualNodeAsync(notification, cancellationToken));
-                
+
             if (!string.Equals(notification.Type, "Event", StringComparison.OrdinalIgnoreCase))
             {
                 tasks.Add(_elasticService.PutHistoricalNodesAsync(notification.Id, notification.RequestId, cancellationToken));
@@ -39,7 +40,12 @@ namespace Iis.Api.EventHandlers
 
             return Task.WhenAll(tasks);
         }
-        
+
+        public Task Handle(EntityDeleteEvent notification, CancellationToken cancellationToken)
+        {
+            return _elasticService.DeleteNodeAsync(notification.Id, notification.Type, cancellationToken);
+        }
+
         private Task PutActualNodeAsync(EntityEvent notification, CancellationToken cancellationToken)
         {
             if (_elasticState.FieldsToExcludeByIndex.TryGetValue(notification.Type, out var fieldsToExclude))
