@@ -58,8 +58,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return events;
         }
 
-        
-
         public IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId)
         {
             var node = _data.GetNode(entityId);
