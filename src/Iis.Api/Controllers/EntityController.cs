@@ -36,7 +36,7 @@ namespace Iis.Api.Controllers
 
             _ontologySerivice.RemoveNode(node);
 
-            await _mediator.Publish(new EntityDeleteEvent { Id = node.Id, Type = node.Type.Name });
+            await _mediator.Publish(EntityDeleteEvent.Create(node.Id, node.Type.Name));
 
             return Ok($"Deleted:{id}");
         }
