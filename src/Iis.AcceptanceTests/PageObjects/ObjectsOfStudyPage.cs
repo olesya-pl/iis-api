@@ -67,6 +67,9 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement ObjectTitleInTheSmallCard;
 
+        [FindsBy(How = How.XPath, Using = "//span[text()=' Зберегти тему ']")]
+        public IWebElement CreateThemeButton;
+
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-full-screen']")]
         [CacheLookup]
         public IWebElement EnlargeObjectOfStudySmallCardButton;

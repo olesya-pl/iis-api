@@ -1,3 +1,4 @@
+using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
@@ -21,5 +22,12 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement FirstThemeInTheThemeList;
 
+        [FindsBy(How = How.XPath, Using = "//input[@placeholder='Введіть назву теми']")]
+        public IWebElement EnterThemeNameField;
+
+        public Theme GetThemeByTitle(string title)
+        {
+            return new Theme(driver, title);
+        }
     }
 }
