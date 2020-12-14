@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
@@ -24,7 +26,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//input[@placeholder='Введіть назву теми']")]
         public IWebElement EnterThemeNameField;
-
+        public List<Theme> Themes => driver.FindElements(By.ClassName("el-table__row"))
+                    .Select(_ => new Theme(driver, _)).ToList();
+        public ThemeSideView SideView => new ThemeSideView(driver);
         public Theme GetThemeByTitle(string title)
         {
             return new Theme(driver, title);
