@@ -56,8 +56,11 @@ namespace IIS.Core.Ontology.EntityFramework
                 Query = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}",
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchFields = ontologyFields
+                SearchFields = ontologyFields,
+                SortColumn = filter.SortColumn,
+                SortOrder = filter.SortOrder
             };
+            
             var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
             return new SearchResult
             {

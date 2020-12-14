@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using Iis.Domain.Elastic;
-using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Services.Contracts.Enums;
@@ -20,20 +19,17 @@ namespace Iis.Services
     {
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
-        private readonly IMaterialRepository _materialRepository;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
 
-        private string[] MaterialIndexes = new[] { "Materials" };
+        private string[] MaterialIndexes = { "Materials" };
 
         public MaterialElasticService(IElasticManager elasticManager,
             IElasticState elasticState,
-            IElasticResponseManagerFactory elasticResponseManagerFactory,
-            IMaterialRepository materialRepository
+            IElasticResponseManagerFactory elasticResponseManagerFactory
             )
         {
             _elasticManager = elasticManager;
             _elasticState = elasticState;
-            _materialRepository = materialRepository;
             _elasticResponseManagerFactory = elasticResponseManagerFactory;
         }
 

@@ -353,7 +353,7 @@ namespace Iis.Api
 
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
             CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();
-            CreateMap<Iis.Interfaces.Elastic.SearchEntitiesByConfiguredFieldsResult, IIS.Core.GraphQL.Entities.ObjectOfStudyFilterableQueryResponse>()
+            CreateMap<Iis.Interfaces.Elastic.SearchEntitiesByConfiguredFieldsResult, IIS.Core.GraphQL.Entities.OntologyFilterableQueryResponse>()
                 .ForMember(dest => dest.Aggregations, opts => opts.MapFrom(src => src.Aggregations))
                 .ForMember(dest => dest.Items, opts => opts.MapFrom(src => src.Entities));
 

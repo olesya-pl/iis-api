@@ -87,5 +87,24 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+        
+        [Fact]
+        public void TextType_ShouldHaveKeyword()
+        {
+            var actual = TextProperty.Create("propertyName", null, true).ToJObject();
+
+            var expected =  JObject.Parse( 
+            @"{
+                'type' : 'text',
+                'fields' : {
+                    'keyword' : {
+                        'type' : 'keyword',
+                        'ignore_above' : 256
+                    }
+                }
+            }");
+
+            actual.Should().BeEquivalentTo(expected);
+        }
     }
 }
