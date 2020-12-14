@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using AcceptanceTests.Helpers;
 using BoDi;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -16,13 +18,13 @@ namespace AcceptanceTests
         {
             this.container = container;
         }
-        [BeforeScenario]
+
+        [BeforeScenario("UI")]
         public void CreateWebDriver()
         {
             var driverOptions = new ChromeOptions();
 
-            var runName = GetType().Assembly.GetName().Name;
-            var timestamp = $"{DateTime.Now:yyyyMMdd.HHmm}";
+            var runName = Assembly.GetExecutingAssembly().GetName().Name;
 
             driverOptions.AddAdditionalCapability("name", runName, true);
             driverOptions.AddAdditionalCapability("enableVNC", true, true);
@@ -30,13 +32,13 @@ namespace AcceptanceTests
 
             //var driver = new ChromeDriver();
             //var driver = new RemoteWebDriver(new Uri("http://192.168.88.114:4444/wd/hub"), driverOptions);
-            var driver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), driverOptions);
+            var driver = new RemoteWebDriver(new Uri(TestData.RemoteWebDriverUrl), driverOptions);
             //homeUrl = "http://qa.contour.net/";
             driver.Manage().Window.Maximize();
             container.RegisterInstanceAs<IWebDriver>(driver);
         }
 
-        [AfterScenario]
+        [AfterScenario("UI")]
         public void DestroyWebDriver()
         {
             var driver = container.Resolve<IWebDriver>();

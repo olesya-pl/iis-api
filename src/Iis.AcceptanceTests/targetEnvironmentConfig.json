@@ -1,0 +1,59 @@
+{
+  "Local": {
+    "BaseAddress": "https://localhost:8080",
+    "BaseApiAddress": "https://localhost:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://localhost:4444/wd/hub"
+  },
+  "Dev": {
+    "BaseAddress": "https://dev.contour.net",
+    "BaseApiAddress": "https://dev-api.contour.net:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "hammer69",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+
+  },
+  "QA": {
+    "BaseAddress": "https://qa.contour.net",
+    "BaseApiAddress": "https://qa-api.contour.net:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+  },
+  "Dev2": {
+    "BaseAddress": "https://dev2.contour.net",
+    "BaseApiAddress": "https://dev2-api.contour.net:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+  },
+  "Dev3": {
+    "BaseAddress": "https://dev3.contour.net",
+    "BaseApiAddress": "https://dev3-api.contour.net:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+  },
+  "Demo": {
+    "BaseAddress": "https://demo.contour.net",
+    "BaseApiAddress": "https://demo-api.contour.net:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+  },
+  "ContourStage": {
+    "BaseAddress": "https://stage.contour.net",
+    "BaseApiAddress": "https://stage.contour.net:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+  },
+  "PoglyadStage": {
+    "BaseAddress": "https://stage.poglyad.net",
+    "BaseApiAddress": "https://stage.pogliyad.net:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+  }
+}
