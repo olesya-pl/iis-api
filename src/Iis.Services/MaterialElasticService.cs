@@ -70,7 +70,9 @@ namespace Iis.Services
             return searchResult;
         }
 
-        public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, IEnumerable<Guid> materialList, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, 
+            IEnumerable<Guid> materialList, 
+            CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
 
@@ -110,11 +112,13 @@ namespace Iis.Services
         public async Task<SearchResult> SearchMoreLikeThisAsync(SearchParams searchParams, CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
-
+            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+            
             var queryData = new MoreLikeThisQueryBuilder()
                         .WithPagination(from, size)
                         .WithMaterialId(searchParams.Suggestion)
                         .Build()
+                        .SetupSorting(sortColumn, sortOrder)
                         .ToString(Formatting.None);
 
             var searchResult = await _elasticManager.SearchAsync(queryData, _elasticState.MaterialIndexes, ct);
