@@ -38,7 +38,7 @@ namespace Iis.Api.Controllers
 
             await _mediator.Publish(new EntityDeleteEvent { Id = node.Id, Type = node.Type.Name });
 
-            return Content($"OK {id} {authorization}");
+            return Ok($"Deleted:{id}");
         }
     }
 }

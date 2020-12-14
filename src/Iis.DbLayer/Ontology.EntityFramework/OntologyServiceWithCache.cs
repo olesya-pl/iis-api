@@ -197,6 +197,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public Node GetNode(Guid nodeId)
         {
             var node = _data.GetNode(nodeId);
+
+            if(node is null) return null;
+
             return MapNode(node);
         }
         public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes)
