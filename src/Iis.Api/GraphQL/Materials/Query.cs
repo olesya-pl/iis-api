@@ -161,11 +161,13 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] Guid materialId,
-            [GraphQLNonNullType] PaginationInput pagination)
+            [GraphQLNonNullType] PaginationInput pagination,
+            [GraphQLNonNullType] SortingInput sorting)
         {
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
+            var sortingParams = new SortingParams(sorting.ColumnName, sorting.Order);
 
-            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId, pageParam);
+            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId, pageParam, sortingParams);
 
             var materials = materialsResult.Materials
                                 .Select(m => mapper.Map<Material>(m))

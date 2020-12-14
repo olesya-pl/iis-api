@@ -19,7 +19,7 @@ namespace Iis.Elastic
         {
             var json = new JObject();
 
-            if(extNode.NodeType.IsObjectOfStudy)
+            if(extNode.NodeType.IsObjectOfStudy || extNode.NodeType.IsEvent)
             {
                 json[nameof(extNode.Id)] = extNode.Id;
             }
