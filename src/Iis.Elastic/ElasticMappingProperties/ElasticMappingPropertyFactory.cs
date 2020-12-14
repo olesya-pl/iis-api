@@ -20,7 +20,7 @@ namespace Iis.Elastic.ElasticMappingProperties
                 switch (propertyType)
                 {
                     case ElasticMappingPropertyType.Text:
-                        var res = new List<ElasticMappingProperty>() { TextProperty.Create(name, null) };
+                        var res = new List<ElasticMappingProperty>() { TextProperty.Create(name, null, true) };
                         if (isAggregated)
                         {
                             res.Add(KeywordProperty.Create($"{name}{SearchQueryExtension.AggregateSuffix}", false));
