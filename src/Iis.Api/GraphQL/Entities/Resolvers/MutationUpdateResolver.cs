@@ -71,7 +71,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             IEntityTypeModel type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
         {
-            var node = (Entity)_ontologyService.LoadNodes(id);
+            var node = (Entity)_ontologyService.GetNode(id);
             if (node == null)
                 throw new ArgumentException($"There is no entity with id {id}");
             if (!type.IsAssignableFrom(node.Type)) // no direct checking of types - we can update child as its base type
@@ -82,7 +82,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 var newNode = await _mutationCreateResolver.CreateEntity(type, properties);
                 if (newNode.Id != node.Id)
                 {
-                    node = (Entity)_ontologyService.LoadNodes(newNode.Id);
+                    node = (Entity)_ontologyService.GetNode(newNode.Id);
                 }
             }
             else
@@ -195,7 +195,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     {
                         node.RemoveNode(relation);
                         var newRelation = new Relation(Guid.NewGuid(), embed);
-                        var target = (Entity)_ontologyService.LoadNodes(updatedNode.Id);
+                        var target = (Entity)_ontologyService.GetNode(updatedNode.Id);
                         newRelation.AddNode(target);
                         node.AddNode(newRelation);
                     }

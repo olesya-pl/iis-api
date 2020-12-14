@@ -130,9 +130,9 @@ namespace Iis.Elastic
             return statusCode / 100 == 4;
         }
 
-        public async Task<bool> DeleteDocumentAsync(string indexName, string documentId)
+        public async Task<bool> DeleteDocumentAsync(string indexName, string documentId, CancellationToken ct = default)
         {
-            var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId);
+            var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId, ctx:ct);
 
             return searchResponse.Success;
         }

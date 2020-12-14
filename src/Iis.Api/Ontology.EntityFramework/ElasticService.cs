@@ -316,7 +316,9 @@ namespace IIS.Core.Ontology.EntityFramework
         }
         public Task<bool> DeleteNodeAsync(Guid id, string typeName, CancellationToken ct = default)
         {
-            return Task.FromResult(true);
+            var indexName = _elasticState.OntologyIndexes.Union(_elasticState.EventIndexes).FirstOrDefault(e => e.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+
+            return _elasticManager.DeleteDocumentAsync(indexName, id.ToString("N"), ct);
         }
     }
 }

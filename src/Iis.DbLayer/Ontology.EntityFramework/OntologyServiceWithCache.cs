@@ -194,7 +194,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public Node LoadNodes(Guid nodeId)
+        public Node GetNode(Guid nodeId)
         {
             var node = _data.GetNode(nodeId);
             return MapNode(node);

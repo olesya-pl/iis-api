@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 
 using Iis.Events.Entities;
+using Iis.Domain;
 
 namespace Iis.Api.Controllers
 {
@@ -11,10 +12,13 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class EntityController : Controller
     {
+        private readonly IOntologyService _ontologySerivice;
         private readonly IMediator _mediator;
         public EntityController(
+            IOntologyService ontologyService,
             IMediator mediator)
         {
+            _ontologySerivice = ontologyService;
             _mediator = mediator;
 
         }
@@ -22,7 +26,17 @@ namespace Iis.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Detele(string id, [FromHeader] string authorization)
         {
-            await _mediator.Publish(new EntityDeleteEvent { Id = Guid.NewGuid(), Type = "OLOLO" });
+            var parseResult = Guid.TryParse(id, out Guid nodeId);
+
+            if(!parseResult) return ValidationProblem();
+
+            var node = _ontologySerivice.GetNode(nodeId) as Entity;
+
+            if(node is null) return NotFound(id);
+
+            _ontologySerivice.RemoveNode(node);
+
+            await _mediator.Publish(new EntityDeleteEvent { Id = node.Id, Type = node.Type.Name });
 
             return Content($"OK {id} {authorization}");
         }

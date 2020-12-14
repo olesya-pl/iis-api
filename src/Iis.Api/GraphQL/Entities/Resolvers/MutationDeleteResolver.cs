@@ -33,7 +33,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Entity DeleteEntity(Guid id, string typeName)
         {
-            var node = (Entity)_ontologyService.LoadNodes(id); // load only type
+            var node = (Entity)_ontologyService.GetNode(id); // load only type
             if (node == null)
                 throw new QueryException($"Entity with id {id} was not found");
             var type = _ontology.GetEntityType(typeName);

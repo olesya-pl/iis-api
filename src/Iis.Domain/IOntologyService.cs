@@ -18,7 +18,7 @@ namespace Iis.Domain
         (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         void SaveNode(Node node);
         void RemoveNode(Node node);
-        Node LoadNodes(Guid nodeId);
+        Node GetNode(Guid nodeId);
         IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes);
         IReadOnlyCollection<Entity> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Node GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
