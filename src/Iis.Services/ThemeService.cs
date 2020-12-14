@@ -62,9 +62,24 @@ namespace Iis.Services
         {
             PopulateOptionalFields(theme);
             var entity = _mapper.Map<ThemeEntity>(theme);
+            await UpdateQueryResults(entity);
             _context.Themes.Update(entity);
             await _context.SaveChangesAsync();
             return entity.Id;
+        }
+
+        private async Task UpdateQueryResults(ThemeEntity entity)
+        {
+            var originalEntity = await GetThemeAsync(entity.Id);
+            if (string.Equals(originalEntity.QueryRequest, entity.QueryRequest, StringComparison.Ordinal))
+            {
+                entity.QueryResults = originalEntity.QueryResults;
+                entity.ReadQueryResults = originalEntity.ReadQueryResults;
+            }
+            else
+            {
+                entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.TypeId, GetQuery(entity.QueryRequest))).Count;
+            }
         }
 
         private void PopulateOptionalFields(ThemeDto theme)

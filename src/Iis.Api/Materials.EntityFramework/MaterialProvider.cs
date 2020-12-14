@@ -302,7 +302,10 @@ namespace IIS.Core.Materials.EntityFramework
             return parentNodesMap;
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(Guid materialId, PaginationParams page)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(
+            Guid materialId, 
+            PaginationParams page,
+            SortingParams sorting)
         {
             var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
 
@@ -311,7 +314,8 @@ namespace IIS.Core.Materials.EntityFramework
             var searchParams = new SearchParams
             {
                 Suggestion = materialId.ToString("N"),
-                Page = page
+                Page = page,
+                Sorting = sorting
             };
 
             var searchResult = await _materialElasticService.SearchMoreLikeThisAsync(searchParams);

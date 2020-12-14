@@ -102,6 +102,29 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             Assert.Null(affiliation["CreatedAt"]);
             Assert.Null(affiliation["UpdatedAt"]);
         }
+        
+        [Fact]
+        public void GetJsonObjectByExtNode_Events()
+        {
+            var entityNodeTypeMock = new Mock<INodeTypeLinked>();
+            entityNodeTypeMock.Setup(e => e.IsEvent).Returns(true);
+
+            var serializer = new ElasticSerializer();
+            var extNode = new ExtNode
+            {
+                Id = "b01",
+                NodeType = entityNodeTypeMock.Object,
+                NodeTypeName = "testEntity",
+                CreatedAt = new DateTime(2020, 1, 2),
+                UpdatedAt = new DateTime(2020, 1, 3),
+            };
+
+            var json = serializer.GetJsonObjectByExtNode(extNode);
+            Assert.Equal(extNode.Id, json["Id"]);
+            Assert.Equal(extNode.NodeTypeName, json["NodeTypeName"]);
+            Assert.Equal(extNode.CreatedAt, Convert.ToDateTime(json["CreatedAt"]));
+            Assert.Equal(extNode.UpdatedAt, Convert.ToDateTime(json["UpdatedAt"]));
+        }
 
         [Theory]
         [AutoData]

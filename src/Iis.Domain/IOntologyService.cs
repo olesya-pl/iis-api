@@ -26,5 +26,6 @@ namespace Iis.Domain
         IReadOnlyCollection<Guid> GetNodeIdListByFeatureIdList(IEnumerable<Guid> featureIdList);
         string GetAttributeValueByDotName(Guid id, string dotName);
         Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds);
+        Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter);
     }
 }

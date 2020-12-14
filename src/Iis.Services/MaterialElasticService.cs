@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using Iis.Domain.Elastic;
-using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Services.Contracts.Enums;
@@ -20,20 +19,17 @@ namespace Iis.Services
     {
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
-        private readonly IMaterialRepository _materialRepository;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
 
-        private string[] MaterialIndexes = new[] { "Materials" };
+        private string[] MaterialIndexes = { "Materials" };
 
         public MaterialElasticService(IElasticManager elasticManager,
             IElasticState elasticState,
-            IElasticResponseManagerFactory elasticResponseManagerFactory,
-            IMaterialRepository materialRepository
+            IElasticResponseManagerFactory elasticResponseManagerFactory
             )
         {
             _elasticManager = elasticManager;
             _elasticState = elasticState;
-            _materialRepository = materialRepository;
             _elasticResponseManagerFactory = elasticResponseManagerFactory;
         }
 
@@ -70,7 +66,9 @@ namespace Iis.Services
             return searchResult;
         }
 
-        public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, IEnumerable<Guid> materialList, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, 
+            IEnumerable<Guid> materialList, 
+            CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
 
@@ -110,11 +108,13 @@ namespace Iis.Services
         public async Task<SearchResult> SearchMoreLikeThisAsync(SearchParams searchParams, CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
-
+            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+            
             var queryData = new MoreLikeThisQueryBuilder()
                         .WithPagination(from, size)
                         .WithMaterialId(searchParams.Suggestion)
                         .Build()
+                        .SetupSorting(sortColumn, sortOrder)
                         .ToString(Formatting.None);
 
             var searchResult = await _elasticManager.SearchAsync(queryData, _elasticState.MaterialIndexes, ct);

@@ -52,11 +52,11 @@ namespace IIS.Core.GraphQL
             builder.AddQueryType(d =>
             {
                 d.Name("QueryType");
-                d.Include<Entities.ObjectSignQuery>();
+                d.Include<ObjectSignQuery>();
                 d.Include<EntityTypes.Query>();
                 d.Include<Materials.Query>();
                 d.Include<Roles.Query>();
-                d.Include<Entities.ObjectOfStudyFilterableQuery>();
+                d.Include<OntologyFilterableQuery>();
                 d.Include<Users.Query>();
                 d.Include<AnalyticsQuery.Query>();
                 d.Include<AnalyticsIndicator.Query>();
