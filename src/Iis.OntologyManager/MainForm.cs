@@ -28,6 +28,7 @@ namespace Iis.OntologyManager
 
         IConfiguration _configuration;
         IOntologySchema _schema;
+        IOntologyNodesData _ontologyData;
         IOntologyManagerStyle _style;
         IMapper _mapper;
         UiControlsCreator _uiControlsCreator;
@@ -42,18 +43,20 @@ namespace Iis.OntologyManager
         UiEntityTypeControl _uiEntityTypeControl;
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
+        UiOntologyDataControl _uiOntologyDataControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.19";
+        const string VERSION = "1.20";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
-
+        bool _ontologyDataView = false;
+        
         private enum NodeViewType : byte
         {
             Entity,
             RelationEntity,
-            RelationAttribute
-        }
+            RelationAttribute,
+            Data        }
 
         string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
         INodeTypeLinked SelectedNodeType =>
@@ -142,6 +145,10 @@ namespace Iis.OntologyManager
             _uiRelationEntityControl.Initialize("RelationEntityControl", pnlRelationEntity);
             _uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
 
+            var pnlOntologyData = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiOntologyDataControl = new UiOntologyDataControl(_uiControlsCreator);
+            _uiOntologyDataControl.Initialize("OntologyDataControl", pnlOntologyData);
+
             _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
             _nodeTypeControls[NodeViewType.RelationEntity] = _uiRelationEntityControl;
             _nodeTypeControls[NodeViewType.RelationAttribute] = _uiRelationAttributeControl;
@@ -164,32 +171,28 @@ namespace Iis.OntologyManager
 
         private void SetTypeViewHeader(Panel rootPanel)
         {
-            rootPanel.SuspendLayout();
+            var rootContainer = new UiContainerManager("RootPanel", rootPanel);
 
-            btnTypeBack = new Button
-            {
-                Location = new Point(_style.MarginHor, _style.MarginVer),
-                MinimumSize = new Size
-                {
-                    Height = _style.ButtonHeightDefault,
-                    Width = _style.ButtonWidthDefault
-                },
-                Text = "Back"
-            };
+            btnTypeBack = new Button { Text = "Назад" };
             btnTypeBack.Click += (sender, e) => { GoBack(); };
+            rootContainer.Add(btnTypeBack);
+
+            btnSwitch = new Button();
+            SetSwitchViewTypeText();
+            btnSwitch.Click += (sender, e) => { SwitchOntologyViewType(); };
+            rootContainer.Add(btnSwitch);
 
             lblTypeHeaderName = new Label
             {
-                Location = new Point(btnTypeBack.Right + _style.MarginHor, _style.MarginVer),
                 ForeColor = Color.DarkBlue,
                 Font = _style.TypeHeaderNameFont,
                 AutoSize = true,
                 Text = ""
             };
-
-            rootPanel.Controls.Add(btnTypeBack);
-            rootPanel.Controls.Add(lblTypeHeaderName);
-            rootPanel.ResumeLayout();
+            
+            rootContainer.GoToNewColumn();
+            rootContainer.AutoWidth = true;
+            rootContainer.Add(lblTypeHeaderName);
         }
         private void SetControlsTopPanel()
         {
@@ -237,6 +240,16 @@ namespace Iis.OntologyManager
             _history.RemoveAt(_history.Count - 1);
             SetNodeTypeView(nodeType, false);
         }
+        private void SetSwitchViewTypeText()
+        {
+            btnSwitch.Text = _ontologyDataView ? "Показати тип" : "Показати данi";
+        }
+        private void SwitchOntologyViewType()
+        {
+            _ontologyDataView = !_ontologyDataView;
+            SetNodeTypeView(_currentNodeType, false);
+            SetSwitchViewTypeText();
+        }
         private void btnSave_Click(object sender, EventArgs e)
         {
             var dialog = new SaveFileDialog
@@ -269,7 +282,7 @@ namespace Iis.OntologyManager
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             _duplicatesControl = new UiDuplicatesControl();
             _duplicatesControl.Initialize("DuplicatesControl", rootPanel);
-            _duplicatesControl.OnGetData += GetOntologyData;
+            _duplicatesControl.OnGetData += () => _ontologyData;
 
             var context = OntologyContext.GetContext(SelectedConnectionString);
             _duplicatesControl.PatchSaver = new OntologyPatchSaver(context);
@@ -317,8 +330,13 @@ namespace Iis.OntologyManager
             var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
                 (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
             if (currentSchemaSource == null) return;
+
             _schema = _schemaService.GetOntologySchema(currentSchemaSource);
             ReloadTypes(_filterControl.GetModel());
+
+            _ontologyData = currentSchemaSource.SourceKind == SchemaSourceKind.Database ?
+                GetOntologyData(currentSchemaSource.Data) :
+                null;
         }
         private void UpdateSchemaSources()
         {
@@ -328,9 +346,7 @@ namespace Iis.OntologyManager
         }
         private List<IOntologySchemaSource> GetSchemaSources()
         {
-            var result = new List<IOntologySchemaSource>
-            {
-            };
+            var result = new List<IOntologySchemaSource>();
             var connectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
             result.AddRange(connectionStrings.Select(section => new OntologySchemaSource
             {
@@ -401,7 +417,7 @@ namespace Iis.OntologyManager
             _schema.RemoveInheritance(_currentNodeType.Id, ancestorId);
             SetNodeTypeView(_currentNodeType, false);
         }
-        private void SetNodeTypeViewVisibility(NodeViewType nodeViewType)
+        private void SetNodeTypeViewVisibility(NodeViewType? nodeViewType)
         {
             foreach (var key in _nodeTypeControls.Keys)
             {
@@ -437,17 +453,28 @@ namespace Iis.OntologyManager
         }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
+            if (nodeType == null) return;
             if (addToHistory && _currentNodeType != null)
             {
                 _history.Add(_currentNodeType);
             }
-            var nodeViewType = GetNodeViewType(nodeType);
-            SetNodeTypeViewVisibility(nodeViewType);
-            var aliases = nodeType.Kind == Kind.Entity ? _schema.Aliases.GetStrings(nodeType.Name) : new List<string>();
-            _nodeTypeControls[nodeViewType].SetUiValues(nodeType, aliases);
+            if (_ontologyDataView)
+            {
+                SetNodeTypeViewVisibility(null);
+                _uiOntologyDataControl.Visible = true;
+                _uiOntologyDataControl.SetUiValues(nodeType, _ontologyData);
+            }
+            else
+            {
+                var nodeViewType = GetNodeViewType(nodeType);
+                SetNodeTypeViewVisibility(nodeViewType);
+                _uiOntologyDataControl.Visible = false;
+                var aliases = nodeType.Kind == Kind.Entity ? _schema.Aliases.GetStrings(nodeType.Name) : new List<string>();
+                _nodeTypeControls[nodeViewType].SetUiValues(nodeType, aliases);
 
-            lblTypeHeaderName.Text = nodeType.Name;
-            _currentNodeType = nodeType;
+                lblTypeHeaderName.Text = nodeType.Name;
+                _currentNodeType = nodeType;
+            }
         }
         private INodeTypeLinked ChooseEntityTypeFromCombo()
         {
@@ -480,16 +507,8 @@ namespace Iis.OntologyManager
             var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
             return new OntologyNodesData(rawData, schema, saver);
         }
-        public OntologyNodesData GetOntologyData()
-        {
-            if (SelectedConnectionString == null) return null;
-            using var context = OntologyContext.GetContext(SelectedConnectionString);
-            var schema = _schemaService.GetOntologySchema(SelectedSchemaSource);
-            var saver = new OntologyPatchSaver(context);
 
-            var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
-            return new OntologyNodesData(rawData, schema, saver);
-        }
+        public OntologyNodesData GetOntologyData() => GetOntologyData(SelectedConnectionString);
 
         #endregion
     }

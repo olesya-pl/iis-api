@@ -11,30 +11,23 @@ namespace Iis.AcceptanceTests.PageObjects.Controls
 
         public string Type =>
             //TODO: add selector for them type row
-            themeElement.FindElement(By.ClassName("")).Text;
+            themeElement.FindElement(By.ClassName("table_1_column_3")).Text;
 
         public string Name =>
             //TODO: add selector for them name row
-            themeElement.FindElement(By.ClassName("")).Text;
+            themeElement.FindElement(By.ClassName("el-table_1_column_1")).Text;
 
-        public int TotalCount
-        {
-            get
-            {
-                //TODO: add selector for Total Items count row
-                int.Parse(themeElement.FindElement(By.ClassName("")).Text);
-                return 1;
-            }
-        }
-        public int NewCount
-        {
-            get
-            {
-                //TODO: add selector for New Items count row
-                int.Parse(themeElement.FindElement(By.ClassName("")).Text);
-                return 1;
-            }
-        }
+        public string Comment =>
+            //TODO: add selector for them name row
+            themeElement.FindElement(By.ClassName("el-table_1_column_2")).Text;
+
+        public int TotalCount =>
+            //TODO: add selector for Total Items count row
+            int.Parse(themeElement.FindElement(By.ClassName("table_1_column_4")).Text);
+
+        public int NewCount =>
+            //TODO: add selector for New Items count row
+            int.Parse(themeElement.FindElement(By.ClassName("table_1_column_5")).Text);
 
         public bool Displayed => themeElement.Displayed;
         public IWebElement EditButton => themeElement.FindElement(By.ClassName("el-icon-edit"));
