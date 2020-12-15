@@ -29,8 +29,8 @@
     "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
   },
   "Dev3": {
-    "BaseAddress": "https://dev3.contour.net",
-    "BaseApiAddress": "https://dev3-api.contour.net:5000",
+    "BaseAddress": "http://dev3.contour.net",
+    "BaseApiAddress": "http://dev3-api.contour.net:5000",
     "defaultUserName": "olya",
     "defaultUserPassword": "123",
     "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
