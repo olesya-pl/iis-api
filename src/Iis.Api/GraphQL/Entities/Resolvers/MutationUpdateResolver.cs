@@ -79,7 +79,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             if (type.HasUniqueValues && properties.ContainsKey(type.UniqueValueFieldName) && node.GetProperty(type.UniqueValueFieldName) != null)
             {
-                var newNode = await _mutationCreateResolver.CreateEntity(type, properties);
+                var newNode = await _mutationCreateResolver.CreateEntity(id, type, dotName, properties);
                 if (newNode.Id != node.Id)
                 {
                     node = (Entity)_ontologyService.LoadNodes(newNode.Id);
@@ -142,11 +142,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 switch (key)
                 {
                     case "create":
-                        var relations = await _mutationCreateResolver.CreateMultipleProperties(embed, v);
+                        var relations = 
+                            await _mutationCreateResolver.CreateMultipleProperties(_rootNodeId, embed, v, string.Empty, dotName, requestId);
                         foreach (var relation in relations)
                         {
                             node.AddNode(relation);
-                            await SaveChangesForNewRelation(relation, requestId);
                         }
                         break;
                     case "update":
@@ -203,7 +203,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 else // targetId only
                 {
                     node.RemoveNode(relation);
-                    var newRel = await _mutationCreateResolver.CreateSinglePropertyAsync(embed, uvdict);
+                    var newRel = 
+                        await _mutationCreateResolver.CreateSinglePropertyAsync(_rootNodeId, embed, uvdict, null, dotName, requestId);
                     node.AddNode(newRel);
                 }
             }
@@ -267,32 +268,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             if (value != null)
             {
-                var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
-                var newRelation = await _mutationCreateResolver.CreateSinglePropertyAsync(embed, value);
-                node.AddNode(newRelation);
-                if (oldRelation == null)
-                {
-                    if (newRelation.Target is Attribute)
-                    {
-                        await _changeHistoryService
-                            .SaveNodeChange(dotName, _rootNodeId, GetCurrentUserName(), string.Empty, stringifiedValue, requestId);
-                    }
-                    else
-                    {
-                        await SaveChangesForNewRelation(newRelation, requestId);
-                    }
-                }
-                else if (oldRelation.Target is Attribute)
+                var oldValue = string.Empty;
+                if (oldRelation != null && oldRelation.Target is Attribute)
                 {
                     var oldValueObj = (oldRelation.Target as Attribute).Value;
-                    var oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);
-
-                    if (oldValue != stringifiedValue)
-                    {
-                        await _changeHistoryService
-                            .SaveNodeChange(dotName, _rootNodeId, GetCurrentUserName(), oldValue, stringifiedValue, requestId);
-                    }
+                    oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);                    
                 }
+                var newRelation = 
+                    await _mutationCreateResolver.CreateSinglePropertyAsync(_rootNodeId, embed, value, oldValue, dotName, requestId);
+                node.AddNode(newRelation);                
             }
         }
 
@@ -302,17 +286,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
             return tokenPayload?.User?.UserName;
-        }
-
-        private async Task SaveChangesForNewRelation(Relation relation, Guid requestId)
-        {
-            var children = relation.GetChildAttributes();
-            foreach (var child in children)
-            {
-                await _changeHistoryService
-                    .SaveNodeChange(child.dotName, _rootNodeId,
-                        GetCurrentUserName(), string.Empty, child.attribute.Value?.ToString(), requestId);
-            }
         }
 
         private async Task SaveChangesForDeletedRelation(Relation relation, Guid requestId)

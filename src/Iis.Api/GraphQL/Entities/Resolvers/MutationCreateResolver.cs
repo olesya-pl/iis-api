@@ -9,6 +9,7 @@ using Iis.Services.Contracts.Interfaces;
 using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts;
+using Newtonsoft.Json;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -48,8 +49,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _ontology.GetEntityType(typeName);
-            var entity = await CreateEntity(type, data);
+            var type = _ontology.GetEntityType(typeName);            
+            var entity = await CreateRootEntity(Guid.NewGuid(), type, data);
             return entity;
         }
 
@@ -66,9 +67,28 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             catch (ArgumentException) { }
         }
 
-        public async Task<Entity> CreateEntity(
-            IEntityTypeModel type, 
+        private Task<Entity> CreateRootEntity(
+            Guid entityId,
+            IEntityTypeModel type,
             Dictionary<string, object> properties)
+        {
+            return CreateEntityCore(entityId, type, properties, string.Empty, entityId);
+        }
+
+        public Task<Entity> CreateEntity(
+            Guid entityId,
+            IEntityTypeModel type,
+            string dotName,
+            Dictionary<string, object> properties)
+        {
+            return CreateEntityCore(entityId, type, properties, dotName, Guid.NewGuid());
+        }
+
+        private async Task<Entity> CreateEntityCore(Guid rootEntityId, 
+            IEntityTypeModel type, 
+            Dictionary<string, object> properties,
+            string dotName,
+            Guid entityId)
         {
             if (properties == null)
                 throw new ArgumentException($"{type.Name} creation ex nihilo is allowed only to God.");
@@ -80,23 +100,28 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
 
             var requestId = Guid.NewGuid();
-            node = new Entity(Guid.NewGuid(), type);
-            await CreateProperties(node, properties, requestId);
+            node = new Entity(entityId, type);
+            await CreateProperties(rootEntityId, node, properties, dotName, requestId);
             TrySetCreatedBy(node);
             _ontologyService.SaveNode(node);
             await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name, Id = node.Id });
             return node;
         }
 
-        private async Task<Entity> CreateProperties(Entity node, 
+        private async Task<Entity> CreateProperties(Guid entityId,
+            Entity node, 
             Dictionary<string, object> properties,
+            string dotName,
             Guid requestId)
         {
             foreach (var (key, value) in properties)
             {
                 var embed = node.Type.GetProperty(key) ??
                             throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
-                var relations = await CreateRelations(node.Id, embed, value, requestId);
+                var newDotName = string.IsNullOrEmpty(dotName)
+                    ? key
+                    : $"{dotName}.{key}";
+                var relations = await CreateRelations(entityId, embed, value, newDotName, requestId);
                 foreach (var relation in relations)
                     node.AddNode(relation);
             }
@@ -113,18 +138,19 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return null;
         }
 
-        public async Task<IEnumerable<Relation>> CreateRelations(Guid entityId, 
+        private async Task<IEnumerable<Relation>> CreateRelations(Guid entityId, 
             IEmbeddingRelationTypeModel embed, 
             object value,
+            string dotName,
             Guid requestId)
         {
             switch (embed.EmbeddingOptions)
             {
                 case EmbeddingOptions.Optional:
                 case EmbeddingOptions.Required:
-                    return new[] {await CreateSinglePropertyAsync(entityId, embed, value, requestId)};
+                    return new[] {await CreateSinglePropertyAsync(entityId, embed, value, string.Empty, dotName, requestId)};
                 case EmbeddingOptions.Multiple:
-                    return await CreateMultipleProperties(entityId, embed, value, requestId);
+                    return await CreateMultipleProperties(entityId, embed, value, string.Empty, dotName, requestId);
                 default:
                     throw new NotImplementedException();
             }
@@ -134,6 +160,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             Guid entityId,
             IEmbeddingRelationTypeModel embed, 
             object value,
+            string oldValue,
+            string dotName,
             Guid requestId)
         {
             var values = (IEnumerable<object>)value;
@@ -141,32 +169,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var v in values)
                 if (embed.IsEntityType)
                 {
-                    result.Add(CreateSinglePropertyAsync(entityId, embed, v, requestId));
+                    result.Add(CreateSinglePropertyAsync(entityId, embed, v, oldValue, dotName, requestId));
                 }
                 else
                 {
                     var dict = (Dictionary<string, object>)v;
                     var attrValue = dict["value"];
-                    result.Add(CreateSinglePropertyAsync(entityId, embed, attrValue, requestId));
-                }
-
-            return Task.WhenAll(result);
-        }
-
-        public Task<Relation[]> CreateMultipleProperties(IEmbeddingRelationTypeModel embed, object value)
-        {
-            var values = (IEnumerable<object>) value;
-            var result = new List<Task<Relation>>();
-            foreach (var v in values)
-                if (embed.IsEntityType)
-                {
-                    result.Add(CreateSinglePropertyAsync(embed, v));
-                }
-                else
-                {
-                    var dict = (Dictionary<string, object>) v;
-                    var attrValue = dict["value"];
-                    result.Add(CreateSinglePropertyAsync(embed, attrValue));
+                    result.Add(CreateSinglePropertyAsync(entityId, embed, attrValue, oldValue, dotName, requestId));
                 }
 
             return Task.WhenAll(result);
@@ -176,46 +185,49 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             Guid entityId,
             IEmbeddingRelationTypeModel embed, 
             object value,
+            string oldValue,
+            string dotName,
             Guid requestId)
         {
             var prop = new Relation(Guid.NewGuid(), embed);
-            var target = await CreateNode(entityId, embed, value, requestId);
+            var target = await CreateNode(entityId, embed, value, oldValue, dotName, requestId);
             prop.AddNode(target);
             return prop;
         }
 
-        public async Task<Relation> CreateSinglePropertyAsync(
-            IEmbeddingRelationTypeModel embed,
-            object value)
-        {
-            var prop = new Relation(Guid.NewGuid(), embed);
-            var target = await CreateNode(embed, value);
-            prop.AddNode(target);
-            return prop;
-        }
-
-        public async Task<Node> CreateNode(Guid entityId, 
-            IEmbeddingRelationTypeModel embed, 
+        private async Task<Node> CreateNode(Guid entityId, 
+            IEmbeddingRelationTypeModel embed,             
             object value, 
+            string oldValue,
+            string dotName,
             Guid requestId)
         {
-            var node = await CreateNode(embed, value);
+            var node = await CreateNode(entityId, embed, value, dotName);
             if (embed.IsAttributeType)
             {
                 var username = GetCurrentUser()?.UserName ?? "system";
+                var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
                 
-                await _changeHistoryService.SaveNodeChange(embed.GetFieldName(), 
-                    entityId, 
-                    username, 
-                    string.Empty, 
-                    value.ToString(), 
+                if (!string.Equals(stringifiedValue, oldValue, StringComparison.Ordinal))
+                {
+                    await _changeHistoryService.SaveNodeChange(dotName,
+                    entityId,
+                    username,
+                    oldValue,
+                    stringifiedValue,
                     requestId);
+                }               
+                
             }
             return node;
         } 
 
 
-        public async Task<Node> CreateNode(IEmbeddingRelationTypeModel embed, object value) // attribute or entity
+        private async Task<Node> CreateNode(
+            Guid entityId, 
+            IEmbeddingRelationTypeModel embed, 
+            object value,
+            string dotName) // attribute or entity
         {
             if (embed.IsAttributeType)
             {
@@ -243,7 +255,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     var (typeName, unionData) = InputExtensions.ParseInputUnion(dictTarget);
                     var type = _ontology.GetEntityType(typeName);
-                    return await CreateEntity(type, unionData);
+                    return await CreateEntity(entityId, type, dotName, unionData);
                 }
 
                 throw new ArgumentException("Incorrect arguments for Entity creation. ");
