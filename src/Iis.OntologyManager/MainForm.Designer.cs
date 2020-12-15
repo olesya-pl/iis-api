@@ -146,6 +146,7 @@ namespace Iis.OntologyManager
         private Panel panelTypeHeader;
         private Panel panelTypeMain;
         private Button btnTypeBack;
+        private Button btnSwitch;
         private Label lblTypeHeaderName;
         
         private Panel panelComparison;
