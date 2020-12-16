@@ -6,6 +6,7 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
 using Iis.OntologyData.Migration;
+using Iis.OntologyManager.Configurations;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +25,10 @@ namespace Iis.OntologyManager
 {
     public partial class MainForm : Form
     {
-        #region Properties and Constructors
+        #region Fields
+
+        const string EnvironmentPropertiesSectionName = "environmentProperties";
+        IReadOnlyCollection<SchemaDataSource> _schemaSources;
 
         IConfiguration _configuration;
         IOntologySchema _schema;
@@ -33,9 +37,9 @@ namespace Iis.OntologyManager
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
         OntologySchemaService _schemaService;
-        List<IOntologySchemaSource> _schemaSources;
+        //List<IOntologySchemaSource> _schemaSources;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
-        
+
         UiFilterControl _filterControl;
         UiMigrationControl _migrationControl;
         UiDuplicatesControl _duplicatesControl;
@@ -48,6 +52,10 @@ namespace Iis.OntologyManager
         Button btnDuplicates;
         ILogger _logger;
 
+        #endregion
+
+        #region Properties and Constructors
+
         private enum NodeViewType : byte
         {
             Entity,
@@ -59,12 +67,14 @@ namespace Iis.OntologyManager
         INodeTypeLinked SelectedNodeType =>
             gridTypes.SelectedRows.Count == 0 ?
                 null : (INodeTypeLinked)gridTypes.SelectedRows[0].DataBoundItem;
-        IOntologySchemaSource SelectedSchemaSource =>
-             (OntologySchemaSource) cmbSchemaSources.SelectedItem ??
-                (_schemaSources?.Count > 0 ? _schemaSources[0] : null);
+        IOntologySchemaSource SelectedSchemaSource => cmbSchemaSources?.SelectedItem as IOntologySchemaSource ?? _schemaSources?.FirstOrDefault();
+
         string SelectedConnectionString =>
             SelectedSchemaSource?.SourceKind == SchemaSourceKind.Database ?
                 SelectedSchemaSource.Data : null;
+        
+        //EnvConfig SelectedEnvironmentProperty => _environmentProps[SelectedSchemaSource.]
+
 
         public MainForm(IConfiguration configuration,
             OntologySchemaService schemaService,
@@ -72,14 +82,17 @@ namespace Iis.OntologyManager
             IMapper mapper)
         {
             InitializeComponent();
-            this.Text = $"Володар Онтології {VERSION}";
+            Text = $"Володар Онтології {VERSION}";
+
             _configuration = configuration;
             _style = OntologyManagerStyle.GetDefaultStyle(this);
             _uiControlsCreator = new UiControlsCreator(_style);
             _logger = logger;
             _schemaService = schemaService;
             _mapper = mapper;
-            _schemaSources = GetSchemaSources();
+
+            _schemaSources = ReadSchemaDataSourcesFromConfiguration();
+
 
             SuspendLayout();
             SetBackColor();
@@ -89,7 +102,9 @@ namespace Iis.OntologyManager
             SetControlsTabMain(panelRight);
             
             SetControlsTopPanel();
-            LoadCurrentSchema();
+
+            LoadCurrentSchema(SelectedSchemaSource);
+
             ResumeLayout();
             ReloadTypes(_filterControl.GetModel());
         }
@@ -208,7 +223,7 @@ namespace Iis.OntologyManager
                 BackColor = panelTop.BackColor
             };
             cmbSchemaSources.DataSource = _schemaSources;
-            cmbSchemaSources.SelectedIndexChanged += (sender, e) => { LoadCurrentSchema(); };
+            cmbSchemaSources.SelectedIndexChanged += SourceSelectionChanged;
             container.Add(cmbSchemaSources);
 
             btnSaveSchema = new Button { Text = "Зберегти", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
@@ -308,44 +323,39 @@ namespace Iis.OntologyManager
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
         }
+        private void SourceSelectionChanged(object sender, EventArgs e) 
+        {
+            LoadCurrentSchema(SelectedSchemaSource);
+        }
 
         #endregion
 
         #region Schema Logic
-        private void LoadCurrentSchema()
+        private void LoadCurrentSchema(IOntologySchemaSource schemaSource)
         {
-            var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
-                (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
-            if (currentSchemaSource == null) return;
-            _schema = _schemaService.GetOntologySchema(currentSchemaSource);
+            if (schemaSource == null) return;
+
+            _schema = _schemaService.GetOntologySchema(schemaSource);
+
             ReloadTypes(_filterControl.GetModel());
         }
         private void UpdateSchemaSources()
         {
-            _schemaSources = GetSchemaSources();
+            _schemaSources = ReadSchemaDataSourcesFromConfiguration();
             _uiControlsCreator.UpdateComboSource(cmbSchemaSources, _schemaSources);
             var src = new List<IOntologySchemaSource>(_schemaSources);
         }
-        private List<IOntologySchemaSource> GetSchemaSources()
+        private IReadOnlyCollection<SchemaDataSource> ReadSchemaDataSourcesFromConfiguration()
         {
-            var result = new List<IOntologySchemaSource>
-            {
-            };
-            var connectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
-            result.AddRange(connectionStrings.Select(section => new OntologySchemaSource
-            {
-                Title = $"(DB): {section.Key}",
-                SourceKind = SchemaSourceKind.Database,
-                Data = section.Value
-            }));
+            var result = new List<SchemaDataSource>();
+
+            var environmentProps = _configuration.GetSection(EnvironmentPropertiesSectionName).Get<IReadOnlyDictionary<string, EnvConfig>>();
+
+            result.AddRange(environmentProps.Select(property => SchemaDataSource.CreateForDb(property.Key, property.Value.ConnectionString, property.Value.ApiUri)));
 
             var filesNames = Directory.GetFiles(DefaultSchemaStorage, "*.ont");
-            result.AddRange(filesNames.Select(fileName => new OntologySchemaSource
-            {
-                Title = $"(FILE): {Path.GetFileNameWithoutExtension(fileName)}",
-                SourceKind = SchemaSourceKind.File,
-                Data = fileName
-            }));
+
+            result.AddRange(filesNames.Select(SchemaDataSource.CreateForFile));
 
             return result;
         }
