@@ -65,7 +65,8 @@ namespace Iis.OntologyManager
             Entity,
             RelationEntity,
             RelationAttribute,
-            Data        }
+            Data
+        }
 
         string DefaultSchemaStorage => _configuration.GetValue<string>("DefaultSchemaStorage");
         INodeTypeLinked SelectedNodeType =>
