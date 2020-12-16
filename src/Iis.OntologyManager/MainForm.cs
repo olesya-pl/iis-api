@@ -362,11 +362,14 @@ namespace Iis.OntologyManager
             _uiControlsCreator.UpdateComboSource(cmbSchemaSources, _schemaSources);
             var src = new List<IOntologySchemaSource>(_schemaSources);
         }
+
         private IReadOnlyCollection<SchemaDataSource> ReadSchemaDataSourcesFromConfiguration()
         {
             var result = new List<SchemaDataSource>();
 
-            var environmentProps = _configuration.GetSection(EnvironmentPropertiesSectionName).Get<IReadOnlyDictionary<string, EnvConfig>>();
+            var environmentProps = _configuration.GetSection(EnvironmentPropertiesSectionName)
+                                        .Get<IReadOnlyDictionary<string, EnvConfig>>()
+                                        .OrderBy(property => property.Value.SortOrder);
 
             result.AddRange(environmentProps.Select(property => SchemaDataSource.CreateForDb(property.Key, property.Value.ConnectionString, property.Value.ApiUri)));
 
