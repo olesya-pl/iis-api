@@ -45,7 +45,7 @@ namespace Iis.OntologyManager
         UiRelationEntityControl _uiRelationEntityControl;
         UiOntologyDataControl _uiOntologyDataControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.20";
+        const string VERSION = "1.21";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -243,6 +243,7 @@ namespace Iis.OntologyManager
         private void SetSwitchViewTypeText()
         {
             btnSwitch.Text = _ontologyDataView ? "Показати тип" : "Показати данi";
+            btnSwitch.Enabled = _schema?.SchemaSource?.SourceKind == SchemaSourceKind.Database;
         }
         private void SwitchOntologyViewType()
         {
@@ -337,6 +338,7 @@ namespace Iis.OntologyManager
             _ontologyData = currentSchemaSource.SourceKind == SchemaSourceKind.Database ?
                 GetOntologyData(currentSchemaSource.Data) :
                 null;
+
         }
         private void UpdateSchemaSources()
         {
@@ -453,6 +455,7 @@ namespace Iis.OntologyManager
         }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
+            SetSwitchViewTypeText();
             if (nodeType == null) return;
             if (addToHistory && _currentNodeType != null)
             {
