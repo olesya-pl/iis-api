@@ -7,7 +7,7 @@ namespace Iis.Utility
 {
     public static class StringExtensions
     {
-        public static string Camelize(this string value) => value.Substring(0, 1).ToUpper() + value.Substring(1);
+        public static string Capitalize(this string value) => value.Substring(0, 1).ToUpper() + value.Substring(1);
 
         public static string ToLowerCamelcase(this string value) => value.Substring(0, 1).ToLower() + value.Substring(1);
 

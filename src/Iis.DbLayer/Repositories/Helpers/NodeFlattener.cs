@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Iis.DbLayer.Repositories.Helpers
 {
@@ -24,7 +23,7 @@ namespace Iis.DbLayer.Repositories.Helpers
             _extNodeService = extNodeService;
             _ontologyData = ontologyData;
         }
-        
+
         public FlattenNodeResult FlattenNode(Guid id, CancellationToken cancellationToken = default)
         {
             var node = _ontologyData.GetNode(id);

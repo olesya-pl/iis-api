@@ -6,27 +6,32 @@ using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
+using Iis.Services.Contracts;
+using Newtonsoft.Json;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
     public class MutationCreateResolver
     {
         private readonly IFileService _fileService;
+        private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMediator _mediator;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologyModel _ontology;
+        private readonly IResolverContext _resolverContext;
 
         public MutationCreateResolver(IOntologyModel ontology, 
             IOntologyService ontologyService,
             IFileService fileService,
+            IChangeHistoryService changeHistoryService,
             IMediator mediator)
         {
             _ontology = ontology;
             _ontologyService = ontologyService;
             _fileService = fileService;
+            _changeHistoryService = changeHistoryService;
             _mediator = mediator;
         }
 
@@ -35,112 +40,206 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _fileService = ctx.Service<IFileService>();
             _ontology = ctx.Service<IOntologyModel>();
             _ontologyService = ctx.Service<IOntologyService>();
+            _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
+            _resolverContext = ctx;
         }
 
         public async Task<Entity> CreateEntity(IResolverContext ctx, string typeName)
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _ontology.GetEntityType(typeName);
-            var entity = await CreateEntity(type, data);
-
+            var type = _ontology.GetEntityType(typeName);            
+            var entity = await CreateRootEntity(Guid.NewGuid(), type, data);
             return entity;
         }
 
-        public async Task<Entity> CreateEntity(INodeTypeModel type, Dictionary<string, object> properties)
+        private void TrySetCreatedBy(Entity entity)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUser()?.Id;
+                if (currentUserId.HasValue)
+                {
+                    entity.SetProperty("createdBy", currentUserId.Value.ToString("N"));
+                }
+            }
+            catch (ArgumentException) { }
+        }
+
+        private Task<Entity> CreateRootEntity(
+            Guid entityId,
+            IEntityTypeModel type,
+            Dictionary<string, object> properties)
+        {
+            return CreateEntityCore(entityId, type, properties, string.Empty, entityId);
+        }
+
+        public Task<Entity> CreateEntity(
+            Guid entityId,
+            IEntityTypeModel type,
+            string dotName,
+            Dictionary<string, object> properties)
+        {
+            return CreateEntityCore(entityId, type, properties, dotName, Guid.NewGuid());
+        }
+
+        private async Task<Entity> CreateEntityCore(Guid rootEntityId, 
+            IEntityTypeModel type, 
+            Dictionary<string, object> properties,
+            string dotName,
+            Guid entityId)
         {
             if (properties == null)
                 throw new ArgumentException($"{type.Name} creation ex nihilo is allowed only to God.");
             Entity node;
             if (type.HasUniqueValues)
             {
-                node = await GetUniqueValueEntity(type, properties);
+                node = GetUniqueValueEntity(type, properties);
                 if (node != null) return node;
             }
 
-            node = new Entity(Guid.NewGuid(), type);
-            await CreateProperties(node, properties);
-            await _ontologyService.SaveNodeAsync(node);
-            await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name });
+            var requestId = Guid.NewGuid();
+            node = new Entity(entityId, type);
+            await CreateProperties(rootEntityId, node, properties, dotName, requestId);
+            TrySetCreatedBy(node);
+            _ontologyService.SaveNode(node);
+            await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name, Id = node.Id });
             return node;
         }
 
-        private async Task<Entity> CreateProperties(Entity node, Dictionary<string, object> properties)
+        private async Task<Entity> CreateProperties(Guid entityId,
+            Entity node, 
+            Dictionary<string, object> properties,
+            string dotName,
+            Guid requestId)
         {
             foreach (var (key, value) in properties)
             {
                 var embed = node.Type.GetProperty(key) ??
                             throw new ArgumentException($"There is no property '{key}' on type '{node.Type.Name}'");
-                var relations = await CreateRelations(embed, value);
+                var newDotName = string.IsNullOrEmpty(dotName)
+                    ? key
+                    : $"{dotName}.{key}";
+                var relations = await CreateRelations(entityId, embed, value, newDotName, requestId);
                 foreach (var relation in relations)
                     node.AddNode(relation);
             }
             return node;
         }
-        private async Task<Entity> GetUniqueValueEntity(INodeTypeModel type, Dictionary<string, object> properties)
+
+        private Entity GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
         {
             if (properties.ContainsKey(type.UniqueValueFieldName))
             {
                 var value = properties[type.UniqueValueFieldName].ToString();
-                return (Entity)_ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName);
+                return _ontologyService.GetNodeByUniqueValue(type.Id, value, type.UniqueValueFieldName) as Entity;
             }
             return null;
         }
 
-        public async Task<IEnumerable<Relation>> CreateRelations(INodeTypeModel embed, object value)
+        private async Task<IEnumerable<Relation>> CreateRelations(Guid entityId, 
+            IEmbeddingRelationTypeModel embed, 
+            object value,
+            string dotName,
+            Guid requestId)
         {
             switch (embed.EmbeddingOptions)
             {
                 case EmbeddingOptions.Optional:
                 case EmbeddingOptions.Required:
-                    return new[] {await CreateSingleProperty(embed, value)};
+                    return new[] {await CreateSinglePropertyAsync(entityId, embed, value, string.Empty, dotName, requestId)};
                 case EmbeddingOptions.Multiple:
-                    return await CreateMultipleProperties(embed, value);
+                    return await CreateMultipleProperties(entityId, embed, value, string.Empty, dotName, requestId);
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        public Task<Relation[]> CreateMultipleProperties(INodeTypeModel embed, object value)
+        public Task<Relation[]> CreateMultipleProperties(
+            Guid entityId,
+            IEmbeddingRelationTypeModel embed, 
+            object value,
+            string oldValue,
+            string dotName,
+            Guid requestId)
         {
-            var values = (IEnumerable<object>) value;
+            var values = (IEnumerable<object>)value;
             var result = new List<Task<Relation>>();
             foreach (var v in values)
                 if (embed.IsEntityType)
                 {
-                    result.Add(CreateSingleProperty(embed, v));
+                    result.Add(CreateSinglePropertyAsync(entityId, embed, v, oldValue, dotName, requestId));
                 }
                 else
                 {
-                    var dict = (Dictionary<string, object>) v;
+                    var dict = (Dictionary<string, object>)v;
                     var attrValue = dict["value"];
-                    result.Add(CreateSingleProperty(embed, attrValue));
+                    result.Add(CreateSinglePropertyAsync(entityId, embed, attrValue, oldValue, dotName, requestId));
                 }
 
             return Task.WhenAll(result);
         }
 
-        public async Task<Relation> CreateSingleProperty(INodeTypeModel embed, object value)
+        public async Task<Relation> CreateSinglePropertyAsync(
+            Guid entityId,
+            IEmbeddingRelationTypeModel embed, 
+            object value,
+            string oldValue,
+            string dotName,
+            Guid requestId)
         {
             var prop = new Relation(Guid.NewGuid(), embed);
-            var target = await CreateNode(embed, value);
+            var target = await CreateNode(entityId, embed, value, oldValue, dotName, requestId);
             prop.AddNode(target);
             return prop;
         }
 
-        public async Task<Node> CreateNode(INodeTypeModel embed, object value) // attribute or entity
+        private async Task<Node> CreateNode(Guid entityId, 
+            IEmbeddingRelationTypeModel embed,             
+            object value, 
+            string oldValue,
+            string dotName,
+            Guid requestId)
+        {
+            var node = await CreateNode(entityId, embed, value, dotName);
+            if (embed.IsAttributeType)
+            {
+                var username = GetCurrentUser()?.UserName ?? "system";
+                var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
+                
+                if (!string.Equals(stringifiedValue, oldValue, StringComparison.Ordinal))
+                {
+                    await _changeHistoryService.SaveNodeChange(dotName,
+                    entityId,
+                    username,
+                    oldValue,
+                    stringifiedValue,
+                    requestId);
+                }               
+                
+            }
+            return node;
+        } 
+
+
+        private async Task<Node> CreateNode(
+            Guid entityId, 
+            IEmbeddingRelationTypeModel embed, 
+            object value,
+            string dotName) // attribute or entity
         {
             if (embed.IsAttributeType)
             {
-                if (embed.AttributeTypeModel.ScalarTypeEnum == ScalarType.File)
+                if (embed.AttributeType.ScalarTypeEnum == ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.AttributeTypeModel.ScalarTypeEnum == ScalarType.Geo)
+                else if (embed.AttributeType.ScalarTypeEnum == ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
-                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeTypeModel.ScalarTypeEnum);
-                return new Attribute(Guid.NewGuid(), embed.AttributeTypeModel, value);
+                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum);
+                
+                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
             }
 
             if (embed.IsEntityType)
@@ -156,7 +255,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     var (typeName, unionData) = InputExtensions.ParseInputUnion(dictTarget);
                     var type = _ontology.GetEntityType(typeName);
-                    return await CreateEntity(type, unionData);
+                    return await CreateEntity(entityId, type, dotName, unionData);
                 }
 
                 throw new ArgumentException("Incorrect arguments for Entity creation. ");
@@ -164,5 +263,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             throw new ArgumentException(nameof(embed));
          }
+
+        private User GetCurrentUser()
+        {
+            if (_resolverContext is null) return null;
+
+            var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
+            return tokenPayload?.User;
+        }
     }
 }

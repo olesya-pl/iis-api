@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.GraphQL.Entities
 {
-    public class ObjectOfStudyFilterableQueryResponse
+    public class OntologyFilterableQueryResponse
     {
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Items { get; set; }

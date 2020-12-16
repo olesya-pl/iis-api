@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Iis.AcceptanceTests.DTO;
+using AcceptanceTests.DTO;
 using GraphQL;
 using IIS.Core.GraphQL.Users;
 using Newtonsoft.Json.Linq; //using Iis.AcceptanceTests.Environment;
 
-namespace Iis.AcceptanceTests.Helpers
+namespace AcceptanceTests.Helpers
 {
     public class IisApiUtils
     {

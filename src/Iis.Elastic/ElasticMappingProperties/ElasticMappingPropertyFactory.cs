@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Iis.DbLayer.Repositories;
+using Iis.Elastic.SearchQueryExtensions;
 
 namespace Iis.Elastic.ElasticMappingProperties
 {
@@ -19,10 +20,10 @@ namespace Iis.Elastic.ElasticMappingProperties
                 switch (propertyType)
                 {
                     case ElasticMappingPropertyType.Text:
-                        var res = new List<ElasticMappingProperty>() { TextProperty.Create(name, null) };
+                        var res = new List<ElasticMappingProperty>() { TextProperty.Create(name, null, true) };
                         if (isAggregated)
                         {
-                            res.Add(KeywordProperty.Create($"{name}{ElasticManager.AggregateSuffix}", false));
+                            res.Add(KeywordProperty.Create($"{name}{SearchQueryExtension.AggregateSuffix}", false));
                         }
                         return res;
                     case ElasticMappingPropertyType.Integer:

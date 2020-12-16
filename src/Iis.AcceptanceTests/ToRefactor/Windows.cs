@@ -1,9 +1,9 @@
-﻿using Iis.AcceptanceTests.Helpers;
+﻿using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.ToRefactor
 {
 	[Binding]
 	public class Windows

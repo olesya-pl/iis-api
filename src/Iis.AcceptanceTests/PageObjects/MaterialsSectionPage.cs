@@ -47,8 +47,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement EventsTab;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(4)")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
         public IWebElement ObjectsTab;
 
         [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(2)")]
@@ -63,7 +62,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .material-relations-input")]
+        [FindsBy(How = How.CssSelector, Using = ".el-popover__reference-wrapper > .el-input > .el-input__inner")]
         [CacheLookup]
         public IWebElement ObjectsTabSearch;
 
@@ -93,9 +92,38 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSearchResultCounter;
 
-        [FindsBy(How = How.CssSelector, Using = "body > div:last-child ul > li:nth-child(1)")]
+        [FindsBy(How = How.CssSelector, Using = "button:nth-of-type(3) > span")]
         [CacheLookup]
-        public IWebElement ImportanceDropDownFirstValue;
+        public IWebElement BackButton;
 
+        [FindsBy(How = How.CssSelector, Using = ".el-table.el-table--enable-row-transition.el-table--fit.el-table--medium.el-table--striped  .el-table__body  .el-table__row")]
+        [CacheLookup]
+        public IWebElement FirstSearchResult;
+
+        [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .el-button--default")]
+        [CacheLookup]
+        public IWebElement TextClassifierMLOutputButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .meta-data-card__result-body")]
+        [CacheLookup]
+        public IWebElement TextClassifierMLOutputForm;
+
+        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none")]
+        [CacheLookup]
+        public IWebElement EmptyAreInTheMaterialList;
+
+        [FindsBy(How = How.XPath, Using = "//b")]
+        public IWebElement ConnectedObjectLink;
+
+        [FindsBy(How = How.XPath, Using = "//button[@class='el-button el-button--default el-button--small el-button--primary ']")]
+        public IWebElement ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy;
+
+        [FindsBy(How = How.CssSelector, Using = ".cell > div:nth-of-type(2)")]
+        [CacheLookup]
+        public IWebElement FirstSearchResultContentBlock;
+
+        [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
+        [CacheLookup]
+        public IWebElement DeleteRelatedObjectOfStudy;
     }
 }

@@ -57,7 +57,34 @@ namespace Iis.Api.Controllers
         [HttpGet("ReInitializeSignIndexes/{indexNames}")]
         public Task<IActionResult> ReInitializeSignIndexes(string indexNames, CancellationToken ct)
         {
-            return CreateOntologyIndexes(indexNames, _elasticState.SignIndexes, true, false, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.SignIndexes, false, ct);
+        }
+
+        [HttpGet("ReInitializeEventIndexes")]
+        public async Task<IActionResult> ReInitializeEventIndexes(CancellationToken ct)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            _adminElasticService.Logger = new StringBuilder();
+
+            var indexes = _elasticState.EventIndexes;
+            await _adminElasticService.DeleteIndexesAsync(indexes, false, ct);
+
+            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, false, ct);
+
+            if (_elasticState.FieldsToExcludeByIndex.TryGetValue(indexes.First(), out var fieldsToExclude))
+            {
+                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, fieldsToExclude, ct);
+            }
+            else 
+            {
+                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, false, ct);
+            }
+
+            _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+
+            return Content(_adminElasticService.Logger.ToString());
+
         }
 
         private async Task<IActionResult> RecreateOntologyIndexes(string indexNames, bool isHistorical, bool useNodesFromMemory, CancellationToken ct)
@@ -167,7 +194,7 @@ namespace Iis.Api.Controllers
             }
         }
 
-        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IEnumerable<string> baseIndexList, bool useMemoryCache, bool isHistorical, CancellationToken ct)
+        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IEnumerable<string> baseIndexList, bool isHistorical, CancellationToken ct)
         {
             var stopwatch = Stopwatch.StartNew();
 

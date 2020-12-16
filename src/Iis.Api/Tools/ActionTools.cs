@@ -1,25 +1,17 @@
+using Iis.DataModel;
+using Iis.DataModel.Analytics;
+using Iis.DbLayer.OntologySchema;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.Saver;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using IIS.Core.Analytics.EntityFramework;
-using IIS.Core.Ontology;
-using IIS.Core.Ontology.EntityFramework;
-using Iis.DataModel;
-using Iis.DataModel.Analytics;
-using Iis.Domain;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-using Iis.Api;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using IIS.Domain;
-using Iis.DbLayer.Ontology.EntityFramework;
-using Iis.Interfaces.Ontology.Schema;
-using System.Configuration;
-using Iis.OntologySchema.Saver;
-using Iis.DbLayer.OntologySchema;
 
 namespace IIS.Core.Tools
 {
@@ -28,20 +20,17 @@ namespace IIS.Core.Tools
         private readonly ILogger<ActionTools> _logger;
         private readonly IConfiguration _configuration;
         private readonly OntologyContext _ontologyContext;
-        private readonly RunTimeSettings _runtimeSettings;
         OntologySchemaService _ontologySchemaService;
 
         public ActionTools(
             ILogger<ActionTools> logger,
             IConfiguration configuration,
             OntologyContext ontologyContext,
-            RunTimeSettings runTimeSettings,
             OntologySchemaService ontologySchemaService)
         {
             _logger = logger;
             _configuration = configuration;
             _ontologyContext = ontologyContext;
-            _runtimeSettings = runTimeSettings;
             _ontologySchemaService = ontologySchemaService;
         }
 

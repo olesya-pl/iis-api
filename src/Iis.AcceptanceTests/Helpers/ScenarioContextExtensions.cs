@@ -1,7 +1,7 @@
 ﻿using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 
-namespace Iis.AcceptanceTests.Helpers
+namespace AcceptanceTests.Helpers
 {
     public static class ScenarioContextExtensions
     {

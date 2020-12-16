@@ -1,9 +1,10 @@
 ﻿using MediatR;
+using System;
 
 namespace Iis.Events.Entities
 {
-    public class EntityUpdatedEvent : INotification
+    public class EntityUpdatedEvent : EntityEvent, INotification
     {
-        public string Type { get; set; }
+        public Guid RequestId { get; set; }
     }
 }

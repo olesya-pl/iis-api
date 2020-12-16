@@ -1,10 +1,10 @@
-﻿using AcceptanceTests.PageObjects;
-using Iis.AcceptanceTests.Helpers;
+﻿using AcceptanceTests.Helpers;
+using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Iis.AcceptanceTests.UISteps
+namespace AcceptanceTests.UISteps
 {
     [Binding]
     public class AuthorizationSteps
@@ -12,24 +12,41 @@ namespace Iis.AcceptanceTests.UISteps
         private readonly ScenarioContext context;
         private readonly IWebDriver driver;
 
+        private LoginPageObjects loginPageObjects;
+
         public AuthorizationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
+            loginPageObjects = new LoginPageObjects(driver);
             context = injectedContext;
             this.driver = driver;
         }
 
+        #region Given/When
         [Given(@"I sign in with the user (.*) and password (.*) in the Contour")]
         public void IWantToAuthorizeInTheContour(string login, string password)
         {
-            var loginPage = new LoginPageObjects(driver);
-            loginPage.Navigate();
-            loginPage.LoginField.SendKeys(login);
-            loginPage.PasswordField.SendKeys(password);
-            loginPage.LoginButton.Click();
-            
+            loginPageObjects.Navigate();
+            loginPageObjects.LoginField.SendKeys(login);
+            loginPageObjects.PasswordField.SendKeys(password);
+            loginPageObjects.LoginButton.Click();
+
             driver.WaitFor(15);
         }
 
+        [When(@"I pressed Sign out button")]
+        public void WhenIPressedSignOutButton()
+        {
+            loginPageObjects.LogOutButton.Click();
+        }
+
+        [When(@"I confirmed the log out operation")]
+        public void WhenITheLogOutOperation()
+        {
+            loginPageObjects.ConfirmLogOutButton.Click();
+        }
+        #endregion
+
+        #region Then
         [Then(@"I redirected to objects page")]
         public void ThenIRedirectedToObjectsPage()
         {
@@ -39,8 +56,7 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"Login button is active")]
         public void LoginButtonMustMeActive()
         {
-            var loginPage = new LoginPageObjects(driver);
-            Assert.True(loginPage.LoginButton.Enabled);
+            Assert.True(loginPageObjects.LoginButton.Enabled);
         }
 
         [Then(@"Login and password inputs are highlighted with red")]
@@ -53,8 +69,15 @@ namespace Iis.AcceptanceTests.UISteps
         [Then(@"I see the error message that login or password is incorrect")]
         public void ThenISeeTheLoginErrorMessage()
         {
-            var loginPage = new LoginPageObjects(driver);
-            Assert.True(loginPage.ErrorMessage.Displayed);
+            Assert.True(loginPageObjects.ErrorMessage.Displayed);
         }
+
+        [Then(@"I must see the Contour main page")]
+        public void ThenIMustSeeTheContourMainPage()
+        {
+            Assert.True(loginPageObjects.LoginField.Displayed);
+            Assert.True(loginPageObjects.PasswordField.Displayed);
+        }
+        #endregion
     }
 }

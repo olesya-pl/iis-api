@@ -1,13 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Iis.AcceptanceTests.DTO;
-using Iis.AcceptanceTests.Helpers;
+using AcceptanceTests.DTO;
+using AcceptanceTests.Helpers;
 using FluentAssertions;
 using GraphQL;
 using Newtonsoft.Json.Linq;
 using TechTalk.SpecFlow;
 
-namespace Iis.AcceptanceTests.APISteps
+namespace AcceptanceTests.APISteps
 {
     [Binding]
     public class MaterialsSteps

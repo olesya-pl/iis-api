@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
-using System;
+using Iis.Elastic.SearchQueryExtensions;
 
 namespace Iis.Elastic
 {
@@ -18,18 +19,22 @@ namespace Iis.Elastic
         {
             var json = new JObject();
 
-            if (IsHeadNode)
+            if(extNode.NodeType.IsObjectOfStudy || extNode.NodeType.IsEvent)
             {
                 json[nameof(extNode.Id)] = extNode.Id;
+            }
+
+            if (IsHeadNode)
+            {
                 json[nameof(extNode.NodeTypeName)] = extNode.NodeTypeName;
                 if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
                 {
                     json[nameof(extNode.NodeTypeTitle)] = extNode.NodeTypeTitle;
-                    json[$"{nameof(extNode.NodeTypeTitle)}{ElasticManager.AggregateSuffix}"] = extNode.NodeTypeTitle;
+                    json[$"{nameof(extNode.NodeTypeTitle)}{SearchQueryExtension.AggregateSuffix}"] = extNode.NodeTypeTitle;
                 }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
-            }
+            } 
 
             var coordinates = extNode.GetCoordinatesWithoutNestedObjects();
             if (coordinates != null && coordinates.Count > 0)
@@ -51,6 +56,7 @@ namespace Iis.Elastic
                 if (childGroup.Count() == 1)
                 {
                     var child = childGroup.First();
+
                     json[key] = GetExtNodeValue(child);
                 }
                 else

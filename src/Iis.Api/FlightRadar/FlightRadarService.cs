@@ -44,12 +44,12 @@ namespace IIS.Core.FlightRadar
             }
 
             var signEntityRelations = GetIncomingEntities(signs);
-            await SaveSignsLocationsAsync(signs, historyItems);
+            SaveSignsLocations(signs, historyItems);
             await SaveHistoryEntitiesAsync(historyItems, signEntityRelations);
 
         }
 
-        private async Task SaveSignsLocationsAsync(IEnumerable<INode> signs, IReadOnlyCollection<FlightRadarHistory> historyItems)
+        private void SaveSignsLocations(IEnumerable<INode> signs, IReadOnlyCollection<FlightRadarHistory> historyItems)
         {
             var latestValue = historyItems.OrderBy(p => p.RegisteredAt).LastOrDefault();
             if (latestValue is null)
@@ -61,7 +61,7 @@ namespace IIS.Core.FlightRadar
                     { "type", "Point" },
                     { "coordinates", new [] {latestValue.Lat, latestValue.Long} }
                 });
-                await _ontologyService.SaveNodeAsync(node);
+                _ontologyService.SaveNode(node);
             }
         }
 

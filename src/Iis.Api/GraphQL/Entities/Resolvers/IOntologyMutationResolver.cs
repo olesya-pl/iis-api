@@ -16,14 +16,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
     public class OntologyMutationResolver : IOntologyMutationResolver
     {
-        public async Task<string> ResolveResponseType(IResolverContext ctx)
+        public Task<string> ResolveResponseType(IResolverContext ctx)
         {
-            return "ok";
+            return Task.FromResult("ok");
         }
 
-        public async Task<Entity> ResolveResponseDetails(IResolverContext ctx)
+        public Task<Entity> ResolveResponseDetails(IResolverContext ctx)
         {
-            return ctx.Parent<Entity>();
+            return Task.FromResult(ctx.Parent<Entity>());
         }
 
         public Task<Entity> CreateEntity(IResolverContext ctx, string typeName)

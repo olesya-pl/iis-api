@@ -7,6 +7,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData.DataTypes;
+using Iis.Services.Contracts.Interfaces;
 using Moq;
 using Xunit;
 
@@ -70,7 +71,9 @@ namespace Iis.UnitTests.Iis.DbLayer
             Mock<IOntologyNodesData> nodesDataMock =
                 SetupNodesData(nodeTypeId, attributeValue, nodeId, incomingRelations, outgoingRelations);
 
-            var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
+            var sut = new OntologyServiceWithCache(nodesDataMock.Object, 
+                new Mock<IElasticService>().Object,
+                new Mock<IElasticState>().Object);
 
             var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
             Assert.Single(res);
@@ -89,7 +92,9 @@ namespace Iis.UnitTests.Iis.DbLayer
             Mock<IOntologyNodesData> nodesDataMock =
                 SetupNodesData(nodeTypeId, attributeValue + "hitler", nodeId, incomingRelations, outgoingRelations);
 
-            var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
+            var sut = new OntologyServiceWithCache(nodesDataMock.Object,
+                new Mock<IElasticService>().Object,
+                new Mock<IElasticState>().Object);
 
             var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
             Assert.Single(res);
@@ -108,7 +113,9 @@ namespace Iis.UnitTests.Iis.DbLayer
             Mock<IOntologyNodesData> nodesDataMock =
                 SetupNodesData(nodeTypeId, "bandera" + attributeValue, nodeId, incomingRelations, outgoingRelations);
 
-            var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
+            var sut = new OntologyServiceWithCache(nodesDataMock.Object, 
+                new Mock<IElasticService>().Object,
+                new Mock<IElasticState>().Object);
 
             var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
             Assert.Single(res);
@@ -127,7 +134,9 @@ namespace Iis.UnitTests.Iis.DbLayer
             Mock<IOntologyNodesData> nodesDataMock =
                 SetupNodesData(nodeTypeId, null, nodeId, incomingRelations, outgoingRelations);
 
-            var sut = new OntologyServiceWithCache(nodesDataMock.Object, new Mock<IElasticService>().Object);
+            var sut = new OntologyServiceWithCache(nodesDataMock.Object, 
+                new Mock<IElasticService>().Object,
+                new Mock<IElasticState>().Object);
 
             var res = sut.GetNodesByUniqueValue(nodeTypeId, attributeValue, "value", limit);
             Assert.Empty(res);

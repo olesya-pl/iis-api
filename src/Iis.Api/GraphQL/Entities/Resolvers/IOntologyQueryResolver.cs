@@ -25,5 +25,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
         Task<Tuple<IEnumerable<INodeTypeModel>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
         Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx);
+        Task<string> ResolveCreatedBy(IResolverContext ctx);
     }
 }

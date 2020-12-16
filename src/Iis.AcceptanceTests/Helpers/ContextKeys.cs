@@ -1,4 +1,4 @@
-﻿namespace Iis.AcceptanceTests.Helpers
+﻿namespace AcceptanceTests.Helpers
 {
     internal class ContextKeys
     {

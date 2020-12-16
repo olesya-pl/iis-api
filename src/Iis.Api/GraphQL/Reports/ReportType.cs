@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL.Reports
         public ReportType(TypeRepository typeRepository, IOntologyModel ontology)
         {
             _typeRepository   = typeRepository ?? throw new System.ArgumentNullException(nameof(typeRepository));
-            
+
             _ontology = ontology;
 
             type = _ontology.GetEntityType("Event");
@@ -41,12 +41,12 @@ namespace IIS.Core.GraphQL.Reports
             descriptor
                 .Field("events")
                 .Type(new NonNullType(new ListType(new NonNullType(objectType))))
-                .Resolver(async ctx =>
+                .Resolver(ctx =>
                 {
                     var service = ctx.Service<IOntologyService>();
                     var report = ctx.Parent<Report>();
                     var nodes = service.LoadNodes(report.EventIds, null);
-                    return nodes.Cast<Entity>();
+                    return Task.FromResult(nodes.Cast<Entity>());
                 });
             descriptor
                 .Field("relatedMaterials")
@@ -54,7 +54,7 @@ namespace IIS.Core.GraphQL.Reports
                 .Resolver(async ctx => {
 
                     var materialProvider = ctx.Service<IMaterialProvider>();
-                    
+
                     var mapper = ctx.Service<IMapper>();
 
                     var report = ctx.Parent<Report>();
@@ -62,7 +62,7 @@ namespace IIS.Core.GraphQL.Reports
                     if(!report.EventIds.Any()) return new List<RelatedMaterialsItem>();
 
                     var tasks = report.EventIds.Select(async eventId => {
-                            
+
                             var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(eventId);
 
                             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
@@ -81,7 +81,6 @@ namespace IIS.Core.GraphQL.Reports
                         };
                     });
                 });
-            
         }
     }
 }

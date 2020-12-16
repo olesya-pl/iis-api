@@ -206,55 +206,62 @@ namespace IIS.Core.Materials.EntityFramework
                 if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
                 
                 input.ImportanceId.DoIfHasValue(p => {
-                    CreateChangeHistory(material.ImportanceSignId,
-                        nameof(material.SessionPriority),
+                    CreateChangeHistory(material.Id,
+                        material.ImportanceSignId,
+                        nameof(material.Importance),
                         p, username, changeRequestId, changesList);
                     material.Importance = null;
                     material.ImportanceSignId = p;
                 });
 
                 input.ReliabilityId.DoIfHasValue(p => {
-                    CreateChangeHistory(material.ReliabilitySignId,
-                        nameof(material.SessionPriority),
+                    CreateChangeHistory(material.Id,
+                        material.ReliabilitySignId,
+                        nameof(material.Reliability),
                         p, username, changeRequestId, changesList);
                     material.Reliability = null;
                     material.ReliabilitySignId = p;
                 });
 
                 input.RelevanceId.DoIfHasValue(p => {
-                    CreateChangeHistory(material.RelevanceSignId,
-                        nameof(material.SessionPriority),
+                    CreateChangeHistory(material.Id,
+                        material.RelevanceSignId,
+                        nameof(material.Relevance),
                         p, username, changeRequestId, changesList);
                     material.Relevance = null;
                     material.RelevanceSignId = p;
                 });
 
                 input.CompletenessId.DoIfHasValue(p => {
-                    CreateChangeHistory(material.CompletenessSignId,
-                        nameof(material.SessionPriority),
+                    CreateChangeHistory(material.Id,
+                        material.CompletenessSignId,
+                        nameof(material.Completeness),
                         p, username, changeRequestId, changesList);
                     material.Completeness = null;
                     material.CompletenessSignId = p;
                 });
 
                 input.SourceReliabilityId.DoIfHasValue(p => {
-                    CreateChangeHistory(material.SourceReliabilitySignId,
-                        nameof(material.SessionPriority),
+                    CreateChangeHistory(material.Id,
+                        material.SourceReliabilitySignId,
+                        nameof(material.SourceReliability),
                         p, username, changeRequestId, changesList);
                     material.SourceReliability = null;
                     material.SourceReliabilitySignId = p;
                 });
 
                 input.ProcessedStatusId.DoIfHasValue(p => {
-                    CreateChangeHistory(material.ProcessedStatusSignId,
-                        nameof(material.SessionPriority),
+                    CreateChangeHistory(material.Id,
+                        material.ProcessedStatusSignId,
+                        nameof(material.ProcessedStatus),
                         p, username, changeRequestId, changesList);
                     material.ProcessedStatus = null;
                     material.ProcessedStatusSignId = p;
                 });
 
                 input.SessionPriorityId.DoIfHasValue(p => {
-                    CreateChangeHistory(material.SessionPriorityId,
+                    CreateChangeHistory(material.Id,
+                        material.SessionPriorityId,
                         nameof(material.SessionPriority),
                         p, username, changeRequestId, changesList);
                     material.SessionPriority = null;
@@ -263,6 +270,11 @@ namespace IIS.Core.Materials.EntityFramework
 
                 await input.AssigneeId.DoIfHasValueAsync(async p => {
 
+                    if (material.AssigneeId.HasValue && material.AssigneeId.Value == p)
+                    {
+                        return;
+                    }
+                    
                     var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p));
 
                     changesList.Add(new ChangeHistoryDto
@@ -278,7 +290,7 @@ namespace IIS.Core.Materials.EntityFramework
                     material.Assignee = null;
                     material.AssigneeId = input.AssigneeId;
                 });
-                if (input.Content != null) 
+                if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal)) 
                 {
                     changesList.Add(new ChangeHistoryDto
                     {
@@ -331,13 +343,19 @@ namespace IIS.Core.Materials.EntityFramework
             return await _materialProvider.GetMaterialAsync(input.Id, userId);
         }
 
-        private void CreateChangeHistory(Guid? destinationId,
+        private void CreateChangeHistory(Guid targetId,
+            Guid? destinationId,
             string destinationName,
             Guid value,
             string userName,
             Guid requestId,
             List<ChangeHistoryDto> changesList)
         {
+            if (destinationId.HasValue && destinationId.Value == value)
+            {
+                return;
+            }
+            
             changesList.Add(new ChangeHistoryDto
             {
                 Date = DateTime.UtcNow,
@@ -347,7 +365,8 @@ namespace IIS.Core.Materials.EntityFramework
                                 : string.Empty,
                 PropertyName = destinationName,
                 UserName = userName,
-                RequestId = requestId
+                RequestId = requestId,
+                TargetId = targetId
             });
         }
 

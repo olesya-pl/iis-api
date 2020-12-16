@@ -44,3 +44,6 @@ src/Iis.ApiTests/mono_crash*.json
 src/Iis.AcceptanceTests/mono_crash*.json
 src/Iis.AcceptanceTests/mono_crash.mem*
 AcceptanceTests-test-result.xml
+
+*.feature.cs
+*feature.cs

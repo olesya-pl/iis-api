@@ -23,7 +23,11 @@ namespace Iis.Services
             EventIndexes = new List<string> { "Event" };
             MaterialIndexes = new List<string> { "Materials" };
             ReportIndex = "Reports";
-            SignIndexes = new List<string>{ "CellphoneSign", "SatellitePhoneSign"};
+            SignIndexes = new List<string> { "CellphoneSign", "SatellitePhoneSign" };
+            FieldsToExcludeByIndex = new Dictionary<string, IEnumerable<string>>()
+            {
+                { "Event", new [] { "associatedWithEvent" } }
+            };
         }
 
         public string ReportIndex { get; set; }
@@ -32,6 +36,7 @@ namespace Iis.Services
         public Dictionary<string, string> HistoricalOntologyIndexes { get; }
         public List<string> EventIndexes { get; }
         public List<string> SignIndexes { get; }
+        public Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
 
         private string GetHistoricalIndex(string typeName) => $"historical_{typeName}";
     }

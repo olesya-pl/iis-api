@@ -1,5 +1,5 @@
 ﻿using System;
-using Iis.AcceptanceTests.Helpers;
+using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
@@ -30,16 +30,20 @@ namespace AcceptanceTests.PageObjects
         public IWebElement LoginButton;
 
         [FindsBy(How = How.CssSelector, Using = "div[name='username'] input")]
-        [CacheLookup]
         public IWebElement LoginField;
 
         [FindsBy(How = How.CssSelector, Using = "div[name='password'] input")]
-        [CacheLookup]
         public IWebElement PasswordField;
 
         [FindsBy(How = How.ClassName, Using = "error-message")]
         [CacheLookup]
         public IWebElement ErrorMessage;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Вихід')]")]
+        public IWebElement LogOutButton;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Підтвердити')]")]
+        public IWebElement ConfirmLogOutButton;
 
     }
 }

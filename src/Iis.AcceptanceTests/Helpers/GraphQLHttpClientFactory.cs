@@ -1,7 +1,7 @@
 ﻿using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 
-namespace Iis.AcceptanceTests.Helpers
+namespace AcceptanceTests.Helpers
 {
     public static class GraphQLHttpClientFactory
     {
