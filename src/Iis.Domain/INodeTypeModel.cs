@@ -28,6 +28,7 @@ namespace Iis.Domain
         INodeTypeModel GetProperty(string typeName);
         bool IsSubtypeOf(INodeTypeModel type);
 
+        INodeTypeModel AttributeTypeModel { get; }
         IAttributeType AttributeType { get; }
         IRelationTypeLinked RelationType { get; }
         
@@ -39,7 +40,6 @@ namespace Iis.Domain
         #region RelationType
         EmbeddingOptions EmbeddingOptions { get; }
         INodeTypeModel EntityType { get; }
-        INodeTypeModel AttributeTypeModel { get; }
         bool IsAttributeType { get; }
         bool IsEntityType { get; }
         bool IsInversed { get; }

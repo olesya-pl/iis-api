@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private Task<Entity> CreateRootEntity(
             Guid entityId,
-            IEntityTypeModel type,
+            INodeTypeModel type,
             Dictionary<string, object> properties)
         {
             return CreateEntityCore(entityId, type, properties, string.Empty, entityId);
@@ -77,15 +77,15 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Entity> CreateEntity(
             Guid entityId,
-            IEntityTypeModel type,
+            INodeTypeModel type,
             string dotName,
             Dictionary<string, object> properties)
         {
             return CreateEntityCore(entityId, type, properties, dotName, Guid.NewGuid());
         }
 
-        private async Task<Entity> CreateEntityCore(Guid rootEntityId, 
-            IEntityTypeModel type, 
+        private async Task<Entity> CreateEntityCore(Guid rootEntityId,
+            INodeTypeModel type, 
             Dictionary<string, object> properties,
             string dotName,
             Guid entityId)
@@ -128,7 +128,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node;
         }
 
-        private Entity GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
+        private Entity GetUniqueValueEntity(INodeTypeModel type, Dictionary<string, object> properties)
         {
             if (properties.ContainsKey(type.UniqueValueFieldName))
             {
@@ -138,8 +138,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return null;
         }
 
-        private async Task<IEnumerable<Relation>> CreateRelations(Guid entityId, 
-            IEmbeddingRelationTypeModel embed, 
+        private async Task<IEnumerable<Relation>> CreateRelations(Guid entityId,
+            INodeTypeModel embed, 
             object value,
             string dotName,
             Guid requestId)
@@ -158,7 +158,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Relation[]> CreateMultipleProperties(
             Guid entityId,
-            IEmbeddingRelationTypeModel embed, 
+            INodeTypeModel embed, 
             object value,
             string oldValue,
             string dotName,
@@ -183,7 +183,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public async Task<Relation> CreateSinglePropertyAsync(
             Guid entityId,
-            IEmbeddingRelationTypeModel embed, 
+            INodeTypeModel embed, 
             object value,
             string oldValue,
             string dotName,
@@ -195,8 +195,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return prop;
         }
 
-        private async Task<Node> CreateNode(Guid entityId, 
-            IEmbeddingRelationTypeModel embed,             
+        private async Task<Node> CreateNode(Guid entityId,
+            INodeTypeModel embed,             
             object value, 
             string oldValue,
             string dotName,
@@ -224,22 +224,22 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
 
         private async Task<Node> CreateNode(
-            Guid entityId, 
-            IEmbeddingRelationTypeModel embed, 
+            Guid entityId,
+            INodeTypeModel embed, 
             object value,
             string dotName) // attribute or entity
         {
             if (embed.IsAttributeType)
             {
-                if (embed.AttributeType.ScalarTypeEnum == ScalarType.File)
+                if (embed.AttributeType.ScalarType == ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.AttributeType.ScalarTypeEnum == ScalarType.Geo)
+                else if (embed.AttributeType.ScalarType == ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
-                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum);
+                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarType);
                 
-                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
+                return new Attribute(Guid.NewGuid(), embed.AttributeTypeModel, value);
             }
 
             if (embed.IsEntityType)
