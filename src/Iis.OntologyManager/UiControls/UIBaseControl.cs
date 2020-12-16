@@ -14,6 +14,8 @@ namespace Iis.OntologyManager.UiControls
         protected UiControlsCreator _uiControlsCreator;
         public Panel MainPanel { get; private set; }
         public string Name { get; private set; }
+        public int Width => _container.Right;
+        public int Height => _container.Bottom;
         public bool Visible
         {
             get { return MainPanel.Visible; }

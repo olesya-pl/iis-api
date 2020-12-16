@@ -62,7 +62,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .el-input__inner")]
+        [FindsBy(How = How.CssSelector, Using = ".el-popover__reference-wrapper > .el-input > .el-input__inner")]
         [CacheLookup]
         public IWebElement ObjectsTabSearch;
 

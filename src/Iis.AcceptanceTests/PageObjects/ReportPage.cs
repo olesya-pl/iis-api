@@ -1,3 +1,4 @@
+using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
@@ -20,5 +21,17 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "tbody .el-table__row:nth-of-type(1)")]
         [CacheLookup]
         public IWebElement FirstReportInTheReportList;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Нове зведення')]")]
+        public IWebElement NewReportButton;
+
+        [FindsBy(How = How.XPath, Using = "//button[@class='el-button add-button el-button--default']")]
+        public IWebElement CreateNewReportButton;
+
+        public Report GetReportByTitle(string title)
+        {
+            return new Report(driver, title);
+        }
+        public ReportCreationAndEdit ReportCreationAndEdit => new ReportCreationAndEdit(driver);
     }
 }

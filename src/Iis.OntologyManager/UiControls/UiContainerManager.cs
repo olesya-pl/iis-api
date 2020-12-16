@@ -80,6 +80,11 @@ namespace Iis.OntologyManager.UiControls
             {
                 control.Width = _colWidth;
             }
+
+            if (control.Left < _left) _left = control.Left;
+            if (control.Bottom > _bottom) _bottom = control.Bottom;
+            if (control.Right > _right) _right = control.Right;
+            
             Top = control.Bottom + _style.MarginVer;
             AddToRoot(control);
             Log.Logger.Verbose($"<= Top = {Top}");

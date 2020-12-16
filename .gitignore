@@ -46,3 +46,4 @@ src/Iis.AcceptanceTests/mono_crash.mem*
 AcceptanceTests-test-result.xml
 
 *.feature.cs
+*feature.cs

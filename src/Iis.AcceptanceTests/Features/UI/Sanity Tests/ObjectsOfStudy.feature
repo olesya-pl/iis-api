@@ -3,6 +3,7 @@ Feature: ObjectsOfStudySection - sanity
     - IIS-6119 - Possibility to switch between hierarchy objects in the OOS section
     - IIS-6211 - Search results must contain a specific result
     - IIS-6370 - View and interact with data in profile in the objects section
+    - IIS-6219 - Open a small object of study card
 
     Background:
         Given I sign in with the user olya and password 123 in the Contour
