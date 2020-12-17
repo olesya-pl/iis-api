@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
@@ -16,8 +19,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > li:nth-of-type(2)")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//li[@name='events']")]
         public IWebElement EventsPage;
 
         [FindsBy(How = How.CssSelector, Using = ".add-button")]
@@ -28,5 +30,16 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement FirstEventInTheEventsList;
 
+        public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
+                    .Select(webElement => new Event(driver, webElement)).ToList();
+
+        public List<Event> GetEventsByName(string eventName)
+        {
+            return Events.Where(i => i.Name.Contains(eventName)).ToList();
+        }
+        public Event GetEventByTitle(string title)
+        {
+            return new Event(driver, title);
+        }
     }
 }

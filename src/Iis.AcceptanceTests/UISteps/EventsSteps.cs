@@ -1,3 +1,4 @@
+using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
@@ -12,8 +13,12 @@ namespace AcceptanceTests.UISteps
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
 
+        private EventsPageObjects eventsPage;
+
+        #region Given/When
         public EventsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
+            eventsPage = new EventsPageObjects(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -21,12 +26,27 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to Events page")]
         public void IWantNavigateToEventsPage()
         {
-            var eventsPage = new EventsPageObjects(driver);
             eventsPage.EventsPage.Click();
-
             driver.WaitFor(10);
         }
 
+        [When(@"I clicked on the (.*) event in the event list")]
+        public void WhenIGotAllEventsList(string eventName)
+        {
+            var xyz = eventsPage.Events.First().Click();
+            // var events = eventsPage.GetEventsByName("захід");
+            // var eventTitle = eventsPage.GetEventByTitle("Захід");
+        }
+
+        [When(@"I clicked on the (.*) event in the event list")]
+        public void WhenIClickedOnTheEventInTheEventList(string value)
+        {
+            var activeEvent = eventsPage.GetEventByTitle(value);
+            //activeEvent.Click();
+        }
+        #endregion
+
+        #region Then
         [Then(@"I must see the Events page")]
         public void ThenIMustSeeEventCreationButton()
         {
@@ -36,8 +56,9 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see first event in the events list")]
         public void ThenIMustSeeFirstEventInTheEventsList()
         {
-            var eventsPage = new EventsPageObjects(driver);
             Assert.True(eventsPage.FirstEventInTheEventsList.Displayed);
         }
+        #endregion
     }
 }
+
