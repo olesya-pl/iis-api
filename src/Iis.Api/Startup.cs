@@ -158,7 +158,7 @@ namespace IIS.Core
 
                     return new OntologyNodesData(rawData, ontologySchema, ontologySaver);
                 });
-                services.AddTransient<IOntologyCache, OntologyCache>();
+                services.AddSingleton<IOntologyCache, OntologyCache>();
                 services.AddSingleton<IOntologySchema>(provider => (new OntologySchemaService()).GetOntologySchema(schemaSource));
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
                 services.AddSingleton<IOntologyModel>(provider => new OntologyWrapper(provider.GetRequiredService<IOntologySchema>()));

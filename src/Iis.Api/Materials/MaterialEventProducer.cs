@@ -8,6 +8,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 
 using Iis.Api.Configuration;
+using Iis.Api.Materials;
 
 namespace IIS.Core.Materials
 {
@@ -17,6 +18,7 @@ namespace IIS.Core.Materials
         void SendMaterialEvent(MaterialEventMessage eventMessage);
         void SendMaterialFeatureEvent(MaterialEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
+        void SaveMaterialToElastic(Guid id);
     }
 
     public class MaterialEventProducer : IMaterialEventProducer
@@ -28,17 +30,20 @@ namespace IIS.Core.Materials
         private readonly IModel _materialEventChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
+        private readonly CreatedMaterialElasticSaverConfiguration _elasticSaverConfiguration;
 
         public MaterialEventProducer(IConnectionFactory connectionFactory,
             ILoggerFactory loggerFactory,
             MaterialEventConfiguration eventConfiguration,
-            MaterialOperatorAssignerConfiguration assignerConfiguration)
+            MaterialOperatorAssignerConfiguration assignerConfiguration,
+            CreatedMaterialElasticSaverConfiguration elasticSaverConfiguration)
         {
             _logger = loggerFactory.CreateLogger<MaterialEventProducer>();
 
             _connectionFactory = connectionFactory;
             _eventConfiguration = eventConfiguration;
             _assignerConfiguration = assignerConfiguration;
+            _elasticSaverConfiguration = elasticSaverConfiguration;
 
             while (true)
             {
@@ -121,6 +126,22 @@ namespace IIS.Core.Materials
         {
             _channel.QueueDeclare(
                 queue: _assignerConfiguration.QueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+
+            var body = Encoding.UTF8.GetBytes(materialId.ToString());
+
+            _channel.BasicPublish(exchange: "",
+                                routingKey: _assignerConfiguration.QueueName,
+                                basicProperties: null,
+                                body: body);
+        }
+
+        public void SaveMaterialToElastic(Guid materialId)
+        {
+            _channel.QueueDeclare(
+                queue: _elasticSaverConfiguration.QueueName,
                 durable: true,
                 exclusive: false,
                 autoDelete: false);

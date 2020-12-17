@@ -153,16 +153,17 @@ namespace Iis.DbLayer.Repositories
             return responses;
         }
 
-        public async Task<bool> PutCreatedMaterialToElasticSearchAsync(Guid materialId)
+        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken token = default)
         {
-            var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-            .SingleOrDefaultAsync(p => p.Id == materialId);
+            var materials = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+            .Where(p => materialIds.Contains(p.Id))
+            .ToListAsync();
 
-            var materialDocument = MapEntityToDocument(material);
+            var materialDocuments = materials
+                    .Select(p => MapEntityToDocument(p))
+                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n"); ;
 
-            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                materialId.ToString("N"),
-                JsonConvert.SerializeObject(materialDocument));
+            return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), materialDocuments, token);
         }
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, 
