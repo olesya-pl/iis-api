@@ -9,6 +9,7 @@ using Iis.Domain;
 using IIS.Domain;
 using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using HotChocolate.Types;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities
 {

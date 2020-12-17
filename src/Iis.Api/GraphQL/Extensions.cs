@@ -12,6 +12,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Meta;
 using Iis.Api.GraphQL.Common;
 using Microsoft.EntityFrameworkCore;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL
 {

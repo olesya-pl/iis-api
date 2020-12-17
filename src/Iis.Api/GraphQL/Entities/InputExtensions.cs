@@ -12,6 +12,7 @@ using Iis.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Iis.Services.Contracts.Interfaces;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities
 {

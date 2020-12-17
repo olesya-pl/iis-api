@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Iis.Domain;
 using Newtonsoft.Json.Linq;
+using Iis.OntologySchema.DataTypes;
 
-namespace IIS.Core.Ontology {
+namespace IIS.Core.Ontology
+{
     public class AnalyticsQueryParser {
         private readonly IOntologyModel _ontology;
 

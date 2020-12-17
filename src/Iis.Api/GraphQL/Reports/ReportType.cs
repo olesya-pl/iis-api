@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Iis.Domain;
 using IIS.Domain;
 using AutoMapper;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Reports
 {

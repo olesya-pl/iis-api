@@ -2,6 +2,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
+using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

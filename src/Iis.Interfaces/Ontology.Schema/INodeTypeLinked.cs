@@ -43,6 +43,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<INodeTypeLinked> DirectProperties => GetDirectProperties();
         IReadOnlyList<INodeTypeLinked> GetAllProperties();
         IEnumerable<INodeTypeLinked> AllProperties => GetAllProperties();
+        IRelationTypeLinked GetRelationByName(string relationName);
         bool IsIdentical(INodeTypeLinked nodeType);
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();
@@ -64,6 +65,14 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsComputed { get; }
         string Formula { get; }
         EmbeddingOptions EmbeddingOptions { get; }
+        ScalarType ScalarTypeEnum { get; }
+        INodeTypeLinked EntityType { get; }
+        bool IsAttributeType { get; }
+        bool IsEntityType { get; }
+        INodeTypeLinked TargetType { get; }
+        bool IsSubtypeOf(INodeTypeLinked type);
+        bool AcceptsScalar(object value);
+        bool AcceptsOperation(EntityOperation create);
     }
 
     public class NodeAggregationInfo

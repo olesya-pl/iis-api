@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GreenDonut;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.DataLoaders
 {

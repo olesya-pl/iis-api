@@ -10,6 +10,7 @@ using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts;
 using Newtonsoft.Json;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

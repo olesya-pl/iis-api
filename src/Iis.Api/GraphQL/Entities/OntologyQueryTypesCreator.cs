@@ -3,6 +3,7 @@ using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using System;

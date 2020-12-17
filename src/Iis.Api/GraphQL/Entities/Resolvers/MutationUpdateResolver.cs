@@ -12,6 +12,7 @@ using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts.Interfaces;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

@@ -5,6 +5,7 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using Iis.Services;
 using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;

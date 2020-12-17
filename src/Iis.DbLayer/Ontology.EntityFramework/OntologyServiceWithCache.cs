@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
+using Iis.OntologySchema.DataTypes;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {

@@ -434,12 +434,13 @@ namespace Iis.OntologySchema.DataTypes
             } ).ToList();
         }
 
-        internal SchemaRelationType GetRelationByName(string relationName)
+        internal SchemaRelationType GetSchemaRelationByName(string relationName)
         {
             return _outgoingRelations
-                .Where(r => r.NodeType.Name == relationName)
+                .Where(r => r.Kind == RelationKind.Embedding && r.NodeType.Name == relationName)
                 .SingleOrDefault();
         }
+        public IRelationTypeLinked GetRelationByName(string relationName) => GetSchemaRelationByName(relationName);
 
         public INodeTypeLinked GetNodeTypeByDotNameParts(string[] dotNameParts)
         {
@@ -469,5 +470,52 @@ namespace Iis.OntologySchema.DataTypes
         {
             return GetAllOutgoingRelations().Where(r => r.NodeType.MetaObject.Formula != null).ToList();
         }
+
+        public INodeTypeLinked GetProperty(string relationName)
+        {
+            var result = GetRelationByName(relationName);
+            if (result != null) return result.TargetType;
+            foreach (var parentType in GetAllAncestors())
+            {
+                result = parentType.GetRelationByName(relationName);
+                if (result != null) return result.TargetType;
+            }
+            return null;
+        }
+
+        public ScalarType ScalarTypeEnum => AttributeType.ScalarType;
+
+        public INodeTypeLinked EntityType =>
+            RelationType.TargetType.Kind == Kind.Entity ?
+                    RelationType.TargetType :
+                    null;
+
+        public bool IsAttributeType => RelationType?.TargetType?.Kind == Kind.Attribute;
+
+        public bool IsEntityType => RelationType?.TargetType?.Kind == Kind.Entity;
+
+        public INodeTypeLinked TargetType => RelationType?.TargetType;
+
+        public bool IsSubtypeOf(INodeTypeLinked type)
+        {
+            return Id == type.Id || IsInheritedFrom(type.Name);
+        }
+
+        public bool AcceptsScalar(object value)
+        {
+            if (AttributeType == null) return false;
+
+            return (value is int || value is long) && ScalarTypeEnum == ScalarType.Int
+                || value is bool && ScalarTypeEnum == ScalarType.Boolean
+                || value is decimal && ScalarTypeEnum == ScalarType.Decimal
+                || value is string && ScalarTypeEnum == ScalarType.String
+                || value is string && ScalarTypeEnum == ScalarType.IntegerRange
+                || value is string && ScalarTypeEnum == ScalarType.FloatRange
+                || value is DateTime && ScalarTypeEnum == ScalarType.Date
+                || value is Dictionary<string, object> && ScalarTypeEnum == ScalarType.Geo
+                || value is Guid && ScalarTypeEnum == ScalarType.File;
+        }
+
+        public bool AcceptsOperation(EntityOperation create) => true;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using HotChocolate.Types;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
