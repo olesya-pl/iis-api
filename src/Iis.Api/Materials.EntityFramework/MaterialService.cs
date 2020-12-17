@@ -73,7 +73,7 @@ namespace IIS.Core.Materials.EntityFramework
             SaveMaterialInfoEntitites(material);
 
             await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+                await unitOfWork.MaterialRepository.PutCreatedMaterialToElasticSearchAsync(material.Id));
 
             if (material.IsParentMaterial())
             {
@@ -329,7 +329,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
 
-                var fillElasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+                var fillElasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true));
 
                 var addHistoryTask = _changeHistoryService.SaveMaterialChanges(changesList);
 
