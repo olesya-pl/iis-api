@@ -153,8 +153,21 @@ namespace Iis.DbLayer.Repositories
             return responses;
         }
 
+        public async Task<bool> PutCreatedMaterialToElasticSearchAsync(Guid materialId)
+        {
+            var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+            .SingleOrDefaultAsync(p => p.Id == materialId);
 
-        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken token = default)
+            var materialDocument = MapEntityToDocument(material);
+
+            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
+                materialId.ToString("N"),
+                JsonConvert.SerializeObject(materialDocument));
+        }
+
+        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, 
+            CancellationToken token = default,
+            bool waitForIndexing = false)
         {
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .SingleOrDefaultAsync(p => p.Id == materialId);
@@ -174,7 +187,7 @@ namespace Iis.DbLayer.Repositories
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
-                true,
+                waitForIndexing,
                 token);
         }
 

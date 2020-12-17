@@ -389,7 +389,10 @@ namespace IIS.Core.Materials.EntityFramework
             var materialEntitiesIdList = materialEntityList
                 .GroupBy(e => e.Id)
                 .Where(gr => gr.Count() == nodeIdList.Count())
-                .Select(gr => gr.Select(e => e.Id).FirstOrDefault());
+                .Select(gr => gr.Select(e => e.Id).FirstOrDefault())
+                .ToArray();
+
+            if (!materialEntitiesIdList.Any()) return EmptMaterialResult;
 
             var searchParams = new SearchParams { Suggestion = suggestion, Page = page, Sorting = sorting };
 
