@@ -8,6 +8,7 @@ using Iis.OntologyData;
 using Iis.OntologyData.Migration;
 using Iis.OntologyManager.Configurations;
 using Iis.OntologyManager.Style;
+using Iis.OntologyManager.Helpers;
 using Iis.OntologyManager.UiControls;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -17,8 +18,6 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Iis.OntologyManager
@@ -34,11 +33,9 @@ namespace Iis.OntologyManager
         IOntologySchema _schema;
         IOntologyNodesData _ontologyData;
         IOntologyManagerStyle _style;
-        IMapper _mapper;
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
         OntologySchemaService _schemaService;
-        //List<IOntologySchemaSource> _schemaSources;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
 
         UiFilterControl _filterControl;
@@ -72,17 +69,17 @@ namespace Iis.OntologyManager
         INodeTypeLinked SelectedNodeType =>
             gridTypes.SelectedRows.Count == 0 ?
                 null : (INodeTypeLinked)gridTypes.SelectedRows[0].DataBoundItem;
-        IOntologySchemaSource SelectedSchemaSource => cmbSchemaSources?.SelectedItem as IOntologySchemaSource ?? _schemaSources?.FirstOrDefault();
+        SchemaDataSource SelectedSchemaSource => cmbSchemaSources?.SelectedItem as SchemaDataSource ?? _schemaSources?.FirstOrDefault();
 
         string SelectedConnectionString =>
             SelectedSchemaSource?.SourceKind == SchemaSourceKind.Database ?
                 SelectedSchemaSource.Data : null;
 
 
-        public MainForm(IConfiguration configuration,
+        public MainForm(
+            IConfiguration configuration,
             OntologySchemaService schemaService,
-            ILogger logger, 
-            IMapper mapper)
+            ILogger logger)
         {
             InitializeComponent();
             Text = $"Володар Онтології {VERSION}";
@@ -92,7 +89,6 @@ namespace Iis.OntologyManager
             _uiControlsCreator = new UiControlsCreator(_style);
             _logger = logger;
             _schemaService = schemaService;
-            _mapper = mapper;
 
             _schemaSources = ReadSchemaDataSourcesFromConfiguration();
 
@@ -109,6 +105,7 @@ namespace Iis.OntologyManager
             LoadCurrentSchema(SelectedSchemaSource);
 
             ResumeLayout();
+
             ReloadTypes(_filterControl.GetModel());
         }
 
@@ -127,7 +124,7 @@ namespace Iis.OntologyManager
         {
             var pnlTop = new Panel();
             pnlTop.Location = new Point(0, 0);
-            pnlTop.Size = new Size(rootPanel.Width, _style.ButtonHeightDefault*2);
+            pnlTop.Size = new Size(rootPanel.Width, _style.ButtonHeightDefault * 2);
             pnlTop.BorderStyle = BorderStyle.FixedSingle;
             pnlTop.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -204,7 +201,7 @@ namespace Iis.OntologyManager
                 AutoSize = true,
                 Text = ""
             };
-            
+
             rootContainer.GoToNewColumn();
             rootContainer.AutoWidth = true;
             rootContainer.Add(lblTypeHeaderName);
@@ -217,7 +214,7 @@ namespace Iis.OntologyManager
             _filterControl.Initialize("FilterControl", null);
             _filterControl.OnChange += ReloadTypes;
             container.AddPanel(_filterControl.MainPanel);
-            
+
             cmbSchemaSources = new ComboBox
             {
                 Name = "cmbSchemaSources",
@@ -234,7 +231,7 @@ namespace Iis.OntologyManager
             btnCompare = new Button { Text = "Порівняти", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
-            
+
             btnMigrate = new Button { Text = "Міграція", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnMigrate.Click += btnMigrate_Click;
             container.Add(btnMigrate);
@@ -242,6 +239,12 @@ namespace Iis.OntologyManager
             btnDuplicates = new Button { Text = "Дублікати", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnDuplicates.Click += btnDuplicates_Click;
             container.Add(btnDuplicates);
+
+            var btnRemoveEntity = new Button { Text = "Видалити сутність", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnRemoveEntity.Click += RemoveEntityClick;
+
+            container.Add(btnRemoveEntity);
+
 
             panelTop.ResumeLayout();
         }
@@ -305,6 +308,7 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
+
         private void btnMigrate_Click(object sender, EventArgs e)
         {
             var form = _uiControlsCreator.GetModalForm(this);
@@ -316,6 +320,7 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
+
         private IMigrationResult Migrate(IMigration migration, IMigrationOptions migrationOptions)
         {
             if (SelectedConnectionString == null) return null;
@@ -336,11 +341,26 @@ namespace Iis.OntologyManager
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
         }
-        private void SourceSelectionChanged(object sender, EventArgs e) 
+
+        private void SourceSelectionChanged(object sender, EventArgs e)
         {
             LoadCurrentSchema(SelectedSchemaSource);
         }
 
+        private void RemoveEntityClick(object sender, EventArgs e)
+        {
+            var form = _uiControlsCreator.GetModalForm(this);
+            var rootPanel = _uiControlsCreator.GetFillPanel(form);
+
+            form.ShowDialog();
+
+            form.Close();
+            //var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress);
+
+            //var result = requestWrapper.DeleteEntityAsync(Guid.Parse("4787d92ee9d211e9ab4c37575451fca8")).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            //MessageBox.Show(result.ToString());
+        }
         #endregion
 
         #region Schema Logic
@@ -352,11 +372,12 @@ namespace Iis.OntologyManager
 
             ReloadTypes(_filterControl.GetModel());
 
-            _ontologyData = 
+            _ontologyData =
                 schemaSource.SourceKind == SchemaSourceKind.Database ?
                 GetOntologyData(schemaSource.Data) :
                 null;
         }
+
         private void UpdateSchemaSources()
         {
             _schemaSources = ReadSchemaDataSourcesFromConfiguration();
@@ -380,11 +401,13 @@ namespace Iis.OntologyManager
 
             return result;
         }
+
         private List<INodeTypeLinked> GetAllEntities()
         {
             var filter = new GetTypesFilter { Kinds = new[] { Kind.Entity } };
             return _schema.GetTypes(filter).OrderBy(t => t.Name).ToList();
         }
+
         private void OnNodeTypeSaveClick(INodeTypeUpdateParameter updateParameter)
         {
             try
@@ -404,6 +427,7 @@ namespace Iis.OntologyManager
                 MessageBox.Show(ex.Message);
             }
         }
+
         #endregion
 
         #region Node Type Logic
