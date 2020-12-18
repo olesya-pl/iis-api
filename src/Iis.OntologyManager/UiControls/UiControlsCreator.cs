@@ -21,6 +21,7 @@ namespace Iis.OntologyManager.UiControls
             grid.Columns[0].DataPropertyName = "Name";
             grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             grid.AllowUserToResizeRows = false;
+            grid.AutoGenerateColumns = false;
             grid.MultiSelect = false;
             grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             grid.ForeColor = Color.Black;
