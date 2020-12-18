@@ -56,6 +56,8 @@ namespace Iis.Api.Materials
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            const int MaxBatchSize = 50;
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -66,6 +68,7 @@ namespace Iis.Api.Materials
                         if (_materialIds.Any())
                         {
                             await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, stoppingToken);
+                            _materialIds.Clear();
                         }                        
                         await Task.Delay(TimeSpan.FromSeconds(1));                        
                         continue;
@@ -73,6 +76,11 @@ namespace Iis.Api.Materials
                     var materialId = new Guid(System.Text.Encoding.UTF8.GetString(message.Body));
                     _channel.BasicAck(message.DeliveryTag, false);
                     _materialIds.Add(materialId);
+                    if (_materialIds.Count() >= MaxBatchSize)
+                    {
+                        await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, stoppingToken);
+                        _materialIds.Clear();
+                    }
                     await Task.Delay(TimeSpan.FromMilliseconds(100));
                 }
                 catch (Exception e)

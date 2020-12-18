@@ -149,7 +149,7 @@ namespace IIS.Core.Materials
             var body = Encoding.UTF8.GetBytes(materialId.ToString());
 
             _channel.BasicPublish(exchange: "",
-                                routingKey: _assignerConfiguration.QueueName,
+                                routingKey: _elasticSaverConfiguration.QueueName,
                                 basicProperties: null,
                                 body: body);
         }
