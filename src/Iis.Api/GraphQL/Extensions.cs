@@ -20,7 +20,7 @@ namespace IIS.Core.GraphQL
     {
         public static IObjectTypeDescriptor PopulateFields(this IOntologyFieldPopulator populator,
             IObjectTypeDescriptor descriptor,
-            IEnumerable<INodeTypeModel> entityTypes, params Operation[] operations)
+            IEnumerable<INodeTypeLinked> entityTypes, params Operation[] operations)
         {
             foreach (var type in entityTypes)
             foreach (var operation in operations)
@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL
             return descriptor;
         }
 
-        public static IOutputType WrapOutputType(this IOutputType type, INodeTypeModel relationType)
+        public static IOutputType WrapOutputType(this IOutputType type, INodeTypeLinked relationType)
         {
             if (relationType.IsComputed)
                 return type;
@@ -45,7 +45,7 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        public static IInputType WrapInputType(this IInputType type, INodeTypeModel relationType)
+        public static IInputType WrapInputType(this IInputType type, INodeTypeLinked relationType)
         {
             switch (relationType.EmbeddingOptions)
             {

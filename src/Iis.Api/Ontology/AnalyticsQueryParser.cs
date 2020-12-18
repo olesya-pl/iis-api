@@ -5,6 +5,7 @@ using System.Linq;
 using Iis.Domain;
 using Newtonsoft.Json.Linq;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Ontology
 {
@@ -57,13 +58,13 @@ namespace IIS.Core.Ontology
 
         private void _tryToAddAttribute(Ast ast, string value)
         {
-            var (name, types, conditions) = _parseChunk<INodeTypeModel>(value);
+            var (name, types, conditions) = _parseChunk<INodeTypeLinked>(value);
             ast.Add(new AstAttribute(types.FirstOrDefault(), conditions) { Name = name });
         }
 
         private void _tryToAddNode(Ast ast, string value)
         {
-            var (name, types, conditions) = _parseChunk<INodeTypeModel>(value);
+            var (name, types, conditions) = _parseChunk<INodeTypeLinked>(value);
             var type = types == null ? null : types.FirstOrDefault();
 
             if (conditions != null)
@@ -83,14 +84,14 @@ namespace IIS.Core.Ontology
 
         private void _tryToAddRelation(Ast ast, string value, bool isDirect)
         {
-            var (name, relationTypes, _) = _parseChunk<INodeTypeModel>(value);
+            var (name, relationTypes, _) = _parseChunk<INodeTypeLinked>(value);
 
             ast.Add(new AstRelation(relationTypes, isDirect) {
                 Name = name
             });
         }
 
-        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: INodeTypeModel
+        private (string, IEnumerable<T>, string) _parseChunk<T>(string rawValue) where T: INodeTypeLinked
         {
             var value = rawValue;
             var conditionsIndex = value.IndexOf('{');
@@ -161,7 +162,7 @@ namespace IIS.Core.Ontology
 
         public class AstNode {
             public string Name;
-            public virtual INodeTypeModel Type { get; private set; }
+            public virtual INodeTypeLinked Type { get; private set; }
             public AstNode Next;
             public AstNode Prev;
             public virtual bool IsVirtual
@@ -169,12 +170,12 @@ namespace IIS.Core.Ontology
                 get { return false; }
             }
 
-            public virtual string INodeTypeModel
+            public virtual string INodeTypeLinked
             {
                 get { return GetType().Name; }
             }
 
-            public AstNode(INodeTypeModel type)
+            public AstNode(INodeTypeLinked type)
             {
                 Type = type;
             }
@@ -188,14 +189,14 @@ namespace IIS.Core.Ontology
         public class AstRelation : AstNode {
             public readonly bool IsDirect;
 
-            public readonly IEnumerable<INodeTypeModel> Types;
+            public readonly IEnumerable<INodeTypeLinked> Types;
 
             public override Guid[] TypeIds
             {
                 get { return Types.Select(type => type.Id).ToArray(); }
             }
 
-            public AstRelation(IEnumerable<INodeTypeModel> types, bool isDirect): base(null) {
+            public AstRelation(IEnumerable<INodeTypeLinked> types, bool isDirect): base(null) {
                 Types = types;
                 IsDirect = isDirect;
             }
@@ -203,12 +204,12 @@ namespace IIS.Core.Ontology
 
         public class AstRef: AstNode
         {
-            public override string INodeTypeModel
+            public override string INodeTypeLinked
             {
-                get { return this._ast.nodeByRef(Name).INodeTypeModel; }
+                get { return this._ast.nodeByRef(Name).INodeTypeLinked; }
             }
 
-            public override INodeTypeModel Type
+            public override INodeTypeLinked Type
             {
                 get { return this._ast.nodeByRef(Name).Type; }
             }
@@ -229,11 +230,11 @@ namespace IIS.Core.Ontology
         {
             public readonly JObject Conditions;
 
-            public AstAttribute(INodeTypeModel type): base(type)
+            public AstAttribute(INodeTypeLinked type): base(type)
             {
             }
 
-            public AstAttribute(INodeTypeModel type, string conditions): base(type)
+            public AstAttribute(INodeTypeLinked type, string conditions): base(type)
             {
                 try {
                     Conditions = conditions == null ? null : JObject.Parse(conditions);

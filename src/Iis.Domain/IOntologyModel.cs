@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 using System.Collections.Generic;
 
 namespace Iis.Domain
 {
     public interface IOntologyModel
     {
-        IEnumerable<INodeTypeModel> EntityTypes { get; }
-        IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type);
-        INodeTypeModel GetEntityType(string name);
-        INodeTypeModel GetType(Guid id);
-        IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeModel;
+        IEnumerable<INodeTypeLinked> EntityTypes { get; }
+        IEnumerable<INodeTypeLinked> GetChildTypes(INodeTypeLinked type);
+        INodeTypeLinked GetEntityType(string name);
+        INodeTypeLinked GetType(Guid id);
+        IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeLinked;
     }
 }

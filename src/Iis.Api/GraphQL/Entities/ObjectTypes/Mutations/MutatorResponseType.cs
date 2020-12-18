@@ -3,6 +3,7 @@ using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes.Mutations
 {
@@ -13,14 +14,14 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes.Mutations
 
         private readonly Operation _operation;
 
-        public MutatorResponseType(Operation operation, INodeTypeModel entityType, IOutputType ontologyType)
+        public MutatorResponseType(Operation operation, INodeTypeLinked entityType, IOutputType ontologyType)
         {
             _operation = operation;
             _name = GetName(operation, entityType);
             _ontologyType = ontologyType;
         }
 
-        public static string GetName(Operation operation, INodeTypeModel entityType)
+        public static string GetName(Operation operation, INodeTypeLinked entityType)
         {
             return $"{operation}{OntologyObjectType.GetName(entityType)}Response";
         }

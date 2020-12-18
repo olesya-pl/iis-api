@@ -4,6 +4,7 @@ using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes
 {
@@ -12,9 +13,9 @@ namespace IIS.Core.GraphQL.Entities.InputTypes
         public static string ANY_OF_CRITERIA_FIELD = "_anyOf";
         public static string EXACT_MATCH_CRITERIA_FIELD = "_exactMatch";
 
-        private readonly INodeTypeModel _type;
+        private readonly INodeTypeLinked _type;
 
-        public CriteriaInputType(INodeTypeModel type)
+        public CriteriaInputType(INodeTypeLinked type)
         {
             _type = type;
         }

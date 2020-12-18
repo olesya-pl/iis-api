@@ -517,5 +517,9 @@ namespace Iis.OntologySchema.DataTypes
         }
 
         public bool AcceptsOperation(EntityOperation create) => true;
+        public INodeTypeLinked AttributeTypeModel =>
+            RelationType.TargetType.Kind == Kind.Attribute ?
+                RelationType.TargetType :
+                null;
     }
 }

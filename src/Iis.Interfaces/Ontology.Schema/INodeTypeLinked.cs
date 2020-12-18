@@ -27,6 +27,7 @@ namespace Iis.Interfaces.Ontology.Schema
         ISchemaMeta MetaObject { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
         IReadOnlyList<IRelationTypeLinked> OutgoingRelations { get; }
+        INodeTypeLinked AttributeTypeModel { get; }
         IAttributeType  AttributeType { get; }
         IRelationTypeLinked RelationType { get; }
         string GetMetaDeep();
@@ -47,6 +48,7 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsIdentical(INodeTypeLinked nodeType);
         string GetStringCode();
         Dictionary<string, string> GetPropertiesDict();
+        INodeTypeLinked GetProperty(string relationName);
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
         List<NodeAggregationInfo> GetAttributeDotNamesRecursiveWithLimit(
             string path = null,

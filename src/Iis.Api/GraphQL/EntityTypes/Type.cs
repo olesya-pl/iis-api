@@ -8,19 +8,20 @@ using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
-    public class EntityTypeCollection : Collection<INodeTypeModel, EntityType>
+    public class EntityTypeCollection : Collection<INodeTypeLinked, EntityType>
     {
         private IOntologyModel _ontology { get; }
 
-        public EntityTypeCollection(IEnumerable<INodeTypeModel> source, IOntologyModel ontology) : base(source)
+        public EntityTypeCollection(IEnumerable<INodeTypeLinked> source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
 
-        protected override EntityType Select(INodeTypeModel arg)
+        protected override EntityType Select(INodeTypeLinked arg)
         {
             return new EntityType(arg, _ontology);
         }
@@ -28,13 +29,13 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityType
     {
-        public EntityType(INodeTypeModel source, IOntologyModel ontology)
+        public EntityType(INodeTypeLinked source, IOntologyModel ontology)
         {
             Source = source;
             _ontology = ontology;
         }
 
-        protected INodeTypeModel Source { get; }
+        protected INodeTypeLinked Source { get; }
 
         private IOntologyModel _ontology { get; }
 
@@ -70,7 +71,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Entity contains unique values and needs dropdown tip on UI")]
         public bool HasUniqueValues => Source.HasUniqueValues;
 
-        protected IEntityAttribute CreateEntityAttribute(INodeTypeModel relationType)
+        protected IEntityAttribute CreateEntityAttribute(INodeTypeLinked relationType)
         {
             return relationType.IsAttributeType
                 ? (IEntityAttribute) new EntityAttributePrimitive(relationType)

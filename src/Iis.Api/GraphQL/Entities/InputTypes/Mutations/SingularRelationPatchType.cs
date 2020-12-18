@@ -6,6 +6,7 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {
@@ -14,9 +15,9 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         private readonly string _typeName;
         private readonly IInputType _createType;
         private readonly IInputType _updateType;
-        private readonly INodeTypeModel _relationType;
+        private readonly INodeTypeLinked _relationType;
 
-        public SingularRelationPatchType(INodeTypeModel relationType, TypeRepository typeRepository)
+        public SingularRelationPatchType(INodeTypeLinked relationType, TypeRepository typeRepository)
         {
             _relationType = relationType;
             _typeName = GetName(relationType);
@@ -49,13 +50,13 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
                 d.Field("update").Type(_updateType);
         }
 
-        public static string GetName(INodeTypeModel relationType)
+        public static string GetName(INodeTypeLinked relationType)
         {
             if (relationType.IsAttributeType)
                 return relationType.AttributeTypeModel.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
-                var ops = relationType.Meta.AcceptsEntityOperations;
+                var ops = relationType.MetaObject.AcceptsEntityOperations;
                 if (ops == null || ops.Length == 0)
                     return "EntityRelationInput";
                 return $"{OntologyObjectType.GetName(relationType.EntityType)}_{RelationPatchType.GetAbbreviation(ops)}";

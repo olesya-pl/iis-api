@@ -24,7 +24,7 @@ namespace IIS.Core.Ontology
         ITypeBuilder IsAbstraction();
         ITypeBuilder IsEntity();
         IAttributeBuilder IsAttribute();
-        INodeTypeModel Build();
+        INodeTypeLinked Build();
     }
 
     public interface IAttributeBuilder : ITypeBuilder

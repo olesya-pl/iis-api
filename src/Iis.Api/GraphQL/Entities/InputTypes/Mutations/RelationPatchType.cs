@@ -7,6 +7,7 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {
@@ -16,9 +17,9 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         private readonly string _typeName;
         private readonly IInputType _createType;
         private readonly IInputType _updateType;
-        private readonly INodeTypeModel _relationType;
+        private readonly INodeTypeLinked _relationType;
 
-        public RelationPatchType(INodeTypeModel relationType, TypeRepository typeRepository)
+        public RelationPatchType(INodeTypeLinked relationType, TypeRepository typeRepository)
         {
             _relationType = relationType;
             _typeName = GetName(relationType);
@@ -38,13 +39,13 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             }
         }
 
-        public static string GetName(INodeTypeModel relationType)
+        public static string GetName(INodeTypeLinked relationType)
         {
             if (relationType.IsAttributeType)
                 return relationType.AttributeTypeModel.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
-                var ops = relationType.Meta.AcceptsEntityOperations;
+                var ops = relationType.MetaObject.AcceptsEntityOperations;
                 if (ops == null || ops.Length == 0)
                     return "EntityRelationInput";
                 return $"{OntologyObjectType.GetName(relationType.EntityType)}_{GetAbbreviation(ops)}";
@@ -81,7 +82,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             }
             else
             {
-                var ops = _relationType.Meta.AcceptsEntityOperations;
+                var ops = _relationType.MetaObject?.AcceptsEntityOperations;
                 var description = $"Patch array of {_relationType.EntityType.Name} entity type.";
                 if (ops != null)
                     description += $" Accepts entity operations: {string.Join(", ", ops)}";

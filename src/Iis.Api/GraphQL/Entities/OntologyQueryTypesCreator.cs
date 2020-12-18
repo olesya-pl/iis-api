@@ -23,7 +23,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Object creation ----- //
 
-        protected void OnObject(INodeTypeModel type, IObjectTypeDescriptor d = null)
+        protected void OnObject(INodeTypeLinked type, IObjectTypeDescriptor d = null)
         {
             foreach (var parentInterface in type.AllParents.Select(_repository.GetOntologyType).OfType<InterfaceType>())
                 d?.Interface(parentInterface);
@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdByUser").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedBy(ctx));
         }
 
-        protected void OnRelation(INodeTypeModel relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
+        protected void OnRelation(INodeTypeLinked relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
         {
             var type = GetType(relationType);
             if (objectTypeDescriptor == null) return;
@@ -56,7 +56,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private void OnRelation(INodeTypeModel entityType, IGrouping<string, INodeTypeModel> relationTypeGroup,
+        private void OnRelation(INodeTypeLinked entityType, IGrouping<string, INodeTypeLinked> relationTypeGroup,
             IObjectTypeDescriptor objectTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -74,7 +74,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Interfaces creation ----- //
 
-        protected void OnInterface(INodeTypeModel type, IInterfaceTypeDescriptor d = null)
+        protected void OnInterface(INodeTypeLinked type, IInterfaceTypeDescriptor d = null)
         {
             if (d == null) return;
             d.Name(OntologyInterfaceType.GetName(type));
@@ -85,14 +85,14 @@ namespace IIS.Core.GraphQL.Entities
             d.ResolveAbstractType((ctx, obj) => ctx.Service<IOntologyQueryResolver>().ResolveAbstractType(ctx, obj));
         }
 
-        protected void OnRelation(INodeTypeModel relationType,
+        protected void OnRelation(INodeTypeLinked relationType,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             var type = GetType(relationType);
             interfaceTypeDescriptor?.Field(relationType.Name).Type(type.WrapOutputType(relationType));
         }
 
-        private void OnRelation(INodeTypeModel entityType, IGrouping<string, INodeTypeModel> relationTypeGroup,
+        private void OnRelation(INodeTypeLinked entityType, IGrouping<string, INodeTypeLinked> relationTypeGroup,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -107,8 +107,8 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private OutputUnionType GetOutputUnionType(INodeTypeModel entityType,
-            IGrouping<string, INodeTypeModel> relationTypeGroup)
+        private OutputUnionType GetOutputUnionType(INodeTypeLinked entityType,
+            IGrouping<string, INodeTypeLinked> relationTypeGroup)
         {
             if (relationTypeGroup.Any(r => !r.IsEntityType))
                 throw new ArgumentException(
@@ -123,7 +123,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Generic ----- //
 
-        private IOutputType GetType(INodeTypeModel relationType)
+        private IOutputType GetType(INodeTypeLinked relationType)
         {
             var type = relationType.IsAttributeType
                 ? GetAttributeType(relationType)
@@ -133,7 +133,7 @@ namespace IIS.Core.GraphQL.Entities
             return type;
         }
 
-        private IOutputType GetAttributeType(INodeTypeModel relationType)
+        private IOutputType GetAttributeType(INodeTypeLinked relationType)
         {
             var type = relationType.AttributeTypeModel;
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
@@ -141,7 +141,7 @@ namespace IIS.Core.GraphQL.Entities
             return _repository.GetScalarOutputType(type.ScalarTypeEnum);
         }
 
-        public IOntologyType NewOntologyType(INodeTypeModel type)
+        public IOntologyType NewOntologyType(INodeTypeLinked type)
         {
             if (type.IsAbstract)
             {

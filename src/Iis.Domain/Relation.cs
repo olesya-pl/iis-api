@@ -11,12 +11,12 @@ namespace Iis.Domain
         {
             get
             {
-                return Nodes.SingleOrDefault(e => e.Type.Source.Kind != Kind.Relation)
+                return Nodes.SingleOrDefault(e => e.Type.Kind != Kind.Relation)
                        ?? throw new Exception("Relation does not have a target.");
             }
             set
             {
-                var currentValue = Nodes.SingleOrDefault(e => e.Type.Source.Kind != Kind.Relation);
+                var currentValue = Nodes.SingleOrDefault(e => e.Type.Kind != Kind.Relation);
                 if (currentValue != null)
                     RemoveNode(currentValue);
                 AddNode(value);
@@ -26,7 +26,7 @@ namespace Iis.Domain
         public Attribute AttributeTarget => Nodes.OfType<Attribute>().SingleOrDefault();
         public Entity EntityTarget => Nodes.OfType<Entity>().SingleOrDefault();
 
-        public Relation(Guid id, INodeTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
+        public Relation(Guid id, INodeTypeLinked type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
 

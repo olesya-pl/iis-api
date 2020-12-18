@@ -15,7 +15,7 @@ namespace IIS.Core.GraphQL.Common
 
         public int Count => _source.Count();
 
-        [GraphQLNonNullType] //[GraphQLType(typeof(NonNullType<ListType<NonNullType<INodeTypeModel>>>))]
+        [GraphQLNonNullType] //[GraphQLType(typeof(NonNullType<ListType<NonNullType<INodeTypeLinked>>>))]
         public IEnumerable<TResult> GetItems()
         {
             return _source.Select(Select);

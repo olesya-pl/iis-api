@@ -13,6 +13,7 @@ using Iis.Domain;
 using IIS.Domain;
 using AutoMapper;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Reports
 {
@@ -21,7 +22,7 @@ namespace IIS.Core.GraphQL.Reports
         private readonly TypeRepository _typeRepository;
         private readonly IOntologyModel _ontology;
         IOntologyType objectType;
-        INodeTypeModel type;
+        INodeTypeLinked type;
 
         public ReportType(TypeRepository typeRepository, IOntologyModel ontology)
         {

@@ -71,10 +71,10 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public abstract class EntityAttributeBase : IEntityAttribute
     {
-        public EntityAttributeBase(INodeTypeModel source)
+        public EntityAttributeBase(INodeTypeLinked source)
         {
             Source = source;
-            MetaObject = Source.Meta;
+            MetaObject = Source.MetaObject;
 
             var configuration = new MapperConfiguration(cfg =>
             {
@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             _mapper = new Mapper(configuration);
         }
         protected IMapper _mapper;
-        protected INodeTypeModel Source { get; }
+        protected INodeTypeLinked Source { get; }
         protected ISchemaMeta MetaObject { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
@@ -133,7 +133,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributePrimitive : EntityAttributeBase
     {
-        public EntityAttributePrimitive(INodeTypeModel source) : base(source)
+        public EntityAttributePrimitive(INodeTypeLinked source) : base(source)
         {
         }
 
@@ -143,7 +143,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(INodeTypeModel source, IOntologyModel ontology) : base(source)
+        public EntityAttributeRelation(INodeTypeLinked source, IOntologyModel ontology) : base(source)
         {
             _ontology = ontology;
         }
@@ -154,7 +154,7 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<StringType>>>))]
         public IEnumerable<string> AcceptsEntityOperations =>
-            (Source.Meta.AcceptsEntityOperations ?? new EntityOperation[]{})
+            (Source.MetaObject?.AcceptsEntityOperations ?? new EntityOperation[]{})
                 .Select(e => e.ToString().ToLower());
 
         [GraphQLNonNullType]
@@ -165,13 +165,13 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
         public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology)
         {
-            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<INodeTypeModel>();
+            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<INodeTypeLinked>();
             if (types == null)
                 types = new[] {Source.EntityType };
             else if (!types.Any(t => t.Id == Source.EntityType.Id))
                 types = types.Union(new[] {Source.EntityType });
 
-            var metaTargetTypes = Source.Meta?.TargetTypes;
+            var metaTargetTypes = Source.MetaObject?.TargetTypes;
             if (metaTargetTypes != null && metaTargetTypes.Length > 0)
             {
                 types = types.Where(t => metaTargetTypes.Contains(t.Name));

@@ -70,7 +70,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private Task<Entity> CreateRootEntity(
             Guid entityId,
-            INodeTypeModel type,
+            INodeTypeLinked type,
             Dictionary<string, object> properties)
         {
             return CreateEntityCore(entityId, type, properties, string.Empty, entityId);
@@ -78,7 +78,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Entity> CreateEntity(
             Guid entityId,
-            INodeTypeModel type,
+            INodeTypeLinked type,
             string dotName,
             Dictionary<string, object> properties)
         {
@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         private async Task<Entity> CreateEntityCore(Guid rootEntityId,
-            INodeTypeModel type, 
+            INodeTypeLinked type, 
             Dictionary<string, object> properties,
             string dotName,
             Guid entityId)
@@ -129,7 +129,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node;
         }
 
-        private Entity GetUniqueValueEntity(INodeTypeModel type, Dictionary<string, object> properties)
+        private Entity GetUniqueValueEntity(INodeTypeLinked type, Dictionary<string, object> properties)
         {
             if (properties.ContainsKey(type.UniqueValueFieldName))
             {
@@ -140,7 +140,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         private async Task<IEnumerable<Relation>> CreateRelations(Guid entityId,
-            INodeTypeModel embed, 
+            INodeTypeLinked embed, 
             object value,
             string dotName,
             Guid requestId)
@@ -159,7 +159,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Relation[]> CreateMultipleProperties(
             Guid entityId,
-            INodeTypeModel embed, 
+            INodeTypeLinked embed, 
             object value,
             string oldValue,
             string dotName,
@@ -184,7 +184,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public async Task<Relation> CreateSinglePropertyAsync(
             Guid entityId,
-            INodeTypeModel embed, 
+            INodeTypeLinked embed, 
             object value,
             string oldValue,
             string dotName,
@@ -197,7 +197,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         private async Task<Node> CreateNode(Guid entityId,
-            INodeTypeModel embed,             
+            INodeTypeLinked embed,             
             object value, 
             string oldValue,
             string dotName,
@@ -226,7 +226,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private async Task<Node> CreateNode(
             Guid entityId,
-            INodeTypeModel embed, 
+            INodeTypeLinked embed, 
             object value,
             string dotName) // attribute or entity
         {

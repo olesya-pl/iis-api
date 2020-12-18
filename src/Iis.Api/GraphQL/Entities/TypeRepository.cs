@@ -10,6 +10,7 @@ using IIS.Domain;
 using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using HotChocolate.Types;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -58,7 +59,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel parent)
+        public IEnumerable<INodeTypeLinked> GetChildTypes(INodeTypeLinked parent)
         {
             return _ontology.GetChildTypes(parent);
         }
@@ -70,7 +71,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- READ QUERY TYPES ----- //
 
-        public IOntologyType GetOntologyType(INodeTypeModel type)
+        public IOntologyType GetOntologyType(INodeTypeLinked type)
         {
             return GetOrCreate(type.Name, () => _creator.NewOntologyType(type));
         }
@@ -92,7 +93,7 @@ namespace IIS.Core.GraphQL.Entities
                 new MultipleOutputType(name, GetScalarOutputType(scalarType)));
         }
 
-        public OutputUnionType GetOutputUnionType(INodeTypeModel source, string propertyName,
+        public OutputUnionType GetOutputUnionType(INodeTypeLinked source, string propertyName,
             IEnumerable<ObjectType> outputTypes)
         {
             var name = OutputUnionType.GetName(source, propertyName);
@@ -103,7 +104,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC SCHEMA TYPES ----- //
 
-        public IInputType GetInputAttributeType(INodeTypeModel attributeType)
+        public IInputType GetInputAttributeType(INodeTypeLinked attributeType)
         {
             IInputType type;
             if (attributeType.ScalarTypeEnum == OScalarType.File)
@@ -115,34 +116,34 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC MUTATOR TYPES ----- //
 
-        public MutatorInputType GetMutatorInputType(Operation operation, INodeTypeModel type)
+        public MutatorInputType GetMutatorInputType(Operation operation, INodeTypeLinked type)
         {
             var name = MutatorInputType.GetName(operation, type.Name);
             return GetOrCreate(name, () => GetMutator(operation).NewMutatorInputType(type));
         }
 
-        public MutatorResponseType GetMutatorResponseType(Operation operation, INodeTypeModel type)
+        public MutatorResponseType GetMutatorResponseType(Operation operation, INodeTypeLinked type)
         {
             var name = MutatorResponseType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new MutatorResponseType(GetMutator(operation).Operation, type, GetOntologyType(type)));
         }
 
-        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, INodeTypeModel type)
+        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, INodeTypeLinked type)
         {
             var name = EntityRelationToInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new EntityRelationToInputType(operation, type, GetEntityUnionInputType(operation, type)));
         }
 
-        public EntityUnionInputType GetEntityUnionInputType(Operation operation, INodeTypeModel type)
+        public EntityUnionInputType GetEntityUnionInputType(Operation operation, INodeTypeLinked type)
         {
             var name = EntityUnionInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new EntityUnionInputType(operation, type, this));
         }
 
-        public MultipleInputType GetMultipleInputType(Operation operation, INodeTypeModel type)
+        public MultipleInputType GetMultipleInputType(Operation operation, INodeTypeLinked type)
         {
             var scalarName = type.ScalarTypeEnum.ToString();
             var name = MultipleInputType.GetName(operation, scalarName);
@@ -152,14 +153,14 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- UPDATE TYPES ----- //
 
-        public RelationPatchType GetRelationPatchType(INodeTypeModel relationType)
+        public RelationPatchType GetRelationPatchType(INodeTypeLinked relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>
                 new RelationPatchType(relationType, this));
         }
 
-        public SingularRelationPatchType GetSingularRelationPatchType(INodeTypeModel relationType)
+        public SingularRelationPatchType GetSingularRelationPatchType(INodeTypeLinked relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>

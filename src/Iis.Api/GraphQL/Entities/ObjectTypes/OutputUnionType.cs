@@ -5,6 +5,7 @@ using HotChocolate.Types;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
@@ -13,10 +14,10 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
     {
         private readonly IEnumerable<ObjectType> _objectTypes;
 
-        private readonly INodeTypeModel _source;
+        private readonly INodeTypeLinked _source;
         private readonly string _relationName;
 
-        public OutputUnionType(INodeTypeModel source, string relationName, IEnumerable<ObjectType> objectTypes)
+        public OutputUnionType(INodeTypeLinked source, string relationName, IEnumerable<ObjectType> objectTypes)
         {
             _source = source;
             _relationName = relationName;
@@ -25,7 +26,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 throw new ArgumentException("Two or more types are required to create a union.");
         }
 
-        public static string GetName(INodeTypeModel source, string relationName)
+        public static string GetName(INodeTypeLinked source, string relationName)
         {
             return $"{OntologyObjectType.GetName(source)}_{relationName}_Union";
         }

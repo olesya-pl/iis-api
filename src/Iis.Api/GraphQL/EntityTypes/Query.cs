@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.EntityTypes
@@ -14,12 +15,12 @@ namespace IIS.Core.GraphQL.EntityTypes
         public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
             EntityTypesFilter filter = null)
         {
-            IEnumerable<INodeTypeModel> types;
+            IEnumerable<INodeTypeLinked> types;
             if (!string.IsNullOrEmpty(filter?.Parent))
             {
                 var et = ontology.GetEntityType(filter.Parent);
                 if (et == null)
-                    types = new List<INodeTypeModel>();
+                    types = new List<INodeTypeLinked>();
                 else
                     types = ontology.GetChildTypes(et);                
             }
@@ -29,7 +30,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             }
             if (filter?.ConcreteTypes == true)
             {
-                types = types.OfType<INodeTypeModel>().Where(t => !t.IsAbstract);
+                types = types.OfType<INodeTypeLinked>().Where(t => !t.IsAbstract);
             }                
             return Task.FromResult(new EntityTypeCollection(types, ontology));
         }

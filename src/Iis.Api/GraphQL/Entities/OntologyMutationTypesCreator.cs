@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL.Entities
         public Operation Operation { get; }
 
         // this return value should not be wrapped in NonNullType()
-        public MutatorInputType NewMutatorInputType(INodeTypeModel type)
+        public MutatorInputType NewMutatorInputType(INodeTypeLinked type)
         {
             var configure = new Action<IInputObjectTypeDescriptor>(d =>
             {
@@ -36,7 +36,7 @@ namespace IIS.Core.GraphQL.Entities
             return new MutatorInputType(configure);
         }
 
-        protected virtual void OnRelation(INodeTypeModel relationType,
+        protected virtual void OnRelation(INodeTypeLinked relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             var type = relationType.IsAttributeType
@@ -54,7 +54,7 @@ namespace IIS.Core.GraphQL.Entities
         {
         }
 
-        protected override void OnRelation(INodeTypeModel relationType,
+        protected override void OnRelation(INodeTypeLinked relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type = null;
@@ -82,7 +82,7 @@ namespace IIS.Core.GraphQL.Entities
         {
         }
 
-        protected override void OnRelation(INodeTypeModel relationType,
+        protected override void OnRelation(INodeTypeLinked relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type;

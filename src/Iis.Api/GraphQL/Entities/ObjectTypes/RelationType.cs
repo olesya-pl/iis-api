@@ -1,6 +1,7 @@
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using System;
 
@@ -32,13 +33,13 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             }
 
             [GraphQLType(typeof(EmbeddingRelationTypeType))]
-            public INodeTypeModel Type([Parent] Relation parent) => parent.Type;
+            public INodeTypeLinked Type([Parent] Relation parent) => parent.Type;
         }
     }
 
-    public class EmbeddingRelationTypeType : ObjectType<INodeTypeModel>
+    public class EmbeddingRelationTypeType : ObjectType<INodeTypeLinked>
     {
-        protected override void Configure(IObjectTypeDescriptor<INodeTypeModel> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<INodeTypeLinked> descriptor)
         {
             descriptor.BindFields(BindingBehavior.Explicit);
             descriptor.Include<Resolvers>();
@@ -47,13 +48,13 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         private class Resolvers
         {
             [GraphQLType(typeof(NonNullType<IdType>))]
-            public Guid Id([Parent] INodeTypeModel parent) => parent.Id;
+            public Guid Id([Parent] INodeTypeLinked parent) => parent.Id;
 
             [GraphQLNonNullType]
-            public string Code([Parent] INodeTypeModel parent) => parent.Name;
+            public string Code([Parent] INodeTypeLinked parent) => parent.Name;
 
             [GraphQLNonNullType]
-            public string Title([Parent] INodeTypeModel parent) => parent.Title;
+            public string Title([Parent] INodeTypeLinked parent) => parent.Title;
         }
     }
 }

@@ -24,15 +24,15 @@ namespace Iis.OntologyModelWrapper
             _source = source;
         }
 
-        public IEnumerable<INodeTypeModel> AllParents => _source.GetAllAncestors().Select(nt => new NodeTypeWrapper(nt));
+        public IEnumerable<INodeTypeLinked> AllParents => _source.GetAllAncestors();
 
-        public IEnumerable<INodeTypeModel> AllProperties => _source.GetAllProperties().Select(nt => new NodeTypeWrapper(nt));
+        public IEnumerable<INodeTypeLinked> AllProperties => _source.GetAllProperties();
 
         public DateTime CreatedAt => _source.CreatedAt;
 
-        public IEnumerable<INodeTypeModel> DirectParents => _source.DirectParents.Select(nt => new NodeTypeWrapper(nt));
+        public IEnumerable<INodeTypeLinked> DirectParents => _source.DirectParents;
 
-        public IEnumerable<INodeTypeModel> DirectProperties => _source.DirectProperties.Select(nt => new NodeTypeWrapper(nt));
+        public IEnumerable<INodeTypeLinked> DirectProperties => _source.DirectProperties;
 
         public bool HasUniqueValues => _source.HasUniqueValues;
         public string UniqueValueFieldName => _source.UniqueValueFieldName;
@@ -50,12 +50,12 @@ namespace Iis.OntologyModelWrapper
         public DateTime UpdatedAt => _source.UpdatedAt;
         public bool IsComputed => !string.IsNullOrWhiteSpace(_source.MetaObject?.Formula);
 
-        public INodeTypeModel GetProperty(string typeName)
+        public INodeTypeLinked GetProperty(string typeName)
         {
             return AllProperties.FirstOrDefault(p => p.Name == typeName);
         }
 
-        public bool IsSubtypeOf(INodeTypeModel type)
+        public bool IsSubtypeOf(INodeTypeLinked type)
         {
             return Id == type.Id || _source.IsInheritedFrom(type.Name);
         }
@@ -78,14 +78,14 @@ namespace Iis.OntologyModelWrapper
 
         public EmbeddingOptions EmbeddingOptions => _source.RelationType.EmbeddingOptions;
 
-        public INodeTypeModel EntityType =>
+        public INodeTypeLinked EntityType =>
             _source.RelationType.TargetType.Kind == Kind.Entity ?
-                    new NodeTypeWrapper(_source.RelationType.TargetType) :
+                    _source.RelationType.TargetType :
                     null;
 
-        public INodeTypeModel AttributeTypeModel =>
+        public INodeTypeLinked AttributeTypeModel =>
             _source.RelationType.TargetType.Kind == Kind.Attribute ?
-                new NodeTypeWrapper(_source.RelationType.TargetType) :
+                _source.RelationType.TargetType :
                 null;
 
         public bool IsAttributeType => _source.RelationType.TargetType.Kind == Kind.Attribute;
@@ -94,10 +94,10 @@ namespace Iis.OntologyModelWrapper
 
         public bool IsInversed => _source.IsInversed;
 
-        public INodeTypeModel TargetType =>
+        public INodeTypeLinked TargetType =>
             _source?.RelationType.TargetType == null ?
                 null :
-                new NodeTypeWrapper(_source.RelationType.TargetType);
+                _source.RelationType.TargetType;
 
         public bool AcceptsOperation(EntityOperation create) => true;
         public IAttributeType AttributeType => Source.AttributeType;

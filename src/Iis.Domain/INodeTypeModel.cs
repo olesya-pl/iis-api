@@ -19,16 +19,16 @@ namespace Iis.Domain
         string UniqueValueFieldName { get; }
         bool IsAbstract { get; }
         bool IsComputed { get; }
-        IEnumerable<INodeTypeModel> DirectParents { get; }
-        IEnumerable<INodeTypeModel> AllParents { get; }
-        IEnumerable<INodeTypeModel> DirectProperties { get; }
-        IEnumerable<INodeTypeModel> AllProperties { get; }
+        IEnumerable<INodeTypeLinked> DirectParents { get; }
+        IEnumerable<INodeTypeLinked> AllParents { get; }
+        IEnumerable<INodeTypeLinked> DirectProperties { get; }
+        IEnumerable<INodeTypeLinked> AllProperties { get; }
         bool IsObjectOfStudy { get; }
         INodeTypeLinked Source { get; }
-        INodeTypeModel GetProperty(string typeName);
-        bool IsSubtypeOf(INodeTypeModel type);
+        INodeTypeLinked GetProperty(string typeName);
+        bool IsSubtypeOf(INodeTypeLinked type);
 
-        INodeTypeModel AttributeTypeModel { get; }
+        INodeTypeLinked AttributeTypeModel { get; }
         IAttributeType AttributeType { get; }
         IRelationTypeLinked RelationType { get; }
         
@@ -39,11 +39,11 @@ namespace Iis.Domain
 
         #region RelationType
         EmbeddingOptions EmbeddingOptions { get; }
-        INodeTypeModel EntityType { get; }
+        INodeTypeLinked EntityType { get; }
         bool IsAttributeType { get; }
         bool IsEntityType { get; }
         bool IsInversed { get; }
-        INodeTypeModel TargetType { get; }
+        INodeTypeLinked TargetType { get; }
         bool AcceptsOperation(EntityOperation create);
         #endregion
     }

@@ -14,14 +14,14 @@ namespace Iis.OntologyModelWrapper
             _schema = schema;
         }
 
-        public IEnumerable<INodeTypeModel> EntityTypes => _schema.GetEntityTypes().Select(et => new NodeTypeWrapper(et));
+        public IEnumerable<INodeTypeLinked> EntityTypes => _schema.GetEntityTypes();
 
-        public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel type)
+        public IEnumerable<INodeTypeLinked> GetChildTypes(INodeTypeLinked type)
         {
             var nodeType = _schema.GetNodeTypeById(type.Id);
-            var result = new List<INodeTypeModel>();
+            var result = new List<INodeTypeLinked>();
             
-            result.AddRange(nodeType.GetAllDescendants().Distinct().Select(nt => new NodeTypeWrapper(nt)));
+            result.AddRange(nodeType.GetAllDescendants().Distinct());
             if (!result.Any(nt => nt.Id == type.Id))
             {
                 result.Add(type);
@@ -29,12 +29,12 @@ namespace Iis.OntologyModelWrapper
             return result.Distinct();
         }
 
-        public INodeTypeModel GetEntityType(string name)
+        public INodeTypeLinked GetEntityType(string name)
         {
-            return new NodeTypeWrapper(_schema.GetEntityTypeByName(name));
+            return _schema.GetEntityTypeByName(name);
         }
 
-        public INodeTypeModel GetType(Guid id)
+        public INodeTypeLinked GetType(Guid id)
         {
             var nodeType = _schema.GetNodeTypeById(id);
             
@@ -43,33 +43,25 @@ namespace Iis.OntologyModelWrapper
             switch (nodeType.Kind)
             {
                 case Kind.Entity:
-                    return new NodeTypeWrapper(nodeType);
+                    return nodeType;
                 case Kind.Attribute:
-                    return new NodeTypeWrapper(nodeType);
+                    return nodeType;
                 case Kind.Relation:
-                    return new NodeTypeWrapper(nodeType);
+                    return nodeType;
             }
             return null;
         }
 
-        public IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeModel
+        public IEnumerable<T> GetTypes<T>(string name) where T : INodeTypeLinked
         {
-            var list = new List<INodeTypeModel>();
+            var list = new List<INodeTypeLinked>();
             var nodeTypes = _schema.GetAllNodeTypes();
             foreach (var nodeType in nodeTypes)
             {
-                if (nodeType.Name != name) continue;
-                switch (nodeType.Kind)
+                if (nodeType.Name == name)
                 {
-                    case Kind.Entity: 
-                        list.Add(new NodeTypeWrapper(nodeType));
-                        break;
-                    case Kind.Attribute:
-                        list.Add(new NodeTypeWrapper(nodeType));
-                        break;
-                    case Kind.Relation:
-                        list.Add(new NodeTypeWrapper(nodeType));
-                        break;
+                    list.Add(nodeType);
+                    break;
                 }
             }
             return list.OfType<T>();
