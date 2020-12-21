@@ -45,6 +45,7 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         UiOntologyDataControl _uiOntologyDataControl;
+        RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         const string VERSION = "1.20";
         Button btnMigrate;
@@ -240,11 +241,10 @@ namespace Iis.OntologyManager
             btnDuplicates.Click += btnDuplicates_Click;
             container.Add(btnDuplicates);
 
-            var btnRemoveEntity = new Button { Text = "Видалити сутність", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            var btnRemoveEntity = new Button { Text = "Видалення", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btnRemoveEntity.Click += RemoveEntityClick;
 
             container.Add(btnRemoveEntity);
-
 
             panelTop.ResumeLayout();
         }
@@ -308,7 +308,6 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
-
         private void btnMigrate_Click(object sender, EventArgs e)
         {
             var form = _uiControlsCreator.GetModalForm(this);
@@ -352,12 +351,26 @@ namespace Iis.OntologyManager
             var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
 
+            form.Text = "Видалення";
+
+            _removeEntityUiControl = new RemoveEntityUiControl();
+            _removeEntityUiControl.Initialize("RemoveEntityControl", rootPanel);
+            _removeEntityUiControl.OnGetOntologyData += () => _ontologyData;
+            _removeEntityUiControl.OnRemove += OnRemove;
+
             form.ShowDialog();
 
             form.Close();
+        }
+
+        private void OnRemove(Guid entityId)
+        {
+
+            MessageBox.Show("OnRemove");
+
             //var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress);
 
-            //var result = requestWrapper.DeleteEntityAsync(Guid.Parse("4787d92ee9d211e9ab4c37575451fca8")).ConfigureAwait(false).GetAwaiter().GetResult();
+            //var result = requestWrapper.DeleteEntityAsync(entityId).ConfigureAwait(false).GetAwaiter().GetResult();
 
             //MessageBox.Show(result.ToString());
         }
