@@ -16,7 +16,7 @@ namespace AcceptanceTests.PageObjects
         }
 
 
-        [FindsBy(How = How.CssSelector, Using = ".el-button.el-button--default.el-tooltip")]
+        [FindsBy(How = How.CssSelector, Using = ".entity-search .entity-search__toggle button")]
         [CacheLookup]
         public IWebElement SearchLoopButton;
 

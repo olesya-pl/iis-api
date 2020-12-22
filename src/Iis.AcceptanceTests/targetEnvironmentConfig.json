@@ -7,7 +7,7 @@
     "RemoteWebDriverUrl": "http://localhost:4444/wd/hub"
   },
   "Dev": {
-    "BaseAddress": "https://dev.contour.net",
+    "BaseAddress": "http://dev.contour.net",
     "BaseApiAddress": "https://dev-api.contour.net:5000",
     "defaultUserName": "olya",
     "defaultUserPassword": "hammer69",

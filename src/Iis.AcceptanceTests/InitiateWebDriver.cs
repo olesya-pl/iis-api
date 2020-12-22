@@ -30,8 +30,8 @@ namespace AcceptanceTests
             driverOptions.AddAdditionalCapability("enableVNC", true, true);
             driverOptions.AddAdditionalCapability("screenResolution", "1920x1080x24", true);
 
-            //var driver = new ChromeDriver();
-            //var driver = new RemoteWebDriver(new Uri("http://192.168.88.114:4444/wd/hub"), driverOptions);
+            // var driver = new ChromeDriver();
+            // var driver = new RemoteWebDriver(new Uri("http://192.168.88.114:4444/wd/hub"), driverOptions);
             var driver = new RemoteWebDriver(new Uri(TestData.RemoteWebDriverUrl), driverOptions);
             //homeUrl = "http://qa.contour.net/";
             driver.Manage().Window.Maximize();
