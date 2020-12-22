@@ -45,7 +45,7 @@ namespace Iis.OntologyManager
         UiRelationEntityControl _uiRelationEntityControl;
         UiOntologyDataControl _uiOntologyDataControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.22";
+        const string VERSION = "1.23";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -276,6 +276,8 @@ namespace Iis.OntologyManager
 
             form.ShowDialog();
             form.Close();
+            if (control.UpdatedDatabases.Contains(SelectedSchemaSource.Title))
+                LoadCurrentSchema();
         }
         private void btnDuplicates_Click(object sender, EventArgs e)
         {
@@ -328,8 +330,7 @@ namespace Iis.OntologyManager
         #region Schema Logic
         private void LoadCurrentSchema()
         {
-            var currentSchemaSource = (OntologySchemaSource)cmbSchemaSources.SelectedItem ??
-                (_schemaSources?.Count > 0 ? _schemaSources[0] : (OntologySchemaSource)null);
+            var currentSchemaSource = SelectedSchemaSource;
             if (currentSchemaSource == null) return;
 
             _schema = _schemaService.GetOntologySchema(currentSchemaSource);
