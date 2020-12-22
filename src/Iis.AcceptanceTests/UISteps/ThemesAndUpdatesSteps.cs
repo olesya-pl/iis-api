@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
@@ -59,6 +60,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see a theme with specified name")]
         public void ThenIMustSeeAThemeWithASpecifiedName()
         {
+            var list = themesAndUpdatesPageObjects.Themes.First().Name;
             var themeName = context.GetResponse<string>("themeName");
             Assert.True(themesAndUpdatesPageObjects.GetThemeByTitle(themeName).Displayed);
         }

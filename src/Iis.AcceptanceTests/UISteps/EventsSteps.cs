@@ -33,7 +33,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the (.*) event in the event list")]
         public void WhenIGotAllEventsList(string eventName)
         {
-            var xyz = eventsPage.Events.First().Click();
+            //var xyz = eventsPage.Events.First().Click();
             // var events = eventsPage.GetEventsByName("захід");
             // var eventTitle = eventsPage.GetEventByTitle("Захід");
         }

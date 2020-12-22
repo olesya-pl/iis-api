@@ -47,6 +47,11 @@ namespace Iis.AcceptanceTests.PageObjects.Controls
             this.driver = driver;
             themeElement = webElement;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
         public Theme(IWebDriver driver, string value)
         {
             this.driver = driver;

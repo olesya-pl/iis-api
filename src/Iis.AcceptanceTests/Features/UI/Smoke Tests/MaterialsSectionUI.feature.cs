@@ -407,18 +407,18 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 54
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
                             "ImportanceDropDown"});
-                table3.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "RelevanceDropDown"});
-                table3.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "СompletenessOfInformation"});
-                table3.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "SourceCredibility"});
-                table3.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "Originator"});
 #line 55
-        testRunner.Then("I must see these elements", ((string)(null)), table3, "Then ");
+        testRunner.Then("I must see these elements", ((string)(null)), table4, "Then ");
 #line hidden
 #line 63
         testRunner.Then("I must I must see at least one user in the originator drop down menu", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

@@ -202,12 +202,14 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         [Xunit.TraitAttribute("FeatureTitle", "ObjectsOfStudySection - smoke")]
         [Xunit.TraitAttribute("Description", "IIS-6207 - Open a small object of study card")]
         [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "sanity")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "ObjectOfStudySmallCardUI")]
         public virtual void IIS_6207_OpenASmallObjectOfStudyCard()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
+                    "sanity",
                     "UI",
                     "ObjectOfStudySmallCardUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
@@ -252,12 +254,14 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         [Xunit.TraitAttribute("FeatureTitle", "ObjectsOfStudySection - smoke")]
         [Xunit.TraitAttribute("Description", "IIS-6208 - Open a big object of study card")]
         [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "sanity")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "ObjectOfStudySmallCardUI")]
         public virtual void IIS_6208_OpenABigObjectOfStudyCard()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
+                    "sanity",
                     "UI",
                     "ObjectOfStudySmallCardUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
@@ -291,25 +295,25 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 33
         testRunner.And("I clicked on enlarge small card button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                             "BigCardProfileTab"});
-                table4.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "BigCardMaterialsTab"});
-                table4.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "BigCardEventsTab"});
-                table4.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "BigCardChangeHistoryTab"});
-                table4.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "BigCardRelationsTab"});
 #line 34
-        testRunner.Then("I must see these tabs in the big object of study card", ((string)(null)), table4, "Then ");
+        testRunner.Then("I must see these tabs in the big object of study card", ((string)(null)), table5, "Then ");
 #line hidden
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                             "BigCardAffiliation"});
-                table5.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "BigCardImportance"});
 #line 42
-        testRunner.Then("I must see the specific text blocks in big object of study card", ((string)(null)), table5, "Then ");
+        testRunner.Then("I must see the specific text blocks in big object of study card", ((string)(null)), table6, "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

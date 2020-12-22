@@ -1,4 +1,5 @@
 using AcceptanceTests.PageObjects;
+using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
@@ -133,6 +134,29 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'3 окрема мотострілецька бригада \"Беркут\"')]")]
         [CacheLookup]
         public IWebElement ThirdBrigadeSearchResult;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),' Створити обʼєкт... ')]")]
+        public IWebElement CreateANewObjectOfStudyButton;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(@class, 'el-tree-node__label') and text() = 'Військовий підрозділ']")]
+        public IWebElement CreateAMilitaryOrganizationButton;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='affiliation'] .el-input__inner")]
+        public IWebElement AffiliationField;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='importance'] .el-input__inner")]
+        public IWebElement ImportanceField;
+
+        [FindsBy(How = How.CssSelector, Using = "//div[contains(text(),' Класифікатори ')]")]
+        public IWebElement ClassifiersBlock;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='parent'] .el-input__inner")]
+        public IWebElement DirectReportingRelationship;
+
+        public ObjectsSearch GetObjectByTitle(string title)
+        {
+            return new ObjectsSearch(driver, title);
+        }
         public HierarchyCard GetHierarchyCardByTitle(string title)
         {
             return new HierarchyCard(driver, title);

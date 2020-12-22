@@ -110,6 +110,50 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.GetHierarchyCardByTitle(cardName).Expand();
         }
+
+        [When(@"I clicked on the create a new object of study button")]
+        public void WhenIClickOnTheCreateANewObjectOfStudyButton()
+        {
+            objectsOfStudyPage.CreateANewObjectOfStudyButton.Click();
+        }
+
+        [When(@"I clicked on the create a new military organization button")]
+        public void WhenIClickOnTheCreateANewMilitaryOrganizationButton()
+        {
+            objectsOfStudyPage.CreateAMilitaryOrganizationButton.Click();
+            driver.WaitFor(0.5);
+        }
+
+        [When(@"I entered the (.*) value in the affiliation field")]
+        public void WhenIEnteredTheValueInTheAffiliationField(string value)
+        {
+            objectsOfStudyPage.AffiliationField.SendKeys(value);
+            objectsOfStudyPage.AffiliationField.SendKeys(Keys.Down);
+            objectsOfStudyPage.AffiliationField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I entered the (.*) value in the importance field")]
+        public void WhenIEnteredTheValueInTheImportanceField(string value)
+        {
+            objectsOfStudyPage.ImportanceField.SendKeys(value);
+            objectsOfStudyPage.ImportanceField.SendKeys(Keys.Down);
+            objectsOfStudyPage.ImportanceField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I clicked on the classifiers block")]
+        public void WhenIClickedOnTheClassifiersBlock()
+        {
+            objectsOfStudyPage.ClassifierBlock.Click();
+            driver.WaitFor(1);
+        }
+
+        [When(@"I entered the (.*) value in the direct reporting relationship field")]
+        public void WhenIEnteredTheValueInTheDirectReportingRelationShipField(string value)
+        {
+            objectsOfStudyPage.DirectReportingRelationship.SendKeys(value);
+            objectsOfStudyPage.DirectReportingRelationship.SendKeys(Keys.Up);
+            objectsOfStudyPage.DirectReportingRelationship.SendKeys(Keys.Enter);
+        }
         #endregion
 
         #region Then
@@ -208,10 +252,21 @@ namespace AcceptanceTests.UISteps
             }
         }
 
-        [Then(@"I must see third brigade Berkut as one of the search results")]
-        public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResults()
+        [Then(@"I must see the (.*) as one of the search results")]
+        public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResults(string value)
         {
-            Assert.True(objectsOfStudyPage.ThirdBrigadeSearchResult.Displayed);
+            //Assert.True(objectsOfStudyPage.ThirdBrigadeSearchResult.Displayed);
+            Assert.True(objectsOfStudyPage.GetObjectByTitle(value).Displayed);
+        }
+
+        [Then(@"I must see the specified result")]
+        public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResultss(Table table)
+        {
+            foreach (TableRow row in table.Rows)
+            {
+                var tableValue = row.Values.First();
+                Assert.True(objectsOfStudyPage.GetObjectByTitle(tableValue).Displayed);
+            }
         }
 
         [Then(@"I must see name real full is equal to the (.*) value")]

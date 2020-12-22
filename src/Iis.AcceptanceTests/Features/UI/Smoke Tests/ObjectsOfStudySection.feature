@@ -21,13 +21,13 @@ Feature: ObjectsOfStudySection - smoke
         And I searched ! data in the Objects of study section
         Then I must see zero search results in the Object of study page
 
-    @smoke @UI @ObjectOfStudySmallCardUI
+    @smoke @sanity @UI @ObjectOfStudySmallCardUI
     Scenario: IIS-6207 - Open a small object of study card
         When I clicked on first object of study
         Then I must see the object of study small card
         Then I must see the title тест графа наземного базування in the small card
 
-    @smoke @UI @ObjectOfStudySmallCardUI
+    @smoke @sanity @UI @ObjectOfStudySmallCardUI
     Scenario: IIS-6208 - Open a big object of study card
         When I clicked on first object of study
         And I clicked on enlarge small card button

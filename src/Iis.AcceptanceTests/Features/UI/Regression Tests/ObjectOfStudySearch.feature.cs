@@ -251,12 +251,14 @@ namespace AcceptanceTests.Features.UI.RegressionTests
         [Xunit.TraitAttribute("FeatureTitle", "ObjectsOfStudySearch - functional")]
         [Xunit.TraitAttribute("Description", "IIS-6082 - Search object of study by full name")]
         [Xunit.TraitAttribute("Category", "functional")]
+        [Xunit.TraitAttribute("Category", "sanity")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "ObjectsOfStudySearchUI")]
         public virtual void IIS_6082_SearchObjectOfStudyByFullName()
         {
             string[] tagsOfScenario = new string[] {
                     "functional",
+                    "sanity",
                     "UI",
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
