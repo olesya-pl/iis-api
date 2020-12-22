@@ -27,6 +27,8 @@ namespace Iis.OntologyManager
         #region Fields
 
         const string EnvironmentPropertiesSectionName = "environmentProperties";
+        const string UserCredentialsSectionName = "userCredentials";
+
         IReadOnlyCollection<SchemaDataSource> _schemaSources;
 
         IConfiguration _configuration;
@@ -37,6 +39,7 @@ namespace Iis.OntologyManager
         INodeTypeLinked _currentNodeType;
         OntologySchemaService _schemaService;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
+        UserCredentials _userCredentials;
 
         UiFilterControl _filterControl;
         UiMigrationControl _migrationControl;
@@ -93,6 +96,9 @@ namespace Iis.OntologyManager
 
             _schemaSources = ReadSchemaDataSourcesFromConfiguration();
 
+            _userCredentials = _configuration
+                                    .GetSection(UserCredentialsSectionName)
+                                    .Get<UserCredentials>();
 
             SuspendLayout();
             SetBackColor();
@@ -361,11 +367,11 @@ namespace Iis.OntologyManager
         }
         private void OnRemove(Guid entityId)
         {
-            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress);
+            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials);
 
             var result = requestWrapper.DeleteEntityAsync(entityId).ConfigureAwait(false).GetAwaiter().GetResult();
 
-            MessageBox.Show(result ? "Сутність видалено": "При видаленні сталася помилка");
+            MessageBox.Show(result ? "Сутність видалено !": "При видаленні сталася помилка !");
         }
         #endregion
 

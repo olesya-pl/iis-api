@@ -5,9 +5,10 @@ using MediatR;
 
 using Iis.Events.Entities;
 using Iis.Domain;
-
+using Iis.Api.Filters;
 namespace Iis.Api.Controllers
 {
+    [BasicAuth]
     [Route("api/[controller]")]
     [ApiController]
     public class EntityController : Controller
@@ -24,7 +25,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Detele(string id, [FromHeader] string authorization)
+        public async Task<IActionResult> Detele(string id)
         {
             var parseResult = Guid.TryParse(id, out Guid nodeId);
 

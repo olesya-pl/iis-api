@@ -106,7 +106,6 @@ namespace IIS.Core
                 .RegisterSeederTools()
                 .AddConfigurations(Configuration);
 
-            
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
@@ -282,6 +281,12 @@ namespace IIS.Core
                     Configuration["activeDirectory:server"],
                     Configuration["activeDirectory:login"],
                     Configuration["activeDirectory:password"]));
+            services.AddSingleton<UserConfiguration>(_ => 
+                new UserConfiguration
+                {
+                    UserName = Configuration["defaultUserName"],
+                    Password = Configuration["defaultPassword"]
+                });
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
             services.AddHostedService<ThemeCounterBackgroundService>();
