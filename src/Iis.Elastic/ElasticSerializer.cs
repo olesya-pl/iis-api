@@ -19,13 +19,10 @@ namespace Iis.Elastic
         {
             var json = new JObject();
 
-            if(extNode.NodeType.IsObjectOfStudy || extNode.NodeType.IsEvent)
-            {
-                json[nameof(extNode.Id)] = extNode.Id;
-            }
 
             if (IsHeadNode)
             {
+                json[nameof(extNode.Id)] = extNode.Id;
                 json[nameof(extNode.NodeTypeName)] = extNode.NodeTypeName;
                 if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
                 {
@@ -34,7 +31,10 @@ namespace Iis.Elastic
                 }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
-            } 
+            } else if(extNode.NodeType.IsObjectOfStudy)
+            {
+                json[nameof(extNode.Id)] = extNode.Id;
+            }
 
             var coordinates = extNode.GetCoordinatesWithoutNestedObjects();
             if (coordinates != null && coordinates.Count > 0)
