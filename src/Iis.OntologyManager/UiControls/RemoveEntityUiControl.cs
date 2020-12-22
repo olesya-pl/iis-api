@@ -45,6 +45,9 @@ namespace Iis.OntologyManager.UiControls
             container.Add(_removeButton = new Button());
             container.Add(_foundNodeLabel = new Label { Text = FoundNodeText });
 
+            _foundNodeLabel.DoubleClick += FoundNodDoubleClick;
+            _foundNodeLabel.Cursor = Cursors.Hand;
+
             SetupActionButtonAsSearch(_searchButton);
             SetupActionButtonAsRemove(_removeButton);
             SetupTextBox(_entityIdSearch);
@@ -56,8 +59,6 @@ namespace Iis.OntologyManager.UiControls
 
             bottomContainer.SetFullWidthColumn();
             bottomContainer.Add(_resultGrid, null, true);
-
-
         }
 
         private void TextChanged(object sender, EventArgs e)
@@ -97,6 +98,17 @@ namespace Iis.OntologyManager.UiControls
             PopulateData(_resultGrid, incomingRelations);
 
             _removeButton.Enabled = true;
+        }
+
+        private void FoundNodDoubleClick(object sender, EventArgs e)
+        {
+            if (_selectedNode is null) return;
+
+            var url = $"{_schemaDataSource.AppAddress}/objects/Entity{_selectedNode.NodeType.Name}.{_selectedNode.Id:N}/view";
+
+            url = url.Replace("&", "^&");
+
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
 
         private void RemoveClick(object sender, EventArgs e)
