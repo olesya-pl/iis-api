@@ -298,6 +298,7 @@ namespace Iis.OntologyManager
         {
             var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
+
             _duplicatesControl = new UiDuplicatesControl();
             _duplicatesControl.Initialize("DuplicatesControl", rootPanel);
             _duplicatesControl.OnGetData += () => _ontologyData;
@@ -319,7 +320,6 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
-
         private IMigrationResult Migrate(IMigration migration, IMigrationOptions migrationOptions)
         {
             if (SelectedConnectionString == null) return null;
@@ -333,19 +333,16 @@ namespace Iis.OntologyManager
             ontologyPatchSaver.SavePatch(ontologyData.Patch);
             return result;
         }
-
         private void gridTypes_SelectionChanged(object sender, EventArgs e)
         {
             if (SelectedNodeType == null) return;
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
         }
-
         private void SourceSelectionChanged(object sender, EventArgs e)
         {
             LoadCurrentSchema(SelectedSchemaSource);
         }
-
         private void RemoveEntityClick(object sender, EventArgs e)
         {
             var form = _uiControlsCreator.GetModalForm(this);
@@ -362,7 +359,6 @@ namespace Iis.OntologyManager
 
             form.Close();
         }
-
         private void OnRemove(Guid entityId)
         {
             var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress);

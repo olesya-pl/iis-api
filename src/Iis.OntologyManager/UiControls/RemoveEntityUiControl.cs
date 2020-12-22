@@ -181,8 +181,23 @@ namespace Iis.OntologyManager.UiControls
             ConfigureGridColumns(grid);
 
             grid.DoubleClick += GridDoubleClick;
-
+            grid.CellFormatting += GridCellFormatting;
             return grid;
+        }
+
+        private void GridCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var grid = (DataGridView)sender;
+
+            var row = grid.Rows[e.RowIndex];
+
+            var color = row.Index % 2 == 1 ? _style.RelationTypeBackColor : _style.AttributeTypeBackColor;
+            var style = row.DefaultCellStyle;
+
+            style.BackColor = color;
+            style.SelectionBackColor = color;
+            style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
+            style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
         }
 
         private void GridDoubleClick(object sender, EventArgs e)
