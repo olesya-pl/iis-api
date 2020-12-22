@@ -353,7 +353,7 @@ namespace Iis.OntologyManager
 
             form.Text = "Видалення";
 
-            _removeEntityUiControl = new RemoveEntityUiControl();
+            _removeEntityUiControl = new RemoveEntityUiControl(SelectedSchemaSource);
             _removeEntityUiControl.Initialize("RemoveEntityControl", rootPanel);
             _removeEntityUiControl.OnGetOntologyData += () => _ontologyData;
             _removeEntityUiControl.OnRemove += OnRemove;
@@ -365,14 +365,11 @@ namespace Iis.OntologyManager
 
         private void OnRemove(Guid entityId)
         {
+            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress);
 
-            MessageBox.Show("OnRemove");
+            var result = requestWrapper.DeleteEntityAsync(entityId).ConfigureAwait(false).GetAwaiter().GetResult();
 
-            //var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress);
-
-            //var result = requestWrapper.DeleteEntityAsync(entityId).ConfigureAwait(false).GetAwaiter().GetResult();
-
-            //MessageBox.Show(result.ToString());
+            MessageBox.Show(result ? "Сутність видалено": "При видаленні сталася помилка");
         }
         #endregion
 
@@ -406,7 +403,7 @@ namespace Iis.OntologyManager
                                         .Get<IReadOnlyDictionary<string, EnvConfig>>()
                                         .OrderBy(property => property.Value.SortOrder);
 
-            result.AddRange(environmentProps.Select(property => SchemaDataSource.CreateForDb(property.Key, property.Value.ConnectionString, property.Value.ApiUri)));
+            result.AddRange(environmentProps.Select(property => SchemaDataSource.CreateForDb(property.Key, property.Value.ConnectionString, property.Value.ApiUri, property.Value.AppUri)));
 
             var filesNames = Directory.GetFiles(DefaultSchemaStorage, "*.ont");
 

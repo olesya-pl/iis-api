@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using Iis.Interfaces.Ontology.Data;
+using Iis.OntologyManager.DTO;
+using Iis.OntologyManager.Configurations;
+using System.Diagnostics;
 
 namespace Iis.OntologyManager.UiControls
 {
@@ -15,13 +19,19 @@ namespace Iis.OntologyManager.UiControls
         private Button _removeButton;
         private Label _foundNodeLabel;
         private DataGridView _resultGrid;
-
+        private SchemaDataSource _schemaDataSource;
         private INode _selectedNode;
         private IOntologyNodesData _data;
 
         public event Action<Guid> OnRemove;
         public event Func<IOntologyNodesData> OnGetOntologyData;
 
+        DataGridViewRow SelectedRow => _resultGrid?.SelectedRows.Count > 0 ? _resultGrid.SelectedRows[0] : null;
+
+        public RemoveEntityUiControl(SchemaDataSource schemaDataSource)
+        {
+            _schemaDataSource = schemaDataSource;
+        }
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
@@ -29,8 +39,6 @@ namespace Iis.OntologyManager.UiControls
             var bottomContainer = new UiContainerManager("RemoveEntityResult", panels.panelBottom);
 
             container.SetColWidth(750);
-
-            var resultContainer = new UiContainerManager("RemoveEntityResults", panels.panelTop);
 
             container.Add(_entityIdSearch = new TextBox(), "Введіть ідентифікатор сутності");
             container.Add(_searchButton = new Button());
@@ -42,11 +50,14 @@ namespace Iis.OntologyManager.UiControls
             SetupTextBox(_entityIdSearch);
 
             _resultGrid = _uiControlsCreator.GetDataGridView("gridRelationsResult", null, new List<string>());
+            _resultGrid.Width = panels.panelBottom.Width;
+
+            SetupGridView(_resultGrid);
 
             bottomContainer.SetFullWidthColumn();
             bottomContainer.Add(_resultGrid, null, true);
 
-            SetupGridView(_resultGrid);
+
         }
 
         private void TextChanged(object sender, EventArgs e)
@@ -80,6 +91,10 @@ namespace Iis.OntologyManager.UiControls
             var title = _selectedNode.GetComputedValue("__title");
 
             _foundNodeLabel.Text = $"{FoundNodeText}'{title}' з ідентифікатором {_selectedNode.Id}";
+
+            var incomingRelations = _selectedNode.IncomingRelations.Select(e => MapToDTO(e, _schemaDataSource.AppAddress)).ToArray();
+
+            PopulateData(_resultGrid, incomingRelations);
 
             _removeButton.Enabled = true;
         }
@@ -163,7 +178,63 @@ namespace Iis.OntologyManager.UiControls
             grid.ColumnHeadersVisible = true;
             grid.AutoGenerateColumns = false;
 
+            ConfigureGridColumns(grid);
+
+            grid.DoubleClick += GridDoubleClick;
+
             return grid;
+        }
+
+        private void GridDoubleClick(object sender, EventArgs e)
+        {
+            var url = SelectedRow.Cells[_resultGrid.Columns["NodeUrl"].Index].Value?.ToString();
+
+            if (url == null) return;
+
+            url = url.Replace("&", "^&");
+            
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+        }
+
+        private RelationDTO MapToDTO(IRelation relation, string appAddress)
+        {
+            return new RelationDTO
+            {
+                TypeName = $"{relation.RelationTypeName}/{relation.Node.NodeType.Title}",
+                NodeId = relation.SourceNode.Id,
+                NodeTitle = relation.SourceNode.GetComputedValue("__title"),
+                NodeTypeName = $"{relation.SourceNode.NodeType.Name}/{relation.SourceNode.NodeType.Title}",
+                NodeUrl = $"{appAddress}/objects/Entity{relation.SourceNode.NodeType.Name}.{relation.SourceNode.Id:N}/view"
+            };
+        }
+
+        private void ConfigureGridColumns(DataGridView grid)
+        {
+            grid.Columns.Clear();
+
+            grid.AddTextColumn("TypeName", "назва відносини", 2);
+            grid.AddTextColumn("NodeTypeName", "тип сутності", 2);
+            grid.AddTextColumn("NodeTitle", "назва сутності", 2);
+            grid.AddTextColumn("NodeUrl", "посилання на сутность", 2);
+        }
+
+        private void PopulateData(DataGridView grid, IReadOnlyCollection<RelationDTO> relationList)
+        {
+            grid.Rows.Clear();
+
+            foreach (var relation in relationList)
+            {
+                var row = new DataGridViewRow();
+
+                row.CreateCells(grid);
+
+                row.Cells[grid.Columns["TypeName"].Index].Value = relation.TypeName;
+                row.Cells[grid.Columns["NodeTypeName"].Index].Value = relation.NodeTypeName;
+                row.Cells[grid.Columns["NodeTitle"].Index].Value = relation.NodeTitle;
+                row.Cells[grid.Columns["NodeUrl"].Index].Value = relation.NodeUrl;
+
+                grid.Rows.Add(row);
+            }
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.OntologyManager.Configurations
@@ -13,6 +10,7 @@ namespace Iis.OntologyManager.Configurations
         public string Title { get; private set; }
         public string EnvironmentCode { get; private set; }
         public string ApiAddress { get; private set; }
+        public string AppAddress { get; private set; }
         private SchemaDataSource() { }
         public static SchemaDataSource CreateForFile(string fileName)
         {
@@ -23,7 +21,7 @@ namespace Iis.OntologyManager.Configurations
                 Data = fileName
             };
         }
-        public static SchemaDataSource CreateForDb(string environmentCode, string connectionString, string apiAddress)
+        public static SchemaDataSource CreateForDb(string environmentCode, string connectionString, string apiAddress, string appAddress)
         {
             return new SchemaDataSource
             {
@@ -31,7 +29,8 @@ namespace Iis.OntologyManager.Configurations
                 Title = $"(DB): {environmentCode}",
                 EnvironmentCode = environmentCode,
                 Data = connectionString,
-                ApiAddress = apiAddress
+                ApiAddress = apiAddress,
+                AppAddress = appAddress
             };
         }
     }
