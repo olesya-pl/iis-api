@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
@@ -17,11 +17,13 @@ namespace AcceptanceTests.UISteps
         private ThemesAndUpdatesPageObjects themesAndUpdatesPageObjects;
 
         private ObjectsOfStudyPageObjects objectsOfStudyPageObjects;
+        private MaterialsSectionPage materialsSectionPage;
 
         public ThemesAndUpdatesSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             themesAndUpdatesPageObjects = new ThemesAndUpdatesPageObjects(driver);
             objectsOfStudyPageObjects = new ObjectsOfStudyPageObjects(driver);
+            materialsSectionPage = new MaterialsSectionPage(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -43,7 +45,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIEnteredTheThemeName(string themeName)
         {
             var themeUniqueName = $"{themeName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid().ToString("N")}";
-            context.SetResponse("themeName", themeUniqueName);
+            context.Set(themeUniqueName, "themeName");
             themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(themeUniqueName);
             themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(Keys.Enter);
         }
@@ -61,9 +63,41 @@ namespace AcceptanceTests.UISteps
         public void ThenIMustSeeAThemeWithASpecifiedName()
         {
             var list = themesAndUpdatesPageObjects.Themes.First().Title;
-            var themeName = context.GetResponse<string>("themeName");
+            var themeName = context.Get<string>("themeName");
             Assert.True(themesAndUpdatesPageObjects.GetThemeByTitle(themeName).Displayed);
         }
         #endregion
+
+        [Given(@"I created a theme with a name (.*)")]
+        public void GivenICreatedAThemeWithAName(string themeName)
+        {
+            var themeUniqueName = themeName + Guid.NewGuid();
+            context.Set(themeUniqueName, themeName);
+            objectsOfStudyPageObjects.SearchLoopButton.Click();
+            materialsSectionPage.ObjectsTabSearch.SendKeys("Попов");
+            driver.WaitFor(2);
+            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Down);
+            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Enter);
+            objectsOfStudyPageObjects.CreateThemeButton.Click();
+            themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(themeUniqueName);
+            themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I Delete theme (.*)")]
+        public void WhenIDeleteTheme(string themeName)
+        {
+            var themeUniqueName = context.Get<string>(themeName);
+            driver.WaitFor(15);
+            var theme = themesAndUpdatesPageObjects.GetThemeByTitle(themeUniqueName);
+            theme.DeleteTheme();
+        }
+        [Then(@"I must not see a theme (.*)")]
+        public void ThenIMustNotSeeATheme(string themeName)
+        {
+            driver.WaitFor(15);
+            var themeUniqueName = context.Get<string>(themeName);
+            Assert.True(themesAndUpdatesPageObjects.Themes.Count(_ => _.Title == themeUniqueName) == 0);
+        }
+
     }
 }

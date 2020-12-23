@@ -13,3 +13,10 @@ Feature: ThemesAndUpdatesSection - sanity
         And I entered the Тестова тема theme name in the objects section
         When I navigated to Themes and updates section
         Then I must see a theme with specified name
+
+    @UI @ThemesAndUpdatesSectionUI
+    Scenario: IIS-6159 - Delete theme
+        Given I created a theme with a name Тестова тема
+        When I navigated to Themes and updates section
+        And I Delete theme Тестова тема
+        Then I must not see a theme Тестова тема
