@@ -89,6 +89,12 @@ namespace Iis.OntologyManager.UiControls
                 return;
             }
 
+            if (!CouldBeDeleted(_selectedNode))
+            {
+                MessageBox.Show("Сутність з таким ідентифікатором не може бути зницена!");
+                return;
+            }
+
             var title = _selectedNode.GetComputedValue("__title");
 
             _foundNodeLabel.Text = $"{FoundNodeText}'{title}' з ідентифікатором {_selectedNode.Id}";
@@ -152,6 +158,10 @@ namespace Iis.OntologyManager.UiControls
             return _data.GetNode(identity);
         }
 
+        private bool CouldBeDeleted(INode node)
+        {
+            return !node.IsArchived && (node.NodeType.IsEvent || node.NodeType.IsObjectOfStudy);
+        }
         private Button SetupActionButtonAsRemove(Button actionButton)
         {
             if (actionButton is null) return actionButton;
