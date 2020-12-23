@@ -45,7 +45,7 @@ namespace Iis.OntologyManager
         UiRelationEntityControl _uiRelationEntityControl;
         UiOntologyDataControl _uiOntologyDataControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.23";
+        const string VERSION = "1.24";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
