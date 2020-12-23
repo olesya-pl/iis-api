@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using Iis.Interfaces.Ontology.Data;
@@ -19,7 +20,7 @@ namespace Iis.OntologyManager.UiControls
         private Button _removeButton;
         private Label _foundNodeLabel;
         private DataGridView _resultGrid;
-        private SchemaDataSource _schemaDataSource;
+        private readonly SchemaDataSource _schemaDataSource;
         private INode _selectedNode;
         private IOntologyNodesData _data;
 
@@ -32,25 +33,24 @@ namespace Iis.OntologyManager.UiControls
         {
             _schemaDataSource = schemaDataSource;
         }
+
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
             var container = new UiContainerManager("RemoveEntityOptions", panels.panelTop);
             var bottomContainer = new UiContainerManager("RemoveEntityResult", panels.panelBottom);
 
-            container.SetColWidth(750);
+            container.SetFullWidthColumn();
 
             container.Add(_entityIdSearch = new TextBox(), "Введіть ідентифікатор сутності");
             container.Add(_searchButton = new Button());
             container.Add(_removeButton = new Button());
-            container.Add(_foundNodeLabel = new Label { Text = FoundNodeText });
-
-            _foundNodeLabel.DoubleClick += FoundNodDoubleClick;
-            _foundNodeLabel.Cursor = Cursors.Hand;
+            container.Add(_foundNodeLabel = new Label(), FoundNodeText);
 
             SetupActionButtonAsSearch(_searchButton);
             SetupActionButtonAsRemove(_removeButton);
             SetupTextBox(_entityIdSearch);
+            SetupFoundNodeLabel(_foundNodeLabel);
 
             _resultGrid = _uiControlsCreator.GetDataGridView("gridRelationsResult", null, new List<string>());
             _resultGrid.Width = panels.panelBottom.Width;
@@ -58,7 +58,7 @@ namespace Iis.OntologyManager.UiControls
             SetupGridView(_resultGrid);
 
             bottomContainer.SetFullWidthColumn();
-            bottomContainer.Add(_resultGrid, null, true);
+            bottomContainer.Add(_resultGrid, "Вхідні зв'язкі:", true);
         }
 
         private void TextChanged(object sender, EventArgs e)
@@ -68,6 +68,13 @@ namespace Iis.OntologyManager.UiControls
             _removeButton.Enabled = false;
             
             _selectedNode = null;
+
+            _foundNodeLabel.Text = string.Empty;
+
+            if (_resultGrid.Rows.Count > 0)
+            {
+                _resultGrid.Rows.Clear();
+            }
         }
 
         private void SearchClick(object sender, EventArgs e)
@@ -95,9 +102,9 @@ namespace Iis.OntologyManager.UiControls
                 return;
             }
 
-            var title = _selectedNode.GetComputedValue("__title");
+            var title = GetNodeTitle(_selectedNode);
 
-            _foundNodeLabel.Text = $"{FoundNodeText}'{title}' з ідентифікатором {_selectedNode.Id}";
+            _foundNodeLabel.Text = $"тип {_selectedNode.NodeType.Title} з назвою '{title}' (ідентифікатор {_selectedNode.Id})";
 
             var incomingRelations = _selectedNode.IncomingRelations.Select(e => MapToDTO(e, _schemaDataSource.AppAddress)).ToArray();
 
@@ -126,7 +133,7 @@ namespace Iis.OntologyManager.UiControls
             var title = _selectedNode.GetComputedValue("__title");
 
             var messageResult = MessageBox.Show(
-                    $"Ви впевнені що бажаєте видалити сутність {title} з ідентифікатором {_selectedNode.Id}",
+                    $"Ви впевнені що бажаєте видалити сутність типа {_selectedNode.NodeType.Title} з назвою '{title}' (ідентифікатор {_selectedNode.Id})",
                     "Підтвердження видалення",
                     MessageBoxButtons.YesNo);
 
@@ -162,6 +169,16 @@ namespace Iis.OntologyManager.UiControls
         {
             return !node.IsArchived && (node.NodeType.IsEvent || node.NodeType.IsObjectOfStudy);
         }
+
+        private string GetNodeTitle(INode node)
+        {
+            if (node.NodeType.IsEvent)
+            {
+                return node.OutgoingRelations.FirstOrDefault(node => node.TypeName == "name")?.TargetNode.Value;
+            }
+            return node.GetComputedValue("__title");
+        }
+
         private Button SetupActionButtonAsRemove(Button actionButton)
         {
             if (actionButton is null) return actionButton;
@@ -194,12 +211,21 @@ namespace Iis.OntologyManager.UiControls
             return textBox;
         }
 
+        private Label SetupFoundNodeLabel(Label label)
+        {
+            label.Cursor = Cursors.Hand;
+            label.Font = new Font(label.Font, FontStyle.Underline);
+            label.DoubleClick += FoundNodDoubleClick;
+
+            return label;
+        }
+
         private DataGridView SetupGridView(DataGridView grid)
         {
             grid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             grid.ColumnHeadersVisible = true;
             grid.AutoGenerateColumns = false;
-
+            grid.AllowUserToAddRows = false;
             ConfigureGridColumns(grid);
 
             grid.DoubleClick += GridDoubleClick;
