@@ -56,7 +56,13 @@ Feature: ObjectsOfStudySection - sanity
         And I entered the джокер value in the affiliation field
         And I entered the першочерговий value in the importance field
         And I clicked on the classifiers block
-        And I entered the Балтійський флот value in the direct reporting relationship field
+        And I entered the 28 обр РХБЗ value in the direct reporting relationship field
+        And I clicked on the general info block
+        And I entered the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 value in the name real full field
+        And I clicked on the save button to create a new object of study
+        And I clicked on the confirm save button to create a new object of study
+
+
 
 
 

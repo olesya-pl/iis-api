@@ -33,8 +33,10 @@ namespace AcceptanceTests.PageObjects
         public IWebElement EditObjectOfStudyButton;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Класифікатори')]")]
-        [CacheLookup]
         public IWebElement ClassifierBlock;
+
+        [FindsBy(How = How.CssSelector, Using = "textarea[name='title']")]
+        public IWebElement RealNameFullField;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Загальна інформація')]")]
         [CacheLookup]
@@ -70,6 +72,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//span[text()=' Зберегти тему ']")]
         public IWebElement CreateThemeButton;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Зберегти')]")]
+        public IWebElement SaveObjectOfStudyButton;
 
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-full-screen']")]
         [CacheLookup]
@@ -153,6 +158,21 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div[name='parent'] .el-input__inner")]
         public IWebElement DirectReportingRelationship;
 
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Підтвердити')]")]
+        public IWebElement ConfirmSaveOfANewObjectOfStudyButton;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Дислокація ')]")]
+        public IWebElement DislocationBlock;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-input--mini:nth-of-type(1) .el-input__inner")]
+        public IWebElement LongitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-input--mini:nth-of-type(2) .el-input__inner")]
+        public IWebElement LatitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
+        public IWebElement DislocationSectionCountryField;
+
         public ObjectsSearch GetObjectByTitle(string title)
         {
             return new ObjectsSearch(driver, title);
@@ -160,6 +180,11 @@ namespace AcceptanceTests.PageObjects
         public HierarchyCard GetHierarchyCardByTitle(string title)
         {
             return new HierarchyCard(driver, title);
+        }
+
+        public ObjectsSearch ScrollDown(string title)
+        {
+            return new ObjectsSearch(driver, title);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
@@ -115,13 +116,13 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickOnTheCreateANewObjectOfStudyButton()
         {
             objectsOfStudyPage.CreateANewObjectOfStudyButton.Click();
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the create a new military organization button")]
         public void WhenIClickOnTheCreateANewMilitaryOrganizationButton()
         {
             objectsOfStudyPage.CreateAMilitaryOrganizationButton.Click();
-            driver.WaitFor(0.5);
         }
 
         [When(@"I entered the (.*) value in the affiliation field")]
@@ -140,6 +141,29 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.ImportanceField.SendKeys(Keys.Enter);
         }
 
+        [When(@"I entered the (.*) value in the name real full field")]
+        public void WhenIEnteredTheValueInTheRealNameFullField(string objectOfStudyName)
+        {
+            var objectOfStudyUniqueName = $"{objectOfStudyName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid():N}";
+            context.SetResponse("objectOfStudyName", objectOfStudyUniqueName);
+            objectsOfStudyPage.RealNameFullField.SendKeys(objectOfStudyUniqueName);
+            objectsOfStudyPage.RealNameFullField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I clicked on the save button to create a new object of study")]
+        public void WhenIClickedOnTheSaveButtonToCreateANewObjectOfStudy()
+        {
+            objectsOfStudyPage.SaveObjectOfStudyButton.Click();
+            driver.WaitFor(1);
+        }
+
+        [When(@"I clicked on the confirm save button to create a new object of study")]
+        public void WhenIClickedOnTheConfirmSaveButtonToCreateANewObjectOfStudy()
+        {
+            objectsOfStudyPage.ConfirmSaveOfANewObjectOfStudyButton.Click();
+            driver.WaitFor(2);
+        }
+
         [When(@"I clicked on the classifiers block")]
         public void WhenIClickedOnTheClassifiersBlock()
         {
@@ -147,12 +171,33 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(1);
         }
 
+        [When(@"I clicked on the dislocation block")]
+        public void WhenIClickedOnTheDislocationBlock()
+        {
+            objectsOfStudyPage.DislocationBlock.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I clicked on the general info block")]
+        public void WhenIClickedOnTheGeneralBlock()
+        {
+            objectsOfStudyPage.GeneralInfoBlock.Click();
+            driver.WaitFor(2);
+        }
+
         [When(@"I entered the (.*) value in the direct reporting relationship field")]
         public void WhenIEnteredTheValueInTheDirectReportingRelationShipField(string value)
         {
             objectsOfStudyPage.DirectReportingRelationship.SendKeys(value);
-            objectsOfStudyPage.DirectReportingRelationship.SendKeys(Keys.Up);
+            driver.WaitFor(8);
+            objectsOfStudyPage.DirectReportingRelationship.SendKeys(Keys.Down);
             objectsOfStudyPage.DirectReportingRelationship.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I scrolled down to the (.*) element")]
+        public void WhenIScrolledDownToTheElement()
+        {
+            //objectsOfStudyPage.ObjectSearch.
         }
         #endregion
 
