@@ -60,7 +60,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see a theme with specified name")]
         public void ThenIMustSeeAThemeWithASpecifiedName()
         {
-            var list = themesAndUpdatesPageObjects.Themes.First().Name;
+            var list = themesAndUpdatesPageObjects.Themes.First().Title;
             var themeName = context.GetResponse<string>("themeName");
             Assert.True(themesAndUpdatesPageObjects.GetThemeByTitle(themeName).Displayed);
         }
