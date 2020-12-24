@@ -12,5 +12,6 @@ namespace Iis.Interfaces.Meta
         IContainerMeta Container { get; }
         bool Multiple { get; set; }
         IValidation Validation { get; }
+        bool? IsImportantRelation { get; }
     }
 }
