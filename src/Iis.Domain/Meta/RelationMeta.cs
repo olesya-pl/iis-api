@@ -12,6 +12,7 @@ namespace Iis.Domain.Meta
         public ContainerMeta Container { get; set; }
         public bool Multiple { get; set; }
         public Validation Validation { get; set; }
+        public bool? IsImportantRelation { get; set; }
         IFormField IRelationMetaBase.FormField => FormField;
         IContainerMeta IRelationMetaBase.Container => Container;
         IValidation IRelationMetaBase.Validation => Validation;
