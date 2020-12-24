@@ -37,11 +37,10 @@ namespace IIS.Core.Materials.EntityFramework
         {
             DateParseHandling = DateParseHandling.None
         };
-        private static readonly Dictionary<Guid, SearchResultItem> EmptyHighLightCollection = new Dictionary<Guid, SearchResultItem>();
         private static readonly IEnumerable<Material> EmptyMaterialCollection = Array.Empty<Material>();
         private static readonly IReadOnlyCollection<string> RelationTypeNameList = new List<string>
         {
-            "parent"
+            "parent", "bePartOf"
         };
         private static readonly (IEnumerable<Material> Materials, int Count) EmptMaterialResult = (Materials: Array.Empty<Material>(), 0);
         private readonly IOntologyService _ontologyService;
