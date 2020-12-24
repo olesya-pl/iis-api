@@ -178,6 +178,56 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
+        [When(@"I clicked on the temporary dislocation block")]
+        public void WhenIClickedOnTheTemporaryDislocationBlock()
+        {
+            objectsOfStudyPage.TemporaryDislocationBlock.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I entered the (.*) value in the latitude field at the dislocation block")]
+        public void WhenIEnteredTheValueInTheLatitudeField(string value)
+        {
+            objectsOfStudyPage.LatitudeField.SendKeys(value);
+        }
+
+        [When(@"I entered the (.*) value in the country field at the dislocation block")]
+        public void WhenIEnteredTheValueInTheCountryField(string value)
+        {
+            objectsOfStudyPage.CountryFieldInTheDisclocationBlock.SendKeys(value);
+            driver.WaitFor(2);
+            objectsOfStudyPage.CountryFieldInTheDisclocationBlock.SendKeys(Keys.Down);
+            objectsOfStudyPage.CountryFieldInTheDisclocationBlock.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I entered the (.*) value in the country field at the temporary dislocation block")]
+        public void WhenIEnteredTheValueInTheCountryFieldTempDis(string value)
+        {
+            objectsOfStudyPage.CountryFieldInTheTemporaryDisclocationBlock.SendKeys(value);
+            driver.WaitFor(2);
+            objectsOfStudyPage.CountryFieldInTheTemporaryDisclocationBlock.SendKeys(Keys.Down);
+            objectsOfStudyPage.CountryFieldInTheTemporaryDisclocationBlock.SendKeys(Keys.Enter);
+        }
+
+
+        [When(@"I entered the (.*) value in the longitude field at dislocation block")]
+        public void WhenIEnteredTheValueInTheLongitudeFieldAtTheDislocationBlock(string value)
+        {
+            objectsOfStudyPage.LongitudeField.SendKeys(value);
+        }
+
+        [When(@"I entered the (.*) value in the longitude field at temporary dislocation block")]
+        public void WhenIEnteredTheValueInTheLongitudeFieldAtTheTemporaryDislocationBlock(string value)
+        {
+            objectsOfStudyPage.TemporaryDislocationLongitudeField.SendKeys(value);
+        }
+
+        [When(@"I entered the (.*) value in the latitude field at the temporary dislocation block")]
+        public void WhenIEnteredTheValueInTheLatitudeFieldAtTheTemporaryDislocationBlock(string value)
+        {
+            objectsOfStudyPage.TemporaryDislocationLatitudeField.SendKeys(value);
+        }
+
         [When(@"I clicked on the general info block")]
         public void WhenIClickedOnTheGeneralBlock()
         {
@@ -195,9 +245,9 @@ namespace AcceptanceTests.UISteps
         }
 
         [When(@"I scrolled down to the (.*) element")]
-        public void WhenIScrolledDownToTheElement()
+        public void WhenIScrolledDownToTheElement(string element)
         {
-            //objectsOfStudyPage.ObjectSearch.
+            objectsOfStudyPage.ScrollDown(element);
         }
         #endregion
 

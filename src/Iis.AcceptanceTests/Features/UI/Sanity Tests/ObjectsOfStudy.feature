@@ -59,6 +59,16 @@ Feature: ObjectsOfStudySection - sanity
         And I entered the 28 обр РХБЗ value in the direct reporting relationship field
         And I clicked on the general info block
         And I entered the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 value in the name real full field
+        And I clicked on the dislocation block
+        And I entered the 48 value in the latitude field at the dislocation block
+        And I entered the 48 value in the longitude field at dislocation block
+        And I entered the Росія value in the country field at the dislocation block
+        #And I clicked on the dislocation block
+        #And I scrolled down to the Ідентифікаційні ознаки element
+        #And I clicked on the temporary dislocation block
+        #And I entered the 49 value in the longitude field at temporary dislocation block
+        #And I entered the 49 value in the latitude field at the temporary dislocation block
+        #And I entered the Росія value in the country field at the temporary dislocation block
         And I clicked on the save button to create a new object of study
         And I clicked on the confirm save button to create a new object of study
 

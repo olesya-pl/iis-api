@@ -1,6 +1,7 @@
 using AcceptanceTests.PageObjects;
 using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using SeleniumExtras.PageObjects;
 
 namespace AcceptanceTests.PageObjects
@@ -164,11 +165,27 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Дислокація ')]")]
         public IWebElement DislocationBlock;
 
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Тимчасова дислокація ')]")]
+        public IWebElement TemporaryDislocationBlock;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
+        public IWebElement CountryFieldInTheDisclocationBlock;
+
         [FindsBy(How = How.CssSelector, Using = ".el-input--mini:nth-of-type(1) .el-input__inner")]
         public IWebElement LongitudeField;
 
         [FindsBy(How = How.CssSelector, Using = ".el-input--mini:nth-of-type(2) .el-input__inner")]
         public IWebElement LatitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(1) .el-input__inner")]
+        public IWebElement TemporaryDislocationLatitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(2) .el-input__inner")]
+        public IWebElement TemporaryDislocationLongitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(2) .el-input__inner")]
+        public IWebElement CountryFieldInTheTemporaryDisclocationBlock;
+
 
         [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
         public IWebElement DislocationSectionCountryField;
@@ -182,9 +199,11 @@ namespace AcceptanceTests.PageObjects
             return new HierarchyCard(driver, title);
         }
 
-        public ObjectsSearch ScrollDown(string title)
+        public void ScrollDown(string value)
         {
-            return new ObjectsSearch(driver, title);
+            var elementToScroll = driver.FindElement(By.XPath($"//div[contains(text(),'{value}')]"));
+            Actions actions = new Actions(driver);
+            actions.MoveToElement(elementToScroll).Perform();
         }
     }
 }
