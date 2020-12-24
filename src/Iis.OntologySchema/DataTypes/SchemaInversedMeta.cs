@@ -16,5 +16,6 @@ namespace Iis.OntologySchema.DataTypes
         public IContainerMeta Container { get; set; }
         public bool Multiple { get; set; }
         public IValidation Validation { get; set; }
+        public bool? IsImportantRelation { get; set; }
     }
 }

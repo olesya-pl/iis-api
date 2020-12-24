@@ -26,6 +26,7 @@ namespace Iis.OntologySchema.DataTypes
         public IValidation Validation { get; set; }
         public IInversedRelationMeta Inversed { get; set; }
         public bool? IsAggregated { get; set; }
+        public bool? IsImportantRelation { get; set; }
 
         public SchemaMeta(string json)
         {
@@ -50,6 +51,10 @@ namespace Iis.OntologySchema.DataTypes
             if (jObj.ContainsKey("IsAggregated"))
             {
                 IsAggregated = bool.Parse(jObj["IsAggregated"].ToString());
+            }
+            if (jObj.ContainsKey("IsImportantRelation"))
+            {
+                IsImportantRelation = bool.Parse(jObj["IsImportantRelation"].ToString());
             }
             if (jObj.ContainsKey("Title"))
             {

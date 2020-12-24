@@ -424,7 +424,7 @@
       "Id": "19f0896c-ed3f-4073-bc01-0d588978e64a",
       "Name": "sign",
       "Title": "Ознаки",
-      "Meta": "{\r\n  \"AcceptsEntityOperations\": [\r\n    0,\r\n    1,\r\n    2\r\n  ],\r\n  \"SortOrder\": 3,\r\n  \"FormField\": {\r\n    \"Type\": \"form\"\r\n  },\r\n  \"Multiple\": true\r\n}",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],\n  \"SortOrder\": 3,\n  \"FormField\": {\n    \"Type\": \"form\"\n  },\n  \"Multiple\": true,\n  \"IsImportantRelation\": true\n}",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -3781,18 +3781,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "819b5095-0730-4d2f-af44-1a1a66e3000e",
-      "Name": "Country",
-      "Title": "Країна",
-      "Meta": "{\r\n  \"SortOrder\": 244\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "82843c30-bbf5-48d3-a619-4bfb4c5df524",
       "Name": "orderPublisher",
       "Title": "Чий наказ",
@@ -5257,18 +5245,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "301be639-7fd5-40b4-8d9d-7856189fb959",
-      "Name": "magnitudeOfTheTides",
-      "Title": "Величина приливів\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "ccbf1b82-9e2b-4fe9-aae7-6b205933a4d3",
       "Name": "title",
       "Title": "Повна Назва",
@@ -5853,18 +5829,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "efe6b452-e3ad-4098-aa77-f2f6c102a2f1",
-      "Name": "fullName",
-      "Title": "Повна Назва організації",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [0,1,2],\n  \"SortOrder\": 10,\n  \"FormField\": {\n    \"Type\": \"form\"\n  },\n  \"Container\": {\n    \"Id\": \"b72b4a68edcb41cf9d6011ebc78b05d7\",\n    \"Title\": \"Загальна інформація\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": false\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -7561,18 +7525,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "01b36d75-703f-4a56-abcb-edcc9071bbfd",
-      "Name": "Is",
-      "Title": null,
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "01cbe9be-fe01-4868-8598-76e78ecc6a38",
       "Name": "MilitaryCommonInfo",
       "Title": "Загальна інформація",
@@ -8593,18 +8545,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "c8ad8bed-a485-428c-b6d4-d918227cd85f",
-      "Name": "helicopterPads",
-      "Title": "Вертольотні майданчики",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "deee9215-c9c0-41cf-81b7-02aa5906f8f3",
       "Name": "antennaSystem",
       "Title": "Характеристики антенних систем",
@@ -8677,18 +8617,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "169f5130-4139-40a5-9734-5dd6024b62cd",
-      "Name": "constructionSites",
-      "Title": "Ділянки будівельних робіт",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "1b0a6b84-d723-45d8-a19c-d2ff952b1c0b",
       "Name": "averageSpeedOfDataSending",
       "Title": "Середня швидкість передачі даних, кбіт/с",
@@ -8752,18 +8680,6 @@
       "Id": "2ff84b0f-2b63-4460-8d40-813f283f32c9",
       "Name": "ygfuvhibj",
       "Title": "dsyfxguchipjk`",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "0512af66-cef1-4d57-ae9b-ce713fcbbb97",
-      "Name": "mooringFront",
-      "Title": "Причальний фронт, м\t",
       "Meta": null,
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
@@ -9541,18 +9457,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "45e05138-637b-4037-8a93-1d79bb2cb38f",
-      "Name": "technicalSites",
-      "Title": "technical platforms",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "46603011-33c1-4fb9-9eb7-1aced3401c8d",
       "Name": "massOfExplosive",
       "Title": "Маса вибухової речовини, кг",
@@ -10297,18 +10201,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "6e9edbb6-17fb-46df-ad05-dcff7280a0b6",
-      "Name": "carParkings",
-      "Title": "Стоянки автомашин",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "6f5e9e15-76a0-4199-958b-3e34aaf842f8",
       "Name": "withoutAdditionalTanks",
       "Title": "без додаткових паливних баків",
@@ -10317,18 +10209,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "6f8851a0-f798-4331-a343-31441d2b899f",
-      "Name": "technicalAndOfficeBuildings",
-      "Title": "Технічні та. службові будівлі",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -10813,18 +10693,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "74769cba-d7cd-489a-b346-3510f25b92b2",
-      "Name": "depthsAtBerths",
-      "Title": "Глибини у причалів, м\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "75f28333-83c9-4e90-bec3-f7aa53a2d21b",
       "Name": "track",
       "Title": "Колія",
@@ -11257,18 +11125,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "1e10b6c1-92ba-40a8-96bc-99d4901afb19",
-      "Name": "itemsForExport",
-      "Title": "Предмети вивозу",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "0b862c8d-c3b2-43be-ae3c-e9294a7887b2",
       "Name": "Is",
       "Title": null,
@@ -11473,30 +11329,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "1c2cc565-680d-4fc0-823e-36878a93404b",
-      "Name": "technicalSites",
-      "Title": "technical platforms",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "207ffcac-e2ac-48c3-b22c-2f4d6048623f",
-      "Name": "fencingStrips",
-      "Title": "смуг огородження",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "2adc87bf-3de7-42c2-8078-615805818210",
       "Name": "earthenEmbankmentsForAntennas",
       "Title": "Земляні насипи для розміщення антен\t",
@@ -11529,30 +11361,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "2fa8e3d1-9820-4c25-a61b-9a0bb51ba0fd",
-      "Name": "storages",
-      "Title": "Сховища, всього:",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "2fcd9605-14ae-4941-add7-cca256a8d043",
-      "Name": "helicopterPads",
-      "Title": "Вертольотні майданчики",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -11701,18 +11509,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "31c15dfe-0e78-43ba-9755-795caf5849c8",
-      "Name": "numberOfPorters",
-      "Title": "Кількість фарфатерів\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "32bd06ce-8f5c-409f-b52c-7c5337527e7d",
       "Name": "consumer",
       "Title": "споживча",
@@ -11845,18 +11641,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "3e1a8ad6-6786-47af-bdff-a44435940d6a",
-      "Name": "itemsForImport",
-      "Title": "Предмети ввозу\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
       "Name": "FuelDepots",
       "Title": "Склади ПММ",
@@ -11925,18 +11709,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "479e6f49-53fe-48dc-ac0a-b63c50260178",
-      "Name": "carParkings",
-      "Title": "Стоянки автомашин",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -12025,18 +11797,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "5b072263-242a-45bf-b180-b26d8577e8ed",
-      "Name": "constructionSites",
-      "Title": "Ділянки будівельних робіт",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "5c885df5-1742-4abd-92d4-b7f2be6e7d97",
       "Name": "withFoldedEmphasis",
       "Title": "зі складеним прикладом",
@@ -12097,18 +11857,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "65cb54b6-307f-42f6-82a3-4a4f8293b248",
-      "Name": "minimumDepthsOfFairways",
-      "Title": "Мінімальні глибини фарватерів, м\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "65e5950f-cf58-49f0-814c-4c37a20956a7",
       "Name": "openEmbankedAreas",
       "Title": "відкриті обваловані майданчики",
@@ -12129,18 +11877,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "67a66820-09f1-4bef-924a-970ab0cc1bea",
-      "Name": "PositionsOfStart",
-      "Title": "Стартові позиції",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -12253,18 +11989,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "80a4f988-21c0-4916-b48e-aad9f7d84327",
-      "Name": "itemsForImport",
-      "Title": "Предмети ввозу\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "8121a38e-1587-465a-ac32-342b4146ea7c",
       "Name": "general",
       "Title": "загальна",
@@ -12337,18 +12061,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "746e2871-cb57-411e-86fc-157ff29d1c18",
-      "Name": "buildingsForAntennas",
-      "Title": "Споруди для розміщення антен:",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "749e49a3-7358-4db0-9b66-16c68e0b322b",
       "Name": "step",
       "Title": "Крок сітки частот, кГц",
@@ -12364,30 +12076,6 @@
       "Id": "755b2d77-350d-4cf8-a538-ee0eddf26d07",
       "Name": "Is",
       "Title": null,
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "764b4bc2-b625-498a-8034-54d90cbd648f",
-      "Name": "MeansOfProtectionAndDefenseForPositions",
-      "Title": "Засоби охорони та оборони:",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "77fea676-31c0-492c-9a74-77e0360653de",
-      "Name": "itemsForExport",
-      "Title": "Предмети вивозу",
       "Meta": null,
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
@@ -12505,18 +12193,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "82bad52d-f41f-461d-98f5-6c7286410bd8",
-      "Name": "waterArea",
-      "Title": "Площа акваторії, кв.м.",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "836c3446-64d0-4b96-bee2-e5d0937e70ab",
       "Name": "constructionSites",
       "Title": "Ділянки будівельних робіт",
@@ -12581,18 +12257,6 @@
       "Name": "tlf",
       "Title": "ТЛФ",
       "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "8744a5b0-f41e-4c53-8fe3-201034dbdae8",
-      "Name": "commandPost",
-      "Title": "Командний пункт",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -12700,18 +12364,6 @@
       "Id": "880979e8-58e9-46ee-b4df-5987ec724f17",
       "Name": "shelterForPersonnel",
       "Title": "Укриття для особового складу\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "885e6f50-3b1e-4614-ac75-c5f8277897b5",
-      "Name": "shipTurnover",
-      "Title": "Судооборот, судів за рік\t",
       "Meta": null,
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
@@ -13093,18 +12745,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "94574561-439d-4d07-b645-9762f95d836a",
-      "Name": "technicalAndOfficeBuildings",
-      "Title": "Технічні та. службові будівлі",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "94f8b0ce-8449-48c7-98bf-f058bfbd1705",
       "Name": "startControlPoints",
       "Title": "пунктів управління стартом",
@@ -13357,18 +12997,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "99063511-e97f-41ae-a07b-94955ccaa65f",
-      "Name": "shipTurnover",
-      "Title": "Судооборот, судів за рік\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "9907d416-f4f5-4915-a2ed-9862ca4e5cb9",
       "Name": "equipped",
       "Title": "споряджена",
@@ -13585,18 +13213,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "a725c3ad-7c71-4c1a-bbf3-aba28daad8a6",
-      "Name": "depthsAtBerths",
-      "Title": "Глибини у причалів, м\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "bae1861b-601b-4018-9517-b444cb97ba4f",
       "Name": "sleeveLength",
       "Title": "Довжина гільзи, мм",
@@ -13649,18 +13265,6 @@
       "Name": "accuracy",
       "Title": "Точність визначення цілі",
       "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "a97645b3-9ec9-47e7-8ad3-4cbcdb5a4bd4",
-      "Name": "waterArea",
-      "Title": "Площа акваторії, кв.м.",
-      "Meta": null,
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -13993,18 +13597,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "ad108c47-97a0-4ba3-8bea-55450fc63e72",
-      "Name": "magnitudeOfTheTides",
-      "Title": "Величина приливів\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "ad230c5d-d386-4e95-83f9-9484fb3ea598",
       "Name": "maxRange",
       "Title": "Максимальна дальність (радіус зони ураження), м",
@@ -14077,18 +13669,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "b23b19e8-291d-4d72-a3be-7c1758eded73",
-      "Name": "positionsOfStart",
-      "Title": "Стартові позиції",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "b290811d-0dbf-4c36-b9f5-1b7d688b384b",
       "Name": "mortars",
       "Title": "міномети",
@@ -14145,18 +13725,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "b514007f-d55d-43bd-b3b1-204bb1982c4c",
-      "Name": "guardTowers",
-      "Title": "караульних вишок",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -14569,18 +14137,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "c565272f-4dbd-4d37-b42b-d1528c82af32",
-      "Name": "meansOfProtectionAndDefence",
-      "Title": "Засоби охорони та оборони:",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "c5e17b94-429f-478c-9da6-41991854b786",
       "Name": "Is",
       "Title": null,
@@ -14773,18 +14329,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "d746fad8-51ef-4376-a349-f974182e571d",
-      "Name": "mooringFront",
-      "Title": "Причальний фронт, м\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "d8014aa7-f74f-4305-8ff9-8d5498ff7f87",
       "Name": "mass",
       "Title": "Маса кулі, г",
@@ -14917,18 +14461,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "e29d4ee5-2667-4a11-b24c-f3d14bfade7b",
-      "Name": "cargoTurnover",
-      "Title": "Грузооборот порту за рік\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "e2ec3573-df4c-4c34-a723-9afc9e48b1dd",
       "Name": "suspensionType",
       "Title": "Тип підвіски",
@@ -15025,18 +14557,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "e7c66125-5df6-4842-a06b-6c482bbdd7f8",
-      "Name": "technical",
-      "Title": "Техніні позиції",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "e7c88691-495c-437b-a438-c58104b8388a",
       "Name": "explosive",
       "Title": "Вибухова речовина",
@@ -15069,18 +14589,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "e8de702e-6894-49cd-8ac6-5f7794e7a734",
-      "Name": "numberOfPorters",
-      "Title": "Кількість фарфатерів\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -15121,18 +14629,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "ce90c525-986a-4298-b328-6b3a3bda0957",
-      "Name": "protectAndDefense",
-      "Title": "Засоби охорони та оборони",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "ceeff8dc-6c8c-41b4-9f30-d20b3572cf33",
       "Name": "frequencyRange",
       "Title": "Діапазон рабочих частот, МГц\t",
@@ -15153,18 +14649,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "d0248b92-3e40-4e75-b32a-b4fd60e757dc",
-      "Name": "fencingStrips",
-      "Title": "смуг огородження",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -15277,18 +14761,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "dd64ee17-8550-4228-a00c-d07fed8dadb8",
-      "Name": "minimumDepthsOfFairways",
-      "Title": "Мінімальні глибини фарватерів, м\t",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "e0bb0d6f-0ea9-40dc-865d-c6ac83e959a0",
       "Name": "semiUndegraund",
       "Title": "напівпідземні",
@@ -15373,18 +14845,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "ed8e0689-777a-4848-bda2-67aee7e222fa",
-      "Name": "guardTowers",
-      "Title": "караульних вишок",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "ee35b34f-2201-45b6-96e5-039dd9754f67",
       "Name": "countOfChannels",
       "Title": "Кількість каналів стеження та реєстрації\t",
@@ -15400,18 +14860,6 @@
       "Id": "eea5df83-a715-4903-a103-22dea2f3e56c",
       "Name": "officeAndTechnicalBuildings",
       "Title": "службових та техніних будівель",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "ef073339-de69-4232-a720-5e3aecc94c1c",
-      "Name": "cargoTurnover",
-      "Title": "Грузооборот порту за рік\t",
       "Meta": null,
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
@@ -15928,7 +15376,7 @@
       "Id": "95e25542-6fdc-4f37-955e-f27721835e34",
       "Name": "parent",
       "Title": "Пряме підпорядкування",
-      "Meta": "{\n  \"Type\": \"hierarchical\",\n  \"Inversed\": {\n    \"Code\": \"child\",\n    \"Editable\": false,\n    \"Title\": \"Підлеглий\",\n    \"Multiple\": true\n  },\n\n  \"Container\": {\n    \"Id\": \"91fee8bb92834138bd26f770b760f8b3\",\n    \"Title\": \"Класифікатори\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": false\n}\n",
+      "Meta": "{\n  \"Type\": \"hierarchical\",\n  \"Inversed\": {\n    \"Code\": \"child\",\n    \"Editable\": false,\n    \"Title\": \"Підлеглий\",\n    \"Multiple\": true\n  },\n\n  \"Container\": {\n    \"Id\": \"91fee8bb92834138bd26f770b760f8b3\",\n    \"Title\": \"Класифікатори\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": false,\n  \"IsImportantRelation\": true\n}\n",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -16081,18 +15529,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "800eb7bf-1f86-4ea3-a07b-813c94c35508",
-      "Name": "Is",
-      "Title": null,
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "fcb00520-401c-4379-a775-eb37f6bd1445",
       "Name": "bystates",
       "Title": "За штатом",
@@ -16141,18 +15577,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "20fe1c16-583c-43e0-bd06-afa378f51098",
-      "Name": "mainEngineer",
-      "Title": "Головний інженер",
-      "Meta": "{\n  \"Container\": {\n    \"Id\": \"3065914f7fdd423982fe0a2fef136615\",\n    \"Title\": \"Правління\",\n    \"Type\": \"Accordion\"\n  }\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "bb28cea1-e2d8-43a9-b9d0-62cecfa08d13",
       "Name": "country",
       "Title": "Країна",
@@ -16168,23 +15592,11 @@
       "Id": "4389784f-6597-43f7-90ca-45ef254ca5d0",
       "Name": "bePartOf",
       "Title": "Безпосереднє підпорядкування",
-      "Meta": null,
+      "Meta": "{\n  \"IsImportantRelation\": true\n}",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "96c79690-e999-4234-bc68-8e494e8fa287",
-      "Name": "Plant",
-      "Title": "Завод",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -16201,34 +15613,10 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "44f727e4-157b-4843-99e3-26bc0cfeb6f3",
-      "Name": "director",
-      "Title": "Директор",
-      "Meta": "{\n  \"Container\": {\n    \"Id\": \"3065914f7fdd423982fe0a2fef136615\",\n    \"Title\": \"Правління\",\n    \"Type\": \"Accordion\"\n  }\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "c6d6951b-7a05-4583-b6c4-fc6992bf3735",
       "Name": "militaryBaseShortName",
       "Title": "Війскова частина",
       "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
-      "Id": "ff355599-75b0-4f1e-9de8-8d53cf86c46e",
-      "Name": "production",
-      "Title": "Продукція",
-      "Meta": "{\n  \"FormField\": {\n    \"Type\": \"dropdown\",\n  },\n  \"Container\": {\n    \"Id\": \"4ad24f0cf5694148b3679c8f4659d9a7\",\n    \"Title\": \"Продукція\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": \"true\"\n}\n",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -16305,6 +15693,18 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "96c79690-e999-4234-bc68-8e494e8fa287",
+      "Name": "Plant",
+      "Title": "Завод",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -16621,6 +16021,1482 @@
       "UniqueValueFieldName": null
     },
     {
+      "Id": "0512af66-cef1-4d57-ae9b-ce713fcbbb97",
+      "Name": "mooringFront",
+      "Title": "Причальний фронт, м\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ea5d10b7-ede3-42ed-8f81-aa3c10f1ab48",
+      "Name": "hasfhangars",
+      "Title": "напівангари",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e8ab7b83-8d50-4c81-87d5-a6bb80fd208f",
+      "Name": "jetsParkings",
+      "Title": "стоянки літаків",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ee3ee85d-b013-48bb-8c87-15c27ed41ed4",
+      "Name": "techBuildings",
+      "Title": "технічні будівлі",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2f456c5d-75c1-4341-a5d4-0a4f07362ef6",
+      "Name": "technicalAndDutyBuildings",
+      "Title": "технічні та службові будівлі",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "37202099-501a-4ee6-8b51-372eb104ad69",
+      "Name": "technicalPlatforms",
+      "Title": "технічні майданчики",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "30b3825b-a4f7-4e87-b8fd-e8a71a6517e7",
+      "Name": "hangarsCommon",
+      "Title": "Ангари",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "00fc5ea1-d10c-48b4-bf1c-0baf0d220aa2",
+      "Name": "technicalBuildingsForHelicopters",
+      "Title": "виробничі корпуси",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "28c71988-4675-4837-bbd0-1e76135f4c10",
+      "Name": "technicalBuildingsAndPlatformsForHelicopters",
+      "Title": "технічні будівлі та майданчики",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4ceea961-7432-4fbb-bada-550a752abad4",
+      "Name": "technicalPlatformsCommon",
+      "Title": "Технічні майданчики",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "786e18a0-3aa2-4ea5-bf91-e4fbd23b55ab",
+      "Name": "hangarsShelter",
+      "Title": "Ангари-укриття",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a08a9af5-b824-4bff-85a1-049efa086f45",
+      "Name": "hangars",
+      "Title": "ангари",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4587ada4-2bf2-460d-8c7e-013883422c6e",
+      "Name": "storagesForJets",
+      "Title": "ангари-сховища",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "37fcb912-55b5-48f2-8630-52fd87b16c69",
+      "Name": "productionBuildings",
+      "Title": "виробничі корпуси",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a6c62598-ee75-4471-acb1-6f4bcfc24ea4",
+      "Name": "strongerTypeWithCircle",
+      "Title": "арочні посиленого типу",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "309f1516-e982-4135-b172-5c7212223bd2",
+      "Name": "embanked",
+      "Title": "обваловані",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "d490e8db-cfab-4f83-b464-1f83ef19fe39",
+      "Name": "openedWithProtection",
+      "Title": "відкритого типу із захисними стінками",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "77c3fae8-e8a6-453b-b1a0-90ae7991318f",
+      "Name": "openedAndEmbanked",
+      "Title": "відкритого типу обваловані",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "69f7bb4b-7ad4-4b33-a9df-5ad60589c3f9",
+      "Name": "countOfPlaces",
+      "Title": "місткість стоянок в літаках бойової авіації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "1cf48187-f7be-41c3-a9d2-a44a983d3651",
+      "Name": "way",
+      "Title": "напрямок (град.)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "aa9986a2-4338-48c4-95c0-9b7f2d95b3ca",
+      "Name": "countOfPlacesInJets",
+      "Title": "Місткість стоянок та сховищ у літаках бойової авіації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "7821c75c-af70-4087-99fd-7760c32c9f8d",
+      "Name": "buildingForCrewsOnDuty",
+      "Title": "Будинок для чергових екіпажів",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "cae6e024-1f3e-44f0-9fad-6a4e62f8786c",
+      "Name": "halfHangarsCommon",
+      "Title": "Напівангари",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a2bb197c-6934-4e35-b309-a2e3e34bb9ca",
+      "Name": "boxesForTestingEngines",
+      "Title": "Бокси для опробування двигунів",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "590efe03-28af-4f3e-9750-0c98796178c9",
+      "Name": "technicalAndDutyBuildingsCommon",
+      "Title": "Технічні та службові будівлі",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "6d44efe0-3007-4198-9d6a-36143b0fc837",
+      "Name": "carParkingsCommon",
+      "Title": "Стоянки автомашин",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "6356c7ec-8029-44db-841c-d5e8fc921799",
+      "Name": "constructionSitesCommon",
+      "Title": "Ділянки будівельних робіт",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e98ba749-8553-41b3-8e4a-8516d6637d9b",
+      "Name": "militaryTownsCommon",
+      "Title": "Військові містечка",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "3baaeabd-7454-41c8-9b6f-05de32c95731",
+      "Name": "airportBuildings",
+      "Title": "Будинки аеровокзалів",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "bf586a6e-26f1-49ef-9945-d568059ad71e",
+      "Name": "loadingAndUnloadingCommon",
+      "Title": "Пункти навантаження і вивантаження",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a28a24f2-ab33-4ca7-b61d-7da7973b2258",
+      "Name": "railwayCommon",
+      "Title": "Під'їздні залізничі колії",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "98755a78-2964-42af-8238-72d1346aa25d",
+      "Name": "positionsOfZA",
+      "Title": "позиції ЗА",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "158d5e5d-6431-48f8-b604-60aa27fbe6d4",
+      "Name": "positionsOFZRK",
+      "Title": "позиції ЗРК",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b8398c7f-6198-47fd-b4b5-8067ef17ad8d",
+      "Name": "shortrangeZRKPositions",
+      "Title": "позиції ЗРК ближнього радіусу дії",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "fcd66c51-750f-49e6-81f9-bc0959b7b0d9",
+      "Name": "aviationShootingRange",
+      "Title": "Авіаційний тир",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2c70b7a9-3c28-4ce1-ba77-a9e9ac47720a",
+      "Name": "compositionOfNuclearmunitions",
+      "Title": "Склад ядерних боєприпачів",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "8a30b171-dd9f-4627-887e-bca313f671a9",
+      "Name": "compositionOfMaterials",
+      "Title": "Склад МТЗ",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "8dbb0fcb-c968-4e28-a92b-acc646364a69",
+      "Name": "compositionOfFuel",
+      "Title": "Склад ПММ",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "9a5f170a-cdba-4ad0-a6d6-1a0a1e586f6c",
+      "Name": "airportBuildingsWithPavilionsForPassengers",
+      "Title": "Будівлі аеровокзалів з павільйонами для посадки пасажирів",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "c6e0d48b-9f31-4ad7-a429-8b6011649de7",
+      "Name": "commonGasStation",
+      "Title": "Пункт системи централізованої заправки",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4da6a0a6-9ec0-4fd6-b619-3769f4e8d4f8",
+      "Name": "commandControlPoint",
+      "Title": "Командно-диспетчерський пункт (КДП)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "daef5cb6-b3d6-4b78-aac3-7057658f4fdc",
+      "Name": "radiolocationStation",
+      "Title": "Радіолокаційна станція",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "8d021a7c-ad30-4195-9aeb-856e58e7d5d6",
+      "Name": "radionavigationStation",
+      "Title": "Радіонавігаційна станція",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4cd8a1bc-252c-4301-ad3c-742a1acffcd4",
+      "Name": "communicationNode",
+      "Title": "Вузол зв'язку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "983a23d7-e540-48dc-b203-fe80bb1cee57",
+      "Name": "radioRelayStations",
+      "Title": "Станції радіорелейного зв'язку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ca9f2d31-44b6-425c-bfa1-5b6461450e44",
+      "Name": "strongerTypeWithGround",
+      "Title": "посиленого типу з земляною обсипкою",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "de11e018-2aca-419e-8e67-ee2317777d43",
+      "Name": "groupsHelicopters",
+      "Title": "групові",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "40f7f572-af61-4d3f-be7e-c836ed503c0c",
+      "Name": "strongerType",
+      "Title": "посиленого типу",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "3a05d42b-a61a-4320-b87f-ad21f3df7629",
+      "Name": "openingDate",
+      "Title": "Дата відкриття рахунку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "c01aa01c-1e24-484c-9fa6-e1ba1fa7410e",
+      "Name": "closingDate",
+      "Title": "Дата закриття рахунку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "60f492d3-1cd6-4f4a-bdf8-324d48172746",
+      "Name": "categoryOfOrganization",
+      "Title": "Категорія організації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "d5d76617-098a-4c7c-ae05-6310016fea09",
+      "Name": "additionalInfo",
+      "Title": "Додаткова інформація",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "28558614-873b-48b3-ad3d-a074aa360fa5",
+      "Name": "mfo",
+      "Title": "МФО",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4a111a76-76d9-470d-a82d-53eb139bd7ee",
+      "Name": "numberOfAccount",
+      "Title": "Номер рахунку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "817502f3-17c4-414d-a4cf-1aa32ca36c87",
+      "Name": "controlledPrintedPublications",
+      "Title": "Офіційні друковані видання, власні (підконтрольні) ЗМІ",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4364a87d-0b82-42ac-84df-a2dd25865a32",
+      "Name": "moneySources",
+      "Title": "Джерела фінансування",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "eda33029-1d34-44c1-b845-befbc5a19d3d",
+      "Name": "shortHistoricalInfo",
+      "Title": "Коротка історична довідка",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ab3954ef-a232-4689-afe1-cd93ca3418e5",
+      "Name": "additionalInfo",
+      "Title": "Додаткова інформація",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "9da1f47e-b25e-4b14-a281-96b597210547",
+      "Name": "currency",
+      "Title": "Найменування валюти",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b43d9160-7a84-42e5-a352-94a48e5d9b75",
+      "Name": "bankName",
+      "Title": "Найменування банку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a678ea0e-9dcb-4aae-8ce2-e707d50e40a1",
+      "Name": "typeOfAccount",
+      "Title": "Вид рахунку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "57fd879d-ad0b-46e7-a555-af3b200c824c",
+      "Name": "structure",
+      "Title": "Організаційна структура",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ac54c735-2357-4ca1-8c4e-0bb356fdca0e",
+      "Name": "reasonsOfClosing",
+      "Title": "Підстави припинення діяльності",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "449f725f-d08b-4e18-9bfe-34cdf0656ecc",
+      "Name": "dateOfClosing",
+      "Title": "Дата припинення діяльності",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2ac6c452-ff70-4fae-a5ea-68548ab13965",
+      "Name": "placeOfRegistration",
+      "Title": "Місце реєстрації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a0bac044-6589-4b1f-b261-870b96af9ced",
+      "Name": "dateOfRegistration",
+      "Title": "Дата реєстрації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "c804cd0d-170f-409e-8a90-a205443087b7",
+      "Name": "purposes",
+      "Title": "Цілі та завдання",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "34ed9262-00af-439c-90fa-949758fbae13",
+      "Name": "category",
+      "Title": "Категорія організації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "56b3fc81-6396-4a89-84a7-32d96c97a3ef",
+      "Name": "legalAddress",
+      "Title": "Юридична адреса",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2371b497-6d26-48e7-bc1e-0c886a6948ce",
+      "Name": "about",
+      "Title": "Ідеологія (опис)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "0903389f-d9b2-4a2d-af93-2e21d989754c",
+      "Name": "meansOfCommunication",
+      "Title": "Засіб зв'язку",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "19003c24-77b1-4c36-836e-2c0484132b19",
+      "Name": "countryAndAto",
+      "Title": "країна, АТО",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b72391c8-eba8-49d8-a33e-ba8290125e5a",
+      "Name": "anotherAddress",
+      "Title": "Інші адреси",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "8a335228-371f-402d-b17d-12ff6ba7491d",
+      "Name": "actualAddress",
+      "Title": "Фактична адреса",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "32d80a16-2b4b-4934-bee0-6e522bd2a798",
+      "Name": "somePlace",
+      "Title": "Конкретне місце",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a191f348-65af-47d3-93be-82df68103c38",
+      "Name": "interestingActivities",
+      "Title": "Дії організації, що становлять інтерес",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "410c2819-8bb7-475e-a281-cf78992057ee",
+      "Name": "currentActivity",
+      "Title": "Поточна діяльність",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "491c03f9-b053-401e-86ec-218bdb47482a",
+      "Name": "techinalBuildingsOfAutomatedSecuritySystem",
+      "Title": "технічні будівлі автоматизованої системи охорони",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "5c5b02db-628b-4603-9a35-eb011b0b6792",
+      "Name": "lightingPoles",
+      "Title": "освітлювальні стовпи",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b3a11d0e-a916-4df2-9550-5eb2795d5133",
+      "Name": "technicalPlatforms",
+      "Title": "Технічні майданчики",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "12320494-6441-46c5-89e9-fa6dd1886f24",
+      "Name": "platformsOnOpenAir",
+      "Title": "Відкриті майданчики під навісами для зберігання техніки",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "7c4a1496-ece6-4f23-8c99-5d7cf2190354",
+      "Name": "loadingAndUnloadingPoints",
+      "Title": "Пункти навантаження і розвантаження",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "85e3c584-011c-4147-aadf-18ee87348717",
+      "Name": "parkings",
+      "Title": "Стоянки автомашин",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "c74dd5d5-feb9-4ff2-808e-3997531dc794",
+      "Name": "platformsForHelicopters",
+      "Title": "Вертольотні майданчики",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ab817003-b873-463b-b98e-fd42464b3b3d",
+      "Name": "railway",
+      "Title": "Під'їзні залізничні колії",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2f6d9ed5-bfb1-4abb-b730-c36c4fd4814d",
+      "Name": "checkpoint",
+      "Title": "КПП",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "da4aa969-4b71-449f-9640-bd90068aae0b",
+      "Name": "territoryAndWaterArea",
+      "Title": "Тетиторія та акваторія, м",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "143de106-efba-4fc8-8f64-043c6c27eff3",
+      "Name": "tunnelType",
+      "Title": "тунельного ьтпу",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "67c42a1b-4a81-44de-a462-b003aaca7462",
+      "Name": "countOfPlacesHelicopters",
+      "Title": "місткість стоянок у вертольотах",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "34e124d2-6504-4df2-821e-02742e1107db",
+      "Name": "singlesHelicopters",
+      "Title": "одиночні",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "5e499ced-7641-48df-a355-c8313d9fb3c5",
+      "Name": "sizes",
+      "Title": "розміри (м)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "1ecab951-265f-4181-a571-688627ea8388",
+      "Name": "square",
+      "Title": "розрахункова площа (тис. кв. м.)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "80a43fe7-aac2-4ea2-828d-37182c059c03",
+      "Name": "underCanopies",
+      "Title": "під навісами",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "6b5195a7-a961-4ca1-b38a-89fb0168bb4b",
+      "Name": "openAndEmbankmeted",
+      "Title": "обваловані",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "75e698d2-5ca8-4e08-9b11-ee1a34f3a2aa",
+      "Name": "area",
+      "Title": "покриття",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "05ffa9a6-7f60-449a-a0d9-0b54d3e25b1f",
+      "Name": "buildingsForFixing",
+      "Title": "для обслуговування та ремонту",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "8cffd8fd-1485-4a2a-bcd3-9c48b59da485",
+      "Name": "electroStations",
+      "Title": "Електропідстанції",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "bbd3c7e3-0fa2-47ad-8f59-87c832b6b3b6",
+      "Name": "countOfJets",
+      "Title": "на кількість літаків",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2dd65aea-697d-41d4-ad68-a015d25e6396",
+      "Name": "zaPositions",
+      "Title": "Позицій ЗА",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "be937c32-e793-458f-a229-5d998fdaa3c7",
+      "Name": "commonInfo",
+      "Title": "Стислі відомості (опис функцій, організаційної структури, форми та методи діяльності організації, фінансові показники, чисельність)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "97760089-6b91-4e9c-a8d6-cd0a1b1280fc",
+      "Name": "countOfPlacesInStorages",
+      "Title": "місткість сховищ в літаках бойової авіації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "12c3a71b-966e-4745-96f7-ea6813225874",
+      "Name": "singles",
+      "Title": "одиночні",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "538c959c-524f-40a9-af27-964024f3fee2",
+      "Name": "groups",
+      "Title": "групові",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2fffd57c-e75a-4514-b650-c81501933c81",
+      "Name": "technicalBuildingsForFixing",
+      "Title": "Для обслуговування та ремонту",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "5fdb2674-6284-47f8-b34c-7a2217cac3cb",
+      "Name": "dutyJetsTA",
+      "Title": "для чергових літаків ТА",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e0fcf289-5ef6-4706-b894-a00824e6100e",
+      "Name": "dutyJetsPVO",
+      "Title": "для чергових літаків ПВО",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "452ab05a-7e7b-4663-99b9-d24f8ad73232",
+      "Name": "allowableLoad",
+      "Title": "припустиме навантаження (т.)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e894d820-f260-415a-ab3f-408ada3aeecb",
+      "Name": "dutyJetsSA",
+      "Title": "для чергових літаків СА",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4df823e7-bd0c-47e1-88bd-cb6637c1d918",
+      "Name": "flightArea",
+      "Title": "Льотне поле (м.)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "01b36d75-703f-4a56-abcb-edcc9071bbfd",
+      "Name": "Is",
+      "Title": null,
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "169f5130-4139-40a5-9734-5dd6024b62cd",
+      "Name": "constructionSites",
+      "Title": "Ділянки будівельних робіт",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "1c2cc565-680d-4fc0-823e-36878a93404b",
+      "Name": "technicalSites",
+      "Title": "technical platforms",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "1e10b6c1-92ba-40a8-96bc-99d4901afb19",
+      "Name": "itemsForExport",
+      "Title": "Предмети вивозу",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "207ffcac-e2ac-48c3-b22c-2f4d6048623f",
+      "Name": "fencingStrips",
+      "Title": "смуг огородження",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "20fe1c16-583c-43e0-bd06-afa378f51098",
+      "Name": "mainEngineer",
+      "Title": "Головний інженер",
+      "Meta": "{\n  \"Container\": {\n    \"Id\": \"3065914f7fdd423982fe0a2fef136615\",\n    \"Title\": \"Правління\",\n    \"Type\": \"Accordion\"\n  }\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "44f727e4-157b-4843-99e3-26bc0cfeb6f3",
+      "Name": "director",
+      "Title": "Директор",
+      "Meta": "{\n  \"Container\": {\n    \"Id\": \"3065914f7fdd423982fe0a2fef136615\",\n    \"Title\": \"Правління\",\n    \"Type\": \"Accordion\"\n  }\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2fa8e3d1-9820-4c25-a61b-9a0bb51ba0fd",
+      "Name": "storages",
+      "Title": "Сховища, всього:",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "2fcd9605-14ae-4941-add7-cca256a8d043",
+      "Name": "helicopterPads",
+      "Title": "Вертольотні майданчики",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "301be639-7fd5-40b4-8d9d-7856189fb959",
+      "Name": "magnitudeOfTheTides",
+      "Title": "Величина приливів\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "31c15dfe-0e78-43ba-9755-795caf5849c8",
+      "Name": "numberOfPorters",
+      "Title": "Кількість фарфатерів\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "3e1a8ad6-6786-47af-bdff-a44435940d6a",
+      "Name": "itemsForImport",
+      "Title": "Предмети ввозу\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "45e05138-637b-4037-8a93-1d79bb2cb38f",
+      "Name": "technicalSites",
+      "Title": "technical platforms",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "479e6f49-53fe-48dc-ac0a-b63c50260178",
+      "Name": "carParkings",
+      "Title": "Стоянки автомашин",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
       "Id": "4b60e9e5-1405-43c4-98bd-a48a13221095",
       "Name": "createdBy",
       "Title": "Ким створено",
@@ -16633,10 +17509,430 @@
       "UniqueValueFieldName": null
     },
     {
+      "Id": "5b072263-242a-45bf-b180-b26d8577e8ed",
+      "Name": "constructionSites",
+      "Title": "Ділянки будівельних робіт",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "65cb54b6-307f-42f6-82a3-4a4f8293b248",
+      "Name": "minimumDepthsOfFairways",
+      "Title": "Мінімальні глибини фарватерів, м\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "67a66820-09f1-4bef-924a-970ab0cc1bea",
+      "Name": "PositionsOfStart",
+      "Title": "Стартові позиції",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "6e9edbb6-17fb-46df-ad05-dcff7280a0b6",
+      "Name": "carParkings",
+      "Title": "Стоянки автомашин",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "6f8851a0-f798-4331-a343-31441d2b899f",
+      "Name": "technicalAndOfficeBuildings",
+      "Title": "Технічні та. службові будівлі",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "746e2871-cb57-411e-86fc-157ff29d1c18",
+      "Name": "buildingsForAntennas",
+      "Title": "Споруди для розміщення антен:",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "74769cba-d7cd-489a-b346-3510f25b92b2",
+      "Name": "depthsAtBerths",
+      "Title": "Глибини у причалів, м\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "764b4bc2-b625-498a-8034-54d90cbd648f",
+      "Name": "MeansOfProtectionAndDefenseForPositions",
+      "Title": "Засоби охорони та оборони:",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "77fea676-31c0-492c-9a74-77e0360653de",
+      "Name": "itemsForExport",
+      "Title": "Предмети вивозу",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "800eb7bf-1f86-4ea3-a07b-813c94c35508",
+      "Name": "Is",
+      "Title": null,
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "80a4f988-21c0-4916-b48e-aad9f7d84327",
+      "Name": "itemsForImport",
+      "Title": "Предмети ввозу\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "819b5095-0730-4d2f-af44-1a1a66e3000e",
+      "Name": "Country",
+      "Title": "Країна",
+      "Meta": "{\r\n  \"SortOrder\": 244\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "82bad52d-f41f-461d-98f5-6c7286410bd8",
+      "Name": "waterArea",
+      "Title": "Площа акваторії, кв.м.",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "8744a5b0-f41e-4c53-8fe3-201034dbdae8",
+      "Name": "commandPost",
+      "Title": "Командний пункт",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "885e6f50-3b1e-4614-ac75-c5f8277897b5",
+      "Name": "shipTurnover",
+      "Title": "Судооборот, судів за рік\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "94574561-439d-4d07-b645-9762f95d836a",
+      "Name": "technicalAndOfficeBuildings",
+      "Title": "Технічні та. службові будівлі",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "99063511-e97f-41ae-a07b-94955ccaa65f",
+      "Name": "shipTurnover",
+      "Title": "Судооборот, судів за рік\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a725c3ad-7c71-4c1a-bbf3-aba28daad8a6",
+      "Name": "depthsAtBerths",
+      "Title": "Глибини у причалів, м\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "a97645b3-9ec9-47e7-8ad3-4cbcdb5a4bd4",
+      "Name": "waterArea",
+      "Title": "Площа акваторії, кв.м.",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ad108c47-97a0-4ba3-8bea-55450fc63e72",
+      "Name": "magnitudeOfTheTides",
+      "Title": "Величина приливів\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b23b19e8-291d-4d72-a3be-7c1758eded73",
+      "Name": "positionsOfStart",
+      "Title": "Стартові позиції",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "b514007f-d55d-43bd-b3b1-204bb1982c4c",
+      "Name": "guardTowers",
+      "Title": "караульних вишок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "c565272f-4dbd-4d37-b42b-d1528c82af32",
+      "Name": "meansOfProtectionAndDefence",
+      "Title": "Засоби охорони та оборони:",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "c8ad8bed-a485-428c-b6d4-d918227cd85f",
+      "Name": "helicopterPads",
+      "Title": "Вертольотні майданчики",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ce90c525-986a-4298-b328-6b3a3bda0957",
+      "Name": "protectAndDefense",
+      "Title": "Засоби охорони та оборони",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "d0248b92-3e40-4e75-b32a-b4fd60e757dc",
+      "Name": "fencingStrips",
+      "Title": "смуг огородження",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "d746fad8-51ef-4376-a349-f974182e571d",
+      "Name": "mooringFront",
+      "Title": "Причальний фронт, м\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
       "Id": "d76bbd48-0549-4477-b7b6-559ae57c3d59",
       "Name": "createdBy",
       "Title": "Ким створено",
       "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "dd64ee17-8550-4228-a00c-d07fed8dadb8",
+      "Name": "minimumDepthsOfFairways",
+      "Title": "Мінімальні глибини фарватерів, м\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e29d4ee5-2667-4a11-b24c-f3d14bfade7b",
+      "Name": "cargoTurnover",
+      "Title": "Грузооборот порту за рік\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e7c66125-5df6-4842-a06b-6c482bbdd7f8",
+      "Name": "technical",
+      "Title": "Техніні позиції",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],   \"SortOrder\": 44, \n   \"FormField\": {\n   \"Type\": \"form\"\n  },\n  \"Multiple\": false\n}\n\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "e8de702e-6894-49cd-8ac6-5f7794e7a734",
+      "Name": "numberOfPorters",
+      "Title": "Кількість фарфатерів\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ed8e0689-777a-4848-bda2-67aee7e222fa",
+      "Name": "guardTowers",
+      "Title": "караульних вишок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ef073339-de69-4232-a720-5e3aecc94c1c",
+      "Name": "cargoTurnover",
+      "Title": "Грузооборот порту за рік\t",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "efe6b452-e3ad-4098-aa77-f2f6c102a2f1",
+      "Name": "fullName",
+      "Title": "Повна Назва організації",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [0,1,2],\n  \"SortOrder\": 10,\n  \"FormField\": {\n    \"Type\": \"form\"\n  },\n  \"Container\": {\n    \"Id\": \"b72b4a68edcb41cf9d6011ebc78b05d7\",\n    \"Title\": \"Загальна інформація\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": false\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "ff355599-75b0-4f1e-9de8-8d53cf86c46e",
+      "Name": "production",
+      "Title": "Продукція",
+      "Meta": "{\n  \"FormField\": {\n    \"Type\": \"dropdown\",\n  },\n  \"Container\": {\n    \"Id\": \"4ad24f0cf5694148b3679c8f4659d9a7\",\n    \"Title\": \"Продукція\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": \"true\"\n}\n",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -18817,13 +20113,6 @@
       "TargetTypeId": "7278e3e4-af7c-464a-9c4d-679781151347"
     },
     {
-      "Id": "efe6b452-e3ad-4098-aa77-f2f6c102a2f1",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "077946f8-c103-4238-ab29-b3d6b96ba349",
-      "TargetTypeId": "428a7162-f518-4fa1-9238-0410e9e62ee5"
-    },
-    {
       "Id": "f07c03ef-1e92-4e72-8a41-e72c18784cb9",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -19151,13 +20440,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
       "TargetTypeId": "845c1b78-5fdf-4065-bb2a-64b91b2bda84"
-    },
-    {
-      "Id": "01b36d75-703f-4a56-abcb-edcc9071bbfd",
-      "Kind": 1,
-      "EmbeddingOptions": 0,
-      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
-      "TargetTypeId": "12714279-135c-4e93-af46-43235f9f94b9"
     },
     {
       "Id": "7ab8c6b4-735a-404d-aff7-ad41655f0164",
@@ -19720,18 +21002,11 @@
       "TargetTypeId": "978f0d51-a532-4255-b833-e8d486dfe32f"
     },
     {
-      "Id": "1c2cc565-680d-4fc0-823e-36878a93404b",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "bb41438b-929e-47ad-bfeb-3126460493fb",
-      "TargetTypeId": "45e05138-637b-4037-8a93-1d79bb2cb38f"
-    },
-    {
-      "Id": "207ffcac-e2ac-48c3-b22c-2f4d6048623f",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f",
-      "TargetTypeId": "d0248b92-3e40-4e75-b32a-b4fd60e757dc"
+      "Id": "01b36d75-703f-4a56-abcb-edcc9071bbfd",
+      "Kind": 1,
+      "EmbeddingOptions": 0,
+      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
+      "TargetTypeId": "12714279-135c-4e93-af46-43235f9f94b9"
     },
     {
       "Id": "21cac02e-3baa-4033-9e97-862c8306df87",
@@ -19795,13 +21070,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
       "TargetTypeId": "09226b9b-b117-4806-9e00-f0145fff8942"
-    },
-    {
-      "Id": "5b072263-242a-45bf-b180-b26d8577e8ed",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
-      "TargetTypeId": "169f5130-4139-40a5-9734-5dd6024b62cd"
     },
     {
       "Id": "5c59ad16-4dac-46bc-a6c6-7290c40e2d24",
@@ -19900,13 +21168,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "f0b3ac0a-0ca4-4ef4-923d-d1d2bde38689",
       "TargetTypeId": "0b8b45e0-1d80-4f06-92d7-82132b523b7e"
-    },
-    {
-      "Id": "65cb54b6-307f-42f6-82a3-4a4f8293b248",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "dd64ee17-8550-4228-a00c-d07fed8dadb8"
     },
     {
       "Id": "65e5950f-cf58-49f0-814c-4c37a20956a7",
@@ -20047,13 +21308,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "10cb0dec-8209-43fb-88ac-bbedeb45a8d1",
       "TargetTypeId": "6a683606-edc7-43b5-a835-a38234355670"
-    },
-    {
-      "Id": "746e2871-cb57-411e-86fc-157ff29d1c18",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "109bfb19-4e52-4ae7-bf7a-99bf39183fe5",
-      "TargetTypeId": "2c9d5325-92b0-413b-9da2-6eee18fbd076"
     },
     {
       "Id": "749e49a3-7358-4db0-9b66-16c68e0b322b",
@@ -20266,20 +21520,6 @@
       "TargetTypeId": "5f676bb5-d25c-4eb7-8b5e-4655363b5640"
     },
     {
-      "Id": "2fa8e3d1-9820-4c25-a61b-9a0bb51ba0fd",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
-      "TargetTypeId": "8ebab1c6-3271-4611-8e8d-823818cf9f48"
-    },
-    {
-      "Id": "2fcd9605-14ae-4941-add7-cca256a8d043",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
-      "TargetTypeId": "c8ad8bed-a485-428c-b6d4-d918227cd85f"
-    },
-    {
       "Id": "2ffefefe-dd45-45a7-9f71-e7037f2f9a29",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -20287,25 +21527,11 @@
       "TargetTypeId": "a9e1e296-071a-43e4-9156-ad02c3571275"
     },
     {
-      "Id": "301be639-7fd5-40b4-8d9d-7856189fb959",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "ad108c47-97a0-4ba3-8bea-55450fc63e72"
-    },
-    {
       "Id": "316b307e-9a01-4def-b39f-96c473ebf390",
       "Kind": 0,
       "EmbeddingOptions": 1,
       "SourceTypeId": "3a825c93-550f-40a5-a070-9477d9404280",
       "TargetTypeId": "423f4f01-3b04-49e0-85c2-9c233725fada"
-    },
-    {
-      "Id": "31c15dfe-0e78-43ba-9755-795caf5849c8",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "e8de702e-6894-49cd-8ac6-5f7794e7a734"
     },
     {
       "Id": "621a3b24-feae-4f2c-a1c7-95a4f5c93a50",
@@ -20350,13 +21576,6 @@
       "TargetTypeId": "9907d416-f4f5-4915-a2ed-9862ca4e5cb9"
     },
     {
-      "Id": "3e1a8ad6-6786-47af-bdff-a44435940d6a",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "80a4f988-21c0-4916-b48e-aad9f7d84327"
-    },
-    {
       "Id": "3f2aaae4-4da1-453f-a3ea-9c2f0d13e785",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -20369,13 +21588,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "bb41438b-929e-47ad-bfeb-3126460493fb",
       "TargetTypeId": "836c3446-64d0-4b96-bee2-e5d0937e70ab"
-    },
-    {
-      "Id": "479e6f49-53fe-48dc-ac0a-b63c50260178",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
-      "TargetTypeId": "6e9edbb6-17fb-46df-ad05-dcff7280a0b6"
     },
     {
       "Id": "00dc62b2-1f6b-447b-bc9c-05752e9120de",
@@ -20665,25 +21877,11 @@
       "TargetTypeId": "14aad0b1-c0ef-4560-b178-3f154d113598"
     },
     {
-      "Id": "77fea676-31c0-492c-9a74-77e0360653de",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "1e10b6c1-92ba-40a8-96bc-99d4901afb19"
-    },
-    {
       "Id": "8728ea5a-b765-4bbc-b1fe-72ea599d456c",
       "Kind": 0,
       "EmbeddingOptions": 1,
       "SourceTypeId": "487f0680-e577-471d-902b-e7e187908cf5",
       "TargetTypeId": "3558684d-ac3a-4d40-b373-8fc3068cfffc"
-    },
-    {
-      "Id": "8744a5b0-f41e-4c53-8fe3-201034dbdae8",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
-      "TargetTypeId": "6c80ea50-004c-45c2-95b8-89e703843a6a"
     },
     {
       "Id": "8796379c-34ae-4b97-bb35-2ae6f133f08e",
@@ -20770,13 +21968,6 @@
       "TargetTypeId": "ab5f0b7f-b9ed-4cd1-9d6b-f35908cc3880"
     },
     {
-      "Id": "885e6f50-3b1e-4614-ac75-c5f8277897b5",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "99063511-e97f-41ae-a07b-94955ccaa65f"
-    },
-    {
       "Id": "88e93698-e031-404c-954d-63f7b24eb478",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -20859,13 +22050,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "0b8b45e0-1d80-4f06-92d7-82132b523b7e",
       "TargetTypeId": "a4e0a479-3309-4e99-892e-c20f0818a11b"
-    },
-    {
-      "Id": "94574561-439d-4d07-b645-9762f95d836a",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "109bfb19-4e52-4ae7-bf7a-99bf39183fe5",
-      "TargetTypeId": "6f8851a0-f798-4331-a343-31441d2b899f"
     },
     {
       "Id": "94f8b0ce-8449-48c7-98bf-f058bfbd1705",
@@ -21015,25 +22199,11 @@
       "TargetTypeId": "ee35b34f-2201-45b6-96e5-039dd9754f67"
     },
     {
-      "Id": "a725c3ad-7c71-4c1a-bbf3-aba28daad8a6",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "74769cba-d7cd-489a-b346-3510f25b92b2"
-    },
-    {
       "Id": "a9144bdc-5eed-4e3b-9fd7-1d73fb8e4920",
       "Kind": 0,
       "EmbeddingOptions": 1,
       "SourceTypeId": "487f0680-e577-471d-902b-e7e187908cf5",
       "TargetTypeId": "6a683606-edc7-43b5-a835-a38234355670"
-    },
-    {
-      "Id": "a97645b3-9ec9-47e7-8ad3-4cbcdb5a4bd4",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "82bad52d-f41f-461d-98f5-6c7286410bd8"
     },
     {
       "Id": "ab33c8c2-2861-4a32-9b72-55717fbc1ad4",
@@ -21085,13 +22255,6 @@
       "TargetTypeId": "a7eeacf7-d36a-4bb6-8cb7-3d6eacc01991"
     },
     {
-      "Id": "b23b19e8-291d-4d72-a3be-7c1758eded73",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
-      "TargetTypeId": "67a66820-09f1-4bef-924a-970ab0cc1bea"
-    },
-    {
       "Id": "b290811d-0dbf-4c36-b9f5-1b7d688b384b",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -21118,13 +22281,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "f09a6984-3a6a-4727-ac89-6f12866ac151",
       "TargetTypeId": "d1f2416a-6c1c-4502-880e-2935250e8495"
-    },
-    {
-      "Id": "b514007f-d55d-43bd-b3b1-204bb1982c4c",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f",
-      "TargetTypeId": "ed8e0689-777a-4848-bda2-67aee7e222fa"
     },
     {
       "Id": "b539d012-0e77-424c-abad-5691eeb6a1a2",
@@ -21155,13 +22311,6 @@
       "TargetTypeId": "863b8340-bf7c-4f88-ba59-557028efb2fd"
     },
     {
-      "Id": "c565272f-4dbd-4d37-b42b-d1528c82af32",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
-      "TargetTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f"
-    },
-    {
       "Id": "c5e17b94-429f-478c-9da6-41991854b786",
       "Kind": 1,
       "EmbeddingOptions": 0,
@@ -21188,13 +22337,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "fccb500d-5f6b-40ad-952a-a5e45f947ea5",
       "TargetTypeId": "643de537-904b-4e95-b01f-5f9faeb0cc22"
-    },
-    {
-      "Id": "ce90c525-986a-4298-b328-6b3a3bda0957",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
-      "TargetTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f"
     },
     {
       "Id": "deee9215-c9c0-41cf-81b7-02aa5906f8f3",
@@ -21230,13 +22372,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "6302976e-0caa-4f8f-94c9-abbd3062a04c",
       "TargetTypeId": "1794a0bb-61e5-4560-b0ea-5f9d9ce7154c"
-    },
-    {
-      "Id": "e29d4ee5-2667-4a11-b24c-f3d14bfade7b",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "ef073339-de69-4232-a720-5e3aecc94c1c"
     },
     {
       "Id": "e2ec3573-df4c-4c34-a723-9afc9e48b1dd",
@@ -21475,13 +22610,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "99966114-901c-4fd3-9651-d0a0f56fa368",
       "TargetTypeId": "73d6b79b-9d62-43d6-82ea-b11a060ad941"
-    },
-    {
-      "Id": "e7c66125-5df6-4842-a06b-6c482bbdd7f8",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
-      "TargetTypeId": "fccb500d-5f6b-40ad-952a-a5e45f947ea5"
     },
     {
       "Id": "e823d706-424d-48fd-8c64-152762522a98",
@@ -21757,13 +22885,6 @@
       "TargetTypeId": "ac53d3c7-b481-487a-87ca-edf559b9a30b"
     },
     {
-      "Id": "d746fad8-51ef-4376-a349-f974182e571d",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
-      "TargetTypeId": "0512af66-cef1-4d57-ae9b-ce713fcbbb97"
-    },
-    {
       "Id": "d97b279a-8a5c-4eb8-aec7-066d5dc18f51",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -21869,46 +22990,11 @@
       "TargetTypeId": "f245afe7-8ac5-490b-be4e-7bf18a2dd895"
     },
     {
-      "Id": "d76bbd48-0549-4477-b7b6-559ae57c3d59",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "1ca66464-4b0c-4d46-8b7a-36a8fed863ca",
-      "TargetTypeId": "4b60e9e5-1405-43c4-98bd-a48a13221095"
-    },
-    {
       "Id": "d4b60364-ab34-490e-bed8-f75bd43a71c4",
       "Kind": 0,
       "EmbeddingOptions": 1,
       "SourceTypeId": "447d0538-0b89-4de1-b5a1-9ae0c8890b92",
       "TargetTypeId": "e826f886-0019-47c4-b176-f8771cb9aa49"
-    },
-    {
-      "Id": "44f727e4-157b-4843-99e3-26bc0cfeb6f3",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
-      "TargetTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451"
-    },
-    {
-      "Id": "20fe1c16-583c-43e0-bd06-afa378f51098",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
-      "TargetTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451"
-    },
-    {
-      "Id": "800eb7bf-1f86-4ea3-a07b-813c94c35508",
-      "Kind": 1,
-      "EmbeddingOptions": 0,
-      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
-      "TargetTypeId": "12714279-135c-4e93-af46-43235f9f94b9"
-    },
-    {
-      "Id": "ff355599-75b0-4f1e-9de8-8d53cf86c46e",
-      "Kind": 0,
-      "EmbeddingOptions": 3,
-      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
-      "TargetTypeId": "12714279-135c-4e93-af46-43235f9f94b9"
     },
     {
       "Id": "bb28cea1-e2d8-43a9-b9d0-62cecfa08d13",
@@ -22079,6 +23165,34 @@
       "TargetTypeId": "a28e31ac-a558-49fd-9e2e-e1cb3ec29fee"
     },
     {
+      "Id": "20fe1c16-583c-43e0-bd06-afa378f51098",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
+      "TargetTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451"
+    },
+    {
+      "Id": "44f727e4-157b-4843-99e3-26bc0cfeb6f3",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
+      "TargetTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451"
+    },
+    {
+      "Id": "800eb7bf-1f86-4ea3-a07b-813c94c35508",
+      "Kind": 1,
+      "EmbeddingOptions": 0,
+      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
+      "TargetTypeId": "12714279-135c-4e93-af46-43235f9f94b9"
+    },
+    {
+      "Id": "d746fad8-51ef-4376-a349-f974182e571d",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "0512af66-cef1-4d57-ae9b-ce713fcbbb97"
+    },
+    {
       "Id": "05090d4d-8e58-446a-bff0-a52364bf1733",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -22119,6 +23233,188 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451",
       "TargetTypeId": "b63d5602-88c6-421f-a975-7baad1b8d5bb"
+    },
+    {
+      "Id": "1c2cc565-680d-4fc0-823e-36878a93404b",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "bb41438b-929e-47ad-bfeb-3126460493fb",
+      "TargetTypeId": "45e05138-637b-4037-8a93-1d79bb2cb38f"
+    },
+    {
+      "Id": "207ffcac-e2ac-48c3-b22c-2f4d6048623f",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f",
+      "TargetTypeId": "d0248b92-3e40-4e75-b32a-b4fd60e757dc"
+    },
+    {
+      "Id": "2fa8e3d1-9820-4c25-a61b-9a0bb51ba0fd",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
+      "TargetTypeId": "8ebab1c6-3271-4611-8e8d-823818cf9f48"
+    },
+    {
+      "Id": "2fcd9605-14ae-4941-add7-cca256a8d043",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
+      "TargetTypeId": "c8ad8bed-a485-428c-b6d4-d918227cd85f"
+    },
+    {
+      "Id": "301be639-7fd5-40b4-8d9d-7856189fb959",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "ad108c47-97a0-4ba3-8bea-55450fc63e72"
+    },
+    {
+      "Id": "31c15dfe-0e78-43ba-9755-795caf5849c8",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "e8de702e-6894-49cd-8ac6-5f7794e7a734"
+    },
+    {
+      "Id": "3e1a8ad6-6786-47af-bdff-a44435940d6a",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "80a4f988-21c0-4916-b48e-aad9f7d84327"
+    },
+    {
+      "Id": "479e6f49-53fe-48dc-ac0a-b63c50260178",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
+      "TargetTypeId": "6e9edbb6-17fb-46df-ad05-dcff7280a0b6"
+    },
+    {
+      "Id": "5b072263-242a-45bf-b180-b26d8577e8ed",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
+      "TargetTypeId": "169f5130-4139-40a5-9734-5dd6024b62cd"
+    },
+    {
+      "Id": "65cb54b6-307f-42f6-82a3-4a4f8293b248",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "dd64ee17-8550-4228-a00c-d07fed8dadb8"
+    },
+    {
+      "Id": "746e2871-cb57-411e-86fc-157ff29d1c18",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "109bfb19-4e52-4ae7-bf7a-99bf39183fe5",
+      "TargetTypeId": "2c9d5325-92b0-413b-9da2-6eee18fbd076"
+    },
+    {
+      "Id": "77fea676-31c0-492c-9a74-77e0360653de",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "1e10b6c1-92ba-40a8-96bc-99d4901afb19"
+    },
+    {
+      "Id": "8744a5b0-f41e-4c53-8fe3-201034dbdae8",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
+      "TargetTypeId": "6c80ea50-004c-45c2-95b8-89e703843a6a"
+    },
+    {
+      "Id": "885e6f50-3b1e-4614-ac75-c5f8277897b5",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "99063511-e97f-41ae-a07b-94955ccaa65f"
+    },
+    {
+      "Id": "94574561-439d-4d07-b645-9762f95d836a",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "109bfb19-4e52-4ae7-bf7a-99bf39183fe5",
+      "TargetTypeId": "6f8851a0-f798-4331-a343-31441d2b899f"
+    },
+    {
+      "Id": "a725c3ad-7c71-4c1a-bbf3-aba28daad8a6",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "74769cba-d7cd-489a-b346-3510f25b92b2"
+    },
+    {
+      "Id": "a97645b3-9ec9-47e7-8ad3-4cbcdb5a4bd4",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "82bad52d-f41f-461d-98f5-6c7286410bd8"
+    },
+    {
+      "Id": "b23b19e8-291d-4d72-a3be-7c1758eded73",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
+      "TargetTypeId": "67a66820-09f1-4bef-924a-970ab0cc1bea"
+    },
+    {
+      "Id": "b514007f-d55d-43bd-b3b1-204bb1982c4c",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f",
+      "TargetTypeId": "ed8e0689-777a-4848-bda2-67aee7e222fa"
+    },
+    {
+      "Id": "c565272f-4dbd-4d37-b42b-d1528c82af32",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "3e8583fb-7b63-4a39-b51e-9b9d8ef3bc47",
+      "TargetTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f"
+    },
+    {
+      "Id": "ce90c525-986a-4298-b328-6b3a3bda0957",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
+      "TargetTypeId": "764b4bc2-b625-498a-8034-54d90cbd648f"
+    },
+    {
+      "Id": "d76bbd48-0549-4477-b7b6-559ae57c3d59",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "1ca66464-4b0c-4d46-8b7a-36a8fed863ca",
+      "TargetTypeId": "4b60e9e5-1405-43c4-98bd-a48a13221095"
+    },
+    {
+      "Id": "e29d4ee5-2667-4a11-b24c-f3d14bfade7b",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
+      "TargetTypeId": "ef073339-de69-4232-a720-5e3aecc94c1c"
+    },
+    {
+      "Id": "e7c66125-5df6-4842-a06b-6c482bbdd7f8",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "a78d40a8-1f58-46d1-855e-8576f056c74f",
+      "TargetTypeId": "fccb500d-5f6b-40ad-952a-a5e45f947ea5"
+    },
+    {
+      "Id": "efe6b452-e3ad-4098-aa77-f2f6c102a2f1",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "077946f8-c103-4238-ab29-b3d6b96ba349",
+      "TargetTypeId": "428a7162-f518-4fa1-9238-0410e9e62ee5"
+    },
+    {
+      "Id": "ff355599-75b0-4f1e-9de8-8d53cf86c46e",
+      "Kind": 0,
+      "EmbeddingOptions": 3,
+      "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
+      "TargetTypeId": "12714279-135c-4e93-af46-43235f9f94b9"
     }
   ],
   "AttributeTypes": [
@@ -22811,10 +24107,6 @@
       "ScalarType": 1
     },
     {
-      "Id": "1e10b6c1-92ba-40a8-96bc-99d4901afb19",
-      "ScalarType": 1
-    },
-    {
       "Id": "1e8afb12-72c0-49cc-9f55-5bb49c3e4cde",
       "ScalarType": 1
     },
@@ -22828,10 +24120,6 @@
     },
     {
       "Id": "32aca6c8-1251-4dcc-ad54-93331bb45cad",
-      "ScalarType": 1
-    },
-    {
-      "Id": "45e05138-637b-4037-8a93-1d79bb2cb38f",
       "ScalarType": 1
     },
     {
@@ -22887,10 +24175,6 @@
       "ScalarType": 1
     },
     {
-      "Id": "82bad52d-f41f-461d-98f5-6c7286410bd8",
-      "ScalarType": 1
-    },
-    {
       "Id": "836c3446-64d0-4b96-bee2-e5d0937e70ab",
       "ScalarType": 1
     },
@@ -22939,10 +24223,6 @@
       "ScalarType": 1
     },
     {
-      "Id": "0512af66-cef1-4d57-ae9b-ce713fcbbb97",
-      "ScalarType": 1
-    },
-    {
       "Id": "058ed18e-364f-4383-8b74-1affc475261b",
       "ScalarType": 2
     },
@@ -22984,10 +24264,6 @@
     },
     {
       "Id": "14aad0b1-c0ef-4560-b178-3f154d113598",
-      "ScalarType": 1
-    },
-    {
-      "Id": "169f5130-4139-40a5-9734-5dd6024b62cd",
       "ScalarType": 1
     },
     {
@@ -23179,24 +24455,8 @@
       "ScalarType": 1
     },
     {
-      "Id": "6e9edbb6-17fb-46df-ad05-dcff7280a0b6",
-      "ScalarType": 1
-    },
-    {
-      "Id": "6f8851a0-f798-4331-a343-31441d2b899f",
-      "ScalarType": 1
-    },
-    {
       "Id": "708df088-0ede-4cd0-84f8-6ae72bcdfcaa",
       "ScalarType": 1
-    },
-    {
-      "Id": "74769cba-d7cd-489a-b346-3510f25b92b2",
-      "ScalarType": 1
-    },
-    {
-      "Id": "80a4f988-21c0-4916-b48e-aad9f7d84327",
-      "ScalarType": 0
     },
     {
       "Id": "81235aa3-0635-41db-a0df-f924b0a2f961",
@@ -23241,10 +24501,6 @@
     {
       "Id": "97b12580-96f2-4407-a4ce-917b4fdf0d13",
       "ScalarType": 0
-    },
-    {
-      "Id": "99063511-e97f-41ae-a07b-94955ccaa65f",
-      "ScalarType": 1
     },
     {
       "Id": "9907d416-f4f5-4915-a2ed-9862ca4e5cb9",
@@ -23443,10 +24699,6 @@
       "ScalarType": 1
     },
     {
-      "Id": "ad108c47-97a0-4ba3-8bea-55450fc63e72",
-      "ScalarType": 1
-    },
-    {
       "Id": "ad230c5d-d386-4e95-83f9-9484fb3ea598",
       "ScalarType": 1
     },
@@ -23555,10 +24807,6 @@
       "ScalarType": 1
     },
     {
-      "Id": "c8ad8bed-a485-428c-b6d4-d918227cd85f",
-      "ScalarType": 1
-    },
-    {
       "Id": "cb58a8f9-53ba-4ab9-b705-d2b901037148",
       "ScalarType": 1
     },
@@ -23576,10 +24824,6 @@
     },
     {
       "Id": "cffd5491-b3bb-4271-b569-838cd3eedc53",
-      "ScalarType": 1
-    },
-    {
-      "Id": "d0248b92-3e40-4e75-b32a-b4fd60e757dc",
       "ScalarType": 1
     },
     {
@@ -23627,10 +24871,6 @@
       "ScalarType": 1
     },
     {
-      "Id": "dd64ee17-8550-4228-a00c-d07fed8dadb8",
-      "ScalarType": 1
-    },
-    {
       "Id": "e0bb0d6f-0ea9-40dc-865d-c6ac83e959a0",
       "ScalarType": 1
     },
@@ -23655,10 +24895,6 @@
       "ScalarType": 0
     },
     {
-      "Id": "e8de702e-6894-49cd-8ac6-5f7794e7a734",
-      "ScalarType": 1
-    },
-    {
       "Id": "eb65c25c-79a6-45b7-ab17-1ddd0b9f85ce",
       "ScalarType": 1
     },
@@ -23671,19 +24907,11 @@
       "ScalarType": 1
     },
     {
-      "Id": "ed8e0689-777a-4848-bda2-67aee7e222fa",
-      "ScalarType": 1
-    },
-    {
       "Id": "ee35b34f-2201-45b6-96e5-039dd9754f67",
       "ScalarType": 1
     },
     {
       "Id": "eea5df83-a715-4903-a103-22dea2f3e56c",
-      "ScalarType": 1
-    },
-    {
-      "Id": "ef073339-de69-4232-a720-5e3aecc94c1c",
       "ScalarType": 1
     },
     {
@@ -23855,8 +25083,508 @@
       "ScalarType": 0
     },
     {
+      "Id": "c804cd0d-170f-409e-8a90-a205443087b7",
+      "ScalarType": 0
+    },
+    {
+      "Id": "05ffa9a6-7f60-449a-a0d9-0b54d3e25b1f",
+      "ScalarType": 1
+    },
+    {
+      "Id": "75e698d2-5ca8-4e08-9b11-ee1a34f3a2aa",
+      "ScalarType": 0
+    },
+    {
+      "Id": "6b5195a7-a961-4ca1-b38a-89fb0168bb4b",
+      "ScalarType": 1
+    },
+    {
+      "Id": "80a43fe7-aac2-4ea2-828d-37182c059c03",
+      "ScalarType": 1
+    },
+    {
+      "Id": "1ecab951-265f-4181-a571-688627ea8388",
+      "ScalarType": 1
+    },
+    {
+      "Id": "5e499ced-7641-48df-a355-c8313d9fb3c5",
+      "ScalarType": 1
+    },
+    {
+      "Id": "34e124d2-6504-4df2-821e-02742e1107db",
+      "ScalarType": 1
+    },
+    {
+      "Id": "67c42a1b-4a81-44de-a462-b003aaca7462",
+      "ScalarType": 1
+    },
+    {
+      "Id": "143de106-efba-4fc8-8f64-043c6c27eff3",
+      "ScalarType": 1
+    },
+    {
+      "Id": "40f7f572-af61-4d3f-be7e-c836ed503c0c",
+      "ScalarType": 1
+    },
+    {
+      "Id": "ca9f2d31-44b6-425c-bfa1-5b6461450e44",
+      "ScalarType": 1
+    },
+    {
+      "Id": "a6c62598-ee75-4471-acb1-6f4bcfc24ea4",
+      "ScalarType": 1
+    },
+    {
+      "Id": "309f1516-e982-4135-b172-5c7212223bd2",
+      "ScalarType": 1
+    },
+    {
+      "Id": "d490e8db-cfab-4f83-b464-1f83ef19fe39",
+      "ScalarType": 1
+    },
+    {
+      "Id": "77c3fae8-e8a6-453b-b1a0-90ae7991318f",
+      "ScalarType": 1
+    },
+    {
+      "Id": "2f6d9ed5-bfb1-4abb-b730-c36c4fd4814d",
+      "ScalarType": 1
+    },
+    {
+      "Id": "491c03f9-b053-401e-86ec-218bdb47482a",
+      "ScalarType": 1
+    },
+    {
+      "Id": "b8398c7f-6198-47fd-b4b5-8067ef17ad8d",
+      "ScalarType": 0
+    },
+    {
+      "Id": "0512af66-cef1-4d57-ae9b-ce713fcbbb97",
+      "ScalarType": 1
+    },
+    {
+      "Id": "169f5130-4139-40a5-9734-5dd6024b62cd",
+      "ScalarType": 1
+    },
+    {
+      "Id": "1e10b6c1-92ba-40a8-96bc-99d4901afb19",
+      "ScalarType": 1
+    },
+    {
+      "Id": "45e05138-637b-4037-8a93-1d79bb2cb38f",
+      "ScalarType": 1
+    },
+    {
       "Id": "4b60e9e5-1405-43c4-98bd-a48a13221095",
       "ScalarType": 0
+    },
+    {
+      "Id": "6e9edbb6-17fb-46df-ad05-dcff7280a0b6",
+      "ScalarType": 1
+    },
+    {
+      "Id": "6f8851a0-f798-4331-a343-31441d2b899f",
+      "ScalarType": 1
+    },
+    {
+      "Id": "b3a11d0e-a916-4df2-9550-5eb2795d5133",
+      "ScalarType": 1
+    },
+    {
+      "Id": "be937c32-e793-458f-a229-5d998fdaa3c7",
+      "ScalarType": 0
+    },
+    {
+      "Id": "2dd65aea-697d-41d4-ad68-a015d25e6396",
+      "ScalarType": 1
+    },
+    {
+      "Id": "8cffd8fd-1485-4a2a-bcd3-9c48b59da485",
+      "ScalarType": 1
+    },
+    {
+      "Id": "2fffd57c-e75a-4514-b650-c81501933c81",
+      "ScalarType": 1
+    },
+    {
+      "Id": "452ab05a-7e7b-4663-99b9-d24f8ad73232",
+      "ScalarType": 1
+    },
+    {
+      "Id": "4df823e7-bd0c-47e1-88bd-cb6637c1d918",
+      "ScalarType": 0
+    },
+    {
+      "Id": "e894d820-f260-415a-ab3f-408ada3aeecb",
+      "ScalarType": 1
+    },
+    {
+      "Id": "4587ada4-2bf2-460d-8c7e-013883422c6e",
+      "ScalarType": 1
+    },
+    {
+      "Id": "e0fcf289-5ef6-4706-b894-a00824e6100e",
+      "ScalarType": 1
+    },
+    {
+      "Id": "bbd3c7e3-0fa2-47ad-8f59-87c832b6b3b6",
+      "ScalarType": 1
+    },
+    {
+      "Id": "da4aa969-4b71-449f-9640-bd90068aae0b",
+      "ScalarType": 1
+    },
+    {
+      "Id": "ab817003-b873-463b-b98e-fd42464b3b3d",
+      "ScalarType": 1
+    },
+    {
+      "Id": "c74dd5d5-feb9-4ff2-808e-3997531dc794",
+      "ScalarType": 1
+    },
+    {
+      "Id": "85e3c584-011c-4147-aadf-18ee87348717",
+      "ScalarType": 1
+    },
+    {
+      "Id": "7c4a1496-ece6-4f23-8c99-5d7cf2190354",
+      "ScalarType": 1
+    },
+    {
+      "Id": "12320494-6441-46c5-89e9-fa6dd1886f24",
+      "ScalarType": 1
+    },
+    {
+      "Id": "5fdb2674-6284-47f8-b34c-7a2217cac3cb",
+      "ScalarType": 1
+    },
+    {
+      "Id": "de11e018-2aca-419e-8e67-ee2317777d43",
+      "ScalarType": 1
+    },
+    {
+      "Id": "69f7bb4b-7ad4-4b33-a9df-5ad60589c3f9",
+      "ScalarType": 1
+    },
+    {
+      "Id": "1cf48187-f7be-41c3-a9d2-a44a983d3651",
+      "ScalarType": 1
+    },
+    {
+      "Id": "c6e0d48b-9f31-4ad7-a429-8b6011649de7",
+      "ScalarType": 1
+    },
+    {
+      "Id": "4da6a0a6-9ec0-4fd6-b619-3769f4e8d4f8",
+      "ScalarType": 1
+    },
+    {
+      "Id": "daef5cb6-b3d6-4b78-aac3-7057658f4fdc",
+      "ScalarType": 1
+    },
+    {
+      "Id": "8d021a7c-ad30-4195-9aeb-856e58e7d5d6",
+      "ScalarType": 1
+    },
+    {
+      "Id": "4cd8a1bc-252c-4301-ad3c-742a1acffcd4",
+      "ScalarType": 1
+    },
+    {
+      "Id": "983a23d7-e540-48dc-b203-fe80bb1cee57",
+      "ScalarType": 1
+    },
+    {
+      "Id": "9a5f170a-cdba-4ad0-a6d6-1a0a1e586f6c",
+      "ScalarType": 1
+    },
+    {
+      "Id": "8dbb0fcb-c968-4e28-a92b-acc646364a69",
+      "ScalarType": 1
+    },
+    {
+      "Id": "3baaeabd-7454-41c8-9b6f-05de32c95731",
+      "ScalarType": 1
+    },
+    {
+      "Id": "6d44efe0-3007-4198-9d6a-36143b0fc837",
+      "ScalarType": 1
+    },
+    {
+      "Id": "6356c7ec-8029-44db-841c-d5e8fc921799",
+      "ScalarType": 1
+    },
+    {
+      "Id": "e98ba749-8553-41b3-8e4a-8516d6637d9b",
+      "ScalarType": 1
+    },
+    {
+      "Id": "bf586a6e-26f1-49ef-9945-d568059ad71e",
+      "ScalarType": 1
+    },
+    {
+      "Id": "a28a24f2-ab33-4ca7-b61d-7da7973b2258",
+      "ScalarType": 1
+    },
+    {
+      "Id": "98755a78-2964-42af-8238-72d1346aa25d",
+      "ScalarType": 0
+    },
+    {
+      "Id": "158d5e5d-6431-48f8-b604-60aa27fbe6d4",
+      "ScalarType": 0
+    },
+    {
+      "Id": "590efe03-28af-4f3e-9750-0c98796178c9",
+      "ScalarType": 1
+    },
+    {
+      "Id": "97760089-6b91-4e9c-a8d6-cd0a1b1280fc",
+      "ScalarType": 1
+    },
+    {
+      "Id": "8a30b171-dd9f-4627-887e-bca313f671a9",
+      "ScalarType": 1
+    },
+    {
+      "Id": "fcd66c51-750f-49e6-81f9-bc0959b7b0d9",
+      "ScalarType": 1
+    },
+    {
+      "Id": "aa9986a2-4338-48c4-95c0-9b7f2d95b3ca",
+      "ScalarType": 0
+    },
+    {
+      "Id": "7821c75c-af70-4087-99fd-7760c32c9f8d",
+      "ScalarType": 1
+    },
+    {
+      "Id": "37fcb912-55b5-48f2-8630-52fd87b16c69",
+      "ScalarType": 1
+    },
+    {
+      "Id": "a08a9af5-b824-4bff-85a1-049efa086f45",
+      "ScalarType": 1
+    },
+    {
+      "Id": "ea5d10b7-ede3-42ed-8f81-aa3c10f1ab48",
+      "ScalarType": 1
+    },
+    {
+      "Id": "e8ab7b83-8d50-4c81-87d5-a6bb80fd208f",
+      "ScalarType": 1
+    },
+    {
+      "Id": "ee3ee85d-b013-48bb-8c87-15c27ed41ed4",
+      "ScalarType": 1
+    },
+    {
+      "Id": "2c70b7a9-3c28-4ce1-ba77-a9e9ac47720a",
+      "ScalarType": 1
+    },
+    {
+      "Id": "2f456c5d-75c1-4341-a5d4-0a4f07362ef6",
+      "ScalarType": 1
+    },
+    {
+      "Id": "00fc5ea1-d10c-48b4-bf1c-0baf0d220aa2",
+      "ScalarType": 1
+    },
+    {
+      "Id": "28c71988-4675-4837-bbd0-1e76135f4c10",
+      "ScalarType": 1
+    },
+    {
+      "Id": "4ceea961-7432-4fbb-bada-550a752abad4",
+      "ScalarType": 1
+    },
+    {
+      "Id": "786e18a0-3aa2-4ea5-bf91-e4fbd23b55ab",
+      "ScalarType": 1
+    },
+    {
+      "Id": "30b3825b-a4f7-4e87-b8fd-e8a71a6517e7",
+      "ScalarType": 1
+    },
+    {
+      "Id": "cae6e024-1f3e-44f0-9fad-6a4e62f8786c",
+      "ScalarType": 1
+    },
+    {
+      "Id": "a2bb197c-6934-4e35-b309-a2e3e34bb9ca",
+      "ScalarType": 1
+    },
+    {
+      "Id": "37202099-501a-4ee6-8b51-372eb104ad69",
+      "ScalarType": 1
+    },
+    {
+      "Id": "12c3a71b-966e-4745-96f7-ea6813225874",
+      "ScalarType": 1
+    },
+    {
+      "Id": "5c5b02db-628b-4603-9a35-eb011b0b6792",
+      "ScalarType": 1
+    },
+    {
+      "Id": "19003c24-77b1-4c36-836e-2c0484132b19",
+      "ScalarType": 0
+    },
+    {
+      "Id": "817502f3-17c4-414d-a4cf-1aa32ca36c87",
+      "ScalarType": 0
+    },
+    {
+      "Id": "34ed9262-00af-439c-90fa-949758fbae13",
+      "ScalarType": 0
+    },
+    {
+      "Id": "a191f348-65af-47d3-93be-82df68103c38",
+      "ScalarType": 0
+    },
+    {
+      "Id": "0903389f-d9b2-4a2d-af93-2e21d989754c",
+      "ScalarType": 0
+    },
+    {
+      "Id": "410c2819-8bb7-475e-a281-cf78992057ee",
+      "ScalarType": 0
+    },
+    {
+      "Id": "28558614-873b-48b3-ad3d-a074aa360fa5",
+      "ScalarType": 0
+    },
+    {
+      "Id": "eda33029-1d34-44c1-b845-befbc5a19d3d",
+      "ScalarType": 0
+    },
+    {
+      "Id": "a678ea0e-9dcb-4aae-8ce2-e707d50e40a1",
+      "ScalarType": 0
+    },
+    {
+      "Id": "ab3954ef-a232-4689-afe1-cd93ca3418e5",
+      "ScalarType": 0
+    },
+    {
+      "Id": "3a05d42b-a61a-4320-b87f-ad21f3df7629",
+      "ScalarType": 3
+    },
+    {
+      "Id": "56b3fc81-6396-4a89-84a7-32d96c97a3ef",
+      "ScalarType": 0
+    },
+    {
+      "Id": "c01aa01c-1e24-484c-9fa6-e1ba1fa7410e",
+      "ScalarType": 3
+    },
+    {
+      "Id": "2371b497-6d26-48e7-bc1e-0c886a6948ce",
+      "ScalarType": 0
+    },
+    {
+      "Id": "b43d9160-7a84-42e5-a352-94a48e5d9b75",
+      "ScalarType": 0
+    },
+    {
+      "Id": "4a111a76-76d9-470d-a82d-53eb139bd7ee",
+      "ScalarType": 0
+    },
+    {
+      "Id": "ac54c735-2357-4ca1-8c4e-0bb356fdca0e",
+      "ScalarType": 0
+    },
+    {
+      "Id": "4364a87d-0b82-42ac-84df-a2dd25865a32",
+      "ScalarType": 0
+    },
+    {
+      "Id": "57fd879d-ad0b-46e7-a555-af3b200c824c",
+      "ScalarType": 0
+    },
+    {
+      "Id": "449f725f-d08b-4e18-9bfe-34cdf0656ecc",
+      "ScalarType": 3
+    },
+    {
+      "Id": "8a335228-371f-402d-b17d-12ff6ba7491d",
+      "ScalarType": 0
+    },
+    {
+      "Id": "d5d76617-098a-4c7c-ae05-6310016fea09",
+      "ScalarType": 0
+    },
+    {
+      "Id": "9da1f47e-b25e-4b14-a281-96b597210547",
+      "ScalarType": 0
+    },
+    {
+      "Id": "538c959c-524f-40a9-af27-964024f3fee2",
+      "ScalarType": 1
+    },
+    {
+      "Id": "60f492d3-1cd6-4f4a-bdf8-324d48172746",
+      "ScalarType": 0
+    },
+    {
+      "Id": "2ac6c452-ff70-4fae-a5ea-68548ab13965",
+      "ScalarType": 0
+    },
+    {
+      "Id": "32d80a16-2b4b-4934-bee0-6e522bd2a798",
+      "ScalarType": 0
+    },
+    {
+      "Id": "b72391c8-eba8-49d8-a33e-ba8290125e5a",
+      "ScalarType": 0
+    },
+    {
+      "Id": "a0bac044-6589-4b1f-b261-870b96af9ced",
+      "ScalarType": 3
+    },
+    {
+      "Id": "74769cba-d7cd-489a-b346-3510f25b92b2",
+      "ScalarType": 1
+    },
+    {
+      "Id": "80a4f988-21c0-4916-b48e-aad9f7d84327",
+      "ScalarType": 0
+    },
+    {
+      "Id": "82bad52d-f41f-461d-98f5-6c7286410bd8",
+      "ScalarType": 1
+    },
+    {
+      "Id": "99063511-e97f-41ae-a07b-94955ccaa65f",
+      "ScalarType": 1
+    },
+    {
+      "Id": "ad108c47-97a0-4ba3-8bea-55450fc63e72",
+      "ScalarType": 1
+    },
+    {
+      "Id": "c8ad8bed-a485-428c-b6d4-d918227cd85f",
+      "ScalarType": 1
+    },
+    {
+      "Id": "d0248b92-3e40-4e75-b32a-b4fd60e757dc",
+      "ScalarType": 1
+    },
+    {
+      "Id": "dd64ee17-8550-4228-a00c-d07fed8dadb8",
+      "ScalarType": 1
+    },
+    {
+      "Id": "e8de702e-6894-49cd-8ac6-5f7794e7a734",
+      "ScalarType": 1
+    },
+    {
+      "Id": "ed8e0689-777a-4848-bda2-67aee7e222fa",
+      "ScalarType": 1
+    },
+    {
+      "Id": "ef073339-de69-4232-a720-5e3aecc94c1c",
+      "ScalarType": 1
     }
   ],
   "Aliases": [
@@ -23865,6 +25593,27 @@
       "Value": "Род_войск",
       "Values": [
         "Род_войск"
+      ]
+    },
+    {
+      "DotName": "MilitaryOrganization.classifiers.corps.name",
+      "Value": "Рід_військ",
+      "Values": [
+        "Рід_військ"
+      ]
+    },
+    {
+      "DotName": "MilitaryOrganization.amount.name",
+      "Value": "Чисельність",
+      "Values": [
+        "Чисельність"
+      ]
+    },
+    {
+      "DotName": "MilitaryOrganization.commonInfo.RealNameShort",
+      "Value": "Назва_підрозділа",
+      "Values": [
+        "Назва_підрозділа"
       ]
     },
     {
@@ -23921,27 +25670,6 @@
       "Value": "Звання",
       "Values": [
         "Звання"
-      ]
-    },
-    {
-      "DotName": "MilitaryOrganization.classifiers.corps.name",
-      "Value": "Рід_військ",
-      "Values": [
-        "Рід_військ"
-      ]
-    },
-    {
-      "DotName": "MilitaryOrganization.amount.name",
-      "Value": "Чисельність",
-      "Values": [
-        "Чисельність"
-      ]
-    },
-    {
-      "DotName": "MilitaryOrganization.commonInfo.RealNameShort",
-      "Value": "Назва_підрозділа",
-      "Values": [
-        "Назва_підрозділа"
       ]
     }
   ]
