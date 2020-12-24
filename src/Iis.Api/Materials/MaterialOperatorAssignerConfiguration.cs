@@ -2,6 +2,6 @@
 {
     public class MaterialOperatorAssignerConfiguration
     {
-        public string QueueName { get; set; } = "assign-operator";
+        public string QueueName { get; set; } = "materials.assign.operator";
     }
 }
