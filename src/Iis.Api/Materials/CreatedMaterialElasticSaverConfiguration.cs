@@ -2,6 +2,6 @@
 {
     public class CreatedMaterialElasticSaverConfiguration
     {
-        public string QueueName { get; set; } = "save-materials-to-elastic";
+        public string QueueName { get; set; } = "materials.save.elastic";
     }
 }
