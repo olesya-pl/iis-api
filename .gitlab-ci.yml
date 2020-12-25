@@ -1,7 +1,6 @@
 stages:
   - build
   - test
-  - deploy
   - build_docker
   - push_docker
   - deploy_nomad
@@ -46,75 +45,6 @@ unit_test:
   #   - /^v.+$/
   #   - /^sprint\..+$/
   #   - /^Release_*/
-
-
-.deploy:
-  stage: deploy
-  variables:
-    GIT_STRATEGY: none
-    GIT_CHECKOUT: "false"
-    EXTRA_VARS: "artifacts_path=$CI_PROJECT_DIR"
-  script:
-    - cd /home/gitlab-runner/ansible
-    - echo "Deploying IIS API using ./vars/$DEPLOYMENT_FILE and extra-vars='$EXTRA_VARS'"
-    - ansible-playbook app_api_net.yml -e "@./vars/$DEPLOYMENT_FILE" -e "$EXTRA_VARS"
-    - rm -rf $CI_PROJECT_DIR/*
-  tags:
-    - ansible
-  only:
-    - /^v.+$/
-    - /^sprint\..+$/
-    - /^Release_*/
-    - master
-    - develop
-    - /^rc-*/
-    - /^release-*/
-    - /^hotfix*/
-
-
-.deploy_od_dev:
-  extends: .deploy
-  variables:
-    DEPLOYMENT_FILE: dev_od.yml
-  environment:
-    name: dev_odysseus
-    url: http://od-dev.contour.net
-
-
-deploy_od_dev_manual:
-  extends: .deploy_od_dev
-  when: manual
-
-
-#deploy_contour_qa:
-#  extends: .deploy
-#  variables:
-#    DEPLOYMENT_FILE: qa_con.yml
-##    EXTRA_VARS: "tag_name=$CI_COMMIT_TAG ontology_clear='$ONTOLOGY_CLEAR'"
-#  environment:
-#    name: qa_contour
-#    url: http://qa-app.contour.net
-#  when: manual
-
-
-deploy_od_qa:
-  extends: .deploy
-  variables:
-    DEPLOYMENT_FILE: qa_od.yml
-##    EXTRA_VARS: "tag_name=$CI_COMMIT_TAG ontology_clear='$ONTOLOGY_CLEAR'"
-  environment:
-    name: qa_odysseus
-    url: http://qa-app.odysseus.lcl
-  when: manual
-
-deploy_contour_demo:
-  extends: .deploy
-  variables:
-    DEPLOYMENT_FILE: demo_con.yml
-  environment:
-    name: demo_contour
-    url: http://demo.contour.net
-  when: manual
 
 
 
@@ -233,6 +163,12 @@ deploy_demo_nomad_manual:
   extends: .deploy_nomad
   variables:
     NOMAD_ENV: demo
+  when: manual
+
+deploy_od-dev_nomad_manual:
+  extends: .deploy_nomad
+  variables:
+    NOMAD_ENV: od-dev
   when: manual
 
 acceptance_test:
