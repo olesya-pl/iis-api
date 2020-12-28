@@ -421,18 +421,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "19f0896c-ed3f-4073-bc01-0d588978e64a",
-      "Name": "sign",
-      "Title": "Ознаки",
-      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],\n  \"SortOrder\": 3,\n  \"FormField\": {\n    \"Type\": \"form\"\n  },\n  \"Multiple\": true,\n  \"IsImportantRelation\": true\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "35248db1-aa07-404b-b34c-a6fd4818d910",
       "Name": "street",
       "Title": "Вулиця",
@@ -15373,18 +15361,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "95e25542-6fdc-4f37-955e-f27721835e34",
-      "Name": "parent",
-      "Title": "Пряме підпорядкування",
-      "Meta": "{\n  \"Type\": \"hierarchical\",\n  \"Inversed\": {\n    \"Code\": \"child\",\n    \"Editable\": false,\n    \"Title\": \"Підлеглий\",\n    \"Multiple\": true\n  },\n\n  \"Container\": {\n    \"Id\": \"91fee8bb92834138bd26f770b760f8b3\",\n    \"Title\": \"Класифікатори\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": false,\n  \"IsImportantRelation\": true\n}\n",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "b2db3394-38bc-4af1-9382-7b4e606d792d",
       "Name": "measurementOfBearings",
       "Title": "Середньоквадратична похибка вимірювання пеленгів на джерело випромінювання, град.",
@@ -15589,18 +15565,6 @@
       "UniqueValueFieldName": null
     },
     {
-      "Id": "4389784f-6597-43f7-90ca-45ef254ca5d0",
-      "Name": "bePartOf",
-      "Title": "Безпосереднє підпорядкування",
-      "Meta": "{\n  \"IsImportantRelation\": true\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null
-    },
-    {
       "Id": "895f2e83-337b-4fa6-ae36-514f54e75169",
       "Name": "militaryBaseShortName",
       "Title": "Війскова частина",
@@ -15705,6 +15669,18 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "4389784f-6597-43f7-90ca-45ef254ca5d0",
+      "Name": "bePartOf",
+      "Title": "Безпосереднє підпорядкування",
+      "Meta": "{\n  \"IsImportantRelation\": true\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
     },
@@ -17939,6 +17915,30 @@
       "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null
+    },
+    {
+      "Id": "19f0896c-ed3f-4073-bc01-0d588978e64a",
+      "Name": "sign",
+      "Title": "Ознаки",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [\n    0,\n    1,\n    2\n  ],\n  \"SortOrder\": 3,\n  \"FormField\": {\n    \"Type\": \"form\"\n  },\n  \"Multiple\": true,\n  \"IsImportantRelation\": true\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
+    },
+    {
+      "Id": "95e25542-6fdc-4f37-955e-f27721835e34",
+      "Name": "parent",
+      "Title": "Пряме підпорядкування",
+      "Meta": "{\n  \"Type\": \"hierarchical\",\n  \"Inversed\": {\n    \"Code\": \"child\",\n    \"Editable\": false,\n    \"Title\": \"Підлеглий\",\n    \"Multiple\": true\n  },\n\n  \"Container\": {\n    \"Id\": \"91fee8bb92834138bd26f770b760f8b3\",\n    \"Title\": \"Класифікатори\",\n    \"Type\": \"Accordion\"\n  },\n  \"Multiple\": false,\n  \"IsImportantRelation\": true\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null
     }
   ],
   "RelationTypes": [
@@ -18039,13 +18039,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "0e18c118-94cd-4c82-87af-8f68ab885451",
       "TargetTypeId": "1596e8c0-abab-4862-b2f5-1ee250ac83d8"
-    },
-    {
-      "Id": "19f0896c-ed3f-4073-bc01-0d588978e64a",
-      "Kind": 0,
-      "EmbeddingOptions": 3,
-      "SourceTypeId": "12714279-135c-4e93-af46-43235f9f94b9",
-      "TargetTypeId": "deea2382-a1fb-4478-b2c7-763c470fede8"
     },
     {
       "Id": "1a2b6345-4afb-41f9-919c-2e533a52852d",
@@ -22976,13 +22969,6 @@
       "TargetTypeId": "ba02a4ff-0959-434d-a43c-b4f3855d24f0"
     },
     {
-      "Id": "95e25542-6fdc-4f37-955e-f27721835e34",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
-      "TargetTypeId": "3b6710e5-3da8-42e8-98b6-90139a109b13"
-    },
-    {
       "Id": "9bb4c18d-69ce-4021-b1cb-37c4d2c0ce05",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -23051,13 +23037,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "47947df2-4425-4a6b-8d3c-5fedc21ae683",
       "TargetTypeId": "fcb00520-401c-4379-a775-eb37f6bd1445"
-    },
-    {
-      "Id": "4389784f-6597-43f7-90ca-45ef254ca5d0",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
-      "TargetTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81"
     },
     {
       "Id": "8fa5ba4c-6580-4f6c-b39a-721dfe2e098c",
@@ -23165,6 +23144,13 @@
       "TargetTypeId": "a28e31ac-a558-49fd-9e2e-e1cb3ec29fee"
     },
     {
+      "Id": "4389784f-6597-43f7-90ca-45ef254ca5d0",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
+      "TargetTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81"
+    },
+    {
       "Id": "20fe1c16-583c-43e0-bd06-afa378f51098",
       "Kind": 0,
       "EmbeddingOptions": 1,
@@ -23191,6 +23177,13 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "02ddfb5a-f9f2-497c-a5e2-e854c225b560",
       "TargetTypeId": "0512af66-cef1-4d57-ae9b-ce713fcbbb97"
+    },
+    {
+      "Id": "95e25542-6fdc-4f37-955e-f27721835e34",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "12458b47-90e9-42e4-bb87-fe54be413b81",
+      "TargetTypeId": "3b6710e5-3da8-42e8-98b6-90139a109b13"
     },
     {
       "Id": "05090d4d-8e58-446a-bff0-a52364bf1733",
@@ -23415,6 +23408,13 @@
       "EmbeddingOptions": 3,
       "SourceTypeId": "96c79690-e999-4234-bc68-8e494e8fa287",
       "TargetTypeId": "12714279-135c-4e93-af46-43235f9f94b9"
+    },
+    {
+      "Id": "19f0896c-ed3f-4073-bc01-0d588978e64a",
+      "Kind": 0,
+      "EmbeddingOptions": 3,
+      "SourceTypeId": "12714279-135c-4e93-af46-43235f9f94b9",
+      "TargetTypeId": "deea2382-a1fb-4478-b2c7-763c470fede8"
     }
   ],
   "AttributeTypes": [
