@@ -88,7 +88,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Materials.EntityFramework\Workers\" />
-  </ItemGroup>
 </Project>

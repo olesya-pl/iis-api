@@ -110,7 +110,7 @@ namespace IIS.Core.Materials.EntityFramework
                                             .ToList();
 
             var nodes = document.NodeIds
-                                    .Select(_ontologyService.LoadNodes)
+                                    .Select(_ontologyService.GetNode)
                                     .ToArray();
 
             material.Events = nodes
@@ -535,7 +535,7 @@ namespace IIS.Core.Materials.EntityFramework
         private MaterialFeature Map(MaterialFeatureEntity feature)
         {
             var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
-            result.Node = _ontologyService.LoadNodes(feature.NodeId);
+            result.Node = _ontologyService.GetNode(feature.NodeId);
             return result;
         }
 

@@ -14,7 +14,7 @@ namespace Iis.OntologyManager.UiControls
 {
     public class UiComparisonControl: UIBaseControl
     {
-        List<IOntologySchemaSource> _schemaSources;
+        IReadOnlyCollection<IOntologySchemaSource> _schemaSources;
         OntologySchemaService _schemaService;
         IOntologySchema _schema;
         ISchemaCompareResult _compareResult;
@@ -26,7 +26,7 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbComparisonDelete;
         CheckBox cbComparisonAliases;
 
-        public UiComparisonControl(List<IOntologySchemaSource> schemaSources,
+        public UiComparisonControl(IReadOnlyCollection<IOntologySchemaSource> schemaSources,
             OntologySchemaService schemaService,
             IOntologySchema schema)
         {

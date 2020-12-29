@@ -56,7 +56,7 @@ namespace IIS.Core.FlightRadar
                 return;
             foreach (var sign in signs)
             {
-                var node = (_ontologyService.LoadNodes(sign.Id)) as Entity;
+                var node = (_ontologyService.GetNode(sign.Id)) as Entity;
                 node.SetProperty("location", new Dictionary<string, object> {
                     { "type", "Point" },
                     { "coordinates", new [] {latestValue.Lat, latestValue.Long} }

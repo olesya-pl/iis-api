@@ -61,8 +61,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return events;
         }
 
-        
-
         public IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId)
         {
             var node = _data.GetNode(entityId);
@@ -199,9 +197,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public Node LoadNodes(Guid nodeId)
+        public Node GetNode(Guid nodeId)
         {
             var node = _data.GetNode(nodeId);
+
+            if(node is null) return null;
+
             return MapNode(node);
         }
         public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes)
