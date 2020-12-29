@@ -13,5 +13,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task<List<ChangeHistoryDto>> GetChangeHistory(ChangeHistoryParams parameters);
         Task<List<ChangeHistoryDto>> GetChangeHistory(IEnumerable<Guid> ids);
         Task<List<ChangeHistoryDto>> GetChangeHistoryByRequest(Guid requestId);
+        Task<List<ChangeHistoryDto>> GetLocationHistory(Guid entityId);
     }
 }

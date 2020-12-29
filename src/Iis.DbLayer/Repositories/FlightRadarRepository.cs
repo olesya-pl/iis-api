@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.FlightRadar;
@@ -27,6 +29,14 @@ namespace Iis.DbLayer.Repositories
         public Task SaveAsync(IReadOnlyCollection<LocationHistoryEntity> entities)
         {
             return Context.AddRangeAsync(entities);
+        }
+
+        public async Task<List<LocationHistoryEntity>> GetLocationHistory(Guid entityId)
+        {
+            return await Context.LocationHistory
+                .Where(lh => lh.EntityId == entityId)
+                .OrderBy(lh => lh.RegisteredAt)
+                .ToListAsync();
         }
     }
 }
