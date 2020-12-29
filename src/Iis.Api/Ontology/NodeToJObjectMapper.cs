@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Iis.Domain;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Utility;
-
 using Newtonsoft.Json.Linq;
+using Iis.Domain;
+using Iis.Utility;
+using Iis.Interfaces.Ontology.Schema;
 
+using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 
 namespace Iis.Api.Ontology
@@ -40,7 +40,6 @@ namespace Iis.Api.Ontology
                     result.Add(new JProperty(attribute.Key, attribute.Select(p =>
                     {
                         var res = new JObject();
-                        
                         res.Add("id", p.Attribute.Value.ToString());
                         res.Add("url", _fileUrlGetter.GetFileUrl((Guid)p.Attribute.Value));
                         return res;
@@ -69,7 +68,7 @@ namespace Iis.Api.Ontology
             return result;
         }
 
-        public async Task<EventAssociatedWithEntity> EventToAssociatedWithEntity(Node node)
+        public EventAssociatedWithEntity EventToAssociatedWithEntity(Node node)
         {
             var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
 
@@ -81,7 +80,7 @@ namespace Iis.Api.Ontology
 
             var attributies = node.GetChildAttributes();
 
-            var res = new EventAssociatedWithEntity {
+            var associatedEvent = new EventAssociatedWithEntity {
                 Id = node.Id,
                 Name = attributies.FirstOrDefault(p => p.dotName == "name").attribute?.Value as string,
                 Description = attributies.FirstOrDefault(p => p.dotName == "description").attribute?.Value as string,
@@ -101,7 +100,7 @@ namespace Iis.Api.Ontology
                 }
             };
 
-            return res;
+            return associatedEvent;
         }
 
         public JObject EventToJObject(Node node)
