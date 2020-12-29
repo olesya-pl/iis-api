@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public static Node LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeModel targetType)
         {
-            var existingNode = service.LoadNodes(targetId); // no fields needed, only type
+            var existingNode = service.GetNode(targetId); // no fields needed, only type
             if (existingNode == null)
                 throw new ArgumentException($"Node with id {targetId} not found");
             if (!targetType.IsAssignableFrom(existingNode.Type))

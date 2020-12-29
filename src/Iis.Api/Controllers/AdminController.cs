@@ -108,7 +108,7 @@ namespace Iis.Api.Controllers
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
 
             await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
-            
+
             await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
@@ -201,7 +201,7 @@ namespace Iis.Api.Controllers
             var indexes = indexNames == AllIndexes ? baseIndexList : baseIndexList.Where(indexName => indexNames.Split(",").Contains(indexName, StringComparer.OrdinalIgnoreCase)).ToList();
 
             if(!indexes.Any()) return Content("There is no valid index names were provided.");
-            
+
             _adminElasticService.Logger  = new StringBuilder();
 
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);

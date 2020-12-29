@@ -106,7 +106,6 @@ namespace IIS.Core
                 .RegisterSeederTools()
                 .AddConfigurations(Configuration);
 
-            
             services.AddMemoryCache();
 
             var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
@@ -260,7 +259,7 @@ namespace IIS.Core
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
             var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
             services.AddSingleton(maxOperatorsConfig);
-            
+
             if (enableContext)
             {
                 services.AddHealthChecks()
@@ -387,7 +386,6 @@ namespace IIS.Core
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)
         {
-            //c.Response.ContentType = MediaTypeNames.Application.Json;
             c.Response.ContentType = "application/health+json";
             var result = JsonConvert.SerializeObject(
                 new

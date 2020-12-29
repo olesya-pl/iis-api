@@ -317,5 +317,11 @@ namespace IIS.Core.Ontology.EntityFramework
                     v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
+        public Task<bool> DeleteNodeAsync(Guid id, string typeName, CancellationToken ct = default)
+        {
+            var indexName = _elasticState.OntologyIndexes.Union(_elasticState.EventIndexes).FirstOrDefault(e => e.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+
+            return _elasticManager.DeleteDocumentAsync(indexName, id.ToString("N"), ct);
+        }
     }
 }
