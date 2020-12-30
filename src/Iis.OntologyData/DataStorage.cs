@@ -163,8 +163,8 @@ namespace Iis.OntologyData
 
             foreach (var node in Nodes.Values)
             {
-                node._outgoingRelations.RemoveAll(r => r.Node.IsArchived);
-                node._incomingRelations.RemoveAll(r => r.Node.IsArchived);
+                node._outgoingRelations.RemoveAll(r => r.Node.IsArchived || r.TargetNode.IsArchived || r.SourceNode.IsArchived);
+                node._incomingRelations.RemoveAll(r => r.Node.IsArchived || r.TargetNode.IsArchived || r.SourceNode.IsArchived);
             }
         }
         private void CompleteRelation(RelationData relation)
@@ -205,10 +205,16 @@ namespace Iis.OntologyData
             UpdateNodeProperty(node, e => e.UpdatedAt = updatedAt);
         }
 
-        public void RemoveNode(Guid id)
+        public void RemoveNodeAndRelations(Guid id)
         {
             SetNodeIsArchived(id);
             MarkLinkedAsArchived(Nodes[id]);
+            RemoveArchivedItems();
+        }
+
+        public void RemoveNode(Guid id)
+        {
+            SetNodeIsArchived(id);
             RemoveArchivedItems();
         }
 

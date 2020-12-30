@@ -206,15 +206,23 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return MapNode(node);
         }
+
         public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes)
         {
             var nodes = _data.GetNodes(nodeIds.Distinct());
             return nodes.Select(n => MapNode(n, relationTypes)).ToList();
         }
-        public void RemoveNode(Node source)
+
+        public void RemoveNodeAndRelations(Node node)
         {
-            _data.RemoveNode(source.Id);
+            _data.RemoveNodeAndRelations(node.Id);
         }
+
+        public void RemoveNode(Node node)
+        {
+            _data.RemoveNode(node.Id);
+        }
+
         public void SaveNode(Node source)
         {
             _data.WriteLock(() =>
@@ -255,7 +263,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (sourceRelation == null && existingRelation != null)
             {
-                _data.RemoveNode(existingRelation.Id);
+                _data.RemoveNodeAndRelations(existingRelation.Id);
             }
             else if (sourceRelation != null && existingRelation == null)
             {
@@ -267,7 +275,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 Guid targetId = sourceRelation.Target.Id;
                 if (existingId != targetId)
                 {
-                    _data.RemoveNode(existingRelation.Id);
+                    _data.RemoveNodeAndRelations(existingRelation.Id);
                     CreateRelation(sourceRelation, existing.Id);
                 }
             }

@@ -54,12 +54,12 @@ namespace Iis.Api
                         var codeNode = amountNode.GetSingleDirectProperty("code");
                         if (codeNode?.Value == militaryAmount.Code) continue;
 
-                        if (codeNode != null) ontologyData.RemoveNode(codeNode.Id);
+                        if (codeNode != null) ontologyData.RemoveNodeAndRelations(codeNode.Id);
                         ontologyData.CreateRelationWithAttribute(amountNode.Id, codeRelationType.Id, militaryAmount.Code);
 
                         for (int i = 1; i < nodes.Count; i++)
                         {
-                            ontologyData.RemoveNode(nodes[i].Id);
+                            ontologyData.RemoveNodeAndRelations(nodes[i].Id);
                         }
                     }
                 }
