@@ -35,7 +35,7 @@ namespace Iis.DbLayer.Repositories
         {
             return await Context.LocationHistory
                 .Where(lh => lh.EntityId == entityId)
-                .OrderBy(lh => lh.RegisteredAt)
+                .OrderByDescending(lh => lh.RegisteredAt)
                 .ToListAsync();
         }
     }
