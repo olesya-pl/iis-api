@@ -207,6 +207,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 var username = GetCurrentUser()?.UserName ?? "system";
                 var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
+                var parentTypeName = embed.Source.RelationType.SourceType.Name;
                 
                 if (!string.Equals(stringifiedValue, oldValue, StringComparison.Ordinal))
                 {
@@ -215,8 +216,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     username,
                     oldValue,
                     stringifiedValue,
+                    parentTypeName,
                     requestId);
-                }               
+                }
                 
             }
             return node;
