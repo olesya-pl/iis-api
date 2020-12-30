@@ -17,8 +17,9 @@ namespace Iis.Api.Ontology
         {
             var entities = ontologyService.GetEventsAssociatedWithEntity(entityId);
 
-            var res = await Task.WhenAll(entities.Select(p => nodeToJObjectMapper.EventToAssociatedWithEntity(p)));
-            return new GraphQLCollection<EventAssociatedWithEntity>(res, res.Count());
+            var result = entities.Select(p => nodeToJObjectMapper.EventToAssociatedWithEntity(p)).ToArray();
+
+            return await Task.FromResult(new GraphQLCollection<EventAssociatedWithEntity>(result, result.Count()));
         }
     }
 }
