@@ -17,7 +17,9 @@ namespace Iis.OntologyData
         public IOntologySchema Schema { get; }
 
         public IEnumerable<INode> Nodes => _storage.Nodes.Values;
+
         public IEnumerable<IRelation> Relations => _storage.Relations.Values;
+
         public IEnumerable<IAttribute> Attributes => _storage.Attributes.Values;
 
         public IOntologyPatch Patch => _storage.Patch;
@@ -33,6 +35,7 @@ namespace Iis.OntologyData
             Locker = new ReadWriteLocker();
             Locker.OnCommingChanges += () => _saver.SavePatch(Patch);
         }
+
         private IMapper GetMapper()
         {
             var configuration = new MapperConfiguration(cfg =>
@@ -44,9 +47,13 @@ namespace Iis.OntologyData
 
             return new Mapper(configuration);
         }
+
         public T ReadLock<T>(Func<T> func) => Locker.ReadLock(func);
+
         public T WriteLock<T>(Func<T> func) => Locker.WriteLock(func);
+
         public void WriteLock(Action action) => Locker.WriteLock(action);
+
         public IReadOnlyList<INode> GetEntitiesByTypeName(string typeName)
         {
             return Locker.ReadLock(() => 
@@ -55,6 +62,7 @@ namespace Iis.OntologyData
                     && (typeName == null || n.NodeType.Name == typeName))
                 .ToList());
         }
+
         public INode CreateNode(Guid nodeTypeId, Guid? id = null) =>
             Locker.WriteLock(() => _storage.CreateNode(nodeTypeId, id));
 
@@ -74,10 +82,12 @@ namespace Iis.OntologyData
         {
             return Locker.ReadLock(() => _storage.Nodes.GetValueOrDefault(id));
         }
+
         internal IReadOnlyList<NodeData> GetNodesData(IEnumerable<Guid> ids)
         {
             return Locker.ReadLock(() => ids.Where(id => _storage.Nodes.ContainsKey(id)).Select(id => _storage.Nodes[id]).ToList());
         }
+
         public void AddValueByDotName(Guid entityId, string value, string[] dotNameParts)
         {
             Locker.WriteLock(() =>
@@ -123,6 +133,7 @@ namespace Iis.OntologyData
                 }
             });
         }
+
         public void ClearPatch()
         {
             _storage.ClearPatch();
@@ -131,8 +142,15 @@ namespace Iis.OntologyData
         {
             Locker.WriteLock(() => _storage.SetNodeIsArchived(nodeId));
         }
+
+        public void SetNodeUpdatedAt(Guid nodeId, DateTime updatedAt)
+        {
+            Locker.WriteLock(() => _storage.SetNodeUpdatedAt(nodeId, updatedAt));
+        }
+
         public void RemoveNode(Guid id) =>
             Locker.WriteLock(() => _storage.RemoveNode(id));
+
         public void SetNodesIsArchived(IEnumerable<Guid> nodeIds)
         {
             Locker.WriteLock(() =>
@@ -143,6 +161,7 @@ namespace Iis.OntologyData
                 }
             });
         }
+
         public IReadOnlyList<INode> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             return Locker.ReadLock(() => Nodes
@@ -150,16 +169,21 @@ namespace Iis.OntologyData
                     && r.GetChildNode(valueTypeName)?.Value == value)
                 .ToList());
         }
+
         public INode GetNode(Guid id) => GetNodeData(id);
+
         public IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids) => GetNodesData(ids);
+
         public IReadOnlyList<INode> GetNodesByTypeIds(IEnumerable<Guid> nodeTypeIds)
         {
             return Locker.ReadLock(() => Nodes.Where(n => nodeTypeIds.Contains(n.NodeTypeId)).ToList());
         }
+
         public IReadOnlyList<INode> GetNodesByTypeId(Guid nodeTypeId)
         {
             return Locker.ReadLock(() => Nodes.Where(n => n.NodeTypeId == nodeTypeId).ToList());
         }
+
         public IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList)
         {
             return GetNodes(entityIdList).SelectMany(n => n.GetIncomingRelations(relationTypeNameList)).ToList();

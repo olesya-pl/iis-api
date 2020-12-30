@@ -1,7 +1,4 @@
 ﻿using Iis.Interfaces.Ontology.Data;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.OntologyData.DataTypes
 {

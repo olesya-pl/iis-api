@@ -190,17 +190,35 @@ namespace Iis.OntologyData
         {
             _patch = new OntologyPatch();
         }
+
         public void SetNodeIsArchived(Guid id) => SetNodeIsArchived(Nodes[id]);
+
         public void SetNodeIsArchived(NodeData node)
         {
-            node.IsArchived = true;
-            _patch._update._nodes.Add(node);
+            UpdateNodeProperty(node, e => e.IsArchived = true);
         }
+
+        public void SetNodeUpdatedAt(Guid id, DateTime updatedAt) => SetNodeUpdatedAt(Nodes[id], updatedAt);
+
+        public void SetNodeUpdatedAt(NodeData node, DateTime updatedAt)
+        {
+            UpdateNodeProperty(node, e => e.UpdatedAt = updatedAt);
+        }
+
         public void RemoveNode(Guid id)
         {
             SetNodeIsArchived(id);
             MarkLinkedAsArchived(Nodes[id]);
             RemoveArchivedItems();
+        }
+
+        private NodeData UpdateNodeProperty(NodeData node, Action<NodeData> nodeAction)
+        {
+            nodeAction(node);
+
+            _patch._update._nodes.Add(node);
+
+            return node;
         }
     }
 }
