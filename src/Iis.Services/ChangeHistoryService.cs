@@ -29,7 +29,8 @@ namespace Iis.Services
             string userName,
             string oldValue,
             string newValue,
-            Guid requestId)
+            Guid requestId,
+            string parentTypeName)
         {
             var changeHistoryEntity = new ChangeHistoryEntity
             {
@@ -41,7 +42,8 @@ namespace Iis.Services
                 OldValue = oldValue,
                 NewValue = newValue,
                 RequestId = requestId,
-                Type = ChangeHistoryEntityType.Node
+                Type = ChangeHistoryEntityType.Node,
+                ParentTypeName = parentTypeName
             };
 
             await RunAsync(uow => uow.ChangeHistoryRepository.Add(changeHistoryEntity));
