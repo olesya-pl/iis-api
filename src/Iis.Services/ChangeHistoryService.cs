@@ -29,8 +29,8 @@ namespace Iis.Services
             string userName,
             string oldValue,
             string newValue,
-            Guid requestId,
-            string parentTypeName)
+            string parentTypeName,
+            Guid requestId)
         {
             var changeHistoryEntity = new ChangeHistoryEntity
             {

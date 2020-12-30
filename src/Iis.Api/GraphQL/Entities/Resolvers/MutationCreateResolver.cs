@@ -216,8 +216,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     username,
                     oldValue,
                     stringifiedValue,
-                    requestId,
-                    parentTypeName);
+                    parentTypeName,
+                    requestId);
                 }
                 
             }
