@@ -28,6 +28,7 @@ namespace Iis.Interfaces.Ontology.Data
         IRelation UpdateRelationTarget(Guid id, Guid targetId);
         IRelation CreateRelationWithAttribute(Guid sourceNodeId, Guid nodeTypeId, string value);
         void SetNodeIsArchived(Guid nodeId);
+        void SetNodeUpdatedAt(Guid nodeId, DateTime updatedAt);
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);
         void AddValueByDotName(Guid entityId, string value, string[] dotNameParts);
     }

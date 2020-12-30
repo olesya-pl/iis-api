@@ -3,6 +3,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyModelWrapper;
+using Iis.OntologyData.DataTypes;
 using Iis.Utility;
 using System;
 using System.Collections.Generic;
@@ -219,6 +220,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             _data.WriteLock(() =>
             {
                 var node = _data.GetNode(source.Id) ?? _data.CreateNode(source.Type.Id, source.Id);
+
+                _data.SetNodeUpdatedAt(source.Id, source.UpdatedAt);
+
                 SaveRelations(source, node);
             });
         }
