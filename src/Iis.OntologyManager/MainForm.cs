@@ -19,6 +19,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Net.Http;
 
 namespace Iis.OntologyManager
 {
@@ -252,6 +253,12 @@ namespace Iis.OntologyManager
 
             container.Add(btnRemoveEntity);
 
+            container.GoToNewColumn();
+
+            var btnReindexElastic = new Button { Text = "Перетворити Elastic", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnReindexElastic.Click += ReindexElasticOntology;
+            container.Add(btnReindexElastic);
+
             panelTop.ResumeLayout();
         }
         #endregion
@@ -364,6 +371,14 @@ namespace Iis.OntologyManager
             form.ShowDialog();
 
             form.Close();
+        }
+        private void ReindexElasticOntology(object sender, EventArgs e)
+        {
+            if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
+
+            var httpClient = new HttpClient();
+            var url = $"{SelectedSchemaSource.ApiAddress}admin/ReInitializeOntologyIndexes/all";
+            var response = httpClient.GetAsync(url).Result;
         }
         private void OnRemove(Guid entityId)
         {
