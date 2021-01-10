@@ -9,6 +9,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Iis.Services
@@ -29,6 +30,7 @@ namespace Iis.Services
             string userName,
             string oldValue,
             string newValue,
+            string parentTypeName,
             Guid requestId)
         {
             var changeHistoryEntity = new ChangeHistoryEntity
@@ -41,7 +43,8 @@ namespace Iis.Services
                 OldValue = oldValue,
                 NewValue = newValue,
                 RequestId = requestId,
-                Type = ChangeHistoryEntityType.Node
+                Type = ChangeHistoryEntityType.Node,
+                ParentTypeName = parentTypeName
             };
 
             await RunAsync(uow => uow.ChangeHistoryRepository.Add(changeHistoryEntity));
@@ -91,6 +94,20 @@ namespace Iis.Services
             var entities = await RunWithoutCommitAsync(uow => uow.ChangeHistoryRepository.GetByRequestIdAsync(requestId));
 
             return _mapper.Map<List<ChangeHistoryDto>>(entities);
+        }
+
+        public async Task<List<ChangeHistoryDto>> GetLocationHistory(Guid entityId)
+        {
+            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistory(entityId));
+            return locations.Select(l =>
+                new ChangeHistoryDto
+                {
+                    Date = l.RegisteredAt,
+                    NewValue = "{\"type\":\"Point\",\"coordinates\":[" + l.Lat.ToString() + "," + l.Long.ToString() + "]}",
+                    PropertyName = "sign.location",
+                    TargetId = entityId,
+                    Type = 0
+                }).ToList();
         }
     }
 }
