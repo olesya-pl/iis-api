@@ -269,7 +269,7 @@ namespace Iis.OntologyManager
             menuElastic.Items[4].Click += (sender, e) => { ReindexElastic("RecreateElasticReportIndex"); };
             menuElastic.Items.Add("Індекси Матеріалів");
             menuElastic.Items[5].Click += (sender, e) => { ReindexElastic("RecreateElasticMaterialIndexes"); };
-            var btnMenu = new Button { Text = "Перестворити Elastic", MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
+            var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
             btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
             container.Add(btnMenu);
 
@@ -368,7 +368,7 @@ namespace Iis.OntologyManager
         }
         private void SourceSelectionChanged(object sender, EventArgs e)
         {
-            LoadCurrentSchema(SelectedSchemaSource);
+            WaitCursorAction(() => LoadCurrentSchema(SelectedSchemaSource));
         }
         private void RemoveEntityClick(object sender, EventArgs e)
         {
@@ -386,6 +386,31 @@ namespace Iis.OntologyManager
 
             form.Close();
         }
+        private void WaitCursorAction(Action action)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            try
+            {
+                action();
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+        }
+        public void ShowMessage(string message, string header = null)
+        {
+            var form = _uiControlsCreator.GetModalForm(this);
+            form.Text = header;
+
+            var rootPanel = _uiControlsCreator.GetFillPanel(form);
+            var textBox = new RichTextBox { Dock = DockStyle.Fill, ReadOnly = true, ScrollBars = RichTextBoxScrollBars.ForcedVertical };
+            rootPanel.Controls.Add(textBox);
+            textBox.Text = message;
+
+            form.ShowDialog();
+            form.Close();
+        }
         private void SendGetRequest(string url)
         {
             var httpClient = new HttpClient();
@@ -397,7 +422,7 @@ namespace Iis.OntologyManager
                 {
                     var msg = response.Content.ReadAsStringAsync().Result;
                     if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
-                    MessageBox.Show(msg);
+                    ShowMessage(msg);
                 }
                 else
                 {
@@ -406,7 +431,7 @@ namespace Iis.OntologyManager
                     sb.AppendLine($"Урл: {url}");
                     sb.AppendLine($"Причина: {response.ReasonPhrase}");
 
-                    MessageBox.Show(sb.ToString(), "Помилка");
+                    ShowMessage(sb.ToString(), "Помилка");
                 }
             }
             catch (Exception ex)
@@ -414,7 +439,7 @@ namespace Iis.OntologyManager
                 var sb = new StringBuilder();
                 sb.AppendLine($"Урл: {url}");
                 sb.AppendLine($"Причина: {ex.Message}");
-                MessageBox.Show(sb.ToString(), "Помилка");
+                ShowMessage(sb.ToString(), "Помилка");
             }
             finally
             {
