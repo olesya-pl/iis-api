@@ -322,7 +322,7 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
             if (control.UpdatedDatabases.Contains(SelectedSchemaSource.Title))
-                LoadCurrentSchema();
+                LoadCurrentSchema(SelectedSchemaSource);
         }
         private void btnDuplicates_Click(object sender, EventArgs e)
         {
