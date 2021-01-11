@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Iis.DataModel.FlightRadar;
 
@@ -10,5 +11,6 @@ namespace Iis.DbLayer.Repositories
         void RemoveSyncJobConfig();
         Task AddSyncJobConfigAsync(FlightRadarHistorySyncJobConfig configToAdd);
         Task<FlightRadarHistorySyncJobConfig> GetLastProcessedIdAsync();
+        Task<List<LocationHistoryEntity>> GetLocationHistory(Guid entityId);
     }
 }

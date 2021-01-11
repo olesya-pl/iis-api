@@ -17,7 +17,8 @@ namespace IIS.Core.GraphQL.ChangeHistory
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid targetId,
             string propertyName = "",
-            DateRangeFilter dateRangeFilter = null)
+            DateRangeFilter dateRangeFilter = null,
+            bool? includeLocationHistory = null)
         {
             DateTime? dateFrom = null;
             DateTime? dateTo = null;
@@ -27,7 +28,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 (dateFrom, dateTo) = dateRangeFilter.ToRange();
             }
 
-            var items = await service.GetChangeHistory(new ChangeHistoryParams 
+            var items = await service.GetChangeHistory(new ChangeHistoryParams
             {
                 DateFrom = dateFrom,
                 DateTo = dateTo,
@@ -35,6 +36,13 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 TargetId = targetId,
                 ApplyAliases = true
             });
+            
+            if (!includeLocationHistory.HasValue || includeLocationHistory == true)
+            {
+                var locationItems = await service.GetLocationHistory(targetId);
+                items.AddRange(locationItems);
+            }
+
             var graphQLItems = items.Select(item => mapper.Map<ChangeHistoryItem>(item))
                 .GroupBy(p => p.RequestId)
                 .Select(p => new ChangeHistoryItemGroup()
