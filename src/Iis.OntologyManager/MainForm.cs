@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Net.Http;
+using System.Text;
 
 namespace Iis.OntologyManager
 {
@@ -255,9 +256,22 @@ namespace Iis.OntologyManager
 
             container.GoToNewColumn();
 
-            var btnReindexElastic = new Button { Text = "Перетворити Elastic", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
-            btnReindexElastic.Click += ReindexElasticOntology;
-            container.Add(btnReindexElastic);
+            var menuElastic = new ContextMenuStrip();
+            menuElastic.Items.Add("Індекси Онтології");
+            menuElastic.Items[0].Click += (sender, e) => { ReindexElastic("ReInitializeOntologyIndexes/all"); };
+            menuElastic.Items.Add("Історічні Індекси");
+            menuElastic.Items[1].Click += (sender, e) => { ReindexElastic("ReInitializeHistoricalOntologyIndexes/all"); };
+            menuElastic.Items.Add("Індекси Ознак");
+            menuElastic.Items[2].Click += (sender, e) => { ReindexElastic("ReInitializeSignIndexes/all"); };
+            menuElastic.Items.Add("Індекси Подій");
+            menuElastic.Items[3].Click += (sender, e) => { ReindexElastic("ReInitializeEventIndexes"); };
+            menuElastic.Items.Add("Індекси Звітів");
+            menuElastic.Items[4].Click += (sender, e) => { ReindexElastic("RecreateElasticReportIndex"); };
+            menuElastic.Items.Add("Індекси Матеріалів");
+            menuElastic.Items[5].Click += (sender, e) => { ReindexElastic("RecreateElasticMaterialIndexes"); };
+            var btnMenu = new Button { Text = "Перестворити Elastic", MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
+            btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
+            container.Add(btnMenu);
 
             panelTop.ResumeLayout();
         }
@@ -372,13 +386,48 @@ namespace Iis.OntologyManager
 
             form.Close();
         }
-        private void ReindexElasticOntology(object sender, EventArgs e)
+        private void SendGetRequest(string url)
+        {
+            var httpClient = new HttpClient();
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                var response = httpClient.GetAsync(url).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var msg = response.Content.ReadAsStringAsync().Result;
+                    if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
+                    MessageBox.Show(msg);
+                }
+                else
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"Код: {response.StatusCode}");
+                    sb.AppendLine($"Урл: {url}");
+                    sb.AppendLine($"Причина: {response.ReasonPhrase}");
+
+                    MessageBox.Show(sb.ToString(), "Помилка");
+                }
+            }
+            catch (Exception ex)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"Урл: {url}");
+                sb.AppendLine($"Причина: {ex.Message}");
+                MessageBox.Show(sb.ToString(), "Помилка");
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+                httpClient.Dispose();
+            }
+        }
+        private void ReindexElastic(string urlTail)
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
-
-            var httpClient = new HttpClient();
-            var url = $"{SelectedSchemaSource.ApiAddress}admin/ReInitializeOntologyIndexes/all";
-            var response = httpClient.GetAsync(url).Result;
+            
+            var url = $"{SelectedSchemaSource.ApiAddress}admin/{urlTail}";
+            SendGetRequest(url);
         }
         private void OnRemove(Guid entityId)
         {
