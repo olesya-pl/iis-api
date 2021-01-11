@@ -52,7 +52,7 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.20";
+        const string VERSION = "1.24";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -288,6 +288,7 @@ namespace Iis.OntologyManager
         private void SetSwitchViewTypeText()
         {
             btnSwitch.Text = _ontologyDataView ? "Показати тип" : "Показати данi";
+            btnSwitch.Enabled = _schema?.SchemaSource?.SourceKind == SchemaSourceKind.Database;
         }
         private void SwitchOntologyViewType()
         {
@@ -320,6 +321,8 @@ namespace Iis.OntologyManager
 
             form.ShowDialog();
             form.Close();
+            if (control.UpdatedDatabases.Contains(SelectedSchemaSource.Title))
+                LoadCurrentSchema();
         }
         private void btnDuplicates_Click(object sender, EventArgs e)
         {
@@ -467,7 +470,8 @@ namespace Iis.OntologyManager
         #region Schema Logic
         private void LoadCurrentSchema(IOntologySchemaSource schemaSource)
         {
-            if (schemaSource == null) return;
+            var currentSchemaSource = SelectedSchemaSource;
+            if (currentSchemaSource == null) return;
 
             _schema = _schemaService.GetOntologySchema(schemaSource);
 
@@ -477,6 +481,7 @@ namespace Iis.OntologyManager
                 schemaSource.SourceKind == SchemaSourceKind.Database ?
                 GetOntologyData(schemaSource.Data) :
                 null;
+
         }
 
         private void UpdateSchemaSources()
@@ -593,6 +598,7 @@ namespace Iis.OntologyManager
         }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
+            SetSwitchViewTypeText();
             if (nodeType == null) return;
             if (addToHistory && _currentNodeType != null)
             {
