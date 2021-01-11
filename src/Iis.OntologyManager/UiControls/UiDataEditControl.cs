@@ -85,7 +85,7 @@ namespace Iis.OntologyManager.UiControls
                 _ontologyData.AddValueByDotName(_node.Id, newValue, new[] { attribute.Name });
                 if (property != null)
                 {
-                    _ontologyData.RemoveNode(property.IncomingRelations.First().Id);
+                    _ontologyData.RemoveNodeAndRelations(property.IncomingRelations.First().Id);
                 }
             }
         }

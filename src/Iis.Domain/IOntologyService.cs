@@ -17,6 +17,7 @@ namespace Iis.Domain
         Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
         (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         void SaveNode(Node node);
+        void RemoveNodeAndRelations(Node node);
         void RemoveNode(Node node);
         Node GetNode(Guid nodeId);
         IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes);

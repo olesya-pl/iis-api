@@ -148,6 +148,9 @@ namespace Iis.OntologyData
             Locker.WriteLock(() => _storage.SetNodeUpdatedAt(nodeId, updatedAt));
         }
 
+        public void RemoveNodeAndRelations(Guid id) =>
+            Locker.WriteLock(() => _storage.RemoveNodeAndRelations(id));
+
         public void RemoveNode(Guid id) =>
             Locker.WriteLock(() => _storage.RemoveNode(id));
 

@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var type = _ontology.GetEntityType(typeName);
             if (!node.Type.IsSubtypeOf(type))
                 throw new QueryException($"Entity with id {id} is of type {node.Type.Name}, not of type {type.Name}");
-            _ontologyService.RemoveNode(node);
+            _ontologyService.RemoveNodeAndRelations(node);
             return node;
         }
     }
