@@ -16,6 +16,7 @@ namespace Iis.Services.DI
             services.AddTransient<IElasticResponseManagerFactory, ElasticResponseManagerFactory>();
             services.AddTransient<IMaterialElasticService, MaterialElasticService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IGsmLocationService, GsmLocationService<IIISUnitOfWork>>();
 
             return services;
         }

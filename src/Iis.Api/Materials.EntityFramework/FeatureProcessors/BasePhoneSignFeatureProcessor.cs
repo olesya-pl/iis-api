@@ -9,6 +9,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
+using Iis.Interfaces.Constants;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
@@ -46,7 +47,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _updateResolver = updateResolver;
             _elasticState = elasticState;
         }
-        public virtual async Task<JObject> ProcessMetadataAsync(JObject metadata)
+        public virtual async Task<JObject> ProcessMetadataAsync(JObject metadata, Guid materialId)
         {
             if (!FeaturesSectionExists(metadata)) return metadata;
 
@@ -96,6 +97,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                     originalFeature[FeatureFields.featureId] = entity.Id.ToString();
                 }
             }
+
+            await PostMetadataProcessingAsync(metadata, materialId);
             return metadata;
         }
         protected virtual bool FeaturesSectionExists(JObject metadata) =>
@@ -232,6 +235,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             var feature = featurePair.Value.SearchResult.Value<JObject>();
 
             return (true, featurePair.Key, feature);
+        }
+
+        protected virtual Task PostMetadataProcessingAsync(JObject metadata, Guid materialId)
+        {
+            return Task.CompletedTask;
         }
     }
 }
