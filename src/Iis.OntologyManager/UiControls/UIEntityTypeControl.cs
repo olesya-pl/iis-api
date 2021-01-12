@@ -91,6 +91,14 @@ namespace Iis.OntologyManager.UiControls
             gridInheritedFrom.DataSource = null;
             gridInheritedBy.DataSource = null;
             gridEmbeddence.DataSource = null;
+            SetGridsEnabled(false);
+        }
+        private void SetGridsEnabled(bool enabled)
+        {
+            gridChildren.Enabled = enabled;
+            gridInheritedFrom.Enabled = enabled;
+            gridInheritedBy.Enabled = enabled;
+            gridEmbeddence.Enabled = enabled;
         }
         protected override void CreateControls()
         {
@@ -109,7 +117,7 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(cmbUniqueValueFieldName, "Unique Value Field Name");
 
             btnSave = new Button { Text = "Save" };
-            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
+            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); SetGridsEnabled(true); };
             _container.Add(btnSave);
             _container.GoToNewColumn();
 

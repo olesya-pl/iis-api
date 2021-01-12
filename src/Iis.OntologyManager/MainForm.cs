@@ -19,6 +19,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Net.Http;
+using System.Text;
 
 namespace Iis.OntologyManager
 {
@@ -50,7 +52,7 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.20";
+        const string VERSION = "1.26";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -252,6 +254,25 @@ namespace Iis.OntologyManager
 
             container.Add(btnRemoveEntity);
 
+            container.GoToNewColumn();
+
+            var menuElastic = new ContextMenuStrip();
+            menuElastic.Items.Add("Індекси Онтології");
+            menuElastic.Items[0].Click += (sender, e) => { ReindexElastic("ReInitializeOntologyIndexes/all"); };
+            menuElastic.Items.Add("Історічні Індекси");
+            menuElastic.Items[1].Click += (sender, e) => { ReindexElastic("ReInitializeHistoricalOntologyIndexes/all"); };
+            menuElastic.Items.Add("Індекси Ознак");
+            menuElastic.Items[2].Click += (sender, e) => { ReindexElastic("ReInitializeSignIndexes/all"); };
+            menuElastic.Items.Add("Індекси Подій");
+            menuElastic.Items[3].Click += (sender, e) => { ReindexElastic("ReInitializeEventIndexes"); };
+            menuElastic.Items.Add("Індекси Звітів");
+            menuElastic.Items[4].Click += (sender, e) => { ReindexElastic("RecreateElasticReportIndex"); };
+            menuElastic.Items.Add("Індекси Матеріалів");
+            menuElastic.Items[5].Click += (sender, e) => { ReindexElastic("RecreateElasticMaterialIndexes"); };
+            var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
+            btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
+            container.Add(btnMenu);
+
             panelTop.ResumeLayout();
         }
         #endregion
@@ -267,6 +288,7 @@ namespace Iis.OntologyManager
         private void SetSwitchViewTypeText()
         {
             btnSwitch.Text = _ontologyDataView ? "Показати тип" : "Показати данi";
+            btnSwitch.Enabled = _schema?.SchemaSource?.SourceKind == SchemaSourceKind.Database;
         }
         private void SwitchOntologyViewType()
         {
@@ -299,6 +321,8 @@ namespace Iis.OntologyManager
 
             form.ShowDialog();
             form.Close();
+            if (control.UpdatedDatabases.Contains(SelectedSchemaSource.Title))
+                WaitCursorAction(() => LoadCurrentSchema(SelectedSchemaSource));
         }
         private void btnDuplicates_Click(object sender, EventArgs e)
         {
@@ -347,7 +371,7 @@ namespace Iis.OntologyManager
         }
         private void SourceSelectionChanged(object sender, EventArgs e)
         {
-            LoadCurrentSchema(SelectedSchemaSource);
+            WaitCursorAction(() => LoadCurrentSchema(SelectedSchemaSource));
         }
         private void RemoveEntityClick(object sender, EventArgs e)
         {
@@ -365,6 +389,74 @@ namespace Iis.OntologyManager
 
             form.Close();
         }
+        private void WaitCursorAction(Action action)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            try
+            {
+                action();
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+        }
+        public void ShowMessage(string message, string header = null)
+        {
+            var form = _uiControlsCreator.GetModalForm(this);
+            form.Text = header;
+
+            var rootPanel = _uiControlsCreator.GetFillPanel(form);
+            var textBox = new RichTextBox { Dock = DockStyle.Fill, ReadOnly = true, ScrollBars = RichTextBoxScrollBars.ForcedVertical };
+            rootPanel.Controls.Add(textBox);
+            textBox.Text = message;
+
+            form.ShowDialog();
+            form.Close();
+        }
+        private void SendGetRequest(string url)
+        {
+            var httpClient = new HttpClient();
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                var response = httpClient.GetAsync(url).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var msg = response.Content.ReadAsStringAsync().Result;
+                    if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
+                    ShowMessage(msg);
+                }
+                else
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"Код: {response.StatusCode}");
+                    sb.AppendLine($"Урл: {url}");
+                    sb.AppendLine($"Причина: {response.ReasonPhrase}");
+
+                    ShowMessage(sb.ToString(), "Помилка");
+                }
+            }
+            catch (Exception ex)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"Урл: {url}");
+                sb.AppendLine($"Причина: {ex.Message}");
+                ShowMessage(sb.ToString(), "Помилка");
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+                httpClient.Dispose();
+            }
+        }
+        private void ReindexElastic(string urlTail)
+        {
+            if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
+            
+            var url = $"{SelectedSchemaSource.ApiAddress}admin/{urlTail}";
+            SendGetRequest(url);
+        }
         private void OnRemove(Guid entityId)
         {
             var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials);
@@ -378,7 +470,8 @@ namespace Iis.OntologyManager
         #region Schema Logic
         private void LoadCurrentSchema(IOntologySchemaSource schemaSource)
         {
-            if (schemaSource == null) return;
+            var currentSchemaSource = SelectedSchemaSource;
+            if (currentSchemaSource == null) return;
 
             _schema = _schemaService.GetOntologySchema(schemaSource);
 
@@ -388,6 +481,7 @@ namespace Iis.OntologyManager
                 schemaSource.SourceKind == SchemaSourceKind.Database ?
                 GetOntologyData(schemaSource.Data) :
                 null;
+
         }
 
         private void UpdateSchemaSources()
@@ -504,6 +598,7 @@ namespace Iis.OntologyManager
         }
         private void SetNodeTypeView(INodeTypeLinked nodeType, bool addToHistory)
         {
+            SetSwitchViewTypeText();
             if (nodeType == null) return;
             if (addToHistory && _currentNodeType != null)
             {

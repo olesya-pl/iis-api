@@ -66,6 +66,7 @@ namespace Iis.OntologyData
             {
                 Id = id ?? Guid.NewGuid(),
                 NodeTypeId = nodeTypeId,
+                NodeType = _schema.GetNodeTypeById(nodeTypeId),
                 UpdatedAt = DateTime.Now,
                 CreatedAt = DateTime.Now,
                 IsArchived = false
