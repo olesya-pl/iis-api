@@ -23,6 +23,19 @@ namespace Iis.Services
 
         private string[] MaterialIndexes = { "Materials" };
 
+        private static List<AggregateFieldMap> _aggregationsMap = new List<AggregateFieldMap>
+        {
+            new AggregateFieldMap("ProcessedStatus", "ProcessedStatus.Title"),
+            new AggregateFieldMap("Completeness", "Completeness.Title"),
+            new AggregateFieldMap("Importance", "Importance.Title"),
+            new AggregateFieldMap("SessionPriority", "SessionPriority.Title"),
+            new AggregateFieldMap("Reliability", "Reliability.Title"),
+            new AggregateFieldMap("Relevance", "Relevance.Title"),
+            new AggregateFieldMap("SourceReliability", "SourceReliability.Title"),
+            new AggregateFieldMap("Type", "Type.keyword"),
+            new AggregateFieldMap("Source", "Source.keyword"),
+        };
+
         public MaterialElasticService(IElasticManager elasticManager,
             IElasticState elasticState,
             IElasticResponseManagerFactory elasticResponseManagerFactory
@@ -43,24 +56,13 @@ namespace Iis.Services
                       
             var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
 
-            var aggregationsMap = new List<AggregateFieldMap> 
-            {
-                new AggregateFieldMap("ProcessedStatus", "ProcessedStatus.Title"),
-                new AggregateFieldMap("Completeness", "Completeness.Title"),
-                new AggregateFieldMap("Importance", "Importance.Title"),
-                new AggregateFieldMap("SessionPriority", "SessionPriority.Title"),
-                new AggregateFieldMap("Reliability", "Reliability.Title"),
-                new AggregateFieldMap("Relevance", "Relevance.Title"),
-                new AggregateFieldMap("SourceReliability", "SourceReliability.Title"),
-                new AggregateFieldMap("Type", "Type.keyword"),
-                new AggregateFieldMap("Source", "Source.keyword"),
-            };            
+                        
             
             var builder = new ExactQueryBuilder();
             var query = builder.WithPagination(from, size)
                 .WithQueryString(queryString)
                 .Build()
-                .WithExactAggregationNames(aggregationsMap)
+                .WithExactAggregationNames(_aggregationsMap)
                 .WithHighlights()
                 .SetupSorting(sortColumn, sortOrder);
 
@@ -138,13 +140,13 @@ namespace Iis.Services
         public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
         {
             var (from, size) = page.ToElasticPage();
-            
-            var searchResult = await _elasticManager.SearchByImageVector(imageVector, new IisElasticSearchParams
-            {
-                BaseIndexNames = _elasticState.MaterialIndexes,
-                From = from,
-                Size = size
-            }, ct);
+
+            var query = new SearchByImageQueryBuilder(imageVector)
+                .WithPagination(from, size)
+                .Build()
+                .WithExactAggregationNames(_aggregationsMap);
+
+            var searchResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
             return MapToSearchResult(searchResult);
         }

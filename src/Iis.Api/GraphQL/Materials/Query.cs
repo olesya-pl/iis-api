@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.Materials
                 var result = await materialProvider
                     .GetMaterialsByImageAsync(pageParam, searchByImageInput.Name, content.ToArray());
                 var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
-                return (mapped, new Dictionary<string, AggregationItem>(), result.Count);
+                return (mapped, result.Aggregations, result.Count);
             }
 
             if(searchByRelation != null && searchByRelation.ShoudBeExecuted)
