@@ -98,7 +98,7 @@ namespace IIS.Core.Materials.EntityFramework
                 .Select(MapMaterialDocument)
                 .ToArray();
 
-            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items);
+            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
         private Material MapMaterialDocument(MaterialDocument document)
