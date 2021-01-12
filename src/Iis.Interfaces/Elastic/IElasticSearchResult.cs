@@ -35,6 +35,7 @@ namespace Iis.Interfaces.Elastic
     public class SearchResult
     {
         public Dictionary<Guid, SearchResultItem> Items { get; set; }
+        public Dictionary<string, AggregationItem> Aggregations { get; set; }
         public int Count { get; set; }
     }
 
