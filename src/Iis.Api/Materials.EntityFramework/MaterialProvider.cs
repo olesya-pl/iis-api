@@ -326,7 +326,7 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, searchResult.Count);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content)
+        public async Task<MaterialsDto> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content)
         {
             decimal[] imageVector;
             try
@@ -343,9 +343,10 @@ namespace IIS.Core.Materials.EntityFramework
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                    .Select(MapMaterialDocument);
+                    .Select(MapMaterialDocument)
+                    .ToList();
 
-            return (materials, searchResult.Count);
+            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
         public async Task<decimal[]> VectorizeImage(byte[] fileContent, string fileName)
