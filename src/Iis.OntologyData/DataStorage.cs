@@ -73,7 +73,7 @@ namespace Iis.OntologyData
             };
             CompleteNode(node);
             Nodes[node.Id] = node;
-            _patch._create._nodes.Add(node);
+            _patch.AddAsCreated(node);
             return node;
         }
 
@@ -91,7 +91,7 @@ namespace Iis.OntologyData
             CompleteRelation(relation);
 
             Relations[relation.Id] = relation;
-            _patch._create._relations.Add(relation);
+            _patch.AddAsCreated(relation);
             return relation;
         }
 
@@ -104,7 +104,7 @@ namespace Iis.OntologyData
             };
             CompleteAttribute(attribute);
             Attributes[attribute.Id] = attribute;
-            _patch._create._attributes.Add(attribute);
+            _patch.AddAsCreated(attribute);
             return attribute;
         }
         internal RelationData CreateRelationWithAttribute(Guid sourceNodeId, Guid nodeTypeId, string value)
@@ -123,7 +123,7 @@ namespace Iis.OntologyData
             relation.TargetNodeId = targetId;
             relation._targetNode = Nodes[targetId];
             relation._targetNode._incomingRelations.Add(relation);
-            _patch._update._relations.Add(relation);
+            _patch.AddAsUpdated(relation);
             return relation;
         }
 
@@ -135,7 +135,7 @@ namespace Iis.OntologyData
                 if (relation.TargetNode.NodeType != null && !relation.IsLinkToSeparateObject && !relation.TargetNode.IsArchived)
                 {
                     relation._targetNode.IsArchived = true;
-                    _patch._update._nodes.Add(relation._targetNode);
+                    _patch.AddAsUpdated(relation._targetNode);
                     MarkLinkedAsArchived(relation._targetNode);
                 }
             }
@@ -223,7 +223,7 @@ namespace Iis.OntologyData
         {
             nodeAction(node);
 
-            _patch._update._nodes.Add(node);
+            _patch.AddAsUpdated(node);
 
             return node;
         }
