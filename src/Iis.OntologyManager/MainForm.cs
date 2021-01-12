@@ -52,7 +52,7 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.24";
+        const string VERSION = "1.26";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -322,7 +322,7 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
             if (control.UpdatedDatabases.Contains(SelectedSchemaSource.Title))
-                LoadCurrentSchema(SelectedSchemaSource);
+                WaitCursorAction(() => LoadCurrentSchema(SelectedSchemaSource));
         }
         private void btnDuplicates_Click(object sender, EventArgs e)
         {
