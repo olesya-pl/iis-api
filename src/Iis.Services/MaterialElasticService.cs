@@ -103,6 +103,7 @@ namespace Iis.Services
                             .Build()
                             .WithHighlights()
                             .SetupSorting(sortColumn, sortOrder)
+                            .WithExactAggregationNames(_aggregationsMap)
                             .ToString(Formatting.None);
 
             var elasticResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);

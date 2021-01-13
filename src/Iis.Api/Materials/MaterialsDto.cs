@@ -26,5 +26,13 @@ namespace IIS.Core.Materials
                 Aggregations = aggregations
             };
         }
+
+        public static MaterialsDto Empty = new MaterialsDto
+        {
+            Materials = Array.Empty<Material>(),
+            Count = 0,
+            Highlights = new Dictionary<Guid, SearchResultItem>(),
+            Aggregations = new Dictionary<string, AggregationItem>()
+        };
     }
 }

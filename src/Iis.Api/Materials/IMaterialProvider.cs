@@ -26,7 +26,7 @@ namespace IIS.Core.Materials
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<MaterialsDto> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
-        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
+        Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
             bool includeDescendants,
             string suggestion,
             PaginationParams page,

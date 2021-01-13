@@ -55,7 +55,7 @@ namespace IIS.Core.GraphQL.Materials
                                 .Select(m => mapper.Map<Material>(m))
                                 .ToList();
 
-                return (mapped, new Dictionary<string, AggregationItem>(), materialsResults.Count);
+                return (mapped, materialsResults.Aggregations, materialsResults.Count);
             }
 
             var materialsResult = await materialProvider
