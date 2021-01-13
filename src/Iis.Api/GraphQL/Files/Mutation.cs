@@ -35,7 +35,11 @@ namespace IIS.Core.GraphQL.Files
             {
                 if (input.Name.EndsWith(".docx"))
                 {
-                    return UploadDocx(uploadConfiguration, input);
+                    return UploadFile(uploadConfiguration.DocxDirectory, input);
+                }
+                else if (input.Name.EndsWith(".pdf"))
+                {
+                    return UploadFile(uploadConfiguration.PdfDirectory, input);
                 }
                 else if (input.Name.EndsWith(".png"))
                 {
@@ -98,10 +102,10 @@ namespace IIS.Core.GraphQL.Files
             }
         }
 
-        private static UploadResult UploadDocx(UploadConfiguration uploadConfiguration, UploadInput input)
+        private static UploadResult UploadFile(string directory, UploadInput input)
         {
             var byteArray = input.Content;
-            var fileName = System.IO.Path.Combine(uploadConfiguration.DocxDirectory, input.Name);
+            var fileName = System.IO.Path.Combine(directory, input.Name);
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
                 fs.Write(byteArray, 0, byteArray.Length);
