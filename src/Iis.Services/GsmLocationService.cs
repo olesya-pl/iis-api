@@ -42,7 +42,7 @@ namespace Iis.Services
                     Lat = lat,
                     Long = @long,
                     RegisteredAt = model.RegTime,
-                    EntityId = model.FeatureId,
+                    NodeId = model.FeatureId,
                     MaterialId = materialId,
                     Type = LocationType.Material
                 }
