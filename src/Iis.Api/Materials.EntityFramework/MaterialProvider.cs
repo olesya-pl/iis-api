@@ -42,7 +42,6 @@ namespace IIS.Core.Materials.EntityFramework
         {
             "parent", "bePartOf"
         };
-        private static readonly (IEnumerable<Material> Materials, int Count) EmptMaterialResult = (Materials: Array.Empty<Material>(), 0);
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly IOntologyNodesData _ontologyData;
@@ -98,7 +97,7 @@ namespace IIS.Core.Materials.EntityFramework
                 .Select(MapMaterialDocument)
                 .ToArray();
 
-            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items);
+            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
         private Material MapMaterialDocument(MaterialDocument document)
@@ -326,7 +325,7 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, searchResult.Count);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content)
+        public async Task<MaterialsDto> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content)
         {
             decimal[] imageVector;
             try
@@ -343,9 +342,10 @@ namespace IIS.Core.Materials.EntityFramework
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                    .Select(MapMaterialDocument);
+                    .Select(MapMaterialDocument)
+                    .ToList();
 
-            return (materials, searchResult.Count);
+            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
         public async Task<decimal[]> VectorizeImage(byte[] fileContent, string fileName)
@@ -361,7 +361,7 @@ namespace IIS.Core.Materials.EntityFramework
             return FaceAPIResponseParser.GetEncoding(contentJson);
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList,
+        public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
             PaginationParams page,
@@ -383,7 +383,7 @@ namespace IIS.Core.Materials.EntityFramework
                 materialEntityList.AddRange(materialEntities);
             }
 
-            if (!materialEntityList.Any()) return EmptMaterialResult;
+            if (!materialEntityList.Any()) return MaterialsDto.Empty;
 
             var materialEntitiesIdList = materialEntityList
                 .GroupBy(e => e.Id)
@@ -391,17 +391,18 @@ namespace IIS.Core.Materials.EntityFramework
                 .Select(gr => gr.Select(e => e.Id).FirstOrDefault())
                 .ToArray();
 
-            if (!materialEntitiesIdList.Any()) return EmptMaterialResult;
+            if (!materialEntitiesIdList.Any()) return MaterialsDto.Empty;
 
             var searchParams = new SearchParams { Suggestion = suggestion, Page = page, Sorting = sorting };
 
-            var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList);
+            var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList, ct);
 
             var materials = searchResult.Items.Values
                 .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
-                .Select(MapMaterialDocument);
+                .Select(MapMaterialDocument)
+                .ToList();
 
-            return (materials, searchResult.Count);
+            return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
         private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)

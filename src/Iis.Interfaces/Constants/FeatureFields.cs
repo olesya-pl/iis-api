@@ -1,6 +1,6 @@
-namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
+namespace Iis.Interfaces.Constants
 {
-    internal static class FeatureFields
+    public static class FeatureFields
     {
         public const string FeaturesSection = "features";
         public const string IMSI = "IMSI";
@@ -14,5 +14,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         public const string Beam = "Beam";
         public const string LocationX = "LocationX";
         public const string LocationY = "LocationY";
+        public const string Mcc = "MCC";
+        public const string Mnc = "MNC";
+        public const string Lac = "LAC";
+        public const string CellId = "CellID";
+        public const string RegTime = "RegTime";
+        
     }
 }

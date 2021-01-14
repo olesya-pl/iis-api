@@ -67,6 +67,8 @@ namespace Iis.DataModel
         public DbSet<LocationHistoryEntity> LocationHistory { get; set; }
 
         public DbSet<FlightRadarHistorySyncJobConfig> FlightRadarHistorySyncJobConfig { get; set;}
+        
+        public DbSet<TowerLocationEntity> TowerLocations { get; set;}
 
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)
@@ -122,6 +124,7 @@ namespace Iis.DataModel
 
             modelBuilder.ApplyConfiguration(new FlightRadarHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new FlightRadarHistorySyncJobConfigConfiguration());
+            modelBuilder.ApplyConfiguration(new TowerLocationConfiguration());
         }
         public static OntologyContext GetContext(string connectionString)
         {

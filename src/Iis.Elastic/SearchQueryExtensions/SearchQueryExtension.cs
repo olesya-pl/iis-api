@@ -69,19 +69,30 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             if(!aggregationFieldNameList.Any()) return jsonQuery;
 
+            var maps = aggregationFieldNameList
+                .Select(p => new AggregateFieldMap(p, $"{p}{AggregateSuffix}"))
+                .ToList();
+            return jsonQuery.WithExactAggregationNames(maps);            
+        }
+
+        public static JObject WithExactAggregationNames(this JObject jsonQuery, 
+            IReadOnlyCollection<AggregateFieldMap> aggregationFieldMaps)
+        {
+            if (!aggregationFieldMaps.Any()) return jsonQuery;
+
             var aggregations = new JObject();
 
             jsonQuery["aggs"] = aggregations;
 
-            foreach (var fieldName in aggregationFieldNameList)
+            foreach (var fieldMap in aggregationFieldMaps)
             {
                 var field = new JObject
                 (
-                    new JProperty("field", $"{fieldName}{AggregateSuffix}"),
+                    new JProperty("field", fieldMap.FieldName),
                     new JProperty("missing", MissingValueKey),
                     new JProperty("size", MaxBucketsCount)
                 );
-                aggregations[fieldName] = new JObject
+                aggregations[fieldMap.Alias] = new JObject
                 (
                     new JProperty("terms", field)
                 );
@@ -95,6 +106,18 @@ namespace Iis.Elastic.SearchQueryExtensions
             return new JObject(
                 new JProperty(sortColumn, new JObject() { new JProperty("order", sortOrder)})
             );
+        }
+    }
+
+    public class AggregateFieldMap
+    {
+        public string Alias { get; private set; }
+        public string FieldName { get; private set; }
+
+        public AggregateFieldMap(string alias, string fieldName)
+        {
+            Alias = alias;
+            FieldName = fieldName;
         }
     }
 }

@@ -17,8 +17,8 @@ namespace IIS.Core.GraphQL.Materials
     public class Query
     {
 
-        [GraphQLType(typeof(MaterialCollection))]
-        public async Task<(IEnumerable<Material> materials, int totalCount)> GetMaterials(
+        [GraphQLType(typeof(AggregatedMaterialCollection))]
+        public async Task<(IEnumerable<Material> materials, Dictionary<string, AggregationItem> aggregations, int totalCount)> GetMaterials(
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.Materials
                 var result = await materialProvider
                     .GetMaterialsByImageAsync(pageParam, searchByImageInput.Name, content.ToArray());
                 var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
-                return (mapped, result.Count);
+                return (mapped, result.Aggregations, result.Count);
             }
 
             if(searchByRelation != null && searchByRelation.ShoudBeExecuted)
@@ -55,7 +55,7 @@ namespace IIS.Core.GraphQL.Materials
                                 .Select(m => mapper.Map<Material>(m))
                                 .ToList();
 
-                return (mapped, materialsResults.Count);
+                return (mapped, materialsResults.Aggregations, materialsResults.Count);
             }
 
             var materialsResult = await materialProvider
@@ -64,7 +64,7 @@ namespace IIS.Core.GraphQL.Materials
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
 
-            return (materials, materialsResult.Count);
+            return (materials, materialsResult.Aggregations, materialsResult.Count);
         }
 
         private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchResultItem> materialsResult)
