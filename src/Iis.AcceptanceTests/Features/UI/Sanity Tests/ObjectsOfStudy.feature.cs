@@ -359,25 +359,6 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 65
         testRunner.And("I entered the Росія value in the country field at the dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 66
-        testRunner.And("I clicked on the dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 67
-        testRunner.And("I scrolled down to the Ідентифікаційні ознаки element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 68
-        testRunner.And("I clicked on the temporary dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 69
-        testRunner.And("I entered the 49 value in the longitude field at temporary dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 70
-        testRunner.And("I entered the 49 value in the latitude field at the temporary dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 71
-        testRunner.And("I entered the Росія value in the country field at the temporary dislocation block" +
-                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
 #line 72
         testRunner.And("I clicked on the save button to create a new object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden

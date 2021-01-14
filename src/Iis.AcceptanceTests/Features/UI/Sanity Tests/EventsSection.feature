@@ -8,8 +8,11 @@ Feature: EventsSection - sanity
     @sanity @EventsSectionSanity @UI
     Scenario: IIS-6364 - Bind a material to an event in the event EventsSection
         When I navigated to Events page
-        And I clicked on the Захід ркр Варяг до ВМБ Севастополь event in the event list
-        And I clicked on the Новое событе тестовое event in the event list
+        And I created a new Тестова подія event
+        And I searched for the Тестова подія created event
+        And I pressed the edit event button
+
+#And I clicked on the Новое событе тестовое event in the event list
 
 
 #Then the material must be binded to the event

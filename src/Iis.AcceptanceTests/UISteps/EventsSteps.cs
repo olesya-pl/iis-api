@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
@@ -27,22 +28,52 @@ namespace AcceptanceTests.UISteps
         public void IWantNavigateToEventsPage()
         {
             eventsPage.EventsPage.Click();
-            driver.WaitFor(10);
+            driver.WaitFor(3);
         }
 
-        [When(@"I clicked on the (.*) event in the event list")]
-        public void WhenIGotAllEventsList(string eventName)
+        [When(@"I created a new (.*) event")]
+        public void WhenICreatedANewEvent(string eventName)
         {
-            //var xyz = eventsPage.Events.First().Click();
-            // var events = eventsPage.GetEventsByName("захід");
-            // var eventTitle = eventsPage.GetEventByTitle("Захід");
+            var eventUniqueName = $"{eventName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid().ToString("N")}";
+            context.Set(eventUniqueName, eventName);
+            eventsPage.CreateEventButton.Click();
+            eventsPage.EventTitle.SendKeys(eventUniqueName);
+            eventsPage.AverageImportaceRadioButton.Click();
+            eventsPage.FlawRadioButton.Click();
+            eventsPage.CountrySelectionDropDown.Click();
+            var countryInput = eventsPage.CountrySelectionDropDown.FindElement(By.TagName("input"));
+            countryInput.SendKeys("Росія");
+            driver.WaitFor(2);
+            countryInput.SendKeys(Keys.Down);
+            countryInput.SendKeys(Keys.Enter);
+            eventsPage.EventTypeDropDown.Click();
+            driver.WaitFor(2);
+            eventsPage.EventTypeDropDown.SendKeys(Keys.Up);
+            eventsPage.EventTypeDropDown.SendKeys(Keys.Enter);
+            eventsPage.EventComponentDropDown.SendKeys("Кризові регіони");
+            eventsPage.EventComponentDropDown.SendKeys(Keys.Down);
+            eventsPage.EventComponentDropDown.SendKeys(Keys.Enter);
+            eventsPage.SaveEventChangesButton.Click();
+            driver.WaitFor(2);
+            eventsPage.ConfirmSaveEventChangesButton.Click();
+            driver.WaitFor(2);
+            driver.Navigate().Refresh();
+            eventsPage.CloseEventCreationWindow.Click();
         }
 
-        [When(@"I clicked on the (.*) event in the event list")]
-        public void WhenIClickedOnTheEventInTheEventList(string value)
+        [When(@"I searched for the (.*) created event")]
+        public void WhenISearchedForTheCreatedEvent(string eventName)
         {
-            var activeEvent = eventsPage.GetEventByTitle(value);
-            //activeEvent.Click();
+            eventsPage.SearchButton.Click();
+            var eventUniqueName = context.Get<string>(eventName);
+            eventsPage.SearchField.SendKeys($"\"{eventUniqueName}\"");
+            eventsPage.SearchField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I pressed the edit event button")]
+        public void WhenIPressedTheEditEventButton()
+        {
+            eventsPage.EditButton.Click();
         }
         #endregion
 
