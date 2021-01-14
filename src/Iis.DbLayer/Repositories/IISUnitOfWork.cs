@@ -17,6 +17,7 @@ namespace Iis.DbLayer.Repositories
         IThemeRepository ThemeRepository { get; }
         IChangeHistoryRepository ChangeHistoryRepository { get; }
         IUserRepository UserRepository { get; }
+        ITowerLocationRepository TowerLocationRepository { get; }
     }
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
         where TContext : DbContext
@@ -44,6 +45,8 @@ namespace Iis.DbLayer.Repositories
         public IChangeHistoryRepository ChangeHistoryRepository => ResolveRepository<IChangeHistoryRepository>();
 
         public IUserRepository UserRepository => ResolveRepository<IUserRepository>();
+        
+        public ITowerLocationRepository TowerLocationRepository => ResolveRepository<ITowerLocationRepository>();
 
         protected override T ResolveRepository<T>()
         {

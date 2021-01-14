@@ -11,6 +11,15 @@ namespace Iis.DataModel.FlightRadar
                 .HasOne(p => p.Node)
                 .WithMany()
                 .HasForeignKey(p => p.NodeId);
+
+            builder
+                .HasOne(p => p.Material)
+                .WithMany()
+                .HasForeignKey(p => p.MaterialId);
+
+            builder.Property(x => x.Type)
+                .IsRequired()
+                .HasDefaultValue(LocationType.Node);
         }
     }
 }
