@@ -3,54 +3,57 @@ using System.Text;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Serilog;
 using Iis.OntologyManager.Configurations;
+using Iis.OntologyManager.DTO;
 
 namespace Iis.OntologyManager.Helpers
 {
     public class RequestWraper
     {
-        private readonly string _apiAddress;
         private readonly UserCredentials _userCredentials;
+        private readonly Uri _baseApiApiAddress;
+        private readonly ILogger _logger;
 
-        public RequestWraper(string apiAddress, UserCredentials userCredentials)
+        public RequestWraper(string apiAddress, UserCredentials userCredentials, ILogger logger)
         {
-            _apiAddress = apiAddress;
+            _baseApiApiAddress = new Uri(apiAddress);
             _userCredentials = userCredentials;
+            _logger = logger;
         }
 
-        public Task<bool> DeleteEntityAsync(Guid entityId) 
+        public Task<RequestResult> DeleteEntityAsync(Guid entityId) 
         {
             var requestUri = GetDeleteEntityRequestUri(entityId);
 
             return SendDeleteRequestAsync(requestUri);
         }
 
-        private async Task<bool> SendDeleteRequestAsync(Uri requestUri)
+        private async Task<RequestResult> SendDeleteRequestAsync(Uri requestUri)
         {
-            using (var httpClient = GetClient(_apiAddress, _userCredentials))
+            using var httpClient = GetClient(_baseApiApiAddress, _userCredentials);
+            var response = await httpClient.DeleteAsync(requestUri).ConfigureAwait(false);
+            try
             {
-                var response = await httpClient.DeleteAsync(requestUri).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
 
-                try
-                {
-                    response.EnsureSuccessStatusCode();
-                    return response.IsSuccessStatusCode;
-                }
-                catch (Exception ex)
-                {
-                    return response.IsSuccessStatusCode;
-                }
+                return RequestResult.Success("Сутність видалено", response.RequestMessage.RequestUri);
+            }
+            catch(Exception exception)
+            {
+                _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
 
+                return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}", response.RequestMessage.RequestUri);
             }
         }
 
-        private static HttpClient GetClient(string apiAddress, UserCredentials userCredentials)
+        private static HttpClient GetClient(Uri apiAddress, UserCredentials userCredentials)
         {
             var byteArray = Encoding.ASCII.GetBytes($"{userCredentials.UserName}:{userCredentials.Password}");
 
             var client = new HttpClient
             {
-                BaseAddress = new Uri(apiAddress)
+                BaseAddress = apiAddress
             };
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));

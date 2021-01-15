@@ -19,10 +19,12 @@ namespace Iis.OntologyManager.UiControls
         private Button _searchButton;
         private Button _removeButton;
         private Label _foundNodeLabel;
+        private Label _invalidBaseAppAdressLabel;
         private DataGridView _resultGrid;
         private readonly SchemaDataSource _schemaDataSource;
         private INode _selectedNode;
         private IOntologyNodesData _data;
+        private bool _baseAppAdressIsValid;
 
         public event Action<Guid> OnRemove;
         public event Func<IOntologyNodesData> OnGetOntologyData;
@@ -32,6 +34,8 @@ namespace Iis.OntologyManager.UiControls
         public RemoveEntityUiControl(SchemaDataSource schemaDataSource)
         {
             _schemaDataSource = schemaDataSource;
+
+            _baseAppAdressIsValid = Uri.IsWellFormedUriString(_schemaDataSource.AppAddress, UriKind.Absolute);
         }
 
         protected override void CreateControls()
@@ -46,6 +50,12 @@ namespace Iis.OntologyManager.UiControls
             container.Add(_searchButton = new Button());
             container.Add(_removeButton = new Button());
             container.Add(_foundNodeLabel = new Label(), FoundNodeText);
+
+            if (!_baseAppAdressIsValid)
+            {
+                container.Add(_invalidBaseAppAdressLabel = new Label(), $"Invalid web application url '{_schemaDataSource.AppAddress}'. Please check configuration.");
+                SetupInvalidBaseAppAdressLabel(_invalidBaseAppAdressLabel);
+            }
 
             SetupActionButtonAsSearch(_searchButton);
             SetupActionButtonAsRemove(_removeButton);
@@ -116,6 +126,8 @@ namespace Iis.OntologyManager.UiControls
         private void FoundNodeDoubleClick(object sender, EventArgs e)
         {
             if (_selectedNode is null) return;
+
+            if (!_baseAppAdressIsValid) return;
 
             var url = GenerateUrlForNode(_selectedNode, _schemaDataSource.AppAddress);
 
@@ -211,9 +223,21 @@ namespace Iis.OntologyManager.UiControls
 
         private Label SetupFoundNodeLabel(Label label)
         {
-            label.Cursor = Cursors.Hand;
+            if (_baseAppAdressIsValid)
+            {
+                label.Cursor = Cursors.Hand;
+            }
+
             label.Font = new Font(label.Font, FontStyle.Underline);
+
             label.DoubleClick += FoundNodeDoubleClick;
+
+            return label;
+        }
+
+        private Label SetupInvalidBaseAppAdressLabel(Label label)
+        {
+            label.Font = new Font(label.Font, FontStyle.Bold);
 
             return label;
         }
@@ -251,6 +275,8 @@ namespace Iis.OntologyManager.UiControls
             var url = SelectedRow.Cells[_resultGrid.Columns["NodeUrl"].Index].Value?.ToString();
 
             if (url == null) return;
+
+            if (!_baseAppAdressIsValid) return;
 
             OpenUrl(url);
         }

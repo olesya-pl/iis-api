@@ -52,7 +52,7 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.26";
+        const string VERSION = "1.27";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -459,11 +459,15 @@ namespace Iis.OntologyManager
         }
         private void OnRemove(Guid entityId)
         {
-            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials);
+            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _logger);
 
             var result = requestWrapper.DeleteEntityAsync(entityId).ConfigureAwait(false).GetAwaiter().GetResult();
 
-            MessageBox.Show(result ? "Сутність видалено !": "При видаленні сталася помилка !");
+            var sb = new StringBuilder()
+                .AppendLine($"Адреса:{result.RequestUrl}")
+                .AppendLine($"Повідомлення: {result.Message}");
+
+            ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
         }
         #endregion
 
