@@ -3,6 +3,7 @@ using System.Linq;
 using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
+using Xunit;
 
 namespace AcceptanceTests.PageObjects
 {
@@ -66,6 +67,13 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "[aria-describedby] .el-input__inner")]
         public IWebElement SearchField;
 
+        [FindsBy(How = How.CssSelector, Using = ".event-card__linked-materials .container")]
+        public IWebElement BindedMaterialsField;
+
+        [FindsBy(How = How.CssSelector, Using = ".event-card__objects-associated-with-event .container")]
+        public IWebElement BindedObjectsOfStudyField;
+
+
         public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
                     .Select(webElement => new Event(driver, webElement)).ToList();
 
@@ -74,6 +82,17 @@ namespace AcceptanceTests.PageObjects
             return Events.Where(i => i.Name.Contains(eventName)).ToList();
         }
         public Event GetEventByTitle(string title)
+        {
+            return new Event(driver, title);
+        }
+
+        public bool IsMaterialVisible(string materialName)
+        {
+            var bindedMaterial = driver.FindElement(By.XPath($"//span[contains(text(),'{materialName}')]"));
+            return bindedMaterial.Displayed;
+        }
+
+        public Event GetRelatedObjectOfStudyNameBindedToTheEvent(string title)
         {
             return new Event(driver, title);
         }

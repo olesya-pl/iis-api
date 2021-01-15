@@ -75,6 +75,54 @@ namespace AcceptanceTests.UISteps
         {
             eventsPage.EditButton.Click();
         }
+
+        [When(@"I binded a (.*) material to the event")]
+        public void WhenIBindedAMaterialToTheEvent(string materialName)
+        {
+            var materialInput = eventsPage.BindedMaterialsField.FindElement(By.TagName("input"));
+            materialInput.SendKeys(materialName);
+            driver.WaitFor(2);
+            materialInput.SendKeys(Keys.Down);
+            materialInput.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I binded an (.*) object of study to the event")]
+        public void WhenIBindedAnObjectOfStudyToTheEvent(string objectOfStudy)
+        {
+            var objectOfStudyInput = eventsPage.BindedObjectsOfStudyField.FindElement(By.TagName("input"));
+            objectOfStudyInput.SendKeys(objectOfStudy);
+            driver.WaitFor(4);
+            objectOfStudyInput.SendKeys(Keys.Down);
+            objectOfStudyInput.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
+        }
+
+        [When(@"I pressed the save event changes button")]
+        public void WhenIPressedTheSaveButton()
+        {
+            eventsPage.SaveEventChangesButton.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I pressed the confirm save changes in the event")]
+        public void WhenIPressedTheConfirmSaveChangesInTheEvent()
+        {
+            eventsPage.ConfirmSaveEventChangesButton.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I reloaded the event page")]
+        public void WhenIReloadedTheEventPage()
+        {
+            driver.Navigate().Refresh();
+            driver.WaitFor(5);
+        }
+
+        [When(@"I clicked on the (.*) binded object of study in the event")]
+        public void WhenIClickedOnTheBindedObjectOfStudyInTheEvent(string objectOfStudy)
+        {
+            eventsPage.GetRelatedObjectOfStudyNameBindedToTheEvent(objectOfStudy).Click();
+        }
         #endregion
 
         #region Then
@@ -89,7 +137,18 @@ namespace AcceptanceTests.UISteps
         {
             Assert.True(eventsPage.FirstEventInTheEventsList.Displayed);
         }
+
+        [Then(@"I must see the (.*) material binded to the event")]
+        public void ThenIMustSeeTheMaterialBindedToTheEvent(string materialName)
+        {
+            Assert.True(eventsPage.IsMaterialVisible(materialName));
+        }
+
+        // [Then(@"I must see the (.*) event")]
+        // public void ThenIMustSeeTheEvent(string eventName)
+        // {
+        //     var eventUniqueName = context.Get<string>(eventName);
+        // }
         #endregion
     }
 }
-

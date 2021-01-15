@@ -98,6 +98,5 @@ namespace AcceptanceTests.UISteps
             var themeUniqueName = context.Get<string>(themeName);
             Assert.True(themesAndUpdatesPageObjects.Themes.Count(_ => _.Title == themeUniqueName) == 0);
         }
-
     }
 }

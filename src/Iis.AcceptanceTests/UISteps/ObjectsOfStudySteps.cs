@@ -249,6 +249,12 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.ScrollDown(element);
         }
+
+        [When(@"I navigated to the Events tab in the big object of study card")]
+        public void WhenINavigatedToTheEventTabInTheBigObjectOfStudyCard()
+        {
+            objectsOfStudyPage.EventsTabInTheBigObjectOfStudyCard.Click();
+        }
         #endregion
 
         #region Then
@@ -371,6 +377,12 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedValue, actualValue);
         }
 
+        [Then(@"I must see (.*) as related to the object of study event")]
+        public void WhenIMustSeeAsRelatedToTheObjectOfStudyEvent(string eventName)
+        {
+            var eventUniqueName = context.Get<string>(eventName);
+            Assert.Contains(objectsOfStudyPage.Events, _ => _.Name == eventUniqueName);
+        }
         #endregion
     }
 }

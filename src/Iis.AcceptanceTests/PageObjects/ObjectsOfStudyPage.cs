@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using AcceptanceTests.PageObjects;
 using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
@@ -186,6 +188,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(2) .el-input__inner")]
         public IWebElement CountryFieldInTheTemporaryDisclocationBlock;
 
+        [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Події')]")]
+        public IWebElement EventsTabInTheBigObjectOfStudyCard;
+
 
         [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
         public IWebElement DislocationSectionCountryField;
@@ -198,6 +203,9 @@ namespace AcceptanceTests.PageObjects
         {
             return new HierarchyCard(driver, title);
         }
+
+        public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
+                   .Select(webElement => new Event(driver, webElement)).ToList();
 
         public void ScrollDown(string value)
         {
