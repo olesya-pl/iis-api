@@ -96,5 +96,11 @@ namespace AcceptanceTests.PageObjects
         {
             return new Event(driver, title);
         }
+
+        public bool IsEventVisible(string eventName)
+        {
+            var eventInTheList = driver.FindElement(By.XPath($"//span[contains(text(),'{eventName}')]"));
+            return eventInTheList.Displayed;
+        }
     }
 }

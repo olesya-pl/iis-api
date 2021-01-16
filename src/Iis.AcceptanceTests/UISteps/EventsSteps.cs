@@ -144,11 +144,12 @@ namespace AcceptanceTests.UISteps
             Assert.True(eventsPage.IsMaterialVisible(materialName));
         }
 
-        // [Then(@"I must see the (.*) event")]
-        // public void ThenIMustSeeTheEvent(string eventName)
-        // {
-        //     var eventUniqueName = context.Get<string>(eventName);
-        // }
+        [Then(@"I must see the (.*) event in the event search results")]
+        public void ThenIMustSeeTheEvent(string eventName)
+        {
+            var eventUniqueName = context.Get<string>(eventName);
+            Assert.True(eventsPage.IsEventVisible(eventUniqueName));
+        }
         #endregion
     }
 }

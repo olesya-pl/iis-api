@@ -31,7 +31,7 @@ Feature: EventsSection - sanity
         And I clicked on the Попов binded object of study in the event
         And I clicked on enlarge small card button
         When I navigated to the Events tab in the big object of study card
-        Then I must see Тестова подія as related to the object of study event
+        Then I must see that the Тестова подія event related to the object of study
 
     @sanity @EventsSectionSanity @UI
     Scenario: IIS-6158 - Create an event in the event section

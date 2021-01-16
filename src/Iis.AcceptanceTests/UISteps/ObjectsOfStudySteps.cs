@@ -377,7 +377,7 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedValue, actualValue);
         }
 
-        [Then(@"I must see (.*) as related to the object of study event")]
+        [Then(@"I must see that the (.*) event related to the object of study")]
         public void WhenIMustSeeAsRelatedToTheObjectOfStudyEvent(string eventName)
         {
             var eventUniqueName = context.Get<string>(eventName);
