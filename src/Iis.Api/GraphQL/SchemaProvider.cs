@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using IIS.Domain;
 using Iis.Api.Ontology;
 using Iis.Api.GraphQL;
+using Iis.Api.GraphQL.CreateMenu;
 
 namespace IIS.Core.GraphQL
 {
@@ -71,6 +72,7 @@ namespace IIS.Core.GraphQL
                 d.Include<AssociatedEventsQuery>();
                 d.Include<IncomingEntitiesQuery>();
                 d.Include<RelationsCountQuery>();
+                d.Include<CreateMenuQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
