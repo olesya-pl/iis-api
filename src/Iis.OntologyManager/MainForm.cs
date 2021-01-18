@@ -10,6 +10,7 @@ using Iis.OntologyManager.Configurations;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.Helpers;
 using Iis.OntologyManager.UiControls;
+using Iis.OntologyManager.Dictionaries;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
@@ -30,6 +31,7 @@ namespace Iis.OntologyManager
 
         const string EnvironmentPropertiesSectionName = "environmentProperties";
         const string UserCredentialsSectionName = "userCredentials";
+        const string RequestSettingsSectionName = "requestSettings";
 
         IReadOnlyCollection<SchemaDataSource> _schemaSources;
 
@@ -42,6 +44,7 @@ namespace Iis.OntologyManager
         OntologySchemaService _schemaService;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         UserCredentials _userCredentials;
+        RequestSettings _requestSettings;
 
         UiFilterControl _filterControl;
         UiMigrationControl _migrationControl;
@@ -101,6 +104,10 @@ namespace Iis.OntologyManager
             _userCredentials = _configuration
                                     .GetSection(UserCredentialsSectionName)
                                     .Get<UserCredentials>();
+
+            _requestSettings = _configuration
+                                    .GetSection(RequestSettingsSectionName)
+                                    .Get<RequestSettings>();
 
             SuspendLayout();
             SetBackColor();
@@ -258,17 +265,17 @@ namespace Iis.OntologyManager
 
             var menuElastic = new ContextMenuStrip();
             menuElastic.Items.Add("Індекси Онтології");
-            menuElastic.Items[0].Click += (sender, e) => { ReindexElastic("ReInitializeOntologyIndexes/all"); };
+            menuElastic.Items[0].Click += (sender, e) => { ReindexElastic(IndexKeys.Ontology); };
             menuElastic.Items.Add("Історічні Індекси");
-            menuElastic.Items[1].Click += (sender, e) => { ReindexElastic("ReInitializeHistoricalOntologyIndexes/all"); };
+            menuElastic.Items[1].Click += (sender, e) => { ReindexElastic(IndexKeys.OntologyHistorical); };
             menuElastic.Items.Add("Індекси Ознак");
-            menuElastic.Items[2].Click += (sender, e) => { ReindexElastic("ReInitializeSignIndexes/all"); };
+            menuElastic.Items[2].Click += (sender, e) => { ReindexElastic(IndexKeys.Signs); };
             menuElastic.Items.Add("Індекси Подій");
-            menuElastic.Items[3].Click += (sender, e) => { ReindexElastic("ReInitializeEventIndexes"); };
+            menuElastic.Items[3].Click += (sender, e) => { ReindexElastic(IndexKeys.Events); };
             menuElastic.Items.Add("Індекси Звітів");
-            menuElastic.Items[4].Click += (sender, e) => { ReindexElastic("RecreateElasticReportIndex"); };
+            menuElastic.Items[4].Click += (sender, e) => { ReindexElastic(IndexKeys.Reports); };
             menuElastic.Items.Add("Індекси Матеріалів");
-            menuElastic.Items[5].Click += (sender, e) => { ReindexElastic("RecreateElasticMaterialIndexes"); };
+            menuElastic.Items[5].Click += (sender, e) => { ReindexElastic(IndexKeys.Materials); };
             var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
             btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
             container.Add(btnMenu);
@@ -389,6 +396,7 @@ namespace Iis.OntologyManager
 
             form.Close();
         }
+
         private void WaitCursorAction(Action action)
         {
             Cursor.Current = Cursors.WaitCursor;
@@ -414,52 +422,25 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
-        private void SendGetRequest(string url)
-        {
-            var httpClient = new HttpClient();
-            try
-            {
-                Cursor.Current = Cursors.WaitCursor;
-                var response = httpClient.GetAsync(url).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var msg = response.Content.ReadAsStringAsync().Result;
-                    if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
-                    ShowMessage(msg);
-                }
-                else
-                {
-                    var sb = new StringBuilder();
-                    sb.AppendLine($"Код: {response.StatusCode}");
-                    sb.AppendLine($"Урл: {url}");
-                    sb.AppendLine($"Причина: {response.ReasonPhrase}");
 
-                    ShowMessage(sb.ToString(), "Помилка");
-                }
-            }
-            catch (Exception ex)
-            {
-                var sb = new StringBuilder();
-                sb.AppendLine($"Урл: {url}");
-                sb.AppendLine($"Причина: {ex.Message}");
-                ShowMessage(sb.ToString(), "Помилка");
-            }
-            finally
-            {
-                Cursor.Current = Cursors.Default;
-                httpClient.Dispose();
-            }
-        }
-        private void ReindexElastic(string urlTail)
+        private void ReindexElastic(IndexKeys indexKey)
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
-            
-            var url = $"{SelectedSchemaSource.ApiAddress}admin/{urlTail}";
-            SendGetRequest(url);
+
+            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+
+            var result = requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            var sb = new StringBuilder()
+                .AppendLine($"Адреса:{result.RequestUrl}")
+                .AppendLine($"Повідомлення: {result.Message}");
+
+            ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
         }
+
         private void OnRemove(Guid entityId)
         {
-            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _logger);
+            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
 
             var result = requestWrapper.DeleteEntityAsync(entityId).ConfigureAwait(false).GetAwaiter().GetResult();
 
