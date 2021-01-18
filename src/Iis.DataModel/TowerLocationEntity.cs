@@ -1,10 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Iis.DataModel
 {
-    public class TowerLocationEntity : BaseEntity
+    public class TowerLocationEntity
     {
+        public int Id { get; set; }
+
+        public string DataSource { get; set; }
+
+        public string RadioType { get; set; }
         public string Mcc { get; set; }
 
         public string Mnc { get; set; }
@@ -16,20 +21,11 @@ namespace Iis.DataModel
         public decimal Lat { get; set; }
 
         public decimal Long { get; set; }
-    }
 
-    internal sealed class TowerLocationConfiguration : IEntityTypeConfiguration<TowerLocationEntity>
-    {
-        public void Configure(EntityTypeBuilder<TowerLocationEntity> builder)
-        {
-            builder
-                .Property(p => p.Id)
-                .ValueGeneratedNever();
+        public string Range { get; set; }
 
-            builder
-                .HasIndex(x => new { x.Mcc, x.Mnc, x.Lat, x.CellId })
-                .IsUnique()
-                .IncludeProperties(x => new { x.Lac, x.Long });
-        }
+        public DateTime Created { get; set; }
+        
+        public DateTime? Updated { get; set; }
     }
 }

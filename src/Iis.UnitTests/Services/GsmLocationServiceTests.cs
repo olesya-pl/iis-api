@@ -31,7 +31,7 @@ namespace Iis.UnitTests.Services
             SetDefaultTowerLocations(
                 new TowerLocationEntity
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 1,
                     Mcc = "251",
                     Mnc = "99",
                     Lac = "25010",
@@ -41,7 +41,7 @@ namespace Iis.UnitTests.Services
                 },
                 new TowerLocationEntity
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 2,
                     Mcc = "248",
                     Mnc = "456",
                     Lac = "912",
@@ -73,7 +73,7 @@ namespace Iis.UnitTests.Services
             SetDefaultTowerLocations(
                 new TowerLocationEntity
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 1,
                     Mcc = "346",
                     Mnc = "99",
                     Lac = "25010",
@@ -101,7 +101,7 @@ namespace Iis.UnitTests.Services
             SetDefaultTowerLocations(
                 new TowerLocationEntity
                 {
-                    Id = Guid.NewGuid(),
+                    Id = 1,
                     Mcc = "346",
                     Mnc = "99",
                     Lac = "25010",

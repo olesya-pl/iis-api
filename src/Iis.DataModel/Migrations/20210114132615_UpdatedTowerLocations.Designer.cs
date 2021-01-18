@@ -3,15 +3,17 @@ using System;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Iis.DataModel.Migrations
+namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20210114132615_UpdatedTowerLocations")]
+    partial class UpdatedTowerLocations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1174,9 +1176,6 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.TowerLocationEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
                     b.Property<string>("CellId")
                         .HasColumnType("text");
 
@@ -1210,9 +1209,8 @@ namespace Iis.DataModel.Migrations
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("timestamp without time zone");
 
-                    b.HasKey("Id");
-
                     b.HasIndex("Mcc", "Mnc", "Lat", "CellId")
+                        .IsUnique()
                         .HasAnnotation("Npgsql:IndexInclude", new[] { "Lac", "Long" });
 
                     b.ToTable("TowerLocations");

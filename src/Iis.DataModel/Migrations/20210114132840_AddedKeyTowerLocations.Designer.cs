@@ -3,15 +3,17 @@ using System;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Iis.DataModel.Migrations
+namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20210114132840_AddedKeyTowerLocations")]
+    partial class AddedKeyTowerLocations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1213,6 +1215,7 @@ namespace Iis.DataModel.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Mcc", "Mnc", "Lat", "CellId")
+                        .IsUnique()
                         .HasAnnotation("Npgsql:IndexInclude", new[] { "Lac", "Long" });
 
                     b.ToTable("TowerLocations");
