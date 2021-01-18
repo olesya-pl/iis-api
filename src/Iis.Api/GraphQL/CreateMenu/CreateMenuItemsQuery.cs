@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Iis.Api.GraphQL.CreateMenu
 {
-    public class CreateMenuQuery
+    public class CreateMenuItemsQuery
     {
-        public async Task<List<CreateMenuItem>> GetCreateMenus([Service] IOntologySchema schema)
+        public List<CreateMenuItem> GetCreateMenuItems([Service] IOntologySchema schema)
         {
             var list = new List<CreateMenuItem>();
-            AddCreateMenuItem(list, "ObjectOfStudy", schema);
-            AddCreateMenuItem(list, "Wiki", schema);
+            AddCreateMenuItem(list, EntityTypeNames.ObjectOfStudy.ToString(), schema);
+            AddCreateMenuItem(list, EntityTypeNames.Wiki.ToString(), schema);
             return list;
         }
 
