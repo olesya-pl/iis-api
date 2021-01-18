@@ -6,6 +6,7 @@
         FuzzyDate,
         ObjectSign,
         Event, 
-        Enum
+        Enum,
+        Wiki
     }
 }
