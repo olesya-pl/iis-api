@@ -15,15 +15,13 @@ namespace Iis.Api.Ontology
     public class NodeToJObjectMapper
     {
         private readonly IOntologyService _ontologyService;
-        private readonly FileUrlGetter _fileUrlGetter;
+
         private readonly string[] EventDotNames = new[] {
             "name", "description", "updatedAt", "startsAt", "endsAt" };
 
-        public NodeToJObjectMapper(IOntologyService ontologyService,
-            FileUrlGetter fileUrlGetter)
+        public NodeToJObjectMapper(IOntologyService ontologyService)
         {
             _ontologyService = ontologyService;
-            _fileUrlGetter = fileUrlGetter;
         }
 
         public JObject NodeToJObject(Node node)
@@ -41,7 +39,7 @@ namespace Iis.Api.Ontology
                     {
                         var res = new JObject();
                         res.Add("id", p.Attribute.Value.ToString());
-                        res.Add("url", _fileUrlGetter.GetFileUrl((Guid)p.Attribute.Value));
+                        res.Add("url", FileUrlGetter.GetFileUrl((Guid)p.Attribute.Value));
                         return res;
                     })));
                 }
