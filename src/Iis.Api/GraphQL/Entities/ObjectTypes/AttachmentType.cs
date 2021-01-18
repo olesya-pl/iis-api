@@ -46,9 +46,9 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             }
 
             [GraphQLNonNullType]
-            public string GetUrl([Parent] Guid fileId, [Service] IHttpContextAccessor contextAccessor)
+            public string GetUrl([Parent] Guid fileId)
             {
-                return FileUrlGetter.GetFileUrl(fileId, contextAccessor);
+                return FileUrlGetter.GetFileUrl(fileId);
             }
         }
     }

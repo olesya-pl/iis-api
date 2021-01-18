@@ -19,16 +19,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     {
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly IReadOnlyCollection<string> _filterNodeTypeNames = new [] {"__title", "title", "lastConfirmedAt"};
-        private readonly IOntologyNodesData _ontologyData;
-        private readonly FileUrlGetter _fileUrlGetter;
-
-        public ExtNodeService(
-            IOntologyNodesData ontologyData,
-            FileUrlGetter fileUrlGetter)
-        {
-            _fileUrlGetter = fileUrlGetter;
-            _ontologyData = ontologyData;
-        }
 
         public IExtNode GetExtNode(INode node)
         {
@@ -199,7 +189,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     return new
                     {
                         fileId = value,
-                        url = _fileUrlGetter.GetFileUrl(new Guid(value))
+                        url = FileUrlGetter.GetFileUrl(new Guid(value))
                     };
                 case ScalarType.IntegerRange:
                 case ScalarType.FloatRange:
