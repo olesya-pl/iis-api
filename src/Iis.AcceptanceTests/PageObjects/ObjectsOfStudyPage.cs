@@ -116,7 +116,6 @@ namespace AcceptanceTests.PageObjects
         public IWebElement BigCardImportance;
 
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
-        [CacheLookup]
         public IWebElement OOSSearchCounter;
 
         [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]

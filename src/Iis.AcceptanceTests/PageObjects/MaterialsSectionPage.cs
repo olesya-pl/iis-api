@@ -1,4 +1,5 @@
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using SeleniumExtras.PageObjects;
 
 namespace AcceptanceTests.PageObjects
@@ -43,9 +44,9 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement ShowMLResultsButton;
 
-        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(5)")]
+        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(4)")]
         [CacheLookup]
-        public IWebElement EventsTab;
+        public IWebElement RelationsTab;
 
         [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
         public IWebElement ObjectsTab;
@@ -54,7 +55,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTab;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-header.material-relations__header > .el-select.material-relations-input")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='material-events']")]
         [CacheLookup]
         public IWebElement EventsTabSearch;
 
@@ -62,7 +63,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-popover__reference-wrapper > .el-input > .el-input__inner")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='material-objects']")]
         [CacheLookup]
         public IWebElement ObjectsTabSearch;
 
@@ -89,7 +90,6 @@ namespace AcceptanceTests.PageObjects
         public IWebElement Originator;
 
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
-        [CacheLookup]
         public IWebElement MaterialsSearchResultCounter;
 
         [FindsBy(How = How.CssSelector, Using = "button:nth-of-type(3) > span")]
@@ -125,5 +125,11 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
         [CacheLookup]
         public IWebElement DeleteRelatedObjectOfStudy;
+
+        public void ScrollDown()
+        {
+            Actions actions = new Actions(driver);
+            actions.SendKeys(Keys.Control).SendKeys(Keys.End).Perform();
+        }
     }
 }

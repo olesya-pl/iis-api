@@ -37,10 +37,10 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
         }
 
-        [When(@"I clicked on the events tab in the material card")]
+        [When(@"I clicked on the relations tab in the material card")]
         public void IClickedOnTheEventsTabInTheMaterialCard()
         {
-            materialsSectionPage.EventsTab.Click();
+            materialsSectionPage.RelationsTab.Click();
         }
 
         [When(@"I clicked on the objects tab in the material card")]
@@ -152,6 +152,12 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedConfirmButton()
         {
             materialsSectionPage.ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy.Click();
+        }
+
+        [When(@"I scrolled down to the bottom of the relations tab")]
+        public void WhenIScrolledDownToTheElementSearchFiledInTheRelationsTab()
+        {
+            materialsSectionPage.ScrollDown();
         }
         #endregion When
 

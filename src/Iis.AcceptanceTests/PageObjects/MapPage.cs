@@ -17,7 +17,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MapSection;
 
-        [FindsBy(How = How.CssSelector, Using = "[role] input.esri-search__input[type]")]
+        [FindsBy(How = How.XPath, Using = "//div[contains(@class, 'esri-search__input-container')]")]
         [CacheLookup]
         public IWebElement MapSearch;
     }
