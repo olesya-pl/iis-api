@@ -56,21 +56,6 @@ namespace Iis.Services
             };
         }
 
-        public bool IsIndexesValid(IEnumerable<string> indexes)
-        {
-            var notValidIndexes = indexes
-                          .Where(name => !_elasticState.OntologyIndexes.Contains(name))
-                          .ToList();
-
-            if (notValidIndexes.Any())
-            {
-                TryLog($"There are not valid index names in list: {string.Join(", ", notValidIndexes)}");
-                return false;
-            }
-
-            return true;
-        }
-
         public async Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
         {
             var indexesToDelete = isHistorical ? GetHistoricalIndexes(indexes) : indexes;
@@ -84,7 +69,7 @@ namespace Iis.Services
                 ct.ThrowIfCancellationRequested();
 
                 var attributesInfo = isHistorical
-                    ? _ontologySchema.GetHistoricalAttributesInfo(index, _elasticState.HistoricalOntologyIndexes[index])
+                    ? _ontologySchema.GetHistoricalAttributesInfo(index, GetHistoricalIndex(index))
                     : _ontologySchema.GetAttributesInfo(index);
 
                 var result = await _elasticManager.CreateMapping(attributesInfo, ct);
@@ -205,12 +190,7 @@ namespace Iis.Services
             }
         }
 
-        private List<string> GetHistoricalIndexes(IEnumerable<string> indexes)
-        {
-            return indexes
-                .Select(x => _elasticState.HistoricalOntologyIndexes.GetValueOrDefault(x))
-                .Where(x => !string.IsNullOrEmpty(x))
-                .ToList();
-        }
+        private string GetHistoricalIndex(string typeName) => $"historical_{typeName}";
+        private List<string> GetHistoricalIndexes(IEnumerable<string> indexes) => indexes.Select(x => GetHistoricalIndex(x)).ToList();
     }
 }
