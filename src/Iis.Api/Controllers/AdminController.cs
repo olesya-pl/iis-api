@@ -57,13 +57,13 @@ namespace Iis.Api.Controllers
         [HttpGet("ReInitializeWikiIndexes/{indexNames}")]
         public Task<IActionResult> ReInitializeWikiIndexes(string indexNames, CancellationToken ct)
         {
-            return CreateOntologyIndexes(indexNames, _elasticState.OntologyIndexes, false, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.WikiIndexes, false, ct);
         }
 
         [HttpGet("ReInitializeHistoricalWikiIndexes/{indexNames}")]
         public Task<IActionResult> ReInitializeHistoricalWikiIndexes(string indexNames, CancellationToken ct)
         {
-            return CreateOntologyIndexes(indexNames, _elasticState.OntologyIndexes, true, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.WikiIndexes, true, ct);
         }
 
         [HttpGet("ReInitializeSignIndexes/{indexNames}")]
