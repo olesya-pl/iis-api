@@ -211,6 +211,7 @@ namespace Iis.OntologySchema
             }
 
             nodeType.UniqueValueFieldName = updateParameter.UniqueValueFieldName;
+            nodeType.IconBase64Body = updateParameter.IconBase64Body;
 
             _storage.Aliases.Update(nodeType.Name, updateParameter.Aliases);
             return nodeType;
