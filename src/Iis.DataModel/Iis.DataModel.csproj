@@ -19,6 +19,8 @@
     <Compile Remove="Migrations\20200917101642_AddFlightRadarHistory.Designer.cs" />
     <Compile Remove="Migrations\20201013101322_AddedQueryResults.cs" />
     <Compile Remove="Migrations\20201013101322_AddedQueryResults.Designer.cs" />
+    <Compile Remove="Migrations\20210119103928_Add_Created_and_Updated.cs" />
+    <Compile Remove="Migrations\20210119103928_Add_Created_and_Updated.Designer.cs" />
     <Compile Update="Migrations\20201230000821_ChangeHistory_ParentTypeName.Designer.cs">
       <DependentUpon>20201230000821_ChangeHistory_ParentTypeName.cs</DependentUpon>
     </Compile>
