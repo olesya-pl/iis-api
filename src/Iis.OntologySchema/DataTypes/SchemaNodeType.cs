@@ -469,5 +469,13 @@ namespace Iis.OntologySchema.DataTypes
         {
             return GetAllOutgoingRelations().Where(r => r.NodeType.MetaObject.Formula != null).ToList();
         }
+
+        public string GetIconName()
+        {
+            return GetAllAncestors()
+                .Where(nt => !string.IsNullOrEmpty(nt.IconBase64Body))
+                .Select(nt => nt.Name)
+                .FirstOrDefault();
+        }
     }
 }

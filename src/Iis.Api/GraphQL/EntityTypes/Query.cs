@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -38,6 +39,18 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
             var type = ontology.GetEntityType(code);
             return Task.FromResult(type == null ? null : new EntityType(type, ontology));
+        }
+
+        public List<EntityTypeIconInfo> GetEntityTypeIcons([Service] IOntologySchema schema)
+        {
+            return schema.GetEntityTypes()
+                .Where(nt => !string.IsNullOrEmpty(nt.IconBase64Body))
+                .Select(nt => new EntityTypeIconInfo
+                {
+                    Name = nt.Name,
+                    IconBase64Body = nt.IconBase64Body
+                })
+                .ToList();
         }
     }
 }
