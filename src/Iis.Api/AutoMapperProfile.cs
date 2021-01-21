@@ -261,11 +261,13 @@ namespace Iis.Api
             //theme: graphQl input -> domain
             CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, ThemeDto>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Services.Contracts.User{ Id = src.UserId.Value }));
+                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Services.Contracts.User{ Id = src.UserId.Value }))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.UtcNow));
 
             CreateMap<IIS.Core.GraphQL.Themes.UpdateThemeInput, ThemeDto>()
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src =>
-                    src.UserId.HasValue ? new Services.Contracts.User { Id = src.UserId.Value } : null));
+                    src.UserId.HasValue ? new Services.Contracts.User { Id = src.UserId.Value } : null))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.UtcNow));
 
             // theme: domain -> entity
             CreateMap<ThemeDto, ThemeEntity>()

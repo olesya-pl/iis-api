@@ -13,5 +13,6 @@ namespace Iis.Services.Contracts.Dtos
         public User User { get; set; }
         public string Comment { get; set; }
         public string Meta { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }
