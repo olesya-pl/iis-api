@@ -96,7 +96,7 @@ namespace IIS.Core.GraphQL.Entities
                 .Type(objectType)
                 .Argument("id", d => d.Type<NonNullType<IdType>>())
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveEntity(ctx, type));
-            
+
             var criteriaInput = new CriteriaInputType(type);
             descriptor.Field($"entity{type.Name}List")
                 .Type(collectionType)

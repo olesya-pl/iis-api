@@ -19,6 +19,7 @@ namespace Iis.Interfaces.Ontology.Schema
         Kind Kind { get; }
         bool IsAbstract { get; }
         string UniqueValueFieldName { get; }
+        string IconBase64Body { get; }
         bool HasUniqueValues { get; }
         Type ClrType { get; }
         bool HasInversed { get; }
@@ -58,6 +59,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IOntologySchema Schema { get; }
         IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes();
         string Formula { get; }
+        string GetIconName();
     }
 
     public class NodeAggregationInfo

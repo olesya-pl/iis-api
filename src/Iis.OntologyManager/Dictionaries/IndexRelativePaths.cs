@@ -13,5 +13,7 @@
         public const string Reports = "ReInitializeSignIndexes/all";
 
         public const string Materials = "ReInitializeSignIndexes/all";
+        public const string Wiki = "ReInitializeWikiIndexes/all";
+        public const string WikiHistorical = "ReInitializeHistoricalWikiIndexes/all";
     }
 }

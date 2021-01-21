@@ -1,12 +1,15 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Iis.OntologySchema.ChangeParameters;
+using ImageMagick;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace Iis.OntologyManager.UiControls
 {
@@ -23,6 +26,8 @@ namespace Iis.OntologyManager.UiControls
         private DataGridView gridChildren;
         private Button btnSave;
         private CheckBox cbAbstract;
+        private PictureBox iconBox;
+        private string IconBase64Body;
 
         public event Action<IChildNodeType> OnShowRelationType;
         public event Action<IChildNodeType> OnShowTargetType;
@@ -62,7 +67,7 @@ namespace Iis.OntologyManager.UiControls
             txtTitle.Text = nodeType.Title;
             cbAbstract.Checked = nodeType.IsAbstract;
             txtAliases.Lines = aliases.ToArray();
-            
+
             var children = nodeType.GetAllChildren()
                 .OrderBy(ch => ch.InheritedFrom)
                 .ThenBy(ch => ch.RelationName)
@@ -80,6 +85,58 @@ namespace Iis.OntologyManager.UiControls
             gridInheritedFrom.DataSource = ancestors;
             gridInheritedBy.DataSource = nodeType.GetDirectDescendants();
             gridEmbeddence.DataSource = nodeType.GetNodeTypesThatEmbedded();
+
+            IconBase64Body = nodeType.IconBase64Body;
+            if (!string.IsNullOrEmpty(IconBase64Body))
+            {
+                var bytes = Convert.FromBase64String(IconBase64Body);
+                SetIcon(bytes);
+            }
+            else
+            {
+                iconBox.Image = null;
+            }
+        }
+        private bool SetIcon(byte[] bytes) => SetIcon(GetImage(bytes));
+        private bool SetIcon(Image image)
+        {
+            iconBox.Image = image;
+            if (image == null) return false;
+            Padding p = new Padding
+            {
+                Left = (iconBox.Width - image.Width) / 2,
+                Top = (iconBox.Height - image.Height) / 2
+            };
+            iconBox.Padding = p;
+            return true;
+        }
+        private Image GetImage(byte[] bytes)
+        {
+
+            try
+            {
+                using (var magickImage = new MagickImage(bytes))
+                {
+                    magickImage.Format = MagickFormat.Bmp;
+                    var bmpBytes = magickImage.ToByteArray();
+                    using (var ms = new MemoryStream(bmpBytes))
+                    {
+                        return new Bitmap(ms);
+                    }
+                }
+            }
+            catch
+            {
+            }
+            return null;
+        }
+        private void RemoveIcon()
+        {
+            if (MessageBox.Show("Ви дійсно хочете видалити іконку?", "Питання", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                IconBase64Body = null;
+                iconBox.Image = null;
+            }
         }
         public void CreateNew()
         {
@@ -136,6 +193,15 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(gridEmbeddence, "Embedded By:", true);
             _container.GoToNewColumn();
 
+            var btnChooseIcon = new Button { Text = "Вибрати іконку" };
+            btnChooseIcon.Click += (sender, e) => ChooseIcon();
+            _container.Add(btnChooseIcon);
+            var btnRemoveIcon = new Button { Text = "Видалити іконку" };
+            btnRemoveIcon.Click += (sender, e) => RemoveIcon();
+            _container.Add(btnRemoveIcon);
+            iconBox = new PictureBox { Height = 100 };
+            _container.Add(iconBox);
+
             _container.GoToBottom();
             _container.StepDown();
             _container.SetFullWidthColumn();
@@ -183,7 +249,8 @@ namespace Iis.OntologyManager.UiControls
                 IsAbstract = cbAbstract.Checked,
                 ParentTypeId = null,
                 Aliases = txtAliases.Lines,
-                UniqueValueFieldName = string.IsNullOrEmpty(cmbUniqueValueFieldName.Text) ? null : cmbUniqueValueFieldName.Text
+                UniqueValueFieldName = string.IsNullOrEmpty(cmbUniqueValueFieldName.Text) ? null : cmbUniqueValueFieldName.Text,
+                IconBase64Body = this.IconBase64Body
             };
         }
         private DataGridView GetRelationsGrid(string name)
@@ -238,6 +305,25 @@ namespace Iis.OntologyManager.UiControls
             style.SelectionBackColor = color;
             style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
             style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
+        }
+        private void ChooseIcon()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var bytes = File.ReadAllBytes(dialog.FileName);
+                IconBase64Body = Convert.ToBase64String(bytes);
+                if (!SetIcon(bytes))
+                {
+                    MessageBox.Show("Здається це не іконка");
+                }
+            }
         }
     }
 }

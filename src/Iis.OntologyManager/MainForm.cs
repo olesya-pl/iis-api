@@ -55,7 +55,7 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.27";
+        const string VERSION = "1.28";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -276,6 +276,10 @@ namespace Iis.OntologyManager
             menuElastic.Items[4].Click += (sender, e) => { ReindexElastic(IndexKeys.Reports); };
             menuElastic.Items.Add("Індекси Матеріалів");
             menuElastic.Items[5].Click += (sender, e) => { ReindexElastic(IndexKeys.Materials); };
+            menuElastic.Items.Add("Індекси Wiki");
+            menuElastic.Items[6].Click += (sender, e) => { ReindexElastic(IndexKeys.Wiki); };
+            menuElastic.Items.Add("Історічні Індекси Wiki");
+            menuElastic.Items[7].Click += (sender, e) => { ReindexElastic(IndexKeys.WikiHistorical); };
             var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
             btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
             container.Add(btnMenu);

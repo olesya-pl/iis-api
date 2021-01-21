@@ -24,7 +24,9 @@ namespace Iis.OntologyManager.Helpers
             { IndexKeys.Signs, IndexRelativePaths.Signs },
             { IndexKeys.Events, IndexRelativePaths.Events },
             { IndexKeys.Reports, IndexRelativePaths.Reports },
-            { IndexKeys.Materials, IndexRelativePaths.Materials}
+            { IndexKeys.Materials, IndexRelativePaths.Materials},
+            { IndexKeys.Wiki, IndexRelativePaths.Wiki },
+            { IndexKeys.WikiHistorical, IndexRelativePaths.WikiHistorical },
         };
 
         public RequestWraper(string apiAddress, UserCredentials userCredentials, RequestSettings requestSettings, ILogger logger)
@@ -73,13 +75,17 @@ namespace Iis.OntologyManager.Helpers
 
                 response.EnsureSuccessStatusCode();
 
-                return RequestResult.Success("Сутність видалено", response.RequestMessage.RequestUri);
+                var msg = response.Content.ReadAsStringAsync().Result;
+                if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
+
+                return RequestResult.Success(msg, response.RequestMessage.RequestUri);
             }
             catch (Exception exception)
             {
+                var msg = response.Content.ReadAsStringAsync().Result;
                 _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
 
-                return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}", response.RequestMessage.RequestUri);
+                return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
             }
         }
 

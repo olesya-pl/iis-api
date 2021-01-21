@@ -16,5 +16,6 @@ namespace Iis.Interfaces.Ontology.Schema
         Guid? TargetTypeId { get; }
         Guid? ParentTypeId { get; }
         string UniqueValueFieldName { get; }
+        string IconBase64Body { get; }
     }
 }
