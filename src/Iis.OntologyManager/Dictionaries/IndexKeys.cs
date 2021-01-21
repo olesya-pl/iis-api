@@ -7,6 +7,8 @@
         Signs,
         Events,
         Reports,
-        Materials
+        Materials,
+        Wiki,
+        WikiHistorical
     }
 }

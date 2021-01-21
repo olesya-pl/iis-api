@@ -1,6 +1,7 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Iis.OntologySchema.ChangeParameters;
+using ImageMagick;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace Iis.OntologyManager.UiControls
 {
@@ -92,26 +94,49 @@ namespace Iis.OntologyManager.UiControls
             }
             else
             {
-                RemoveIcon();
+                iconBox.Image = null;
             }
         }
-        private void SetIcon(byte[] bytes)
+        private bool SetIcon(byte[] bytes) => SetIcon(GetImage(bytes));
+        private bool SetIcon(Image image)
         {
-            using (var stream = new MemoryStream(bytes))
+            iconBox.Image = image;
+            if (image == null) return false;
+            Padding p = new Padding
             {
-                var image = Image.FromStream(stream);
-                iconBox.Image = image;
-                Padding p = new Padding
+                Left = (iconBox.Width - image.Width) / 2,
+                Top = (iconBox.Height - image.Height) / 2
+            };
+            iconBox.Padding = p;
+            return true;
+        }
+        private Image GetImage(byte[] bytes)
+        {
+
+            try
+            {
+                using (var magickImage = new MagickImage(bytes))
                 {
-                    Left = (iconBox.Width - image.Width) / 2,
-                    Top = (iconBox.Height - image.Height) / 2
-                };
-                iconBox.Padding = p;
+                    magickImage.Format = MagickFormat.Bmp;
+                    var bmpBytes = magickImage.ToByteArray();
+                    using (var ms = new MemoryStream(bmpBytes))
+                    {
+                        return new Bitmap(ms);
+                    }
+                }
             }
+            catch
+            {
+            }
+            return null;
         }
         private void RemoveIcon()
         {
-            iconBox.Image = null;
+            if (MessageBox.Show("Ви дійсно хочете видалити іконку?", "Питання", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                IconBase64Body = null;
+                iconBox.Image = null;
+            }
         }
         public void CreateNew()
         {
@@ -168,13 +193,14 @@ namespace Iis.OntologyManager.UiControls
             _container.Add(gridEmbeddence, "Embedded By:", true);
             _container.GoToNewColumn();
 
-            iconBox = new PictureBox { Height = 100 };
-            _container.Add(iconBox);
             var btnChooseIcon = new Button { Text = "Вибрати іконку" };
             btnChooseIcon.Click += (sender, e) => ChooseIcon();
             _container.Add(btnChooseIcon);
-            var btnDeleteIcon = new Button { Text = "Видалити іконку" };
-            _container.Add(btnDeleteIcon);
+            var btnRemoveIcon = new Button { Text = "Видалити іконку" };
+            btnRemoveIcon.Click += (sender, e) => RemoveIcon();
+            _container.Add(btnRemoveIcon);
+            iconBox = new PictureBox { Height = 100 };
+            _container.Add(iconBox);
 
             _container.GoToBottom();
             _container.StepDown();
@@ -293,7 +319,10 @@ namespace Iis.OntologyManager.UiControls
             {
                 var bytes = File.ReadAllBytes(dialog.FileName);
                 IconBase64Body = Convert.ToBase64String(bytes);
-                SetIcon(bytes);
+                if (!SetIcon(bytes))
+                {
+                    MessageBox.Show("Здається це не іконка");
+                }
             }
         }
     }
