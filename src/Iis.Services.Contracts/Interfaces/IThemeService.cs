@@ -1,4 +1,5 @@
 ﻿using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Params;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<Guid> CreateThemeAsync(ThemeDto theme);
         Task<ThemeDto> DeleteThemeAsync(Guid themeId);
         Task<ThemeDto> GetThemeAsync(Guid themeId);
-        Task<IEnumerable<ThemeDto>> GetThemesByUserIdAsync(Guid userId);
+        Task<IEnumerable<ThemeDto>> GetThemesByUserIdAsync(Guid userId, SortingParams sorting);
         Task<ThemeTypeDto> GetThemeTypeByEntityTypeNameAsync(string entityTypeName);
         Task<IEnumerable<ThemeTypeDto>> GetThemeTypesAsync();
         Task<ThemeDto> SetReadCount(Guid themeId, int readCount);

@@ -1115,6 +1115,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("TypeId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
