@@ -28,5 +28,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
         Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx);
         Task<string> ResolveCreatedBy(IResolverContext ctx);
+        string ResolveIconName(IResolverContext ctx);
     }
 }

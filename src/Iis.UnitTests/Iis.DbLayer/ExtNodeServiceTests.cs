@@ -40,9 +40,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService(
-                new Mock<IOntologyNodesData>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+            var sut = new ExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -72,9 +70,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService(
-                new Mock<IOntologyNodesData>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+            var sut = new ExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -104,9 +100,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService(
-                new Mock<IOntologyNodesData>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+            var sut = new ExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -136,9 +130,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService(
-                new Mock<IOntologyNodesData>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+            var sut = new ExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -168,9 +160,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService(
-                new Mock<IOntologyNodesData>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+            var sut = new ExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -200,9 +190,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService(
-                new Mock<IOntologyNodesData>().Object,
-                new FileUrlGetter(new Mock<IHttpContextAccessor>().Object));
+            var sut = new ExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert

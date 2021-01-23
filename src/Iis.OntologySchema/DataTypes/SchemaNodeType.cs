@@ -289,7 +289,8 @@ namespace Iis.OntologySchema.DataTypes
                 && Kind == nodeType.Kind
                 && IsAbstract == nodeType.IsAbstract
                 && UniqueValueFieldName == nodeType.UniqueValueFieldName
-                && scalarTypesAreEqual;
+                && scalarTypesAreEqual
+                && IconBase64Body == nodeType.IconBase64Body;
         }
 
         public Dictionary<string, string> GetPropertiesDict()
@@ -306,6 +307,7 @@ namespace Iis.OntologySchema.DataTypes
             dict["RelationKind"] = RelationType?.Kind.ToString() ?? string.Empty;
             dict["RelationSourceName"] = RelationType?.SourceType.Name ?? string.Empty;
             dict["RelationTargetName"] = RelationType?.TargetType.Name ?? string.Empty;
+            dict[nameof(IconBase64Body)] = IconBase64Body;
             return dict;
         }
 
@@ -521,5 +523,13 @@ namespace Iis.OntologySchema.DataTypes
             RelationType.TargetType.Kind == Kind.Attribute ?
                 RelationType.TargetType :
                 null;
+
+        public string GetIconName()
+        {
+            return GetAllAncestors()
+                .Where(nt => !string.IsNullOrEmpty(nt.IconBase64Body))
+                .Select(nt => nt.Name)
+                .FirstOrDefault();
+        }
     }
 }

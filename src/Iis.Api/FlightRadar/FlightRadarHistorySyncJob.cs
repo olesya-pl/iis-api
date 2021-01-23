@@ -61,7 +61,8 @@ namespace IIS.Core.FlightRadar
 
         private async Task SyncRoutesAsync(List<Routes> routes)
         {
-            var icaoGroups = routes.GroupBy(p => p.Callsign);
+            var icaoGroups = routes.GroupBy(p => p.Flight?.Plane?.Icao)
+                .Where(ig => !string.IsNullOrEmpty(ig.Key));
             var saveFlightHistoryTasks = new List<Task>();
 
             foreach (var icaoGroup in icaoGroups)
@@ -76,6 +77,8 @@ namespace IIS.Core.FlightRadar
         {
             using var flightContext = _provider.GetRequiredService<FlightsContext>();
             return await flightContext.Routes
+                    .Include(p => p.Flight)
+                    .ThenInclude(p => p.Plane)
                 .Where(p => p.Id > minId.LatestProcessedId)
                 .OrderBy(p => p.Id)
                 .Take(batchSize)

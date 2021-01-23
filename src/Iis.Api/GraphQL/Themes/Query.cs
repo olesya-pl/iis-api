@@ -2,6 +2,7 @@ using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 using IIS.Core.GraphQL.Common;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,9 @@ namespace IIS.Core.GraphQL.Themes
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid userId)
         {
-            var themes = await themeService.GetThemesByUserIdAsync(userId);
+            var sortingParam = new SortingParams("updatedAt", "desc");
+
+            var themes = await themeService.GetThemesByUserIdAsync(userId, sortingParam);
 
             var graphThemes = mapper.Map<List<Theme>>(themes);
 

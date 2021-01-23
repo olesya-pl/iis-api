@@ -4,6 +4,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
+using Iis.Interfaces.Constants;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {

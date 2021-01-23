@@ -14,7 +14,7 @@ namespace Iis.OntologyManager.UiControls
 {
     public class UiComparisonControl: UIBaseControl
     {
-        List<IOntologySchemaSource> _schemaSources;
+        IReadOnlyCollection<IOntologySchemaSource> _schemaSources;
         OntologySchemaService _schemaService;
         IOntologySchema _schema;
         ISchemaCompareResult _compareResult;
@@ -25,8 +25,9 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbComparisonUpdate;
         CheckBox cbComparisonDelete;
         CheckBox cbComparisonAliases;
+        public List<string> UpdatedDatabases = new List<string>();
 
-        public UiComparisonControl(List<IOntologySchemaSource> schemaSources,
+        public UiComparisonControl(IReadOnlyCollection<IOntologySchemaSource> schemaSources,
             OntologySchemaService schemaService,
             IOntologySchema schema)
         {
@@ -72,6 +73,7 @@ namespace Iis.OntologyManager.UiControls
             panels.panelBottom.Controls.Add(txtComparison);
 
             MainPanel.ResumeLayout();
+            CompareSchemas(src.FirstOrDefault());
         }
         private string GetCompareText(ISchemaCompareResult compareResult)
         {
@@ -109,9 +111,9 @@ namespace Iis.OntologyManager.UiControls
 
             return sb.ToString();
         }
-        private void CompareSchemas()
+        public void CompareSchemas(IOntologySchemaSource source = null)
         {
-            var selectedSource = (IOntologySchemaSource)cmbSchemaSourcesCompare.SelectedItem;
+            var selectedSource = source ?? (IOntologySchemaSource)cmbSchemaSourcesCompare.SelectedItem;
             if (selectedSource == null) return;
 
             var schema = _schemaService.GetOntologySchema(selectedSource);
@@ -137,6 +139,7 @@ namespace Iis.OntologyManager.UiControls
             };
 
             schemaSaver.SaveToDatabase(_compareResult, schema, parameters);
+            UpdatedDatabases.Add(_compareResult.SchemaSource.Title);
             CompareSchemas();
         }
     }

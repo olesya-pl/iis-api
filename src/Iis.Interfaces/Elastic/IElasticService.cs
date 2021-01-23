@@ -20,5 +20,6 @@ namespace Iis.Interfaces.Elastic
         Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, string[] fieldNames, int size, CancellationToken ct = default);
         Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
         Task<int> CountEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default);
+        Task<bool> DeleteNodeAsync(Guid id, string typeName, CancellationToken ct = default);
     }
 }

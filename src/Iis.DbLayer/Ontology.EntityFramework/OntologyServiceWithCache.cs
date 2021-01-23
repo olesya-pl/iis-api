@@ -3,6 +3,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyModelWrapper;
+using Iis.OntologyData.DataTypes;
 using Iis.Utility;
 using System;
 using System.Collections.Generic;
@@ -61,8 +62,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Select(r => r.SourceNode);
             return events;
         }
-
-        
 
         public IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId)
         {
@@ -200,9 +199,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public Node LoadNodes(Guid nodeId)
+        public Node GetNode(Guid nodeId)
         {
             var node = _data.GetNode(nodeId);
+
+            if(node is null) return null;
+
             return MapNode(node);
         }
         public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<INodeTypeLinked> relationTypes)
@@ -210,15 +212,25 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var nodes = _data.GetNodes(nodeIds.Distinct());
             return nodes.Select(n => MapNode(n, relationTypes)).ToList();
         }
-        public void RemoveNode(Node source)
+
+        public void RemoveNodeAndRelations(Node node)
         {
-            _data.RemoveNode(source.Id);
+            _data.RemoveNodeAndRelations(node.Id);
         }
+
+        public void RemoveNode(Node node)
+        {
+            _data.RemoveNode(node.Id);
+        }
+
         public void SaveNode(Node source)
         {
             _data.WriteLock(() =>
             {
                 var node = _data.GetNode(source.Id) ?? _data.CreateNode(source.Type.Id, source.Id);
+
+                _data.SetNodeUpdatedAt(source.Id, source.UpdatedAt);
+
                 SaveRelations(source, node);
             });
         }
@@ -251,7 +263,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (sourceRelation == null && existingRelation != null)
             {
-                _data.RemoveNode(existingRelation.Id);
+                _data.RemoveNodeAndRelations(existingRelation.Id);
             }
             else if (sourceRelation != null && existingRelation == null)
             {
@@ -263,7 +275,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 Guid targetId = sourceRelation.Target.Id;
                 if (existingId != targetId)
                 {
-                    _data.RemoveNode(existingRelation.Id);
+                    _data.RemoveNodeAndRelations(existingRelation.Id);
                     CreateRelation(sourceRelation, existing.Id);
                 }
             }

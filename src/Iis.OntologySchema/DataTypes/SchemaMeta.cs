@@ -25,6 +25,7 @@ namespace Iis.OntologySchema.DataTypes
         public IValidation Validation { get; set; }
         public ISchemaMeta Inversed { get; set; }
         public bool? IsAggregated { get; set; }
+        public bool? IsImportantRelation { get; set; }
         public string Code { get; set; }
         public bool Editable { get; set; }
 
@@ -52,6 +53,10 @@ namespace Iis.OntologySchema.DataTypes
             if (jObj.ContainsKey("IsAggregated"))
             {
                 IsAggregated = bool.Parse(jObj["IsAggregated"].ToString());
+            }
+            if (jObj.ContainsKey("IsImportantRelation"))
+            {
+                IsImportantRelation = bool.Parse(jObj["IsImportantRelation"].ToString());
             }
             if (jObj.ContainsKey("Title"))
             {

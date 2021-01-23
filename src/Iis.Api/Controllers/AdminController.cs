@@ -45,13 +45,25 @@ namespace Iis.Api.Controllers
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
         public Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken ct)
         {
-            return RecreateOntologyIndexes(indexNames, false, true, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.OntologyIndexes, false, ct);
         }
 
         [HttpGet("ReInitializeHistoricalOntologyIndexes/{indexNames}")]
         public Task<IActionResult> ReInitializeHistoricalOntologyIndexes(string indexNames, CancellationToken ct)
         {
-            return RecreateOntologyIndexes(indexNames, true, true, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.OntologyIndexes, true, ct);
+        }
+
+        [HttpGet("ReInitializeWikiIndexes/{indexNames}")]
+        public Task<IActionResult> ReInitializeWikiIndexes(string indexNames, CancellationToken ct)
+        {
+            return CreateOntologyIndexes(indexNames, _elasticState.WikiIndexes, false, ct);
+        }
+
+        [HttpGet("ReInitializeHistoricalWikiIndexes/{indexNames}")]
+        public Task<IActionResult> ReInitializeHistoricalWikiIndexes(string indexNames, CancellationToken ct)
+        {
+            return CreateOntologyIndexes(indexNames, _elasticState.WikiIndexes, true, ct);
         }
 
         [HttpGet("ReInitializeSignIndexes/{indexNames}")]
@@ -87,35 +99,6 @@ namespace Iis.Api.Controllers
 
         }
 
-        private async Task<IActionResult> RecreateOntologyIndexes(string indexNames, bool isHistorical, bool useNodesFromMemory, CancellationToken ct)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            _adminElasticService.Logger = new StringBuilder();
-
-            IEnumerable<string> indexes;
-            if (indexNames == AllIndexes)
-            {
-                indexes = _elasticState.OntologyIndexes;
-            }
-            else
-            {
-                indexes = indexNames.Split(",");
-
-                if (!_adminElasticService.IsIndexesValid(indexes))
-                    return Content(_adminElasticService.Logger.ToString());
-            }
-
-            await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
-
-            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
-            
-            await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
-
-            _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
-
-            return Content(_adminElasticService.Logger.ToString());
-        }
-
         [HttpGet("RecreateElasticReportIndex")]
         public async Task<IActionResult> RecreateReportIndex(CancellationToken ct) 
         {
@@ -149,7 +132,13 @@ namespace Iis.Api.Controllers
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
                 DenseVectorProperty.Create("ImageVector", MaterialDocument.ImageVectorDimensionsCount),
-                KeywordProperty.Create("ProcessedStatus.Title", false)
+                KeywordProperty.Create("ProcessedStatus.Title", false),
+                KeywordProperty.Create("Completeness.Title", false),
+                KeywordProperty.Create("Importance.Title", false),
+                KeywordProperty.Create("Reliability.Title", false),
+                KeywordProperty.Create("Relevance.Title", false),
+                KeywordProperty.Create("SourceReliability.Title", false),
+                KeywordProperty.Create("SessionPriority.Title", false),
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
@@ -198,10 +187,15 @@ namespace Iis.Api.Controllers
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var indexes = indexNames == AllIndexes ? baseIndexList : baseIndexList.Where(indexName => indexNames.Split(",").Contains(indexName, StringComparer.OrdinalIgnoreCase)).ToList();
+            var indexes = indexNames == AllIndexes ? baseIndexList : indexNames.Split(",");
+                
+            var notValidIndexes = indexes.Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase)).ToList();
 
-            if(!indexes.Any()) return Content("There is no valid index names were provided.");
-            
+            if (notValidIndexes.Any())
+            {
+                return Content($"There are not valid index names in list: {string.Join(", ", notValidIndexes)}");
+            }
+
             _adminElasticService.Logger  = new StringBuilder();
 
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);

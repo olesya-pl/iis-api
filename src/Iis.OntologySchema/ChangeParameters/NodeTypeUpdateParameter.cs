@@ -18,5 +18,6 @@ namespace Iis.OntologySchema.ChangeParameters
         public Guid? TargetTypeId { get; set; }
         public Guid? ParentTypeId { get; set; }
         public string UniqueValueFieldName { get; set; }
+        public string IconBase64Body { get; set; }
     }
 }

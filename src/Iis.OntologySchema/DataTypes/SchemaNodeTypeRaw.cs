@@ -17,5 +17,6 @@ namespace Iis.OntologySchema.DataTypes
         public Kind Kind { get; set; }
         public bool IsAbstract { get; set; }
         public string UniqueValueFieldName { get; set; }
+        public string IconBase64Body { get; set; }
     }
 }

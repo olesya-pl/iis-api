@@ -14,5 +14,6 @@ namespace Iis.DataModel.Themes
         public int ReadQueryResults { get; set; }
         public string Meta { get; set; }
         public string QueryRequest { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -21,5 +21,6 @@ namespace Iis.OntologySchema.DataTypes
         bool? IsAggregated { get; }
         string Code { get; }
         bool Editable { get; }
+        public bool? IsImportantRelation { get; }
     }
 }

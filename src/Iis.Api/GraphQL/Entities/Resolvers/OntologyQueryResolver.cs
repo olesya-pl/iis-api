@@ -223,5 +223,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
             return string.Empty;
         }
+
+        public string ResolveIconName(IResolverContext ctx) =>
+            ctx.Parent<Node>().OriginalNode.NodeType.GetIconName();
     }
 }

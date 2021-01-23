@@ -16,6 +16,7 @@ namespace Iis.DataModel
         public Kind Kind { get; set; }
         public bool IsAbstract { get; set; }
         public string UniqueValueFieldName { get; set; }
+        public string IconBase64Body { get; set; }
 
         public virtual List<RelationTypeEntity> IncomingRelations { get; set; } = new List<RelationTypeEntity>();
         public virtual List<RelationTypeEntity> OutgoingRelations { get; set; } = new List<RelationTypeEntity>();

@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Iis.Domain;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Utility;
-
 using Newtonsoft.Json.Linq;
+using Iis.Domain;
+using Iis.Utility;
+using Iis.Interfaces.Ontology.Schema;
 
+using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 
 namespace Iis.Api.Ontology
@@ -15,15 +15,13 @@ namespace Iis.Api.Ontology
     public class NodeToJObjectMapper
     {
         private readonly IOntologyService _ontologyService;
-        private readonly FileUrlGetter _fileUrlGetter;
+
         private readonly string[] EventDotNames = new[] {
             "name", "description", "updatedAt", "startsAt", "endsAt" };
 
-        public NodeToJObjectMapper(IOntologyService ontologyService,
-            FileUrlGetter fileUrlGetter)
+        public NodeToJObjectMapper(IOntologyService ontologyService)
         {
             _ontologyService = ontologyService;
-            _fileUrlGetter = fileUrlGetter;
         }
 
         public JObject NodeToJObject(Node node)
@@ -40,9 +38,8 @@ namespace Iis.Api.Ontology
                     result.Add(new JProperty(attribute.Key, attribute.Select(p =>
                     {
                         var res = new JObject();
-                        
                         res.Add("id", p.Attribute.Value.ToString());
-                        res.Add("url", _fileUrlGetter.GetFileUrl((Guid)p.Attribute.Value));
+                        res.Add("url", FileUrlGetter.GetFileUrl((Guid)p.Attribute.Value));
                         return res;
                     })));
                 }
@@ -69,19 +66,19 @@ namespace Iis.Api.Ontology
             return result;
         }
 
-        public async Task<EventAssociatedWithEntity> EventToAssociatedWithEntity(Node node)
+        public EventAssociatedWithEntity EventToAssociatedWithEntity(Node node)
         {
             var result = new JObject(new JProperty(nameof(node.Id).ToLower(), node.Id.ToString("N")));
 
             var importanceId = node.Nodes.FirstOrDefault(p => p.Type.Name == "importance").Nodes.First().Id;
             var stateId = node.Nodes.FirstOrDefault(p => p.Type.Name == "state").Nodes.First().Id;
 
-            var importanceAttributes = (_ontologyService.LoadNodes(importanceId)).GetChildAttributes();
-            var stateAttributes = (_ontologyService.LoadNodes(stateId)).GetChildAttributes();
+            var importanceAttributes = (_ontologyService.GetNode(importanceId)).GetChildAttributes();
+            var stateAttributes = (_ontologyService.GetNode(stateId)).GetChildAttributes();
 
             var attributies = node.GetChildAttributes();
 
-            var res = new EventAssociatedWithEntity {
+            var associatedEvent = new EventAssociatedWithEntity {
                 Id = node.Id,
                 Name = attributies.FirstOrDefault(p => p.dotName == "name").attribute?.Value as string,
                 Description = attributies.FirstOrDefault(p => p.dotName == "description").attribute?.Value as string,
@@ -101,7 +98,7 @@ namespace Iis.Api.Ontology
                 }
             };
 
-            return res;
+            return associatedEvent;
         }
 
         public JObject EventToJObject(Node node)

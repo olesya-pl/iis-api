@@ -72,18 +72,20 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             INodeTypeLinked type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
         {
-            var node = (Entity)_ontologyService.LoadNodes(id);
+            var node = (Entity)_ontologyService.GetNode(id);
             if (node == null)
                 throw new ArgumentException($"There is no entity with id {id}");
             if (!type.IsAssignableFrom(node.Type)) // no direct checking of types - we can update child as its base type
                 throw new ArgumentException($"Type {node.Type.Name} can not be updated as {type.Name}");
+
+            node.UpdatedAt = DateTime.UtcNow;
 
             if (type.HasUniqueValues && properties.ContainsKey(type.UniqueValueFieldName) && node.GetProperty(type.UniqueValueFieldName) != null)
             {
                 var newNode = await _mutationCreateResolver.CreateEntity(id, type, dotName, properties);
                 if (newNode.Id != node.Id)
                 {
-                    node = (Entity)_ontologyService.LoadNodes(newNode.Id);
+                    node = (Entity)_ontologyService.GetNode(newNode.Id);
                 }
             }
             else
@@ -196,7 +198,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     {
                         node.RemoveNode(relation);
                         var newRelation = new Relation(Guid.NewGuid(), embed);
-                        var target = (Entity)_ontologyService.LoadNodes(updatedNode.Id);
+                        var target = (Entity)_ontologyService.GetNode(updatedNode.Id);
                         newRelation.AddNode(target);
                         node.AddNode(newRelation);
                     }
@@ -296,7 +298,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 await _changeHistoryService
                     .SaveNodeChange(child.dotName, _rootNodeId,
-                        GetCurrentUserName(), child.attribute.Value.ToString(), string.Empty, requestId);
+                        GetCurrentUserName(), child.attribute.Value.ToString(), string.Empty, 
+                        relation.Target.Type.Name,
+                        requestId);
             }
         }
     }

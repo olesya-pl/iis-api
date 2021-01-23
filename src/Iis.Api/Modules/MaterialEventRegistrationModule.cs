@@ -6,6 +6,7 @@ using IIS.Core;
 using IIS.Core.Materials;
 using IIS.Core.Materials.Handlers;
 using IIS.Core.Materials.Handlers.Configurations;
+using Iis.Api.Materials;
 
 namespace Iis.Api.Modules
 {
@@ -13,7 +14,8 @@ namespace Iis.Api.Modules
     {
         private const string eventSectionName = "materialEventPublisher";
         private const string assignerSectionName = "operatorAssigner";
-        private const string featureHandlerSectionName = "featureHandler"; 
+        private const string featureHandlerSectionName = "featureHandler";
+        private const string elasticSaverSectionName = "elasticSaver";
         public static IServiceCollection RegisterMaterialEventServices(this IServiceCollection services, IConfiguration configuration)
         {
             var gsmWorkerUrl = configuration.GetValue<string>("gsmWorkerUrl");
@@ -24,14 +26,18 @@ namespace Iis.Api.Modules
                                             .Get<MaterialOperatorAssignerConfiguration>();
             var featureHandlerConfig = configuration.GetSection(featureHandlerSectionName)
                                                     .Get<FeatureHandlerConfig>();
+            var elasticSaver = configuration.GetSection(elasticSaverSectionName)
+                                                    .Get<CreatedMaterialElasticSaverConfiguration>();
 
             return services
                         .AddSingleton<MaterialEventConfiguration>(serviceProvider => meConfig)
                         .AddSingleton(assignerConfig)
                         .AddSingleton(featureHandlerConfig)
+                        .AddSingleton(elasticSaver)
                         .AddTransient<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl))
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
                         .AddHostedService<MaterialOperatorAssigner>()
+                        .AddHostedService<CreatedMaterialElasticSaver>()
                         .AddHostedService<FeatureHandler>();
         }
     }

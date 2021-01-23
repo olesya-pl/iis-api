@@ -19,6 +19,7 @@ using IIS.Repository.Factories;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
+using Iis.Interfaces.Constants;
 
 namespace IIS.Core.Materials.Handlers
 {
@@ -106,7 +107,7 @@ namespace IIS.Core.Materials.Handlers
 
             JObject metadata = JObject.Parse(material.Metadata);
 
-            metadata = await processor.ProcessMetadataAsync(metadata);
+            metadata = await processor.ProcessMetadataAsync(metadata, material.Id);
 
             material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 

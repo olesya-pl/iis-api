@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
@@ -110,6 +111,150 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.GetHierarchyCardByTitle(cardName).Expand();
         }
+
+        [When(@"I clicked on the create a new object of study button")]
+        public void WhenIClickOnTheCreateANewObjectOfStudyButton()
+        {
+            objectsOfStudyPage.CreateANewObjectOfStudyButton.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I clicked on the create a new military organization button")]
+        public void WhenIClickOnTheCreateANewMilitaryOrganizationButton()
+        {
+            objectsOfStudyPage.CreateAMilitaryOrganizationButton.Click();
+        }
+
+        [When(@"I entered the (.*) value in the affiliation field")]
+        public void WhenIEnteredTheValueInTheAffiliationField(string value)
+        {
+            objectsOfStudyPage.AffiliationField.SendKeys(value);
+            objectsOfStudyPage.AffiliationField.SendKeys(Keys.Down);
+            objectsOfStudyPage.AffiliationField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I entered the (.*) value in the importance field")]
+        public void WhenIEnteredTheValueInTheImportanceField(string value)
+        {
+            objectsOfStudyPage.ImportanceField.SendKeys(value);
+            objectsOfStudyPage.ImportanceField.SendKeys(Keys.Down);
+            objectsOfStudyPage.ImportanceField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I entered the (.*) value in the name real full field")]
+        public void WhenIEnteredTheValueInTheRealNameFullField(string objectOfStudyName)
+        {
+            var objectOfStudyUniqueName = $"{objectOfStudyName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid():N}";
+            context.SetResponse("objectOfStudyName", objectOfStudyUniqueName);
+            objectsOfStudyPage.RealNameFullField.SendKeys(objectOfStudyUniqueName);
+            objectsOfStudyPage.RealNameFullField.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I clicked on the save button to create a new object of study")]
+        public void WhenIClickedOnTheSaveButtonToCreateANewObjectOfStudy()
+        {
+            objectsOfStudyPage.SaveObjectOfStudyButton.Click();
+            driver.WaitFor(1);
+        }
+
+        [When(@"I clicked on the confirm save button to create a new object of study")]
+        public void WhenIClickedOnTheConfirmSaveButtonToCreateANewObjectOfStudy()
+        {
+            objectsOfStudyPage.ConfirmSaveOfANewObjectOfStudyButton.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I clicked on the classifiers block")]
+        public void WhenIClickedOnTheClassifiersBlock()
+        {
+            objectsOfStudyPage.ClassifierBlock.Click();
+            driver.WaitFor(1);
+        }
+
+        [When(@"I clicked on the dislocation block")]
+        public void WhenIClickedOnTheDislocationBlock()
+        {
+            objectsOfStudyPage.DislocationBlock.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I clicked on the temporary dislocation block")]
+        public void WhenIClickedOnTheTemporaryDislocationBlock()
+        {
+            objectsOfStudyPage.TemporaryDislocationBlock.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I entered the (.*) value in the latitude field at the dislocation block")]
+        public void WhenIEnteredTheValueInTheLatitudeField(string value)
+        {
+            objectsOfStudyPage.LatitudeField.SendKeys(value);
+        }
+
+        [When(@"I entered the (.*) value in the country field at the dislocation block")]
+        public void WhenIEnteredTheValueInTheCountryField(string value)
+        {
+            objectsOfStudyPage.CountryFieldInTheDisclocationBlock.SendKeys(value);
+            driver.WaitFor(2);
+            objectsOfStudyPage.CountryFieldInTheDisclocationBlock.SendKeys(Keys.Down);
+            objectsOfStudyPage.CountryFieldInTheDisclocationBlock.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I entered the (.*) value in the country field at the temporary dislocation block")]
+        public void WhenIEnteredTheValueInTheCountryFieldTempDis(string value)
+        {
+            objectsOfStudyPage.CountryFieldInTheTemporaryDisclocationBlock.SendKeys(value);
+            driver.WaitFor(2);
+            objectsOfStudyPage.CountryFieldInTheTemporaryDisclocationBlock.SendKeys(Keys.Down);
+            objectsOfStudyPage.CountryFieldInTheTemporaryDisclocationBlock.SendKeys(Keys.Enter);
+        }
+
+
+        [When(@"I entered the (.*) value in the longitude field at dislocation block")]
+        public void WhenIEnteredTheValueInTheLongitudeFieldAtTheDislocationBlock(string value)
+        {
+            objectsOfStudyPage.LongitudeField.SendKeys(value);
+        }
+
+        [When(@"I entered the (.*) value in the longitude field at temporary dislocation block")]
+        public void WhenIEnteredTheValueInTheLongitudeFieldAtTheTemporaryDislocationBlock(string value)
+        {
+            objectsOfStudyPage.TemporaryDislocationLongitudeField.SendKeys(value);
+        }
+
+        [When(@"I entered the (.*) value in the latitude field at the temporary dislocation block")]
+        public void WhenIEnteredTheValueInTheLatitudeFieldAtTheTemporaryDislocationBlock(string value)
+        {
+            objectsOfStudyPage.TemporaryDislocationLatitudeField.SendKeys(value);
+        }
+
+        [When(@"I clicked on the general info block")]
+        public void WhenIClickedOnTheGeneralBlock()
+        {
+            objectsOfStudyPage.GeneralInfoBlock.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I entered the (.*) value in the direct reporting relationship field")]
+        public void WhenIEnteredTheValueInTheDirectReportingRelationShipField(string value)
+        {
+            objectsOfStudyPage.DirectReportingRelationship.SendKeys(value);
+            driver.WaitFor(8);
+            objectsOfStudyPage.DirectReportingRelationship.SendKeys(Keys.Down);
+            objectsOfStudyPage.DirectReportingRelationship.SendKeys(Keys.Enter);
+        }
+
+        [When(@"I scrolled down to the (.*) element")]
+        public void WhenIScrolledDownToTheElement(string element)
+        {
+            objectsOfStudyPage.ScrollDown(element);
+        }
+
+        [When(@"I navigated to the Events tab in the big object of study card")]
+        public void WhenINavigatedToTheEventTabInTheBigObjectOfStudyCard()
+        {
+            objectsOfStudyPage.EventsTabInTheBigObjectOfStudyCard.Click();
+        }
         #endregion
 
         #region Then
@@ -208,10 +353,21 @@ namespace AcceptanceTests.UISteps
             }
         }
 
-        [Then(@"I must see third brigade Berkut as one of the search results")]
-        public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResults()
+        [Then(@"I must see the (.*) as one of the search results")]
+        public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResults(string value)
         {
-            Assert.True(objectsOfStudyPage.ThirdBrigadeSearchResult.Displayed);
+            //Assert.True(objectsOfStudyPage.ThirdBrigadeSearchResult.Displayed);
+            Assert.True(objectsOfStudyPage.GetObjectByTitle(value).Displayed);
+        }
+
+        [Then(@"I must see the specified result")]
+        public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResultss(Table table)
+        {
+            foreach (TableRow row in table.Rows)
+            {
+                var tableValue = row.Values.First();
+                Assert.True(objectsOfStudyPage.GetObjectByTitle(tableValue).Displayed);
+            }
         }
 
         [Then(@"I must see name real full is equal to the (.*) value")]
@@ -221,6 +377,12 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedValue, actualValue);
         }
 
+        [Then(@"I must see that the (.*) event related to the object of study")]
+        public void WhenIMustSeeAsRelatedToTheObjectOfStudyEvent(string eventName)
+        {
+            var eventUniqueName = context.Get<string>(eventName);
+            Assert.Contains(objectsOfStudyPage.Events, _ => _.Name == eventUniqueName);
+        }
         #endregion
     }
 }

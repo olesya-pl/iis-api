@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
@@ -9,6 +10,6 @@ namespace IIS.Core.Materials.FeatureProcessors
     public interface IFeatureProcessor
     {
         bool IsDummy { get; }
-        Task<JObject> ProcessMetadataAsync(JObject metadata);
+        Task<JObject> ProcessMetadataAsync(JObject metadata, Guid materialId);
     }
 }

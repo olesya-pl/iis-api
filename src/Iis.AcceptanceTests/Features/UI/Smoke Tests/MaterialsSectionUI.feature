@@ -6,7 +6,7 @@ Feature: MaterialsSectionUI - Smoke
     - IIS-6188 - Ensure that the material card can be opened
     - IIS-6192 - Open events tab relation in the materials card
     - IIS-6189 - Open general tab in the materials card
-    - IIS-6191 - Open objects tab in the materials card
+    - IIS-6191 - Open relations tab in the materials card and ensure that objects search is present
     - IIS-6190 - Open ML tab in the materials card
 
     Background:
@@ -42,10 +42,12 @@ Feature: MaterialsSectionUI - Smoke
         Then I must see relevance drop down in the materials card
 
     @smoke @UI @MaterialsCardEventsTabUI
-    Scenario: IIS-6192 - Open events tab relation in the materials card
+    Scenario: IIS-6192 - Open relations tab in the materials card and ensure that events search is present
         When I navigated to Materials page
+        And I clicked search button in the Materials section
+        And I searched 20201015_Resilience_Application_Form.docx data in the materials
         And I clicked on the first material in the Materials list
-        And I clicked on the events tab in the material card
+        And I clicked on the relations tab in the material card
         Then I must see events search in the materials card
 
     @smoke @UI @MaterialsCardGeneralTabUI
@@ -63,10 +65,12 @@ Feature: MaterialsSectionUI - Smoke
         Then I must I must see at least one user in the originator drop down menu
 
     @smoke @UI @MaterialsCardGeneralTabUI
-    Scenario: IIS-6191 - Open objects tab in the materials card
+    Scenario: IIS-6191 - Open relations tab in the materials card and ensure that objects search is present
         When I navigated to Materials page
+        And I clicked search button in the Materials section
+        And I searched 20201015_Resilience_Application_Form.docx data in the materials
         And I clicked on the first material in the Materials list
-        And I clicked on the objects tab in the material card
+        And I clicked on the relations tab in the material card
         Then I must see objects search in the materials card
 
     @smoke @UI @MaterialsCardGeneralTabUI

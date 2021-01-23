@@ -16,8 +16,15 @@ namespace Iis.Services
                     .Where(nt => !nt.IsAbstract)
                     .Select(nt => nt.Name)
                     .ToList();
+            }
 
-                HistoricalOntologyIndexes = OntologyIndexes.ToDictionary(k => k, GetHistoricalIndex);
+            var wikiType = ontologySchema.GetEntityTypeByName(EntityTypeNames.Wiki.ToString());
+            if (wikiType != null)
+            {
+                WikiIndexes = wikiType.GetAllDescendants()
+                    .Where(nt => !nt.IsAbstract)
+                    .Select(nt => nt.Name)
+                    .ToList();
             }
 
             EventIndexes = new List<string> { "Event" };
@@ -33,11 +40,9 @@ namespace Iis.Services
         public string ReportIndex { get; set; }
         public List<string> MaterialIndexes { get; }
         public List<string> OntologyIndexes { get; }
-        public Dictionary<string, string> HistoricalOntologyIndexes { get; }
+        public List<string> WikiIndexes { get; }
         public List<string> EventIndexes { get; }
         public List<string> SignIndexes { get; }
         public Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
-
-        private string GetHistoricalIndex(string typeName) => $"historical_{typeName}";
     }
 }

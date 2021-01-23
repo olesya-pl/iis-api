@@ -1,5 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using AcceptanceTests.PageObjects;
+using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using SeleniumExtras.PageObjects;
 
 namespace AcceptanceTests.PageObjects
@@ -15,7 +19,7 @@ namespace AcceptanceTests.PageObjects
         }
 
 
-        [FindsBy(How = How.CssSelector, Using = ".el-button.el-button--default.el-tooltip")]
+        [FindsBy(How = How.CssSelector, Using = ".entity-search .entity-search__toggle button")]
         [CacheLookup]
         public IWebElement SearchLoopButton;
 
@@ -32,8 +36,10 @@ namespace AcceptanceTests.PageObjects
         public IWebElement EditObjectOfStudyButton;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Класифікатори')]")]
-        [CacheLookup]
         public IWebElement ClassifierBlock;
+
+        [FindsBy(How = How.CssSelector, Using = "textarea[name='title']")]
+        public IWebElement RealNameFullField;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Загальна інформація')]")]
         [CacheLookup]
@@ -69,6 +75,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//span[text()=' Зберегти тему ']")]
         public IWebElement CreateThemeButton;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Зберегти')]")]
+        public IWebElement SaveObjectOfStudyButton;
 
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-full-screen']")]
         [CacheLookup]
@@ -107,7 +116,6 @@ namespace AcceptanceTests.PageObjects
         public IWebElement BigCardImportance;
 
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
-        [CacheLookup]
         public IWebElement OOSSearchCounter;
 
         [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
@@ -133,9 +141,76 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'3 окрема мотострілецька бригада \"Беркут\"')]")]
         [CacheLookup]
         public IWebElement ThirdBrigadeSearchResult;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),' Створити обʼєкт... ')]")]
+        public IWebElement CreateANewObjectOfStudyButton;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(@class, 'el-tree-node__label') and text() = 'Військовий підрозділ']")]
+        public IWebElement CreateAMilitaryOrganizationButton;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='affiliation'] .el-input__inner")]
+        public IWebElement AffiliationField;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='importance'] .el-input__inner")]
+        public IWebElement ImportanceField;
+
+        [FindsBy(How = How.CssSelector, Using = "//div[contains(text(),' Класифікатори ')]")]
+        public IWebElement ClassifiersBlock;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='parent'] .el-input__inner")]
+        public IWebElement DirectReportingRelationship;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Підтвердити')]")]
+        public IWebElement ConfirmSaveOfANewObjectOfStudyButton;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Дислокація ')]")]
+        public IWebElement DislocationBlock;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Тимчасова дислокація ')]")]
+        public IWebElement TemporaryDislocationBlock;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
+        public IWebElement CountryFieldInTheDisclocationBlock;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-input--mini:nth-of-type(1) .el-input__inner")]
+        public IWebElement LongitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-input--mini:nth-of-type(2) .el-input__inner")]
+        public IWebElement LatitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(1) .el-input__inner")]
+        public IWebElement TemporaryDislocationLatitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(2) .el-input__inner")]
+        public IWebElement TemporaryDislocationLongitudeField;
+
+        [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(2) .el-input__inner")]
+        public IWebElement CountryFieldInTheTemporaryDisclocationBlock;
+
+        [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Події')]")]
+        public IWebElement EventsTabInTheBigObjectOfStudyCard;
+
+
+        [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
+        public IWebElement DislocationSectionCountryField;
+
+        public ObjectsSearch GetObjectByTitle(string title)
+        {
+            return new ObjectsSearch(driver, title);
+        }
         public HierarchyCard GetHierarchyCardByTitle(string title)
         {
             return new HierarchyCard(driver, title);
+        }
+
+        public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
+                   .Select(webElement => new Event(driver, webElement)).ToList();
+
+        public void ScrollDown(string value)
+        {
+            var elementToScroll = driver.FindElement(By.XPath($"//div[contains(text(),'{value}')]"));
+            Actions actions = new Actions(driver);
+            actions.MoveToElement(elementToScroll).Perform();
         }
     }
 }

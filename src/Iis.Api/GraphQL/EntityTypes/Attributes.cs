@@ -64,6 +64,8 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLType(typeof(AnyType))] FormField FormField { get; }
         [GraphQLType(typeof(AnyType))] ContainerMeta Container { get; }
 
+        bool? IsImportantRelation { get; }
+
         int? SortOrder { get; }
 
         [GraphQLType(typeof(AnyType))] Validation Validation { get; }
@@ -112,6 +114,8 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLType(typeof(AnyType))]
         public ContainerMeta Container => _mapper.Map<ContainerMeta>(MetaObject?.Container);
+
+        public bool? IsImportantRelation => MetaObject?.IsImportantRelation;
 
         public int? SortOrder => MetaObject?.SortOrder;
 

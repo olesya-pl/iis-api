@@ -20,6 +20,7 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.Ontology.Data;
 using MediatR;
 using Iis.Events.Materials;
+using Iis.Interfaces.Constants;
 using Iis.Services.Contracts.Dtos;
 using Iis.Utility;
 
@@ -72,8 +73,7 @@ namespace IIS.Core.Materials.EntityFramework
             await SaveMaterialChildren(material, changeRequestId);
             SaveMaterialInfoEntitites(material);
 
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutCreatedMaterialToElasticSearchAsync(material.Id));
+            _eventProducer.SaveMaterialToElastic(materialEntity.Id);
 
             if (material.IsParentMaterial())
             {
@@ -456,6 +456,12 @@ namespace IIS.Core.Materials.EntityFramework
         {
             return RunWithoutCommitAsync(async (unitOfWork)
                 => await unitOfWork.MaterialRepository.PutAllMaterialsToElasticSearchAsync(cancellationToken));
+        }
+
+        public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken stoppingToken)
+        {
+            return RunWithoutCommitAsync(async (unitOfWork)
+                => await unitOfWork.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, stoppingToken));
         }
     }    
 }

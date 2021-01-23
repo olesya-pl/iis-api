@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Iis.DataModel;
+using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -162,7 +163,7 @@ namespace Iis.OntologySchema.Saver
         {
             foreach (var alias in aliasesToUpdate)
             {
-                var aliasEntity = _context.Aliases.Single(a => a.DotName == alias.DotName);
+                var aliasEntity = _context.Aliases.Single(a => a.DotName == alias.DotName && a.Type == AliasType.Ontology);
                 aliasEntity.Value = alias.Value;
                 _context.Aliases.Update(aliasEntity);
             }
@@ -171,7 +172,7 @@ namespace Iis.OntologySchema.Saver
         {
             foreach (var alias in aliasesToDelete)
             {
-                var aliasEntity = _context.Aliases.Single(a => a.DotName == alias.DotName);
+                var aliasEntity = _context.Aliases.Single(a => a.DotName == alias.DotName && a.Type == AliasType.Ontology);
                 _context.Aliases.Remove(aliasEntity);
             }
         }

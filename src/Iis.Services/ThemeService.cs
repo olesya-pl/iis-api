@@ -149,13 +149,15 @@ namespace Iis.Services
             return _mapper.Map<ThemeDto>(entity);
         }
 
-        public async Task<IEnumerable<ThemeDto>> GetThemesByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<ThemeDto>> GetThemesByUserIdAsync(Guid userId, SortingParams sorting)
         {
-            var entities = await GetThemes()
-                                    .Where(e => e.UserId == userId)
+            var query  = GetThemes().Where(e => e.UserId == userId);
+
+            var entities = await ApplySorting(query, sorting.ColumnName, sorting.Order)
                                     .ToListAsync();
 
             var themes = _mapper.Map<IEnumerable<ThemeDto>>(entities);
+
             return themes;
         }
 
@@ -236,6 +238,16 @@ namespace Iis.Services
                     .Include(e => e.Type)
                     .Include(e => e.User)
                     .AsNoTracking();
+        }
+
+        private static IQueryable<ThemeEntity> ApplySorting(IQueryable<ThemeEntity> query, string columnName, string order)
+        {
+            return (columnName, order) switch
+            {
+                ("updatedAt", "asc") => query.OrderBy(e => e.UpdatedAt),
+                ("updatedAt", "desc") => query.OrderByDescending(e => e.UpdatedAt),
+                _ => query.OrderBy(e => e.Id)
+            };
         }
 
         private async Task<QueryResult> GetQueryResultsAsync(Guid typeId, string query)

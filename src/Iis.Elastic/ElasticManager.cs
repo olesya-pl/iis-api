@@ -130,9 +130,9 @@ namespace Iis.Elastic
             return statusCode / 100 == 4;
         }
 
-        public async Task<bool> DeleteDocumentAsync(string indexName, string documentId)
+        public async Task<bool> DeleteDocumentAsync(string indexName, string documentId, CancellationToken ct = default)
         {
-            var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId);
+            var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId, ctx:ct);
 
             return searchResponse.Success;
         }
@@ -306,31 +306,6 @@ namespace Iis.Elastic
             var settigns = request["settings"];
 
             settigns["mapping"] = mappingValue;
-        }
-
-        public async Task<IElasticSearchResult> SearchByImageVector(decimal[] imageVector, IIisElasticSearchParams searchParams, CancellationToken token)
-        {
-            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(index:GetRealIndexNames(searchParams.BaseIndexNames), PostData.Serializable(new
-            {
-                from = searchParams.From,
-                size = searchParams.Size,
-                min_score = 0.1,
-                query = new {
-                    script_score = new {
-                    query = new {
-                        match_all = new { }
-                    },
-                    script = new {
-                        source = "1 / (l2norm(params.queryVector, doc['ImageVector']) + 1)",
-                        @params = new {
-                            queryVector = imageVector
-                        }
-                    }
-                }
-             }
-            }),
-            ctx: token);
-            return _resultExtractor.GetFromResponse(searchResponse);
         }
 
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)

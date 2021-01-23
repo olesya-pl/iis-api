@@ -14,8 +14,8 @@ namespace Iis.AcceptanceTests.PageObjects.Controls
         }
 
         public string Name =>
-       //TODO: add selector for an event name row
-       eventElement.FindElement(By.ClassName("el-table_5_column_30")).Text;
+        //TODO: add selector for an event name row
+        eventElement.FindElement(By.ClassName("events-table__cell--name")).Text;
 
         public void Click()
         {
@@ -33,5 +33,7 @@ namespace Iis.AcceptanceTests.PageObjects.Controls
             this.driver = driver;
             eventElement = driver.FindElement(By.XPath($@"//span[contains(text(),'{value}')]"));
         }
+
+
     }
 }

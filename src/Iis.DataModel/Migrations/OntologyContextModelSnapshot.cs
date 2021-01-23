@@ -187,6 +187,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("OldValue")
                         .HasColumnType("text");
 
+                    b.Property<string>("ParentTypeName")
+                        .HasColumnType("text");
+
                     b.Property<string>("PropertyName")
                         .HasColumnType("text");
 
@@ -257,7 +260,7 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("EntityId")
+                    b.Property<Guid?>("EntityId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("ExternalId")
@@ -269,15 +272,25 @@ namespace Iis.DataModel.Migrations
                     b.Property<decimal>("Long")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("NodeId")
+                    b.Property<Guid?>("MaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("NodeId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.HasKey("Id");
 
                     b.HasIndex("EntityId");
+
+                    b.HasIndex("MaterialId");
 
                     b.HasIndex("NodeId");
 
@@ -796,6 +809,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("IconBase64Body")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsAbstract")
                         .HasColumnType("boolean");
 
@@ -1099,6 +1115,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid>("TypeId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -1157,6 +1176,52 @@ namespace Iis.DataModel.Migrations
                             ShortTitle = "П",
                             Title = "Подія"
                         });
+                });
+
+            modelBuilder.Entity("Iis.DataModel.TowerLocationEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CellId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DataSource")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Lac")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Lat")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("Long")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Mcc")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Mnc")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RadioType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Range")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Mcc", "Mnc", "Lat", "CellId")
+                        .HasAnnotation("Npgsql:IndexInclude", new[] { "Lac", "Long" });
+
+                    b.ToTable("TowerLocations");
                 });
 
             modelBuilder.Entity("Iis.DataModel.UserEntity", b =>
@@ -1259,15 +1324,15 @@ namespace Iis.DataModel.Migrations
                 {
                     b.HasOne("Iis.DataModel.NodeEntity", "Entity")
                         .WithMany()
-                        .HasForeignKey("EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EntityId");
+
+                    b.HasOne("Iis.DataModel.Materials.MaterialEntity", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId");
 
                     b.HasOne("Iis.DataModel.NodeEntity", "Node")
                         .WithMany()
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NodeId");
                 });
 
             modelBuilder.Entity("Iis.DataModel.Materials.MaterialEntity", b =>
