@@ -114,14 +114,14 @@ namespace IIS.Core.Ontology
 
             // TODO: this should be changed to GetType<T>.
             //       Cannot use it right because relation cannot be uniquely identified by its name
-            var types = _ontology.GetTypes<T>(chunks[1]);
+            var type = _ontology.GetEntityTypeByName(chunks[1]);
 
-            if (!types.Any())
+            if (type == null)
             {
                 throw new InvalidOperationException($"Unknown entity type {chunks[1]}");
             }
 
-            return (name, types, conditions);
+            return (name, new List<T> { (T)type }, conditions);
         }
 
         public class Ast {

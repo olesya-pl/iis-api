@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _ontology.GetEntityType(typeName);            
+            var type = _ontology.GetEntityTypeByName(typeName);            
             var entity = await CreateRootEntity(Guid.NewGuid(), type, data);
             return entity;
         }
@@ -257,7 +257,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (props.TryGetValue("target", out var dictTarget))
                 {
                     var (typeName, unionData) = InputExtensions.ParseInputUnion(dictTarget);
-                    var type = _ontology.GetEntityType(typeName);
+                    var type = _ontology.GetEntityTypeByName(typeName);
                     return await CreateEntity(entityId, type, dotName, unionData);
                 }
 

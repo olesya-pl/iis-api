@@ -30,7 +30,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             d.Description("Unites multiple input types. Specify only single field.");
             if (_type.IsAbstract)
             {
-                foreach (var child in _typeRepository.GetChildTypes(_type).OfType<INodeTypeLinked>().Where(t => !t.IsAbstract))
+                foreach (var child in _type.GetAllDescendants().Where(t => !t.IsAbstract))
                 {
                     var type = _typeRepository.GetMutatorInputType(_operation, child);
                     d.Field(child.Name).Type(type);

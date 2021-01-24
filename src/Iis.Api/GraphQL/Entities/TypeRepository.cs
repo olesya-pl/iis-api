@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
-            var entityTypes = _ontology.EntityTypes.ToList();
+            var entityTypes = _ontology.GetEntityTypes().ToList();
             if (entityTypes.Count == 0)
                 throw new OntologyTypesException("There are no entity types to register on graphql schema");
 
@@ -57,11 +57,6 @@ namespace IIS.Core.GraphQL.Entities
                 GetMutatorInputType(mutator, type);
                 GetMutatorResponseType(mutator, type);
             }
-        }
-
-        public IEnumerable<INodeTypeLinked> GetChildTypes(INodeTypeLinked parent)
-        {
-            return _ontology.GetChildTypes(parent);
         }
 
         private OntologyMutationTypesCreator GetMutator(Operation operation)

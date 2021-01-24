@@ -162,7 +162,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
             var ontology = ctx.Service<IOntologyModel>();
 
-            var types = ontology.EntityTypes;
+            var types = ontology.GetEntityTypes();
             if (filter?.Types != null)
                 types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
 

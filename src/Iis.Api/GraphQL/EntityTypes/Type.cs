@@ -56,7 +56,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p, _ontology));
 
         [GraphQLNonNullType]
-        public IEnumerable<EntityType> Children => _ontology.GetChildTypes(Source).Select(child => new EntityType(child, _ontology));
+        public IEnumerable<EntityType> Children => Source.GetAllDescendants().Concat(new[] { Source }).Select(child => new EntityType(child, _ontology));
 
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]

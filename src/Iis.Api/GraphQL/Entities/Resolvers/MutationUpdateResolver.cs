@@ -56,7 +56,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!data.ContainsKey(LastConfirmedFieldName))
                 data.Add(LastConfirmedFieldName, DateTime.UtcNow);
 
-            var type = _ontology.GetEntityType(typeName);
+            var type = _ontology.GetEntityTypeByName(typeName);
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
@@ -192,7 +192,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (uvdict.ContainsKey("target"))
                 {
                     var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
-                    var type = _ontology.GetEntityType(typeName);
+                    var type = _ontology.GetEntityTypeByName(typeName);
                     var updatedNode = await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
                     if (relation.Target.Id != updatedNode.Id)
                     {

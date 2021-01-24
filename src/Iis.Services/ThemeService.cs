@@ -316,11 +316,11 @@ namespace Iis.Services
 
         private string[] GetOntologyIndexes(IOntologyModel ontology, string typeName)
         {
-            var types = ontology.EntityTypes.Where(p => p.Name == typeName);
+            var type = ontology.GetEntityTypeByName(typeName);
 
-            return types
-                .SelectMany(e => _ontology.GetChildTypes(e))
-                .Concat(types)
+            return type
+                .GetAllDescendants()
+                .Concat(new[] { type })
                 .Where(e => !e.IsAbstract)
                 .Select(e => e.Name)
                 .Distinct()

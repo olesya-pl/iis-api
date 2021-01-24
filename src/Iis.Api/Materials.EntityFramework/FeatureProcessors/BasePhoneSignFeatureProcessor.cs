@@ -51,7 +51,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             if (!FeaturesSectionExists(metadata)) return metadata;
 
-            var signType = _ontology.GetEntityType(SignTypeName);
+            var signType = _ontology.GetEntityTypeByName(SignTypeName);
 
             var features = metadata.SelectToken(FeatureFields.FeaturesSection);
 

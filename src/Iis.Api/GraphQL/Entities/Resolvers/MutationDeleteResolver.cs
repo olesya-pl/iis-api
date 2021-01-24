@@ -36,7 +36,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var node = (Entity)_ontologyService.GetNode(id); // load only type
             if (node == null)
                 throw new QueryException($"Entity with id {id} was not found");
-            var type = _ontology.GetEntityType(typeName);
+            var type = _ontology.GetEntityTypeByName(typeName);
             if (!node.Type.IsSubtypeOf(type))
                 throw new QueryException($"Entity with id {id} is of type {node.Type.Name}, not of type {type.Name}");
             _ontologyService.RemoveNodeAndRelations(node);

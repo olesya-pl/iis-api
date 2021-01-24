@@ -169,16 +169,16 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
         public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology)
         {
-            var types = ontology.GetChildTypes(Source.EntityType)?.OfType<INodeTypeLinked>();
+            var types = Source.EntityType.GetAllDescendants().ToList();
             if (types == null)
-                types = new[] {Source.EntityType };
+                types = new List<INodeTypeLinked> {Source.EntityType };
             else if (!types.Any(t => t.Id == Source.EntityType.Id))
-                types = types.Union(new[] {Source.EntityType });
+                types.Add(Source.EntityType);
 
             var metaTargetTypes = Source.MetaObject?.TargetTypes;
             if (metaTargetTypes != null && metaTargetTypes.Length > 0)
             {
-                types = types.Where(t => metaTargetTypes.Contains(t.Name));
+                types = types.Where(t => metaTargetTypes.Contains(t.Name)).ToList();
             }
 
             return types.Where(t => !t.IsAbstract).Select(t => new EntityType(t, _ontology));

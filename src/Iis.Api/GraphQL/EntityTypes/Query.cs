@@ -18,19 +18,19 @@ namespace IIS.Core.GraphQL.EntityTypes
             IEnumerable<INodeTypeLinked> types;
             if (!string.IsNullOrEmpty(filter?.Parent))
             {
-                var et = ontology.GetEntityType(filter.Parent);
+                var et = ontology.GetEntityTypeByName(filter.Parent);
                 if (et == null)
                     types = new List<INodeTypeLinked>();
                 else
-                    types = ontology.GetChildTypes(et);                
+                    types = et.GetAllDescendants().Concat(new[] { et });
             }
             else
             {
-                types = ontology.EntityTypes;
+                types = ontology.GetEntityTypes();
             }
             if (filter?.ConcreteTypes == true)
             {
-                types = types.OfType<INodeTypeLinked>().Where(t => !t.IsAbstract);
+                types = types.Where(t => !t.IsAbstract);
             }                
             return Task.FromResult(new EntityTypeCollection(types, ontology));
         }
@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public Task<EntityType> GetEntityType([Service]IOntologyModel ontology,
             [GraphQLNonNullType] string code)
         {
-            var type = ontology.GetEntityType(code);
+            var type = ontology.GetEntityTypeByName(code);
             return Task.FromResult(type == null ? null : new EntityType(type, ontology));
         }
 
