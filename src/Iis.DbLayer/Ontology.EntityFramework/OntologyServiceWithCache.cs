@@ -2,8 +2,6 @@
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyModelWrapper;
-using Iis.OntologyData.DataTypes;
 using Iis.Utility;
 using System;
 using System.Collections.Generic;
@@ -12,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
-using Iis.OntologySchema.DataTypes;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {

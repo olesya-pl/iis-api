@@ -10,10 +10,11 @@ using Iis.Interfaces.Ontology.Schema;
 namespace IIS.Core.Ontology
 {
     public class AnalyticsQueryParser {
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
 
-        public AnalyticsQueryParser(IOntologyModel ontology) {
-            _ontology = ontology;
+        public AnalyticsQueryParser(IOntologySchema ontologySchema) 
+        {
+            _ontologySchema = ontologySchema;
         }
 
         public Ast Parse(string query)
@@ -114,7 +115,7 @@ namespace IIS.Core.Ontology
 
             // TODO: this should be changed to GetType<T>.
             //       Cannot use it right because relation cannot be uniquely identified by its name
-            var type = _ontology.GetEntityTypeByName(chunks[1]);
+            var type = _ontologySchema.GetEntityTypeByName(chunks[1]);
 
             if (type == null)
             {

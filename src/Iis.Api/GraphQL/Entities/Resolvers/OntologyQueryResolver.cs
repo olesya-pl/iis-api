@@ -160,9 +160,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
-            var ontology = ctx.Service<IOntologyModel>();
+            var schema = ctx.Service<IOntologySchema>();
 
-            var types = ontology.GetEntityTypes();
+            var types = schema.GetEntityTypes();
             if (filter?.Types != null)
                 types = types.Where(et => filter.Types.Contains(et.Name)).ToList();
 

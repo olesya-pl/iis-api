@@ -14,30 +14,24 @@ namespace IIS.Core.GraphQL.EntityTypes
 {
     public class EntityTypeCollection : Collection<INodeTypeLinked, EntityType>
     {
-        private IOntologyModel _ontology { get; }
-
-        public EntityTypeCollection(IEnumerable<INodeTypeLinked> source, IOntologyModel ontology) : base(source)
+        public EntityTypeCollection(IEnumerable<INodeTypeLinked> source) : base(source)
         {
-            _ontology = ontology;
         }
 
         protected override EntityType Select(INodeTypeLinked arg)
         {
-            return new EntityType(arg, _ontology);
+            return new EntityType(arg);
         }
     }
 
     public class EntityType
     {
-        public EntityType(INodeTypeLinked source, IOntologyModel ontology)
+        public EntityType(INodeTypeLinked source)
         {
             Source = source;
-            _ontology = ontology;
         }
 
         protected INodeTypeLinked Source { get; }
-
-        private IOntologyModel _ontology { get; }
 
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id => Source.Id;
@@ -50,13 +44,13 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLDeprecated("Entity can have multiple parents. You should use Parents property.")]
         public EntityType Parent =>
-            Source.DirectParents.Select(p => new EntityType(p, _ontology)).FirstOrDefault();
+            Source.DirectParents.Select(p => new EntityType(p)).FirstOrDefault();
 
         [GraphQLNonNullType]
-        public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p, _ontology));
+        public IEnumerable<EntityType> Parents => Source.DirectParents.Select(p => new EntityType(p));
 
         [GraphQLNonNullType]
-        public IEnumerable<EntityType> Children => Source.GetAllDescendants().Concat(new[] { Source }).Select(child => new EntityType(child, _ontology));
+        public IEnumerable<EntityType> Children => Source.GetAllDescendants().Concat(new[] { Source }).Select(child => new EntityType(child));
 
 
         [GraphQLType(typeof(NonNullType<ListType<NonNullType<EntityAttributeType>>>))]
@@ -75,7 +69,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         {
             return relationType.IsAttributeType
                 ? (IEntityAttribute) new EntityAttributePrimitive(relationType)
-                : new EntityAttributeRelation(relationType, _ontology);
+                : new EntityAttributeRelation(relationType);
         }
     }
 }

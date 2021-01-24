@@ -20,16 +20,16 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMediator _mediator;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly IResolverContext _resolverContext;
 
-        public MutationCreateResolver(IOntologyModel ontology, 
+        public MutationCreateResolver(IOntologySchema ontologySchema, 
             IOntologyService ontologyService,
             IFileService fileService,
             IChangeHistoryService changeHistoryService,
             IMediator mediator)
         {
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _fileService = fileService;
             _changeHistoryService = changeHistoryService;
@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public MutationCreateResolver(IResolverContext ctx)
         {
             _fileService = ctx.Service<IFileService>();
-            _ontology = ctx.Service<IOntologyModel>();
+            _ontologySchema = ctx.Service<IOntologySchema>();
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _ontology.GetEntityTypeByName(typeName);            
+            var type = _ontologySchema.GetEntityTypeByName(typeName);            
             var entity = await CreateRootEntity(Guid.NewGuid(), type, data);
             return entity;
         }
@@ -257,7 +257,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (props.TryGetValue("target", out var dictTarget))
                 {
                     var (typeName, unionData) = InputExtensions.ParseInputUnion(dictTarget);
-                    var type = _ontology.GetEntityTypeByName(typeName);
+                    var type = _ontologySchema.GetEntityTypeByName(typeName);
                     return await CreateEntity(entityId, type, dotName, unionData);
                 }
 

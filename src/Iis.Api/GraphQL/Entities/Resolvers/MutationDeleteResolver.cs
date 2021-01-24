@@ -4,24 +4,24 @@ using HotChocolate.Execution;
 using HotChocolate.Resolvers;
 using IIS.Core.Ontology;
 using Iis.Domain;
-using IIS.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
     public class MutationDeleteResolver
     {
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
 
-        public MutationDeleteResolver(IOntologyService ontologyService, IOntologyModel ontology)
+        public MutationDeleteResolver(IOntologyService ontologyService, IOntologySchema ontologySchema)
         {
             _ontologyService = ontologyService;
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
         }
 
         public MutationDeleteResolver(IResolverContext ctx)
         {
-            _ontology = ctx.Service<IOntologyModel>();
+            _ontologySchema = ctx.Service<IOntologySchema>();
             _ontologyService = ctx.Service<IOntologyService>();
         }
 
@@ -36,7 +36,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var node = (Entity)_ontologyService.GetNode(id); // load only type
             if (node == null)
                 throw new QueryException($"Entity with id {id} was not found");
-            var type = _ontology.GetEntityTypeByName(typeName);
+            var type = _ontologySchema.GetEntityTypeByName(typeName);
             if (!node.Type.IsSubtypeOf(type))
                 throw new QueryException($"Entity with id {id} is of type {node.Type.Name}, not of type {type.Name}");
             _ontologyService.RemoveNodeAndRelations(node);

@@ -12,13 +12,13 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
 
         [GraphQLNonNullType]
-        public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
+        public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologySchema schema,
             EntityTypesFilter filter = null)
         {
             IEnumerable<INodeTypeLinked> types;
             if (!string.IsNullOrEmpty(filter?.Parent))
             {
-                var et = ontology.GetEntityTypeByName(filter.Parent);
+                var et = schema.GetEntityTypeByName(filter.Parent);
                 if (et == null)
                     types = new List<INodeTypeLinked>();
                 else
@@ -26,20 +26,20 @@ namespace IIS.Core.GraphQL.EntityTypes
             }
             else
             {
-                types = ontology.GetEntityTypes();
+                types = schema.GetEntityTypes();
             }
             if (filter?.ConcreteTypes == true)
             {
                 types = types.Where(t => !t.IsAbstract);
             }                
-            return Task.FromResult(new EntityTypeCollection(types, ontology));
+            return Task.FromResult(new EntityTypeCollection(types));
         }
 
-        public Task<EntityType> GetEntityType([Service]IOntologyModel ontology,
+        public Task<EntityType> GetEntityType([Service]IOntologySchema schema,
             [GraphQLNonNullType] string code)
         {
-            var type = ontology.GetEntityTypeByName(code);
-            return Task.FromResult(type == null ? null : new EntityType(type, ontology));
+            var type = schema.GetEntityTypeByName(code);
+            return Task.FromResult(type == null ? null : new EntityType(type));
         }
 
         public List<EntityTypeIconInfo> GetEntityTypeIcons([Service] IOntologySchema schema)

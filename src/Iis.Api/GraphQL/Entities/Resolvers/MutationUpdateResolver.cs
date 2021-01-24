@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
-using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json;
 using Iis.Api.BackgroundServices;
@@ -20,7 +19,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         private readonly MutationCreateResolver _mutationCreateResolver;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMediator _mediator;
         private readonly IResolverContext _resolverContext;
@@ -28,13 +27,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private const string LastConfirmedFieldName = "lastConfirmedAt";
 
         public MutationUpdateResolver(IOntologyService ontologyService,
-            IOntologyModel ontology,
+            IOntologySchema ontologySchema,
             IChangeHistoryService changeHistoryService,
             IMediator mediator,
             MutationCreateResolver mutationCreateResolver)
         {
             _mutationCreateResolver = mutationCreateResolver;
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _changeHistoryService = changeHistoryService;
             _mediator = mediator;
@@ -42,7 +41,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public MutationUpdateResolver(IResolverContext ctx)
         {
             _mutationCreateResolver = new MutationCreateResolver(ctx);
-            _ontology = ctx.Service<IOntologyModel>();
+            _ontologySchema = ctx.Service<IOntologySchema>();
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
@@ -56,7 +55,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!data.ContainsKey(LastConfirmedFieldName))
                 data.Add(LastConfirmedFieldName, DateTime.UtcNow);
 
-            var type = _ontology.GetEntityTypeByName(typeName);
+            var type = _ontologySchema.GetEntityTypeByName(typeName);
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
@@ -192,7 +191,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (uvdict.ContainsKey("target"))
                 {
                     var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
-                    var type = _ontology.GetEntityTypeByName(typeName);
+                    var type = _ontologySchema.GetEntityTypeByName(typeName);
                     var updatedNode = await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
                     if (relation.Target.Id != updatedNode.Id)
                     {

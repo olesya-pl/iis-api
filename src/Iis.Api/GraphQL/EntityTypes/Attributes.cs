@@ -11,7 +11,6 @@ using Iis.Domain.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
-using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Meta;
 using AutoMapper;
@@ -147,12 +146,9 @@ namespace IIS.Core.GraphQL.EntityTypes
 
     public class EntityAttributeRelation : EntityAttributeBase
     {
-        public EntityAttributeRelation(INodeTypeLinked source, IOntologyModel ontology) : base(source)
+        public EntityAttributeRelation(INodeTypeLinked source) : base(source)
         {
-            _ontology = ontology;
         }
-
-        private IOntologyModel _ontology;
 
         public override string Type => "relation";
 
@@ -163,11 +159,11 @@ namespace IIS.Core.GraphQL.EntityTypes
 
         [GraphQLNonNullType]
         [GraphQLDescription("Retrieves relation target type. Type may be abstract.")]
-        public EntityType Target => new EntityType(Source.EntityType, _ontology);
+        public EntityType Target => new EntityType(Source.EntityType);
 
         [GraphQLType(typeof(ListType<NonNullType<ObjectType<EntityType>>>))]
         [GraphQLDescription("Retrieve all possible target types (inheritors of Target type).")]
-        public async Task<IEnumerable<EntityType>> TargetTypes([Service] IOntologyModel ontology)
+        public async Task<IEnumerable<EntityType>> TargetTypes()
         {
             var types = Source.EntityType.GetAllDescendants().ToList();
             if (types == null)
@@ -181,7 +177,7 @@ namespace IIS.Core.GraphQL.EntityTypes
                 types = types.Where(t => metaTargetTypes.Contains(t.Name)).ToList();
             }
 
-            return types.Where(t => !t.IsAbstract).Select(t => new EntityType(t, _ontology));
+            return types.Where(t => !t.IsAbstract).Select(t => new EntityType(t));
         }
     }
 }

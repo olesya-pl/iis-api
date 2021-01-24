@@ -4,9 +4,7 @@ using System.Linq;
 using IIS.Core.GraphQL.Entities.InputTypes.Mutations;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes.Mutations;
-using IIS.Core.Ontology;
 using Iis.Domain;
-using IIS.Domain;
 using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using HotChocolate.Types;
 using Iis.OntologySchema.DataTypes;
@@ -23,13 +21,13 @@ namespace IIS.Core.GraphQL.Entities
 
     public class TypeRepository : TypeStorage
     {
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly OntologyQueryTypesCreator _creator;
         private readonly OntologyMutationTypesCreator[] _mutators;
 
-        public TypeRepository(IOntologyModel ontology)
+        public TypeRepository(IOntologySchema ontologySchema)
         {
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _creator = new OntologyQueryTypesCreator(this);
             _mutators = new OntologyMutationTypesCreator[]
             {
@@ -41,7 +39,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
-            var entityTypes = _ontology.GetEntityTypes().ToList();
+            var entityTypes = _ontologySchema.GetEntityTypes().ToList();
             if (entityTypes.Count == 0)
                 throw new OntologyTypesException("There are no entity types to register on graphql schema");
 

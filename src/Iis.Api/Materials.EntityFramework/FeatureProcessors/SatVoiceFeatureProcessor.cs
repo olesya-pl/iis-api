@@ -5,6 +5,7 @@ using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
 using Iis.Interfaces.Constants;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
@@ -30,11 +31,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         };
 
         public SatVoiceFeatureProcessor(IElasticService elasticService,
-            IOntologyModel ontology,
+            IOntologySchema ontologySchema, 
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
             IElasticState elasticState)
-        : base(elasticService, ontology, createResolver, updateResolver, elasticState)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState)
         {}
     }
 }

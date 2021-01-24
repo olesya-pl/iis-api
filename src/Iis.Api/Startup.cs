@@ -33,7 +33,6 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Roles;
 using Iis.OntologyData;
-using Iis.OntologyModelWrapper;
 using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
@@ -161,7 +160,6 @@ namespace IIS.Core
                 services.AddSingleton<IOntologyCache, OntologyCache>();
                 services.AddSingleton<IOntologySchema>(provider => (new OntologySchemaService()).GetOntologySchema(schemaSource));
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
-                services.AddSingleton<IOntologyModel>(provider => new OntologyWrapper(provider.GetRequiredService<IOntologySchema>()));
                 services.AddTransient<INodeRepository, NodeRepository>();
                 services.AddTransient<ElasticConfiguration>();
             }
