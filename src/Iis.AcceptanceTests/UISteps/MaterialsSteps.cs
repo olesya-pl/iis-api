@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
@@ -43,11 +44,11 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.RelationsTab.Click();
         }
 
-        [When(@"I clicked on the objects tab in the material card")]
+        [When(@"I clicked on the relation tab in the material card")]
         public void IClickedOnTheObjectsTabInTheMaterialCard()
         {
             driver.WaitFor(2);
-            materialsSectionPage.ObjectsTab.Click();
+            materialsSectionPage.RelationsTab.Click();
         }
 
         [When(@"I clicked on the ML tab in the material card")]
@@ -93,7 +94,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressProcessedButton()
         {
             materialsSectionPage.ProcessedButton.Click();
-            driver.WaitFor(1);
+            driver.WaitFor(3);
         }
 
         [When(@"I pressed Back button")]
@@ -152,6 +153,8 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedConfirmButton()
         {
             materialsSectionPage.ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy.Click();
+            driver.WaitFor(2);
+
         }
 
         [When(@"I scrolled down to the bottom of the relations tab")]
@@ -269,7 +272,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must not see the related object in the material")]
         public void ThenIMustNotSeeTheRelatedObjectInTheMaterial()
         {
-            Assert.False(materialsSectionPage.ConnectedObjectLink.Displayed);
+            Assert.False(materialsSectionPage.IsElementVisible());
         }
         #endregion
     }

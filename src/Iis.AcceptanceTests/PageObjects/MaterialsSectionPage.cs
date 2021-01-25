@@ -45,7 +45,6 @@ namespace AcceptanceTests.PageObjects
         public IWebElement ShowMLResultsButton;
 
         [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(4)")]
-        [CacheLookup]
         public IWebElement RelationsTab;
 
         [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
@@ -63,8 +62,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='material-objects']")]
-        [CacheLookup]
+        [FindsBy(How = How.CssSelector, Using = "[aria-describedby] .el-input__inner")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);
@@ -112,10 +110,10 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement EmptyAreInTheMaterialList;
 
-        [FindsBy(How = How.XPath, Using = "//b")]
+        [FindsBy(How = How.CssSelector, Using = ".material-objects .material-objects-table a")]
         public IWebElement ConnectedObjectLink;
 
-        [FindsBy(How = How.XPath, Using = "//button[@class='el-button el-button--default el-button--small el-button--primary ']")]
+        [FindsBy(How = How.CssSelector, Using = ".confirm-message-box__action-confirm")]
         public IWebElement ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy;
 
         [FindsBy(How = How.CssSelector, Using = ".cell > div:nth-of-type(2)")]
@@ -130,6 +128,20 @@ namespace AcceptanceTests.PageObjects
         {
             Actions actions = new Actions(driver);
             actions.SendKeys(Keys.Control).SendKeys(Keys.End).Perform();
+        }
+
+        public bool IsElementVisible()
+        {
+            try
+            {
+                var elem = driver.FindElement(By.CssSelector(".material-objects .material-objects-table a"));
+                return elem.Displayed;
+            }
+            catch
+            {
+                return false;
+            }
+
         }
     }
 }

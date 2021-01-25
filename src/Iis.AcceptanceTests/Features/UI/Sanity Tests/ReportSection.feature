@@ -9,6 +9,7 @@ Feature: ReportSection - sanity
     Scenario: IIS-6408 - Create and view report
         When I navigated to Report section
         And I pressed the Create a new report button
+        And I entered the Тестова тема as report title
         And I entered the Тестовий отримувач recipient name
         And I pressed the Proceed button
         And I selected the first event from the event list
@@ -17,8 +18,9 @@ Feature: ReportSection - sanity
         When I selected the first event from the report
         And I pressed Remove report button
         Then I must not see an event in the report
-        And I selected the first event from the event list
+        When I selected the first event from the event list
         And I pressed Add report button
         And I pressed the Save button
         And I pressed the Confirm button
+        When I clicked two times on the hour and date filter in the report page
         Then I must see a report with specified name

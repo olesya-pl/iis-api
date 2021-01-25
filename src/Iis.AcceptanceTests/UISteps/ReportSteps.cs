@@ -42,7 +42,6 @@ namespace AcceptanceTests.UISteps
         public void WhenIEnteredTheRecipientName(string recipientName)
         {
             var reportUniqueName = $"{recipientName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid().ToString("N")}";
-            context.SetResponse("reportName", reportUniqueName);
             reportPageObjects.ReportCreationAndEdit.EnterRecipientField.SendKeys(recipientName);
             reportPageObjects.ReportCreationAndEdit.EnterRecipientField.SendKeys(Keys.Enter);
         }
@@ -62,7 +61,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I pressed Add report button")]
         public void WhenIPressedAddReportButton()
         {
-            reportPageObjects.ReportCreationAndEdit.AddEventToReport.Click();
+            reportPageObjects.AddEventToReportButton.Click();
         }
 
         [When(@"I pressed Remove report button")]
@@ -87,6 +86,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedTheConfirmButton()
         {
             reportPageObjects.ReportCreationAndEdit.ConfirmButton.Click();
+            driver.WaitFor(3);
         }
 
         [When(@"I mouse hover on the report")]
@@ -95,6 +95,24 @@ namespace AcceptanceTests.UISteps
             var reportName = context.GetResponse<string>("reportName");
             reportPageObjects.GetReportByTitle(reportName).MouseHoverOnReport();
 
+        }
+
+        [When(@"I entered the (.*) as report title")]
+        public void WhenIEnteredTheAsReportTitle(string reportName)
+        {
+            var reportUniqueName = $"{reportName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid().ToString("N")}";
+            context.Set(reportUniqueName, "reportName");
+            reportPageObjects.NameOfTheReportField.Clear();
+            reportPageObjects.NameOfTheReportField.SendKeys(reportUniqueName);
+        }
+
+        [When(@"I clicked two times on the hour and date filter in the report page")]
+        public void WhenIClickedTwoTimesOnTheHourAndDateFilterInTheReportPage()
+        {
+            reportPageObjects.HourAndDateColumn.Click();
+            driver.WaitFor(2);
+            reportPageObjects.HourAndDateColumn.Click();
+            driver.WaitFor(2);
         }
         #endregion
 
@@ -108,7 +126,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must not see an event in the report")]
         public void ThenIMustNotSeeAnEventInTheReport()
         {
-            Assert.False(reportPageObjects.ReportCreationAndEdit.EventInTheReportList.Displayed);
+            Assert.False(reportPageObjects.IsElementVisible());
         }
 
         [Then(@"I must see an event in the report")]
@@ -120,7 +138,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see a report with specified name")]
         public void ThenIMustSeeAReportWithSpecifiedName()
         {
-            var reportName = context.GetResponse<string>("reportName");
+            var reportName = context.Get<string>("reportName");
             Assert.True(reportPageObjects.GetReportByTitle(reportName).Displayed);
         }
 
