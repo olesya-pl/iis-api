@@ -476,11 +476,11 @@ namespace Iis.OntologySchema.DataTypes
         public INodeTypeLinked GetProperty(string relationName)
         {
             var result = GetRelationByName(relationName);
-            if (result != null) return result.TargetType;
+            if (result != null) return result.NodeType;
             foreach (var parentType in GetAllAncestors())
             {
                 result = parentType.GetRelationByName(relationName);
-                if (result != null) return result.TargetType;
+                if (result != null) return result.NodeType;
             }
             return null;
         }
