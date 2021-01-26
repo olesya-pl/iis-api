@@ -20,20 +20,18 @@ namespace Iis.Services
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
-
         private string[] MaterialIndexes = { "Materials" };
-
-        private static List<AggregateFieldMap> _aggregationsMap = new List<AggregateFieldMap>
+        private static IReadOnlyCollection<AggregationField> _aggregationsFieldList = new List<AggregationField>
         {
-            new AggregateFieldMap("ProcessedStatus", "ProcessedStatus.Title"),
-            new AggregateFieldMap("Completeness", "Completeness.Title"),
-            new AggregateFieldMap("Importance", "Importance.Title"),
-            new AggregateFieldMap("SessionPriority", "SessionPriority.Title"),
-            new AggregateFieldMap("Reliability", "Reliability.Title"),
-            new AggregateFieldMap("Relevance", "Relevance.Title"),
-            new AggregateFieldMap("SourceReliability", "SourceReliability.Title"),
-            new AggregateFieldMap("Type", "Type.keyword"),
-            new AggregateFieldMap("Source", "Source.keyword"),
+            new AggregationField("ProcessedStatus", string.Empty, "ProcessedStatus.Title"),
+            new AggregationField("Completeness", string.Empty, "Completeness.Title"),
+            new AggregationField("Importance", string.Empty, "Importance.Title"),
+            new AggregationField("SessionPriority", string.Empty, "SessionPriority.Title"),
+            new AggregationField("Reliability", string.Empty, "Reliability.Title"),
+            new AggregationField("Relevance", string.Empty, "Relevance.Title"),
+            new AggregationField("SourceReliability", string.Empty, "SourceReliability.Title"),
+            new AggregationField("Type", string.Empty, "Type.keyword"),
+            new AggregationField("Source", string.Empty, "Source.keyword"),
         };
 
         public MaterialElasticService(IElasticManager elasticManager,
@@ -53,23 +51,21 @@ namespace Iis.Services
             var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
 
             var (from, size) = searchParams.Page.ToElasticPage();
-                      
+
             var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
 
-                        
-            
-            var builder = new ExactQueryBuilder();
-            var query = builder.WithPagination(from, size)
+            var query = new ExactQueryBuilder()
+                .WithPagination(from, size)
                 .WithQueryString(queryString)
                 .Build()
-                .WithExactAggregationNames(_aggregationsMap)
+                .WithAggregation(_aggregationsFieldList)
                 .WithHighlights()
                 .SetupSorting(sortColumn, sortOrder);
 
             var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
-            
+
             var searchResult = MapToSearchResult(elasticResult);
-            
+
             foreach (var item in searchResult.Items)
             {
                 if (item.Value.Highlight is null) continue;
@@ -103,7 +99,7 @@ namespace Iis.Services
                             .Build()
                             .WithHighlights()
                             .SetupSorting(sortColumn, sortOrder)
-                            .WithExactAggregationNames(_aggregationsMap)
+                            .WithAggregation(_aggregationsFieldList)
                             .ToString(Formatting.None);
 
             var elasticResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);
@@ -145,7 +141,7 @@ namespace Iis.Services
             var query = new SearchByImageQueryBuilder(imageVector)
                 .WithPagination(from, size)
                 .Build()
-                .WithExactAggregationNames(_aggregationsMap);
+                .WithAggregation(_aggregationsFieldList);
 
             var searchResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
