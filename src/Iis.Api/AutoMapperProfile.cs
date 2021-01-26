@@ -311,7 +311,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Entity, opts => opts.Ignore());
 
             CreateMap<Iis.Domain.FlightRadar.FlightRadarHistory, Iis.DataModel.FlightRadar.LocationHistoryEntity>();
-            CreateMap<FlightRadar.DataModel.Routes, Iis.Domain.FlightRadar.FlightRadarHistory>()
+            CreateMap<Iis.FlightRadar.DataModel.Routes, Iis.Domain.FlightRadar.FlightRadarHistory>()
                 .ForMember(dest => dest.Lat, opts => opts.MapFrom(src => src.Latitude))
                 .ForMember(dest => dest.Long, opts => opts.MapFrom(src => src.Longitude))
                 .ForMember(dest => dest.RegisteredAt, opts => opts.MapFrom(src => src.TimeNow))
