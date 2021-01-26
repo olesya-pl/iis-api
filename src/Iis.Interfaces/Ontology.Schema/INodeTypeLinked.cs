@@ -65,6 +65,7 @@ namespace Iis.Interfaces.Ontology.Schema
     public class NodeAggregationInfo
     {
         public string Name { get; set; }
+        public string Alias { get; set; }
         public bool IsAggregated { get; set; }
     }
 }

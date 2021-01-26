@@ -260,7 +260,9 @@ namespace Iis.Elastic
         public async Task<bool> CreateMapping(IAttributeInfoList attributesList, CancellationToken cancellationToken = default)
         {
             var mappingConfiguration = new ElasticMappingConfiguration(attributesList);
-            mappingConfiguration.Properties.Add(KeywordProperty.Create($"NodeTypeTitle{SearchQueryExtension.AggregateSuffix}", false));
+            mappingConfiguration.Properties.Add(KeywordProperty.Create($"{ElasticConfigConstants.NodeTypeTitleField}{SearchQueryExtension.AggregateSuffix}", false));
+            mappingConfiguration.Properties.Add(TextProperty.Create(ElasticConfigConstants.NodeTypeTitleField, string.Empty, true));
+            mappingConfiguration.Properties.Add(AliasProperty.Create(ElasticConfigConstants.NodeTypeTitleAlias, ElasticConfigConstants.NodeTypeTitleField));
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
@@ -364,7 +366,10 @@ namespace Iis.Elastic
 
             PrepareHighlights(json);
 
-            var aggregationFieldList = searchParams.SearchParams.SelectMany(p => p.Fields).Where(p => p.IsAggregated).Select(e => e.Name).ToArray();
+            var aggregationFieldList = searchParams.SearchParams.SelectMany(p => p.Fields)
+                                        .Where(p => p.IsAggregated)
+                                        .Select(e => new AggregationField(e.Name, e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
+                                        .ToArray();
 
             json.WithAggregation(aggregationFieldList);
 
@@ -542,7 +547,7 @@ namespace Iis.Elastic
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = isLenient;
                 queryString["fields"] = new JArray(searchFieldGroup.Select(p => p.Name));
-                
+
                 querySection["query_string"] = queryString;
                 shouldSections.Add(querySection);
             }

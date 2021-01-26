@@ -65,36 +65,31 @@ namespace Iis.Elastic.SearchQueryExtensions
             return jsonQuery;
         }
 
-        public static JObject WithAggregation(this JObject jsonQuery, IReadOnlyCollection<string> aggregationFieldNameList)
+        public static JObject WithAggregation(this JObject jsonQuery,
+            IReadOnlyCollection<AggregationField> aggregationFieldCollection)
         {
-            if(!aggregationFieldNameList.Any()) return jsonQuery;
-
-            var maps = aggregationFieldNameList
-                .Select(p => new AggregateFieldMap(p, $"{p}{AggregateSuffix}"))
-                .ToList();
-            return jsonQuery.WithExactAggregationNames(maps);            
-        }
-
-        public static JObject WithExactAggregationNames(this JObject jsonQuery, 
-            IReadOnlyCollection<AggregateFieldMap> aggregationFieldMaps)
-        {
-            if (!aggregationFieldMaps.Any()) return jsonQuery;
+            if (!aggregationFieldCollection.Any()) return jsonQuery;
 
             var aggregations = new JObject();
 
             jsonQuery["aggs"] = aggregations;
 
-            foreach (var fieldMap in aggregationFieldMaps)
+            foreach (var field in aggregationFieldCollection)
             {
-                var field = new JObject
+                if (string.IsNullOrWhiteSpace(field.TermFieldName) || string.IsNullOrWhiteSpace(field.Name)) continue;
+
+                var aggregation = new JObject
                 (
-                    new JProperty("field", fieldMap.FieldName),
+                    new JProperty("field", field.TermFieldName),
                     new JProperty("missing", MissingValueKey),
                     new JProperty("size", MaxBucketsCount)
                 );
-                aggregations[fieldMap.Alias] = new JObject
+
+                var aggregationName =  !string.IsNullOrWhiteSpace(field.Alias) ? field.Alias : field.Name;
+
+                aggregations[aggregationName] = new JObject
                 (
-                    new JProperty("terms", field)
+                    new JProperty("terms", aggregation)
                 );
             }
 
@@ -106,18 +101,6 @@ namespace Iis.Elastic.SearchQueryExtensions
             return new JObject(
                 new JProperty(sortColumn, new JObject() { new JProperty("order", sortOrder)})
             );
-        }
-    }
-
-    public class AggregateFieldMap
-    {
-        public string Alias { get; private set; }
-        public string FieldName { get; private set; }
-
-        public AggregateFieldMap(string alias, string fieldName)
-        {
-            Alias = alias;
-            FieldName = fieldName;
         }
     }
 }
