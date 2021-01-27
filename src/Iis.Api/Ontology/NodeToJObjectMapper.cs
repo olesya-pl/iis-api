@@ -62,6 +62,7 @@ namespace Iis.Api.Ontology
                     result.Add(new JProperty("__title", node.OriginalNode.ResolveFormula(formula)));
                 }
             }
+            result.Add(new JProperty("__iconName", node.OriginalNode.NodeType.GetIconName()));
 
             return result;
         }
