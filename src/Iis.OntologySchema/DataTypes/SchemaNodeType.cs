@@ -472,10 +472,12 @@ namespace Iis.OntologySchema.DataTypes
 
         public string GetIconName()
         {
-            return GetAllAncestors()
-                .Where(nt => !string.IsNullOrEmpty(nt.IconBase64Body))
-                .Select(nt => nt.Name)
-                .FirstOrDefault();
+            return string.IsNullOrEmpty(IconBase64Body) ?
+                GetAllAncestors()
+                    .Where(nt => !string.IsNullOrEmpty(nt.IconBase64Body))
+                    .Select(nt => nt.Name)
+                    .FirstOrDefault()
+                : Name;
         }
     }
 }
