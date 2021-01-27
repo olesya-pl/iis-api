@@ -140,6 +140,7 @@ namespace Iis.Api.FlightRadar
                 if (!Directory.Exists(_config.DataFolder))
                 {
                     await Task.Delay(TimeSpan.FromMinutes(2));
+                    continue;
                 }
                 var sourcesPaths = Directory.GetDirectories(_config.DataFolder);
                 foreach (var path in sourcesPaths)
