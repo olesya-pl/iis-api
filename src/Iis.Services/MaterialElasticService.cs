@@ -64,7 +64,7 @@ namespace Iis.Services
 
             var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
-            var searchResult = MapToSearchResult(elasticResult);
+            var searchResult = elasticResult.ToSearchResult();
 
             foreach (var item in searchResult.Items)
             {
@@ -104,7 +104,7 @@ namespace Iis.Services
 
             var elasticResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);
 
-            var searchResult = MapToSearchResult(elasticResult);
+            var searchResult = elasticResult.ToSearchResult();
 
             foreach (var item in searchResult.Items)
             {
@@ -121,7 +121,7 @@ namespace Iis.Services
         {
             var (from, size) = searchParams.Page.ToElasticPage();
             var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
-            
+
             var queryData = new MoreLikeThisQueryBuilder()
                         .WithPagination(from, size)
                         .WithMaterialId(searchParams.Suggestion)
@@ -131,7 +131,7 @@ namespace Iis.Services
 
             var searchResult = await _elasticManager.SearchAsync(queryData, _elasticState.MaterialIndexes, ct);
 
-            return MapToSearchResult(searchResult);
+            return searchResult.ToSearchResult();
         }
 
         public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
@@ -145,7 +145,7 @@ namespace Iis.Services
 
             var searchResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
-            return MapToSearchResult(searchResult);
+            return searchResult.ToSearchResult();
         }
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default)
@@ -171,20 +171,6 @@ namespace Iis.Services
                 "importance" => ("Importance.OrderNumber", sorting.Order),
                 "nodes" => ("NodesCount", sorting.Order),
                 _ => (null, null)
-            };
-        }
-
-        private static SearchResult MapToSearchResult(IElasticSearchResult elasticSearchResult)
-        {
-            return new SearchResult
-            {
-                Count = elasticSearchResult.Count,
-                Items = elasticSearchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult }),
-                Aggregations = elasticSearchResult.Aggregations is null
-                ? new Dictionary<string, AggregationItem>()
-                : elasticSearchResult.Aggregations.Where(p => p.Value.Buckets.Any()).ToDictionary(p => p.Key, p => p.Value)
             };
         }
     }
