@@ -260,6 +260,7 @@ namespace IIS.Core
 
             services.RegisterFlightRadarServices(Configuration);
 
+
             if (enableContext)
             {
                 services.AddHealthChecks()
