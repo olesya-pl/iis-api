@@ -89,6 +89,18 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.MaterialPage.ReliabilityDropDown.Select(priority);
         }
 
+        [When(@"I set the session priority (.*) value")]
+        public void WhenISetTheSessionPriorityValue(string sessionPriority)
+        {
+            materialsSectionPage.MaterialPage.SessionPriorityDropDown.Select(sessionPriority);
+        }
+
+        [When(@"I set the source credibility (.*) value")]
+        public void WhenISetTheSourceCredibility(string sourceCredibility)
+        {
+            materialsSectionPage.MaterialPage.SourceCredibilityDropDown.Select(sourceCredibility);
+        }
+
 
         [When(@"I pressed Processed button")]
         public void WhenIPressProcessedButton()
@@ -101,6 +113,13 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressBackButton()
         {
             driver.Navigate().Back();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I pressed the Previous material button")]
+        public void WhenIPressedThePreviousButton()
+        {
+            materialsSectionPage.PreviousMaterialButton.Click();
             driver.WaitFor(2);
         }
 
@@ -162,6 +181,13 @@ namespace AcceptanceTests.UISteps
         {
             materialsSectionPage.ScrollDown();
         }
+
+        [When(@"I clicked on the pattern tab")]
+        public void WhenIClickedOnThePatternTab()
+        {
+            materialsSectionPage.PatternTab.Click();
+        }
+
         #endregion When
 
         #region Then
@@ -256,6 +282,20 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedValue, actualValue);
         }
 
+        [Then(@"I must see that the session priority value must be set to the (.*) value")]
+        public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheValue(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.SessionPriorityDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
+
+        [Then(@"I must see that the source credibility value must be set to the (.*) value")]
+        public void ThenIMustSeeThatTheSourceCredibilityValueMustBeSetToTheValue(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.SourceCredibilityDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
+
         [Then(@"I must see Text classifier ML output form")]
         public void IMustSeeTextClassifierMLOutPutFor()
         {
@@ -273,6 +313,14 @@ namespace AcceptanceTests.UISteps
         public void ThenIMustNotSeeTheRelatedObjectInTheMaterial()
         {
             Assert.False(materialsSectionPage.IsElementVisible());
+        }
+
+        [Then(@"I must see that phone number pattern is equal to value")]
+        public void ThenIMustSeeThatPhoneNumberPatternIsEqualToValue(string phoneNumber)
+        {
+            phoneNumber = phoneNumber.Trim();
+            var actualPhoneNumber = materialsSectionPage.PhoneNumberPatternNode.Text;
+            Assert.Equal(phoneNumber, actualPhoneNumber);
         }
         #endregion
     }
