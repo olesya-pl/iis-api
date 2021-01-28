@@ -7,6 +7,7 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using IIS.Repository;
 using IIS.Repository.Factories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,11 +29,15 @@ namespace Iis.Services
             string attributeDotName,
             Guid targetId,
             string userName,
-            string oldValue,
-            string newValue,
+            object oldValue,
+            object newValue,
             string parentTypeName,
             Guid requestId)
         {
+            var oldInfo = ParseValue(oldValue);
+            var newInfo = ParseValue(newValue);
+            if (oldInfo.value == newInfo.value) return;
+
             var changeHistoryEntity = new ChangeHistoryEntity
             {
                 Id = Guid.NewGuid(),
@@ -40,14 +45,36 @@ namespace Iis.Services
                 UserName = userName,
                 PropertyName = attributeDotName,
                 Date = DateTime.Now,
-                OldValue = oldValue,
-                NewValue = newValue,
+                OldValue = oldInfo.value,
+                NewValue = newInfo.value,
                 RequestId = requestId,
                 Type = ChangeHistoryEntityType.Node,
-                ParentTypeName = parentTypeName
+                ParentTypeName = parentTypeName,
+                OldTitle = oldInfo.title,
+                NewTitle = newInfo.title
             };
 
             await RunAsync(uow => uow.ChangeHistoryRepository.Add(changeHistoryEntity));
+        }
+
+        private (string value, string title) ParseValue(object valueObj)
+        {
+            if (valueObj == null) return (null, null);
+
+            if (valueObj is string) return ((string)valueObj, null);
+
+            if (valueObj is Guid id) return (id.ToString("N"), GetTitle(id));
+
+            return (JsonConvert.SerializeObject(valueObj), null);
+        }
+
+        private string GetTitle(Guid id)
+        {
+            var node = _ontologyNodesData.GetNode(id);
+            if (node == null) return null;
+
+            return node.GetComputedValue("__title") ?? node.GetSingleProperty("name")?.Value;
+
         }
 
         public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes)

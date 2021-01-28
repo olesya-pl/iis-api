@@ -381,10 +381,14 @@ namespace IIS.Core
                 {
                     context.Database.Migrate();
                 }
-                using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                try
                 {
-                    context.Database.Migrate();
+                    using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                    {
+                        context.Database.Migrate();
+                    }
                 }
+                catch { }
             }
         }
 

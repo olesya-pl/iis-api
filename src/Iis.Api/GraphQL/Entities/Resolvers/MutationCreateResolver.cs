@@ -183,9 +183,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public async Task<Relation> CreateSinglePropertyAsync(
             Guid entityId,
-            IEmbeddingRelationTypeModel embed, 
+            IEmbeddingRelationTypeModel embed,
             object value,
-            string oldValue,
+            object oldValue,
             string dotName,
             Guid requestId)
         {
@@ -198,32 +198,27 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private async Task<Node> CreateNode(Guid entityId, 
             IEmbeddingRelationTypeModel embed,             
             object value, 
-            string oldValue,
+            object oldValue,
             string dotName,
             Guid requestId)
         {
             var node = await CreateNode(entityId, embed, value, dotName);
-            if (embed.IsAttributeType)
-            {
-                var username = GetCurrentUser()?.UserName ?? "system";
-                var stringifiedValue = value is string ? (string)value : JsonConvert.SerializeObject(value);
-                var parentTypeName = embed.Source.RelationType.SourceType.Name;
-                
-                if (!string.Equals(stringifiedValue, oldValue, StringComparison.Ordinal))
-                {
-                    await _changeHistoryService.SaveNodeChange(dotName,
-                    entityId,
-                    username,
-                    oldValue,
-                    stringifiedValue,
-                    parentTypeName,
-                    requestId);
-                }
-                
-            }
-            return node;
-        } 
+            
+            var username = GetCurrentUser()?.UserName ?? "system";
+            var parentTypeName = embed.Source.RelationType.SourceType.Name;
 
+            var newValue = value is Dictionary<string, object> dict && dict.ContainsKey("targetId") ?
+                Guid.Parse((string)dict["targetId"]) : value;
+
+            await _changeHistoryService.SaveNodeChange(dotName,
+                entityId,
+                username,
+                oldValue,
+                newValue,
+                parentTypeName,
+                requestId);
+            return node;
+        }
 
         private async Task<Node> CreateNode(
             Guid entityId, 

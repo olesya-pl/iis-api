@@ -12,5 +12,7 @@ namespace Iis.Services.Contracts.Dtos
         public string UserName { get; set; }
         public Guid RequestId { get; set; }
         public int Type { get; set; }
+        public string OldTitle { get; set; }
+        public string NewTitle { get; set; }
     }
 }
