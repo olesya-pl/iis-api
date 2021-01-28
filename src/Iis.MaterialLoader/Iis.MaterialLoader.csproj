@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+      <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
+      <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
+      <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
+      <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
+    </ItemGroup>
+
+
+</Project>

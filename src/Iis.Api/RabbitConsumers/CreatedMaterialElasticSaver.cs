@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.DbLayer.Repositories;
+using Iis.Api.Materials;
 using IIS.Core.Materials;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 
-namespace Iis.Api.Materials
+namespace Iis.Api.RabbitConsumers
 {
     public class CreatedMaterialElasticSaver : BackgroundService
     {
@@ -70,7 +70,7 @@ namespace Iis.Api.Materials
                             await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, stoppingToken);
                             _materialIds.Clear();
                         }                        
-                        await Task.Delay(TimeSpan.FromSeconds(1));                        
+                        await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);                        
                         continue;
                     }
                     var materialId = new Guid(System.Text.Encoding.UTF8.GetString(message.Body));
@@ -81,7 +81,7 @@ namespace Iis.Api.Materials
                         await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, stoppingToken);
                         _materialIds.Clear();
                     }
-                    await Task.Delay(TimeSpan.FromMilliseconds(100));
+                    await Task.Delay(TimeSpan.FromMilliseconds(100), stoppingToken);
                 }
                 catch (Exception e)
                 {

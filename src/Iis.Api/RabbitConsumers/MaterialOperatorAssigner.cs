@@ -1,15 +1,15 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using IIS.Core.Materials;
+using Iis.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
-using System;
-using Iis.Services;
-using Microsoft.Extensions.Configuration;
 
-namespace IIS.Core.Materials
+namespace Iis.Api.RabbitConsumers
 {
     public class MaterialOperatorAssigner : BackgroundService
     {
@@ -65,7 +65,7 @@ namespace IIS.Core.Materials
 
                     if (!availableOperators.Any())
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(30));
+                        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
                         continue;
                     }
 
@@ -74,7 +74,7 @@ namespace IIS.Core.Materials
                         var message = _channel.BasicGet(_configuration.QueueName, false);
                         if (message == null)
                         {
-                            await Task.Delay(TimeSpan.FromSeconds(30));
+                            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
                             continue;
                         }
                         var materialId = new Guid(System.Text.Encoding.UTF8.GetString(message.Body));

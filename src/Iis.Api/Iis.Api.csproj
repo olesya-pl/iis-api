@@ -70,6 +70,7 @@
     <ProjectReference Include="..\Iis.EventHandlers\Iis.EventHandlers.csproj" />
     <ProjectReference Include="..\Iis.FlightRadar.DataModel\Iis.FlightRadar.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
     <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologyModelWrapper\Iis.OntologyModelWrapper.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />

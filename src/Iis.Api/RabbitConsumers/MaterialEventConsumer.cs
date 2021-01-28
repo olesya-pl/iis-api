@@ -1,26 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using IIS.Core.Files.EntityFramework;
+using IIS.Core;
 using IIS.Core.GraphQL.Materials;
+using IIS.Core.Materials;
+using Iis.DataModel;
+using Iis.DataModel.Materials;
+using Iis.Services.Contracts.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
-using System.Net.Http;
-using System.Net;
-using Iis.DataModel.Materials;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Iis.DataModel;
-using Iis.Services.Contracts.Interfaces;
 
-namespace IIS.Core.Materials
+namespace Iis.Api.RabbitConsumers
 {
     public class MaterialEventConsumer : BackgroundService
     {

@@ -1,27 +1,26 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Text;
 using System.Text.Json;
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Iis.Api.Configuration;
+using IIS.Core.Materials;
+using IIS.Core.Materials.FeatureProcessors;
+using IIS.Core.Materials.Handlers.Configurations;
+using Iis.DbLayer.Repositories;
+using Iis.Interfaces.Constants;
+using IIS.Repository.Factories;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
-using Newtonsoft.Json.Linq;
 
-using Iis.Api.Configuration;
-using Iis.DbLayer.Repositories;
-using IIS.Repository.Factories;
-using IIS.Core.Materials.FeatureProcessors;
-using IIS.Core.Materials.Handlers.Configurations;
-using IIS.Core.Materials.EntityFramework.FeatureProcessors;
-using Iis.Interfaces.Constants;
-
-namespace IIS.Core.Materials.Handlers
+namespace Iis.Api.RabbitConsumers
 {
     public class FeatureHandler : BackgroundService
     {

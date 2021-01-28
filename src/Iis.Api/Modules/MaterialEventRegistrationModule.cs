@@ -7,6 +7,7 @@ using IIS.Core.Materials;
 using IIS.Core.Materials.Handlers;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.Api.Materials;
+using Iis.Api.RabbitConsumers;
 
 namespace Iis.Api.Modules
 {
