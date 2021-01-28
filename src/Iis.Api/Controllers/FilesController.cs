@@ -8,6 +8,7 @@ using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
 using IIS.Core.Materials.FeatureProcessors;
+using Iis.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -43,8 +44,8 @@ namespace IIS.Core.Controllers
         [DisableRequestSizeLimit]
         public async Task<object> Post([Required] IFormFile file, CancellationToken token)
         {
-            FileIdDto fileId = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
-            var url = Url.Action("Get", "Files", new { Id = fileId.Id }, Request.Scheme);
+            var fileId = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
+            var url = FileUrlGetter.GetFileUrl(fileId.Id);
             return new
             {
                 fileId.Id,

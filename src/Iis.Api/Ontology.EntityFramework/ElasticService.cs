@@ -62,6 +62,7 @@ namespace IIS.Core.Ontology.EntityFramework
             };
 
             var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
+
             return new SearchResult
             {
                 Count = searchResult.Count,

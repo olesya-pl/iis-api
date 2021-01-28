@@ -260,6 +260,7 @@ namespace IIS.Core
 
             services.RegisterFlightRadarServices(Configuration);
 
+
             if (enableContext)
             {
                 services.AddHealthChecks()
@@ -381,10 +382,14 @@ namespace IIS.Core
                 {
                     context.Database.Migrate();
                 }
-                using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                try
                 {
-                    context.Database.Migrate();
+                    using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                    {
+                        context.Database.Migrate();
+                    }
                 }
+                catch (Exception e) { }
             }
         }
 
