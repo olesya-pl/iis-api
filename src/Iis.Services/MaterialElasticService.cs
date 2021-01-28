@@ -23,15 +23,15 @@ namespace Iis.Services
         private string[] MaterialIndexes = { "Materials" };
         private static IReadOnlyCollection<AggregationField> _aggregationsFieldList = new List<AggregationField>
         {
-            new AggregationField("ProcessedStatus", string.Empty, "ProcessedStatus.Title"),
-            new AggregationField("Completeness", string.Empty, "Completeness.Title"),
-            new AggregationField("Importance", string.Empty, "Importance.Title"),
-            new AggregationField("SessionPriority", string.Empty, "SessionPriority.Title"),
-            new AggregationField("Reliability", string.Empty, "Reliability.Title"),
-            new AggregationField("Relevance", string.Empty, "Relevance.Title"),
-            new AggregationField("SourceReliability", string.Empty, "SourceReliability.Title"),
-            new AggregationField("Type", string.Empty, "Type.keyword"),
-            new AggregationField("Source", string.Empty, "Source.keyword"),
+            new AggregationField("ProcessedStatus.Title", string.Empty, "ProcessedStatus.Title"),
+            new AggregationField("Completeness.Title", string.Empty, "Completeness.Title"),
+            new AggregationField("Importance.Title", string.Empty, "Importance.Title"),
+            new AggregationField("SessionPriority.Title", string.Empty, "SessionPriority.Title"),
+            new AggregationField("Reliability.Title", string.Empty, "Reliability.Title"),
+            new AggregationField("Relevance.Title", string.Empty, "Relevance.Title"),
+            new AggregationField("SourceReliability.Title", string.Empty, "SourceReliability.Title"),
+            new AggregationField("Type.keyword", string.Empty, "Type.keyword"),
+            new AggregationField("Source.keyword", string.Empty, "Source.keyword"),
         };
 
         public MaterialElasticService(IElasticManager elasticManager,
