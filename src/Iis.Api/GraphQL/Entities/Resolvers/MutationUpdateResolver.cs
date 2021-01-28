@@ -81,7 +81,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             if (type.HasUniqueValues && properties.ContainsKey(type.UniqueValueFieldName) && node.GetProperty(type.UniqueValueFieldName) != null)
             {
-                var newNode = await _mutationCreateResolver.CreateEntity(id, type, dotName, properties);
+                var newNode = await _mutationCreateResolver.CreateEntity(id, type, dotName, properties, requestId);
                 if (newNode.Id != node.Id)
                 {
                     node = (Entity)_ontologyService.GetNode(newNode.Id);

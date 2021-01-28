@@ -48,7 +48,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 .Select(p => new ChangeHistoryItemGroup()
                 {
                     RequestId = p.Key,
-                    Items = p.ToList()
+                    Items = p.OrderBy(item => item.PropertyName == "lastConfirmedAt" ? 1 : 0).ToList()
                 })
                 .ToList();
 

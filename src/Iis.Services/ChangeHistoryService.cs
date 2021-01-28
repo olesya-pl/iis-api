@@ -36,7 +36,8 @@ namespace Iis.Services
         {
             var oldInfo = ParseValue(oldValue);
             var newInfo = ParseValue(newValue);
-            if (oldInfo.value == newInfo.value) return;
+            if (oldInfo.value == newInfo.value || IsInternalEntity(oldValue) || IsInternalEntity(newValue)) 
+                return;
 
             var changeHistoryEntity = new ChangeHistoryEntity
             {
@@ -57,6 +58,27 @@ namespace Iis.Services
             await RunAsync(uow => uow.ChangeHistoryRepository.Add(changeHistoryEntity));
         }
 
+        private bool IsInternalEntity(object value)
+        {
+            if (value == null) return false;
+
+            if (value is Dictionary<string, object> dict && (dict.ContainsKey("target") || dict.ContainsKey("targetId")))
+            {
+                return true;
+            }
+
+            if (value is Guid id)
+            {
+                var node = _ontologyNodesData.GetNode(id);
+                if (node == null) return false;
+                
+                var nt = node.NodeType;
+
+                return !(nt.IsObjectOfStudy || nt.IsEvent || nt.IsEnum);
+            }
+            return false;
+        }
+
         private (string value, string title) ParseValue(object valueObj)
         {
             if (valueObj == null) return (null, null);
@@ -73,8 +95,19 @@ namespace Iis.Services
             var node = _ontologyNodesData.GetNode(id);
             if (node == null) return null;
 
-            return node.GetComputedValue("__title") ?? node.GetSingleProperty("name")?.Value;
+            if (node.NodeType.IsObjectOfStudy)
+            {
 
+            }
+
+            return node.GetComputedValue("__title") ?? node.GetSingleProperty("name")?.Value;
+        }
+
+        private string GetTitle(string strId)
+        {
+            return string.IsNullOrEmpty(strId) ?
+                null :
+                GetTitle(Guid.Parse(strId));
         }
 
         public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes)
@@ -84,6 +117,12 @@ namespace Iis.Services
             {
                 entity.Id = Guid.NewGuid();
                 entity.Type = ChangeHistoryEntityType.Material;
+
+                if (entity.PropertyName == "MaterialFeature.NodeId")
+                {
+                    entity.OldTitle = GetTitle(entity.OldValue);
+                    entity.NewTitle = GetTitle(entity.NewValue);
+                }
             }
             await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
         }
