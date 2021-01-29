@@ -17,6 +17,7 @@ namespace Iis.Domain.Vocabularies
             { "SessionPriority", "Прiоритет сеансу" },
             { "Assignee", "Виконавець" },
             { "Content", "Зміст" },
+            { "MaterialFeature.NodeId", "Зв'язок"}
         };
 
         public string Translate(string key)
