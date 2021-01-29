@@ -25,6 +25,7 @@ using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.OntologySchema;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
+using Iis.Domain.Vocabularies;
 using Iis.Elastic;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Elastic;
@@ -196,6 +197,7 @@ namespace IIS.Core
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
+            services.AddSingleton<IisVocabulary>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
@@ -389,7 +391,7 @@ namespace IIS.Core
                         context.Database.Migrate();
                     }
                 }
-                catch (Exception e) { }
+                catch { }
             }
         }
 

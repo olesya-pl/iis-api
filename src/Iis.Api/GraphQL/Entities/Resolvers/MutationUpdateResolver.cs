@@ -81,7 +81,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             if (type.HasUniqueValues && properties.ContainsKey(type.UniqueValueFieldName) && node.GetProperty(type.UniqueValueFieldName) != null)
             {
-                var newNode = await _mutationCreateResolver.CreateEntity(id, type, dotName, properties);
+                var newNode = await _mutationCreateResolver.CreateEntity(id, type, dotName, properties, requestId);
                 if (newNode.Id != node.Id)
                 {
                     node = (Entity)_ontologyService.GetNode(newNode.Id);
@@ -270,15 +270,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             if (value != null)
             {
-                var oldValue = string.Empty;
-                if (oldRelation != null && oldRelation.Target is Attribute)
-                {
-                    var oldValueObj = (oldRelation.Target as Attribute).Value;
-                    oldValue = oldValueObj is string ? (string)oldValueObj : JsonConvert.SerializeObject(oldValueObj);                    
-                }
+                object oldValue = oldRelation == null ? null :
+                    oldRelation.Target is Attribute attribute ?
+                        attribute.Value :
+                        oldRelation.Target.Id;
+
                 var newRelation = 
                     await _mutationCreateResolver.CreateSinglePropertyAsync(_rootNodeId, embed, value, oldValue, dotName, requestId);
-                node.AddNode(newRelation);                
+                node.AddNode(newRelation);
             }
         }
 

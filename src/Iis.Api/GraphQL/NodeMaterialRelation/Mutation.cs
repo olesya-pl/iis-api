@@ -18,7 +18,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
-            await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input));
+            await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.UserId);
             return mapper.Map<Material>(material);
         }
@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
-            await relationService.Delete(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input));
+            await relationService.Delete(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.UserId);
             return mapper.Map<Material>(material);
         }

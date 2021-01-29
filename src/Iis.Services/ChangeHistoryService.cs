@@ -7,6 +7,7 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using IIS.Repository;
 using IIS.Repository.Factories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,11 +29,16 @@ namespace Iis.Services
             string attributeDotName,
             Guid targetId,
             string userName,
-            string oldValue,
-            string newValue,
+            object oldValue,
+            object newValue,
             string parentTypeName,
             Guid requestId)
         {
+            var oldInfo = ParseValue(oldValue);
+            var newInfo = ParseValue(newValue);
+            if (oldInfo.value == newInfo.value || IsInternalEntity(oldValue) || IsInternalEntity(newValue)) 
+                return;
+
             var changeHistoryEntity = new ChangeHistoryEntity
             {
                 Id = Guid.NewGuid(),
@@ -40,14 +46,68 @@ namespace Iis.Services
                 UserName = userName,
                 PropertyName = attributeDotName,
                 Date = DateTime.Now,
-                OldValue = oldValue,
-                NewValue = newValue,
+                OldValue = oldInfo.value,
+                NewValue = newInfo.value,
                 RequestId = requestId,
                 Type = ChangeHistoryEntityType.Node,
-                ParentTypeName = parentTypeName
+                ParentTypeName = parentTypeName,
+                OldTitle = oldInfo.title,
+                NewTitle = newInfo.title
             };
 
             await RunAsync(uow => uow.ChangeHistoryRepository.Add(changeHistoryEntity));
+        }
+
+        private bool IsInternalEntity(object value)
+        {
+            if (value == null) return false;
+
+            if (value is Dictionary<string, object> dict && (dict.ContainsKey("target") || dict.ContainsKey("targetId")))
+            {
+                return true;
+            }
+
+            if (value is Guid id)
+            {
+                var node = _ontologyNodesData.GetNode(id);
+                if (node == null) return false;
+                
+                var nt = node.NodeType;
+
+                return !(nt.IsObjectOfStudy || nt.IsEvent || nt.IsEnum);
+            }
+            return false;
+        }
+
+        private (string value, string title) ParseValue(object valueObj)
+        {
+            if (valueObj == null) return (null, null);
+
+            if (valueObj is string) return ((string)valueObj, null);
+
+            if (valueObj is Guid id) return (id.ToString("N"), GetTitle(id));
+
+            return (JsonConvert.SerializeObject(valueObj), null);
+        }
+
+        private string GetTitle(Guid id)
+        {
+            var node = _ontologyNodesData.GetNode(id);
+            if (node == null) return null;
+
+            if (node.NodeType.IsObjectOfStudy)
+            {
+
+            }
+
+            return node.GetComputedValue("__title") ?? node.GetSingleProperty("name")?.Value;
+        }
+
+        private string GetTitle(string strId)
+        {
+            return string.IsNullOrEmpty(strId) ?
+                null :
+                GetTitle(Guid.Parse(strId));
         }
 
         public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes)
@@ -57,6 +117,12 @@ namespace Iis.Services
             {
                 entity.Id = Guid.NewGuid();
                 entity.Type = ChangeHistoryEntityType.Material;
+
+                if (entity.PropertyName == "MaterialFeature.NodeId")
+                {
+                    entity.OldTitle = GetTitle(entity.OldValue);
+                    entity.NewTitle = GetTitle(entity.NewValue);
+                }
             }
             await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
         }
