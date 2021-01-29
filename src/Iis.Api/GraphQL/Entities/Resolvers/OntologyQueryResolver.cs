@@ -194,7 +194,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     Label = label,
                     Lat = geoCoordinate.Latitude,
-                    Long = geoCoordinate.Longitude
+                    Long = geoCoordinate.Longitude,
+                    PropertyName = relation.Node.NodeType.Name
                 });
             }
             return Task.FromResult(result);
