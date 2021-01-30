@@ -169,8 +169,35 @@ namespace Iis.Elastic
         {
             var path = !baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
 
-            var response = await GetAsync(path, queryData, cancellationToken);
+            var response = await GetAsync(path, queryData, null, cancellationToken);
 
+            return _resultExtractor.GetFromResponse(response);
+        }
+
+        public async Task<IElasticSearchResult> BeginSearchByScrollAsync(
+            string queryData, 
+            TimeSpan scrollLifetime, 
+            IEnumerable<string> baseIndexNameList, 
+            CancellationToken cancellationToken = default)
+        {
+            var path = !baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
+            var queryString = new Dictionary<string, object>() 
+            {
+                {"scroll",  $"{(int)scrollLifetime.TotalSeconds}s"}
+            };
+            var response = await GetAsync(path, queryData, queryString, cancellationToken);
+
+            return _resultExtractor.GetFromResponse(response);
+        }
+
+        public async Task<IElasticSearchResult> SearchByScrollAsync(string scrollId, TimeSpan scrollDuration)
+        {
+            var path = "_search/scroll";
+            var postData = $@"{{
+                ""scroll"" : ""{ scrollDuration.TotalSeconds }s"",                                                                 
+                ""scroll_id"" : ""{scrollId}""
+            }}";
+            var response = await PostAsync(path, postData, CancellationToken.None);
             return _resultExtractor.GetFromResponse(response);
         }
 
@@ -178,7 +205,7 @@ namespace Iis.Elastic
         {
             var path = !baseIndexNameList.Any() ? "_count" : $"{GetRealIndexNames(baseIndexNameList)}/_count";
 
-            var response = await GetAsync(path, queryData, cancellationToken);
+            var response = await GetAsync(path, queryData, null, cancellationToken);
 
             return JObject.Parse(response.Body)["count"].Value<int>();
         }
@@ -243,7 +270,7 @@ namespace Iis.Elastic
         {
             var path = $"{GetRealIndexNames(indexNames)}";
 
-            var response = await DoRequestAsync(HttpMethod.DELETE, path, string.Empty, cancellationToken);
+            var response = await DoRequestAsync(HttpMethod.DELETE, path, string.Empty, null, cancellationToken);
 
             return response.Success;
         }
@@ -252,7 +279,7 @@ namespace Iis.Elastic
         {
             var indexUrl = $"{GetRealIndexName(indexName)}";
 
-            var response = await DoRequestAsync(HttpMethod.DELETE, indexUrl, string.Empty, cancellationToken);
+            var response = await DoRequestAsync(HttpMethod.DELETE, indexUrl, string.Empty, null, cancellationToken);
 
             return response.Success;
         }
@@ -267,7 +294,7 @@ namespace Iis.Elastic
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
             ApplyIndexMappingSettings(jObject);
-            var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), cancellationToken);
+            var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), null, cancellationToken);
             return response.Success;
         }
 
@@ -332,7 +359,7 @@ namespace Iis.Elastic
             ApplyRussianAnalyzerAsync(request);
             ApplyMappingConfiguration(request, mappingConfiguration);
             var response =
-                await DoRequestAsync(HttpMethod.PUT, GetRealIndexName(indexName), request.ToString(), token);
+                await DoRequestAsync(HttpMethod.PUT, GetRealIndexName(indexName), request.ToString(), null, token);
             return response.Success;
         }
 
@@ -341,7 +368,7 @@ namespace Iis.Elastic
             if (!await IndexExistsAsync(indexName, ct))
                 throw new ArgumentException($"{indexName} does not exist", nameof(indexName));
 
-            var response = await DoRequestAsync(HttpMethod.PUT, $"{GetRealIndexName(indexName)}/_mapping", mappingConfiguration.ToString(), ct);
+            var response = await DoRequestAsync(HttpMethod.PUT, $"{GetRealIndexName(indexName)}/_mapping", mappingConfiguration.ToString(), null, ct);
 
             return ParseResponse(response);
         }
@@ -648,12 +675,12 @@ namespace Iis.Elastic
             return builder.ToString();
         }
 
-        private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, CancellationToken cancellationToken)
+        private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, IRequestParameters requestParameters, CancellationToken cancellationToken)
         {
             using (DurationMeter.Measure($"Elastic request {httpMethod} {path}", _logger))
             {
                 PostData postData = data;
-                var response = await _lowLevelClient.DoRequestAsync<StringResponse>(httpMethod, path, cancellationToken, postData);
+                var response = await _lowLevelClient.DoRequestAsync<StringResponse>(httpMethod, path, cancellationToken, postData, requestParameters);
                 var log = _responseLogUtils.PrepareLog(response);
                 _logger.Log(log.LogLevel, log.Message);
                 return response;
@@ -662,17 +689,25 @@ namespace Iis.Elastic
 
         private async Task<StringResponse> PutAsync(string path, string data, CancellationToken cancellationToken)
         {
-            return await DoRequestAsync(HttpMethod.PUT, path, data, cancellationToken);
+            return await DoRequestAsync(HttpMethod.PUT, path, data, null, cancellationToken);
         }
 
-        private async Task<StringResponse> GetAsync(string path, string data, CancellationToken cancellationToken)
+        private async Task<StringResponse> GetAsync(string path, string data, Dictionary<string, object> queryString, CancellationToken cancellationToken)
         {
-            return await DoRequestAsync(HttpMethod.GET, path, data, cancellationToken);
+            IRequestParameters parameters = null;
+            if (queryString != null) 
+            {
+                parameters = new GetRequestParameters()
+                {
+                    QueryString = queryString
+                };
+            }
+            return await DoRequestAsync(HttpMethod.GET, path, data, parameters, cancellationToken);
         }
 
         private async Task<StringResponse> PostAsync(string path, string data, CancellationToken cancellationToken)
         {
-            return await DoRequestAsync(HttpMethod.POST, path, data, cancellationToken);
+            return await DoRequestAsync(HttpMethod.POST, path, data, null, cancellationToken);
         }
     }
 }
