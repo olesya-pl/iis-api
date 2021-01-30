@@ -77,6 +77,12 @@ namespace Iis.Services
             return searchResult;
         }
 
+        public async Task<SearchResult> SearchByScroll(string scrollId, TimeSpan scrollDuration)
+        {
+            IElasticSearchResult elasticResult = await _elasticManager.SearchByScrollAsync(scrollId, scrollDuration);
+            return elasticResult.ToSearchResult();
+        }
+
         public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, 
             IEnumerable<Guid> materialList, 
             CancellationToken ct = default)

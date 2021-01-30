@@ -59,7 +59,8 @@ namespace Iis.Elastic.SearchQueryExtensions
                 Items = elasticSearchResult.Items
                     .ToDictionary(k => new Guid(k.Identifier),
                     v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult }),
-                Aggregations = aggregations
+                Aggregations = aggregations,
+                ScrollId = elasticSearchResult.ScrollId
             };
         }
     }

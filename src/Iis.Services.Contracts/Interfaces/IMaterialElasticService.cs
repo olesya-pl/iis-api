@@ -9,11 +9,11 @@ namespace Iis.Services.Contracts.Interfaces
 {
     public interface IMaterialElasticService
     {
-        Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default);
+        Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(SearchParams searchParams, TimeSpan scrollDuration = default, CancellationToken ct = default);
         Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, IEnumerable<Guid> materialList, CancellationToken ct = default);
         Task<SearchResult> SearchMoreLikeThisAsync(SearchParams searchParams, CancellationToken ct = default);
         Task<SearchResult> SearchByImageVector(decimal[] imageVector, PaginationParams page, CancellationToken ct = default);
         Task<int> CountMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default);
-
+        Task<SearchResult> SearchByScroll(string scrollId, TimeSpan scrollDuration);
     }
 }

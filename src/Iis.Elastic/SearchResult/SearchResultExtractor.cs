@@ -65,6 +65,10 @@ namespace Iis.Elastic.SearchResult
                     }
                 });
             }
+            if (json.ContainsKey("_scroll_id"))
+            {
+                res.ScrollId = json["_scroll_id"].ToString();
+            }
             return res;
         }
 
