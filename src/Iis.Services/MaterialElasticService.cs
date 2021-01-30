@@ -77,6 +77,24 @@ namespace Iis.Services
             return searchResult;
         }
 
+        public async Task<SearchResult> BeginSearchByScrollAsync(SearchParams searchParams, TimeSpan scrollDuration = default, CancellationToken ct = default)
+        {
+            var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
+
+            var (from, size) = searchParams.Page.ToElasticPage();
+
+            var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
+
+            var query = new ExactQueryBuilder()
+                .WithPagination(from, size)
+                .WithQueryString(queryString)
+                .Build();
+
+            var elasticResult = await _elasticManager.BeginSearchByScrollAsync(query.ToString(), scrollDuration, _elasticState.MaterialIndexes, ct);
+
+            return elasticResult.ToSearchResult();
+        }
+
         public async Task<SearchResult> SearchByScroll(string scrollId, TimeSpan scrollDuration)
         {
             IElasticSearchResult elasticResult = await _elasticManager.SearchByScrollAsync(scrollId, scrollDuration);
