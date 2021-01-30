@@ -31,7 +31,9 @@ namespace IIS.Core.NodeMaterialRelation
 
         public async Task Create(NodeMaterialRelation relation, string userName = null)
         {
-            if(!MaterialExists(relation.MaterialId)) throw new InvalidOperationException($"There is no Material with ID:{relation.MaterialId}");
+            var material = GetMaterial(relation.MaterialId);
+
+            if(material == null) throw new InvalidOperationException($"There is no Material with ID:{relation.MaterialId}");
 
             ValidateUniquness(relation);
 
@@ -55,7 +57,7 @@ namespace IIS.Core.NodeMaterialRelation
                 TargetId = relation.MaterialId,
                 UserName = userName
             };
-            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto });
+            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto }, material.Title);
         }
 
         private void ValidateUniquness(NodeMaterialRelation relation)
@@ -67,13 +69,15 @@ namespace IIS.Core.NodeMaterialRelation
             }
         }
 
-        private bool MaterialExists(Guid materialId)
+        private MaterialEntity GetMaterial(Guid materialId)
         {
-            return _context.Materials.Any(e => e.Id == materialId);
+            return _context.Materials.SingleOrDefault(e => e.Id == materialId);
         }
 
         public async Task Delete(NodeMaterialRelation relation, string userName = null)
         {
+            var material = GetMaterial(relation.MaterialId);
+
             var featureToRemove = await _context.MaterialFeatures
                 .Include(p => p.MaterialInfo)
                 .FirstOrDefaultAsync(p => p.NodeId == relation.NodeId && p.MaterialInfo.MaterialId == relation.MaterialId);
@@ -91,7 +95,7 @@ namespace IIS.Core.NodeMaterialRelation
                 TargetId = relation.MaterialId,
                 UserName = userName
             };
-            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto });
+            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto }, material.Title);
         }
     }
 }

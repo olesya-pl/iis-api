@@ -110,9 +110,11 @@ namespace Iis.Services
                 GetTitle(Guid.Parse(strId));
         }
 
-        public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes)
+        public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes, string materialTitle = null)
         {
             var entities = _mapper.Map<List<ChangeHistoryEntity>>(changes);
+            var mirrorEntities = new List<ChangeHistoryEntity>();
+
             foreach (var entity in entities)
             {
                 entity.Id = Guid.NewGuid();
@@ -122,9 +124,30 @@ namespace Iis.Services
                 {
                     entity.OldTitle = GetTitle(entity.OldValue);
                     entity.NewTitle = GetTitle(entity.NewValue);
+                    mirrorEntities.Add(GetMirrorChangeHistoryEntity(entity, materialTitle));
                 }
             }
+            entities.AddRange(mirrorEntities);
             await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
+        }
+
+        private ChangeHistoryEntity GetMirrorChangeHistoryEntity(ChangeHistoryEntity entity, string materialTitle)
+        {
+            return new ChangeHistoryEntity
+            {
+                Id = Guid.NewGuid(),
+                TargetId = Guid.Parse(entity.OldValue ?? entity.NewValue),
+                UserName = entity.UserName,
+                PropertyName = "MaterialLink",
+                Date = entity.Date,
+                OldValue = entity.OldValue == null ? null : entity.TargetId.ToString("N"),
+                NewValue = entity.NewValue == null ? null : entity.TargetId.ToString("N"),
+                RequestId = entity.RequestId,
+                Type = ChangeHistoryEntityType.Node,
+                ParentTypeName = null,
+                OldTitle = entity.OldValue == null ? null : materialTitle,
+                NewTitle = entity.NewValue == null ? null : materialTitle
+            };
         }
 
         public async Task<List<ChangeHistoryDto>> GetChangeHistory(ChangeHistoryParams parameters)
