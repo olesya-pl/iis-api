@@ -327,9 +327,11 @@ namespace Iis.Api.FlightRadar
             {
                 if (!Directory.Exists(_config.DataFolder))
                 {
+                    _logger.LogInformation($"FlightRadarDataReader. Moving file. Directory does not exist {_config.DataFolder}");
                     return;
                 }
-                
+
+                _logger.LogInformation($"FlightRadarDataReader. Start moving file {fullFileName}");
                 var subdirectory = path.Replace(_config.DataFolder, string.Empty, StringComparison.Ordinal).TrimStart('\\');
                 var destinationDirectory = Path.Combine(destinationDir, subdirectory);
                 if (!Directory.Exists(destinationDirectory))
@@ -338,6 +340,7 @@ namespace Iis.Api.FlightRadar
                 }
                 var destination = Path.Combine(destinationDirectory, fileName);
                 File.Move(fullFileName, destination, true);
+                _logger.LogInformation($"FlightRadarDataReader. Done moving file {fullFileName}");
             }
             catch (Exception e)
             {
