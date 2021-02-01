@@ -296,11 +296,13 @@ namespace Iis.Api.FlightRadar
             var fullFileName = Path.Combine(path, fileName);
             if (!File.Exists(fullFileName))
             {
+                _logger.LogInformation($"FlightRadarDataReader. File not found {fullFileName}");
                 return;
             }
 
             try
             {
+                _logger.LogInformation($"FlightRadarDataReader. Start importing file {fullFileName}");
                 using (var reader = new StreamReader(fullFileName))
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
@@ -308,6 +310,7 @@ namespace Iis.Api.FlightRadar
                     var items = csv.GetRecords<TEntity>();
                     await syncAction(items);
                 }
+                _logger.LogInformation($"FlightRadarDataReader. Done importing file {fullFileName}");
             }
             catch (Exception e)
             {
