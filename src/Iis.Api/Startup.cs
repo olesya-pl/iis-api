@@ -193,7 +193,7 @@ namespace IIS.Core
             services.AddTransient<IThemeService, ThemeService<IIISUnitOfWork>>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
-            services.AddTransient<NodeMaterialRelationService>();
+            services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();

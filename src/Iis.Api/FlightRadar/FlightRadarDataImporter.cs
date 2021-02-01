@@ -142,7 +142,7 @@ namespace Iis.Api.FlightRadar
                     await Task.Delay(TimeSpan.FromMinutes(2));
                     continue;
                 }
-                var sourcesPaths = Directory.GetDirectories(_config.DataFolder);
+                var sourcesPaths = Directory.GetDirectories(_config.DataFolder, "*", SearchOption.AllDirectories);
                 foreach (var path in sourcesPaths)
                 {
                     try
@@ -311,7 +311,7 @@ namespace Iis.Api.FlightRadar
             }
             catch (Exception e)
             {
-                _logger.LogError("FileDataReader. Error while importing file", e);
+                _logger.LogError("FileDataReader. Error while importing file. Exception={e}", e);
                 TryMoveFile(path, fileName, fullFileName, _config.ErrorFolder);
                 return;
             }
@@ -338,7 +338,7 @@ namespace Iis.Api.FlightRadar
             }
             catch (Exception e)
             {
-                _logger.LogError("FlightRadarDataReader. Error while moving file", e);
+                _logger.LogError("FlightRadarDataReader. Error while moving file. Exception={e}", e);
             }
         }
     }

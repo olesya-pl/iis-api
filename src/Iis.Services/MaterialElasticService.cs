@@ -48,8 +48,6 @@ namespace Iis.Services
         {
             var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
-            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
-
             var (from, size) = searchParams.Page.ToElasticPage();
 
             var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
@@ -59,11 +57,16 @@ namespace Iis.Services
                 .WithQueryString(queryString)
                 .Build()
                 .WithAggregation(_aggregationsFieldList)
-                .WithHighlights()
-                .SetupSorting(sortColumn, sortOrder);
+                .WithHighlights();
 
-            var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
+            if (searchParams.Sorting != null)
+            {
+                var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+                query = query.SetupSorting(sortColumn, sortOrder);
+            }
 
+            var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct); 
+            
             var searchResult = elasticResult.ToSearchResult();
 
             foreach (var item in searchResult.Items)
@@ -117,14 +120,19 @@ namespace Iis.Services
                 queryBuilder.WithExactQuery(searchParams.Suggestion);
             }
 
-            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
-
-            var query = queryBuilder
+            var queryObj = queryBuilder
                             .Build()
-                            .WithHighlights()
-                            .SetupSorting(sortColumn, sortOrder)
-                            .WithAggregation(_aggregationsFieldList)
-                            .ToString(Formatting.None);
+                            .WithHighlights();
+
+            if (searchParams.Sorting != null)
+            {
+                var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+                queryObj = queryObj.SetupSorting(sortColumn, sortOrder);
+            }
+
+            var query = queryObj
+                .WithAggregation(_aggregationsFieldList)
+                .ToString(Formatting.None);
 
             var elasticResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);
 
@@ -196,6 +204,6 @@ namespace Iis.Services
                 "nodes" => ("NodesCount", sorting.Order),
                 _ => (null, null)
             };
-        }
+        }        
     }
 }
