@@ -332,7 +332,7 @@ namespace Iis.Api.FlightRadar
                 }
 
                 _logger.LogInformation($"FlightRadarDataReader. Start moving file {fullFileName}");
-                var subdirectory = path.Replace(_config.DataFolder, string.Empty, StringComparison.Ordinal).TrimStart('\\');
+                var subdirectory = path.Replace(_config.DataFolder, string.Empty, StringComparison.Ordinal).TrimStart('\\', '/');
                 var destinationDirectory = Path.Combine(destinationDir, subdirectory);
                 if (!Directory.Exists(destinationDirectory))
                 {
