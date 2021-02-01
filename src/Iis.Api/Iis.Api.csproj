@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.0.0" />
+    <PackageReference Include="CsvHelper" Version="19.0.0" />
     <PackageReference Include="Nest" Version="7.8.0" />
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.4" />

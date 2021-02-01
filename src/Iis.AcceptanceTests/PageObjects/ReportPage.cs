@@ -1,5 +1,6 @@
 using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using SeleniumExtras.PageObjects;
 
 namespace AcceptanceTests.PageObjects
@@ -28,10 +29,34 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//button[@class='el-button add-button el-button--default']")]
         public IWebElement CreateNewReportButton;
 
+        [FindsBy(How = How.CssSelector, Using = ".left-table .el-button--icon")]
+        public IWebElement AddEventToReportButton;
+
+        [FindsBy(How = How.CssSelector, Using = "div[name='title'] .el-input__inner")]
+        public IWebElement NameOfTheReportField;
+
+        [FindsBy(How = How.XPath, Using = "//div[contains(@class, 'cell') and text() = 'Час та дата']")]
+        public IWebElement HourAndDateColumn;
+
         public Report GetReportByTitle(string title)
         {
             return new Report(driver, title);
         }
+
+        public bool IsElementVisible()
+        {
+            try
+            {
+                var elem = driver.FindElement(By.XPath("//table[@class='el-table__body']//tr[@class='el-table__row']"));
+                return elem.Displayed;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
         public ReportCreationAndEdit ReportCreationAndEdit => new ReportCreationAndEdit(driver);
     }
 }

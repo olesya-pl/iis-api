@@ -5,7 +5,6 @@ using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Iis.DbLayer.Elastic
 {
@@ -13,6 +12,36 @@ namespace Iis.DbLayer.Elastic
     {
         private readonly IOntologySchema _ontologySchema;
         private readonly List<IElasticFieldEntity> _elasticFields = new List<IElasticFieldEntity>();
+        private static readonly IReadOnlyCollection<NodeAggregationInfo> _defaultNodeTypeFieldList = new List<NodeAggregationInfo>
+        {
+            new NodeAggregationInfo
+            {
+                Name = ElasticConfigConstants.NodeTypeNameField,
+                IsAggregated = false
+            },
+            new NodeAggregationInfo
+            {
+                Name = ElasticConfigConstants.NodeTypeTitleField,
+                Alias = ElasticConfigConstants.NodeTypeTitleAlias,
+                IsAggregated = true
+            },
+            new NodeAggregationInfo
+            {
+                Name = ElasticConfigConstants.NodeTypeTitleAggregateField,
+                IsAggregated = false
+            },
+            new NodeAggregationInfo
+            {
+                Name = ElasticConfigConstants.CreatedAtField,
+                IsAggregated = false
+            },
+            new NodeAggregationInfo
+            {
+                Name = ElasticConfigConstants.UpdatedAtField,
+                IsAggregated = false
+            }
+        };
+
         public IisElasticConfiguration(IOntologySchema ontologySchema)
         {
             _ontologySchema = ontologySchema;
@@ -44,6 +73,7 @@ namespace Iis.DbLayer.Elastic
                 = ontologyFields.Select(p => new IisElasticField
                 {
                     Name = p.Value.Name,
+                    Alias = p.Value.Alias,
                     IsAggregated = p.Value.IsAggregated
                 }).ToDictionary(p => p.Name);
 
@@ -136,36 +166,11 @@ namespace Iis.DbLayer.Elastic
                     .Select(p => new NodeAggregationInfo
                     {
                         Name = p.DotName,
+                        Alias = p.AliasesList?.FirstOrDefault(),
                         IsAggregated = p.IsAggregated
                     }).ToList();
 
-                nodes.AddRange(new[] {
-                    new NodeAggregationInfo
-                    {
-                        Name = "NodeTypeName",
-                        IsAggregated = false
-                    },
-                    new NodeAggregationInfo
-                    {
-                        Name = "NodeTypeTitle",
-                        IsAggregated = true
-                    },
-                    new NodeAggregationInfo
-                    {
-                        Name = "NodeTypeTitleAggregate",
-                        IsAggregated = false
-                    },
-                    new NodeAggregationInfo
-                    {
-                        Name = "CreatedAt",
-                        IsAggregated = false
-                    },
-                    new NodeAggregationInfo
-                    {
-                        Name = "UpdatedAt",
-                        IsAggregated = false
-                    }
-                });
+                nodes.AddRange(_defaultNodeTypeFieldList);
 
                 return nodes;
             }

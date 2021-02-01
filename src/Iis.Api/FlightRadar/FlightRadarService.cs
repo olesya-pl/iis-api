@@ -57,11 +57,16 @@ namespace IIS.Core.FlightRadar
             foreach (var sign in signs)
             {
                 var node = (_ontologyService.GetNode(sign.Id)) as Entity;
-                node.SetProperty("location", new Dictionary<string, object> {
-                    { "type", "Point" },
-                    { "coordinates", new [] {latestValue.Lat, latestValue.Long} }
-                });
-                _ontologyService.SaveNode(node);
+                var registeredAt = node.GetAttributeValue("registeredAt");
+                if (registeredAt is null || (registeredAt is DateTime && (DateTime)registeredAt < latestValue.RegisteredAt))
+                {
+                    node.SetProperty("location", new Dictionary<string, object> {
+                        { "type", "Point" },
+                        { "coordinates", new [] {latestValue.Lat, latestValue.Long} }
+                    });
+                    node.SetProperty("registeredAt", latestValue.RegisteredAt);
+                    _ontologyService.SaveNode(node);
+                }                
             }
         }
 

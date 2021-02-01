@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
@@ -43,11 +44,11 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.RelationsTab.Click();
         }
 
-        [When(@"I clicked on the objects tab in the material card")]
+        [When(@"I clicked on the relation tab in the material card")]
         public void IClickedOnTheObjectsTabInTheMaterialCard()
         {
             driver.WaitFor(2);
-            materialsSectionPage.ObjectsTab.Click();
+            materialsSectionPage.RelationsTab.Click();
         }
 
         [When(@"I clicked on the ML tab in the material card")]
@@ -88,18 +89,37 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.MaterialPage.ReliabilityDropDown.Select(priority);
         }
 
+        [When(@"I set the session priority (.*) value")]
+        public void WhenISetTheSessionPriorityValue(string sessionPriority)
+        {
+            materialsSectionPage.MaterialPage.SessionPriorityDropDown.Select(sessionPriority);
+        }
+
+        [When(@"I set the source credibility (.*) value")]
+        public void WhenISetTheSourceCredibility(string sourceCredibility)
+        {
+            materialsSectionPage.MaterialPage.SourceCredibilityDropDown.Select(sourceCredibility);
+        }
+
 
         [When(@"I pressed Processed button")]
         public void WhenIPressProcessedButton()
         {
             materialsSectionPage.ProcessedButton.Click();
-            driver.WaitFor(1);
+            driver.WaitFor(3);
         }
 
         [When(@"I pressed Back button")]
         public void WhenIPressBackButton()
         {
             driver.Navigate().Back();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I pressed the Previous material button")]
+        public void WhenIPressedThePreviousButton()
+        {
+            materialsSectionPage.PreviousMaterialButton.Click();
             driver.WaitFor(2);
         }
 
@@ -152,6 +172,8 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedConfirmButton()
         {
             materialsSectionPage.ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy.Click();
+            driver.WaitFor(2);
+
         }
 
         [When(@"I scrolled down to the bottom of the relations tab")]
@@ -159,6 +181,13 @@ namespace AcceptanceTests.UISteps
         {
             materialsSectionPage.ScrollDown();
         }
+
+        [When(@"I clicked on the pattern tab")]
+        public void WhenIClickedOnThePatternTab()
+        {
+            materialsSectionPage.PatternTab.Click();
+        }
+
         #endregion When
 
         #region Then
@@ -253,6 +282,20 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedValue, actualValue);
         }
 
+        [Then(@"I must see that the session priority value must be set to the (.*) value")]
+        public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheValue(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.SessionPriorityDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
+
+        [Then(@"I must see that the source credibility value must be set to the (.*) value")]
+        public void ThenIMustSeeThatTheSourceCredibilityValueMustBeSetToTheValue(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.SourceCredibilityDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
+
         [Then(@"I must see Text classifier ML output form")]
         public void IMustSeeTextClassifierMLOutPutFor()
         {
@@ -269,7 +312,15 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must not see the related object in the material")]
         public void ThenIMustNotSeeTheRelatedObjectInTheMaterial()
         {
-            Assert.False(materialsSectionPage.ConnectedObjectLink.Displayed);
+            Assert.False(materialsSectionPage.IsElementVisible());
+        }
+
+        [Then(@"I must see that phone number pattern is equal to value")]
+        public void ThenIMustSeeThatPhoneNumberPatternIsEqualToValue(string phoneNumber)
+        {
+            phoneNumber = phoneNumber.Trim();
+            var actualPhoneNumber = materialsSectionPage.PhoneNumberPatternNode.Text;
+            Assert.Equal(phoneNumber, actualPhoneNumber);
         }
         #endregion
     }

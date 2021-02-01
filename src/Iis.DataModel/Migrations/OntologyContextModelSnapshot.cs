@@ -181,7 +181,13 @@ namespace Iis.DataModel.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("NewTitle")
+                        .HasColumnType("text");
+
                     b.Property<string>("NewValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OldTitle")
                         .HasColumnType("text");
 
                     b.Property<string>("OldValue")

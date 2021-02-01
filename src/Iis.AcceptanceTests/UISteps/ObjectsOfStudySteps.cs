@@ -84,7 +84,8 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the Direct reporting relationship link in the big card window")]
         public void WhenIClickedOnTheDirectReportingRelationshipLinkInTheBigCardWindow()
         {
-            objectsOfStudyPage.ClassifierBlock.Click();
+            objectsOfStudyPage.DirectReportingRelationshipLink.Click();
+            driver.WaitFor(1);
         }
 
         [When(@"I clicked on the relations tab")]
@@ -145,7 +146,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIEnteredTheValueInTheRealNameFullField(string objectOfStudyName)
         {
             var objectOfStudyUniqueName = $"{objectOfStudyName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid():N}";
-            context.SetResponse("objectOfStudyName", objectOfStudyUniqueName);
+            context.Set(objectOfStudyUniqueName, objectOfStudyName);
             objectsOfStudyPage.RealNameFullField.SendKeys(objectOfStudyUniqueName);
             objectsOfStudyPage.RealNameFullField.SendKeys(Keys.Enter);
         }
@@ -343,6 +344,15 @@ namespace AcceptanceTests.UISteps
             Assert.Contains(expectedObjectTitle, actualObjectTitle);
         }
 
+        [Then(@"I must see the (.*) predefined title of the newely created object of study")]
+        public void ThenIMustSeeThePredefinedTitleOfTheObject(string objectOfStudyName)
+        {
+            driver.WaitFor(2);
+            var uniqueObjectTitle = context.Get<string>(objectOfStudyName);
+            var actualObjectTitle = objectsOfStudyPage.OOSTitle.Text;
+            Assert.Contains(uniqueObjectTitle, actualObjectTitle);
+        }
+
         [Then(@"I must see these cards in hierarchy")]
         public void ThenIMustNotSeeTheseCardInHierarchy(Table table)
         {
@@ -356,7 +366,6 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the (.*) as one of the search results")]
         public void ThenIMustSeeThirdBrigadeBerkutAsOneOfTheSearchResults(string value)
         {
-            //Assert.True(objectsOfStudyPage.ThirdBrigadeSearchResult.Displayed);
             Assert.True(objectsOfStudyPage.GetObjectByTitle(value).Displayed);
         }
 
@@ -382,6 +391,20 @@ namespace AcceptanceTests.UISteps
         {
             var eventUniqueName = context.Get<string>(eventName);
             Assert.Contains(objectsOfStudyPage.Events, _ => _.Name == eventUniqueName);
+        }
+
+        [Then(@"I must see the specified title in the small object of study card")]
+        public void ThenIMustSeeTheSpecifiedTitleInTheSmallObjectOfStudyCard(string expectedTitle)
+        {
+            var actualTitle = objectsOfStudyPage.ObjectTitleInTheSmallCard.Text;
+            Assert.Equal(expectedTitle, actualTitle);
+        }
+
+        [Then(@"I must see the specified title in the name real full section")]
+        public void ThenIMustSeeTheSpecifiedTitleInTheNameRealFullSection(string expectedTitle)
+        {
+            var actualTitle = objectsOfStudyPage.RealNameFullBlock.Text;
+            Assert.Equal(expectedTitle, actualTitle);
         }
         #endregion
     }

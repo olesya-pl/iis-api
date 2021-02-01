@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Domain.Vocabularies;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using IIS.Core.GraphQL.Common;
@@ -15,6 +16,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
         public async Task<GraphQLCollection<ChangeHistoryItemGroup>> GetChangeHistory(
             [Service] IChangeHistoryService service,
             [Service] IMapper mapper,
+            [Service] IisVocabulary vocabulary,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid targetId,
             string propertyName = "",
             DateRangeFilter dateRangeFilter = null,
@@ -43,12 +45,17 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 items.AddRange(locationItems);
             }
 
+            foreach (var item in items)
+            {
+                item.PropertyName = vocabulary.Translate(item.PropertyName);
+            }
+
             var graphQLItems = items.Select(item => mapper.Map<ChangeHistoryItem>(item))
                 .GroupBy(p => p.RequestId)
                 .Select(p => new ChangeHistoryItemGroup()
                 {
                     RequestId = p.Key,
-                    Items = p.ToList()
+                    Items = p.OrderBy(item => item.PropertyName == "lastConfirmedAt" ? 1 : 0).ToList()
                 })
                 .ToList();
 

@@ -45,9 +45,18 @@ Feature: ObjectsOfStudySection - sanity
         And I clicked on enlarge small card button
         And I clicked on the Classifier block in the big card window
         And I clicked on the Direct reporting relationship link in the big card window
-        Then I must see the title 1 армійський корпус in the small card
+        Then I must see the specified title in the small object of study card
+
+            """
+            3 окрема мотострілецька бригада "Беркут"
+            """
+        When I clicked on enlarge small card button
         When I clicked on the General info block in the big card window
-        Then I must see name real full is equal to the 3 окрема мотострілецька бригада Беркут value
+        Then I must see the specified title in the name real full section
+
+            """
+            3 окрема мотострілецька бригада "Беркут"
+            """
 
     @sanity @UI @ObjectOfStudySectionUI
     Scenario: IS-5885 - Create a military organization
@@ -63,14 +72,9 @@ Feature: ObjectsOfStudySection - sanity
         And I entered the 48 value in the latitude field at the dislocation block
         And I entered the 48 value in the longitude field at dislocation block
         And I entered the Росія value in the country field at the dislocation block
-        #And I clicked on the dislocation block
-        #And I scrolled down to the Ідентифікаційні ознаки element
-        #And I clicked on the temporary dislocation block
-        #And I entered the 49 value in the longitude field at temporary dislocation block
-        #And I entered the 49 value in the latitude field at the temporary dislocation block
-        #And I entered the Росія value in the country field at the temporary dislocation block
         And I clicked on the save button to create a new object of study
-        And I clicked on the confirm save button to create a new object of study
+        When I clicked on the confirm save button to create a new object of study
+        Then I must see the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 predefined title of the newely created object of study
 
 
 

@@ -272,14 +272,16 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.And("I clicked on the Direct reporting relationship link in the big card window", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 48
-        testRunner.Then("I must see the title 1 армійський корпус in the small card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must see the specified title in the small object of study card", "3 окрема мотострілецька бригада \"Беркут\"", ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 49
+#line 53
+        testRunner.When("I clicked on enlarge small card button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 54
         testRunner.When("I clicked on the General info block in the big card window", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 50
-        testRunner.Then("I must see name real full is equal to the 3 окрема мотострілецька бригада Беркут " +
-                        "value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 55
+        testRunner.Then("I must see the specified title in the name real full section", "3 окрема мотострілецька бригада \"Беркут\"", ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -299,7 +301,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
                     "ObjectOfStudySectionUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IS-5885 - Create a military organization", null, tagsOfScenario, argumentsOfScenario);
-#line 53
+#line 62
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -322,48 +324,53 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 8
     this.FeatureBackground();
 #line hidden
-#line 54
+#line 63
         testRunner.When("I clicked on the create a new object of study button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 55
+#line 64
         testRunner.And("I clicked on the create a new military organization button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 56
+#line 65
         testRunner.And("I entered the джокер value in the affiliation field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 57
+#line 66
         testRunner.And("I entered the першочерговий value in the importance field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 58
+#line 67
         testRunner.And("I clicked on the classifiers block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 59
+#line 68
         testRunner.And("I entered the 28 обр РХБЗ value in the direct reporting relationship field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 60
+#line 69
         testRunner.And("I clicked on the general info block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 61
+#line 70
         testRunner.And("I entered the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генер" +
                         "ал-полковника В. К. Пікалова, в/ч 34081 value in the name real full field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 62
+#line 71
         testRunner.And("I clicked on the dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 63
+#line 72
         testRunner.And("I entered the 48 value in the latitude field at the dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 64
+#line 73
         testRunner.And("I entered the 48 value in the longitude field at dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 65
+#line 74
         testRunner.And("I entered the Росія value in the country field at the dislocation block", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 72
+#line 75
         testRunner.And("I clicked on the save button to create a new object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 73
-        testRunner.And("I clicked on the confirm save button to create a new object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 76
+        testRunner.When("I clicked on the confirm save button to create a new object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 77
+        testRunner.Then("I must see the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу гене" +
+                        "рал-полковника В. К. Пікалова, в/ч 34081 predefined title of the newely created " +
+                        "object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

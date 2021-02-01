@@ -76,11 +76,10 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//span[text()=' Зберегти тему ']")]
         public IWebElement CreateThemeButton;
 
-        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Зберегти')]")]
+        [FindsBy(How = How.CssSelector, Using = "button[name='btn-save']")]
         public IWebElement SaveObjectOfStudyButton;
 
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-full-screen']")]
-        [CacheLookup]
         public IWebElement EnlargeObjectOfStudySmallCardButton;
 
         [FindsBy(How = How.CssSelector, Using = ".el-menu > [role='menuitem']:nth-of-type(1)")]
@@ -190,6 +189,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Події')]")]
         public IWebElement EventsTabInTheBigObjectOfStudyCard;
 
+        [FindsBy(How = How.XPath, Using = "//div[@name='title']/div[@class='el-form-item__content']")]
+        public IWebElement RealNameFullBlock;
+
 
         [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
         public IWebElement DislocationSectionCountryField;
@@ -211,6 +213,12 @@ namespace AcceptanceTests.PageObjects
             var elementToScroll = driver.FindElement(By.XPath($"//div[contains(text(),'{value}')]"));
             Actions actions = new Actions(driver);
             actions.MoveToElement(elementToScroll).Perform();
+        }
+
+        public void ClickOnTheDirectReportingRelationshipLink(string relationshipLinkTitle)
+        {
+            var elementToClick = driver.FindElement(By.XPath($"//div[contains(text(),'{relationshipLinkTitle}')]"));
+            elementToClick.Click();
         }
     }
 }

@@ -13,6 +13,7 @@ using Iis.Api.Bootstrap;
 using Iis.Api.Configuration;
 using Iis.Api.EventHandlers;
 using Iis.Api.Export;
+using Iis.Api.FlightRadar;
 using Iis.Api.GraphQL.Access;
 using Iis.Api.Modules;
 using Iis.Api.Ontology;
@@ -24,8 +25,8 @@ using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.OntologySchema;
 using Iis.DbLayer.Repositories;
 using Iis.Domain;
+using Iis.Domain.Vocabularies;
 using Iis.Elastic;
-using Iis.EventHandlers;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
@@ -40,7 +41,6 @@ using Iis.Services.DI;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.Files.EntityFramework;
-using IIS.Core.FlightRadar;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
@@ -123,7 +123,8 @@ namespace IIS.Core
                 services.AddDbContext<FlightsContext>(
                     options => options
                         .UseNpgsql(flightRadarDbConnectionString)
-                        .UseLoggerFactory(MyLoggerFactory),
+                        .UseLoggerFactory(MyLoggerFactory)
+                        .AddInterceptors(new FlightsContextInterceptor()),
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
 #else
@@ -135,7 +136,8 @@ namespace IIS.Core
 
                 services.AddDbContext<FlightsContext>(
                                     options => options
-                                        .UseNpgsql(flightRadarDbConnectionString),
+                                        .UseNpgsql(flightRadarDbConnectionString)
+                                        .AddInterceptors(new FlightsContextInterceptor()),
                                     contextLifetime: ServiceLifetime.Transient,
                                     optionsLifetime: ServiceLifetime.Transient);
 #endif
@@ -172,9 +174,6 @@ namespace IIS.Core
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
 
-            services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
-            services.AddHostedService<FlightRadarHistorySyncJob>();
-
             services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
             services.AddTransient<IOntologySchemaSource, OntologySchemaSource>();
@@ -192,10 +191,11 @@ namespace IIS.Core
             services.AddTransient<IThemeService, ThemeService<IIISUnitOfWork>>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
-            services.AddTransient<NodeMaterialRelationService>();
+            services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
+            services.AddSingleton<IisVocabulary>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
@@ -257,6 +257,9 @@ namespace IIS.Core
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
             var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
             services.AddSingleton(maxOperatorsConfig);
+
+            services.RegisterFlightRadarServices(Configuration);
+
 
             if (enableContext)
             {
@@ -379,6 +382,14 @@ namespace IIS.Core
                 {
                     context.Database.Migrate();
                 }
+                try
+                {
+                    using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                    {
+                        context.Database.Migrate();
+                    }
+                }
+                catch { }
             }
         }
 

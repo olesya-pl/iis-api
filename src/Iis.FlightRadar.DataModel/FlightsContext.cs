@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Iis.FlightRadar.DataModel
@@ -199,6 +203,7 @@ namespace Iis.FlightRadar.DataModel
 
                 entity.Property(e => e.About)
                     .HasColumnName("about")
+                    .IsRequired(false)
                     .HasColumnType("json");
 
                 entity.Property(e => e.Country)
@@ -280,5 +285,18 @@ namespace Iis.FlightRadar.DataModel
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    }
+
+    public class FlightsContextInterceptor : DbCommandInterceptor
+    {
+        public override Task<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+        {
+            if (command.CommandText.StartsWith("INSERT INTO", StringComparison.OrdinalIgnoreCase))
+            {
+                command.CommandText = command.CommandText.Replace(";", $" ON CONFLICT (\"id\") DO UPDATE SET \"id\"=EXCLUDED.\"id\";");
+            }                
+            
+            return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
+        }
     }
 }

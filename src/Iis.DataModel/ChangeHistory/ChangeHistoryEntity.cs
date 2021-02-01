@@ -20,5 +20,7 @@ namespace Iis.DataModel.ChangeHistory
         public Guid RequestId { get; set; }
         public ChangeHistoryEntityType Type { get; set; }
         public string ParentTypeName { get; set; }
+        public string OldTitle { get; set; }
+        public string NewTitle { get; set; }
     }
 }

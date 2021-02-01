@@ -326,7 +326,11 @@ namespace Iis.OntologyManager.UiControls
         {
             if (node is null) return null;
 
-            var url = $"{baseUrl}/objects/Entity{node.NodeType.Name}.{node.Id:N}/view";
+            var url = node switch
+            {
+                INode {NodeType: {IsEvent : true } } => $"{baseUrl}/events/?page=1&id={node.Id:N}",
+                _ => $"{baseUrl}/objects/Entity{node.NodeType.Name}.{node.Id:N}/view"
+            };
 
             return url.Replace("&", "^&");
         }

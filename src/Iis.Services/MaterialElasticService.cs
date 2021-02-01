@@ -20,20 +20,18 @@ namespace Iis.Services
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
-
         private string[] MaterialIndexes = { "Materials" };
-
-        private static List<AggregateFieldMap> _aggregationsMap = new List<AggregateFieldMap>
+        private static IReadOnlyCollection<AggregationField> _aggregationsFieldList = new List<AggregationField>
         {
-            new AggregateFieldMap("ProcessedStatus", "ProcessedStatus.Title"),
-            new AggregateFieldMap("Completeness", "Completeness.Title"),
-            new AggregateFieldMap("Importance", "Importance.Title"),
-            new AggregateFieldMap("SessionPriority", "SessionPriority.Title"),
-            new AggregateFieldMap("Reliability", "Reliability.Title"),
-            new AggregateFieldMap("Relevance", "Relevance.Title"),
-            new AggregateFieldMap("SourceReliability", "SourceReliability.Title"),
-            new AggregateFieldMap("Type", "Type.keyword"),
-            new AggregateFieldMap("Source", "Source.keyword"),
+            new AggregationField("ProcessedStatus.Title", string.Empty, "ProcessedStatus.Title"),
+            new AggregationField("Completeness.Title", string.Empty, "Completeness.Title"),
+            new AggregationField("Importance.Title", string.Empty, "Importance.Title"),
+            new AggregationField("SessionPriority.Title", string.Empty, "SessionPriority.Title"),
+            new AggregationField("Reliability.Title", string.Empty, "Reliability.Title"),
+            new AggregationField("Relevance.Title", string.Empty, "Relevance.Title"),
+            new AggregationField("SourceReliability.Title", string.Empty, "SourceReliability.Title"),
+            new AggregationField("Type.keyword", string.Empty, "Type.keyword"),
+            new AggregationField("Source.keyword", string.Empty, "Source.keyword"),
         };
 
         public MaterialElasticService(IElasticManager elasticManager,
@@ -50,26 +48,27 @@ namespace Iis.Services
         {
             var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
-            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
-
             var (from, size) = searchParams.Page.ToElasticPage();
-                      
+
             var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
 
-                        
-            
-            var builder = new ExactQueryBuilder();
-            var query = builder.WithPagination(from, size)
+            var query = new ExactQueryBuilder()
+                .WithPagination(from, size)
                 .WithQueryString(queryString)
                 .Build()
-                .WithExactAggregationNames(_aggregationsMap)
-                .WithHighlights()
-                .SetupSorting(sortColumn, sortOrder);
+                .WithAggregation(_aggregationsFieldList)
+                .WithHighlights();
 
-            var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
+            if (searchParams.Sorting != null)
+            {
+                var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+                query = query.SetupSorting(sortColumn, sortOrder);
+            }
+
+            var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct); 
             
-            var searchResult = MapToSearchResult(elasticResult);
-            
+            var searchResult = elasticResult.ToSearchResult();
+
             foreach (var item in searchResult.Items)
             {
                 if (item.Value.Highlight is null) continue;
@@ -79,6 +78,30 @@ namespace Iis.Services
             }
 
             return searchResult;
+        }
+
+        public async Task<SearchResult> BeginSearchByScrollAsync(SearchParams searchParams, TimeSpan scrollDuration = default, CancellationToken ct = default)
+        {
+            var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
+
+            var (from, size) = searchParams.Page.ToElasticPage();
+
+            var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
+
+            var query = new ExactQueryBuilder()
+                .WithPagination(from, size)
+                .WithQueryString(queryString)
+                .Build();
+
+            var elasticResult = await _elasticManager.BeginSearchByScrollAsync(query.ToString(), scrollDuration, _elasticState.MaterialIndexes, ct);
+
+            return elasticResult.ToSearchResult();
+        }
+
+        public async Task<SearchResult> SearchByScroll(string scrollId, TimeSpan scrollDuration)
+        {
+            IElasticSearchResult elasticResult = await _elasticManager.SearchByScrollAsync(scrollId, scrollDuration);
+            return elasticResult.ToSearchResult();
         }
 
         public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, 
@@ -97,18 +120,23 @@ namespace Iis.Services
                 queryBuilder.WithExactQuery(searchParams.Suggestion);
             }
 
-            var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
-
-            var query = queryBuilder
+            var queryObj = queryBuilder
                             .Build()
-                            .WithHighlights()
-                            .SetupSorting(sortColumn, sortOrder)
-                            .WithExactAggregationNames(_aggregationsMap)
-                            .ToString(Formatting.None);
+                            .WithHighlights();
+
+            if (searchParams.Sorting != null)
+            {
+                var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
+                queryObj = queryObj.SetupSorting(sortColumn, sortOrder);
+            }
+
+            var query = queryObj
+                .WithAggregation(_aggregationsFieldList)
+                .ToString(Formatting.None);
 
             var elasticResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);
 
-            var searchResult = MapToSearchResult(elasticResult);
+            var searchResult = elasticResult.ToSearchResult();
 
             foreach (var item in searchResult.Items)
             {
@@ -125,7 +153,7 @@ namespace Iis.Services
         {
             var (from, size) = searchParams.Page.ToElasticPage();
             var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
-            
+
             var queryData = new MoreLikeThisQueryBuilder()
                         .WithPagination(from, size)
                         .WithMaterialId(searchParams.Suggestion)
@@ -135,7 +163,7 @@ namespace Iis.Services
 
             var searchResult = await _elasticManager.SearchAsync(queryData, _elasticState.MaterialIndexes, ct);
 
-            return MapToSearchResult(searchResult);
+            return searchResult.ToSearchResult();
         }
 
         public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
@@ -145,11 +173,11 @@ namespace Iis.Services
             var query = new SearchByImageQueryBuilder(imageVector)
                 .WithPagination(from, size)
                 .Build()
-                .WithExactAggregationNames(_aggregationsMap);
+                .WithAggregation(_aggregationsFieldList);
 
             var searchResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
-            return MapToSearchResult(searchResult);
+            return searchResult.ToSearchResult();
         }
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default)
@@ -176,20 +204,6 @@ namespace Iis.Services
                 "nodes" => ("NodesCount", sorting.Order),
                 _ => (null, null)
             };
-        }
-
-        private static SearchResult MapToSearchResult(IElasticSearchResult elasticSearchResult)
-        {
-            return new SearchResult
-            {
-                Count = elasticSearchResult.Count,
-                Items = elasticSearchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult }),
-                Aggregations = elasticSearchResult.Aggregations is null
-                ? new Dictionary<string, AggregationItem>()
-                : elasticSearchResult.Aggregations.Where(p => p.Value.Buckets.Any()).ToDictionary(p => p.Key, p => p.Value)
-            };
-        }
+        }        
     }
 }

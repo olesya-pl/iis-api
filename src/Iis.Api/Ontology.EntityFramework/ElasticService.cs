@@ -60,8 +60,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 SortColumn = filter.SortColumn,
                 SortOrder = filter.SortOrder
             };
-            
+
             var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
+
             return new SearchResult
             {
                 Count = searchResult.Count,
@@ -94,18 +95,17 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             if(SearchQueryExtension.IsMatchAll(filter.Suggestion))
             {
-                var aggregadionFieldNameList = _elasticConfiguration
+                var aggregadionFieldList = _elasticConfiguration
                     .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p)))
-                    .Where(f => f.IsAggregated)
-                    .Select(f => f.Name)
-                    .ToList()
-                    .AsReadOnly();
+                    .Where(e => e.IsAggregated)
+                    .Select(e => new AggregationField(e.Name, e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
+                    .ToArray();
 
                 var query = new MatchAllQueryBuilder()
                             .WithPagination(filter.Offset, filter.Limit)
                             .Build()
                             .WithHighlights()
-                            .WithAggregation(aggregadionFieldNameList)
+                            .WithAggregation(aggregadionFieldList)
                             .ToString(Formatting.None);
 
                 var results = await _elasticManager.SearchAsync(query, typeNames, ct);

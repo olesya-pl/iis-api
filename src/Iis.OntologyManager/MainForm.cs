@@ -431,15 +431,18 @@ namespace Iis.OntologyManager
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
 
-            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+            WaitCursorAction(() =>
+            {
+                var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
 
-            var result = requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false).GetAwaiter().GetResult();
+                var result = requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false).GetAwaiter().GetResult();
 
-            var sb = new StringBuilder()
-                .AppendLine($"Адреса:{result.RequestUrl}")
-                .AppendLine($"Повідомлення: {result.Message}");
+                var sb = new StringBuilder()
+                    .AppendLine($"Адреса:{result.RequestUrl}")
+                    .AppendLine($"Повідомлення: {result.Message}");
 
-            ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+                ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+            });
         }
 
         private void OnRemove(Guid entityId)

@@ -41,7 +41,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Sanity Tests", "MaterialsSectionUI - Sanity", @"    - IIS-6375 - Material processing, priority and importance setup
-    - IIS-6205 - ML results display for DOCX material
+    - IIS-6374 - ML results display for DOCX material
     - IIS-5837- Connect a material with an object of study from material
     - IIS-6363 - Search a material by keyword from the material", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
@@ -157,21 +157,21 @@ namespace AcceptanceTests.Features.UI.SanityTests
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="IIS-5837 - ML results display for DOCX material")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6374 - ML results display for DOCX material")]
         [Xunit.TraitAttribute("FeatureTitle", "MaterialsSectionUI - Sanity")]
-        [Xunit.TraitAttribute("Description", "IIS-5837 - ML results display for DOCX material")]
+        [Xunit.TraitAttribute("Description", "IIS-6374 - ML results display for DOCX material")]
         [Xunit.TraitAttribute("Category", "sanity")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "MaterialsSanityUI")]
-        public virtual void IIS_5837_MLResultsDisplayForDOCXMaterial()
+        public virtual void IIS_6374_MLResultsDisplayForDOCXMaterial()
         {
             string[] tagsOfScenario = new string[] {
                     "sanity",
                     "UI",
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5837 - ML results display for DOCX material", null, tagsOfScenario, argumentsOfScenario);
-#line 24
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6374 - ML results display for DOCX material", null, tagsOfScenario, argumentsOfScenario);
+#line 23
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -194,25 +194,25 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 8
     this.FeatureBackground();
 #line hidden
-#line 25
+#line 24
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 25
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 27
-        testRunner.And("I searched проект data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 26
+        testRunner.And("I searched 20201015_Resilience_Application_Form.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 28
+#line 27
         testRunner.And("I clicked on the first search result in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 29
+#line 28
         testRunner.And("I clicked on the ML tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 30
+#line 29
         testRunner.And("I pressed Show button to show Text classifier ML output", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 31
+#line 30
         testRunner.Then("I must see Text classifier ML output form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -233,7 +233,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5837- Connect a material with an object of study from material", null, tagsOfScenario, argumentsOfScenario);
-#line 34
+#line 33
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -256,38 +256,44 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 8
     this.FeatureBackground();
 #line hidden
-#line 35
+#line 34
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
+#line 35
+        testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
 #line 36
-        testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched 20201015_Resilience_Application_Form.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 37
-        testRunner.And("I clicked on the objects tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I clicked on the first search result in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 38
-        testRunner.And("I enter Романов value in the search object field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I clicked on the relations tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 39
-        testRunner.When("I clicked on the connected object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.And("I enter Романов value in the search object field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 40
-        testRunner.Then("I must see РОМАНОВ А.Г title of the object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.When("I clicked on the connected object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 41
-        testRunner.When("I clicked Back button in the browser", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.Then("I must see РОМАНОВ А.Г title of the object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 42
-        testRunner.And("I clicked on the objects tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.When("I clicked Back button in the browser", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 43
-        testRunner.And("I clicked delete related object from the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I clicked on the relations tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
+        testRunner.And("I clicked delete related object from the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 45
         testRunner.When("I pressed the Confirm button to confirm the delete relation between material and " +
                         "object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 45
+#line 46
         testRunner.Then("I must not see the related object in the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -338,10 +344,10 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 52
-        testRunner.And("I searched проект data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched NATO data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 53
-        testRunner.Then("I must see a material that contains Проект word in the Materials search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must see a material that contains NATO word in the Materials search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
