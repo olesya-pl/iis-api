@@ -260,7 +260,7 @@ namespace IIS.Core
             var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
             services.AddSingleton(maxOperatorsConfig);
 
-            //services.RegisterFlightRadarServices(Configuration);
+            services.RegisterFlightRadarServices(Configuration);
 
 
             if (enableContext)
