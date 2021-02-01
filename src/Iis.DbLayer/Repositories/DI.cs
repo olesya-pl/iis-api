@@ -22,6 +22,7 @@ namespace Iis.DbLayer.Repositories
             services.AddTransient<IChangeHistoryRepository, ChangeHistoryRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ITowerLocationRepository, TowerLocationRepository>();
+            services.AddTransient<INodeMaterialRelationRepository, NodeMaterialRelationRepository>();
         }
     }
 }
