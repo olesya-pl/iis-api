@@ -142,7 +142,7 @@ namespace Iis.Api.FlightRadar
                     await Task.Delay(TimeSpan.FromMinutes(2));
                     continue;
                 }
-                var sourcesPaths = Directory.GetDirectories(_config.DataFolder, "*", SearchOption.AllDirectories);
+                var sourcesPaths = Directory.GetDirectories(_config.DataFolder);
                 foreach (var path in sourcesPaths)
                 {
                     try
