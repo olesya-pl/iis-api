@@ -340,7 +340,7 @@ namespace Iis.Api.FlightRadar
                 }
                 var destination = Path.Combine(destinationDirectory, fileName);
                 File.Move(fullFileName, destination, true);
-                _logger.LogInformation($"FlightRadarDataReader. Done moving file {fullFileName}");
+                _logger.LogInformation($"FlightRadarDataReader. Done moving file {fullFileName} to {destination}");
             }
             catch (Exception e)
             {
