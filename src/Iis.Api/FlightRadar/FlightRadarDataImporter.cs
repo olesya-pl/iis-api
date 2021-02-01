@@ -142,7 +142,7 @@ namespace Iis.Api.FlightRadar
                     await Task.Delay(TimeSpan.FromMinutes(2));
                     continue;
                 }
-                var sourcesPaths = Directory.GetDirectories(_config.DataFolder);
+                var sourcesPaths = Directory.GetDirectories(_config.DataFolder, "*", SearchOption.AllDirectories);
                 foreach (var path in sourcesPaths)
                 {
                     try
@@ -165,7 +165,7 @@ namespace Iis.Api.FlightRadar
 
         private async Task ImportRoutes(IEnumerable<Routes> routes)
         {
-            const int batchSize = 50000;
+            const int batchSize = 25000;
             var count = 0;
             var toInsert = new List<Routes>();
             using (var flightContext = _provider.GetRequiredService<FlightsContext>())
@@ -192,7 +192,7 @@ namespace Iis.Api.FlightRadar
 
         private async Task ImportFlights(IEnumerable<Flights> flights)
         {
-            const int batchSize = 50000;
+            const int batchSize = 25000;
             var count = 0;
             var toInsert = new List<Flights>();
             using (var flightContext = _provider.GetRequiredService<FlightsContext>())
