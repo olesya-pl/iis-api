@@ -24,10 +24,13 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             return mapper.Map<Material>(material);
         }
 
-        public async Task<CreateRelationsResponse> CreateMultipleNodeMaterialRelations([Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
+        public async Task<CreateRelationsResponse> CreateMultipleNodeMaterialRelations(
+            IResolverContext ctx,
+            [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [GraphQLNonNullType] MultipleNodeMaterialRelationInput input)
         {
-            await relationService.CreateMultipleRelations(input.Query, input.NodeId);
+            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            await relationService.CreateMultipleRelations(input.Query, input.NodeId, tokenPayload.User.UserName);
             return new CreateRelationsResponse
             {
                 Success = true
