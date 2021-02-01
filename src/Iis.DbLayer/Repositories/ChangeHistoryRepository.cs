@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DbLayer.Repositories
 {
-    internal class ChangeHistoryRepository : RepositoryBase<OntologyContext>, IChangeHistoryRepository
+    public class ChangeHistoryRepository : RepositoryBase<OntologyContext>, IChangeHistoryRepository
     {
         public Task<List<ChangeHistoryEntity>> GetManyAsync(Guid targetId, string propertyName, DateTime? dateFrom = null, DateTime? dateTo = null)
         {

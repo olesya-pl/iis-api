@@ -13,8 +13,8 @@ namespace Iis.Api.FlightRadar
             services.AddSingleton(flightRadarDataReaderConfig);
 
             services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();
-            services.AddHostedService<FlightRadarHistorySyncJob>();
-            services.AddHostedService<FlightRadarDataImporter>();
+            // services.AddHostedService<FlightRadarHistorySyncJob>();
+            // services.AddHostedService<FlightRadarDataImporter>();
 
             return services;
         }

@@ -30,26 +30,6 @@ namespace Iis.MaterialLoader
         public string Coordinates { get; set; }
     }
 
-    public class MaterialLoadData
-    {
-        public string From { get; set; }
-        public string LoadedBy { get; set; }
-        public string Coordinates { get; set; }
-        public string Code { get; set; }
-        public DateTime? ReceivingDate { get; set; }
-        public IEnumerable<string> Objects { get; set; } = new List<string>();
-        public IEnumerable<string> Tags { get; set; } = new List<string>();
-        public IEnumerable<string> States { get; set; } = new List<string>();
-    }
-
-    public class Metadata
-    {
-        public string Type { get; set; }
-        public string Source { get; set; }
-        public DateTime? Date { get; set; }
-        public Features Features { get; set; }
-    }
-
     public class Features
     {
         public IEnumerable<Node> Nodes { get; set; }

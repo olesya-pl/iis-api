@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 namespace Iis.MaterialLoader.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class FilesController : ControllerBase
     {
         private readonly IFileService _fileService;
@@ -28,8 +28,7 @@ namespace Iis.MaterialLoader.Controllers
             CancellationToken token)
         {
             var material = JsonConvert.DeserializeObject<MaterialInput>(input);
-            FileIdDto fileSaveResult = await _fileService
-                .SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
+            var fileSaveResult = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
             material.FileId = fileSaveResult.Id;
             if (fileSaveResult.IsDuplicate)
             {

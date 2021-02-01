@@ -39,7 +39,8 @@ namespace Iis.Api.Modules
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
                         .AddHostedService<MaterialOperatorAssigner>()
                         .AddHostedService<CreatedMaterialElasticSaver>()
-                        .AddHostedService<FeatureHandler>();
+                        .AddHostedService<FeatureHandler>()
+                        .AddHostedService<MaterialConsumer>();
         }
     }
 }

@@ -1,29 +1,75 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Microsoft.EntityFrameworkCore;
-
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
-using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
+using Iis.DbLayer.Repositories;
 using Iis.DbLayer.Repositories.Helpers;
-using Iis.Interfaces.Elastic;
-using AutoMapper;
-using Newtonsoft.Json;
-using System.Threading;
-using Newtonsoft.Json.Linq;
-using Iis.Utility;
-using Iis.Domain.Elastic;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using IIS.Repository;
+using Iis.Utility;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace Iis.DbLayer.Repositories
+namespace Iis.MaterialLoader
 {
+    public interface IMaterialRepository
+    {
+        string[] MaterialIndexes { get; }
+        Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
+
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
+
+        Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
+
+        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
+
+        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null);
+
+        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
+
+        Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
+
+        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default);
+
+        Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken token = default);
+        Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default, bool waitForIndexing = false);
+
+        void AddMaterialEntity(MaterialEntity materialEntity);
+
+        void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntities);
+
+        void AddMaterialFeatures(IEnumerable<MaterialFeatureEntity> materialFeatureEntities);
+
+        void EditMaterial(MaterialEntity materialEntity);
+
+        List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
+
+        Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds);
+
+        Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds);
+
+        Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds);
+
+        List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
+
+        Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds);
+
+        void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
+
+        Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId);
+
+        Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
+    }
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
         private const string ImageVectorMlHandlerCode = "imageVector";
@@ -93,10 +139,11 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
         {
-            return await GetMaterialsQuery()
-                            .OnlyParent()
-                            .Where(p => p.AssigneeId == assigneeId)
-                            .ToArrayAsync();
+            // return await GetMaterialsQuery()
+            //                 .OnlyParent()
+            //                 .Where(p => p.AssigneeId == assigneeId)
+            //                 .ToArrayAsync();
+            return null;
         }
 
         public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default)
@@ -234,25 +281,26 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds)
         {
-            var type = ontologySchema.GetEntityTypeByName("ObjectSign");
-
-            var typeIdList = new List<Guid>();
-
-            if (type != null)
-            {
-                typeIdList = type.IncomingRelations
-                    .Select(p => p.SourceTypeId)
-                    .ToList();
-            }
-            return await Context.Nodes
-                .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                .Where(e => (!typeIdList.Any() 
-                    || typeIdList.Contains(e.Node.NodeTypeId)) 
-                    && nodeIds.Contains(e.Relation.SourceNodeId)  
-                    && !e.Relation.Node.IsArchived)
-                .AsNoTracking()
-                .Select(e => new ObjectFeatureRelation { ObjectId = e.Relation.SourceNodeId, FeatureId = e.Node.Id })
-                .ToListAsync();
+            // var type = ontologySchema.GetEntityTypeByName("ObjectSign");
+            //
+            // var typeIdList = new List<Guid>();
+            //
+            // if (type != null)
+            // {
+            //     typeIdList = type.IncomingRelations
+            //         .Select(p => p.SourceTypeId)
+            //         .ToList();
+            // }
+            // return await Context.Nodes
+            //     .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
+            //     .Where(e => (!typeIdList.Any() 
+            //         || typeIdList.Contains(e.Node.NodeTypeId)) 
+            //         && nodeIds.Contains(e.Relation.SourceNodeId)  
+            //         && !e.Relation.Node.IsArchived)
+            //     .AsNoTracking()
+            //     .Select(e => new ObjectFeatureRelation { ObjectId = e.Relation.SourceNodeId, FeatureId = e.Node.Id })
+            //     .ToListAsync();
+            return null;
         }
 
         public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds)
@@ -397,36 +445,36 @@ namespace Iis.DbLayer.Repositories
             string sortColumnName = null,
             string sortOrder = null)
         {
-            var materialQuery = predicate is null
-                                ? GetMaterialsQuery(_includeAll)
-                                    .OnlyParent()
-                                : (IQueryable<MaterialEntity>)
-                                    GetMaterialsQuery(_includeAll)
-                                    .OnlyParent()
-                                    .Where(predicate);
+            // var materialQuery = predicate is null
+            //                     ? GetMaterialsQuery(_includeAll)
+            //                         .OnlyParent()
+            //                     : (IQueryable<MaterialEntity>)
+            //                         GetMaterialsQuery(_includeAll)
+            //                         .OnlyParent()
+            //                         .Where(predicate);
+            //
+            // var materialCountQuery = materialQuery;
+            //
+            // if (limit == 0)
+            // {
+            //     materialQuery = materialQuery
+            //                         .ApplySorting(sortColumnName, sortOrder);
+            // }
+            // else
+            // {
+            //     materialQuery = materialQuery
+            //                         .ApplySorting(sortColumnName, sortOrder)
+            //                         .Skip(offset)
+            //                         .Take(limit);
+            // }
+            //
+            // var materials = await materialQuery
+            //                         .ToArrayAsync();
+            //
+            // var materialCount = await materialCountQuery.CountAsync();
+            //
 
-            var materialCountQuery = materialQuery;
-
-            if (limit == 0)
-            {
-                materialQuery = materialQuery
-                                    .ApplySorting(sortColumnName, sortOrder);
-            }
-            else
-            {
-                materialQuery = materialQuery
-                                    .ApplySorting(sortColumnName, sortOrder)
-                                    .Skip(offset)
-                                    .Take(limit);
-            }
-
-            var materials = await materialQuery
-                                    .ToArrayAsync();
-
-            var materialCount = await materialCountQuery.CountAsync();
-
-
-            return (materials, materialCount);
+            return (null, 0);
         }
 
         private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
@@ -466,13 +514,13 @@ namespace Iis.DbLayer.Repositories
 
             foreach (var include in includes)
             {
-                resultQuery = include switch
-                {
-                    MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
-                    MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
-                    MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
-                    _ => resultQuery
-                };
+                // resultQuery = include switch
+                // {
+                //     MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
+                //     MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
+                //     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
+                //     _ => resultQuery
+                // };
             }
 
             return resultQuery;
