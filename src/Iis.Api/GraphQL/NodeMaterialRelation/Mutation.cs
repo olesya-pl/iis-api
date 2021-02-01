@@ -2,6 +2,7 @@
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Resolvers;
+using Iis.DbLayer.Repositories;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
 using IIS.Core.NodeMaterialRelation;
@@ -12,7 +13,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
     {
         public async Task<Material> CreateNodeMaterialRelation(
             IResolverContext ctx,
-            [Service] NodeMaterialRelationService relationService,
+            [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)
@@ -23,9 +24,19 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             return mapper.Map<Material>(material);
         }
 
+        public async Task<CreateRelationsResponse> CreateMultipleNodeMaterialRelations([Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
+            [GraphQLNonNullType] MultipleNodeMaterialRelationInput input)
+        {
+            await relationService.CreateMultipleRelations(input.Query, input.NodeId);
+            return new CreateRelationsResponse
+            {
+                Success = true
+            };
+        }
+
         public async Task<Material> DeleteNodeMaterialRelation(
             IResolverContext ctx,
-            [Service] NodeMaterialRelationService relationService,
+            [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)
