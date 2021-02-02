@@ -37,7 +37,6 @@ namespace AcceptanceTests.PageObjects
         public IWebElement EmptySearchField;
 
         [FindsBy(How = How.CssSelector, Using = ".el-button--success")]
-        [CacheLookup]
         public IWebElement ProcessedButton;
 
         [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > .meta-data-card > .meta-data-expand  .el-button.el-button--default > span")]
@@ -46,6 +45,12 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(4)")]
         public IWebElement RelationsTab;
+
+        [FindsBy(How = How.CssSelector, Using = ".action-tab--features")]
+        public IWebElement PatternTab;
+
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'PhoneNumber')]/following-sibling::span[1]")]
+        public IWebElement PhoneNumberPatternNode;
 
         [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
         public IWebElement ObjectsTab;
@@ -90,9 +95,8 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
         public IWebElement MaterialsSearchResultCounter;
 
-        [FindsBy(How = How.CssSelector, Using = "button:nth-of-type(3) > span")]
-        [CacheLookup]
-        public IWebElement BackButton;
+        [FindsBy(How = How.CssSelector, Using = ".action-button--prev-page span")]
+        public IWebElement PreviousMaterialButton;
 
         [FindsBy(How = How.CssSelector, Using = ".el-table.el-table--enable-row-transition.el-table--fit.el-table--medium.el-table--striped  .el-table__body  .el-table__row")]
         [CacheLookup]

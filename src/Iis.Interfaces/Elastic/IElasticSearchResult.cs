@@ -23,6 +23,7 @@ namespace Iis.Interfaces.Elastic
         int Count { get; }
         IEnumerable<IElasticSearchResultItem> Items { get; }
         Dictionary<string, AggregationItem> Aggregations { get; }
+        string ScrollId { get; }
     }
 
     public interface IElasticSearchResultItem
@@ -37,6 +38,7 @@ namespace Iis.Interfaces.Elastic
         public Dictionary<Guid, SearchResultItem> Items { get; set; }
         public Dictionary<string, AggregationItem> Aggregations { get; set; }
         public int Count { get; set; }
+        public string ScrollId { get; set; }
     }
 
     public class SearchResultItem

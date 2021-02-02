@@ -18,7 +18,7 @@ namespace Iis.DbLayer.Repositories
         IChangeHistoryRepository ChangeHistoryRepository { get; }
         IUserRepository UserRepository { get; }
         ITowerLocationRepository TowerLocationRepository { get; }
-        
+        INodeMaterialRelationRepository NodeMaterialRelationRepository { get; }
         IMaterialSignRepository MaterialSignRepository { get; }
     }
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
@@ -49,7 +49,10 @@ namespace Iis.DbLayer.Repositories
         public IUserRepository UserRepository => ResolveRepository<IUserRepository>();
         
         public ITowerLocationRepository TowerLocationRepository => ResolveRepository<ITowerLocationRepository>();
+
         public IMaterialSignRepository MaterialSignRepository => ResolveRepository<IMaterialSignRepository>();
+
+        public INodeMaterialRelationRepository NodeMaterialRelationRepository => ResolveRepository<INodeMaterialRelationRepository>();
 
         protected override T ResolveRepository<T>()
         {

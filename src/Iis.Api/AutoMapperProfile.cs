@@ -351,7 +351,9 @@ namespace Iis.Api
             #endregion
 
             CreateMap<ChangeHistoryEntity, ChangeHistoryDto>().ReverseMap();
-            CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>();
+            CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>()
+                .ForMember(dest => dest.OldValue, opts => opts.MapFrom(src => src.OldTitle ?? src.OldValue))
+                .ForMember(dest => dest.NewValue, opts => opts.MapFrom(src => src.NewTitle ?? src.NewValue));
 
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
             CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();

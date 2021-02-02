@@ -142,7 +142,7 @@ namespace Iis.Api.FlightRadar
                     await Task.Delay(TimeSpan.FromMinutes(2));
                     continue;
                 }
-                var sourcesPaths = Directory.GetDirectories(_config.DataFolder);
+                var sourcesPaths = Directory.GetDirectories(_config.DataFolder, "*", SearchOption.AllDirectories);
                 foreach (var path in sourcesPaths)
                 {
                     try
@@ -165,7 +165,7 @@ namespace Iis.Api.FlightRadar
 
         private async Task ImportRoutes(IEnumerable<Routes> routes)
         {
-            const int batchSize = 50000;
+            const int batchSize = 25000;
             var count = 0;
             var toInsert = new List<Routes>();
             using (var flightContext = _provider.GetRequiredService<FlightsContext>())
@@ -192,7 +192,7 @@ namespace Iis.Api.FlightRadar
 
         private async Task ImportFlights(IEnumerable<Flights> flights)
         {
-            const int batchSize = 50000;
+            const int batchSize = 25000;
             var count = 0;
             var toInsert = new List<Flights>();
             using (var flightContext = _provider.GetRequiredService<FlightsContext>())
@@ -296,11 +296,13 @@ namespace Iis.Api.FlightRadar
             var fullFileName = Path.Combine(path, fileName);
             if (!File.Exists(fullFileName))
             {
+                _logger.LogInformation($"FlightRadarDataReader. File not found {fullFileName}");
                 return;
             }
 
             try
             {
+                _logger.LogInformation($"FlightRadarDataReader. Start importing file {fullFileName}");
                 using (var reader = new StreamReader(fullFileName))
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
@@ -308,10 +310,11 @@ namespace Iis.Api.FlightRadar
                     var items = csv.GetRecords<TEntity>();
                     await syncAction(items);
                 }
+                _logger.LogInformation($"FlightRadarDataReader. Done importing file {fullFileName}");
             }
             catch (Exception e)
             {
-                _logger.LogError("FileDataReader. Error while importing file", e);
+                _logger.LogError("FileDataReader. Error while importing file. Exception={e}", e);
                 TryMoveFile(path, fileName, fullFileName, _config.ErrorFolder);
                 return;
             }
@@ -324,10 +327,12 @@ namespace Iis.Api.FlightRadar
             {
                 if (!Directory.Exists(_config.DataFolder))
                 {
+                    _logger.LogInformation($"FlightRadarDataReader. Moving file. Directory does not exist {_config.DataFolder}");
                     return;
                 }
-                
-                var subdirectory = path.Replace(_config.DataFolder, string.Empty, StringComparison.Ordinal).TrimStart('\\');
+
+                _logger.LogInformation($"FlightRadarDataReader. Start moving file {fullFileName}");
+                var subdirectory = path.Replace(_config.DataFolder, string.Empty, StringComparison.Ordinal).TrimStart('\\', '/');
                 var destinationDirectory = Path.Combine(destinationDir, subdirectory);
                 if (!Directory.Exists(destinationDirectory))
                 {
@@ -335,10 +340,11 @@ namespace Iis.Api.FlightRadar
                 }
                 var destination = Path.Combine(destinationDirectory, fileName);
                 File.Move(fullFileName, destination, true);
+                _logger.LogInformation($"FlightRadarDataReader. Done moving file {fullFileName} to {destination}");
             }
             catch (Exception e)
             {
-                _logger.LogError("FlightRadarDataReader. Error while moving file", e);
+                _logger.LogError("FlightRadarDataReader. Error while moving file. Exception={e}", e);
             }
         }
     }

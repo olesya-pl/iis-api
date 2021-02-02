@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.DbLayer.Repositories;
 using IIS.Core.NodeMaterialRelation;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -28,7 +29,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
             context.SaveChanges();
 
             //act
-            var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService>();
+            var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService<IIISUnitOfWork>>();
             await sut.Create(new IIS.Core.NodeMaterialRelation.NodeMaterialRelation
             {
                 NodeId = node.Id,
@@ -58,7 +59,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
             context.SaveChanges();
 
             //act
-            var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService>();
+            var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService<IIISUnitOfWork>>();
             await Assert.ThrowsAsync<Exception>(() => sut.Create(new IIS.Core.NodeMaterialRelation.NodeMaterialRelation
             {
                 NodeId = node.Id,
@@ -110,7 +111,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
             );
             context.SaveChanges();
             //act
-            var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService>();
+            var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService<IIISUnitOfWork>>();
             await sut.Delete(new IIS.Core.NodeMaterialRelation.NodeMaterialRelation
             {
                 NodeId = node.Id,

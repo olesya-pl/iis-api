@@ -38,5 +38,22 @@ namespace Iis.DbLayer.Repositories
                 .OrderByDescending(lh => lh.RegisteredAt)
                 .ToListAsync();
         }
+
+        public Task<List<LocationHistoryEntity>> GetLocationHistory(Guid entityId, DateTime? dateFrom, DateTime? dateTo)
+        {
+            var query = Context.LocationHistory.Where(e => e.EntityId == entityId);
+
+            if(dateFrom.HasValue)
+            {
+                query = query.Where(e => e.RegisteredAt >= dateFrom);
+            }
+
+            if(dateTo.HasValue)
+            {
+                query = query.Where(e => e.RegisteredAt <= dateTo);
+            }
+
+            return query.OrderByDescending(e => e.RegisteredAt).ToListAsync();
+        }
     }
 }

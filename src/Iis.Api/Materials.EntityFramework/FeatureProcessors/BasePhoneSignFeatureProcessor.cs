@@ -92,7 +92,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                 {
                     var properties = GetPropertiesFromFeature(feature);
 
-                    var entity = await _createResolver.CreateEntity(Guid.NewGuid(), signType, string.Empty, properties);
+                    var entity = await _createResolver.CreateEntity(Guid.NewGuid(), signType, string.Empty, properties, Guid.NewGuid());
 
                     originalFeature[FeatureFields.featureId] = entity.Id.ToString();
                 }
