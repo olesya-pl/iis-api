@@ -1,6 +1,8 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using SeleniumExtras.PageObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AcceptanceTests.PageObjects
 {
@@ -59,15 +61,15 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTab;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='material-events']")]
+        [FindsBy(How = How.CssSelector, Using = ".material-events__header .el-input__inner")]
         [CacheLookup]
-        public IWebElement EventsTabSearch;
+        public IWebElement EventsSearch;
 
         [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(2)")]
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = "[aria-describedby] .el-input__inner")]
+        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .el-input__inner")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);
@@ -98,9 +100,8 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-button--prev-page span")]
         public IWebElement PreviousMaterialButton;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-table.el-table--enable-row-transition.el-table--fit.el-table--medium.el-table--striped  .el-table__body  .el-table__row")]
-        [CacheLookup]
-        public IWebElement FirstSearchResult;
+		[FindsBy(How = How.CssSelector, Using = ".table-zones__body .el-table  .el-table__body  .el-table__row")]
+		public IWebElement FirstSearchResult;
 
         [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .el-button--default")]
         [CacheLookup]
@@ -118,7 +119,7 @@ namespace AcceptanceTests.PageObjects
         public IWebElement ConnectedObjectLink;
 
         [FindsBy(How = How.CssSelector, Using = ".confirm-message-box__action-confirm")]
-        public IWebElement ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy;
+        public IWebElement ConfirmDeleteRelationButton;
 
         [FindsBy(How = How.CssSelector, Using = ".cell > div:nth-of-type(2)")]
         [CacheLookup]
@@ -128,24 +129,24 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement DeleteRelatedObjectOfStudy;
 
-        public void ScrollDown()
+        [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
+        public IWebElement DeleteRelatedEventButton;
+
+        public void ScrollToEnd()
         {
             Actions actions = new Actions(driver);
             actions.SendKeys(Keys.Control).SendKeys(Keys.End).Perform();
         }
 
-        public bool IsElementVisible()
-        {
-            try
-            {
-                var elem = driver.FindElement(By.CssSelector(".material-objects .material-objects-table a"));
-                return elem.Displayed;
-            }
-            catch
-            {
-                return false;
-            }
+        public List<MaterialRelatedItem> MaterialsRelatedEvents => driver.FindElements(By.CssSelector(".material-events .material-events-table .el-table__row"))
+                   .Select(_ => new MaterialRelatedItem(driver, _)).ToList();
 
+        public List<MaterialRelatedItem> MaterialsRelatedObjects => driver.FindElements(By.CssSelector(".material-objects .material-objects-table .el-table__row"))
+                  .Select(_ => new MaterialRelatedItem(driver, _)).ToList();
+
+        public MaterialRelatedItem GetItemTitleRelatedToMaterial(string title)
+        {
+            return new MaterialRelatedItem(driver, title);
         }
     }
 }

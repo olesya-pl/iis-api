@@ -287,14 +287,14 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.And("I clicked on the relations tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
-        testRunner.And("I clicked delete related object from the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I clicked on the delete button to destroy relation between the material and the Р" +
+                        "ОМАНОВ А.Г object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 45
-        testRunner.When("I pressed the Confirm button to confirm the delete relation between material and " +
-                        "object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.When("I pressed the confirm button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 46
-        testRunner.Then("I must not see the related object in the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must not see the related РОМАНОВ А.Г object in the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

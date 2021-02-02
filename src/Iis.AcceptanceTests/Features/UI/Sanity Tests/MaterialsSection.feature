@@ -41,9 +41,9 @@ Feature: MaterialsSectionUI - Sanity
         Then I must see РОМАНОВ А.Г title of the object
         When I clicked Back button in the browser
         And I clicked on the relations tab in the material card
-        And I clicked delete related object from the material
-        When I pressed the Confirm button to confirm the delete relation between material and object
-        Then I must not see the related object in the material
+        And I clicked on the delete button to destroy relation between the material and the РОМАНОВ А.Г object
+        When I pressed the confirm button
+        Then I must not see the related РОМАНОВ А.Г object in the material
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6363 - Search a material by keyword from the material

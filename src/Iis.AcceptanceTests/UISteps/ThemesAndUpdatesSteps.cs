@@ -50,24 +50,6 @@ namespace AcceptanceTests.UISteps
             themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(Keys.Enter);
         }
 
-        #endregion
-
-        #region Then
-        [Then(@"I must see first theme in the Themes list")]
-        public void ThenIMustSeeFirstThemeInTheThemeList()
-        {
-            Assert.True(themesAndUpdatesPageObjects.FirstThemeInTheThemeList.Displayed);
-        }
-
-        [Then(@"I must see a theme with specified name")]
-        public void ThenIMustSeeAThemeWithASpecifiedName()
-        {
-            var list = themesAndUpdatesPageObjects.Themes.First().Title;
-            var themeName = context.Get<string>("themeName");
-            Assert.True(themesAndUpdatesPageObjects.GetThemeByTitle(themeName).Displayed);
-        }
-        #endregion
-
         [Given(@"I created a theme with a name (.*)")]
         public void GivenICreatedAThemeWithAName(string themeName)
         {
@@ -91,6 +73,24 @@ namespace AcceptanceTests.UISteps
             var theme = themesAndUpdatesPageObjects.GetThemeByTitle(themeUniqueName);
             theme.DeleteTheme();
         }
+
+        #endregion
+
+        #region Then
+        [Then(@"I must see first theme in the Themes list")]
+        public void ThenIMustSeeFirstThemeInTheThemeList()
+        {
+            Assert.True(themesAndUpdatesPageObjects.FirstThemeInTheThemeList.Displayed);
+        }
+
+        [Then(@"I must see a theme with specified name")]
+        public void ThenIMustSeeAThemeWithASpecifiedName()
+        {
+            var list = themesAndUpdatesPageObjects.Themes.First().Title;
+            var themeName = context.Get<string>("themeName");
+            Assert.True(themesAndUpdatesPageObjects.GetThemeByTitle(themeName).Displayed);
+        }
+
         [Then(@"I must not see a theme (.*)")]
         public void ThenIMustNotSeeATheme(string themeName)
         {
@@ -98,5 +98,6 @@ namespace AcceptanceTests.UISteps
             var themeUniqueName = context.Get<string>(themeName);
             Assert.True(themesAndUpdatesPageObjects.Themes.Count(_ => _.Title == themeUniqueName) == 0);
         }
+        #endregion         
     }
 }

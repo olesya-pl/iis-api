@@ -28,8 +28,7 @@ namespace AcceptanceTests.UISteps
         public void IWantNavigateToMaterialsPage()
         {
             materialsSectionPage.MaterialsSection.Click();
-
-            driver.WaitFor(10);
+            driver.WaitFor(7);
         }
 
         [When(@"I clicked on the first material in the Materials list")]
@@ -75,6 +74,7 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.SearchField.SendKeys(input);
             driver.WaitFor(2);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
         }
 
         [When(@"I set importance (.*) value")]
@@ -156,11 +156,21 @@ namespace AcceptanceTests.UISteps
             driver.Navigate().Back();
         }
 
-        [When(@"I clicked delete related object from the material")]
-        public void WhenIClickedDeleteRelatedObjectFromTheMaterial()
+        [When(@"I clicked on the delete button to destroy relation between the material and the (.*) object")]
+        public void WhenIClickedDeleteRelatedObjectFromTheMaterial(string objectName)
         {
-            materialsSectionPage.DeleteRelatedObjectOfStudy.Click();
+            var objectToUnlink = materialsSectionPage.GetItemTitleRelatedToMaterial(objectName);
+            objectToUnlink.DeleteRelation();
         }
+
+        [When(@"I clicked on the delete button to destroy relation between the material and the (.*) event")]
+        public void WhenIClickedOnTheDeleteButtonToDestroyRelationBetweenTheMaterialAndTheEvent(string eventName)
+        {
+            var eventUniqueName = context.Get<string>(eventName);
+            var eventToUnlink = materialsSectionPage.GetItemTitleRelatedToMaterial(eventUniqueName);
+            eventToUnlink.DeleteRelation();
+        }
+
 
         [When(@"I refreshed the page in the browser")]
         public void WhenIRefreshedThePageInTheBrowser()
@@ -168,10 +178,10 @@ namespace AcceptanceTests.UISteps
             driver.Navigate().Refresh();
         }
 
-        [When(@"I pressed the Confirm button to confirm the delete relation between material and object")]
+        [When(@"I pressed the confirm button")]
         public void WhenIPressedConfirmButton()
         {
-            materialsSectionPage.ConfirmDeleteRelationBetweenMaterialAndObjectOfStudy.Click();
+            materialsSectionPage.ConfirmDeleteRelationButton.Click();
             driver.WaitFor(2);
 
         }
@@ -179,7 +189,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I scrolled down to the bottom of the relations tab")]
         public void WhenIScrolledDownToTheElementSearchFiledInTheRelationsTab()
         {
-            materialsSectionPage.ScrollDown();
+            materialsSectionPage.ScrollToEnd();
         }
 
         [When(@"I clicked on the pattern tab")]
@@ -187,6 +197,18 @@ namespace AcceptanceTests.UISteps
         {
             materialsSectionPage.PatternTab.Click();
         }
+
+        [When(@"I binded the (.*) event to the material")]
+        public void WhenIBindedTheEventToTheMaterial(string eventName)
+        {
+            var eventUniqueName = context.Get<string>(eventName);
+            materialsSectionPage.EventsSearch.SendKeys($"\"{eventUniqueName}\"");
+            driver.WaitFor(1);
+            materialsSectionPage.EventsSearch.SendKeys(Keys.Down);
+            materialsSectionPage.EventsSearch.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
+        }
+
 
         #endregion When
 
@@ -215,7 +237,7 @@ namespace AcceptanceTests.UISteps
         public void IMustSeeEventsSearchInTheMaterialsCard()
         {
 
-            Assert.True(materialsSectionPage.EventsTabSearch.Displayed);
+            Assert.True(materialsSectionPage.EventsSearch.Displayed);
         }
 
         [Then(@"I must see objects search in the materials card")]
@@ -309,10 +331,10 @@ namespace AcceptanceTests.UISteps
             Assert.Contains(keyword, actualContentText);
         }
 
-        [Then(@"I must not see the related object in the material")]
-        public void ThenIMustNotSeeTheRelatedObjectInTheMaterial()
+        [Then(@"I must not see the related (.*) object in the material")]
+        public void ThenIMustNotSeeTheRelatedObjectInTheMaterial(string objectName)
         {
-            Assert.False(materialsSectionPage.IsElementVisible());
+            Assert.DoesNotContain(materialsSectionPage.MaterialsRelatedObjects, _ => _.Title == objectName);
         }
 
         [Then(@"I must see that phone number pattern is equal to value")]
@@ -322,6 +344,22 @@ namespace AcceptanceTests.UISteps
             var actualPhoneNumber = materialsSectionPage.PhoneNumberPatternNode.Text;
             Assert.Equal(phoneNumber, actualPhoneNumber);
         }
+
+        [Then(@"I must not see (.*) as the related event to the material")]
+        public void ThenIMustNotSeeТестоваПодіяAsTheRelatedEventToTheMaterial(string eventName)
+        {
+            var eventUniqueName = context.Get<string>(eventName);
+            Assert.DoesNotContain(materialsSectionPage.MaterialsRelatedEvents, _ => _.Title == eventUniqueName);
+        }
+
+        [Then(@"I must see (.*) as the related event to the material")]
+        public void ThenIMustSeeТестоваПодіяAsTheRelatedEventToTheMaterial(string eventName)
+        {
+            var eventUniqueName = context.Get<string>(eventName);
+            Assert.Contains(materialsSectionPage.MaterialsRelatedEvents, _ => _.Title == eventUniqueName);
+        }
+
+
         #endregion
     }
 }

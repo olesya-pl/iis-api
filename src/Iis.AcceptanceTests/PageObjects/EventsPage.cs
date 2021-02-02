@@ -34,6 +34,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//textarea[@name='name']")]
         public IWebElement EventTitle;
 
+        [FindsBy(How = How.XPath, Using = "//textarea[@name='description']")]
+        public IWebElement DescriptionField;
+
         [FindsBy(How = How.CssSelector, Using = "div[name='importance']  div[role='radiogroup'] > label:nth-of-type(1)  .el-radio__inner")]
         public IWebElement AverageImportaceRadioButton;
 

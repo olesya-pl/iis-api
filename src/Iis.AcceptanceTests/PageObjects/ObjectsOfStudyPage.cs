@@ -133,8 +133,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement RussianMilitaryForcesExpandButton;
 
-        [FindsBy(How = How.XPath, Using = "//ul[@class='el-menu--horizontal el-menu']/li[contains(text(), 'Звʼязки')]")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//ul//li[contains(.,\"Зв'язки\")]")]
         public IWebElement RelationsTab;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'3 окрема мотострілецька бригада \"Беркут\"')]")]

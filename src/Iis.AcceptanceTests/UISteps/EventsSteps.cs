@@ -61,6 +61,39 @@ namespace AcceptanceTests.UISteps
             eventsPage.CloseEventCreationWindow.Click();
         }
 
+        [When(@"I created a new (.*) event by filling in all the data")]
+        public void WhenICreatedANewТестоваПодіяEventByFillingInAllTheData(string eventName)
+        {
+
+            var eventUniqueName = $"{eventName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid().ToString("N")}";
+            context.Set(eventUniqueName, eventName);
+            eventsPage.CreateEventButton.Click();
+            eventsPage.EventTitle.SendKeys(eventUniqueName);
+            eventsPage.DescriptionField.SendKeys("Додаткові тестові дані");
+            eventsPage.AverageImportaceRadioButton.Click();
+            eventsPage.FlawRadioButton.Click();
+            eventsPage.CountrySelectionDropDown.Click();
+            var countryInput = eventsPage.CountrySelectionDropDown.FindElement(By.TagName("input"));
+            countryInput.SendKeys("Росія");
+            driver.WaitFor(2);
+            countryInput.SendKeys(Keys.Down);
+            countryInput.SendKeys(Keys.Enter);
+            eventsPage.EventTypeDropDown.Click();
+            driver.WaitFor(2);
+            eventsPage.EventTypeDropDown.SendKeys(Keys.Up);
+            eventsPage.EventTypeDropDown.SendKeys(Keys.Enter);
+            eventsPage.EventComponentDropDown.SendKeys("Кризові регіони");
+            eventsPage.EventComponentDropDown.SendKeys(Keys.Down);
+            eventsPage.EventComponentDropDown.SendKeys(Keys.Enter);
+            eventsPage.SaveEventChangesButton.Click();
+            driver.WaitFor(2);
+            eventsPage.ConfirmSaveEventChangesButton.Click();
+            driver.WaitFor(2);
+            driver.Navigate().Refresh();
+            eventsPage.CloseEventCreationWindow.Click();
+        }
+
+
         [When(@"I searched for the (.*) created event")]
         public void WhenISearchedForTheCreatedEvent(string eventName)
         {
@@ -74,6 +107,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedTheEditEventButton()
         {
             eventsPage.EditButton.Click();
+            driver.WaitFor(3);
         }
 
         [When(@"I binded a (.*) material to the event")]
