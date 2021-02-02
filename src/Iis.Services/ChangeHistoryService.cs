@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Iis.DataModel.ChangeHistory;
+using Iis.DataModel.FlightRadar;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;
@@ -185,18 +186,32 @@ namespace Iis.Services
             return _mapper.Map<List<ChangeHistoryDto>>(entities);
         }
 
-        public async Task<List<ChangeHistoryDto>> GetLocationHistory(Guid entityId)
+        public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(Guid entityId)
         {
             var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistory(entityId));
-            return locations.Select(l =>
-                new ChangeHistoryDto
-                {
-                    Date = l.RegisteredAt,
-                    NewValue = "{\"type\":\"Point\",\"coordinates\":[" + l.Lat.ToString() + "," + l.Long.ToString() + "]}",
-                    PropertyName = "sign.location",
-                    TargetId = entityId,
-                    Type = 0
-                }).ToList();
+
+            return locations.Select(LocationHistoryToDTO).ToArray();
+        }
+
+        public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(ChangeHistoryParams parameters)
+        {
+            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistory(parameters.TargetId, parameters.DateFrom, parameters.DateTo));
+
+            return locations.Select(LocationHistoryToDTO).ToArray();
+        }
+
+        private static ChangeHistoryDto LocationHistoryToDTO(LocationHistoryEntity entity)
+        {
+            if(entity is null) return null;
+
+            return new ChangeHistoryDto
+            {
+                Date = entity.RegisteredAt,
+                NewValue = "{\"type\":\"Point\",\"coordinates\":[" + entity.Lat.ToString() + "," + entity.Long.ToString() + "]}",
+                PropertyName = "sign.location",
+                TargetId = entity.EntityId.Value,
+                Type = 0
+            };
         }
     }
 }
