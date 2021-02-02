@@ -207,7 +207,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var node = await CreateNode(entityId, embed, value, dotName, requestId);
             
             var username = GetCurrentUser()?.UserName ?? "system";
-            var parentTypeName = embed.Source.RelationType.SourceType.Name;
+            var parentTypeName = embed.RelationType.SourceType.Name;
 
             var newValue = value is Dictionary<string, object> dict && dict.ContainsKey("targetId") ?
                 Guid.Parse((string)dict["targetId"]) : value;
