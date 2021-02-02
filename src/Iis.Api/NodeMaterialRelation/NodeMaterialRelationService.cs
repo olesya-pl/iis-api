@@ -41,7 +41,9 @@ namespace IIS.Core.NodeMaterialRelation
 
         public async Task Create(NodeMaterialRelation relation, string userName = null)
         {
-            if(!MaterialExists(relation.MaterialId)) throw new InvalidOperationException($"There is no Material with ID:{relation.MaterialId}");
+            var material = GetMaterial(relation.MaterialId);
+
+            if(material == null) throw new InvalidOperationException($"There is no Material with ID:{relation.MaterialId}");
 
             ValidateUniquness(relation);
 
@@ -65,10 +67,10 @@ namespace IIS.Core.NodeMaterialRelation
                 TargetId = relation.MaterialId,
                 UserName = userName
             };
-            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto });
+            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto }, material.Title);
         }
 
-        public async Task CreateMultipleRelations(string query, Guid nodeId)
+        public async Task CreateMultipleRelations(string query, Guid nodeId, string userName)
         {
             const int MaxItemsPerQuery = 10000;
 
@@ -81,7 +83,7 @@ namespace IIS.Core.NodeMaterialRelation
             var materialsCount = materials.Items.Count;
             var materialIds = materials.Items.Keys.ToHashSet();
 
-            await CreateMultipleRelations(nodeId, materialIds);
+            await CreateMultipleRelations(nodeId, materialIds, userName);
 
             while (materialsCount > 0)
             {
@@ -89,17 +91,34 @@ namespace IIS.Core.NodeMaterialRelation
                 materials = await _materialElasticService.SearchByScroll(scrollId, TimeSpan.FromMinutes(2));
                 materialsCount = materials.Items.Count;
                 materialIds = materials.Items.Keys.ToHashSet();
-                await CreateMultipleRelations(nodeId, materialIds);
+                await CreateMultipleRelations(nodeId, materialIds, userName);
             }
         }
 
-        private async Task CreateMultipleRelations(Guid nodeId, HashSet<Guid> materialIds)
+        private async Task CreateMultipleRelations(Guid nodeId, HashSet<Guid> materialIds, string userName)
         {
             var existingItems = await RunWithoutCommitAsync(uow => uow.NodeMaterialRelationRepository.GetExistingRelationMaterialIds(nodeId, materialIds));
 
             var newMaterials = materialIds.Except(existingItems).ToList();
 
-            await RunAsync(uow => uow.NodeMaterialRelationRepository.CreateRelations(nodeId, newMaterials));         
+            await RunAsync(uow => uow.NodeMaterialRelationRepository.CreateRelations(nodeId, newMaterials));
+
+            var changeHistoryList = new List<ChangeHistoryDto>();
+
+            foreach (var materialId in materialIds)
+            {
+                changeHistoryList.Add(new ChangeHistoryDto
+                {
+                    Date = DateTime.UtcNow,
+                    NewValue = nodeId.ToString("N"),
+                    OldValue = null,
+                    PropertyName = NodeIdPropertyName,
+                    RequestId = Guid.NewGuid(),
+                    TargetId = materialId,
+                    UserName = userName
+                });
+            }
+            await _changeHistoryService.SaveMaterialChanges(changeHistoryList);
         }
 
         private void ValidateUniquness(NodeMaterialRelation relation)
@@ -111,13 +130,15 @@ namespace IIS.Core.NodeMaterialRelation
             }
         }
 
-        private bool MaterialExists(Guid materialId)
+        private MaterialEntity GetMaterial(Guid materialId)
         {
-            return _context.Materials.Any(e => e.Id == materialId);
+            return _context.Materials.SingleOrDefault(e => e.Id == materialId);
         }
 
         public async Task Delete(NodeMaterialRelation relation, string userName = null)
         {
+            var material = GetMaterial(relation.MaterialId);
+
             var featureToRemove = await _context.MaterialFeatures
                 .Include(p => p.MaterialInfo)
                 .FirstOrDefaultAsync(p => p.NodeId == relation.NodeId && p.MaterialInfo.MaterialId == relation.MaterialId);
@@ -135,7 +156,7 @@ namespace IIS.Core.NodeMaterialRelation
                 TargetId = relation.MaterialId,
                 UserName = userName
             };
-            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto });
+            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto }, material.Title);
         }
     }
 }
