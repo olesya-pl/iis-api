@@ -7,6 +7,7 @@ using HotChocolate;
 using Iis.Api.GraphQL.Common;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Elastic;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Services.Contracts.Params;
@@ -37,7 +38,7 @@ namespace IIS.Core.GraphQL.Entities
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
             return mapped;
         }
-        
+
         public async Task<OntologyFilterableQueryResponse> GetEventList(
             [Service] IOntologyService ontologyService,            
             [Service] IMapper mapper,
@@ -76,7 +77,7 @@ namespace IIS.Core.GraphQL.Entities
 
             return newObj;
         }
-        
+
         private string ToCamelCaseString(string str)
         {
             if (!string.IsNullOrEmpty(str))
@@ -92,10 +93,10 @@ namespace IIS.Core.GraphQL.Entities
             Dictionary<string, AggregationItem> aggregations)
         {
             var res = new Dictionary<string, AggregationItem>(aggregations);
-            if (aggregations.ContainsKey("NodeTypeTitle"))
+            if (aggregations.ContainsKey(ElasticConfigConstants.NodeTypeTitleAlias))
             {
                 var nodeTypes = nodesData.Schema.GetAllNodeTypes();
-                var titleAggregation = res["NodeTypeTitle"];
+                var titleAggregation = res[ElasticConfigConstants.NodeTypeTitleAlias];
                 foreach (var bucket in titleAggregation.Buckets)
                 {
                     var nodeTypeName = nodeTypes
