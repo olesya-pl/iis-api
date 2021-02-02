@@ -3,18 +3,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 
-namespace Iis.MaterialLoader
+namespace Iis.MaterialLoader.Rabbit
 {
     internal static class MqRegistrationModule
     {
-        private const string mqSectionName = "mq";
+        private const string MqSectionName = "mq";
 
         public static IServiceCollection AddRabbit(this IServiceCollection services, IConfiguration configuration, out string mqConnectionString)
         {
 
-            var mqConfig = configuration.GetSection(mqSectionName).Get<MqConfiguration>();
+            var mqConfig = configuration.GetSection(MqSectionName).Get<MqConfiguration>();
 
-            if (mqConfig == null) throw new InvalidOperationException($"No config was found with name \"{mqSectionName}\"");
+            if (mqConfig == null) throw new InvalidOperationException($"No config was found with name \"{MqSectionName}\"");
 
             var connectionFactory = new ConnectionFactory
             {

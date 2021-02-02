@@ -45,6 +45,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventHandlers", "Iis.Ev
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.AcceptanceTests", "Iis.AcceptanceTests\Iis.AcceptanceTests.csproj", "{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.MaterialLoader", "Iis.MaterialLoader\Iis.MaterialLoader.csproj", "{F2051644-0587-4474-A1F4-A76AD1E3355D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2051644-0587-4474-A1F4-A76AD1E3355D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2051644-0587-4474-A1F4-A76AD1E3355D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2051644-0587-4474-A1F4-A76AD1E3355D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2051644-0587-4474-A1F4-A76AD1E3355D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

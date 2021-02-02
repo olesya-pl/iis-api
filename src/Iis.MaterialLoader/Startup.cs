@@ -1,6 +1,8 @@
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DbLayer.Repositories;
+using Iis.MaterialLoader.Rabbit;
+using Iis.MaterialLoader.Services;
 using IIS.Repository.Factories;
 using Iis.Services;
 using Iis.Services.Contracts.Configurations;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using IChangeHistoryService = Iis.MaterialLoader.Services.IChangeHistoryService;
 
 namespace Iis.MaterialLoader
 {
@@ -27,6 +30,7 @@ namespace Iis.MaterialLoader
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddHealthChecks();
             
             var dbConnectionString = Configuration.GetConnectionString("db");
             // services.AddDbContextPool<OntologyContext>(options => options.UseNpgsql(dbConnectionString));
@@ -56,21 +60,12 @@ namespace Iis.MaterialLoader
             {
                 app.UseDeveloperExceptionPage();
             }
-            
-            app.UseCors(builder =>
-                builder
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-            );
 
             app.UseRouting();
-
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }

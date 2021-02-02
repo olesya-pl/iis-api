@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 
-namespace Iis.MaterialLoader
+namespace Iis.MaterialLoader.Models
 {
     public class MaterialInput
     {
@@ -28,42 +27,5 @@ namespace Iis.MaterialLoader
         public DateTime? CreationDate { get; set; }
         public IEnumerable<DateTime> ModificationDates { get; set; }
         public string Coordinates { get; set; }
-    }
-
-    public class Features
-    {
-        public IEnumerable<Node> Nodes { get; set; }
-        public JObject Metadata { get; set; }
-    }
-
-    public class Node
-    {
-        public string Relation { get; set; }
-        public string Type { get; set; } // todo confluence
-        public string Value { get; set; }
-        public JObject Original { get; set; }
-        public UpdateFieldData UpdateField { get; set; }
-    }
-
-    public class UpdateFieldData
-    {
-        public string Name { get; set; }
-
-        public List<FieldValue> Values { get; set; }
-    }
-
-    public class FieldValue
-    {
-        public double Lat { get; set; }
-
-        public double Lng { get; set; }
-
-        public DateTime RegisteredAt { get; set; }
-    }
-
-    public class Data
-    {
-        public string Type { get; set; }
-        public string Text { get; set; }
     }
 }

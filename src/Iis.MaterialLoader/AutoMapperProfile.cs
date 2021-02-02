@@ -3,6 +3,7 @@ using AutoMapper;
 using Iis.DataModel.ChangeHistory;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Materials;
+using Iis.MaterialLoader.Models;
 using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,7 +12,6 @@ namespace Iis.MaterialLoader
 {
     public class AutoMapperProfile: Profile
     {
-        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         public AutoMapperProfile()
         {
             CreateMap<IMaterialSign, MaterialSignEntity>();

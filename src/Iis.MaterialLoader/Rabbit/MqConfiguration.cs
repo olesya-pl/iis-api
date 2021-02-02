@@ -1,8 +1,5 @@
-namespace Iis.MaterialLoader
+namespace Iis.MaterialLoader.Rabbit
 {
-    /// <summary>
-    /// Type for message queue configuration
-    /// </summary>
     public class MqConfiguration
     {
         public string HostName { get; set; }

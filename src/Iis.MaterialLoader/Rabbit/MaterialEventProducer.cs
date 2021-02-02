@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using Iis.Messages;
 using Iis.Utility;
@@ -6,16 +5,10 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 
-namespace Iis.MaterialLoader
+namespace Iis.MaterialLoader.Rabbit
 {
-    public interface IMaterialEventProducer : IDisposable
-    {
-        void PublishMaterialCreatedMessage(MaterialCreatedMessage message);
-    }
-
     public class MaterialEventProducer : IMaterialEventProducer
     {
-        private readonly IConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
@@ -25,13 +18,11 @@ namespace Iis.MaterialLoader
         {
             _logger = loggerFactory.CreateLogger<MaterialEventProducer>();
 
-            _connectionFactory = connectionFactory;
-
             while (true)
             {
                 try
                 {
-                    _connection = _connectionFactory.CreateConnection();
+                    _connection = connectionFactory.CreateConnection();
                     break;
                 }
                 catch (BrokerUnreachableException)

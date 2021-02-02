@@ -6,13 +6,8 @@ using Iis.DataModel;
 using Iis.DataModel.ChangeHistory;
 using Iis.Services.Contracts.Dtos;
 
-namespace Iis.MaterialLoader
+namespace Iis.MaterialLoader.Services
 {
-    public interface IChangeHistoryService
-    {
-        Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes);
-    }
-
     public class ChangeHistoryService : IChangeHistoryService
     {
         private readonly IMapper _mapper;

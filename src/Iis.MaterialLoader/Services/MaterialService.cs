@@ -6,12 +6,14 @@ using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
+using Iis.MaterialLoader.Models;
+using Iis.MaterialLoader.Rabbit;
 using Iis.Messages;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Iis.MaterialLoader
+namespace Iis.MaterialLoader.Services
 {
     public class MaterialService : IMaterialService
     {
@@ -32,8 +34,8 @@ namespace Iis.MaterialLoader
             _changeHistoryService = changeHistoryService;
             _dbContext = dbContext;
         }
-        
-        public async Task<Material> SaveAsync(Material material, Guid? changeRequestId = null)
+
+        private async Task<Material> SaveAsync(Material material, Guid? changeRequestId = null)
         {
             await MakeFilePermanent(material);
             await ValidateMaterialParent(material);
@@ -78,7 +80,7 @@ namespace Iis.MaterialLoader
             return material;
         }
 
-        public MaterialSign GetMaterialSign(string signValue)
+        private MaterialSign GetMaterialSign(string signValue)
         {
             if (string.IsNullOrEmpty(signValue))
                 return null;

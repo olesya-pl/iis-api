@@ -1,13 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Iis.Domain.Materials;
+using Iis.MaterialLoader.Models;
 
-namespace Iis.MaterialLoader
+namespace Iis.MaterialLoader.Services
 {
     public interface IMaterialService
     {
-        Task<Material> SaveAsync(Material material, Guid? changeRequestId = null);
-
         Task<Material> SaveAsync(MaterialInput materialInput);
     }
 }
