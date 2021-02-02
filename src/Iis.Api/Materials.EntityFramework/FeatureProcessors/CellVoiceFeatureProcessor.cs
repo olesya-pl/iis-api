@@ -8,6 +8,7 @@ using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
 using Iis.Interfaces.Constants;
 using Newtonsoft.Json.Linq;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
@@ -39,11 +40,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         }
 
         public CellVoiceFeatureProcessor(IElasticService elasticService,
-            IOntologyModel ontology,
+            IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
             IElasticState elasticState, IGsmLocationService gsmLocationService)
-        : base(elasticService, ontology, createResolver, updateResolver, elasticState)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState)
         {
             _gsmLocationService = gsmLocationService;
         }

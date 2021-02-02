@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {
@@ -23,7 +25,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             descriptor.Field("count").Type<IntType>()
                 .Resolver(async ctx =>
                 {
-                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter,IEnumerable<Guid>>>();
+                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter,IEnumerable<Guid>>>();
                     var service = ctx.Service<IOntologyService>();
 
                     if(matchList != null && matchList.Any())
@@ -37,7 +39,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 .Type(new NonNullType(new ListType(new NonNullType(_itemsType))))
                 .Resolver(async ctx =>
                 {
-                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<IEntityTypeModel>, ElasticFilter, IEnumerable<Guid>>>();
+                    var (types, filter, matchList) = ctx.Parent<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>>();
                     var service = ctx.Service<IOntologyService>();
 
                     if(matchList != null && matchList.Any())

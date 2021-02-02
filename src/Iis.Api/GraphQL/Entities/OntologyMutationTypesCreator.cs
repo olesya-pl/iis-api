@@ -7,6 +7,7 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Meta;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -23,25 +24,25 @@ namespace IIS.Core.GraphQL.Entities
         public Operation Operation { get; }
 
         // this return value should not be wrapped in NonNullType()
-        public MutatorInputType NewMutatorInputType(INodeTypeModel type)
+        public MutatorInputType NewMutatorInputType(INodeTypeLinked type)
         {
             var configure = new Action<IInputObjectTypeDescriptor>(d =>
             {
                 d?.Name(MutatorInputType.GetName(Operation, type.Name));
-                foreach (var attr in type.AllProperties.Where(p => !(p.IsInversed || p.IsComputed())))
+                foreach (var attr in type.AllProperties.Where(p => !(p.IsInversed || p.IsComputed)))
                     OnRelation(attr, d);
             });
             configure(null); // Ensure creation of types before descriptor is called
             return new MutatorInputType(configure);
         }
 
-        protected virtual void OnRelation(IEmbeddingRelationTypeModel relationType,
+        protected virtual void OnRelation(INodeTypeLinked relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             var type = relationType.IsAttributeType
-                ? TypeRepository.GetInputAttributeType(relationType.AttributeType).WrapInputType(relationType)
+                ? TypeRepository.GetInputAttributeType(relationType.AttributeTypeModel).WrapInputType(relationType)
                 : TypeRepository.GetType<EntityRelationInputType>().WrapInputType(relationType);
-            objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+            objectTypeDescriptor?.Field(relationType.Name).Type(type);
         }
     }
 
@@ -53,7 +54,7 @@ namespace IIS.Core.GraphQL.Entities
         {
         }
 
-        protected override void OnRelation(IEmbeddingRelationTypeModel relationType,
+        protected override void OnRelation(INodeTypeLinked relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type = null;
@@ -63,13 +64,13 @@ namespace IIS.Core.GraphQL.Entities
                     .WrapInputType(relationType);
 
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple && relationType.IsAttributeType)
-                type = TypeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeType)
+                type = TypeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeTypeModel)
                     .WrapInputType(relationType);
 
             if (type == null)
                 base.OnRelation(relationType, objectTypeDescriptor);
             else
-                objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+                objectTypeDescriptor?.Field(relationType.Name).Type(type);
         }
     }
 
@@ -81,14 +82,14 @@ namespace IIS.Core.GraphQL.Entities
         {
         }
 
-        protected override void OnRelation(IEmbeddingRelationTypeModel relationType,
+        protected override void OnRelation(INodeTypeLinked relationType,
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type;
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
                 type = TypeRepository.GetRelationPatchType(relationType);
             else if (relationType.IsAttributeType)
-                type = TypeRepository.GetInputAttributeType(relationType.AttributeType);
+                type = TypeRepository.GetInputAttributeType(relationType.AttributeTypeModel);
             else if (relationType.AcceptsOperation(EntityOperation.Update))
                 type = TypeRepository.GetSingularRelationPatchType(relationType);
             else
@@ -104,7 +105,7 @@ namespace IIS.Core.GraphQL.Entities
 //                    ? TypeRepository.GetInputAttributeType(relationType.IAttributeTypeModel)
 //                    : TypeRepository.GetType<EntityRelationInputType>();
 //            }
-            objectTypeDescriptor?.Field(relationType.GetFieldName()).Type(type);
+            objectTypeDescriptor?.Field(relationType.Name).Type(type);
         }
     }
 

@@ -10,6 +10,7 @@ using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts;
 using Newtonsoft.Json;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -19,16 +20,16 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMediator _mediator;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly IResolverContext _resolverContext;
 
-        public MutationCreateResolver(IOntologyModel ontology, 
+        public MutationCreateResolver(IOntologySchema ontologySchema, 
             IOntologyService ontologyService,
             IFileService fileService,
             IChangeHistoryService changeHistoryService,
             IMediator mediator)
         {
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _fileService = fileService;
             _changeHistoryService = changeHistoryService;
@@ -38,7 +39,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public MutationCreateResolver(IResolverContext ctx)
         {
             _fileService = ctx.Service<IFileService>();
-            _ontology = ctx.Service<IOntologyModel>();
+            _ontologySchema = ctx.Service<IOntologySchema>();
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
@@ -49,7 +50,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _ontology.GetEntityType(typeName);            
+            var type = _ontologySchema.GetEntityTypeByName(typeName);            
             var entity = await CreateRootEntity(Guid.NewGuid(), type, data);
             return entity;
         }
@@ -69,7 +70,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private Task<Entity> CreateRootEntity(
             Guid entityId,
-            IEntityTypeModel type,
+            INodeTypeLinked type,
             Dictionary<string, object> properties)
         {
             return CreateEntityCore(entityId, type, properties, string.Empty, entityId, Guid.NewGuid());
@@ -77,7 +78,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Entity> CreateEntity(
             Guid entityId,
-            IEntityTypeModel type,
+            INodeTypeLinked type,
             string dotName,
             Dictionary<string, object> properties,
             Guid requestId)
@@ -85,8 +86,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return CreateEntityCore(entityId, type, properties, dotName, Guid.NewGuid(), requestId);
         }
 
-        private async Task<Entity> CreateEntityCore(Guid rootEntityId, 
-            IEntityTypeModel type, 
+        private async Task<Entity> CreateEntityCore(Guid rootEntityId,
+            INodeTypeLinked type, 
             Dictionary<string, object> properties,
             string dotName,
             Guid entityId,
@@ -129,7 +130,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node;
         }
 
-        private Entity GetUniqueValueEntity(IEntityTypeModel type, Dictionary<string, object> properties)
+        private Entity GetUniqueValueEntity(INodeTypeLinked type, Dictionary<string, object> properties)
         {
             if (properties.ContainsKey(type.UniqueValueFieldName))
             {
@@ -139,8 +140,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return null;
         }
 
-        private async Task<IEnumerable<Relation>> CreateRelations(Guid entityId, 
-            IEmbeddingRelationTypeModel embed, 
+        private async Task<IEnumerable<Relation>> CreateRelations(Guid entityId,
+            INodeTypeLinked embed, 
             object value,
             string dotName,
             Guid requestId)
@@ -159,7 +160,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Relation[]> CreateMultipleProperties(
             Guid entityId,
-            IEmbeddingRelationTypeModel embed, 
+            INodeTypeLinked embed, 
             object value,
             string oldValue,
             string dotName,
@@ -184,7 +185,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public async Task<Relation> CreateSinglePropertyAsync(
             Guid entityId,
-            IEmbeddingRelationTypeModel embed,
+            INodeTypeLinked embed, 
             object value,
             object oldValue,
             string dotName,
@@ -196,8 +197,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return prop;
         }
 
-        private async Task<Node> CreateNode(Guid entityId, 
-            IEmbeddingRelationTypeModel embed,             
+        private async Task<Node> CreateNode(Guid entityId,
+            INodeTypeLinked embed,             
             object value, 
             object oldValue,
             string dotName,
@@ -222,23 +223,24 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         private async Task<Node> CreateNode(
-            Guid entityId, 
-            IEmbeddingRelationTypeModel embed, 
+            Guid entityId,
+            INodeTypeLinked embed, 
             object value,
             string dotName,
             Guid requestId) // attribute or entity
         {
             if (embed.IsAttributeType)
             {
-                if (embed.AttributeType.ScalarTypeEnum == ScalarType.File)
+                var scalarType = embed.TargetType.AttributeType.ScalarType;
+                if (scalarType == ScalarType.File)
                     value = await InputExtensions.ProcessFileInput(_fileService, value);
-                else if (embed.AttributeType.ScalarTypeEnum == ScalarType.Geo)
+                else if (scalarType == ScalarType.Geo)
                     value = InputExtensions.ProcessGeoInput(value);
                 else
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
-                    value = AttributeType.ParseValue(value.ToString(), embed.AttributeType.ScalarTypeEnum);
+                    value = AttributeType.ParseValue(value.ToString(), scalarType);
                 
-                return new Attribute(Guid.NewGuid(), embed.AttributeType, value);
+                return new Attribute(Guid.NewGuid(), embed.AttributeTypeModel, value);
             }
 
             if (embed.IsEntityType)
@@ -253,7 +255,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (props.TryGetValue("target", out var dictTarget))
                 {
                     var (typeName, unionData) = InputExtensions.ParseInputUnion(dictTarget);
-                    var type = _ontology.GetEntityType(typeName);
+                    var type = _ontologySchema.GetEntityTypeByName(typeName);
                     return await CreateEntity(entityId, type, dotName, unionData, requestId);
                 }
 

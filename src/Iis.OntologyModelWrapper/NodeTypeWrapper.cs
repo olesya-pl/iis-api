@@ -2,6 +2,7 @@
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyModelWrapper.Meta;
+using Iis.OntologySchema.DataTypes;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -23,78 +24,83 @@ namespace Iis.OntologyModelWrapper
             _source = source;
         }
 
-        public IEnumerable<IEntityTypeModel> AllParents => _source.GetAllAncestors().Select(nt => new EntityTypeWrapper(nt));
+        public IEnumerable<INodeTypeLinked> AllParents => _source.GetAllAncestors();
 
-        public IEnumerable<IEmbeddingRelationTypeModel> AllProperties => _source.GetAllProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
+        public IEnumerable<INodeTypeLinked> AllProperties => _source.GetAllProperties();
 
-        public Type ClrType
-        {
-            get
-            {
-                if (this is IEntityTypeModel) return typeof(Entity);
-                if (this is IEmbeddingRelationTypeModel) return typeof(Relation);
-                return _source.ClrType;
-            }
-        }
+        public DateTime CreatedAt => _source.CreatedAt;
 
-        public DateTime CreatedAt
-        {
-            get { return _source.CreatedAt; }
-            set { throw new NotImplementedException(); }
-        }
+        public IEnumerable<INodeTypeLinked> DirectParents => _source.DirectParents;
 
-        public IEnumerable<IEntityTypeModel> DirectParents => _source.GetDirectAncestors().Select(nt => new EntityTypeWrapper(nt));
-
-        public IEnumerable<IEmbeddingRelationTypeModel> DirectProperties => _source.GetDirectProperties().Select(nt => new EmbeddingRelationTypeWrapper(nt));
+        public IEnumerable<INodeTypeLinked> DirectProperties => _source.DirectProperties;
 
         public bool HasUniqueValues => _source.HasUniqueValues;
-        public string UniqueValueFieldName
-        {
-            get { return _source.UniqueValueFieldName; }
-            set { throw new NotImplementedException(); }
-        }
-
+        public string UniqueValueFieldName => _source.UniqueValueFieldName;
         public Guid Id => _source.Id;
 
         public bool IsObjectOfStudy => _source.IsObjectOfStudy;
+        public bool IsAbstract => _source.IsAbstract;
 
-        public IMeta Meta
-        {
-            get
-            {
-                return _source.MetaObject;
-            }
-            set { throw new NotImplementedException(); }
-        }
-        public JObject MetaSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
+        public ISchemaMeta Meta => _source.MetaObject;
         public string Name => _source.Name;
+        public override string ToString() => Name;
 
-        public string Title
-        {
-            get { return _source.Title; }
-            set { throw new NotImplementedException(); }
-        }
+        public string Title => _source.Title;
 
-        public DateTime UpdatedAt
-        {
-            get { return _source.UpdatedAt; }
-            set { throw new NotImplementedException(); }
-        }
+        public DateTime UpdatedAt => _source.UpdatedAt;
+        public bool IsComputed => !string.IsNullOrWhiteSpace(_source.MetaObject?.Formula);
 
-        public void AddType(INodeTypeModel type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEmbeddingRelationTypeModel GetProperty(string typeName)
+        public INodeTypeLinked GetProperty(string typeName)
         {
             return AllProperties.FirstOrDefault(p => p.Name == typeName);
         }
 
-        public bool IsSubtypeOf(INodeTypeModel type)
+        public bool IsSubtypeOf(INodeTypeLinked type)
         {
             return Id == type.Id || _source.IsInheritedFrom(type.Name);
         }
+
+        public ScalarType ScalarTypeEnum => _source.AttributeType?.ScalarType ?? default;
+
+        public bool AcceptsScalar(object value)
+        {
+            return (value is int || value is long) && ScalarTypeEnum == ScalarType.Int
+                || value is bool && ScalarTypeEnum == ScalarType.Boolean
+                || value is decimal && ScalarTypeEnum == ScalarType.Decimal
+                || value is string && ScalarTypeEnum == ScalarType.String
+                || value is string && ScalarTypeEnum == ScalarType.IntegerRange
+                || value is string && ScalarTypeEnum == ScalarType.FloatRange
+                || value is DateTime && ScalarTypeEnum == ScalarType.Date
+                || value is Dictionary<string, object> && ScalarTypeEnum == ScalarType.Geo
+                || value is Guid && ScalarTypeEnum == ScalarType.File;
+        }
+
+
+        public EmbeddingOptions EmbeddingOptions => _source.RelationType.EmbeddingOptions;
+
+        public INodeTypeLinked EntityType =>
+            _source.RelationType.TargetType.Kind == Kind.Entity ?
+                    _source.RelationType.TargetType :
+                    null;
+
+        public INodeTypeLinked AttributeTypeModel =>
+            _source.RelationType.TargetType.Kind == Kind.Attribute ?
+                _source.RelationType.TargetType :
+                null;
+
+        public bool IsAttributeType => _source.RelationType.TargetType.Kind == Kind.Attribute;
+
+        public bool IsEntityType => _source.RelationType.TargetType.Kind == Kind.Entity;
+
+        public bool IsInversed => _source.IsInversed;
+
+        public INodeTypeLinked TargetType =>
+            _source?.RelationType.TargetType == null ?
+                null :
+                _source.RelationType.TargetType;
+
+        public bool AcceptsOperation(EntityOperation create) => true;
+        public IAttributeType AttributeType => Source.AttributeType;
+        public IRelationTypeLinked RelationType => Source.RelationType;
     }
 }

@@ -5,55 +5,8 @@ using Newtonsoft.Json;
 
 namespace Iis.Domain
 {
-    public sealed class AttributeType : NodeType, IAttributeTypeModel
+    public static class AttributeType
     {
-        public ScalarType ScalarTypeEnum { get; }
-
-        public AttributeType(Guid id, string name, ScalarType scalarType)
-            : base(id, name)
-        {
-            ScalarTypeEnum = scalarType;
-        }
-
-        public override Type ClrType
-        {
-            get
-            {
-                switch (ScalarTypeEnum)
-                {
-                    case ScalarType.String:
-                    case ScalarType.IntegerRange:
-                    case ScalarType.FloatRange:
-                        return typeof(string);
-                    case ScalarType.Int:
-                        return typeof(int);
-                    case ScalarType.Decimal:
-                        return typeof(decimal);
-                    case ScalarType.Boolean:
-                        return typeof(bool);
-                    case ScalarType.Date:
-                        return typeof(DateTime);
-                    case ScalarType.Geo:
-                        return typeof(Dictionary<string, object>);
-                    case ScalarType.File:
-                        return typeof(Guid);
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-
-        public bool AcceptsScalar(object value)
-        {
-            return (value is int || value is long) && ScalarTypeEnum == ScalarType.Int
-                || value is bool && ScalarTypeEnum == ScalarType.Boolean
-                || value is decimal && ScalarTypeEnum == ScalarType.Decimal
-                || value is string && ScalarTypeEnum == ScalarType.String
-                || value is DateTime && ScalarTypeEnum == ScalarType.Date
-                || value is Dictionary<string, object> && ScalarTypeEnum == ScalarType.Geo
-                || value is Guid && ScalarTypeEnum == ScalarType.File;
-        }
-
         public static object ParseValue(string value, ScalarType scalarType)
         {
             switch (scalarType)

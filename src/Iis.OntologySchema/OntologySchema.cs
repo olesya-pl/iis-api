@@ -157,7 +157,7 @@ namespace Iis.OntologySchema
             SchemaNodeType nodeType = _storage.NodeTypes.Values
                 .Where(nt => nt.Kind == Kind.Entity
                     && nt.Name == entityName).SingleOrDefault();
-            return nodeType?.GetRelationByName(relationName);
+            return nodeType?.GetSchemaRelationByName(relationName);
         }
 
         public ISchemaCompareResult CompareTo(IOntologySchema schema)

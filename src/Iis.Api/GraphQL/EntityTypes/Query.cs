@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.EntityTypes
 {
@@ -11,34 +12,34 @@ namespace IIS.Core.GraphQL.EntityTypes
     {
 
         [GraphQLNonNullType]
-        public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologyModel ontology,
+        public Task<EntityTypeCollection> GetEntityTypes([Service]IOntologySchema schema,
             EntityTypesFilter filter = null)
         {
-            IEnumerable<INodeTypeModel> types;
+            IEnumerable<INodeTypeLinked> types;
             if (!string.IsNullOrEmpty(filter?.Parent))
             {
-                var et = ontology.GetEntityType(filter.Parent);
+                var et = schema.GetEntityTypeByName(filter.Parent);
                 if (et == null)
-                    types = new List<INodeTypeModel>();
+                    types = new List<INodeTypeLinked>();
                 else
-                    types = ontology.GetChildTypes(et);                
+                    types = et.GetAllDescendants().Concat(new[] { et });
             }
             else
             {
-                types = ontology.EntityTypes;
+                types = schema.GetEntityTypes();
             }
             if (filter?.ConcreteTypes == true)
             {
-                types = types.OfType<IEntityTypeModel>().Where(t => !t.IsAbstract);
+                types = types.Where(t => !t.IsAbstract);
             }                
-            return Task.FromResult(new EntityTypeCollection(types, ontology));
+            return Task.FromResult(new EntityTypeCollection(types));
         }
 
-        public Task<EntityType> GetEntityType([Service]IOntologyModel ontology,
+        public Task<EntityType> GetEntityType([Service]IOntologySchema schema,
             [GraphQLNonNullType] string code)
         {
-            var type = ontology.GetEntityType(code);
-            return Task.FromResult(type == null ? null : new EntityType(type, ontology));
+            var type = schema.GetEntityTypeByName(code);
+            return Task.FromResult(type == null ? null : new EntityType(type));
         }
 
         public List<EntityTypeIconInfo> GetEntityTypeIcons([Service] IOntologySchema schema)

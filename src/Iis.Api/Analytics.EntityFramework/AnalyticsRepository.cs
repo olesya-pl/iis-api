@@ -6,20 +6,19 @@ using Microsoft.EntityFrameworkCore;
 using Iis.DataModel;
 using Iis.DataModel.Analytics;
 using Newtonsoft.Json;
-using IIS.Domain;
-using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Analytics.EntityFramework
 {
     public class AnalyticsRepository : IAnalyticsRepository
     {
         private OntologyContext _context;
-        private IOntologyModel _ontology;
+        private IOntologySchema _ontologySchema;
 
-        public AnalyticsRepository(OntologyContext ctx, IOntologyModel ontology)
+        public AnalyticsRepository(OntologyContext ctx, IOntologySchema ontologySchema)
         {
             _context = ctx;
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
         }
 
         public async Task<IEnumerable<AnalyticIndicatorEntity>> GetAllChildrenAsync(Guid parentId)
@@ -107,7 +106,7 @@ namespace IIS.Core.Analytics.EntityFramework
                 throw new InvalidOperationException($"Query of \"{indicator.Title}\" analytics Indicator is invalid");
             }
 
-            var finalQuery = AnalyticsQueryBuilder.From(_ontology).Load(config);
+            var finalQuery = AnalyticsQueryBuilder.From(_ontologySchema).Load(config);
             var (startDateField, endDateField) = (config.StartDateField, config.EndDateField ?? config.StartDateField);
 
             if (startDateField != null && fromDate != null)

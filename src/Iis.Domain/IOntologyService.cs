@@ -4,13 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Domain
 {
     public interface IOntologyService
     {
-        Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default);
+        Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default);
         IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId);
         IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId);
         Dictionary<Guid, int> CountEventsAssociatedWithEntities(HashSet<Guid> entityIds);
@@ -20,7 +21,7 @@ namespace Iis.Domain
         void RemoveNodeAndRelations(Node node);
         void RemoveNode(Node node);
         Node GetNode(Guid nodeId);
-        IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes);
+        IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<INodeTypeLinked> relationTypes);
         IReadOnlyCollection<Entity> GetEntitiesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         Node GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         IReadOnlyList<IAttributeBase> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName, int limit);

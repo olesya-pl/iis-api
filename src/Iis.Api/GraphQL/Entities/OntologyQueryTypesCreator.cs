@@ -3,6 +3,7 @@ using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using System;
@@ -22,7 +23,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Object creation ----- //
 
-        protected void OnObject(IEntityTypeModel type, IObjectTypeDescriptor d = null)
+        protected void OnObject(INodeTypeLinked type, IObjectTypeDescriptor d = null)
         {
             foreach (var parentInterface in type.AllParents.Select(_repository.GetOntologyType).OfType<InterfaceType>())
                 d?.Interface(parentInterface);
@@ -38,11 +39,11 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("__iconName").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveIconName(ctx));
         }
 
-        protected void OnRelation(IEmbeddingRelationTypeModel relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
+        protected void OnRelation(INodeTypeLinked relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
         {
             var type = GetType(relationType);
             if (objectTypeDescriptor == null) return;
-            var fd = objectTypeDescriptor.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
+            var fd = objectTypeDescriptor.Field(relationType.Name).Type(type.WrapOutputType(relationType));
             if (relationType.IsAttributeType)
             {
                 if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
@@ -56,7 +57,7 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private void OnRelation(IEntityTypeModel entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
+        private void OnRelation(INodeTypeLinked entityType, IGrouping<string, INodeTypeLinked> relationTypeGroup,
             IObjectTypeDescriptor objectTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -74,7 +75,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Interfaces creation ----- //
 
-        protected void OnInterface(IEntityTypeModel type, IInterfaceTypeDescriptor d = null)
+        protected void OnInterface(INodeTypeLinked type, IInterfaceTypeDescriptor d = null)
         {
             if (d == null) return;
             d.Name(OntologyInterfaceType.GetName(type));
@@ -85,14 +86,14 @@ namespace IIS.Core.GraphQL.Entities
             d.ResolveAbstractType((ctx, obj) => ctx.Service<IOntologyQueryResolver>().ResolveAbstractType(ctx, obj));
         }
 
-        protected void OnRelation(IEmbeddingRelationTypeModel relationType,
+        protected void OnRelation(INodeTypeLinked relationType,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             var type = GetType(relationType);
-            interfaceTypeDescriptor?.Field(relationType.GetFieldName()).Type(type.WrapOutputType(relationType));
+            interfaceTypeDescriptor?.Field(relationType.Name).Type(type.WrapOutputType(relationType));
         }
 
-        private void OnRelation(IEntityTypeModel entityType, IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup,
+        private void OnRelation(INodeTypeLinked entityType, IGrouping<string, INodeTypeLinked> relationTypeGroup,
             IInterfaceTypeDescriptor interfaceTypeDescriptor = null)
         {
             if (relationTypeGroup.Count() == 1)
@@ -107,8 +108,8 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private OutputUnionType GetOutputUnionType(IEntityTypeModel entityType,
-            IGrouping<string, IEmbeddingRelationTypeModel> relationTypeGroup)
+        private OutputUnionType GetOutputUnionType(INodeTypeLinked entityType,
+            IGrouping<string, INodeTypeLinked> relationTypeGroup)
         {
             if (relationTypeGroup.Any(r => !r.IsEntityType))
                 throw new ArgumentException(
@@ -123,7 +124,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- Generic ----- //
 
-        private IOutputType GetType(IEmbeddingRelationTypeModel relationType)
+        private IOutputType GetType(INodeTypeLinked relationType)
         {
             var type = relationType.IsAttributeType
                 ? GetAttributeType(relationType)
@@ -133,15 +134,15 @@ namespace IIS.Core.GraphQL.Entities
             return type;
         }
 
-        private IOutputType GetAttributeType(IEmbeddingRelationTypeModel relationType)
+        private IOutputType GetAttributeType(INodeTypeLinked relationType)
         {
-            var type = relationType.AttributeType;
+            var type = relationType.AttributeTypeModel;
             if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
                 return _repository.GetMultipleOutputType(type.ScalarTypeEnum);
             return _repository.GetScalarOutputType(type.ScalarTypeEnum);
         }
 
-        public IOntologyType NewOntologyType(IEntityTypeModel type)
+        public IOntologyType NewOntologyType(INodeTypeLinked type)
         {
             if (type.IsAbstract)
             {

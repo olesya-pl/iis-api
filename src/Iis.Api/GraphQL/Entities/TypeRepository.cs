@@ -4,11 +4,11 @@ using System.Linq;
 using IIS.Core.GraphQL.Entities.InputTypes.Mutations;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes.Mutations;
-using IIS.Core.Ontology;
 using Iis.Domain;
-using IIS.Domain;
 using OScalarType = Iis.Interfaces.Ontology.Schema.ScalarType;
 using HotChocolate.Types;
+using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -21,13 +21,13 @@ namespace IIS.Core.GraphQL.Entities
 
     public class TypeRepository : TypeStorage
     {
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly OntologyQueryTypesCreator _creator;
         private readonly OntologyMutationTypesCreator[] _mutators;
 
-        public TypeRepository(IOntologyModel ontology)
+        public TypeRepository(IOntologySchema ontologySchema)
         {
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _creator = new OntologyQueryTypesCreator(this);
             _mutators = new OntologyMutationTypesCreator[]
             {
@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.Entities
 
         public void InitializeTypes()
         {
-            var entityTypes = _ontology.EntityTypes.ToList();
+            var entityTypes = _ontologySchema.GetEntityTypes().ToList();
             if (entityTypes.Count == 0)
                 throw new OntologyTypesException("There are no entity types to register on graphql schema");
 
@@ -57,11 +57,6 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        public IEnumerable<INodeTypeModel> GetChildTypes(INodeTypeModel parent)
-        {
-            return _ontology.GetChildTypes(parent);
-        }
-
         private OntologyMutationTypesCreator GetMutator(Operation operation)
         {
             return _mutators.Single(m => m.Operation == operation);
@@ -69,7 +64,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- READ QUERY TYPES ----- //
 
-        public IOntologyType GetOntologyType(IEntityTypeModel type)
+        public IOntologyType GetOntologyType(INodeTypeLinked type)
         {
             return GetOrCreate(type.Name, () => _creator.NewOntologyType(type));
         }
@@ -91,7 +86,7 @@ namespace IIS.Core.GraphQL.Entities
                 new MultipleOutputType(name, GetScalarOutputType(scalarType)));
         }
 
-        public OutputUnionType GetOutputUnionType(IEntityTypeModel source, string propertyName,
+        public OutputUnionType GetOutputUnionType(INodeTypeLinked source, string propertyName,
             IEnumerable<ObjectType> outputTypes)
         {
             var name = OutputUnionType.GetName(source, propertyName);
@@ -102,7 +97,7 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC SCHEMA TYPES ----- //
 
-        public IInputType GetInputAttributeType(IAttributeTypeModel attributeType)
+        public IInputType GetInputAttributeType(INodeTypeLinked attributeType)
         {
             IInputType type;
             if (attributeType.ScalarTypeEnum == OScalarType.File)
@@ -114,34 +109,34 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- GENERIC MUTATOR TYPES ----- //
 
-        public MutatorInputType GetMutatorInputType(Operation operation, INodeTypeModel type)
+        public MutatorInputType GetMutatorInputType(Operation operation, INodeTypeLinked type)
         {
             var name = MutatorInputType.GetName(operation, type.Name);
             return GetOrCreate(name, () => GetMutator(operation).NewMutatorInputType(type));
         }
 
-        public MutatorResponseType GetMutatorResponseType(Operation operation, IEntityTypeModel type)
+        public MutatorResponseType GetMutatorResponseType(Operation operation, INodeTypeLinked type)
         {
             var name = MutatorResponseType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new MutatorResponseType(GetMutator(operation).Operation, type, GetOntologyType(type)));
         }
 
-        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, IEntityTypeModel type)
+        public EntityRelationToInputType GetEntityRelationToInputType(Operation operation, INodeTypeLinked type)
         {
             var name = EntityRelationToInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new EntityRelationToInputType(operation, type, GetEntityUnionInputType(operation, type)));
         }
 
-        public EntityUnionInputType GetEntityUnionInputType(Operation operation, IEntityTypeModel type)
+        public EntityUnionInputType GetEntityUnionInputType(Operation operation, INodeTypeLinked type)
         {
             var name = EntityUnionInputType.GetName(operation, type);
             return GetOrCreate(name, () =>
                 new EntityUnionInputType(operation, type, this));
         }
 
-        public MultipleInputType GetMultipleInputType(Operation operation, IAttributeTypeModel type)
+        public MultipleInputType GetMultipleInputType(Operation operation, INodeTypeLinked type)
         {
             var scalarName = type.ScalarTypeEnum.ToString();
             var name = MultipleInputType.GetName(operation, scalarName);
@@ -151,14 +146,14 @@ namespace IIS.Core.GraphQL.Entities
 
         // ----- UPDATE TYPES ----- //
 
-        public RelationPatchType GetRelationPatchType(IEmbeddingRelationTypeModel relationType)
+        public RelationPatchType GetRelationPatchType(INodeTypeLinked relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>
                 new RelationPatchType(relationType, this));
         }
 
-        public SingularRelationPatchType GetSingularRelationPatchType(IEmbeddingRelationTypeModel relationType)
+        public SingularRelationPatchType GetSingularRelationPatchType(INodeTypeLinked relationType)
         {
             var name = RelationPatchType.GetName(relationType);
             return GetOrCreate(name, () =>

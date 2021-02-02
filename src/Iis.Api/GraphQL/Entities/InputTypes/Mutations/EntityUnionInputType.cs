@@ -1,8 +1,7 @@
 using System.Linq;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
-using IIS.Core.Ontology;
-using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {
@@ -10,17 +9,17 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
     public class EntityUnionInputType : InputObjectType
     {
         private readonly Operation _operation;
-        private readonly IEntityTypeModel _type;
+        private readonly INodeTypeLinked _type;
         private readonly TypeRepository _typeRepository;
 
-        public EntityUnionInputType(Operation operation, IEntityTypeModel type, TypeRepository typeRepository)
+        public EntityUnionInputType(Operation operation, INodeTypeLinked type, TypeRepository typeRepository)
         {
             _operation = operation;
             _type = type;
             _typeRepository = typeRepository;
         }
 
-        public static string GetName(Operation operation, IEntityTypeModel type)
+        public static string GetName(Operation operation, INodeTypeLinked type)
         {
             return $"UnionInput_{operation.Short()}_{OntologyObjectType.GetName(type)}";
         }
@@ -31,7 +30,7 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             d.Description("Unites multiple input types. Specify only single field.");
             if (_type.IsAbstract)
             {
-                foreach (var child in _typeRepository.GetChildTypes(_type).OfType<IEntityTypeModel>().Where(t => !t.IsAbstract))
+                foreach (var child in _type.GetAllDescendants().Where(t => !t.IsAbstract))
                 {
                     var type = _typeRepository.GetMutatorInputType(_operation, child);
                     d.Field(child.Name).Type(type);
