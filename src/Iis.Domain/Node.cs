@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +12,13 @@ namespace Iis.Domain
         private readonly List<Node> _nodes;
 
         public Guid Id { get; set; }
-        public INodeTypeModel Type { get; }
+        public INodeTypeLinked Type { get; }
         public IEnumerable<Node> Nodes => _nodes;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public INode OriginalNode { get; set; }
 
-        protected Node(Guid id, INodeTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
+        protected Node(Guid id, INodeTypeLinked type, DateTime createdAt = default, DateTime updatedAt = default)
         {
             _nodes = new List<Node>();
 
@@ -44,24 +45,24 @@ namespace Iis.Domain
             return attribute?.Value;
         }
 
-        public IEnumerable<Relation> GetRelations(IRelationTypeModel relationType) =>
-            Nodes.OfType<Relation>().Where(r => r.Type.Name == relationType.Name);
+        public IEnumerable<Relation> GetRelations(string relationTypeName) =>
+            Nodes.OfType<Relation>().Where(r => r.Type.Name == relationTypeName);
 
-        public IEmbeddingRelationTypeModel GetRelationType(string relationTypeName) =>
+        public INodeTypeLinked GetRelationType(string relationTypeName) =>
             Type.GetProperty(relationTypeName) ??
             throw new ArgumentException($"Relation with name {relationTypeName} does not exist");
 
         // Only single relations
-        public Relation GetRelation(IEmbeddingRelationTypeModel relationType) =>
-            GetRelations(relationType).SingleOrDefault()
+        public Relation GetRelation(INodeTypeLinked relationType) =>
+            GetRelations(relationType.Name).SingleOrDefault()
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name}");
 
-        public Relation GetRelationOrDefault(IEmbeddingRelationTypeModel relationType) =>
-            GetRelations(relationType).SingleOrDefault();
+        public Relation GetRelationOrDefault(INodeTypeLinked relationType) =>
+            GetRelations(relationType.Name).SingleOrDefault();
 
         // For single or multiple relations
-        public Relation GetRelation(IEmbeddingRelationTypeModel relationType, Guid relationId) =>
-            GetRelations(relationType).SingleOrDefault(r => r.Id == relationId)
+        public Relation GetRelation(INodeTypeLinked relationType, Guid relationId) =>
+            GetRelations(relationType.Name).SingleOrDefault(r => r.Id == relationId)
             ?? throw new ArgumentException($"There is no relation from {Type.Name} {Id} to {relationType.Name} of type {relationType.TargetType.Name} with id {relationId}");
 
         public override string ToString()
@@ -90,7 +91,7 @@ namespace Iis.Domain
         private string GetDotName((Attribute attribute, string dotName) child)
         {
             var sb = new StringBuilder();
-            if (this.Type is IRelationTypeModel)
+            if (this.Type.Kind == Kind.Relation)
             {
                 sb.Append(this.Type.Name);
             }

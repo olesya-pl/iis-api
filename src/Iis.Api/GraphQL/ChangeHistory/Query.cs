@@ -30,18 +30,21 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 (dateFrom, dateTo) = dateRangeFilter.ToRange();
             }
 
-            var items = await service.GetChangeHistory(new ChangeHistoryParams
+            var changeHistoryParams = new ChangeHistoryParams
             {
                 DateFrom = dateFrom,
                 DateTo = dateTo,
                 PropertyName = propertyName,
                 TargetId = targetId,
                 ApplyAliases = true
-            });
-            
+            };
+
+            var items = await service.GetChangeHistory(changeHistoryParams);
+
             if (!includeLocationHistory.HasValue || includeLocationHistory == true)
             {
-                var locationItems = await service.GetLocationHistory(targetId);
+                var locationItems = await service.GetLocationHistory(changeHistoryParams);
+
                 items.AddRange(locationItems);
             }
 

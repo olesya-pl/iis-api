@@ -2,6 +2,7 @@
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Resolvers;
+using Iis.DbLayer.Repositories;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
 using IIS.Core.NodeMaterialRelation;
@@ -12,20 +13,33 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
     {
         public async Task<Material> CreateNodeMaterialRelation(
             IResolverContext ctx,
-            [Service] NodeMaterialRelationService relationService,
+            [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
-            await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.UserId);
+            await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             return mapper.Map<Material>(material);
+        }
+
+        public async Task<CreateRelationsResponse> CreateMultipleNodeMaterialRelations(
+            IResolverContext ctx,
+            [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
+            [GraphQLNonNullType] MultipleNodeMaterialRelationInput input)
+        {
+            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            await relationService.CreateMultipleRelations(input.Query, input.NodeId, tokenPayload.User.UserName);
+            return new CreateRelationsResponse
+            {
+                Success = true
+            };
         }
 
         public async Task<Material> DeleteNodeMaterialRelation(
             IResolverContext ctx,
-            [Service] NodeMaterialRelationService relationService,
+            [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)

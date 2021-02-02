@@ -10,25 +10,26 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Iis.Domain;
-using IIS.Domain;
 using AutoMapper;
+using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Reports
 {
     public class ReportType : ObjectType<Report>
     {
         private readonly TypeRepository _typeRepository;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         IOntologyType objectType;
-        IEntityTypeModel type;
+        INodeTypeLinked type;
 
-        public ReportType(TypeRepository typeRepository, IOntologyModel ontology)
+        public ReportType(TypeRepository typeRepository, IOntologySchema ontologySchema)
         {
             _typeRepository   = typeRepository ?? throw new System.ArgumentNullException(nameof(typeRepository));
 
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
 
-            type = _ontology.GetEntityType("Event");
+            type = _ontologySchema.GetEntityTypeByName("Event");
 
             if (type == null)
                 throw new InvalidOperationException("Cannot find required type 'Event' in database. Add type to database or disable reports in configuration file using reportsAvailable : false");

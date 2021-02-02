@@ -6,6 +6,8 @@ using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
+using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {
@@ -15,16 +17,16 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
         private readonly string _typeName;
         private readonly IInputType _createType;
         private readonly IInputType _updateType;
-        private readonly IEmbeddingRelationTypeModel _relationType;
+        private readonly INodeTypeLinked _relationType;
 
-        public RelationPatchType(IEmbeddingRelationTypeModel relationType, TypeRepository typeRepository)
+        public RelationPatchType(INodeTypeLinked relationType, TypeRepository typeRepository)
         {
             _relationType = relationType;
             _typeName = GetName(relationType);
             if (relationType.IsAttributeType)
             {
-                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeType);
-                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.AttributeType);
+                _createType = typeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeTypeModel);
+                _updateType = typeRepository.GetMultipleInputType(Operation.Update, relationType.AttributeTypeModel);
             }
             else if (relationType.IsEntityType)
             {
@@ -37,13 +39,13 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
             }
         }
 
-        public static string GetName(IEmbeddingRelationTypeModel relationType)
+        public static string GetName(INodeTypeLinked relationType)
         {
             if (relationType.IsAttributeType)
-                return relationType.AttributeType.ScalarTypeEnum.ToString();
+                return relationType.AttributeTypeModel.ScalarTypeEnum.ToString();
             if (relationType.IsEntityType)
             {
-                var ops = relationType.GetOperations();
+                var ops = relationType.MetaObject.AcceptsEntityOperations;
                 if (ops == null || ops.Length == 0)
                     return "EntityRelationInput";
                 return $"{OntologyObjectType.GetName(relationType.EntityType)}_{GetAbbreviation(ops)}";
@@ -74,14 +76,13 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 
         protected void SetDescription(IInputObjectTypeDescriptor d)
         {
-            var meta = _relationType.Meta;
             if (_relationType.IsAttributeType)
             {
                 d.Description($"Patch array of {_typeName} attribute.");
             }
             else
             {
-                var ops = _relationType.GetOperations();
+                var ops = _relationType.MetaObject?.AcceptsEntityOperations;
                 var description = $"Patch array of {_relationType.EntityType.Name} entity type.";
                 if (ops != null)
                     description += $" Accepts entity operations: {string.Join(", ", ops)}";

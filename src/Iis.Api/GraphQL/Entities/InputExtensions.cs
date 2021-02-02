@@ -12,6 +12,8 @@ using Iis.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Iis.Services.Contracts.Interfaces;
+using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -34,12 +36,12 @@ namespace IIS.Core.GraphQL.Entities
             return Guid.Parse((string) obj);
         }
 
-        public static bool IsAssignableFrom(this INodeTypeModel target, INodeTypeModel source)
+        public static bool IsAssignableFrom(this INodeTypeLinked target, INodeTypeLinked source)
         {
             return source.Name == target.Name || source.AllParents.Any(t => t.Name == target.Name);
         }
 
-        public static Node LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeModel targetType)
+        public static Node LoadNodeOfType(this IOntologyService service, Guid targetId, INodeTypeLinked targetType)
         {
             var existingNode = service.GetNode(targetId); // no fields needed, only type
             if (existingNode == null)
@@ -57,7 +59,7 @@ namespace IIS.Core.GraphQL.Entities
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery};
         }
 
-        public static ElasticFilter CreateNodeFilter(this IResolverContext ctx, IEntityTypeModel criteriaType)
+        public static ElasticFilter CreateNodeFilter(this IResolverContext ctx, INodeTypeLinked criteriaType)
         {
             var result = ctx.CreateNodeFilter();
             return result;

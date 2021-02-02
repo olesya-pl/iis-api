@@ -1,6 +1,8 @@
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Domain;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using System;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
@@ -31,16 +33,13 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             }
 
             [GraphQLType(typeof(EmbeddingRelationTypeType))]
-            public IEmbeddingRelationTypeModel Type([Parent] Relation parent)
-            {
-                return parent.Type as IEmbeddingRelationTypeModel;
-            }
+            public INodeTypeLinked Type([Parent] Relation parent) => parent.Type;
         }
     }
 
-    public class EmbeddingRelationTypeType : ObjectType<IEmbeddingRelationTypeModel>
+    public class EmbeddingRelationTypeType : ObjectType<INodeTypeLinked>
     {
-        protected override void Configure(IObjectTypeDescriptor<IEmbeddingRelationTypeModel> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<INodeTypeLinked> descriptor)
         {
             descriptor.BindFields(BindingBehavior.Explicit);
             descriptor.Include<Resolvers>();
@@ -49,22 +48,13 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         private class Resolvers
         {
             [GraphQLType(typeof(NonNullType<IdType>))]
-            public Guid Id([Parent] IEmbeddingRelationTypeModel parent)
-            {
-                return parent.Id;
-            }
+            public Guid Id([Parent] INodeTypeLinked parent) => parent.Id;
 
             [GraphQLNonNullType]
-            public string Code([Parent] IEmbeddingRelationTypeModel parent)
-            {
-                return parent.Name;
-            }
+            public string Code([Parent] INodeTypeLinked parent) => parent.Name;
 
             [GraphQLNonNullType]
-            public string Title([Parent] IEmbeddingRelationTypeModel parent)
-            {
-                return parent.Title;
-            }
+            public string Title([Parent] INodeTypeLinked parent) => parent.Title;
         }
     }
 }

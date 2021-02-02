@@ -3,6 +3,8 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
 {
@@ -10,16 +12,16 @@ namespace IIS.Core.GraphQL.Entities.InputTypes.Mutations
     {
         private readonly Operation _operation;
         private readonly EntityUnionInputType _target;
-        private readonly INodeTypeModel _type;
+        private readonly INodeTypeLinked _type;
 
-        public EntityRelationToInputType(Operation operation, INodeTypeModel type, EntityUnionInputType target)
+        public EntityRelationToInputType(Operation operation, INodeTypeLinked type, EntityUnionInputType target)
         {
             _operation = operation;
             _target = target;
             _type = type;
         }
 
-        public static string GetName(Operation operation, INodeTypeModel type)
+        public static string GetName(Operation operation, INodeTypeLinked type)
         {
             return $"RelationTo_{operation.Short()}_{OntologyObjectType.GetName(type)}";
         }

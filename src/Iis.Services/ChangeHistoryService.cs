@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Iis.DataModel.ChangeHistory;
+using Iis.DataModel.FlightRadar;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;
@@ -110,9 +111,11 @@ namespace Iis.Services
                 GetTitle(Guid.Parse(strId));
         }
 
-        public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes)
+        public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes, string materialTitle = null)
         {
             var entities = _mapper.Map<List<ChangeHistoryEntity>>(changes);
+            var mirrorEntities = new List<ChangeHistoryEntity>();
+
             foreach (var entity in entities)
             {
                 entity.Id = Guid.NewGuid();
@@ -122,9 +125,30 @@ namespace Iis.Services
                 {
                     entity.OldTitle = GetTitle(entity.OldValue);
                     entity.NewTitle = GetTitle(entity.NewValue);
+                    mirrorEntities.Add(GetMirrorChangeHistoryEntity(entity, materialTitle));
                 }
             }
+            entities.AddRange(mirrorEntities);
             await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
+        }
+
+        private ChangeHistoryEntity GetMirrorChangeHistoryEntity(ChangeHistoryEntity entity, string materialTitle)
+        {
+            return new ChangeHistoryEntity
+            {
+                Id = Guid.NewGuid(),
+                TargetId = Guid.Parse(entity.OldValue ?? entity.NewValue),
+                UserName = entity.UserName,
+                PropertyName = "MaterialLink",
+                Date = entity.Date,
+                OldValue = entity.OldValue == null ? null : entity.TargetId.ToString("N"),
+                NewValue = entity.NewValue == null ? null : entity.TargetId.ToString("N"),
+                RequestId = entity.RequestId,
+                Type = ChangeHistoryEntityType.Node,
+                ParentTypeName = null,
+                OldTitle = entity.OldValue == null ? null : materialTitle,
+                NewTitle = entity.NewValue == null ? null : materialTitle
+            };
         }
 
         public async Task<List<ChangeHistoryDto>> GetChangeHistory(ChangeHistoryParams parameters)
@@ -162,18 +186,32 @@ namespace Iis.Services
             return _mapper.Map<List<ChangeHistoryDto>>(entities);
         }
 
-        public async Task<List<ChangeHistoryDto>> GetLocationHistory(Guid entityId)
+        public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(Guid entityId)
         {
             var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistory(entityId));
-            return locations.Select(l =>
-                new ChangeHistoryDto
-                {
-                    Date = l.RegisteredAt,
-                    NewValue = "{\"type\":\"Point\",\"coordinates\":[" + l.Lat.ToString() + "," + l.Long.ToString() + "]}",
-                    PropertyName = "sign.location",
-                    TargetId = entityId,
-                    Type = 0
-                }).ToList();
+
+            return locations.Select(LocationHistoryToDTO).ToArray();
+        }
+
+        public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(ChangeHistoryParams parameters)
+        {
+            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistory(parameters.TargetId, parameters.DateFrom, parameters.DateTo));
+
+            return locations.Select(LocationHistoryToDTO).ToArray();
+        }
+
+        private static ChangeHistoryDto LocationHistoryToDTO(LocationHistoryEntity entity)
+        {
+            if(entity is null) return null;
+
+            return new ChangeHistoryDto
+            {
+                Date = entity.RegisteredAt,
+                NewValue = "{\"type\":\"Point\",\"coordinates\":[" + entity.Lat.ToString() + "," + entity.Long.ToString() + "]}",
+                PropertyName = "sign.location",
+                TargetId = entity.EntityId.Value,
+                Type = 0
+            };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,12 +11,12 @@ namespace Iis.Domain
         {
             get
             {
-                return Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(IRelationTypeModel))
+                return Nodes.SingleOrDefault(e => e.Type.Kind != Kind.Relation)
                        ?? throw new Exception("Relation does not have a target.");
             }
             set
             {
-                var currentValue = Nodes.SingleOrDefault(e => e.Type.GetType() != typeof(IRelationTypeModel));
+                var currentValue = Nodes.SingleOrDefault(e => e.Type.Kind != Kind.Relation);
                 if (currentValue != null)
                     RemoveNode(currentValue);
                 AddNode(value);
@@ -25,7 +26,7 @@ namespace Iis.Domain
         public Attribute AttributeTarget => Nodes.OfType<Attribute>().SingleOrDefault();
         public Entity EntityTarget => Nodes.OfType<Entity>().SingleOrDefault();
 
-        public Relation(Guid id, IRelationTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
+        public Relation(Guid id, INodeTypeLinked type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
 

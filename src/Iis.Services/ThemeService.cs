@@ -17,6 +17,7 @@ using IIS.Repository.Factories;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.Services
 {
@@ -25,7 +26,7 @@ namespace Iis.Services
         private const string CoordinatesPrefix = "__coordinates:*";
         private readonly OntologyContext _context;
         private readonly IMapper _mapper;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly IElasticService _elasticService;
         private readonly IMaterialElasticService _materialElasticService;
         private readonly IElasticState _elasticState;
@@ -33,14 +34,14 @@ namespace Iis.Services
         public ThemeService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             OntologyContext context,
             IMapper mapper,
-            IOntologyModel ontology,
+            IOntologySchema ontologySchema,
             IElasticService elasticService,
             IMaterialElasticService materialElasticService,
             IElasticState elasticState) : base(unitOfWorkFactory)
         {
             _context = context;
             _mapper = mapper;
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _elasticService = elasticService;
             _materialElasticService = materialElasticService;
             _elasticState = elasticState;
@@ -262,8 +263,8 @@ namespace Iis.Services
             var indexes = typeId switch
             {
                 _ when typeId == ThemeTypeEntity.EntityMaterialId => _elasticState.MaterialIndexes,
-                _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(_ontology, "ObjectOfStudy"),
-                _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(_ontology, "Event"),
+                _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(EntityTypeNames.ObjectOfStudy.ToString()),
+                _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(EntityTypeNames.Event.ToString()),
                 _ => (IEnumerable<string>)null
             };
 
@@ -314,14 +315,14 @@ namespace Iis.Services
             }
         }
 
-        private string[] GetOntologyIndexes(IOntologyModel ontology, string typeName)
+        private string[] GetOntologyIndexes(string typeName)
         {
-            var types = ontology.EntityTypes.Where(p => p.Name == typeName);
+            var type = _ontologySchema.GetEntityTypeByName(typeName);
 
-            return types
-                .SelectMany(e => _ontology.GetChildTypes(e))
-                .Concat(types)
-                .Where(e => e is IEntityTypeModel entityTypeModel && !entityTypeModel.IsAbstract)
+            return type
+                .GetAllDescendants()
+                .Concat(new[] { type })
+                .Where(e => !e.IsAbstract)
                 .Select(e => e.Name)
                 .Distinct()
                 .ToArray();

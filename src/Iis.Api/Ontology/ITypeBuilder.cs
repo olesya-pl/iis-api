@@ -3,6 +3,7 @@ using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology
@@ -11,7 +12,7 @@ namespace IIS.Core.Ontology
     {
         ITypeBuilder WithName(string name);
         ITypeBuilder WithTitle(string name);
-        ITypeBuilder WithMeta(IMeta meta);
+        ITypeBuilder WithMeta(ISchemaMeta meta);
         ITypeBuilder Is(string name);
         ITypeBuilder Is(Action<ITypeBuilder> buildAction);
         ITypeBuilder HasRequired(string targetName);
@@ -23,7 +24,7 @@ namespace IIS.Core.Ontology
         ITypeBuilder IsAbstraction();
         ITypeBuilder IsEntity();
         IAttributeBuilder IsAttribute();
-        INodeTypeModel Build();
+        INodeTypeLinked Build();
     }
 
     public interface IAttributeBuilder : ITypeBuilder
@@ -35,8 +36,8 @@ namespace IIS.Core.Ontology
     {
         IRelationBuilder WithName(string name);
         IRelationBuilder WithTitle(string title);
-        IRelationBuilder WithMeta(RelationMetaBase meta);
-        IRelationBuilder WithMeta<T>(Action<T> descriptor) where T : RelationMetaBase, new();
+        IRelationBuilder WithMeta(ISchemaMeta meta);
+        IRelationBuilder WithMeta<T>(Action<T> descriptor) where T : ISchemaMeta, new();
         IRelationBuilder Target(string targetName);
     }
 }

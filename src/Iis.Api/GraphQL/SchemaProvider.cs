@@ -10,10 +10,10 @@ using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.GraphQL.Export;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
-using IIS.Domain;
 using Iis.Api.Ontology;
 using Iis.Api.GraphQL;
 using Iis.Api.GraphQL.CreateMenu;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL
 {
@@ -21,28 +21,28 @@ namespace IIS.Core.GraphQL
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly TypeRepository _typeRepository;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly IOntologyFieldPopulator _populator;
         private readonly IConfiguration _configuration;
-        private ISchema _schema;
+        private ISchema _hotChocolateSchema;
 
-        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologyModel ontology, IOntologyFieldPopulator populator, IConfiguration configuration)
+        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologySchema ontologySchema, IOntologyFieldPopulator populator, IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _populator = populator;
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public ISchema GetSchema()
         {
-            return _schema ?? (_schema = LoadSchema());
+            return _hotChocolateSchema ?? (_hotChocolateSchema = LoadSchema());
         }
 
         public void RecreateSchema()
         {
-            _schema = LoadSchema();
+            _hotChocolateSchema = LoadSchema();
         }
 
         private ISchema LoadSchema()
@@ -78,8 +78,8 @@ namespace IIS.Core.GraphQL
                 {
                     d.Include<Reports.Query>();
                 }
-                if (_ontology != null)
-                    ConfigureOntologyQuery(d, _ontology);
+                if (_ontologySchema != null)
+                    ConfigureOntologyQuery(d, _ontologySchema);
             });
             builder.AddMutationType(d =>
             {
@@ -101,8 +101,8 @@ namespace IIS.Core.GraphQL
                 {
                     d.Include<Reports.Mutation>();
                 }
-                if (_ontology != null)
-                    ConfigureOntologyMutation(d, _ontology);
+                if (_ontologySchema != null)
+                    ConfigureOntologyMutation(d, _ontologySchema);
             });
             return builder.Create();
         }
@@ -131,11 +131,10 @@ namespace IIS.Core.GraphQL
             }
         }
 
-        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, IOntologyModel ontology)
+        protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, IOntologySchema schema)
         {
-            var typesToPopulate = ontology.EntityTypes
-//                .Where(t => t.CreateMeta().ExposeOnApi != false)
-                .ToList();
+            var typesToPopulate = schema.GetEntityTypes().ToList();
+
             _populator.PopulateFields(descriptor, typesToPopulate, Operation.Read);
             if (typesToPopulate.Count == 0) return;
             ConfigureAllEntitiesQueries(descriptor);
@@ -150,9 +149,9 @@ namespace IIS.Core.GraphQL
                 .Resolver(ctx => ctx.Service<IOntologyQueryResolver>().GetAllEntities(ctx));
         }
 
-        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, IOntologyModel ontology)
+        protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, IOntologySchema schema)
         {
-            var typesToPopulate = ontology.EntityTypes;
+            var typesToPopulate = schema.GetEntityTypes();
             typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
             _populator.PopulateFields(descriptor, typesToPopulate,
                 Operation.Create, Operation.Update, Operation.Delete);

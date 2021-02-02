@@ -10,6 +10,7 @@ using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
 using Iis.Interfaces.Constants;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
@@ -25,7 +26,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MergeNullValueHandling = MergeNullValueHandling.Ignore
         };
         protected readonly IElasticService _elasticService;
-        protected readonly IOntologyModel _ontology;
+        protected readonly IOntologySchema _ontologySchema;
         protected readonly IElasticState _elasticState;
         protected readonly MutationCreateResolver _createResolver;
         protected readonly MutationUpdateResolver _updateResolver;
@@ -36,13 +37,13 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         public virtual bool IsDummy => false;
 
         public BasePhoneSignFeatureProcessor(IElasticService elasticService,
-            IOntologyModel ontology,
+            IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
             IElasticState elasticState)
         {
             _elasticService = elasticService;
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _createResolver = createResolver;
             _updateResolver = updateResolver;
             _elasticState = elasticState;
@@ -51,7 +52,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             if (!FeaturesSectionExists(metadata)) return metadata;
 
-            var signType = _ontology.GetEntityType(SignTypeName);
+            var signType = _ontologySchema.GetEntityTypeByName(SignTypeName);
 
             var features = metadata.SelectToken(FeatureFields.FeaturesSection);
 

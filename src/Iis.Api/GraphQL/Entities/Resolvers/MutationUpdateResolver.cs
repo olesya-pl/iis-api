@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
-using IIS.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json;
 using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts.Interfaces;
+using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -19,7 +19,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     {
         private readonly MutationCreateResolver _mutationCreateResolver;
         private readonly IOntologyService _ontologyService;
-        private readonly IOntologyModel _ontology;
+        private readonly IOntologySchema _ontologySchema;
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMediator _mediator;
         private readonly IResolverContext _resolverContext;
@@ -27,13 +27,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private const string LastConfirmedFieldName = "lastConfirmedAt";
 
         public MutationUpdateResolver(IOntologyService ontologyService,
-            IOntologyModel ontology,
+            IOntologySchema ontologySchema,
             IChangeHistoryService changeHistoryService,
             IMediator mediator,
             MutationCreateResolver mutationCreateResolver)
         {
             _mutationCreateResolver = mutationCreateResolver;
-            _ontology = ontology;
+            _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _changeHistoryService = changeHistoryService;
             _mediator = mediator;
@@ -41,7 +41,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public MutationUpdateResolver(IResolverContext ctx)
         {
             _mutationCreateResolver = new MutationCreateResolver(ctx);
-            _ontology = ctx.Service<IOntologyModel>();
+            _ontologySchema = ctx.Service<IOntologySchema>();
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
@@ -55,12 +55,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!data.ContainsKey(LastConfirmedFieldName))
                 data.Add(LastConfirmedFieldName, DateTime.UtcNow);
 
-            var type = _ontology.GetEntityType(typeName);
+            var type = _ontologySchema.GetEntityTypeByName(typeName);
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
         }
-        public Task<Entity> UpdateEntity(IEntityTypeModel type, Guid id, Dictionary<string, object> properties)
+        public Task<Entity> UpdateEntity(INodeTypeLinked type, Guid id, Dictionary<string, object> properties)
         {
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
@@ -68,7 +68,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return UpdateEntity(type, id, properties, string.Empty, requestId);
         }
         private async Task<Entity> UpdateEntity(
-            IEntityTypeModel type, Guid id,
+            INodeTypeLinked type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
         {
             var node = (Entity)_ontologyService.GetNode(id);
@@ -115,7 +115,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         protected virtual async Task UpdateRelations(
-            Node node, IEmbeddingRelationTypeModel embed,
+            Node node, INodeTypeLinked embed,
             object value, string dotName, Guid requestId)
         {
             switch (embed.EmbeddingOptions)
@@ -133,7 +133,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         protected virtual async Task UpdateMultipleProperties(
-            Node node, IEmbeddingRelationTypeModel embed,
+            Node node, INodeTypeLinked embed,
             object value, string dotName, Guid requestId)
         {
             // patch input on multiple property
@@ -172,7 +172,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        protected async Task ApplyUpdate(Node node, IEmbeddingRelationTypeModel embed, object uv, string dotName, Guid requestId)
+        protected async Task ApplyUpdate(Node node, INodeTypeLinked embed, object uv, string dotName, Guid requestId)
         {
             var uvdict = (Dictionary<string, object>)uv; // RelationTo_U_Entity
             Relation relation;
@@ -191,7 +191,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 if (uvdict.ContainsKey("target"))
                 {
                     var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
-                    var type = _ontology.GetEntityType(typeName);
+                    var type = _ontologySchema.GetEntityTypeByName(typeName);
                     var updatedNode = await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
                     if (relation.Target.Id != updatedNode.Id)
                     {
@@ -222,7 +222,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         }
 
         protected virtual async Task UpdateSingleProperty(
-            Node node, IEmbeddingRelationTypeModel embed,
+            Node node, INodeTypeLinked embed,
             object value, string dotName, Guid requestId)
         {
             var existingRelation = node.GetRelationOrDefault(embed);
@@ -256,7 +256,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        protected virtual async Task UpdateSingleProperty(Node node, IEmbeddingRelationTypeModel embed, object value,
+        protected virtual async Task UpdateSingleProperty(Node node, INodeTypeLinked embed, object value,
             Relation oldRelation, string dotName, Guid requestId)
         {
             if (oldRelation != null)

@@ -6,12 +6,14 @@ using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Ontology;
 using Iis.Domain;
+using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.GraphQL.Entities
 {
     public interface IOntologyFieldPopulator
     {
-        void AddFields(IObjectTypeDescriptor descriptor, IEntityTypeModel type, Operation operation);
+        void AddFields(IObjectTypeDescriptor descriptor, INodeTypeLinked type, Operation operation);
     }
 
     public class OntologyFieldPopulator : IOntologyFieldPopulator
@@ -23,7 +25,7 @@ namespace IIS.Core.GraphQL.Entities
             _repository = repository;
         }
 
-        public void AddFields(IObjectTypeDescriptor descriptor, IEntityTypeModel type, Operation operation)
+        public void AddFields(IObjectTypeDescriptor descriptor, INodeTypeLinked type, Operation operation)
         {
             switch (operation)
             {
@@ -44,12 +46,12 @@ namespace IIS.Core.GraphQL.Entities
             }
         }
 
-        private string GetName(Operation operation, IEntityTypeModel type)
+        private string GetName(Operation operation, INodeTypeLinked type)
         {
             return $"{operation.ToLower()}Entity{type.Name}";
         }
 
-        public void AddCreateFields(IObjectTypeDescriptor descriptor, IEntityTypeModel type)
+        public void AddCreateFields(IObjectTypeDescriptor descriptor, INodeTypeLinked type)
         {
             var operation = Operation.Create;
             var name = type.Name;
@@ -64,7 +66,7 @@ namespace IIS.Core.GraphQL.Entities
                 .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().CreateEntity(ctx, name));
         }
 
-        public void AddUpdateFields(IObjectTypeDescriptor descriptor, IEntityTypeModel type)
+        public void AddUpdateFields(IObjectTypeDescriptor descriptor, INodeTypeLinked type)
         {
             var operation = Operation.Update;
             var name = type.Name;
@@ -76,7 +78,7 @@ namespace IIS.Core.GraphQL.Entities
                 .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().UpdateEntity(ctx, name));
         }
 
-        public void AddDeleteFields(IObjectTypeDescriptor descriptor, IEntityTypeModel type)
+        public void AddDeleteFields(IObjectTypeDescriptor descriptor, INodeTypeLinked type)
         {
             var operation = Operation.Delete;
             var name = type.Name;
@@ -86,7 +88,7 @@ namespace IIS.Core.GraphQL.Entities
                 .Resolver(ctx => ctx.Service<IOntologyMutationResolver>().DeleteEntity(ctx, name));
         }
 
-        public void AddQueryFields(IObjectTypeDescriptor descriptor, IEntityTypeModel type)
+        public void AddQueryFields(IObjectTypeDescriptor descriptor, INodeTypeLinked type)
         {
             var objectType = _repository.GetOntologyType(type);
             var collectionType =

@@ -1147,7 +1147,7 @@ namespace IIS.Core.Migrations
 
             modelBuilder.Entity("Iis.DataModel.AttributeTypeEntity", b =>
                 {
-                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
+                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeLinked")
                         .WithOne("IAttributeTypeModel")
                         .HasForeignKey("Iis.DataModel.AttributeTypeEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1264,7 +1264,7 @@ namespace IIS.Core.Migrations
 
             modelBuilder.Entity("Iis.DataModel.RelationTypeEntity", b =>
                 {
-                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeModel")
+                    b.HasOne("Iis.DataModel.NodeTypeEntity", "INodeTypeLinked")
                         .WithOne("RelationType")
                         .HasForeignKey("Iis.DataModel.RelationTypeEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)

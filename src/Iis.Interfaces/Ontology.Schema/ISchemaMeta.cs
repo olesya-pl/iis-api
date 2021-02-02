@@ -2,22 +2,25 @@
 
 namespace Iis.OntologySchema.DataTypes
 {
-    public interface ISchemaMeta: IRelationMetaBase, IEntityMeta, IEntityRelationMeta, IAttributeRelationMeta
+    public interface ISchemaMeta
     {
-        bool? ExposeOnApi { get; set; }
-        bool? HasFewEntities { get; set; }
-        int? SortOrder { get; set; }
-        string Title { get; set; }
-        string Formula { get; set; }
-        string Format { get; set; }
-        EntityOperation[] AcceptsEntityOperations { get; set; }
-        EntityOperation[] AcceptsEmbeddedOperations { get; set; }
-        string Type { get; set; }
-        string[] TargetTypes { get; set; }
-        IFormField FormField { get; set; }
-        IContainerMeta Container { get; set; }
-        bool Multiple { get; set; }
-        IValidation Validation { get; set; }
-        IInversedRelationMeta Inversed { get; set; }
+        bool? ExposeOnApi { get; }
+        bool? HasFewEntities { get; }
+        int? SortOrder { get; }
+        string Title { get; }
+        string Formula { get; }
+        string Format { get; }
+        EntityOperation[] AcceptsEntityOperations { get; }
+        string Type { get; }
+        string[] TargetTypes { get; }
+        IFormField FormField { get; }
+        IContainerMeta Container { get; }
+        bool Multiple { get; }
+        IValidation Validation { get; }
+        ISchemaMeta Inversed { get; }
+        bool? IsAggregated { get; }
+        string Code { get; }
+        bool Editable { get; }
+        public bool? IsImportantRelation { get; }
     }
 }

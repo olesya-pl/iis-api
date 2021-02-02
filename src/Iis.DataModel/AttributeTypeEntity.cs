@@ -4,7 +4,7 @@ namespace Iis.DataModel
 {
     public class AttributeTypeEntity : BaseEntity, IAttributeType
     {
-        public virtual NodeTypeEntity INodeTypeModel { get; set; }
+        public virtual NodeTypeEntity INodeTypeLinked { get; set; }
         public ScalarType ScalarType { get; set; }
     }
 }

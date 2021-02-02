@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Iis.Interfaces.Meta
 {
-    public interface IContainerMeta : IMeta
+    public interface IContainerMeta
     {
         Guid Id { get; }
         string Title { get; }

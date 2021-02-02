@@ -7,7 +7,7 @@ namespace Iis.Domain
 {
     public sealed class Entity : Node
     {
-        public Entity(Guid id, IEntityTypeModel type, DateTime createdAt = default, DateTime updatedAt = default)
+        public Entity(Guid id, INodeTypeLinked type, DateTime createdAt = default, DateTime updatedAt = default)
             : base(id, type, createdAt, updatedAt)
         {
 
@@ -15,14 +15,12 @@ namespace Iis.Domain
 
         public override void AddNode(Node node)
         {
-            var relationType = (IRelationTypeModel)node.Type;
-            if (relationType is IEmbeddingRelationTypeModel)
+            if (node.Type.Kind == Kind.Relation)
             {
-                var embeddingRelationType = (IEmbeddingRelationTypeModel)relationType;
-                if (embeddingRelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                if (node.Type.RelationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
-                    var existingNode = Nodes.SingleOrDefault(e => e.Type == relationType);
-                    if (existingNode != null) throw new Exception($"Relation '{relationType.Name}' supports single value only.");
+                    var existingNode = Nodes.SingleOrDefault(e => e.Type.Id == node.Type.Id);
+                    if (existingNode != null) throw new Exception($"Relation '{node.Type.Name}' supports single value only.");
                 }
             }
 
@@ -32,7 +30,7 @@ namespace Iis.Domain
         public object GetProperty(string relationName)
         {
             var embed = GetRelationType(relationName);
-            var nodes = GetRelations(embed).Select(r => r.Target);
+            var nodes = GetRelations(embed.Name).Select(r => r.Target);
             if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
             {
                 if (embed.IsAttributeType)
@@ -48,7 +46,7 @@ namespace Iis.Domain
         public void SetProperty(string relationName, object value)
         {
             var embed = GetRelationType(relationName);
-            var existingRelations = GetRelations(embed).ToList();
+            var existingRelations = GetRelations(embed.Name).ToList();
             List<object> targets;
             if (value == null)
             {
@@ -71,7 +69,7 @@ namespace Iis.Domain
                 throw new ArgumentException($"Unable to set non-Entity and non-Guid value to attribute {Type.Name}.{embed.Name}");
 
             var targetNodes = embed.IsAttributeType
-                ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.AttributeType, t))
+                ? targets.Select(t => new Attribute(Guid.NewGuid(), embed.RelationType.TargetType, t))
                 : targets.Select(t => t is Guid guid
                     ? new Entity(guid, embed.EntityType) // Convert guids to node instances
                     : t).Cast<Node>();

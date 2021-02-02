@@ -18,15 +18,17 @@ namespace Iis.OntologySchema.DataTypes
         public string Formula { get; set; }
         public string Format { get; set; }
         public EntityOperation[] AcceptsEntityOperations { get; set; } 
-        public EntityOperation[] AcceptsEmbeddedOperations { get; set; }
         public string Type { get; set; }
         public string[] TargetTypes { get; set; }
         public IFormField FormField { get; set; }
         public IContainerMeta Container { get; set; }
         public IValidation Validation { get; set; }
-        public IInversedRelationMeta Inversed { get; set; }
+        public ISchemaMeta Inversed { get; set; }
         public bool? IsAggregated { get; set; }
         public bool? IsImportantRelation { get; set; }
+        public string Code { get; set; }
+        public bool Editable { get; set; }
+
 
         public SchemaMeta(string json)
         {
@@ -77,11 +79,6 @@ namespace Iis.OntologySchema.DataTypes
                 AcceptsEntityOperations = ((JArray)jObj["AcceptsEntityOperations"])
                     .Select(n => (EntityOperation)byte.Parse(n.ToString())).ToArray();
             }
-            if (jObj.ContainsKey("AcceptsEmbeddedOperations"))
-            {
-                AcceptsEmbeddedOperations = ((JArray)jObj["AcceptsEmbeddedOperations"])
-                    .Select(n => (EntityOperation)byte.Parse(n.ToString())).ToArray();
-            }
             if (jObj.ContainsKey("TargetTypes"))
             {
                 TargetTypes = ((JArray)jObj["TargetTypes"])
@@ -90,7 +87,7 @@ namespace Iis.OntologySchema.DataTypes
 
             if (jObj.ContainsKey("Inversed"))
             {
-                Inversed = ((JObject)jObj["Inversed"]).ToObject<SchemaInversedMeta>();
+                Inversed = ((JObject)jObj["Inversed"]).ToObject<SchemaMeta>();
             }
             if (jObj.ContainsKey("FormField"))
             {

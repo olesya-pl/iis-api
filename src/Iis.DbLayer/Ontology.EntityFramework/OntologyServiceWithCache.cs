@@ -2,8 +2,6 @@
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyModelWrapper;
-using Iis.OntologyData.DataTypes;
 using Iis.Utility;
 using System;
 using System.Collections.Generic;
@@ -127,7 +125,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Distinct()
                 .ToArray();
         }
-        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema
                 .GetNodeTypes(types.Select(t => t.Id))
@@ -167,7 +165,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)))
                 .Count();
         }
-        public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeModel> types, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
 
@@ -206,8 +204,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return MapNode(node);
         }
-
-        public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<IEmbeddingRelationTypeModel> relationTypes)
+        public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<INodeTypeLinked> relationTypes)
         {
             var nodes = _data.GetNodes(nodeIds.Distinct());
             return nodes.Select(n => MapNode(n, relationTypes)).ToList();
@@ -236,7 +233,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         private void SaveRelations(Node source, INode existing)
         {
-            foreach (IEmbeddingRelationTypeModel relationType in source.Type.AllProperties)
+            foreach (INodeTypeLinked relationType in source.Type.AllProperties)
             {
                 if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
                 {
@@ -285,7 +282,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (relation.Target is Attribute)
             {
                 var attribute = relation.Target as Attribute;
-                var value = AttributeType.ValueToString(attribute.Value, ((IAttributeTypeModel)attribute.Type).ScalarTypeEnum);
+                var value = AttributeType.ValueToString(attribute.Value, attribute.Type.ScalarTypeEnum);
                 return _data.CreateRelationWithAttribute(sourceId, relation.Type.Id, value);
             }
             else
@@ -293,11 +290,11 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 return _data.CreateRelation(sourceId, relation.Target.Id, relation.Type.Id);
             }
         }
-        private Node MapNode(INode node, IEnumerable<IEmbeddingRelationTypeModel> relationTypes = null)
+        private Node MapNode(INode node, IEnumerable<INodeTypeLinked> relationTypes = null)
         {
             return MapNode(node, new List<Node>(), relationTypes);
         }
-        private Node MapNode(INode node, List<Node> mappedNodes, IEnumerable<IEmbeddingRelationTypeModel> relationTypes = null)
+        private Node MapNode(INode node, List<Node> mappedNodes, IEnumerable<INodeTypeLinked> relationTypes = null)
         {
             var m = mappedNodes.SingleOrDefault(e => e.Id == node.Id);
             if (m != null) return m;
@@ -307,18 +304,18 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (nodeType.Kind == Kind.Attribute)
             {
                 var value = AttributeType.ParseValue(node.Value, nodeType.AttributeType.ScalarType);
-                var attributeType = new AttributeTypeWrapper(nodeType);
+                var attributeType = nodeType;
                 result = new Attribute(node.Id, attributeType, value, node.CreatedAt, node.UpdatedAt);
             }
             else if (nodeType.Kind == Kind.Entity)
             {
-                var entityType = new EntityTypeWrapper(nodeType);
+                var entityType = nodeType;
                 result = new Entity(node.Id, entityType, node.CreatedAt, node.UpdatedAt);
                 mappedNodes.Add(result);
             }
             else if (nodeType.Kind == Kind.Relation)
             {
-                var relationType = new RelationTypeWrapper(nodeType);
+                var relationType = nodeType;
                 result = new Relation(node.Id, relationType, node.CreatedAt, node.UpdatedAt);
                 var target = MapNode(node.Relation.TargetNode, mappedNodes);
                 result.AddNode(target);
