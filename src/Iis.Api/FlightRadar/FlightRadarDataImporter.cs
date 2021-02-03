@@ -167,7 +167,7 @@ namespace Iis.Api.FlightRadar
         {
             const int batchSize = 25000;
             var count = 0;
-            var toInsert = new List<Routes>();
+            var toInsert = new List<Routes>(batchSize);
             using (var flightContext = _provider.GetRequiredService<FlightsContext>())
             {
                 foreach (var route in routes)
@@ -194,7 +194,7 @@ namespace Iis.Api.FlightRadar
         {
             const int batchSize = 25000;
             var count = 0;
-            var toInsert = new List<Flights>();
+            var toInsert = new List<Flights>(batchSize);
             using (var flightContext = _provider.GetRequiredService<FlightsContext>())
             {
                 foreach (var flight in flights)

@@ -25,9 +25,7 @@ namespace Iis.Api.Ontology
         private static List<NodeRelationCount> MergeResults(HashSet<Guid> uniqueEntityIds, Dictionary<Guid, int> relationsCount, Dictionary<Guid, int> eventsCount, Dictionary<Guid, int> materialsCount)
         {
             var res = new List<NodeRelationCount>();
-
-            foreach (var entityId in uniqueEntityIds)
-            {
+            return uniqueEntityIds.Select(entityId => {
                 var item = new NodeRelationCount()
                 {
                     NodeId = entityId
@@ -46,11 +44,8 @@ namespace Iis.Api.Ontology
                 {
                     item.MaterialsCount = materialsCount[entityId];
                 }
-
-                res.Add(item);
-            }
-
-            return res;
+                return item;
+            }).ToList();
         }
     }
 }
