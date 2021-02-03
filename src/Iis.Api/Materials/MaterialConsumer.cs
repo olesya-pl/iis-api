@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Api.BackgroundServices;
+using Iis.Api.Materials.Handlers;
 using IIS.Core.Materials;
 using Iis.Messages;
 using Iis.Utility;
@@ -12,7 +13,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
-namespace Iis.Api.RabbitConsumers
+namespace Iis.Api.Materials
 {
     public class MaterialConsumer : BackgroundService
     {
@@ -80,7 +81,6 @@ namespace Iis.Api.RabbitConsumers
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var materialService = scope.ServiceProvider.GetService<IMaterialService>();
                 var eventProducer = scope.ServiceProvider.GetService<IMaterialEventProducer>();
                 ThemeCounterBackgroundService.SignalMaterialUpdateNeeded();
                 

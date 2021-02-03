@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.Api.Materials;
 using IIS.Core.Materials;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 
-namespace Iis.Api.RabbitConsumers
+namespace Iis.Api.Materials
 {
-    public class CreatedMaterialElasticSaver : BackgroundService
+    public class MaterialElasticConsumer : BackgroundService
     {
-        private readonly ILogger<CreatedMaterialElasticSaver> _logger;
+        private readonly ILogger<MaterialElasticConsumer> _logger;
         private readonly IMaterialService _materialService;
         private readonly CreatedMaterialElasticSaverConfiguration _configuration;
         private readonly IConnection _connection;
@@ -22,7 +21,7 @@ namespace Iis.Api.RabbitConsumers
 
         private readonly List<Guid> _materialIds = new List<Guid>();
 
-        public CreatedMaterialElasticSaver(ILogger<CreatedMaterialElasticSaver> logger,
+        public MaterialElasticConsumer(ILogger<MaterialElasticConsumer> logger,
             IConnectionFactory connectionFactory,
             IMaterialService materialService,
             CreatedMaterialElasticSaverConfiguration configuration)

@@ -7,7 +7,7 @@ using IIS.Core.Materials;
 using IIS.Core.Materials.Handlers;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.Api.Materials;
-using Iis.Api.RabbitConsumers;
+using Iis.Api.Materials.Handlers;
 
 namespace Iis.Api.Modules
 {
@@ -37,8 +37,8 @@ namespace Iis.Api.Modules
                         .AddSingleton(elasticSaver)
                         .AddTransient<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl))
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
-                        .AddHostedService<MaterialOperatorAssigner>()
-                        .AddHostedService<CreatedMaterialElasticSaver>()
+                        .AddHostedService<MaterialOperatorConsumer>()
+                        .AddHostedService<MaterialElasticConsumer>()
                         .AddHostedService<FeatureHandler>()
                         .AddHostedService<MaterialConsumer>();
         }

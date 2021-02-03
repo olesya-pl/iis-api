@@ -77,7 +77,6 @@ namespace IIS.Core.Materials.EntityFramework
                 FileId = material.FileId,
                 ParentId = material.ParentId,
                 CreatedDate = material.CreatedDate,
-                Metadata = material.Metadata.ToString(),
                 Type = material.Type,
                 Source = material.Source
             });

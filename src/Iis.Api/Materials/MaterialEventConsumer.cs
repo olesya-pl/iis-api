@@ -21,8 +21,9 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
-namespace Iis.Api.RabbitConsumers
+namespace Iis.Api.Materials
 {
+    [Obsolete("Maybe should be deleted")]
     public class MaterialEventConsumer : BackgroundService
     {
         private static readonly HttpClient _httpClient = new HttpClient();

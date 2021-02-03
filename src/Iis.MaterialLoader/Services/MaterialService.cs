@@ -56,7 +56,6 @@ namespace Iis.MaterialLoader.Services
                 FileId = material.FileId,
                 ParentId = material.ParentId,
                 CreatedDate = material.CreatedDate,
-                Metadata = material.Metadata.ToString(),
                 Type = material.Type,
                 Source = material.Source
             });
@@ -75,7 +74,7 @@ namespace Iis.MaterialLoader.Services
             var material = _mapper.Map<Material>(materialInput);
             material.Reliability = GetMaterialSign(materialInput.ReliabilityText);
             material.SourceReliability = GetMaterialSign(materialInput.SourceReliabilityText);
-            material.LoadData = _mapper.Map<Iis.Domain.Materials.MaterialLoadData>(materialInput);
+            material.LoadData = _mapper.Map<MaterialLoadData>(materialInput);
 
             return material;
         }

@@ -16,8 +16,6 @@ namespace Iis.Messages
         public Guid? ParentId { get; set; }
         
         public DateTime CreatedDate { get; set; }
-        
-        public string Metadata { get; set; }
 
         public string Type { get; set; }
         

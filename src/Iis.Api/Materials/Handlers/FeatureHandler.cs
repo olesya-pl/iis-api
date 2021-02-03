@@ -20,7 +20,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
-namespace Iis.Api.RabbitConsumers
+namespace Iis.Api.Materials.Handlers
 {
     public class FeatureHandler : BackgroundService
     {
