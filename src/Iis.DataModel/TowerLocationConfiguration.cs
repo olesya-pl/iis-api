@@ -15,9 +15,9 @@ namespace Iis.DataModel
                 .ValueGeneratedNever();
 
             builder
-                .HasIndex(x => new { x.Mcc, x.Mnc, x.Lat, x.CellId })
+                .HasIndex(x => new { x.Mcc, x.Mnc, x.Lac, x.CellId })
                 .IsUnique(false)
-                .IncludeProperties(x => new { x.Lac, x.Long });
+                .IncludeProperties(x => new { x.Lat, x.Long });
         }
     }
 }
