@@ -221,15 +221,12 @@ namespace Iis.OntologyData.DataTypes
         }
         public IDotNameValues GetComputedValues()
         {
-            var list = new List<DotNameValue>();
-            foreach (var computedRelationType in NodeType.GetComputedRelationTypes())
-            {
-                list.Add(new DotNameValue
+            var list = NodeType.GetComputedRelationTypes()
+                .Select(computedRelationType => new DotNameValue
                 {
                     DotName = computedRelationType.NodeType.Name,
                     Value = ResolveFormula(computedRelationType.NodeType.MetaObject.Formula)
                 });
-            }
             return new DotNameValues(list);
         }
         public IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null)

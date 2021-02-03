@@ -105,12 +105,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         private List<ExtNode> MapComputedProperties(INode node, IEnumerable<IRelationTypeLinked> computedRelationTypes)
         {
-            var list = new List<ExtNode>();
-            foreach (var relationType in computedRelationTypes)
-            {
+            return computedRelationTypes.Select(relationType => {
                 var formula = relationType.NodeType.MetaObject.Formula;
                 var computedValue = node.ResolveFormula(formula);
-                list.Add(new ExtNode
+                return new ExtNode
                 {
                     NodeTypeId = relationType.Id.ToString("N"),
                     NodeType = relationType.NodeType,
@@ -119,9 +117,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     EntityTypeName = relationType.SourceType.Name,
                     AttributeValue = computedValue,
                     ScalarType = ScalarType.String
-                });
-            }
-            return list;
+                };
+            }).ToList();
         }
 
 
