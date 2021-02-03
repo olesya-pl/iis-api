@@ -167,34 +167,41 @@ namespace Iis.Api.FlightRadar
         {
             const int batchSize = 25000;
             var count = 0;
-            var toInsert = new List<Routes>();
-            using (var flightContext = _provider.GetRequiredService<FlightsContext>())
+            var toInsert = new List<Routes>(batchSize);
+            
+            foreach (var route in routes)
             {
-                foreach (var route in routes)
+                toInsert.Add(route);
+                count++;
+                if (count == batchSize)
                 {
-                    toInsert.Add(route);
-                    count++;
-                    if (count == batchSize)
+                    using (var scope = _provider.CreateScope())
                     {
+                        var flightContext = scope.ServiceProvider.GetRequiredService<FlightsContext>();
                         await flightContext.Routes.AddRangeAsync(toInsert);
                         await flightContext.SaveChangesAsync();
-                        toInsert.Clear();
-                        count = 0;
                     }
+                    
+                    toInsert.Clear();
+                    count = 0;
                 }
-                if (toInsert.Any())
+            }
+            if (toInsert.Any())
+            {
+                using (var scope = _provider.CreateScope())
                 {
+                    var flightContext = scope.ServiceProvider.GetRequiredService<FlightsContext>();
                     await flightContext.Routes.AddRangeAsync(toInsert);
                     await flightContext.SaveChangesAsync();
-                }
-            }            
+                }                    
+            }
         }
 
         private async Task ImportFlights(IEnumerable<Flights> flights)
         {
             const int batchSize = 25000;
             var count = 0;
-            var toInsert = new List<Flights>();
+            var toInsert = new List<Flights>(batchSize);
             using (var flightContext = _provider.GetRequiredService<FlightsContext>())
             {
                 foreach (var flight in flights)

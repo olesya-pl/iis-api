@@ -1,27 +1,27 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using IIS.Core.Materials;
+using Iis.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
-using System;
-using Iis.Services;
-using Microsoft.Extensions.Configuration;
 
-namespace IIS.Core.Materials
+namespace Iis.Api.Materials
 {
-    public class MaterialOperatorAssigner : BackgroundService
+    public class MaterialOperatorConsumer : BackgroundService
     {
         private readonly UserService _userService;
-        private readonly ILogger<MaterialOperatorAssigner> _logger;
+        private readonly ILogger<MaterialOperatorConsumer> _logger;
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly IMaterialService _materialService;
         private readonly MaterialOperatorAssignerConfiguration _configuration;
 
-        public MaterialOperatorAssigner(
-            ILogger<MaterialOperatorAssigner> logger,
+        public MaterialOperatorConsumer(
+            ILogger<MaterialOperatorConsumer> logger,
             IConnectionFactory connectionFactory,
             MaterialOperatorAssignerConfiguration configuration,
             IMaterialService materialService,
@@ -65,7 +65,7 @@ namespace IIS.Core.Materials
 
                     if (!availableOperators.Any())
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(30));
+                        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
                         continue;
                     }
 
@@ -74,7 +74,7 @@ namespace IIS.Core.Materials
                         var message = _channel.BasicGet(_configuration.QueueName, false);
                         if (message == null)
                         {
-                            await Task.Delay(TimeSpan.FromSeconds(30));
+                            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
                             continue;
                         }
                         var materialId = new Guid(System.Text.Encoding.UTF8.GetString(message.Body));

@@ -117,7 +117,7 @@ namespace Iis.DbLayer.Repositories
                 .OrderByDescending(x => x.First().Date)
                 .ToList();
 
-            var nodes = new List<FlattenNodeResult>();
+            var nodes = new List<FlattenNodeResult>(changes.Count());
             foreach (var changePack in changes)
             {
                 var olderNode = new FlattenNodeResult

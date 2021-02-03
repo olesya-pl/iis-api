@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Elasticsearch.Net;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
@@ -24,15 +25,14 @@ namespace Iis.Elastic.SearchResult
         public IElasticSearchResult GetFromResponse(StringResponse response)
         {
             var json = JObject.Parse(response.Body);
-            var items = new List<ElasticSearchResultItem>();
+            List<ElasticSearchResultItem> items = null;
             const string NODE_TYPE_NAME = "NodeTypeName";
             const string HIGHLIGHT = "highlight";
 
             var hits = json["hits"]?["hits"];
             if (hits != null)
             {
-                foreach (var hit in hits)
-                {
+                items = hits.Select(hit => {
                     var resultItem = new ElasticSearchResultItem
                     {
                         Identifier = hit["_id"].ToString(),
@@ -45,15 +45,14 @@ namespace Iis.Elastic.SearchResult
                     {
                         resultItem.SearchResult["__typename"] = $"Entity{resultItem.SearchResult[NODE_TYPE_NAME]}";
                     }
-                    items.Add(resultItem);
-
-                }
+                    return resultItem;
+                }).ToList();                
             }
             var total = json["hits"]?["total"]?["value"];
             var res = new ElasticSearchResult
             {
                 Count = (int?)total ?? 0,
-                Items = items                
+                Items = items ?? new List<ElasticSearchResultItem>()
             };
             if (json.ContainsKey("aggregations"))
             {

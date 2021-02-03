@@ -11,7 +11,7 @@ namespace IIS.Core.Materials
 {
     public interface IMaterialService
     {
-        Task SaveAsync(Material material);
+        Task SaveAsync(Material material, Guid? changeRequestId = null);
         Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response);
         Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, Guid userId, string username);
         Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
