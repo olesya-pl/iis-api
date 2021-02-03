@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build
+ARG BUILD_VERSION=local
+
+
+ENV IIS_SOURCE_REVISION_ID=${BUILD_VERSION}
+WORKDIR /opt/material-loader
+COPY . /opt/material-loader/
+
+RUN dotnet publish src/Iis.MaterialLoader/Iis.MaterialLoader.csproj -c Release -o publish/material-loader
+
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+WORKDIR /opt/material-loader
+COPY --from=build /opt/material-loader/publish/material-loader/ /opt/material-loader/
+RUN rm -f /opt/material-loader/appsettings.Production.json && ln -s /local/appsettings.json /opt/material-loader/appsettings.Production.json
+
+EXPOSE 5123
+CMD ["dotnet", "Iis.MaterialLoader.dll"]

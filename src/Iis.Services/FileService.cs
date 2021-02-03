@@ -1,19 +1,19 @@
-using Iis.DataModel.Materials;
-using Iis.DbLayer.Repositories;
-using Iis.Services.Contracts.Configurations;
-using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Interfaces;
-using IIS.Repository;
-using IIS.Repository.Factories;
-using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.DataModel.Materials;
+using Iis.DbLayer.Repositories;
+using IIS.Repository;
+using IIS.Repository.Factories;
+using Iis.Services.Contracts.Configurations;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using Microsoft.Extensions.Logging;
 
-namespace IIS.Core.Files.EntityFramework
+namespace Iis.Services
 {
     public class FileService<TUnitOfWork> : BaseService<TUnitOfWork>, IFileService where TUnitOfWork : IIISUnitOfWork
     {

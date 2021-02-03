@@ -79,19 +79,17 @@ namespace IIS.Core.FlightRadar
 
         private async Task SaveHistoryEntitiesAsync(IReadOnlyCollection<FlightRadarHistory> historyItems, IEnumerable<SignEntityRelation> signEntityRelations)
         {
-            var histotyEntities = new List<LocationHistoryEntity>();
-            foreach (var relation in signEntityRelations)
-            {
-                histotyEntities.AddRange(
-                    _mapper.Map<List<LocationHistoryEntity>>(historyItems)
+            var histotyEntities = signEntityRelations.SelectMany(relation =>
+                _mapper.Map<List<LocationHistoryEntity>>(historyItems)
                     .Select(p =>
                     {
                         p.Id = Guid.NewGuid();
                         p.EntityId = relation.EntityId;
                         p.NodeId = relation.NodeId;
                         return p;
-                    }));
-            }
+                    })
+            ).ToList();
+
             await RunAsync(async unitOfWork => await unitOfWork.FlightRadarRepository.SaveAsync(histotyEntities));
         }
 

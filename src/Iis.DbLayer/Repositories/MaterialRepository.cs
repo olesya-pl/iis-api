@@ -24,7 +24,7 @@ using IIS.Repository;
 
 namespace Iis.DbLayer.Repositories
 {
-    internal class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
+    public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
         private const string ImageVectorMlHandlerCode = "imageVector";
 

@@ -81,7 +81,7 @@ namespace Iis.Elastic
 
             var jBody = JObject.Parse(body);
             var statusItems = jBody["items"];
-            var result = new List<ElasticBulkResponse>();
+            var result = new List<ElasticBulkResponse>(statusItems.Count());
             foreach (JObject item in statusItems)
             {
                 if (IsErrorStatusCode(item["index"]["status"].Value<int>()))
