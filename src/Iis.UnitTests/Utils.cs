@@ -17,6 +17,7 @@ using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DbLayer.OntologySchema;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.UnitTests
 {
@@ -101,6 +102,7 @@ namespace Iis.UnitTests
             serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
             serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
             serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
+            serviceCollection.AddTransient<IOntologyNodesData>(factory => new Mock<IOntologyNodesData>().Object);
 
             return new Utils
             {
