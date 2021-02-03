@@ -1,9 +1,6 @@
-using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using IIS.Core.Files;
-using Iis.Domain.Materials;
 using Newtonsoft.Json.Linq;
 using Iis.Services.Contracts.Dtos;
 

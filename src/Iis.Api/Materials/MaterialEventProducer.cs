@@ -3,12 +3,12 @@ using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
-
 using Iis.Api.Configuration;
 using Iis.Api.Materials;
+using Iis.Messages;
+using Iis.Utility;
 
 namespace IIS.Core.Materials
 {
@@ -19,6 +19,8 @@ namespace IIS.Core.Materials
         void SendMaterialFeatureEvent(MaterialEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
         void SaveMaterialToElastic(Guid id);
+
+        void PublishMaterialCreatedMessage(MaterialCreatedMessage message);
     }
 
     public class MaterialEventProducer : IMaterialEventProducer
@@ -152,6 +154,22 @@ namespace IIS.Core.Materials
                                 routingKey: _elasticSaverConfiguration.QueueName,
                                 basicProperties: null,
                                 body: body);
+        }
+
+        public void PublishMaterialCreatedMessage(MaterialCreatedMessage message)
+        {
+            _channel.QueueDeclare(
+                queue: MaterialRabbitConsts.QueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+
+            var body = message.ToBytes();
+            
+            _channel.BasicPublish(exchange: "",
+                routingKey: MaterialRabbitConsts.QueueName,
+                basicProperties: null,
+                body: body);
         }
     }
 }

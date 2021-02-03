@@ -17,10 +17,10 @@ using System.Threading;
 using Iis.DbLayer.MaterialEnum;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Interfaces.Ontology.Data;
 using MediatR;
 using Iis.Events.Materials;
 using Iis.Interfaces.Constants;
+using Iis.Messages;
 using Iis.Services.Contracts.Dtos;
 using Iis.Utility;
 
@@ -33,7 +33,6 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialEventProducer _eventProducer;
         private readonly IMaterialProvider _materialProvider;
         private readonly IMLResponseRepository _mLResponseRepository;
-        private readonly IOntologyNodesData _nodesData;
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IMediator _mediatr;
@@ -43,7 +42,6 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialEventProducer eventProducer,
             IMaterialProvider materialProvider,
             IMLResponseRepository mLResponseRepository,
-            IOntologyNodesData nodesData,
             IChangeHistoryService changeHistoryService,
             IMediator mediator,
             IMaterialSignRepository materialSignRepository,
@@ -54,65 +52,57 @@ namespace IIS.Core.Materials.EntityFramework
             _eventProducer = eventProducer;
             _materialProvider = materialProvider;
             _mLResponseRepository = mLResponseRepository;
-            _nodesData = nodesData;
             _changeHistoryService = changeHistoryService;
             _materialSignRepository = materialSignRepository;
             _mediatr = mediator;
         }
 
-        public async Task SaveAsync(Material material)
+        public async Task SaveAsync(Material material, Guid? changeRequestId = null)
         {
             await MakeFilePermanent(material);
             await ValidateMaterialParent(material);
 
             var materialEntity = _mapper.Map<MaterialEntity>(material);
 
-            Run(unitOfWork => { unitOfWork.MaterialRepository.AddMaterialEntity(materialEntity); });
-            var changeRequestId = Guid.NewGuid();
-            await SaveMaterialChangeHistory(material, changeRequestId);
-            await SaveMaterialChildren(material, changeRequestId);
-            SaveMaterialInfoEntitites(material);
+            await RunAsync(unitOfWork => { unitOfWork.MaterialRepository.AddMaterialEntity(materialEntity); });
+            
+            var requestId = changeRequestId.GetValueOrDefault(Guid.NewGuid());
+            await SaveMaterialChangeHistory(material, requestId);
+            await SaveMaterialChildren(material, requestId);
+            await SaveMaterialInfoEntities(material);
 
-            _eventProducer.SaveMaterialToElastic(materialEntity.Id);
-
-            if (material.IsParentMaterial())
+            _eventProducer.PublishMaterialCreatedMessage(new MaterialCreatedMessage
             {
-                _eventProducer.SendAvailableForOperatorEvent(materialEntity.Id);
-            }
-
-            var message = new MaterialEventMessage { Id = materialEntity.Id, Source = materialEntity.Source, Type = materialEntity.Type };
-
-            _eventProducer.SendMaterialEvent(message);
-
-            _eventProducer.SendMaterialFeatureEvent(message);
-
-            // todo: multiple queues for different material types
-            if (material.File != null && material.Type == "cell.voice")
-                _eventProducer.SendMaterialAddedEventAsync(
-                    new MaterialAddedEvent { FileId = material.File.Id, MaterialId = material.Id });
-
-            await _mediatr.Publish(new MaterialCreatedEvent());
+                MaterialId = material.Id,
+                FileId = material.FileId,
+                ParentId = material.ParentId,
+                CreatedDate = material.CreatedDate,
+                Type = material.Type,
+                Source = material.Source
+            });
         }
 
         private Task SaveMaterialChangeHistory(Material material, Guid changeRequestId)
         {
-            var changeItems = new List<ChangeHistoryDto>();
-            changeItems.Add(new ChangeHistoryDto 
+            var changeItems = new List<ChangeHistoryDto>
             {
-                Date = DateTime.UtcNow,
-                NewValue = material.Id.ToString(),
-                PropertyName = nameof(material.Id),
-                RequestId = changeRequestId,
-                TargetId = material.Id,                
-            });
-            changeItems.Add(new ChangeHistoryDto
-            {
-                Date = DateTime.UtcNow,
-                NewValue = material.Source,
-                PropertyName = nameof(material.Source),
-                RequestId = changeRequestId,
-                TargetId = material.Id,
-            });
+                new ChangeHistoryDto
+                {
+                    Date = DateTime.UtcNow,
+                    NewValue = material.Id.ToString(),
+                    PropertyName = nameof(material.Id),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                },
+                new ChangeHistoryDto
+                {
+                    Date = DateTime.UtcNow,
+                    NewValue = material.Source,
+                    PropertyName = nameof(material.Source),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                }
+            };
             return _changeHistoryService.SaveMaterialChanges(changeItems);
         }
 
@@ -143,46 +133,20 @@ namespace IIS.Core.Materials.EntityFramework
             foreach (var child in material.Children)
             {
                 child.ParentId = material.Id;
-                await SaveAsync(child);
-                await SaveMaterialChangeHistory(child, changeRequestId);
+                await SaveAsync(child, changeRequestId);
             }
         }
 
-        private void SaveMaterialInfoEntitites(Material material)
+        private Task SaveMaterialInfoEntities(Material material)
         {
             var materialInfoEntities = material.Infos.Select(info => Map(info, material.Id)).ToList();
-            var materialFeatures = new List<MaterialFeatureEntity>();
-
-            foreach (var featureId in GetNodeIdentitiesFromFeatures(material.Metadata))
-            {
-                if (string.Equals(material.Source, "osint.data.file", StringComparison.Ordinal))
-                {
-                    var node = _nodesData.GetNode(featureId);
-                    if (node == null)
-                    {
-                        continue;
-                    }
-                }
-
-                materialFeatures.Add(new MaterialFeatureEntity
-                {
-                    NodeId = featureId,
-                    MaterialInfo = new MaterialInfoEntity
-                    {
-                        MaterialId = material.Id
-                    }
-                });
-            }
-
-            Run(unitOfWork =>
+            return RunAsync(unitOfWork =>
             {
                 unitOfWork.MaterialRepository.AddMaterialInfos(materialInfoEntities);
-                unitOfWork.MaterialRepository.AddMaterialFeatures(materialFeatures);
             });
         }
 
         public async Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response)
-
         {
             var responseEntity = _mapper.Map<MLResponseEntity>(response);
 
@@ -414,31 +378,7 @@ namespace IIS.Core.Materials.EntityFramework
             await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
         }
-
-        private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
-        {
-            var result = new List<Guid>();
-
-            var features = metadata.SelectToken(FeatureFields.FeaturesSection);
-
-            if (features is null) return result;
-
-            foreach (JObject feature in features)
-            {
-                var featureId = feature.GetValue(FeatureFields.featureId)?.Value<string>();
-
-                if (string.IsNullOrWhiteSpace(featureId)) continue;
-
-                if (!Guid.TryParse(featureId, out Guid featureGuid)) continue;
-
-                if (featureGuid.Equals(Guid.Empty)) continue;
-
-                result.Add(featureGuid);
-            }
-
-            return result;
-        }
-
+        
         private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
         {
             return new MaterialInfoEntity

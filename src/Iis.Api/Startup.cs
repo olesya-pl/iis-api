@@ -40,7 +40,6 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Services.DI;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
-using IIS.Core.Files.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
