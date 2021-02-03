@@ -379,7 +379,10 @@ namespace IIS.Core
             {
                 using (var context = serviceScope.ServiceProvider.GetService<OntologyContext>())
                 {
+                    var defaultCommandTimeout = context.Database.GetCommandTimeout();
+                    context.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
                     context.Database.Migrate();
+                    context.Database.SetCommandTimeout(defaultCommandTimeout);
                 }
                 try
                 {
