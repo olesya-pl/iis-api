@@ -19,7 +19,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
             _serviceProvider = Utils.GetServiceProvider();
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public async Task Create_SuccessPath(NodeEntity node, MaterialEntity material)
         {
             //arrange
@@ -41,7 +41,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
                             && p.MaterialInfo.MaterialId == material.Id));
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public async Task Create_RelationAlreadyExists_Throws(NodeEntity node, MaterialEntity material)
         {
             //arrange
@@ -71,7 +71,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
                             && p.MaterialInfo.MaterialId == material.Id));
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public async Task Delete_SuccessPath(NodeEntity node, MaterialEntity material,
             NodeEntity node2, MaterialEntity material2)
         {
