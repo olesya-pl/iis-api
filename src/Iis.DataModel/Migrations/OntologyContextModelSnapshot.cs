@@ -1186,9 +1186,6 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.TowerLocationEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
                     b.Property<string>("CellId")
                         .HasColumnType("text");
 
@@ -1197,6 +1194,9 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<string>("DataSource")
                         .HasColumnType("text");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Lac")
                         .HasColumnType("text");
@@ -1221,11 +1221,6 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Mcc", "Mnc", "Lac", "CellId")
-                        .HasAnnotation("Npgsql:IndexInclude", new[] { "Lat", "Long" });
 
                     b.ToTable("TowerLocations");
                 });
