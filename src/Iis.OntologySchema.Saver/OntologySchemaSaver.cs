@@ -23,15 +23,14 @@ namespace Iis.OntologySchema.Saver
 
         public void SaveToDatabase(ISchemaCompareResult compareResult, IOntologySchema schemaTo, ISchemaSaveParameters parameters = null)
         {
-            if (parameters?.Create ?? true) AddNodes(compareResult.ItemsToAdd);
-            if (parameters?.Delete ?? true) DeleteNodes(compareResult.ItemsToDelete);
-            if (parameters?.Update ?? true) UpdateNodes(compareResult.ItemsToUpdate, schemaTo);
-            if (parameters?.Aliases ?? true)
-            {
-                AddAliases(compareResult.AliasesToAdd);
-                UpdateAliases(compareResult.AliasesToUpdate);
-                DeleteAliases(compareResult.AliasesToDelete);
-            }
+            AddNodes(compareResult.ItemsToAdd.Where(item => parameters?.IsChecked(item) == true));
+            DeleteNodes(compareResult.ItemsToDelete.Where(item => parameters?.IsChecked(item) == true));
+            UpdateNodes(compareResult.ItemsToUpdate.Where(item => parameters?.IsChecked(item) == true), schemaTo);
+
+            AddAliases(compareResult.AliasesToAdd.Where(item => parameters?.IsChecked(item) == true));
+            UpdateAliases(compareResult.AliasesToUpdate.Where(item => parameters?.IsChecked(item) == true));
+            DeleteAliases(compareResult.AliasesToDelete.Where(item => parameters?.IsChecked(item) == true));
+
             _context.SaveChanges();
         }
 
@@ -48,7 +47,7 @@ namespace Iis.OntologySchema.Saver
             }
         }
 
-        private void AddNodes(IReadOnlyList<INodeTypeLinked> nodeTypesToAdd)
+        private void AddNodes(IEnumerable<INodeTypeLinked> nodeTypesToAdd)
         {
             foreach (var nodeType in nodeTypesToAdd)
             {
@@ -91,7 +90,7 @@ namespace Iis.OntologySchema.Saver
                 }
             }
         }
-        private void DeleteNodes(IReadOnlyList<INodeTypeLinked> nodeTypesToDelete)
+        private void DeleteNodes(IEnumerable<INodeTypeLinked> nodeTypesToDelete)
         {
             foreach (var nodeType in nodeTypesToDelete)
             {
@@ -100,7 +99,7 @@ namespace Iis.OntologySchema.Saver
                 _context.NodeTypes.Update(nodeTypeEntity);
             }
         }
-        private void UpdateNodes(IReadOnlyList<ISchemaCompareDiffItem> itemsToUpdate, ISchemaEntityTypeFinder entityTypeFinder)
+        private void UpdateNodes(IEnumerable<ISchemaCompareDiffItem> itemsToUpdate, ISchemaEntityTypeFinder entityTypeFinder)
         {
             var updatedAttributesIds = new List<Guid>();
             foreach (var item in itemsToUpdate)
