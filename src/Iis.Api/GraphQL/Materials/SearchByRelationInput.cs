@@ -10,6 +10,6 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<Guid> NodeIdentityList { get; set; }
         public bool IncludeDescendants { get; set; }
         [GraphQLIgnore]
-        public bool ShoudBeExecuted => NodeIdentityList != null && NodeIdentityList.Any();
+        public bool HasConditions => NodeIdentityList != null && NodeIdentityList.Any();
     }
 }
