@@ -129,7 +129,7 @@ namespace Iis.OntologyManager.UiControls
             //menuGrid.Items.Add("Видалити");
             //grid.ContextMenuStrip = menuGrid;
         }
-        public void CompareSchemas(IOntologySchemaSource source = null)
+        public void CompareSchemas(IOntologySchemaSource source = null, bool setCheckBoxes = true)
         {
             var selectedSource = source ?? (IOntologySchemaSource)cmbSchemaSourcesCompare.SelectedItem;
             if (selectedSource == null) return;
@@ -139,7 +139,8 @@ namespace Iis.OntologyManager.UiControls
             _compareResultForGrid = new CompareResultForGrid(_compareResult);
             grid.DataSource = _compareResultForGrid.Items;
             
-            SetStartCheckBoxes();
+            if (setCheckBoxes) SetStartCheckBoxes();
+            SetAllChecks();
         }
         private void SetStartCheckBoxes()
         {
@@ -149,6 +150,9 @@ namespace Iis.OntologyManager.UiControls
             cbAliasCreate.Checked = false;
             cbAliasUpdate.Checked = false;
             cbAliasDelete.Checked = false;
+        }
+        private void SetAllChecks()
+        {
             ChangeChecks(cbNodeTypeCreate.Checked, CompareResultItemType.NodeType, CompareResultOperation.Insert);
             ChangeChecks(cbNodeTypeUpdate.Checked, CompareResultItemType.NodeType, CompareResultOperation.Update);
             ChangeChecks(cbNodeTypeDelete.Checked, CompareResultItemType.NodeType, CompareResultOperation.Delete);
@@ -169,7 +173,7 @@ namespace Iis.OntologyManager.UiControls
 
             schemaSaver.SaveToDatabase(_compareResult, schema, _compareResultForGrid);
             UpdatedDatabases.Add(_compareResult.SchemaSource.Title);
-            CompareSchemas();
+            CompareSchemas(null, false);
         }
 
         private void grid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
