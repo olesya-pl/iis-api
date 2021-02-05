@@ -91,6 +91,7 @@ namespace IIS.Core.Controllers
                 Inline = true
             };
             Response.Headers.Add("Content-Disposition", cd.ToString());
+            Response.Headers.Add("Accept-ranges", "bytes");
             return File(fi.Contents, fi.ContentType);
         }
 

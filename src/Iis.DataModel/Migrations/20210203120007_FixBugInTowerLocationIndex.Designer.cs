@@ -3,15 +3,17 @@ using System;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Iis.DataModel.Migrations
+namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20210203120007_FixBugInTowerLocationIndex")]
+    partial class FixBugInTowerLocationIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1186,6 +1188,9 @@ namespace Iis.DataModel.Migrations
 
             modelBuilder.Entity("Iis.DataModel.TowerLocationEntity", b =>
                 {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
                     b.Property<string>("CellId")
                         .HasColumnType("text");
 
@@ -1194,9 +1199,6 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<string>("DataSource")
                         .HasColumnType("text");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Lac")
                         .HasColumnType("text");
@@ -1221,6 +1223,11 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Mcc", "Mnc", "Lac", "CellId")
+                        .HasAnnotation("Npgsql:IndexInclude", new[] { "Lat", "Long" });
 
                     b.ToTable("TowerLocations");
                 });
