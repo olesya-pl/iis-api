@@ -107,7 +107,7 @@ namespace Iis.OntologyData.DataTypes
         }
         public bool HasPropertyWithValue(string propertyName, string value)
         {
-            return AllData.Locker.ReadLock(() => _outgoingRelations.Any(r => r.TypeName == propertyName && r.TargetNode.Value == value));
+            return AllData.Locker.ReadLock(() => _outgoingRelations.Any(r => r.TypeName == propertyName && string.Equals(r.TargetNode.Value, value, StringComparison.OrdinalIgnoreCase)));
         }
         public INode GetChildNode(string childTypeName)
         {
