@@ -6,14 +6,14 @@ using System.Text;
 
 namespace AcceptanceTests.PageObjects
 {
-	public class MaterialRelatedItem
+	public class MaterialRelatedItems
 	{
 		private readonly IWebDriver _driver;
 
 		private readonly IWebElement _tableRowElement;
 
 
-		public MaterialRelatedItem(IWebDriver driver, IWebElement webElement)
+		public MaterialRelatedItems(IWebDriver driver, IWebElement webElement)
 		{
 			_driver = driver;
 			_tableRowElement = webElement;
@@ -29,7 +29,7 @@ namespace AcceptanceTests.PageObjects
 			_driver.WaitFor(2);
 		}
 
-		public MaterialRelatedItem(IWebDriver driver, string value)
+		public MaterialRelatedItems(IWebDriver driver, string value)
 		{
 			_driver = driver;
 			_tableRowElement = driver.FindElement(By.XPath($@"//table[@class='el-table__body']//tr/td[1]//b[.='{value}']"));

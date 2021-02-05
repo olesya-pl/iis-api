@@ -22,16 +22,13 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSection;
 
-        [FindsBy(How = How.CssSelector, Using = "tbody > tr:nth-of-type(1)")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//tr[@class='el-table__row']/td[1]")]
         public IWebElement FirstMaterialInTheMaterialsList;
 
         [FindsBy(How = How.CssSelector, Using = ".el-button--default")]
-        [CacheLookup]
         public IWebElement SearchButton;
 
-        [FindsBy(How = How.CssSelector, Using = "span > .el-input > .el-input__inner")]
-        [CacheLookup]
+        [FindsBy(How = How.CssSelector, Using = ".el-input.entity-search__input > .el-input__inner")]
         public IWebElement SearchField;
 
         [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
@@ -138,15 +135,15 @@ namespace AcceptanceTests.PageObjects
             actions.SendKeys(Keys.Control).SendKeys(Keys.End).Perform();
         }
 
-        public List<MaterialRelatedItem> MaterialsRelatedEvents => driver.FindElements(By.CssSelector(".material-events .material-events-table .el-table__row"))
-                   .Select(_ => new MaterialRelatedItem(driver, _)).ToList();
+        public List<MaterialRelatedItems> MaterialsRelatedEvents => driver.FindElements(By.CssSelector(".material-events .material-events-table .el-table__row"))
+                   .Select(_ => new MaterialRelatedItems(driver, _)).ToList();
 
-        public List<MaterialRelatedItem> MaterialsRelatedObjects => driver.FindElements(By.CssSelector(".material-objects .material-objects-table .el-table__row"))
-                  .Select(_ => new MaterialRelatedItem(driver, _)).ToList();
+        public List<MaterialRelatedItems> MaterialsRelatedObjects => driver.FindElements(By.CssSelector(".material-objects .material-objects-table .el-table__row"))
+                  .Select(_ => new MaterialRelatedItems(driver, _)).ToList();
 
-        public MaterialRelatedItem GetItemTitleRelatedToMaterial(string title)
+        public MaterialRelatedItems GetItemTitleRelatedToMaterial(string title)
         {
-            return new MaterialRelatedItem(driver, title);
+            return new MaterialRelatedItems(driver, title);
         }
     }
 }
