@@ -12,40 +12,45 @@ namespace Iis.OntologyManager.UiControls
 {
     public class UiFilterControl: UIBaseControl
     {
-        IGetTypesFilter _model;
-
-        CheckBox cbFilterEntities;
-        CheckBox cbFilterAttributes;
-        CheckBox cbFilterRelations;
         TextBox txtFilterName;
+        List<RadioButton> radioButtons = new List<RadioButton>();
 
-        public delegate void OnChangeHandler(IGetTypesFilter filter);
+        public delegate bool NodeTypeFilterFunc(INodeTypeLinked nodeType);
+        NodeTypeFilterFunc _filterFunc;
+
+        public delegate void OnChangeHandler(NodeTypeFilterFunc filter);
         public event OnChangeHandler OnChange;
 
         protected override void CreateControls()
         {
             _container.SetColWidth(_style.ButtonWidthDefault / 2);
-            _container.Add(cbFilterEntities = new CheckBox {
-                Text = "Entities",
-                Checked = true,
-                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
-            });
-            _container.Add(cbFilterAttributes = new CheckBox {
-                Text = "Attributes",
-                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
-            });
-            _container.Add(cbFilterRelations = new CheckBox {
-                Text = "Relations",
-                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
-            });
 
-            cbFilterEntities.CheckedChanged += OnUserInput;
-            cbFilterAttributes.CheckedChanged += OnUserInput;
-            cbFilterRelations.CheckedChanged += OnUserInput;
+            var radioAll = new RadioButton
+            {
+                Text = "All",
+                Checked = true,
+                BackColor = _style.EntityTypeBackColor
+            };
+            _container.Add(radioAll);
+            radioAll.CheckedChanged += OnFilterChanged;
+            radioButtons.Add(radioAll);
+
+            foreach (var typeName in _style.EntityColors.Keys)
+            {
+                var radio = new RadioButton
+                {
+                    Text = typeName,
+                    Checked = false,
+                    BackColor = _style.EntityColors[typeName]
+                };
+                _container.Add(radio);
+                radio.CheckedChanged += OnFilterChanged;
+                radioButtons.Add(radio);
+            }
 
             _container.GoToNewColumn();
             _container.Add(txtFilterName = new TextBox(), "Name");
-            txtFilterName.TextChanged += OnUserInput;
+            txtFilterName.TextChanged += OnFilterChanged;
 
             Log.Logger.Verbose("Filter controls:");
             foreach (Control control in _container.RootControl.Controls)
@@ -54,33 +59,30 @@ namespace Iis.OntologyManager.UiControls
                 Log.Logger.Verbose($"... ({control.Left},{control.Top},{control.Width},{control.Height})");
             }
         }
-        public void OnUserInput(object sender, EventArgs e)
+
+        private void OnFilterChanged(object sender, EventArgs e)
         {
-            if (OnChange != null)
+            var radio = radioButtons.Where(rb => rb.Checked).FirstOrDefault();
+
+            _filterFunc = nt =>
+                (radio.Text == "All" || nt.Name == radio.Text || nt.IsInheritedFrom(radio.Text)) &&
+                (string.IsNullOrEmpty(txtFilterName.Text) || nt.Name.Contains(txtFilterName.Text, StringComparison.OrdinalIgnoreCase));
+
+            OnChange(_filterFunc);
+        }
+
+        public NodeTypeFilterFunc GetModel() => _filterFunc;
+
+        public Color GetNodeTypeColor(INodeTypeLinked nodeType)
+        {
+            foreach (var nodeTypeName in _style.EntityColors.Keys)
             {
-                var filter = GetModel();
-                OnChange(filter);
+                if (nodeType.Name == nodeTypeName || nodeType.IsInheritedFrom(nodeTypeName))
+                {
+                    return _style.EntityColors[nodeTypeName];
+                }
             }
-        }
-        public IGetTypesFilter GetModel()
-        {
-            var kinds = new List<Kind>();
-            if (cbFilterEntities.Checked) kinds.Add(Kind.Entity);
-            if (cbFilterAttributes.Checked) kinds.Add(Kind.Attribute);
-            if (cbFilterRelations.Checked) kinds.Add(Kind.Relation);
-            return new GetTypesFilter
-            {
-                Kinds = kinds,
-                Name = txtFilterName.Text
-            };
-        }
-        public void SetModel(IGetTypesFilter model)
-        {
-            _model = model;
-            cbFilterEntities.Checked = model.Kinds.Contains(Kind.Entity);
-            cbFilterAttributes.Checked = model.Kinds.Contains(Kind.Attribute);
-            cbFilterRelations.Checked = model.Kinds.Contains(Kind.Relation);
-            txtFilterName.Text = model.Name;
+            return _style.EntityOtherColor;
         }
     }
 }
