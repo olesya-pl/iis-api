@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
 using Iis.DataModel;
-using Iis.DataModel.FlightRadar;
+using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -12,10 +13,14 @@ namespace Iis.UnitTests.Services
     public class GsmLocationServiceTests
     {
         private ServiceProvider _serviceProvider;
+        private Mock<ITowerLocationRepository> _towerLocationRepositoryMock = new Mock<ITowerLocationRepository>();
 
         public GsmLocationServiceTests()
         {
-            _serviceProvider = Utils.GetServiceProvider();
+            _serviceProvider = Utils.GetServiceProviderWithCustomSetup(services =>
+            {
+                services.AddSingleton(_ => _towerLocationRepositoryMock.Object);
+            });
         }
 
         public void Dispose()
@@ -24,31 +29,15 @@ namespace Iis.UnitTests.Services
             _serviceProvider.Dispose();
         }
 
-        [Fact(Skip = "Will be unskiped")]
+        [Fact]
         public void TryFillTowerLocationHistory_GivenTwoTowerLocations_ShouldCreateOneLocationHistory()
         {
             //Arrange
-            SetDefaultTowerLocations(
-                new TowerLocationEntity
-                {
-                    Id = 1,
-                    Mcc = "251",
-                    Mnc = "99",
-                    Lac = "25010",
-                    CellId = "4476",
-                    Lat = 21.01233121m,
-                    Long = 52.2138913m
-                },
-                new TowerLocationEntity
-                {
-                    Id = 2,
-                    Mcc = "248",
-                    Mnc = "456",
-                    Lac = "912",
-                    CellId = "12343",
-                    Lat = 61.086781221m,
-                    Long = 52.23242343m
-                });
+            _towerLocationRepositoryMock.Setup(x =>
+                    x.GetByCellGlobalIdentityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                        It.IsAny<string>()))
+                .ReturnsAsync((21.01233121m, 52.2138913m));
+
             var metadata = GetMetadata();
             var materialId = Guid.NewGuid();
 
@@ -66,21 +55,15 @@ namespace Iis.UnitTests.Services
             Assert.Equal(new DateTime(2018, 9, 26, 17, 29, 31), historicalLocations[0].RegisteredAt);
         }
 
-        [Fact(Skip = "Will be unskiped")]
+        [Fact]
         public void TryFillTowerLocationHistory_GivenOneTowerLocations_ShouldNotCreateAnyLocationHistory()
         {
             //Arrange
-            SetDefaultTowerLocations(
-                new TowerLocationEntity
-                {
-                    Id = 1,
-                    Mcc = "346",
-                    Mnc = "99",
-                    Lac = "25010",
-                    CellId = "4476",
-                    Lat = 21.01233121m,
-                    Long = 52.2138913m
-                });
+            _towerLocationRepositoryMock.Setup(x =>
+                    x.GetByCellGlobalIdentityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                        It.IsAny<string>()))
+                .ReturnsAsync((default(decimal), default(decimal)));
+
             var metadata = GetMetadata();
             var materialId = Guid.NewGuid();
 
@@ -94,21 +77,10 @@ namespace Iis.UnitTests.Services
             Assert.Empty(historicalLocations);
         }
 
-        [Fact(Skip = "Will be unskiped")]
+        [Fact]
         public void TryFillTowerLocationHistory_GivenInvalidMetadata_ShouldNotCreateAnyLocationHistory()
         {
             //Arrange
-            SetDefaultTowerLocations(
-                new TowerLocationEntity
-                {
-                    Id = 1,
-                    Mcc = "346",
-                    Mnc = "99",
-                    Lac = "25010",
-                    CellId = "4476",
-                    Lat = 21.01233121m,
-                    Long = 52.2138913m
-                });
             var metadata = JObject.FromObject(new {name = "Petro"});
             var materialId = Guid.NewGuid();
 
@@ -122,10 +94,14 @@ namespace Iis.UnitTests.Services
             Assert.Empty(historicalLocations);
         }
 
-        [Fact(Skip = "Will be unskiped")]
+        [Fact]
         public void TryFillTowerLocationHistory_GivenNoTowerLocation_ShouldNotCreateAnyLocationHistory()
         {
             //Arrange
+            _towerLocationRepositoryMock.Setup(x =>
+                    x.GetByCellGlobalIdentityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                        It.IsAny<string>()))
+                .ReturnsAsync((default(decimal), default(decimal)));
             var metadata = GetMetadata();
             var materialId = Guid.NewGuid();
 
@@ -142,9 +118,8 @@ namespace Iis.UnitTests.Services
         private void CleanDatabase()
         {
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            
+
             context.LocationHistory.RemoveRange(context.LocationHistory);
-            context.TowerLocations.RemoveRange(context.TowerLocations);
             context.SaveChanges();
         }
 
@@ -176,13 +151,6 @@ namespace Iis.UnitTests.Services
                 }
             ]
             }");
-        }
-
-        private void SetDefaultTowerLocations(params TowerLocationEntity[] entities)
-        {
-            var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            context.TowerLocations.AddRange(entities);
-            context.SaveChanges();
         }
     }
 }

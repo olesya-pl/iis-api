@@ -65,7 +65,7 @@ namespace Iis.UnitTests
             return Instance.Startup.Configuration.GetConnectionString("DB");
         }
 
-        public static IServiceProvider GetServiceProviderWithCustomSetup(Action<ServiceCollection> setup)
+        public static ServiceProvider GetServiceProviderWithCustomSetup(Action<ServiceCollection> setup)
         {
             var startup = new Startup(new ConfigurationBuilder()
                             .AddJsonFile("appsettings.json", optional: true)
