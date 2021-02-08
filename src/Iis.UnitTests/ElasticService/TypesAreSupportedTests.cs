@@ -63,6 +63,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 .Setup(p => p.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString()))
                 .Returns(objectOfStudyTypeMock.Object);
 
+            ontologySchemaMock
+                .Setup(p => p.GetEntityTypeByName(EntityTypeNames.Wiki.ToString()))
+                .Returns(objectOfStudyTypeMock.Object);
+
             objectOfStudyTypeMock.Setup(p => p.GetAllDescendants())
                 .Returns(ontologytypes);
 

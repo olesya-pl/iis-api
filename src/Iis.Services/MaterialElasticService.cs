@@ -66,7 +66,7 @@ namespace Iis.Services
             }
 
             var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct); 
-            
+
             var searchResult = elasticResult.ToSearchResult();
 
             foreach (var item in searchResult.Items)

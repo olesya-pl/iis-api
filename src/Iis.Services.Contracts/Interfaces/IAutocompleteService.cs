@@ -7,8 +7,8 @@ namespace Iis.Services.Contracts.Interfaces
 {
     public interface IAutocompleteService
     {
-        List<string> GetTips(string query, int count);
+        IReadOnlyCollection<string> GetTips(string query, int count);
 
-        Task<List<AutocompleteEntityDto>> GetEntitiesAsync(string query, int? size, CancellationToken ct = default);
+        Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, CancellationToken ct = default);
     }
 }
