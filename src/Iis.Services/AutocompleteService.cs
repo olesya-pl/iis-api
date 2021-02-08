@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Elastic.SearchQueryExtensions;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Newtonsoft.Json.Linq;
@@ -15,7 +16,7 @@ namespace Iis.Services
     {
         private readonly IOntologySchema _ontologySchema;
         private readonly IElasticService _elasticService;
-        private const int DefaultSize = 10;
+        private static readonly IReadOnlyCollection<AutocompleteEntityDto> EmptyAutoCompleteList = Array.Empty<AutocompleteEntityDto>();
         private static readonly List<string> KeyWords = new List<string>();
         private static readonly string[] SearchableFields = { "__title", "commonInfo.RealNameShort", "title" };
 
@@ -25,7 +26,7 @@ namespace Iis.Services
             _elasticService = elasticService;
         }
 
-        public List<string> GetTips(string query, int count)
+        public IReadOnlyCollection<string> GetTips(string query, int count)
         {
             var result = new List<string>(count);
             result.AddRange(GetKeyWords().Where(x => x.StartsWith(query, StringComparison.InvariantCultureIgnoreCase)));
@@ -38,16 +39,23 @@ namespace Iis.Services
             return result
                 .Distinct()
                 .Take(count)
-                .ToList();
+                .ToArray();
         }
 
-        public async Task<List<AutocompleteEntityDto>> GetEntitiesAsync(string query, int? size, CancellationToken ct = default)
+        public async Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, CancellationToken ct = default)
         {
-            if(query.Trim().Equals("*")) return new List<AutocompleteEntityDto>();
+            if(SearchQueryExtension.IsMatchAll(query)) return EmptyAutoCompleteList;
 
             if (!query.Contains('*')) query = $"*{query}*";
 
-            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFields, size.GetValueOrDefault(DefaultSize), ct);
+            var typeNameList = _ontologySchema.GetEntityTypesByName(types, includeChildren: true)
+                                .Select(e => e.Name)
+                                .Distinct()
+                                .ToArray();
+
+            if(!_elasticService.TypesAreSupported(typeNameList)) return EmptyAutoCompleteList;
+
+            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFields, typeNameList, size, ct);
 
             return response.Select(x => new AutocompleteEntityDto
             {
@@ -55,7 +63,7 @@ namespace Iis.Services
                 Title = GetFirstNotNullField(x.SearchResult),
                 TypeName = x.SearchResult["NodeTypeName"].Value<string>(),
                 TypeTitle = x.SearchResult["NodeTypeTitle"].Value<string>()
-            }).ToList();
+            }).ToArray();
         }
 
         private string GetFirstNotNullField(JObject jObject) 
