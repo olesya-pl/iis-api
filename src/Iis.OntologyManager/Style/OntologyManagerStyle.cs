@@ -24,8 +24,17 @@ namespace Iis.OntologyManager.Style
         public Font DefaultFont { get; set; }
         public Font SelectedFont { get; set; }
         public Font TypeHeaderNameFont { get; set; }
-        //public float CharacterHeight { get; set; }
-        //public float CharacterWidth { get; set; }
+
+        public Color EntityOtherColor { get; } = Color.FromArgb(220, 220, 220);
+
+        public Dictionary<string, Color> EntityColors { get; } = new Dictionary<string, Color>
+        {
+            { "ObjectOfStudy", Color.SkyBlue },
+            { "Wiki", Color.FromArgb(230, 200, 255) },
+            { "Enum", Color.LightPink },
+            { "ObjectSign", Color.FromArgb(245, 192, 162) },
+        };
+
         public static IOntologyManagerStyle GetDefaultStyle(Control control)
         {
             SizeF size;

@@ -28,7 +28,6 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbAliasUpdate;
         CheckBox cbAliasDelete;
         DataGridView grid;
-        ContextMenuStrip menuGrid;
         public List<string> UpdatedDatabases = new List<string>();
         Color _createColor = Color.FromArgb(192, 255, 192);
         Color _updateColor = Color.Moccasin;
@@ -125,9 +124,6 @@ namespace Iis.OntologyManager.UiControls
             {
                 column.ReadOnly = column.Name != "Checked";
             }
-            //menuGrid = new ContextMenuStrip();
-            //menuGrid.Items.Add("Видалити");
-            //grid.ContextMenuStrip = menuGrid;
         }
         public void CompareSchemas(IOntologySchemaSource source = null, bool setCheckBoxes = true)
         {
