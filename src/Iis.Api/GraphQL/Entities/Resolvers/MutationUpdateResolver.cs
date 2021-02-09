@@ -296,7 +296,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 await _changeHistoryService
                         .SaveNodeChange(
-                            relation.Type.Name,
+                            relation.Target.OriginalNode.GetDotName(),
                             _rootNodeId,
                             userName,
                             relation.Target.Id.ToString("N"),
