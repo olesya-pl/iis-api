@@ -219,6 +219,19 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 newValue,
                 parentTypeName,
                 requestId);
+
+            if (embed.IsLinkFromEventToObjectOfStudy)
+            {
+                await _changeHistoryService.SaveNodeChange(
+                    "EventLink",
+                    Guid.Parse(newValue.ToString()),
+                    username,
+                    null,
+                    entityId.ToString("N"),
+                    null,
+                    requestId);
+            }
+
             return node;
         }
 
