@@ -224,6 +224,8 @@ namespace Iis.OntologySchema.DataTypes
         public bool IsAncestorOfObjectOfStudy => IsAbstract &&
             GetAllDescendants().All(nt => nt.IsAbstract || nt.IsObjectOfStudy);
         public bool IsSeparateObject => IsObjectOfStudy || IsObjectSign || IsEnum || IsAncestorOfObjectOfStudy;
+        public bool IsLinkFromEventToObjectOfStudy =>
+            RelationType.SourceType.IsEvent && RelationType.TargetType.IsObjectOfStudy;
 
         public string GetStringCode()
         {
