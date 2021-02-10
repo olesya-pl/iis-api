@@ -51,10 +51,14 @@ namespace Iis.OntologySchema.DataTypes
         }
         public bool HasUniqueValues => UniqueValueFieldName != null;
         public ISchemaMeta MetaObject => new SchemaMeta(GetMetaDeep());
-        public string Formula => 
-            Kind == Kind.Attribute ?
-                IncomingRelations.First().NodeType.MetaObject.Formula :
-                null;
+        public string Formula =>
+            Kind switch
+            {
+                Kind.Attribute => IncomingRelations.First().NodeType.MetaObject.Formula,
+                Kind.Relation => MetaObject.Formula,
+                Kind.Entity => null
+            };
+
         public bool IsComputed => !string.IsNullOrWhiteSpace(Formula);
         public EmbeddingOptions EmbeddingOptions => RelationType?.EmbeddingOptions ?? EmbeddingOptions.None;
 
@@ -213,8 +217,12 @@ namespace Iis.OntologySchema.DataTypes
 
         public bool IsInheritedFrom(string nodeTypeName)
         {
-            var ancestors = GetAllAncestors();
-            return ancestors.Any(nt => nt.Name == nodeTypeName);
+            foreach (var directAncestor in GetDirectAncestors())
+            {
+                if (directAncestor.Name == nodeTypeName) return true;
+                if (directAncestor.IsInheritedFrom(nodeTypeName)) return true;
+            }
+            return false;
         }
 
         public bool IsObjectOfStudy => Name == EntityTypeNames.ObjectOfStudy.ToString() || IsInheritedFrom(EntityTypeNames.ObjectOfStudy.ToString());
