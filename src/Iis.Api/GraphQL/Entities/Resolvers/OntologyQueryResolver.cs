@@ -4,6 +4,7 @@ using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
 using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using Iis.Services;
@@ -175,7 +176,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids));
         }
-
         public Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {
             var result = new List<GeoCoordinate>();
@@ -186,6 +186,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var attributeNode in attributeNodes)
             {
                 var relation = attributeNode.IncomingRelations.Single();
+                
+                if (relation.SourceNode.NodeType.IsObjectSign)
+                    continue;
+
                 var geoCoordinate = attributeNode.Attribute.ValueAsGeoCoordinates;
                 var label = relation.SourceNodeId == parentNode.Id ?
                     relation.Node.NodeType.Title :
