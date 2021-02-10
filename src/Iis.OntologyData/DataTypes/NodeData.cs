@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Iis.OntologyData.DataTypes
@@ -256,6 +257,21 @@ namespace Iis.OntologyData.DataTypes
                     relationTypeNameList.Contains(r.Node.NodeType.Name))
                 .ToList()
             );
+        }
+        public string GetDotName()
+        {
+            var node = NodeType.Kind == Kind.Relation ? this.Relation.TargetNode : this;
+            var sb = new StringBuilder();
+
+            while (!node.NodeType.IsObjectOfStudy)
+            {
+                if (sb.Length > 0) sb.Insert(0, ".");
+                sb.Insert(0, node.IncomingRelations.First().Node.NodeType.Name);
+
+                node = node.IncomingRelations.First().SourceNode;
+            }
+
+            return sb.ToString();
         }
     }
 }
