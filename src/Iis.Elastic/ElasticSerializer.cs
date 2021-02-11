@@ -50,9 +50,9 @@ namespace Iis.Elastic
                 json["__coordinates"] = coords;
             }
 
-            foreach (var childGroup in extNode.Children.GroupBy(p => p.NodeTypeName))
+            foreach (var childGroup in extNode.Children.GroupBy(p => new {p.NodeTypeName, p.EntityTypeName}))
             {
-                var key = childGroup.Key;
+                var key = childGroup.Key.NodeTypeName;
                 if (childGroup.Count() == 1)
                 {
                     var child = childGroup.First();

@@ -21,8 +21,8 @@ namespace Iis.DbLayer.Repositories
                 .Where(x => x.Mcc == mcc && x.Mnc == mnc && x.Lac == lac && x.CellId == cellId)
                 .Select(x => new {x.Lat, x.Long})
                 .FirstOrDefaultAsync();
-            
-            return (location.Lat, location.Long);
+
+            return location == null ? (default, default) : (location.Lat, location.Long);
         }
     }
 }

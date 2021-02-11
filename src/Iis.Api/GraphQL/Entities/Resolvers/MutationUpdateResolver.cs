@@ -291,14 +291,47 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         private async Task SaveChangesForDeletedRelation(Relation relation, Guid requestId)
         {
-            var children = relation.GetChildAttributes();
-            foreach (var child in children)
+            var userName = GetCurrentUserName();
+            if (relation.Type.TargetType.IsObjectOfStudy)
             {
                 await _changeHistoryService
-                    .SaveNodeChange(child.dotName, _rootNodeId,
-                        GetCurrentUserName(), child.attribute.Value.ToString(), string.Empty, 
-                        relation.Target.Type.Name,
+                        .SaveNodeChange(
+                            relation.Target.OriginalNode.GetDotName(),
+                            _rootNodeId,
+                            userName,
+                            relation.Target.Id.ToString("N"),
+                            null,
+                            relation.Target.Type.Name,
+                            requestId);
+
+                if (relation.Type.IsLinkFromEventToObjectOfStudy)
+                {
+                    await _changeHistoryService.SaveNodeChange(
+                        "EventLink",
+                        relation.Target.Id,
+                        userName,
+                        _rootNodeId.ToString("N"),
+                        null,
+                        null,
                         requestId);
+                }
+            }
+            else
+            {
+                var children = relation.GetChildAttributes();
+                foreach (var child in children)
+                {
+                    var value = child.attribute.Value.ToString();
+                    await _changeHistoryService
+                        .SaveNodeChange(
+                            child.dotName,
+                            _rootNodeId,
+                            userName,
+                            value,
+                            string.Empty,
+                            relation.Target.Type.Name,
+                            requestId);
+                }
             }
         }
     }

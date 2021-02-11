@@ -1,6 +1,9 @@
 ﻿using HotChocolate;
+using HotChocolate.Types;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,8 +12,9 @@ namespace IIS.Core.GraphQL.Autocomplete
     public class Query
     {
         private const int DefaultTipsCount = 20;
+        private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString()};
 
-        public List<string> GetTips(
+        public IReadOnlyCollection<string> GetTips(
             [Service] IAutocompleteService autocomplete,
             [GraphQLNonNullType] string query, 
             int? count)
@@ -18,12 +22,15 @@ namespace IIS.Core.GraphQL.Autocomplete
             return autocomplete.GetTips(query, count.GetValueOrDefault(DefaultTipsCount));
         }
 
-        public Task<List<AutocompleteEntityDto>> GetEntities(
+        public Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntities(
             [Service] IAutocompleteService autocomplete,
             [GraphQLNonNullType] string query,
+            [GraphQLType(typeof(ListType<NonNullType<StringType>>))] string[] types,
             int? size)
         {
-            return autocomplete.GetEntitiesAsync(query, size);
+            types = types is null || !types.Any() ? ObjectOfStudyTypeList : types;
+
+            return autocomplete.GetEntitiesAsync(query, types, size.GetValueOrDefault(DefaultTipsCount));
         }
     }
 }

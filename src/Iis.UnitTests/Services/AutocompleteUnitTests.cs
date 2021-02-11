@@ -19,6 +19,7 @@ namespace Iis.UnitTests.Services
     {
         private readonly Mock<IOntologySchema> _ontologySchemaMock = new Mock<IOntologySchema>();
         private readonly Mock<IElasticService> _elasticServiceMock = new Mock<IElasticService>();
+        private static readonly string[] ObjectOfStudyTypeList = new[] { "ObjectOfStudy" };
 
         public AutocompleteUnitTests()
         {
@@ -72,7 +73,7 @@ namespace Iis.UnitTests.Services
             var service = GetService();
 
             //Act
-            var entities = await service.GetEntitiesAsync("some text", 5);
+            var entities = await service.GetEntitiesAsync("some text", ObjectOfStudyTypeList, 5);
 
             //Assert
             entities.Should().HaveCount(2);
@@ -89,7 +90,7 @@ namespace Iis.UnitTests.Services
             var service = GetService();
 
             //Act
-            var entities = await service.GetEntitiesAsync("rpg", 5);
+            var entities = await service.GetEntitiesAsync("rpg", ObjectOfStudyTypeList, 5);
 
             //Assert
             entities.Should().HaveCount(2);
@@ -130,8 +131,19 @@ namespace Iis.UnitTests.Services
                 { "person.userInfo", new SchemaNodeType() { Kind = Kind.Relation} },
             });
 
+            _ontologySchemaMock
+                .Setup(x => x.GetEntityTypesByName(It.IsAny<string[]>(), It.IsAny<bool>()))
+                .Returns(new List<INodeTypeLinked>{
+                    new SchemaNodeType { Kind = Kind.Entity, Name = "Person"},
+                    new SchemaNodeType { Kind = Kind.Entity, Name = "MilitaryOrganization"}
+                });
+
             _elasticServiceMock
-                .Setup(x => x.SearchByFieldsAsync("*some text*", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.TypesAreSupported(It.IsAny<string[]>()))
+                .Returns(true);
+
+            _elasticServiceMock
+                .Setup(x => x.SearchByFieldsAsync("*some text*", It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ElasticSearchResultItem>()
                 {
                     new ElasticSearchResultItem
@@ -158,7 +170,7 @@ namespace Iis.UnitTests.Services
                 });
 
             _elasticServiceMock
-                .Setup(x => x.SearchByFieldsAsync("*rpg*", It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.SearchByFieldsAsync("*rpg*", It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ElasticSearchResultItem>()
                 {
                     new ElasticSearchResultItem

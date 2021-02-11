@@ -265,12 +265,16 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public bool TypesAreSupported(IEnumerable<string> typeNames)
         {
+            if(typeNames is null || !typeNames.Any()) return false;
+
             return OntologyIndexesAreSupported(typeNames);
         }
 
         private bool OntologyIndexIsSupported(string indexName)
         {
-            return _elasticState.OntologyIndexes.Any(index => index.Equals(indexName)) || _elasticState.EventIndexes.Any(index => index.Equals(indexName));
+            return _elasticState.OntologyIndexes.Any(index => index.Equals(indexName))
+                || _elasticState.EventIndexes.Any(index => index.Equals(indexName))
+                || _elasticState.WikiIndexes.Any(index => index.Equals(indexName));
         }
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
@@ -285,14 +289,14 @@ namespace IIS.Core.Ontology.EntityFramework
             return response.All(x => x.IsSuccess);
         }
 
-        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, string[] fieldNames, int size, CancellationToken ct = default)
+        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, IReadOnlyCollection<string> fieldNames, IReadOnlyCollection<string> typeNames, int size, CancellationToken ct = default)
         {
             var searchParams = new IisElasticSearchParams
             {
-                BaseIndexNames = _elasticState.OntologyIndexes.ToList(),
+                BaseIndexNames = typeNames,
                 Query = query,
                 Size = size,
-                SearchFields = fieldNames.Select(x => new IisElasticField { Name = x}).ToList()
+                SearchFields = fieldNames.Select(x => new IisElasticField { Name = x}).ToArray()
             };
             var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
             return searchResult.Items;

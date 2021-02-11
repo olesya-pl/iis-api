@@ -7,6 +7,7 @@ using HotChocolate;
 using Iis.Api.GraphQL.Common;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Elastic;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
@@ -18,15 +19,16 @@ namespace IIS.Core.GraphQL.Entities
 {
     public class OntologyFilterableQuery
     {
+        private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString()};
         public async Task<OntologyFilterableQueryResponse> EntityObjectOfStudyFilterableList(
-            [Service] IOntologyService ontologyService,            
+            [Service] IOntologyService ontologyService,
             [Service] IOntologyNodesData nodesData,
             [Service] IMapper mapper,
             PaginationInput pagination,
             AllEntitiesFilterInput filter
             )
         {
-            var types = filter.Types is null || !filter.Types.Any() ? new[] { "ObjectOfStudy" } : filter.Types;
+            var types = filter.Types is null || !filter.Types.Any() ? ObjectOfStudyTypeList : filter.Types;
 
             var response = await ontologyService.FilterNodeAsync(types, new ElasticFilter
             {
@@ -40,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities
         }
 
         public async Task<OntologyFilterableQueryResponse> GetEventList(
-            [Service] IOntologyService ontologyService,            
+            [Service] IOntologyService ontologyService,
             [Service] IMapper mapper,
             PaginationInput pagination,
             FilterInput filter,

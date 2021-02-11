@@ -33,7 +33,7 @@ namespace IIS.Core.GraphQL.Materials
 
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
 
-            if (searchByImageInput != null)
+            if (searchByImageInput != null && searchByImageInput.HasConditions)
             {
                 var content = Convert.FromBase64String(searchByImageInput.Content);
                 var result = await materialProvider
@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Materials
                 return (mapped, result.Aggregations, result.Count);
             }
 
-            if(searchByRelation != null && searchByRelation.ShoudBeExecuted)
+            if(searchByRelation != null && searchByRelation.HasConditions)
             {
                 var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(
                     searchByRelation.NodeIdentityList,

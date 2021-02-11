@@ -81,6 +81,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public int GetRelationsCount(Guid entityId)
         {
             var node = _data.GetNode(entityId);
+            if (node == null) return 0;
+
             return node.IncomingRelations.Count(r => r.RelationKind == RelationKind.Embedding)
                 + node.OutgoingRelations.Count(r => r.RelationKind == RelationKind.Embedding && r.IsLinkToSeparateObject);
         }
