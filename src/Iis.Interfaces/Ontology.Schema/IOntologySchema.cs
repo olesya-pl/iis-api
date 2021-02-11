@@ -26,6 +26,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IAliases Aliases { get; }
         void RemoveRelation(Guid relationId);
         IEnumerable<INodeTypeLinked> GetAllNodeTypes();
+        IReadOnlyDictionary<Guid, INodeTypeLinked> GetNonAttributeTypes();
         void PutInOrder();
         void RemoveEntity(Guid id);
         string ValidateRemoveEntity(Guid id);

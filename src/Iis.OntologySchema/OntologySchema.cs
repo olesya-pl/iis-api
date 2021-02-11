@@ -162,16 +162,16 @@ namespace Iis.OntologySchema
 
         public ISchemaCompareResult CompareTo(IOntologySchema schema)
         {
-            Dictionary<string, INodeTypeLinked> thisCodes = GetStringCodes();
-            Dictionary<string, INodeTypeLinked> otherCodes = schema.GetStringCodes();
+            var thisNodeTypes = GetNonAttributeTypes();
+            var otherNodeTypes = schema.GetNonAttributeTypes();
             var result = new SchemaCompareResult();
-            result.ItemsToAdd = thisCodes.Keys.Where(key => !otherCodes.ContainsKey(key)).Select(key => thisCodes[key]).ToList();
-            result.ItemsToDelete = otherCodes.Keys.Where(key => !thisCodes.ContainsKey(key)).Select(key => otherCodes[key]).ToList();
-            var commonKeys = thisCodes.Keys.Where(key => otherCodes.ContainsKey(key)).ToList();
+            result.ItemsToAdd = thisNodeTypes.Keys.Where(key => !otherNodeTypes.ContainsKey(key)).Select(key => thisNodeTypes[key]).ToList();
+            result.ItemsToDelete = otherNodeTypes.Keys.Where(key => !thisNodeTypes.ContainsKey(key)).Select(key => otherNodeTypes[key]).ToList();
+            var commonKeys = thisNodeTypes.Keys.Where(key => otherNodeTypes.ContainsKey(key)).ToList();
             
             result.ItemsToUpdate = commonKeys
-                .Where(key => !thisCodes[key].IsIdentical(otherCodes[key]))
-                .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = otherCodes[key] })
+                .Where(key => !thisNodeTypes[key].IsIdentical(otherNodeTypes[key]))
+                .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisNodeTypes[key], NodeTypeTo = otherNodeTypes[key] })
                 .ToList();
             result.SchemaSource = schema.SchemaSource;
 
@@ -439,7 +439,14 @@ namespace Iis.OntologySchema
         {
             return _storage.NodeTypes.Values;
         }
-        
+
+        public IReadOnlyDictionary<Guid, INodeTypeLinked> GetNonAttributeTypes()
+        {
+            return _storage.NodeTypes
+                .Where(p => p.Value.Kind != Kind.Attribute)
+                .ToDictionary(pair => pair.Key, pair => (INodeTypeLinked)pair.Value);
+        }
+
         public void PutInOrder()
         {
             _storage.SetDotNameTypes();
