@@ -297,12 +297,15 @@ namespace Iis.OntologyManager.UiControls
             var grid = (DataGridView)sender;
             var nodeType = (IChildNodeType)grid.Rows[e.RowIndex].DataBoundItem;
             if (nodeType == null) return;
-            var color = _style.GetColorByNodeType(nodeType.Kind);
             var row = (DataGridViewRow)grid.Rows[e.RowIndex];
             var style = row.DefaultCellStyle;
 
-            style.BackColor = color;
-            style.SelectionBackColor = color;
+            style.BackColor =
+                nodeType.Kind == Kind.Entity ?
+                    _style.GetColorByAncestor(nodeType.TargetType) :
+                    _style.GetColorByNodeTypeKind(nodeType.Kind);
+
+            style.SelectionBackColor = style.BackColor;
             style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
             style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
         }

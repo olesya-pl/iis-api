@@ -29,7 +29,7 @@ namespace Iis.OntologyManager.UiControls
             {
                 Text = "All",
                 Checked = true,
-                BackColor = _style.EntityTypeBackColor
+                BackColor = _style.EntityOtherColor
             };
             _container.Add(radioAll);
             radioAll.CheckedChanged += OnFilterChanged;
@@ -72,17 +72,5 @@ namespace Iis.OntologyManager.UiControls
         }
 
         public NodeTypeFilterFunc GetModel() => _filterFunc;
-
-        public Color GetNodeTypeColor(INodeTypeLinked nodeType)
-        {
-            foreach (var nodeTypeName in _style.EntityColors.Keys)
-            {
-                if (nodeType.Name == nodeTypeName || nodeType.IsInheritedFrom(nodeTypeName))
-                {
-                    return _style.EntityColors[nodeTypeName];
-                }
-            }
-            return _style.EntityOtherColor;
-        }
     }
 }

@@ -54,6 +54,7 @@ namespace Iis.OntologyManager.UiControls
             {
                 grid.Columns[i].DataPropertyName = dataNames[i];
                 grid.Columns[i].HeaderText = dataNames[i];
+                grid.Columns[i].Name = dataNames[i];
             }
             return grid;
         }

@@ -24,7 +24,9 @@ namespace Iis.OntologyManager.Style
         Font TypeHeaderNameFont { get; }
         Dictionary<string, Color> EntityColors { get; }
         Color EntityOtherColor { get; }
-        Color GetColorByNodeType(Kind kind);
+        Color GetColorByNodeTypeKind(Kind kind);
+        Color GetColorByAncestor(INodeTypeLinked nodeType);
         void GridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e);
+
     }
 }

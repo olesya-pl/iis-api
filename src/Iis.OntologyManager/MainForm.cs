@@ -56,7 +56,7 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.30";
+        const string VERSION = "1.31";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -390,7 +390,7 @@ namespace Iis.OntologyManager
             var grid = (DataGridView)sender;
             var nodeType = (INodeTypeLinked)grid.Rows[e.RowIndex].DataBoundItem;
             if (nodeType == null) return;
-            var color = _filterControl.GetNodeTypeColor(nodeType);
+            var color = _style.GetColorByAncestor(nodeType);
             var row = (DataGridViewRow)grid.Rows[e.RowIndex];
             var style = row.DefaultCellStyle;
 
