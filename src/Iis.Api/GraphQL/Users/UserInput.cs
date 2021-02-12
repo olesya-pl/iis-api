@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Interfaces.Enums;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -23,6 +24,8 @@ namespace IIS.Core.GraphQL.Users
         public string UserName { get; set; }
         public string UserNameActiveDirectory { get; set; }
         public bool? IsBlocked { get; set; }
+        [GraphQLNonNullType]
+        public AccessLevel AccessLevel { get; set; }
         [GraphQLNonNullType]
         public IEnumerable<Guid> Roles { get; set; }
     }
