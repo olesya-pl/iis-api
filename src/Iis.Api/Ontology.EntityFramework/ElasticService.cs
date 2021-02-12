@@ -48,7 +48,7 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default)
         {
             var ontologyFields
-                = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p)));
+                = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)));
 
             var searchParams = new IisElasticSearchParams
             {
@@ -96,7 +96,7 @@ namespace IIS.Core.Ontology.EntityFramework
             if(SearchQueryExtension.IsMatchAll(filter.Suggestion))
             {
                 var aggregadionFieldList = _elasticConfiguration
-                    .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p)))
+                    .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)))
                     .Where(e => e.IsAggregated)
                     .Select(e => new AggregationField(e.Name, e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
                     .ToArray();
@@ -149,9 +149,11 @@ namespace IIS.Core.Ontology.EntityFramework
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
 
             var searchFields = _elasticConfiguration
-                        .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.OntologyIndexes.Contains(p))).ToList();
+                        .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)))
+                        .ToList();
 
             IElasticSearchResult searchByHistoryResult = null;
+
             if (useHistoricalSearch)
             {
                 var historicalIndexes = typeNames.Select(GetHistoricalIndex).ToList();
@@ -197,7 +199,10 @@ namespace IIS.Core.Ontology.EntityFramework
 
             if (useHistoricalSearch && searchByHistoryResult.Count > 0)
             {
-                var entityIds = searchByHistoryResult.Items.Select(x => x.SearchResult["Id"].Value<string>()).Distinct();
+                var entityIds = searchByHistoryResult.Items
+                    .Select(x => x.SearchResult["Id"].Value<string>())
+                    .Distinct();
+
                 multiSearchParams.SearchParams.Add((string.Join(" ", entityIds),
                     new List<IIisElasticField>
                     {
@@ -272,9 +277,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private bool OntologyIndexIsSupported(string indexName)
         {
-            return _elasticState.OntologyIndexes.Any(index => index.Equals(indexName))
-                || _elasticState.EventIndexes.Any(index => index.Equals(indexName))
-                || _elasticState.WikiIndexes.Any(index => index.Equals(indexName));
+            return _elasticState.ObjectIndexes.Any(index => index.Equals(indexName))
+                || _elasticState.EventIndexes.Any(index => index.Equals(indexName));
         }
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
