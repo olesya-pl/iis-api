@@ -59,7 +59,7 @@ namespace Iis.Api.Ontology
                 var formula = titleRelationType.NodeType.MetaObject.Formula;
                 if (!string.IsNullOrWhiteSpace(formula))
                 {
-                    result.Add(new JProperty("__title", node.OriginalNode.ResolveFormula(formula)));
+                    result["__title"] = node.OriginalNode.ResolveFormula(formula);
                 }
             }
             result.Add(new JProperty("__iconName", node.OriginalNode.NodeType.GetIconName()));
