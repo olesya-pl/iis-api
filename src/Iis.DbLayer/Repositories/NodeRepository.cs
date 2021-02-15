@@ -53,7 +53,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = _nodeFlattener.FlattenNode(id, cancellationToken);
+            var result = _nodeFlattener.FlattenNode(id);
             return await _elasticManager.PutDocumentAsync(
                 result.NodeTypeName,
                 result.Id,
@@ -62,7 +62,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExclude, CancellationToken cancellationToken = default)
         {
-            var result = _nodeFlattener.FlattenNode(id, cancellationToken);
+            var result = _nodeFlattener.FlattenNode(id);
             result.SerializedNode = ExcludeFields(result.SerializedNode, fieldsToExclude);
 
             return await _elasticManager.PutDocumentAsync(
@@ -100,7 +100,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
         {
-            var actualNode = _nodeFlattener.FlattenNode(id, ct);
+            var actualNode = _nodeFlattener.FlattenNode(id);
             var getNodeChanges = requestId.HasValue ?
                 _changeHistoryService.GetChangeHistoryByRequest(requestId.Value) :
                 _changeHistoryService.GetChangeHistory(new ChangeHistoryParams 
@@ -140,18 +140,6 @@ namespace Iis.DbLayer.Repositories
             }
 
             return true;
-        }
-
-        public async Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
-        {
-            var flattenNodes = new List<FlattenNodeResult>(ids.Count());
-            foreach (var id in ids)
-                flattenNodes.Add(_nodeFlattener.FlattenNode(id, ct));
-
-            var changes = await _changeHistoryService.GetChangeHistory(ids);
-            var historicalNodes = flattenNodes.SelectMany(x => GetHistoricalNodes(x, changes));
-
-            return await PutNodesToElasticAsync(historicalNodes, true, ct);
         }
 
         private async Task<List<ElasticBulkResponse>> PutNodesToElasticAsync(IEnumerable<FlattenNodeResult> nodes, bool isHistoricalIndex, CancellationToken ct = default) 

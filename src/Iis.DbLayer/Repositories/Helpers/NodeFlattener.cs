@@ -24,7 +24,7 @@ namespace Iis.DbLayer.Repositories.Helpers
             _ontologyData = ontologyData;
         }
 
-        public FlattenNodeResult FlattenNode(Guid id, CancellationToken cancellationToken = default)
+        public FlattenNodeResult FlattenNode(Guid id)
         {
             var node = _ontologyData.GetNode(id);
             var extNode = _extNodeService.GetExtNode(node);
