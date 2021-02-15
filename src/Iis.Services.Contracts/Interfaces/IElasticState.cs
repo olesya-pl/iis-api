@@ -4,12 +4,13 @@ namespace Iis.Services.Contracts.Interfaces
 {
     public interface IElasticState
     {
-        List<string> EventIndexes { get; }
-        List<string> MaterialIndexes { get; }
-        List<string> OntologyIndexes { get; }
-        List<string> WikiIndexes { get; }
+        IReadOnlyCollection<string> EventIndexes { get; }
+        IReadOnlyCollection<string> MaterialIndexes { get; }
+        IReadOnlyCollection<string> OntologyIndexes { get; }
+        IReadOnlyCollection<string> WikiIndexes { get; }
+        IReadOnlyCollection<string> ObjectIndexes { get; }
         string ReportIndex { get; }
-        List<string> SignIndexes { get; }
+        IReadOnlyCollection<string> SignIndexes { get; }
         Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
     }
 }

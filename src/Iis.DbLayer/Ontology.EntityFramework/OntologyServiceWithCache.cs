@@ -109,6 +109,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
+
         public Node GetNodeByUniqueValue(Guid nodeTypeId, string value, string valueTypeName)
         {
             var nodes = _data.GetNodesByUniqueValue(nodeTypeId, value, valueTypeName);
@@ -119,6 +120,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
+
         public IReadOnlyCollection<Guid> GetNodeIdListByFeatureIdList(IEnumerable<Guid> featureIdList)
         {
             return _data.Relations
@@ -127,6 +129,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Distinct()
                 .ToArray();
         }
+
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema
@@ -359,6 +362,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Distinct();
 
             var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
+
             if (isElasticSearch)
             {
                 return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
@@ -376,16 +380,16 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 filter.SortColumn = GetSortColumnForElastic(filter.SortColumn);
                 filter.SortOrder = filter.SortOrder;
             }
-            
+
             var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter);
-            
+
             return new SearchEntitiesByConfiguredFieldsResult()
             {
                 Count = response.Count,
                 Entities = response.Items.Select(x => x.Value.SearchResult).ToList()
             };
         }
-        
+
         private static string GetSortColumnForElastic(string sortColumn)
         {
             return sortColumn switch

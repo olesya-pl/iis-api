@@ -2,7 +2,7 @@
 using Iis.Services.Contracts.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-
+using System;
 namespace Iis.Services
 {
     public class ElasticState : IElasticState
@@ -15,8 +15,8 @@ namespace Iis.Services
                 OntologyIndexes = objectOfStudyType.GetAllDescendants()
                     .Where(nt => !nt.IsAbstract)
                     .Select(nt => nt.Name)
-                    .ToList();
-            }
+                    .ToArray();
+            } else OntologyIndexes = Array.Empty<string>();
 
             var wikiType = ontologySchema.GetEntityTypeByName(EntityTypeNames.Wiki.ToString());
             if (wikiType != null)
@@ -24,13 +24,15 @@ namespace Iis.Services
                 WikiIndexes = wikiType.GetAllDescendants()
                     .Where(nt => !nt.IsAbstract)
                     .Select(nt => nt.Name)
-                    .ToList();
-            }
+                    .ToArray();
+            } else WikiIndexes = Array.Empty<string>();
 
-            EventIndexes = new List<string> { "Event" };
-            MaterialIndexes = new List<string> { "Materials" };
+            ObjectIndexes = OntologyIndexes.Concat(WikiIndexes).ToArray();
+
+            EventIndexes = new [] { "Event" };
+            MaterialIndexes = new [] { "Materials" };
             ReportIndex = "Reports";
-            SignIndexes = new List<string> { "CellphoneSign", "SatellitePhoneSign" };
+            SignIndexes = new [] { "CellphoneSign", "SatellitePhoneSign" };
             FieldsToExcludeByIndex = new Dictionary<string, IEnumerable<string>>()
             {
                 { "Event", new [] { "associatedWithEvent" } }
@@ -38,11 +40,12 @@ namespace Iis.Services
         }
 
         public string ReportIndex { get; set; }
-        public List<string> MaterialIndexes { get; }
-        public List<string> OntologyIndexes { get; }
-        public List<string> WikiIndexes { get; }
-        public List<string> EventIndexes { get; }
-        public List<string> SignIndexes { get; }
+        public IReadOnlyCollection<string> MaterialIndexes { get; }
+        public IReadOnlyCollection<string> OntologyIndexes { get; }
+        public IReadOnlyCollection<string> WikiIndexes { get; }
+        public IReadOnlyCollection<string> ObjectIndexes { get; }
+        public IReadOnlyCollection<string> EventIndexes { get; }
+        public IReadOnlyCollection<string> SignIndexes { get; }
         public Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
     }
 }

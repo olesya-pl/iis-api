@@ -514,7 +514,7 @@ namespace Iis.Elastic
             var result = new JObject();
             result.Add(sortColumName, new JObject() { new JProperty("order", sortOder) });
             return result;
-        }        
+        }
 
         private void PopulateExactQuery(IIisElasticSearchParams searchParams, JObject json)
         {
