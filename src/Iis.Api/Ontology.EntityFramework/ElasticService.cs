@@ -106,10 +106,7 @@ namespace IIS.Core.Ontology.EntityFramework
                             .Build()
                             .WithHighlights();
 
-                if (filter.IncludeAggregations)
-                {
-                    queryObj = queryObj.WithAggregation(aggregadionFieldList);
-                }
+                queryObj = queryObj.WithAggregation(aggregadionFieldList);
 
                 var query = queryObj.ToString(Formatting.None);
 
