@@ -165,7 +165,7 @@ namespace Iis.DbLayer.Repositories
         private List<FlattenNodeResult> GetHistoricalNodes(FlattenNodeResult node, IEnumerable<ChangeHistoryDto> changes)
         {
             var changesByRequestId = changes
-                    .Where(x => x.TargetId.ToString("N") == node.Id && !PropertiesToIgnore.Contains(x.PropertyName))
+                    .Where(x => x.TargetId.ToString("N") == node.Id && !string.IsNullOrWhiteSpace(x.OldValue) && !PropertiesToIgnore.Contains(x.PropertyName))
                     .GroupBy(x => x.RequestId)
                     .Where(x => x.Count() > 0)
                     .OrderByDescending(x => x.First().Date)
