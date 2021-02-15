@@ -16,6 +16,9 @@ namespace Iis.OntologySchema
         IMapper _mapper;
         SchemaStorage _storage;
         public IOntologySchemaSource SchemaSource { get; private set; }
+        private Dictionary<string, INodeTypeLinked> _stringCodes;
+        private Dictionary<string, INodeTypeLinked> StringCodes =>
+            _stringCodes ?? (_stringCodes = _storage.GetStringCodes());
         public IAliases Aliases => _storage.Aliases;
         public const string MSG_REMOVE_ENTITY_IS_ANCESTOR = "Ця сутність не може бути знищена бо вона є предком для {0}";
         public const string MSG_REMOVE_ENTITY_IS_EMBEDDED = "Ця сутність не може бути знищена бо вона є полем для {0}";
@@ -104,10 +107,8 @@ namespace Iis.OntologySchema
             relationType.SetMeta(meta);
         }
 
-        public Dictionary<string, INodeTypeLinked> GetStringCodes()
-        {
-            return _storage.GetStringCodes();
-        }
+        public Dictionary<string, INodeTypeLinked> GetStringCodes() => StringCodes;
+        public INodeTypeLinked GetNodeTypeByStringCode(string code) => StringCodes.GetValueOrDefault(code);
 
         public Dictionary<string, INodeTypeLinked> GetFullHierarchyNodes()
         {
@@ -173,7 +174,9 @@ namespace Iis.OntologySchema
                 .Where(key => !thisCodes[key].IsIdentical(otherCodes[key]))
                 .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = otherCodes[key] })
                 .ToList();
-            result.SchemaSource = schema.SchemaSource;
+
+            result.SchemaFrom = this;
+            result.SchemaTo = schema;
 
             var aliasesComparison = Aliases.CompareTo(schema.Aliases);
             result.AliasesToAdd = aliasesComparison.itemsToAdd.ToList();

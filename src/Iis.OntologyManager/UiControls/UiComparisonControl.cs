@@ -159,16 +159,16 @@ namespace Iis.OntologyManager.UiControls
         private void UpdateComparedDatabase()
         {
             if (_compareResult == null) return;
-            if (MessageBox.Show($"Are you sure you want to update database {_compareResult.SchemaSource.Title}?", "Update Database", MessageBoxButtons.YesNo) == DialogResult.No)
+            if (MessageBox.Show($"Are you sure you want to update database {_compareResult.SchemaTo.SchemaSource.Title}?", "Update Database", MessageBoxButtons.YesNo) == DialogResult.No)
             {
                 return;
             }
-            using var context = OntologyContext.GetContext(_compareResult.SchemaSource.Data);
-            var schema = _schemaService.GetOntologySchema(_compareResult.SchemaSource);
+            using var context = OntologyContext.GetContext(_compareResult.SchemaTo.Data);
+            var schema = _schemaService.GetOntologySchema(_compareResult.SchemaTo);
             var schemaSaver = new OntologySchemaSaver(context);
 
             schemaSaver.SaveToDatabase(_compareResult, schema, _compareResultForGrid);
-            UpdatedDatabases.Add(_compareResult.SchemaSource.Title);
+            UpdatedDatabases.Add(_compareResult.SchemaTo.Title);
             CompareSchemas(null, false);
         }
 

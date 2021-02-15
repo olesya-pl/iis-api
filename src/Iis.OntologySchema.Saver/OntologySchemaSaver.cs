@@ -34,17 +34,9 @@ namespace Iis.OntologySchema.Saver
             _context.SaveChanges();
         }
 
-        private void AddOrResurrectNodeType(NodeTypeEntity nodeTypeEntity)
+        private void AddNodeType(NodeTypeEntity nodeTypeEntity)
         {
-            var archivedNodeType = _context.NodeTypes.SingleOrDefault(nt => nt.Id == nodeTypeEntity.Id);
-            if (archivedNodeType == null)
-            {
-                _context.NodeTypes.Add(nodeTypeEntity);
-            }
-            else
-            {
-                _context.NodeTypes.Update(nodeTypeEntity);
-            }
+            _context.NodeTypes.Add(nodeTypeEntity);
         }
 
         private void AddNodes(IEnumerable<INodeTypeLinked> nodeTypesToAdd)
@@ -52,17 +44,17 @@ namespace Iis.OntologySchema.Saver
             foreach (var nodeType in nodeTypesToAdd)
             {
                 var nodeTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)nodeType);
-                AddOrResurrectNodeType(nodeTypeEntity);
+                AddNodeType(nodeTypeEntity);
 
                 if (nodeType.Kind == Kind.Relation)
                 {
-                    if (nodeType.RelationType.TargetType.Kind == Kind.Attribute)                        
+                    if (nodeType.RelationType.TargetType.Kind == Kind.Attribute)                     
                     {
                         var targetType = nodeType.RelationType.TargetType;
                         if (!_context.NodeTypes.Local.Any(nt => nt.Id == targetType.Id))
                         {
                             var targetTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)targetType);
-                            AddOrResurrectNodeType(targetTypeEntity);
+                            AddNodeType(targetTypeEntity);
 
                             var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.AttributeType);
                             var existingAttributeType = _context.AttributeTypes.SingleOrDefault(at => at.Id == attributeTypeEntity.Id);
