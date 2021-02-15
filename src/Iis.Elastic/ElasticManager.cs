@@ -393,12 +393,15 @@ namespace Iis.Elastic
 
             PrepareHighlights(json);
 
-            var aggregationFieldList = searchParams.SearchParams.SelectMany(p => p.Fields)
+            if (searchParams.IncludeAggregations)
+            {
+                var aggregationFieldList = searchParams.SearchParams.SelectMany(p => p.Fields)
                                         .Where(p => p.IsAggregated)
                                         .Select(e => new AggregationField(e.Name, e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
                                         .ToArray();
 
-            json.WithAggregation(aggregationFieldList);
+                json.WithAggregation(aggregationFieldList);
+            }
 
             var shouldSections = new JArray();
             foreach (var searchItem in searchParams.SearchParams)
