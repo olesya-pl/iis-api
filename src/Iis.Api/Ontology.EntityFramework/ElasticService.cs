@@ -140,6 +140,25 @@ namespace IIS.Core.Ontology.EntityFramework
             return searchResult.ToOutputSearchResult();
         }
 
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(
+            IEnumerable<string> typeNames,
+            IElasticNodeFilter filter,
+            CancellationToken ct = default)
+        {
+            var (multiSearchParams, _) = await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
+
+            var query = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+                .WithPagination(multiSearchParams.From, multiSearchParams.Size)
+                .WithLeniency(multiSearchParams.IsLenient)
+                .WithResultFields(multiSearchParams.ResultFields)
+                .Build()
+                .ToString();
+
+            var searchResult = await _elasticManager.SearchAsync(query, typeNames, ct);
+
+            return searchResult.ToOutputSearchResult();
+        }
+
         public async Task<int> CountEntitiesByConfiguredFieldsAsync(
             IEnumerable<string> typeNames,
             IElasticNodeFilter filter,

@@ -19,8 +19,8 @@ namespace Iis.Elastic
 {
     internal class ElasticManager: IElasticManager
     {
-        private const string EscapeSymbolsPattern = "^\"~:(){}[]\\/!";
-        private const string RemoveSymbolsPattern = "№";
+        public const string EscapeSymbolsPattern = "^\"~:(){}[]\\/!";
+        public const string RemoveSymbolsPattern = "№";
         public const string NullValue = "NULL";
         private readonly ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;
@@ -625,7 +625,7 @@ namespace Iis.Elastic
             return string.Join(',', baseIndexNames.Select(name => GetRealIndexName(name)));
         }
 
-        private string ApplyFuzzinessOperator(string input)
+        public static string ApplyFuzzinessOperator(string input)
         {
             if (IsWildCard(input))
             {
@@ -640,7 +640,7 @@ namespace Iis.Elastic
             return input.Contains('*');
         }
 
-        private string EscapeElasticSpecificSymbols(string input, string escapePattern)
+        public static string EscapeElasticSpecificSymbols(string input, string escapePattern)
         {
             if (string.IsNullOrWhiteSpace(input)) return input;
 
@@ -661,7 +661,7 @@ namespace Iis.Elastic
             return builder.ToString();
         }
 
-        private string RemoveSymbols(string input, string removeSymbols)
+        public static string RemoveSymbols(string input, string removeSymbols)
         {
             if(string.IsNullOrWhiteSpace(input)) return input;
 

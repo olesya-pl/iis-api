@@ -16,6 +16,7 @@ namespace Iis.Domain
         IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId);
         Dictionary<Guid, int> CountEventsAssociatedWithEntities(HashSet<Guid> entityIds);
         Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
+        Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
         (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         void SaveNode(Node node);
         void RemoveNodeAndRelations(Node node);
