@@ -34,7 +34,8 @@ namespace IIS.Core.GraphQL.Entities
             {
                 Limit = pagination.PageSize,
                 Offset = pagination.Offset(),
-                Suggestion = filter?.Suggestion ?? filter?.SearchQuery
+                Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
+                IncludeAggregations = filter.IncludeAggregations == false ? false : true
             });
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);

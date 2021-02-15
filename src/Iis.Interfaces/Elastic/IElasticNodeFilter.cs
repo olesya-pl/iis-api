@@ -10,5 +10,6 @@ namespace Iis.Interfaces.Elastic
         string Suggestion { get; set; }
         string SortColumn { get; set; }
         string SortOrder { get; set; }
+        bool IncludeAggregations { get; set; }
     }
 }

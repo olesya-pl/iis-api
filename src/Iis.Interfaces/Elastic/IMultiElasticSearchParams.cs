@@ -10,5 +10,6 @@ namespace Iis.Interfaces.Elastic
         List<string> ResultFields { get; set; }
         List<(string Query, List<IIisElasticField> Fields)> SearchParams { get; set; }
         int Size { get; set; }
+        bool IncludeAggregations { get; set; }
     }
 }

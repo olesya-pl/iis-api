@@ -101,12 +101,17 @@ namespace IIS.Core.Ontology.EntityFramework
                     .Select(e => new AggregationField(e.Name, e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
                     .ToArray();
 
-                var query = new MatchAllQueryBuilder()
+                var queryObj = new MatchAllQueryBuilder()
                             .WithPagination(filter.Offset, filter.Limit)
                             .Build()
-                            .WithHighlights()
-                            .WithAggregation(aggregadionFieldList)
-                            .ToString(Formatting.None);
+                            .WithHighlights();
+
+                if (filter.IncludeAggregations)
+                {
+                    queryObj = queryObj.WithAggregation(aggregadionFieldList);
+                }
+
+                var query = queryObj.ToString(Formatting.None);
 
                 var results = await _elasticManager.SearchAsync(query, typeNames, ct);
 
@@ -194,7 +199,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
                 {
                     (string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}", searchFields)
-                }
+                },
+                IncludeAggregations = filter.IncludeAggregations
             };
 
             if (useHistoricalSearch && searchByHistoryResult.Count > 0)

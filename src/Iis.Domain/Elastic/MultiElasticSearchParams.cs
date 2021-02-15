@@ -11,5 +11,6 @@ namespace Iis.Domain.Elastic
         public bool IsLenient { get; set; } = true;
         public int From { get; set; }
         public int Size { get; set; }
+        public bool IncludeAggregations { get; set; }
     }
 }
