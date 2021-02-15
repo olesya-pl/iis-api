@@ -24,8 +24,17 @@ namespace Iis.OntologyManager.Style
         public Font DefaultFont { get; set; }
         public Font SelectedFont { get; set; }
         public Font TypeHeaderNameFont { get; set; }
-        //public float CharacterHeight { get; set; }
-        //public float CharacterWidth { get; set; }
+
+        public Color EntityOtherColor { get; } = Color.Khaki; //  Color.FromArgb(220, 220, 220);
+
+        public Dictionary<string, Color> EntityColors { get; } = new Dictionary<string, Color>
+        {
+            { "ObjectOfStudy", Color.SkyBlue },
+            { "Wiki", Color.FromArgb(230, 200, 255) },
+            { "Enum", Color.LightPink },
+            { "ObjectSign", Color.FromArgb(245, 192, 162) },
+        };
+
         public static IOntologyManagerStyle GetDefaultStyle(Control control)
         {
             SizeF size;
@@ -56,7 +65,7 @@ namespace Iis.OntologyManager.Style
                 TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold)
         };
         }
-        public Color GetColorByNodeType(Kind kind)
+        public Color GetColorByNodeTypeKind(Kind kind)
         {
             switch (kind)
             {
@@ -70,12 +79,23 @@ namespace Iis.OntologyManager.Style
                     return BackgroundColor;
             }
         }
+        public Color GetColorByAncestor(INodeTypeLinked nodeType)
+        {
+            foreach (var nodeTypeName in EntityColors.Keys)
+            {
+                if (nodeType.Name == nodeTypeName || nodeType.IsInheritedFrom(nodeTypeName))
+                {
+                    return EntityColors[nodeTypeName];
+                }
+            }
+            return EntityOtherColor;
+        }
         public void GridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             var grid = (DataGridView)sender;
             var nodeType = (INodeTypeLinked)grid.Rows[e.RowIndex].DataBoundItem;
             if (nodeType == null) return;
-            var color = GetColorByNodeType(nodeType.Kind);
+            var color = GetColorByNodeTypeKind(nodeType.Kind);
             var row = (DataGridViewRow)grid.Rows[e.RowIndex];
             var style = row.DefaultCellStyle;
 

@@ -1,7 +1,7 @@
 ﻿using Iis.DataModel;
 using Iis.DbLayer.OntologySchema;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyManager.Parameters;
+using Iis.OntologyManager.Comparison;
 using Iis.OntologySchema.Saver;
 using System;
 using System.Collections.Generic;
@@ -18,14 +18,21 @@ namespace Iis.OntologyManager.UiControls
         OntologySchemaService _schemaService;
         IOntologySchema _schema;
         ISchemaCompareResult _compareResult;
+        CompareResultForGrid _compareResultForGrid;
 
         ComboBox cmbSchemaSourcesCompare;
-        RichTextBox txtComparison;
-        CheckBox cbComparisonCreate;
-        CheckBox cbComparisonUpdate;
-        CheckBox cbComparisonDelete;
-        CheckBox cbComparisonAliases;
+        CheckBox cbNodeTypeCreate;
+        CheckBox cbNodeTypeUpdate;
+        CheckBox cbNodeTypeDelete;
+        CheckBox cbAliasCreate;
+        CheckBox cbAliasUpdate;
+        CheckBox cbAliasDelete;
+        DataGridView grid;
         public List<string> UpdatedDatabases = new List<string>();
+        Color _createColor = Color.FromArgb(192, 255, 192);
+        Color _updateColor = Color.Moccasin;
+        Color _deleteColor = Color.FromArgb(255, 192, 192);
+        Color _aliasColor = Color.DarkBlue;
 
         public UiComparisonControl(IReadOnlyCollection<IOntologySchemaSource> schemaSources,
             OntologySchemaService schemaService,
@@ -39,7 +46,7 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             MainPanel.SuspendLayout();
-            var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200, 20);
+            var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 120, 20);
             var container = new UiContainerManager("Comparison", panels.panelTop);
 
             cmbSchemaSourcesCompare = new ComboBox
@@ -59,66 +66,95 @@ namespace Iis.OntologyManager.UiControls
             container.Add(btnComparisonUpdate);
 
             container.GoToNewColumn();
-            container.Add(cbComparisonCreate = new CheckBox { Text = "Create", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
-            container.Add(cbComparisonUpdate = new CheckBox { Text = "Update", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
-            container.Add(cbComparisonDelete = new CheckBox { Text = "Delete", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
-            container.Add(cbComparisonAliases = new CheckBox { Text = "Aliases", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            CreateCheckBoxes(container);
+            CreateGrid(container, panels.panelBottom);
 
-            txtComparison = new RichTextBox
-            {
-                ReadOnly = true,
-                Dock = DockStyle.Fill,
-                BackColor = MainPanel.BackColor
-            };
-            panels.panelBottom.Controls.Add(txtComparison);
+            panels.panelBottom.Controls.Add(grid);
 
             MainPanel.ResumeLayout();
             CompareSchemas(src.FirstOrDefault());
         }
-        private string GetCompareText(ISchemaCompareResult compareResult)
+        private void CreateCheckBoxes(UiContainerManager container)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine(GetCompareText("NODES TO ADD", compareResult.ItemsToAdd.Select(item => item.GetStringCode())));
-            sb.AppendLine(GetCompareText("NODES TO DELETE", compareResult.ItemsToDelete.Select(item => item.GetStringCode())));
-            sb.AppendLine("===============");
-            sb.AppendLine("NODES TO UPDATE");
-            sb.AppendLine("===============");
-            foreach (var item in compareResult.ItemsToUpdate)
-            {
-                sb.AppendLine(item.NodeTypeFrom.GetStringCode());
-                var differences = item.NodeTypeFrom.GetDifference(item.NodeTypeTo);
-                foreach (var diff in differences)
-                {
-                    sb.AppendLine($"{diff.PropertyName}:\n{diff.OldValue}\n{diff.NewValue}");
-                }
-                sb.AppendLine();
-            }
-            sb.AppendLine(GetCompareText("ALIASES TO ADD", compareResult.AliasesToAdd.Select(item => item.ToString())));
-            sb.AppendLine(GetCompareText("ALIASES TO DELETE", compareResult.AliasesToDelete.Select(item => item.ToString())));
-            sb.AppendLine(GetCompareText("ALIASES TO UPDATE", compareResult.AliasesToUpdate.Select(item => item.ToString())));
-            return sb.ToString();
-        }
-        private string GetCompareText(string title, IEnumerable<string> lines)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("===============");
-            sb.AppendLine(title);
-            sb.AppendLine("===============");
-            foreach (var line in lines)
-            {
-                sb.AppendLine(line);
-            }
+            container.Add(cbNodeTypeCreate = new CheckBox { Text = "NodeType Create", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbNodeTypeUpdate = new CheckBox { Text = "NodeType Update", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbNodeTypeDelete = new CheckBox { Text = "NodeType Delete", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.GoToNewColumn();
+            container.Add(cbAliasCreate = new CheckBox { Text = "Aliases Create", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbAliasUpdate = new CheckBox { Text = "Aliases Update", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbAliasDelete = new CheckBox { Text = "Aliases Delete", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
 
-            return sb.ToString();
+            cbNodeTypeCreate.BackColor = _createColor;
+            cbNodeTypeUpdate.BackColor = _updateColor;
+            cbNodeTypeDelete.BackColor = _deleteColor;
+            cbAliasCreate.BackColor = _createColor;
+            cbAliasUpdate.BackColor = _updateColor;
+            cbAliasDelete.BackColor = _deleteColor;
+            cbAliasCreate.ForeColor = _aliasColor;
+            cbAliasUpdate.ForeColor = _aliasColor;
+            cbAliasDelete.ForeColor = _aliasColor;
+
+            cbNodeTypeCreate.Click += (sender, e) => { ChangeChecks(cbNodeTypeCreate.Checked, CompareResultItemType.NodeType, CompareResultOperation.Insert); };
+            cbNodeTypeUpdate.Click += (sender, e) => { ChangeChecks(cbNodeTypeUpdate.Checked, CompareResultItemType.NodeType, CompareResultOperation.Update); };
+            cbNodeTypeDelete.Click += (sender, e) => { ChangeChecks(cbNodeTypeDelete.Checked, CompareResultItemType.NodeType, CompareResultOperation.Delete); };
+            cbAliasCreate.Click += (sender, e) => { ChangeChecks(cbAliasCreate.Checked, CompareResultItemType.Alias, CompareResultOperation.Insert); };
+            cbAliasUpdate.Click += (sender, e) => { ChangeChecks(cbAliasUpdate.Checked, CompareResultItemType.Alias, CompareResultOperation.Update); };
+            cbAliasDelete.Click += (sender, e) => { ChangeChecks(cbAliasDelete.Checked, CompareResultItemType.Alias, CompareResultOperation.Delete); };
         }
-        public void CompareSchemas(IOntologySchemaSource source = null)
+        private void CreateGrid(UiContainerManager container, Panel panel)
+        {
+            grid = _uiControlsCreator.GetDataGridView("gridCompareResult", null, new List<string>());
+            grid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            grid.Width = panel.ClientRectangle.Width;
+            grid.Height = panel.ClientRectangle.Height;
+            grid.ReadOnly = false;
+            grid.CellFormatting += grid_CellFormatting;
+
+            grid.AddCheckBoxColumn("Checked", "");
+            grid.AddTextColumn("ItemType", "ItemType");
+            grid.AddTextColumn("Title", "Title", 2);
+            grid.AddTextColumn("NewValue", "NewValue", 2);
+            grid.AddTextColumn("OldValue", "OldValue", 2);
+            grid.Columns["NewValue"].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            grid.Columns["OldValue"].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            grid.ColumnHeadersVisible = true;
+            grid.AutoGenerateColumns = false;
+
+            foreach (DataGridViewColumn column in grid.Columns)
+            {
+                column.ReadOnly = column.Name != "Checked";
+            }
+        }
+        public void CompareSchemas(IOntologySchemaSource source = null, bool setCheckBoxes = true)
         {
             var selectedSource = source ?? (IOntologySchemaSource)cmbSchemaSourcesCompare.SelectedItem;
             if (selectedSource == null) return;
 
             var schema = _schemaService.GetOntologySchema(selectedSource);
             _compareResult = _schema.CompareTo(schema);
-            txtComparison.Text = GetCompareText(_compareResult);
+            _compareResultForGrid = new CompareResultForGrid(_compareResult);
+            grid.DataSource = _compareResultForGrid.Items;
+            
+            if (setCheckBoxes) SetStartCheckBoxes();
+            SetAllChecks();
+        }
+        private void SetStartCheckBoxes()
+        {
+            cbNodeTypeCreate.Checked = true;
+            cbNodeTypeUpdate.Checked = true;
+            cbNodeTypeDelete.Checked = false;
+            cbAliasCreate.Checked = false;
+            cbAliasUpdate.Checked = false;
+            cbAliasDelete.Checked = false;
+        }
+        private void SetAllChecks()
+        {
+            ChangeChecks(cbNodeTypeCreate.Checked, CompareResultItemType.NodeType, CompareResultOperation.Insert);
+            ChangeChecks(cbNodeTypeUpdate.Checked, CompareResultItemType.NodeType, CompareResultOperation.Update);
+            ChangeChecks(cbNodeTypeDelete.Checked, CompareResultItemType.NodeType, CompareResultOperation.Delete);
+            ChangeChecks(cbAliasCreate.Checked, CompareResultItemType.Alias, CompareResultOperation.Insert);
+            ChangeChecks(cbAliasUpdate.Checked, CompareResultItemType.Alias, CompareResultOperation.Update);
+            ChangeChecks(cbAliasDelete.Checked, CompareResultItemType.Alias, CompareResultOperation.Delete);
         }
         private void UpdateComparedDatabase()
         {
@@ -130,17 +166,44 @@ namespace Iis.OntologyManager.UiControls
             using var context = OntologyContext.GetContext(_compareResult.SchemaSource.Data);
             var schema = _schemaService.GetOntologySchema(_compareResult.SchemaSource);
             var schemaSaver = new OntologySchemaSaver(context);
-            var parameters = new SchemaSaveParameters
+
+            schemaSaver.SaveToDatabase(_compareResult, schema, _compareResultForGrid);
+            UpdatedDatabases.Add(_compareResult.SchemaSource.Title);
+            CompareSchemas(null, false);
+        }
+
+        private void grid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var row = grid.Rows[e.RowIndex];
+            var item = (CompareResultForGridItem)row.DataBoundItem;
+
+            var color = item.Operation switch
             {
-                Create = cbComparisonCreate.Checked,
-                Update = cbComparisonUpdate.Checked,
-                Delete = cbComparisonDelete.Checked,
-                Aliases = cbComparisonAliases.Checked
+                CompareResultOperation.Insert => _createColor,
+                CompareResultOperation.Update => _updateColor,
+                CompareResultOperation.Delete => _deleteColor
             };
 
-            schemaSaver.SaveToDatabase(_compareResult, schema, parameters);
-            UpdatedDatabases.Add(_compareResult.SchemaSource.Title);
-            CompareSchemas();
+            var style = row.DefaultCellStyle;
+
+            style.BackColor = color;
+            style.ForeColor = item.ItemType == CompareResultItemType.Alias ? _aliasColor : grid.DefaultCellStyle.ForeColor;
+            style.SelectionBackColor = color;
+            style.SelectionForeColor = style.ForeColor;
+            style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
+        }
+
+        private void ChangeChecks(bool isChecked, CompareResultItemType? itemType, CompareResultOperation? operation)
+        {
+            foreach (var item in _compareResultForGrid.Items)
+            {
+                if ((itemType == null || item.ItemType == itemType) &&
+                    (operation == null || item.Operation == operation))
+                {
+                    item.Checked = isChecked;
+                }
+            }
+            grid.Refresh();
         }
     }
 }

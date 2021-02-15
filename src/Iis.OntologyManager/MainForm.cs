@@ -22,6 +22,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Net.Http;
 using System.Text;
+using static Iis.OntologyManager.UiControls.UiFilterControl;
 
 namespace Iis.OntologyManager
 {
@@ -55,7 +56,7 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
-        const string VERSION = "1.28";
+        const string VERSION = "1.31";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -112,7 +113,7 @@ namespace Iis.OntologyManager
             SuspendLayout();
             SetBackColor();
             _uiControlsCreator.SetGridTypesStyle(gridTypes);
-            gridTypes.CellFormatting += _style.GridTypes_CellFormatting;
+            gridTypes.CellFormatting += GridTypes_CellFormatting;
             AddGridTypesMenu();
             SetControlsTabMain(panelRight);
 
@@ -384,6 +385,20 @@ namespace Iis.OntologyManager
         {
             WaitCursorAction(() => LoadCurrentSchema(SelectedSchemaSource));
         }
+        public void GridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var grid = (DataGridView)sender;
+            var nodeType = (INodeTypeLinked)grid.Rows[e.RowIndex].DataBoundItem;
+            if (nodeType == null) return;
+            var color = _style.GetColorByAncestor(nodeType);
+            var row = (DataGridViewRow)grid.Rows[e.RowIndex];
+            var style = row.DefaultCellStyle;
+
+            style.BackColor = color;
+            style.SelectionBackColor = color;
+            style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;
+            style.Font = row.Selected ? _style.SelectedFont : _style.DefaultFont;
+        }
         private void RemoveEntityClick(object sender, EventArgs e)
         {
             var form = _uiControlsCreator.GetModalForm(this);
@@ -618,10 +633,11 @@ namespace Iis.OntologyManager
         {
             return _uiControlsCreator.ChooseFromModalComboBox(GetAllEntities(), "Name");
         }
-        public void ReloadTypes(IGetTypesFilter filter)
+        public void ReloadTypes(NodeTypeFilterFunc filter)
         {
             if (_schema == null) return;
-            var ds = _schema.GetTypes(filter)
+            var ds = _schema.GetEntityTypes()
+                .Where(nt => filter == null || filter(nt))
                 .OrderBy(t => t.Name)
                 .ToList();
             this.gridTypes.DataSource = ds;

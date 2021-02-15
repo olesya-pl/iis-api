@@ -12,10 +12,26 @@ namespace Iis.OntologyManager.UiControls
             var column = new DataGridViewColumn
             {
                 Name = name,
+                DataPropertyName = name,
                 HeaderText = headerText,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
                 CellTemplate = new DataGridViewTextBoxCell()
             };
             column.Width *= koef;
+            grid.Columns.Add(column);
+            return column;
+        }
+
+        public static DataGridViewColumn AddCheckBoxColumn(this DataGridView grid, string name, string headerText)
+        {
+            var column = new DataGridViewColumn
+            {
+                Name = name,
+                DataPropertyName = name,
+                HeaderText = headerText,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                CellTemplate = new DataGridViewCheckBoxCell()
+            };
             grid.Columns.Add(column);
             return column;
         }

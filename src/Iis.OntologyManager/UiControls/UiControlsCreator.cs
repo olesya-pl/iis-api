@@ -54,6 +54,7 @@ namespace Iis.OntologyManager.UiControls
             {
                 grid.Columns[i].DataPropertyName = dataNames[i];
                 grid.Columns[i].HeaderText = dataNames[i];
+                grid.Columns[i].Name = dataNames[i];
             }
             return grid;
         }
@@ -74,7 +75,7 @@ namespace Iis.OntologyManager.UiControls
             {
                 Name = $"{rootPanel.Name}_Bottom",
                 Location = new Point(margin, panelTop.Bottom + margin),
-                Size = new Size(rootPanel.Width - margin * 2, rootPanel.Height - panelTop.Bottom - margin * 2),
+                Size = new Size(rootPanel.Width - margin * 2, rootPanel.Height - panelTop.Bottom - margin * 4),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 BorderStyle = BorderStyle.FixedSingle,
                 BackColor = rootPanel.BackColor
