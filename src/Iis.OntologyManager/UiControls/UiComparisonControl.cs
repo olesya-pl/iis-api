@@ -163,12 +163,12 @@ namespace Iis.OntologyManager.UiControls
             {
                 return;
             }
-            using var context = OntologyContext.GetContext(_compareResult.SchemaTo.Data);
-            var schema = _schemaService.GetOntologySchema(_compareResult.SchemaTo);
-            var schemaSaver = new OntologySchemaSaver(context);
+            using var context = OntologyContext.GetContext(_compareResult.SchemaTo.SchemaSource.Data);
+            var schema = _schemaService.GetOntologySchema(_compareResult.SchemaTo.SchemaSource);
+            var schemaSaver = new OntologySchemaSaver(context, _compareResult.SchemaTo);
 
-            schemaSaver.SaveToDatabase(_compareResult, schema, _compareResultForGrid);
-            UpdatedDatabases.Add(_compareResult.SchemaTo.Title);
+            schemaSaver.SaveToDatabase(_compareResult, _compareResultForGrid);
+            UpdatedDatabases.Add(_compareResult.SchemaTo.SchemaSource.Title);
             CompareSchemas(null, false);
         }
 

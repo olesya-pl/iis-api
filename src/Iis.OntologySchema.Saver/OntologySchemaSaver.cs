@@ -13,19 +13,23 @@ namespace Iis.OntologySchema.Saver
     public class OntologySchemaSaver
     {
         OntologyContext _context;
+        IOntologySchema _schemaTo;
         IMapper _mapper;
-        public OntologySchemaSaver(OntologyContext context)
+        List<INodeType> _createdEntityTypes;
+        public OntologySchemaSaver(OntologyContext context, IOntologySchema schemaTo)
         {
             _context = context;
             context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            _schemaTo = schemaTo;
             _mapper = GetMapper();
         }
 
-        public void SaveToDatabase(ISchemaCompareResult compareResult, IOntologySchema schemaTo, ISchemaSaveParameters parameters = null)
+        public void SaveToDatabase(ISchemaCompareResult compareResult, ISchemaSaveParameters parameters = null)
         {
+            _createdEntityTypes = new List<INodeType>();
             AddNodes(compareResult.ItemsToAdd.Where(item => parameters?.IsChecked(item) == true));
             DeleteNodes(compareResult.ItemsToDelete.Where(item => parameters?.IsChecked(item) == true));
-            UpdateNodes(compareResult.ItemsToUpdate.Where(item => parameters?.IsChecked(item) == true), schemaTo);
+            UpdateNodes(compareResult.ItemsToUpdate.Where(item => parameters?.IsChecked(item) == true));
 
             AddAliases(compareResult.AliasesToAdd.Where(item => parameters?.IsChecked(item) == true));
             UpdateAliases(compareResult.AliasesToUpdate.Where(item => parameters?.IsChecked(item) == true));
@@ -37,6 +41,9 @@ namespace Iis.OntologySchema.Saver
         private void AddNodeType(NodeTypeEntity nodeTypeEntity)
         {
             _context.NodeTypes.Add(nodeTypeEntity);
+            
+            if (nodeTypeEntity.Kind == Kind.Entity)
+                _createdEntityTypes.Add(nodeTypeEntity);
         }
 
         private void AddNodes(IEnumerable<INodeTypeLinked> nodeTypesToAdd)
@@ -48,38 +55,67 @@ namespace Iis.OntologySchema.Saver
 
                 if (nodeType.Kind == Kind.Relation)
                 {
-                    if (nodeType.RelationType.TargetType.Kind == Kind.Attribute)                     
+                    var targetType = nodeType.RelationType.TargetType;
+                    if (targetType.Kind == Kind.Attribute)                     
                     {
-                        var targetType = nodeType.RelationType.TargetType;
                         if (!_context.NodeTypes.Local.Any(nt => nt.Id == targetType.Id))
                         {
                             var targetTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)targetType);
                             AddNodeType(targetTypeEntity);
-
-                            var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>((IAttributeType)targetType.AttributeType);
-                            var existingAttributeType = _context.AttributeTypes.SingleOrDefault(at => at.Id == attributeTypeEntity.Id);
-                            if (existingAttributeType == null)
-                            {
-                                _context.AttributeTypes.Add(attributeTypeEntity);
-                            }
-                            else
-                            {
-                                _context.AttributeTypes.Update(attributeTypeEntity);
-                            }
+                            AddAttributeType(targetType.AttributeType);
+                            
                         }
                     }
-                    var relationType = _mapper.Map<RelationTypeEntity>((IRelationType)nodeType.RelationType);
-                    var existingRelationType = _context.RelationTypes.SingleOrDefault(rt => rt.Id == relationType.Id);
-                    if (existingRelationType == null)
-                    {
-                        _context.RelationTypes.Add(relationType);
-                    }
-                    else
-                    {
-                        _context.RelationTypes.Update(relationType);
-                    }
-                    
+                    AddRelationType(nodeType.RelationType);
                 }
+            }
+        }
+        private void AddRelationType(IRelationTypeLinked relationType)
+        {
+            var relationTypeEntity = GetRelationTypeEntity(relationType);
+
+            var existingRelationType = _context.RelationTypes.SingleOrDefault(rt => rt.Id == relationTypeEntity.Id);
+            if (existingRelationType == null)
+            {
+                _context.RelationTypes.Add(relationTypeEntity);
+            }
+            else
+            {
+                _context.RelationTypes.Update(relationTypeEntity);
+            }
+        }
+        private RelationTypeEntity GetRelationTypeEntity(IRelationTypeLinked relationType)
+        {
+            var relationTypeEntity = _mapper.Map<RelationTypeEntity>(relationType);
+
+            relationTypeEntity.SourceTypeId = GetEntityTypeIdByName(relationType.SourceType.Name);
+
+            if (relationType.TargetType.Kind == Kind.Entity)
+                relationTypeEntity.TargetTypeId = GetEntityTypeIdByName(relationType.TargetType.Name);
+
+            return relationTypeEntity;
+        }
+        private Guid GetEntityTypeIdByName(string name)
+        {
+            var entityType = (INodeType)_schemaTo.GetEntityTypeByName(name) ??
+                _createdEntityTypes.FirstOrDefault(nt => nt.Name == name);
+
+            if (entityType == null)
+                throw new Exception($"Неможливо знайти тип {name}");
+
+            return entityType.Id;
+        }
+        private void AddAttributeType(IAttributeType attributeType)
+        {
+            var attributeTypeEntity = _mapper.Map<AttributeTypeEntity>(attributeType);
+            var existingAttributeType = _context.AttributeTypes.SingleOrDefault(at => at.Id == attributeTypeEntity.Id);
+            if (existingAttributeType == null)
+            {
+                _context.AttributeTypes.Add(attributeTypeEntity);
+            }
+            else
+            {
+                _context.AttributeTypes.Update(attributeTypeEntity);
             }
         }
         private void DeleteNodes(IEnumerable<INodeTypeLinked> nodeTypesToDelete)
@@ -91,7 +127,7 @@ namespace Iis.OntologySchema.Saver
                 _context.NodeTypes.Update(nodeTypeEntity);
             }
         }
-        private void UpdateNodes(IEnumerable<ISchemaCompareDiffItem> itemsToUpdate, ISchemaEntityTypeFinder entityTypeFinder)
+        private void UpdateNodes(IEnumerable<ISchemaCompareDiffItem> itemsToUpdate)
         {
             var updatedAttributesIds = new List<Guid>();
             foreach (var item in itemsToUpdate)
@@ -111,7 +147,7 @@ namespace Iis.OntologySchema.Saver
                 var toTargetType = item.NodeTypeTo.RelationType.TargetType;
                 if (fromTargetType.Kind == Kind.Entity && fromTargetType.Name != toTargetType.Name)
                 {
-                    var newToTargetType = entityTypeFinder.GetEntityTypeByName(fromTargetType.Name);
+                    var newToTargetType = _schemaTo.GetEntityTypeByName(fromTargetType.Name);
                     relationType.TargetTypeId = newToTargetType.Id;
                 }
                 else
