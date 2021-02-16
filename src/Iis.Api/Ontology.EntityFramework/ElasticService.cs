@@ -98,7 +98,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 var aggregadionFieldList = _elasticConfiguration
                     .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)))
                     .Where(e => e.IsAggregated)
-                    .Select(e => new AggregationField(e.Name, e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
+                    .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
                     .ToArray();
 
                 var queryObj = new MatchAllQueryBuilder()
