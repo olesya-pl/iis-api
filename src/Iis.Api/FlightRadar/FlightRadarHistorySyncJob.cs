@@ -75,6 +75,11 @@ namespace IIS.Core.FlightRadar
 
         private async Task<List<Routes>> GetRoutesAsync(FlightRadarHistorySyncJobConfig minId)
         {
+            if (minId == null)
+            {
+                return new List<Routes>();
+            }
+            
             using var flightContext = _provider.GetRequiredService<FlightsContext>();
             return await flightContext.Routes
                     .Include(p => p.Flight)
