@@ -58,8 +58,8 @@ namespace IIS.Core.Tools
             var connectionString = _configuration.GetConnectionString("db", "DB_");
             var schemaTo = _ontologySchemaService.GetOntologySchema(new OntologySchemaSource { SourceKind = SchemaSourceKind.Database, Data = connectionString });
             var compareResult = schemaFrom.CompareTo(schemaTo);
-            var schemaSaver = new OntologySchemaSaver(OntologyContext.GetContext(connectionString));
-            schemaSaver.SaveToDatabase(compareResult, schemaTo);
+            var schemaSaver = new OntologySchemaSaver(OntologyContext.GetContext(connectionString), schemaTo);
+            schemaSaver.SaveToDatabase(compareResult);
             var ontologyMigration = new OntologyMigrationsEntity
             {
                 Id = Guid.NewGuid(),

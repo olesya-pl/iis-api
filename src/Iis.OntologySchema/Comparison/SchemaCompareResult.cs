@@ -7,7 +7,8 @@ namespace Iis.OntologySchema.Comparison
 {
     public class SchemaCompareResult : ISchemaCompareResult
     {
-        public IOntologySchemaSource SchemaSource { get; set; }
+        public IOntologySchema SchemaFrom { get; set; }
+        public IOntologySchema SchemaTo { get; set; }
         public IReadOnlyList<INodeTypeLinked> ItemsToAdd { get; set; }
         public IReadOnlyList<INodeTypeLinked> ItemsToDelete { get; set; }
         public IReadOnlyList<ISchemaCompareDiffItem> ItemsToUpdate { get; set; }

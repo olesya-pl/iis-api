@@ -6,7 +6,8 @@ namespace Iis.Interfaces.Ontology.Schema
 {
     public interface ISchemaCompareResult
     {
-        IOntologySchemaSource SchemaSource { get; }
+        IOntologySchema SchemaFrom { get; }
+        IOntologySchema SchemaTo { get; }
         IReadOnlyList<INodeTypeLinked> ItemsToAdd { get; }
         IReadOnlyList<INodeTypeLinked> ItemsToDelete { get; }
         IReadOnlyList<ISchemaCompareDiffItem> ItemsToUpdate { get; }

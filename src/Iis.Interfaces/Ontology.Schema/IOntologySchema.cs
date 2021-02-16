@@ -17,6 +17,7 @@ namespace Iis.Interfaces.Ontology.Schema
         void SetRelationMeta(string entityName, string relationName, string meta);
         ISchemaCompareResult CompareTo(IOntologySchema schema);
         Dictionary<string, INodeTypeLinked> GetStringCodes();
+        INodeTypeLinked GetNodeTypeByStringCode(string code);
         INodeTypeLinked UpdateNodeType(INodeTypeUpdateParameter updateParameter);
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
