@@ -101,12 +101,14 @@ namespace IIS.Core.Ontology.EntityFramework
                     .Select(e => new AggregationField(e.Name, e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
                     .ToArray();
 
-                var query = new MatchAllQueryBuilder()
+                var queryObj = new MatchAllQueryBuilder()
                             .WithPagination(filter.Offset, filter.Limit)
                             .Build()
-                            .WithHighlights()
-                            .WithAggregation(aggregadionFieldList)
-                            .ToString(Formatting.None);
+                            .WithHighlights();
+
+                queryObj = queryObj.WithAggregation(aggregadionFieldList);
+
+                var query = queryObj.ToString(Formatting.None);
 
                 var results = await _elasticManager.SearchAsync(query, typeNames, ct);
 
@@ -131,6 +133,25 @@ namespace IIS.Core.Ontology.EntityFramework
                         item.Identifier);
                 }
             }
+
+            return searchResult.ToOutputSearchResult();
+        }
+
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(
+            IEnumerable<string> typeNames,
+            IElasticNodeFilter filter,
+            CancellationToken ct = default)
+        {
+            var (multiSearchParams, _) = await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
+
+            var query = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+                .WithPagination(multiSearchParams.From, multiSearchParams.Size)
+                .WithLeniency(multiSearchParams.IsLenient)
+                .WithResultFields(multiSearchParams.ResultFields)
+                .Build()
+                .ToString();
+
+            var searchResult = await _elasticManager.SearchAsync(query, typeNames, ct);
 
             return searchResult.ToOutputSearchResult();
         }
@@ -194,7 +215,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
                 {
                     (string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}", searchFields)
-                }
+                },
+                IncludeAggregations = filter.IncludeAggregations
             };
 
             if (useHistoricalSearch && searchByHistoryResult.Count > 0)

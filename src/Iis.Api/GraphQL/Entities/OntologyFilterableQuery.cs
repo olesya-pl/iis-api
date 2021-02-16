@@ -41,6 +41,25 @@ namespace IIS.Core.GraphQL.Entities
             return mapped;
         }
 
+        public async Task<OntologyFilterableQueryResponse> EntityObjectOfStudyCoordinatesList(
+            [Service] IOntologyService ontologyService,
+            [Service] IMapper mapper,
+            PaginationInput pagination,
+            AllEntitiesFilterInput filter
+            )
+        {
+            var types = filter.Types is null || !filter.Types.Any() ? ObjectOfStudyTypeList : filter.Types;
+
+            var response = await ontologyService.FilterNodeCoordinatesAsync(types, new ElasticFilter
+            {
+                Limit = pagination.PageSize,
+                Offset = pagination.Offset(),
+                Suggestion = filter?.Suggestion ?? filter?.SearchQuery
+            });
+            var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
+            return mapped;
+        }
+
         public async Task<OntologyFilterableQueryResponse> GetEventList(
             [Service] IOntologyService ontologyService,
             [Service] IMapper mapper,

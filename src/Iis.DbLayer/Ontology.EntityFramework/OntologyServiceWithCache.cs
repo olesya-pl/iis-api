@@ -373,6 +373,27 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, 
+            ElasticFilter filter, 
+            CancellationToken cancellationToken = default)
+        {
+            var derivedTypeNames = _data.Schema
+                .GetEntityTypesByName(typeNameList, true)
+                .Select(nt => nt.Name)
+                .Distinct();
+
+            var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
+
+            if (isElasticSearch)
+            {
+                return await _elasticService.FilterNodeCoordinatesAsync(derivedTypeNames, filter);
+            }
+            else
+            {
+                return new SearchEntitiesByConfiguredFieldsResult();
+            }
+        }
+
         public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter)
         {
             if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortOrder))
