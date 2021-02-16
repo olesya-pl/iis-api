@@ -30,56 +30,21 @@ namespace Iis.Services
             _logger = logger;
         }
 
+        public async Task<FileIdDto> IsDuplicatedAsync(byte[] contents)
+        {
+            var hash = ComputeHash(contents);
+
+            return await IsDuplicatedAsync(contents, hash);
+        }
+        
         public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType, CancellationToken token)
         {
-            byte[] contents;
-            using (var ms = new MemoryStream())
-            {
-                await stream.CopyToAsync(ms, token);
-                contents = ms.ToArray();
-            }
+            var contents = await ConvertToBytes(stream, token);
+            var hash = ComputeHash(contents);
 
-            Guid hash = ComputeHash(contents);
-
-            var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.ContentHash == hash));
-            foreach (var fileData in files)
-            {
-                var storedFileBody = Array.Empty<byte>();
-
-                //since we have at least 2 types of storage: Database and Folder 
-                //let's do checks in both of them  
-                if (fileData.Contents != null)
-                {
-                    storedFileBody = fileData.Contents;
-                }
-                else
-                if (_configuration.Storage == Storage.Folder)
-                {
-                    var storedFilePath = Path.Combine(_configuration.Path, fileData.Id.ToString("D"));
-
-                    var storedFileInfo = new FileInfo(storedFilePath);
-
-                    if (storedFileInfo.Exists)
-                    {
-                        storedFileBody = await File.ReadAllBytesAsync(storedFileInfo.FullName);
-                    }
-                }
-
-                if (storedFileBody.Length != contents.Length)
-                {
-                    continue;
-                }
-
-                if (contents.SequenceEqual(storedFileBody))
-                {
-                    // Duplicate found.
-                    return new FileIdDto
-                    {
-                        Id = fileData.Id,
-                        IsDuplicate = true
-                    };
-                }
-            }
+            var duplicatedResult = await IsDuplicatedAsync(contents, hash, token);
+            if (duplicatedResult.IsDuplicate)
+                return duplicatedResult;
 
             var file = new FileEntity
             {
@@ -167,12 +132,65 @@ namespace Iis.Services
 
             await RunAsync(uow => uow.FileRepository.Update(file));
         }
+        
+        private async Task<FileIdDto> IsDuplicatedAsync(byte[] contents, Guid hash, CancellationToken token = default)
+        {
+            var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.ContentHash == hash));
+            foreach (var fileData in files)
+            {
+                var storedFileBody = Array.Empty<byte>();
 
+                //since we have at least 2 types of storage: Database and Folder 
+                //let's do checks in both of them  
+                if (fileData.Contents != null)
+                {
+                    storedFileBody = fileData.Contents;
+                }
+                else if (_configuration.Storage == Storage.Folder)
+                {
+                    var storedFilePath = Path.Combine(_configuration.Path, fileData.Id.ToString("D"));
+
+                    var storedFileInfo = new FileInfo(storedFilePath);
+
+                    if (storedFileInfo.Exists)
+                    {
+                        storedFileBody = await File.ReadAllBytesAsync(storedFileInfo.FullName, token);
+                    }
+                }
+
+                if (storedFileBody.Length != contents.Length)
+                {
+                    continue;
+                }
+
+                if (contents.SequenceEqual(storedFileBody))
+                {
+                    return new FileIdDto
+                    {
+                        Id = fileData.Id,
+                        IsDuplicate = true
+                    };
+                }
+            }
+            
+            return new FileIdDto
+            {
+                IsDuplicate = false
+            };
+        }
+        
         private static Guid ComputeHash(byte[] data)
         {
             using HashAlgorithm algorithm = MD5.Create();
             byte[] bytes = algorithm.ComputeHash(data);
             return new Guid(bytes);
+        }
+
+        private static async Task<byte[]> ConvertToBytes(Stream stream, CancellationToken token)
+        {
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms, token);
+            return ms.ToArray();
         }
     }
 }
