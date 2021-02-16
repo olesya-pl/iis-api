@@ -285,7 +285,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return _nodeRepository.PutNodeAsync(id, fieldsToExtract, ct);
         }
 
-        public Task<bool> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
+        public Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
         {
             return _nodeRepository.PutHistoricalNodesAsync(id, requestId, ct);
         }
