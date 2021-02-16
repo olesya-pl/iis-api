@@ -342,6 +342,7 @@ namespace Iis.OntologySchema
                 case Kind.Attribute:
                     return UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
             }
+            ResetCaches();
             return null;
         }
         private void ValidateNodeTypeUpdateParameter(INodeTypeUpdateParameter updateParameter)
@@ -467,9 +468,10 @@ namespace Iis.OntologySchema
         public void RemoveEntity(Guid id)
         {
             _storage.RemoveEntity(id);
+            ResetCaches();
         }
 
-        private List<AttributeInfoItem> BuildAttributesBasedOnEntityFileds(string entityName) 
+        private List<AttributeInfoItem> BuildAttributesBasedOnEntityFileds(string entityName)
         {
             var items = new List<AttributeInfoItem>();
             foreach (var key in _storage.DotNameTypes.Keys.Where(key => key.StartsWith(entityName + ".")))
@@ -524,6 +526,10 @@ namespace Iis.OntologySchema
         public IDotName GetDotName(string value)
         {
             return new DotName(value);
+        }
+        private void ResetCaches()
+        {
+            _stringCodes = null;
         }
     }
 }
