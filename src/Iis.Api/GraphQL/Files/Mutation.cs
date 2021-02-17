@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -16,6 +15,12 @@ namespace IIS.Core.GraphQL.Files
 {
     public class Mutation
     {
+        private static readonly UploadResult DuplicatedUploadResult = new UploadResult()
+        {
+            Success = false,
+            Message = "Даний файл вже завантажений до системи"
+        };
+        
         public async Task<IEnumerable<UploadResult>> Upload([Service] UploadConfiguration uploadConfiguration,
             [Service] IFileService fileService,
             [Service] IMaterialService materialService,
@@ -35,11 +40,11 @@ namespace IIS.Core.GraphQL.Files
             {
                 if (input.Name.EndsWith(".docx"))
                 {
-                    return UploadFile(uploadConfiguration.DocxDirectory, input);
+                    return await UploadFileAsync(fileService, uploadConfiguration.DocxDirectory, input);
                 }
                 else if (input.Name.EndsWith(".pdf"))
                 {
-                    return UploadFile(uploadConfiguration.PdfDirectory, input);
+                    return await UploadFileAsync(fileService, uploadConfiguration.PdfDirectory, input);
                 }
                 else if (input.Name.EndsWith(".png"))
                 {
@@ -62,7 +67,6 @@ namespace IIS.Core.GraphQL.Files
                     Message = e.Message
                 };
             }
-
         }
 
         private static async Task<UploadResult> UploadPng(IFileService fileService, IMaterialService materialService, UploadInput input)
@@ -73,11 +77,7 @@ namespace IIS.Core.GraphQL.Files
                 .SaveFileAsync(stream, input.Name, "image/png", CancellationToken.None);
                 if (fileSaveResult.IsDuplicate)
                 {
-                    return new UploadResult
-                    {
-                        Success = false,
-                        Message = "Даний файл вже завантажений до системи"
-                    };
+                    return DuplicatedUploadResult;
                 }
 
                 var material = new Material
@@ -102,8 +102,12 @@ namespace IIS.Core.GraphQL.Files
             }
         }
 
-        private static UploadResult UploadFile(string directory, UploadInput input)
+        private static async Task<UploadResult> UploadFileAsync(IFileService fileService, string directory, UploadInput input)
         {
+            var result = await fileService.IsDuplicatedAsync(input.Content);
+            if (result.IsDuplicate)
+                return DuplicatedUploadResult;
+            
             var byteArray = input.Content;
             var fileName = System.IO.Path.Combine(directory, input.Name);
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
@@ -113,7 +117,6 @@ namespace IIS.Core.GraphQL.Files
                 {
                     Success = true
                 };
-
             }
         }
     }
