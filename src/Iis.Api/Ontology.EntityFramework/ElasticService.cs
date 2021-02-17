@@ -176,7 +176,11 @@ namespace IIS.Core.Ontology.EntityFramework
             CancellationToken ct = default)
         {
             var (multiSearchParams, _)= await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
-            return await _elasticManager.CountAsync(multiSearchParams, ct);
+            var query = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+                .WithLeniency(multiSearchParams.IsLenient)
+                .BuildCountQuery()                
+                .ToString();
+            return await _elasticManager.CountAsync(query, typeNames, ct);
         }
 
         private async Task<(MultiElasticSearchParams MultiSearchParams, IElasticSearchResult HistoricalResult)> PrepareMultiElasticSearchParamsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default) 
