@@ -1,6 +1,7 @@
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using System.Collections.Generic;
+using Iis.Interfaces.Enums;
 
 namespace Iis.DataModel
 {
@@ -15,6 +16,7 @@ namespace Iis.DataModel
         public string PasswordHash { get; set; }
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
+        public AccessLevel AccessLevel { get; set; }
         public List<UserRoleEntity> UserRoles { get; set; }
         public List<MaterialEntity> Materials { get; internal set; }
     }
