@@ -6,7 +6,6 @@ namespace IIS.Core.GraphQL.Entities.InputTypes
 {
     public class AllEntitiesFilterInput : FilterInput
     {
-        [GraphQLType(typeof(ListType<NonNullType<StringType>>))] public IEnumerable<string> Types { get; set; }
-        public bool? IncludeAggregations { get; set; }
+        [GraphQLType(typeof(ListType<NonNullType<StringType>>))] public IEnumerable<string> Types { get; set; }        
     }
 }

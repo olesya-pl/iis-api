@@ -161,7 +161,7 @@ namespace Iis.DbLayer.Repositories
 
             var materialDocuments = materials
                     .Select(p => MapEntityToDocument(p))
-                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n"); ;
+                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
 
             return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), materialDocuments, token);
         }

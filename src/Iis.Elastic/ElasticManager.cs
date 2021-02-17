@@ -151,13 +151,6 @@ namespace Iis.Elastic
             return CountAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
         }
 
-        public Task<IElasticSearchResult> SearchAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
-        {
-            var jsonString = GetSearchJson(searchParams);
-
-            return SearchAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
-        }
-
         public Task<int> CountAsync(IMultiElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetCountJson(searchParams);
@@ -380,49 +373,6 @@ namespace Iis.Elastic
                 return;
             }
             request.Merge(mappingConfiguration);
-        }
-
-        private string GetSearchJson(IMultiElasticSearchParams searchParams)
-        {
-            var json = new JObject();
-            json["_source"] = new JArray(searchParams.ResultFields);
-            json["from"] = searchParams.From;
-            json["size"] = searchParams.Size;
-            json["query"] = new JObject();
-            json["query"]["bool"] = new JObject();
-
-            PrepareHighlights(json);
-
-            var aggregationFieldList = searchParams.SearchParams.SelectMany(p => p.Fields)
-                                    .Where(p => p.IsAggregated)
-                                    .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
-                                    .ToArray();
-
-            json.WithAggregation(aggregationFieldList);
-
-            var shouldSections = new JArray();
-            foreach (var searchItem in searchParams.SearchParams)
-            {
-                if (SearchQueryExtension.IsExactQuery(searchItem.Query))
-                {
-                    var shouldSection = CreateExactShouldSection(searchItem.Query, searchParams.IsLenient);
-                    shouldSections.Add(shouldSection);
-                }
-                else if (searchItem.Fields?.Any() == true)
-                {
-                    var shouldSection = CreateMultiFieldShouldSection(searchItem.Query, searchItem.Fields, searchParams.IsLenient);
-                    shouldSections.Merge(shouldSection);
-                }
-                else
-                {
-                    var shouldSection = CreateFallbackShouldSection(searchItem.Query, searchParams.IsLenient);
-                    shouldSections.Add(shouldSection);
-                }
-            }
-
-            json["query"]["bool"]["should"] = shouldSections;
-
-            return json.ToString();
         }
 
         private string GetCountJson(IMultiElasticSearchParams searchParams)
