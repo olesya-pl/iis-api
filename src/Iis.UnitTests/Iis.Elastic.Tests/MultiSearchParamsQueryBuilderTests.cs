@@ -71,6 +71,58 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         }
 
         [Fact]
+        public void ExactIds_QueryString_CountQuery()
+        {
+            var sut = new MultiSearchParamsQueryBuilder(new List<(string Query, List<IIisElasticField> Fields)> {
+                ("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
+                    new IisElasticField
+                    {
+                        Name = "purpose"
+                    },
+                    new IisElasticField
+                    {
+                        Name = "destination"
+                    }
+                }),
+                ("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
+                    new IisElasticField
+                    {
+                        Name = "Id",
+                        Boost = 0.05m
+                    }
+                })
+            })
+                .WithLeniency(true)
+                .BuildCountQuery();
+            var expected = JObject.Parse(@"{
+  ""query"": {
+    ""bool"": {
+        ""should"": [
+        {
+          ""query_string"": {
+            ""query"": ""__coordinates:* AND тестовий підрозділ 452"",
+            ""lenient"": true
+          }
+        },
+        {
+         ""query_string"": {
+           ""query"": ""\""1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33\"""",
+           ""fuzziness"": 0,
+           ""boost"": 0.05,
+           ""lenient"": true,
+           ""fields"": [
+             ""Id""
+           ]
+         }
+       }
+    ]
+    }
+  }
+}");
+            sut.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
         public void ExactIds_QueryString_Highlights_Aggregations()
         {
             var sut = new MultiSearchParamsQueryBuilder(new List<(string Query, List<IIisElasticField> Fields)> { 
