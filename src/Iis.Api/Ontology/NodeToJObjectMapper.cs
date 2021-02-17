@@ -77,7 +77,7 @@ namespace Iis.Api.Ontology
             var importanceAttributes = (_ontologyService.GetNode(importanceId)).GetChildAttributes();
             var stateAttributes = (_ontologyService.GetNode(stateId)).GetChildAttributes();
 
-            var attributies = node.GetChildAttributes();
+            var attributies = node.GetTopLevelAttributes();
 
             var associatedEvent = new EventAssociatedWithEntity {
                 Id = node.Id,

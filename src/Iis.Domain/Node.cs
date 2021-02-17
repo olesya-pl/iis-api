@@ -88,6 +88,32 @@ namespace Iis.Domain
             return result;
         }
 
+        public List<(Attribute attribute, string dotName)> GetTopLevelAttributes()
+        {
+            var result = new List<(Attribute, string)>();
+            if (this is Attribute)
+            {
+                result.Add((this as Attribute, Type.Name));
+            }
+            foreach (var node in Nodes)
+            {
+                if (node is Attribute)
+                {
+                    result.Add((node as Attribute, Type.Name));
+                }
+                if (node is Relation)
+                {
+                    var relation = node as Relation;
+                    if (relation.AttributeTarget == null)
+                    {
+                        continue;
+                    }
+                    result.Add((relation.AttributeTarget, relation.AttributeTarget.Type.Name));
+                }
+            }
+            return result;
+        }
+
         private string GetDotName((Attribute attribute, string dotName) child)
         {
             var sb = new StringBuilder();
