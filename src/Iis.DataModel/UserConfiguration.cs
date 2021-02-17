@@ -1,3 +1,4 @@
+using Iis.Interfaces.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,6 +13,9 @@ namespace Iis.DataModel
             builder.HasMany(u => u.UserRoles)
                 .WithOne(ur => ur.User)
                 .HasForeignKey(ur => ur.UserId);
+
+            builder.Property(x => x.AccessLevel)
+                .HasDefaultValue(AccessLevel.Unclassified);
         }
     }
 }

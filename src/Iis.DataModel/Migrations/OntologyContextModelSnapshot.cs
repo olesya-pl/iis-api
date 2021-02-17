@@ -1254,6 +1254,11 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("AccessLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("Comment")
                         .HasColumnType("text");
 

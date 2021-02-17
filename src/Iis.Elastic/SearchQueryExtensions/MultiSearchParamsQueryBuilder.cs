@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Iis.Interfaces.Elastic;
 using Newtonsoft.Json.Linq;
 
@@ -26,6 +24,17 @@ namespace Iis.Elastic.SearchQueryExtensions
         public override JObject Build()
         {
             var json = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
+            return CreateMultiParamsQuery(json);
+        }
+
+        public JObject BuildCountQuery()
+        {
+            var json = new JObject(new JProperty("query", new JObject()));
+            return CreateMultiParamsQuery(json);
+        }
+
+        private JObject CreateMultiParamsQuery(JObject json)
+        {
             json["query"]["bool"] = new JObject();
             var shouldSections = new JArray();
 

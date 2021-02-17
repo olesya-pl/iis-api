@@ -117,7 +117,21 @@ namespace IIS.Core.Ontology.EntityFramework
 
             var (multiSearchParams, historicalResult) = await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
 
-            var searchResult = await _elasticManager.SearchAsync(multiSearchParams, ct);
+            var aggregationFieldList = multiSearchParams.SearchParams.SelectMany(p => p.Fields)
+                                    .Where(p => p.IsAggregated)
+                                    .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
+                                    .ToArray();
+
+            var multiSearchQuery = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+                .WithLeniency(multiSearchParams.IsLenient)
+                .WithPagination(multiSearchParams.From, multiSearchParams.Size)
+                .WithResultFields(multiSearchParams.ResultFields)
+                .Build()
+                .WithHighlights()
+                .WithAggregation(aggregationFieldList)
+                .ToString();
+
+            var searchResult = await _elasticManager.SearchAsync(multiSearchQuery, typeNames, ct);
 
             if (historicalResult != null && historicalResult.Count > 0)
             {
@@ -162,7 +176,11 @@ namespace IIS.Core.Ontology.EntityFramework
             CancellationToken ct = default)
         {
             var (multiSearchParams, _)= await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
-            return await _elasticManager.CountAsync(multiSearchParams, ct);
+            var query = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+                .WithLeniency(multiSearchParams.IsLenient)
+                .BuildCountQuery()                
+                .ToString();
+            return await _elasticManager.CountAsync(query, typeNames, ct);
         }
 
         private async Task<(MultiElasticSearchParams MultiSearchParams, IElasticSearchResult HistoricalResult)> PrepareMultiElasticSearchParamsAsync(IEnumerable<string> typeNames, IElasticNodeFilter filter, CancellationToken ct = default) 
@@ -215,8 +233,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
                 {
                     (string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}", searchFields)
-                },
-                IncludeAggregations = filter.IncludeAggregations
+                }
             };
 
             if (useHistoricalSearch && searchByHistoryResult.Count > 0)
