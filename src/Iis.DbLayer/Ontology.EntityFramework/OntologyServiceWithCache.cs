@@ -20,7 +20,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         readonly IElasticState _elasticState;
         public OntologyServiceWithCache(
             IOntologyNodesData data,
-            IElasticService elasticService, 
+            IElasticService elasticService,
             IElasticState elasticState)
         {
             _data = data;
