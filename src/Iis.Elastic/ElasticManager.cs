@@ -8,7 +8,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Elastic.SearchResult;
@@ -19,14 +18,15 @@ namespace Iis.Elastic
 {
     internal class ElasticManager: IElasticManager
     {
-        public const string EscapeSymbolsPattern = "^\"~:(){}[]\\/!";
-        public const string RemoveSymbolsPattern = "№";
         public const string NullValue = "NULL";
         private readonly ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;
         private readonly SearchResultExtractor _resultExtractor;
         private readonly ILogger<ElasticManager> _logger;
         private readonly ElasticLogUtils _responseLogUtils;
+
+        public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
+        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^','\"', '~', ':' ,'(', ')', '{', '}', '[', ']', '\\', '/', '!' };
 
         public ElasticManager(ElasticConfiguration configuration,
             SearchResultExtractor resultExtractor,
@@ -448,9 +448,9 @@ namespace Iis.Elastic
                 var query = new JObject();
                 var queryString = new JObject();
                 queryString["query"] = ApplyFuzzinessOperator(
-                    EscapeElasticSpecificSymbols(
-                        RemoveSymbols(searchParams.Query, RemoveSymbolsPattern),
-                    EscapeSymbolsPattern));
+                    searchParams.Query
+                        .RemoveSymbols(RemoveSymbolsPattern)
+                        .EscapeSymbols(EscapeSymbolsPattern));
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = searchParams.IsLenient;
@@ -463,8 +463,9 @@ namespace Iis.Elastic
         private void PrepareFallbackQuery(IIisElasticSearchParams searchParams, JObject json)
         {
             var queryString = new JObject();
-            queryString["query"] = EscapeElasticSpecificSymbols(
-                RemoveSymbols(searchParams.Query, RemoveSymbolsPattern), EscapeSymbolsPattern);
+            queryString["query"] = searchParams.Query
+                    .RemoveSymbols(RemoveSymbolsPattern)
+                    .EscapeSymbols(EscapeSymbolsPattern);
             queryString["fields"] = new JArray("*");
             queryString["lenient"] = searchParams.IsLenient;
             json["query"]["query_string"] = queryString;
@@ -500,44 +501,6 @@ namespace Iis.Elastic
         private static bool IsWildCard(string input)
         {
             return input.Contains('*');
-        }
-
-        public static string EscapeElasticSpecificSymbols(string input, string escapePattern)
-        {
-            if (string.IsNullOrWhiteSpace(input)) return input;
-
-            if (string.IsNullOrWhiteSpace(escapePattern)) throw new ArgumentNullException(nameof(escapePattern));
-
-            var builder = new StringBuilder();
-
-            foreach (var ch in input)
-            {
-                if (escapePattern.Contains(ch))
-                {
-                    builder.Append('\\');
-                }
-
-                builder.Append(ch);
-            }
-
-            return builder.ToString();
-        }
-
-        public static string RemoveSymbols(string input, string removeSymbols)
-        {
-            if(string.IsNullOrWhiteSpace(input)) return input;
-
-            if(string.IsNullOrWhiteSpace(removeSymbols)) throw new ArgumentNullException(nameof(removeSymbols));
-
-            var builder = new StringBuilder();
-
-            foreach (var ch in input)
-            {
-                if(removeSymbols.Contains(ch)) continue;
-
-                builder.Append(ch);
-            }
-            return builder.ToString();
         }
 
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, IRequestParameters requestParameters, CancellationToken cancellationToken)

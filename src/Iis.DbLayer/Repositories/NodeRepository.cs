@@ -164,7 +164,7 @@ namespace Iis.DbLayer.Repositories
         private string GenerateBulkData(IEnumerable<FlattenNodeResult> nodes, bool isHistoricalIndex)
         {
             Func<string, string> getIdFunc =  id => isHistoricalIndex ? Guid.NewGuid().ToString("N") : id;
-            return nodes.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{getIdFunc(p.Id):N}\" }} }}\n{p.SerializedNode.RemoveNewLinesCharacter()}\n");
+            return nodes.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{getIdFunc(p.Id):N}\" }} }}\n{p.SerializedNode.RemoveNewLineCharacters()}\n");
         }
 
         private string ExcludeFields(string json, IEnumerable<string> fieldsToExclude) 

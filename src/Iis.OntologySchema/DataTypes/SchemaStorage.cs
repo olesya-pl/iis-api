@@ -91,7 +91,7 @@ namespace Iis.OntologySchema.DataTypes
             var inversedMeta = directRelationType.NodeType.MetaObject.Inversed;
             nodeType.Id = Guid.NewGuid();
             inversed.Id = nodeType.Id;
-            nodeType.Name = inversedMeta.Code ?? directRelationType.SourceType.Name.ToLowerCamelcase();
+            nodeType.Name = inversedMeta.Code ?? directRelationType.SourceType.Name.ToLowerCamelCase();
             nodeType.Title = inversedMeta.Title ?? directRelationType.SourceType.Title ?? nodeType.Name;
             inversed.EmbeddingOptions = inversedMeta.Multiple ? EmbeddingOptions.Multiple : EmbeddingOptions.Optional;
             nodeType.SetIsInversed();

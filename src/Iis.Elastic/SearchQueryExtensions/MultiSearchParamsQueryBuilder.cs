@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Iis.Interfaces.Elastic;
+using Iis.Utility;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
@@ -82,9 +83,9 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 var querySection = new JObject();
                 var queryString = new JObject();
-                queryString["query"] = ElasticManager.ApplyFuzzinessOperator(
-                    ElasticManager.EscapeElasticSpecificSymbols(ElasticManager.RemoveSymbols(query, ElasticManager.RemoveSymbolsPattern),
-                    ElasticManager.EscapeSymbolsPattern));
+                queryString["query"] = ElasticManager.ApplyFuzzinessOperator(query
+                    .RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
+                    .EscapeSymbols(ElasticManager.EscapeSymbolsPattern));
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = _isLenient;
@@ -101,8 +102,9 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             var shouldSection = new JObject();
             var queryString = new JObject();
-            queryString["query"] = ElasticManager.EscapeElasticSpecificSymbols(
-                ElasticManager.RemoveSymbols(query, ElasticManager.RemoveSymbolsPattern), ElasticManager.EscapeSymbolsPattern);
+            queryString["query"] = query
+                    .RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
+                    .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
             queryString["fields"] = new JArray("*");
             queryString["lenient"] = _isLenient;
             shouldSection["query_string"] = queryString;

@@ -209,7 +209,7 @@ namespace Iis.OntologyData.DataTypes
             foreach (Match match in matches)
             {
                 var dotName = match.Groups[1].ToString();
-                var value = GetSingleProperty(dotName)?.Value?.Replace("\"", "\\\"").RemoveNewLinesCharacter();
+                var value = GetSingleProperty(dotName)?.Value?.Replace("\"", "\\\"").RemoveNewLineCharacters();
                 result = result.Replace("{" + dotName + "}", "\"" + value + "\"");
             }
             return result;
