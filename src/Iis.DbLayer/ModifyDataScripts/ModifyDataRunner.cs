@@ -49,8 +49,7 @@ namespace Iis.DbLayer.ModifyDataScripts
         }
         private bool ActionDeployed(string name)
         {
-            return false;
-            //return _context.ModifyDataLogs.Any(x => x.Name == name);
+            return _context.ModifyDataLogs.Any(x => x.Name == name && x.Success);
         }
         private void AddLog(string name, bool success, string error)
         {
