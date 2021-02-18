@@ -20,6 +20,7 @@ using Iis.Api.Ontology;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DbLayer.Elastic;
+using Iis.DbLayer.ModifyDataScripts;
 using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.OntologySchema;
@@ -293,6 +294,7 @@ namespace IIS.Core
             services.RegisterRepositories();
             services.RegisterElasticModules();
             services.AddMediatR(typeof(ReportEventHandler));
+            services.AddTransient<ModifyDataRunner>();
         }
 
 
@@ -393,6 +395,9 @@ namespace IIS.Core
                     }
                 }
                 catch { }
+
+                var modifyDataRunner = serviceScope.ServiceProvider.GetService<ModifyDataRunner>();
+                modifyDataRunner.Run();
             }
         }
 

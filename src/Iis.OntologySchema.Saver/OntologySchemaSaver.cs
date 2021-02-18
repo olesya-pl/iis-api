@@ -27,7 +27,9 @@ namespace Iis.OntologySchema.Saver
         public void SaveToDatabase(ISchemaCompareResult compareResult, ISchemaSaveParameters parameters = null)
         {
             _createdEntityTypes = new List<INodeType>();
-            AddNodes(compareResult.ItemsToAdd.Where(item => parameters?.IsChecked(item) == true));
+            AddNodes(compareResult.ItemsToAdd
+                .Where(item => parameters?.IsChecked(item) == true)
+                .OrderBy(item => item.Kind));
             DeleteNodes(compareResult.ItemsToDelete.Where(item => parameters?.IsChecked(item) == true));
             UpdateNodes(compareResult.ItemsToUpdate.Where(item => parameters?.IsChecked(item) == true));
 
