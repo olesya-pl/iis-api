@@ -341,6 +341,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
+            app.SeedUser();
             app.UpdateMilitaryAmmountCodes();
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();

@@ -1234,7 +1234,7 @@ namespace Iis.DataModel.Migrations
                     b.Property<int>("AccessLevel")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasDefaultValue(1);
 
                     b.Property<string>("Comment")
                         .HasColumnType("text");

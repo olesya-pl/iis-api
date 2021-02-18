@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    [Migration("20210212083646_AddedAccessLevelToUser")]
+    [Migration("20210218131816_AddedAccessLevelToUser")]
     partial class AddedAccessLevelToUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1236,7 +1236,7 @@ namespace IIS.Core.Migrations
                     b.Property<int>("AccessLevel")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasDefaultValue(1);
 
                     b.Property<string>("Comment")
                         .HasColumnType("text");
