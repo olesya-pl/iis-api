@@ -10,7 +10,7 @@ namespace IIS.Core.Migrations
                 name: "AccessLevel",
                 table: "Users",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 1);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
