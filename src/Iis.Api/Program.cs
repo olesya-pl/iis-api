@@ -17,7 +17,6 @@ namespace IIS.Core
             IHost host = CreateWebHostBuilder(args).Build();
             if (await host.RunUpAsync())
             {
-                await host.SeedUserAsync();
                 host.Run();
             }
         }
