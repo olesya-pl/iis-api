@@ -7,6 +7,7 @@
         ObjectSign,
         Event, 
         Enum,
-        Wiki
+        Wiki,
+        Object
     }
 }

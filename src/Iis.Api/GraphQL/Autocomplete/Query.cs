@@ -12,7 +12,7 @@ namespace IIS.Core.GraphQL.Autocomplete
     public class Query
     {
         private const int DefaultTipsCount = 20;
-        private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString()};
+        private static readonly string[] ObjectTypeList = new[] { EntityTypeNames.Object.ToString()};
 
         public IReadOnlyCollection<string> GetTips(
             [Service] IAutocompleteService autocomplete,
@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.Autocomplete
             [GraphQLType(typeof(ListType<NonNullType<StringType>>))] string[] types,
             int? size)
         {
-            types = types is null || !types.Any() ? ObjectOfStudyTypeList : types;
+            types = types is null || !types.Any() ? ObjectTypeList : types;
 
             return autocomplete.GetEntitiesAsync(query, types, size.GetValueOrDefault(DefaultTipsCount));
         }
