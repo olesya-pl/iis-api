@@ -174,7 +174,6 @@ namespace Iis.OntologySchema.DataTypes
                 }
             }
             return result;
-            //return result.Where(nt => !nt.Disabled).ToList();
         }
         public IEnumerable<IRelationTypeLinked> GetAllOutgoingRelations()
         {
