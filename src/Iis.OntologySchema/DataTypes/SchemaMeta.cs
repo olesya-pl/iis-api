@@ -27,8 +27,9 @@ namespace Iis.OntologySchema.DataTypes
         public bool? IsAggregated { get; set; }
         public bool? IsImportantRelation { get; set; }
         public string Code { get; set; }
+        public bool Disabled { get; set; }
+        [Obsolete]
         public bool Editable { get; set; }
-
 
         public SchemaMeta(string json)
         {
@@ -100,6 +101,10 @@ namespace Iis.OntologySchema.DataTypes
             if (jObj.ContainsKey("Validation"))
             {
                 Validation = ((JObject)jObj["Validation"]).ToObject<SchemaValidation>();
+            }
+            if (jObj.ContainsKey("Disabled"))
+            {
+                Disabled = bool.Parse(jObj["Disabled"].ToString());
             }
         }
     }
