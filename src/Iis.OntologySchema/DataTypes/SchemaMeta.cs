@@ -28,9 +28,9 @@ namespace Iis.OntologySchema.DataTypes
         public bool? IsImportantRelation { get; set; }
         public string Code { get; set; }
         public bool Disabled { get; set; }
-        [Obsolete]
         public bool Editable { get; set; }
 
+        public SchemaMeta() { }
         public SchemaMeta(string json)
         {
             if (string.IsNullOrEmpty(json)) return;

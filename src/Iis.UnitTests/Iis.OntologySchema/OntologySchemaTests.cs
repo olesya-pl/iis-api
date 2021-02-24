@@ -11,10 +11,16 @@ namespace Iis.UnitTests.Iis.OntologySchema
 {
     public class OntologySchemaTests
     {
+        private (IOntologySchema schema, OntologyDataCreator creator) GetSchemaAndCreator()
+        {
+            var schema = Utils.GetEmptyOntologySchema();
+            var creator = new OntologyDataCreator(schema);
+            return (schema, creator);
+        }
         [Fact]
         public void CreateEntityTest()
         {
-            var schema = Utils.GetEmptyOntologySchema();
+            var (schema, creator) = GetSchemaAndCreator();
             var updateParameter = new NodeTypeUpdateParameter
             {
                 Name = "Entity1",
