@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using Iis.Interfaces.Enums;
 namespace Iis.DataModel.Materials
 {
     public class MaterialEntity : BaseEntity
@@ -17,7 +17,7 @@ namespace Iis.DataModel.Materials
             = new Guid("AB3B68F3-42BB-4C43-8121-ED0DC2B0BAD1");
 
         public static readonly Guid ProcessingStatusPrimaryProcessingSignId
-            = new Guid("5164D448-8709-4839-9907-F5205CA384D1");        
+            = new Guid("5164D448-8709-4839-9907-F5205CA384D1");
 
         public static readonly Guid ProcessingStatusNotProcessedSignId
             = new Guid("0a641312-abb7-4b40-a766-0781308eb077");
@@ -104,7 +104,7 @@ namespace Iis.DataModel.Materials
             = new Guid("60560b14-195c-4605-816e-983118ab9ed9");
 
         public static readonly Guid SessionPriorityTranslateSignId
-            = new Guid("6071f9f3-1988-4b14-9f6a-c0514fc795d0");       
+            = new Guid("6071f9f3-1988-4b14-9f6a-c0514fc795d0");
 
         #endregion
 
@@ -139,6 +139,7 @@ namespace Iis.DataModel.Materials
         public Guid? AssigneeId { get; set; }
         public virtual UserEntity Assignee { get; set; }
         public int MlHandlersCount { get; set; }
+        public AccessLevel AccessLevel { get; set; }
 
         public bool CanBeEdited(Guid userId)
         {

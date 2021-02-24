@@ -77,7 +77,7 @@ namespace Iis.Api.Materials
             base.Dispose();
         }
 
-        private async Task ProcessMessage(MaterialCreatedMessage message)
+        private Task ProcessMessage(MaterialCreatedMessage message)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -111,6 +111,8 @@ namespace Iis.Api.Materials
                             MaterialId = message.MaterialId
                         });
                 }
+
+                return Task.CompletedTask;
             }
         }
 
