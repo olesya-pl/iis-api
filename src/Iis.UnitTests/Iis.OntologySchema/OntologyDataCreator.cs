@@ -20,7 +20,6 @@ namespace Iis.UnitTests.Iis.OntologySchema
         ObjectAffiliation,
         ObjectImportance,
         EmailSign,
-        NicknameSign
     }
 
     public class OntologyDataCreator
@@ -32,7 +31,15 @@ namespace Iis.UnitTests.Iis.OntologySchema
             _schema = schema;
         }
 
-        public INodeTypeLinked CreateEntity(string name, string title = null, bool isAbstract = false, Guid? ancestorId = null)
+        public static (IOntologySchema schema, OntologyDataCreator creator) GetBaseTestOntology()
+        {
+            var schema = Utils.GetEmptyOntologySchema();
+            var creator = new OntologyDataCreator(schema);
+            creator.CreateBaseTestOntology();
+            return (schema, creator);
+        }
+
+        public INodeTypeLinked CreateEntityType(string name, string title = null, bool isAbstract = false, Guid? ancestorId = null)
         {
             var updateParameter = new NodeTypeUpdateParameter
             {
@@ -48,7 +55,7 @@ namespace Iis.UnitTests.Iis.OntologySchema
             }
             return nodeType;
         }
-        public INodeTypeLinked CreateAttribute(
+        public INodeTypeLinked CreateAttributeType(
             Guid parentId, 
             string name,
             string title = null,
@@ -67,7 +74,7 @@ namespace Iis.UnitTests.Iis.OntologySchema
             };
             return _schema.UpdateNodeType(updateParameter);
         }
-        public INodeTypeLinked CreateRelation(
+        public INodeTypeLinked CreateRelationType(
             Guid sourceId,
             Guid targetId,
             string name,
@@ -87,32 +94,32 @@ namespace Iis.UnitTests.Iis.OntologySchema
             return _schema.UpdateNodeType(updateParameter);
         }
 
-        public IOntologySchema CreateTestOntology1()
+        public IOntologySchema CreateBaseTestOntology()
         {
-            var objectType = CreateEntity(EntityTypeNames.Object.ToString(), "Base Object", true);
-            CreateAttribute(objectType.Id, "title", "Title");
-            CreateAttribute(objectType.Id, "__title", "Description", meta: new SchemaMeta { Formula = "{title};\"No Name Object\"" });
+            var objectType = CreateEntityType(EntityTypeNames.Object.ToString(), "Base Object", true);
+            CreateAttributeType(objectType.Id, "title", "Title");
+            CreateAttributeType(objectType.Id, "__title", "Description", meta: new SchemaMeta { Formula = "{title};\"No Name Object\"" });
 
-            var enumType = CreateEntity(EntityTypeNames.Enum.ToString(), "Base Enum", true);
-            CreateAttribute(enumType.Id, "name", "Name");
-            CreateAttribute(enumType.Id, "value", "Value");
+            var enumType = CreateEntityType(EntityTypeNames.Enum.ToString(), "Base Enum", true);
+            CreateAttributeType(enumType.Id, "name", "Name", ScalarType.String, EmbeddingOptions.Required);
+            CreateAttributeType(enumType.Id, "sortOrder", "Sort Order", ScalarType.Int);
 
-            var affiliationType = CreateEntity(EntityTypeNames.ObjectAffiliation.ToString(), "Affiliation", false, enumType.Id);
-            var importanceType = CreateEntity(EntityTypeNames.ObjectImportance.ToString(), "Importance", false, enumType.Id);
+            var affiliationType = CreateEntityType(EntityTypeNames.ObjectAffiliation.ToString(), "Affiliation", false, enumType.Id);
+            var importanceType = CreateEntityType(EntityTypeNames.ObjectImportance.ToString(), "Importance", false, enumType.Id);
 
-            var signType = CreateEntity(EntityTypeNames.ObjectSign.ToString(), "Base Sign", true);
-            CreateAttribute(signType.Id, "value", "Value");
+            var signType = CreateEntityType(EntityTypeNames.ObjectSign.ToString(), "Base Sign", true);
+            CreateAttributeType(signType.Id, "value", "Value");
 
-            CreateEntity(EntityTypeNames.EmailSign.ToString(), "Email Sign", false, enumType.Id);
+            CreateEntityType(EntityTypeNames.EmailSign.ToString(), "Email Sign", false, enumType.Id);
 
-            var objectOfStudyType = CreateEntity(EntityTypeNames.ObjectOfStudy.ToString(), "Object Of Study", true, objectType.Id);
-            CreateRelation(objectOfStudyType.Id, affiliationType.Id, "affiliation", "Affiliation");
-            CreateRelation(objectOfStudyType.Id, importanceType.Id, "importance", "Importance");
-            CreateRelation(objectOfStudyType.Id, signType.Id, "sign", "Sign");
-            CreateAttribute(objectOfStudyType.Id, "lastConfirmedAt", "Last Confirmed At", ScalarType.Date);
+            var objectOfStudyType = CreateEntityType(EntityTypeNames.ObjectOfStudy.ToString(), "Object Of Study", true, objectType.Id);
+            CreateRelationType(objectOfStudyType.Id, affiliationType.Id, "affiliation", "Affiliation");
+            CreateRelationType(objectOfStudyType.Id, importanceType.Id, "importance", "Importance");
+            CreateRelationType(objectOfStudyType.Id, signType.Id, "sign", "Sign");
+            CreateAttributeType(objectOfStudyType.Id, "lastConfirmedAt", "Last Confirmed At", ScalarType.Date);
 
-            var wikiType = CreateEntity(EntityTypeNames.Wiki.ToString(), "Base Wiki", true, objectType.Id);
-            CreateAttribute(wikiType.Id, "photo", "Photo", ScalarType.File, EmbeddingOptions.Multiple);
+            var wikiType = CreateEntityType(EntityTypeNames.Wiki.ToString(), "Base Wiki", true, objectType.Id);
+            CreateAttributeType(wikiType.Id, "photo", "Photo", ScalarType.File, EmbeddingOptions.Multiple);
 
             return _schema;
         }
