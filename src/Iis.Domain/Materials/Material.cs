@@ -1,8 +1,9 @@
-using Iis.Services.Contracts;
-using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using Iis.Interfaces.Enums;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Dtos;
 
 namespace Iis.Domain.Materials
 {
@@ -44,6 +45,7 @@ namespace Iis.Domain.Materials
         public IEnumerable<JObject> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
         public bool CanBeEdited { get; set; }
+        public AccessLevel AccessLevel { get; set; }
 
         public bool HasAttachedFile() => File != null;
 

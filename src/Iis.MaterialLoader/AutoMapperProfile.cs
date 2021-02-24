@@ -15,6 +15,7 @@ namespace Iis.MaterialLoader
         public AutoMapperProfile()
         {
             CreateMap<IMaterialSign, MaterialSignEntity>();
+            CreateMap<MaterialSignEntity, Domain.Materials.MaterialSign>();
             CreateMap<Domain.Materials.Material, MaterialEntity>()
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Metadata, opt => opt.MapFrom(src => src.Metadata == null ? (string)null : src.Metadata.ToString(Formatting.None)))

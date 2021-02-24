@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Scalars;
@@ -59,6 +60,8 @@ namespace IIS.Core.GraphQL.Materials
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public bool CanBeEdited { get; set; }
+        public AccessLevel AccessLevel { get; set; }
+
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
             if (FileId == null) return null;

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Iis.Interfaces.Enums;
 
 namespace Iis.DataModel.Materials
 {
@@ -77,6 +78,9 @@ namespace Iis.DataModel.Materials
             builder.Property(e => e.Content)
                 .IsRequired(true)
                 .HasDefaultValue("");
+
+            builder.Property(e => e.AccessLevel)
+                .HasDefaultValue(AccessLevel.Undefined);
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-
+using Iis.Interfaces.Enums;
 namespace Iis.DbLayer.Repositories
 {
     public class MaterialDocument
@@ -10,6 +10,7 @@ namespace Iis.DbLayer.Repositories
         public const int ImageVectorDimensionsCount = 128;
 
         public Guid Id { get; set; }
+        public AccessLevel AccessLevel { get; set; }
         public Guid? FileId { get; set; }
         public Guid? ParentId { get; set; }
         public JObject Metadata { get; set; }
