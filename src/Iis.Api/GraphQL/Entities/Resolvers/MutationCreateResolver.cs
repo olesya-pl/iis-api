@@ -55,17 +55,23 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return entity;
         }
 
-        private void TrySetCreatedBy(Entity entity)
+        private void SetCreatedByIfExists(Entity entity)
         {
-            try
+            var propertyName = "createdBy";
+            var currentUserId = GetCurrentUser()?.Id;
+            if (currentUserId.HasValue && entity.Type.GetProperty(propertyName) != null)
             {
-                var currentUserId = GetCurrentUser()?.Id;
-                if (currentUserId.HasValue)
-                {
-                    entity.SetProperty("createdBy", currentUserId.Value.ToString("N"));
-                }
+                entity.SetProperty(propertyName, currentUserId.Value.ToString("N"));
             }
-            catch (ArgumentException) { }
+        }
+
+        private void SetLastConfirmedAtIfExists(Entity entity)
+        {
+            var propertyName = "lastConfirmedAt";
+            if (entity.Type.GetProperty(propertyName) != null && entity.GetProperty(propertyName) == null)
+            {
+                entity.SetProperty(propertyName, DateTime.UtcNow);
+            }
         }
 
         private Task<Entity> CreateRootEntity(
@@ -104,7 +110,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             node = new Entity(entityId, type);
             await CreateProperties(rootEntityId, node, properties, dotName, requestId);
-            TrySetCreatedBy(node);
+            SetCreatedByIfExists(node);
+            SetLastConfirmedAtIfExists(node);
             _ontologyService.SaveNode(node);
             await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name, Id = node.Id });
             return node;
