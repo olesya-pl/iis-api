@@ -24,6 +24,7 @@ namespace Iis.Interfaces.Ontology.Schema
         Type ClrType { get; }
         bool HasInversed { get; }
         bool IsInversed { get; }
+        bool Hidden => MetaObject.Hidden;
         void SetIsInversed();
         ISchemaMeta MetaObject { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
@@ -51,10 +52,6 @@ namespace Iis.Interfaces.Ontology.Schema
         Dictionary<string, string> GetPropertiesDict();
         INodeTypeLinked GetProperty(string relationName);
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
-        List<NodeAggregationInfo> GetAttributeDotNamesRecursiveWithLimit(
-            string path = null,
-            string parent = null,
-            int recursionLevel = 0);
         bool IsInheritedFrom(string nodeTypeName);
         bool IsObjectOfStudy { get; }
         bool IsEvent { get; }

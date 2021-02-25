@@ -1,10 +1,13 @@
 ﻿using Iis.Interfaces.Meta;
+using System;
 
 namespace Iis.OntologySchema.DataTypes
 {
     public interface ISchemaMeta
     {
+        [Obsolete]
         bool? ExposeOnApi { get; }
+        [Obsolete]
         bool? HasFewEntities { get; }
         int? SortOrder { get; }
         string Title { get; }
@@ -22,5 +25,6 @@ namespace Iis.OntologySchema.DataTypes
         string Code { get; }
         bool Editable { get; }
         public bool? IsImportantRelation { get; }
+        public bool Hidden { get; }
     }
 }

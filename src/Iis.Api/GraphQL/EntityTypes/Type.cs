@@ -57,7 +57,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLDescription("Get all type relations")]
         public IEnumerable<IEntityAttribute> GetAttributes()
         {
-            var props = Source.AllProperties.Where(p => !p.IsComputed).OrderBy(a => a.CreatedAt);
+            var props = Source.AllProperties.Where(p => !p.IsComputed && !p.Hidden).OrderBy(a => a.CreatedAt);
             return props.Select(CreateEntityAttribute);
         }
 
