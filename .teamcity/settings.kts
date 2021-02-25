@@ -215,7 +215,7 @@ object Api_DeployIisDevNomad : BuildType({
         replaceContent {
             fileRules = "+:iis-dev/%NOMAD_ENV%/%JOB_HCl%"
             pattern = "%DOCKER_IMAGE_NAME%:latest"
-            replacement = "%DOCKER_IMAGE_NAME%:%dep.Iis_Ui_BuildDocker.gitHashShort%"
+            replacement = "%DOCKER_IMAGE_NAME%:${Api_BuildDocker.depParamRefs["gitHashShort"]}"
         }
     }
 
