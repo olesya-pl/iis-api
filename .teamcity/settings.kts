@@ -278,7 +278,7 @@ object MaterialLoader_BuildDocker : BuildType({
             name = "Docker Build"
             commandType = build {
                 source = file {
-                    path = "Dockerfile"
+                    path = "Dockerfile.material-loader"
                 }
                 namesAndTags = "%DOCKER_IMAGE_NAME%:%gitHashShort%"
                 commandArgs = "--build-arg BUILD_VERSION=%env.CI_BUILD_VERSION%"
