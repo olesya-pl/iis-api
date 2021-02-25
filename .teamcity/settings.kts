@@ -1,7 +1,10 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.dockerSupport
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.replaceContent
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dockerCommand
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
@@ -39,8 +42,10 @@ object Api : Project({
     name = "API"
 
     vcsRoot(Api_IisContourUiHttps)
+    vcsRoot(Api_IisNomad)
 
     buildType(Api_BuildDocker)
+    buildType(Api_DeployIisDevNomad)
 })
 
 object Api_BuildDocker : BuildType({
@@ -135,6 +140,75 @@ object Api_BuildDocker : BuildType({
     }
 })
 
+object Api_DeployIisDevNomad : BuildType({
+    name = "Deploy(iis-dev nomad)"
+
+    enablePersonalBuilds = false
+    type = BuildTypeSettings.Type.DEPLOYMENT
+    maxRunningBuilds = 1
+
+    params {
+        param("env.NOMAD_ADDR", "http://is-dev-srv1.contour.net:4646")
+        param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
+        param("JOB_HCl", "iis_ui.hcl")
+        select("NOMAD_ENV", "dev", label = "NOMAD_ENV", description = "Nomad Environment",
+                options = listOf("dev", "dev2", "dev3", "qa", "demo"))
+    }
+
+    vcs {
+        root(Api_IisNomad)
+    }
+
+    steps {
+        script {
+            name = "Add tags"
+            scriptContent = """curl -X POST -H "Content-Type: text/plain" --data "%NOMAD_ENV%" -u "%system.teamcity.auth.userId%:%system.teamcity.auth.password%" "%teamcity.serverUrl%/httpAuth/app/rest/builds/id:%teamcity.build.id%/tags/""""
+        }
+        script {
+            name = "Nomad plan"
+            scriptContent = """
+                #!/bin/sh
+                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/%JOB_HCl%
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
+            name = "Nomad run"
+            scriptContent = """
+                #!/bin/sh
+                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/%JOB_HCl%
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+    }
+
+    triggers {
+        finishBuildTrigger {
+            buildType = "Iis_Ui_BuildDocker"
+            successfulOnly = true
+        }
+    }
+
+    features {
+        replaceContent {
+            fileRules = "+:iis-dev/%NOMAD_ENV%/%JOB_HCl%"
+            pattern = "%DOCKER_IMAGE_NAME%:latest"
+            replacement = "%DOCKER_IMAGE_NAME%:%dep.Iis_Ui_BuildDocker.gitHashShort%"
+        }
+    }
+
+    dependencies {
+        snapshot(AbsoluteId("Iis_Ui_BuildDocker")) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+})
+
 object Api_IisContourUiHttps : GitVcsRoot({
     name = "IIS/contour-ui(https)"
     url = "https://git.warfare-tec.com/IIS/contour-ui.git"
@@ -147,5 +221,15 @@ object Api_IisContourUiHttps : GitVcsRoot({
     authMethod = password {
         userName = "tc_contour"
         password = "credentialsJSON:33e32587-317c-4e6a-8230-ad7ce5143a2e"
+    }
+})
+
+object Api_IisNomad : GitVcsRoot({
+    name = "IIS/nomad"
+    url = "git@git.warfare-tec.com:IIS/nomad.git"
+    branch = "master"
+    useTagsAsBranches = true
+    authMethod = uploadedKey {
+        uploadedKey = "tc_contour"
     }
 })
