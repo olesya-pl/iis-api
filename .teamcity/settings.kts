@@ -325,7 +325,7 @@ object MaterialLoader_BuildDocker : BuildType({
 
     triggers {
         vcs {
-            triggerRules = "-:root=Iis_Core_MaterialLoader_IisContourUiHttps:.teamcity/*"
+            triggerRules = "-:root=${DslContext.settingsRoot.id}:.teamcity/*"
 
             branchFilter = """
                 +:<default>
