@@ -25,6 +25,6 @@ namespace Iis.OntologySchema.DataTypes
         string Code { get; }
         bool Editable { get; }
         public bool? IsImportantRelation { get; }
-        public bool Disabled { get; }
+        public bool Hidden { get; }
     }
 }

@@ -24,7 +24,7 @@ namespace Iis.Interfaces.Ontology.Schema
         Type ClrType { get; }
         bool HasInversed { get; }
         bool IsInversed { get; }
-        bool Disabled => MetaObject.Disabled;
+        bool Hidden => MetaObject.Hidden;
         void SetIsInversed();
         ISchemaMeta MetaObject { get; }
         IReadOnlyList<IRelationTypeLinked> IncomingRelations { get; }
