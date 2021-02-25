@@ -206,7 +206,7 @@ object Api_DeployIisDevNomad : BuildType({
 
     triggers {
         finishBuildTrigger {
-            buildType = "Iis_Ui_BuildDocker"
+            buildType = "${Api_BuildDocker.id}"
             successfulOnly = true
         }
     }
