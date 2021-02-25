@@ -66,10 +66,6 @@ object Api_BuildDocker : BuildType({
         param("env.CI_BUILD_VERSION", "%teamcity.build.branch%.%system.build.number%")
     }
 
-    vcs {
-        root(Api_IisContourUiHttps)
-    }
-
     steps {
         script {
             name = "Register variables"
