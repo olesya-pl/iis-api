@@ -81,6 +81,13 @@ object Api_BuildDocker : BuildType({
                 echo "##teamcity[setParameter name='gitHashShort' value='${'$'}{GIT_HASH_SHORT}']"
             """.trimIndent()
         }
+        dotnetTest {
+            name = "Unit tests"
+            projects = "src/Iis.UnitTests/Iis.UnitTests.csproj"
+            dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
+            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
+        }
         dockerCommand {
             name = "Docker Build"
             commandType = build {
@@ -127,13 +134,6 @@ object Api_BuildDocker : BuildType({
             commandType = push {
                 namesAndTags = "%DOCKER_IMAGE_NAME%:latest"
             }
-        }
-        dotnetTest {
-            name = "Unit tests"
-            projects = "src/Iis.UnitTests/Iis.UnitTests.csproj"
-            dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
-            dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
-            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
         }
     }
 
