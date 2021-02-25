@@ -220,7 +220,7 @@ object Api_DeployIisDevNomad : BuildType({
     }
 
     dependencies {
-        snapshot(AbsoluteId("Iis_Ui_BuildDocker")) {
+        snapshot(Api_BuildDocker) {
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
         }
