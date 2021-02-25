@@ -52,6 +52,7 @@ object Api_BuildDocker : BuildType({
     name = "Build Docker"
 
     params {
+        param("DOCKER_IMAGE_NAME", "docker.contour.net:5000/iis-core")
         param("env.CI_BUILD_VERSION", "%teamcity.build.branch%.%system.build.number%")
     }
 
