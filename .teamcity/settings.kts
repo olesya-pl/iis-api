@@ -34,6 +34,10 @@ version = "2020.2"
 
 project {
 
+    params {
+        param("teamcity.vcsTrigger.runBuildInNewEmptyBranch", "true")
+    }
+
     subProject(Api)
 }
 
