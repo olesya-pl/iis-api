@@ -257,7 +257,6 @@ object Api_IisNomad : GitVcsRoot({
 object MaterialLoader : Project({
     name = "Material-Loader"
 
-    vcsRoot(MaterialLoader_IisContourUiHttps)
     vcsRoot(MaterialLoader_IisNomad)
 
     buildType(MaterialLoader_BuildDocker)
@@ -349,7 +348,7 @@ object MaterialLoader_BuildDocker : BuildType({
 
     triggers {
         vcs {
-            triggerRules = "-:root=${MaterialLoader_IisContourUiHttps.id}:.teamcity/*"
+            triggerRules = "-:root=Iis_Core_MaterialLoader_IisContourUiHttps:.teamcity/*"
 
             branchFilter = """
                 +:<default>
@@ -434,21 +433,6 @@ object MaterialLoader_DeployIisDevNomad : BuildType({
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
         }
-    }
-})
-
-object MaterialLoader_IisContourUiHttps : GitVcsRoot({
-    name = "IIS/contour-ui(https)"
-    url = "https://git.warfare-tec.com/IIS/contour-ui.git"
-    branch = "develop"
-    branchSpec = """
-        +:refs/heads/*
-        +:refs/tags/*
-    """.trimIndent()
-    useTagsAsBranches = true
-    authMethod = password {
-        userName = "tc_contour"
-        password = "credentialsJSON:33e32587-317c-4e6a-8230-ad7ce5143a2e"
     }
 })
 
