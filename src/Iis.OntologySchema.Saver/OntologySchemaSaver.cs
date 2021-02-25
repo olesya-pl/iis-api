@@ -42,7 +42,11 @@ namespace Iis.OntologySchema.Saver
 
         private void AddNodeType(NodeTypeEntity nodeTypeEntity)
         {
-            _context.NodeTypes.Add(nodeTypeEntity);
+            var existingNodeType = _context.NodeTypes.FirstOrDefault(nt => nt.Id == nodeTypeEntity.Id);
+            if (existingNodeType == null)
+                _context.NodeTypes.Add(nodeTypeEntity);
+            else
+                _context.NodeTypes.Update(nodeTypeEntity);
             
             if (nodeTypeEntity.Kind == Kind.Entity)
                 _createdEntityTypes.Add(nodeTypeEntity);
