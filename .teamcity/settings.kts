@@ -53,6 +53,7 @@ object Api : Project({
 
     params {
         param("DOCKER_IMAGE_NAME", "docker.contour.net:5000/iis-core")
+        param("gitHashShort", "ffffffff")
     }
 })
 
