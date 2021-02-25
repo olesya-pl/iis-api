@@ -66,6 +66,10 @@ object Api_BuildDocker : BuildType({
         param("env.CI_BUILD_VERSION", "%teamcity.build.branch%.%system.build.number%")
     }
 
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
     steps {
         script {
             name = "Register variables"
