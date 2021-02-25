@@ -247,7 +247,7 @@ object MaterialLoader : Project({
     buildType(MaterialLoader_DeployIisDevNomad)
 
     params {
-        param("DOCKER_IMAGE_NAME", "docker.contour.net:5000/iis-core")
+        param("DOCKER_IMAGE_NAME", "docker.contour.net:5000/iis-material-loader")
         param("gitHashShort", "ffffffff")
     }
 })
