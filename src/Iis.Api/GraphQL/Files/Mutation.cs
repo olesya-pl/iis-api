@@ -93,7 +93,8 @@ namespace IIS.Core.GraphQL.Files
                     }),
                     LoadData = new MaterialLoadData(),
                     File = new FileDto(fileSaveResult.Id),
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow,
+                    AccessLevel = input.AccessLevel
                 };
 
                 await materialService.SaveAsync(material);
@@ -104,20 +105,29 @@ namespace IIS.Core.GraphQL.Files
 
         private static async Task<UploadResult> UploadFileAsync(IFileService fileService, string directory, UploadInput input)
         {
+            const string dataFileExtension = ".dat";
+            const string accessLevelLinePrefix = "Рівень доступу: ";
+
             var result = await fileService.IsDuplicatedAsync(input.Content);
             if (result.IsDuplicate)
                 return DuplicatedUploadResult;
             
             var byteArray = input.Content;
             var fileName = System.IO.Path.Combine(directory, input.Name);
+            var dataFileName = $"{System.IO.Path.GetFileNameWithoutExtension(input.Name)}{dataFileExtension}";
+            var fullDataName = System.IO.Path.Combine(directory, dataFileName);
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
-                fs.Write(byteArray, 0, byteArray.Length);
-                return new UploadResult
-                {
-                    Success = true
-                };
+                await fs.WriteAsync(byteArray, 0, byteArray.Length);                
             }
+            using (var sw = File.CreateText(fullDataName))
+            {
+                await sw.WriteLineAsync($"{accessLevelLinePrefix} {(int)input.AccessLevel}");                
+            }
+            return new UploadResult
+            {
+                Success = true
+            };
         }
     }
 }
