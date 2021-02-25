@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Enums;
+using Iis.DataModel;
 namespace Iis.DbLayer.Repositories
 {
     public class MaterialDocument
     {
         public const int ImageVectorDimensionsCount = 128;
-
         public Guid Id { get; set; }
         public AccessLevel AccessLevel { get; set; }
         public Guid? FileId { get; set; }
@@ -37,6 +37,7 @@ namespace Iis.DbLayer.Repositories
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
         public decimal[] ImageVector { get; set; } = new decimal[ImageVectorDimensionsCount].Select(p => -10000m).ToArray();
+        public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
     }
 
     public class MaterialSign

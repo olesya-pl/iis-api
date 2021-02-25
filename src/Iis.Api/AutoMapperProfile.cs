@@ -67,6 +67,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.AccessLevel, opts => opts.MapFrom(src => (byte)src.AccessLevel))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -204,6 +205,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.FileName, opts => opts.MapFrom(src => src.File == null ? null : src.File.Name))
+                .ForPath(dest => dest.SecurityAttributes.AccessLevel, opts => opts.MapFrom(src=> src.AccessLevel))
                 .ForMember(dest => dest.Importance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Importance)))
                 .ForMember(dest => dest.Reliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
