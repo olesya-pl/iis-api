@@ -274,13 +274,6 @@ object MaterialLoader_BuildDocker : BuildType({
                 echo "##teamcity[setParameter name='gitHashShort' value='${'$'}{GIT_HASH_SHORT}']"
             """.trimIndent()
         }
-        dotnetTest {
-            name = "Unit tests"
-            projects = "src/Iis.UnitTests/Iis.UnitTests.csproj"
-            dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
-            dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
-            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
-        }
         dockerCommand {
             name = "Docker Build"
             commandType = build {
