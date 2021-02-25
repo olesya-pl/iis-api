@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    </PropertyGroup>
+      <UserSecretsId>8e09b9ab-30e6-4677-a102-8de60c3457f2</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
@@ -22,6 +23,7 @@
       <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
       <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
       <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
+      <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj"/>
     </ItemGroup>
 
 

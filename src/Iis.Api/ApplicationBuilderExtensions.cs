@@ -26,49 +26,6 @@ namespace Iis.Api
             public string Name { get; set; }
         }
 
-        public static void UpdateMilitaryAmmountCodes(this IApplicationBuilder app)
-        {
-            try
-            {
-                using (var serviceScope = app.ApplicationServices
-                .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-                {
-                    var serviceProvider = serviceScope.ServiceProvider;
-                    var ontologyData = serviceProvider.GetRequiredService<IOntologyNodesData>();
-
-                    var amountType = ontologyData.Schema.GetEntityTypeByName("MilitaryAmount");
-                    var codeRelationType = amountType.GetRelationTypeByName("code");
-                    if (amountType == null || codeRelationType == null) return;
-                    if (!File.Exists("data/contour/entities/MilitaryAmount.json")) return;
-
-                    var text = File.ReadAllText("data/contour/entities/MilitaryAmount.json");
-                    var jsonMilitaryAmounts = JsonConvert.DeserializeObject<List<MilitaryAmountEntry>>(text);
-
-                    foreach (var militaryAmount in jsonMilitaryAmounts)
-                    {
-                        var nodes = ontologyData.GetNodesByUniqueValue(amountType.Id, militaryAmount.Name, "name");
-                        var amountNode = nodes.FirstOrDefault();
-                        if (amountNode == null) continue;
-
-                        var codeNode = amountNode.GetSingleDirectProperty("code");
-                        if (codeNode?.Value == militaryAmount.Code) continue;
-
-                        if (codeNode != null) ontologyData.RemoveNodeAndRelations(codeNode.Id);
-                        ontologyData.CreateRelationWithAttribute(amountNode.Id, codeRelationType.Id, militaryAmount.Code);
-
-                        for (int i = 1; i < nodes.Count; i++)
-                        {
-                            ontologyData.RemoveNodeAndRelations(nodes[i].Id);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
-        }
-
         public static void UpdateMartialStatus(this IApplicationBuilder app)
         {
             try
