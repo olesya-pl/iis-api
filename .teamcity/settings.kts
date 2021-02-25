@@ -62,7 +62,6 @@ object Api_BuildDocker : BuildType({
 
     params {
         param("env.CI_BUILD_VERSION", "%teamcity.build.branch%.%system.build.number%")
-        param("gitHashShort", "ffffffff")
     }
 
     vcs {
