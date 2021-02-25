@@ -50,6 +50,10 @@ object Api : Project({
 
     buildType(Api_BuildDocker)
     buildType(Api_DeployIisDevNomad)
+
+    params {
+        param("DOCKER_IMAGE_NAME", "docker.contour.net:5000/iis-core")
+    }
 })
 
 object Api_BuildDocker : BuildType({
