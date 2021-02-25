@@ -1,8 +1,10 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.replaceContent
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.DotnetTestStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dockerCommand
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetTest
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -125,6 +127,13 @@ object Api_BuildDocker : BuildType({
             commandType = push {
                 namesAndTags = "%DOCKER_IMAGE_NAME%:latest"
             }
+        }
+        dotnetTest {
+            name = "Unit tests"
+            projects = "src/Iis.UnitTests/Iis.UnitTests.csproj"
+            dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
+            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
         }
     }
 
