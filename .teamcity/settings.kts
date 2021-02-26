@@ -427,4 +427,106 @@ object MaterialLoader_IisNomad : GitVcsRoot({
 
 object Tests : Project({
     name = "Tests"
+
+    vcsRoot(Tests_IisNomad)
+
+    buildType(Tests_PrepareTestEnv)
+})
+
+object Tests_PrepareTestEnv : BuildType({
+    name = "Prepare_Test_Env"
+
+    params {
+        param("NOMAD_ENV", "dev3")
+    }
+
+    vcs {
+        root(Tests_IisNomad)
+
+        showDependenciesChanges = true
+    }
+
+    steps {
+        script {
+            name = "Nomad plan core"
+            scriptContent = """
+                #!/bin/sh
+                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_core.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
+            name = "Nomad plan ui"
+            scriptContent = """
+                #!/bin/sh
+                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_core.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
+            name = "Nomad run core"
+            scriptContent = """
+                #!/bin/sh
+                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_core.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
+            name = "Nomad run ui"
+            scriptContent = """
+                #!/bin/sh
+                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_ui.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+    }
+
+    triggers {
+        finishBuildTrigger {
+            buildType = "Iis_Ui_BuildDocker"
+            successfulOnly = true
+        }
+        finishBuildTrigger {
+            buildType = "${Api_BuildDocker.id}"
+        }
+    }
+
+    features {
+        replaceContent {
+            fileRules = "+:iis-dev/%NOMAD_ENV%/iis_core.hcl"
+            pattern = "${Api_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:latest"
+            replacement = "${Api_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:${Api_BuildDocker.depParamRefs["gitHashShort"]}"
+        }
+        replaceContent {
+            fileRules = "+:iis-dev/%NOMAD_ENV%/iis_ui.hcl"
+            pattern = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:latest"
+            replacement = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:%dep.Iis_Ui_BuildDocker.gitHashShort%"
+        }
+    }
+
+    dependencies {
+        snapshot(Api_BuildDocker) {
+        }
+        snapshot(AbsoluteId("Iis_Ui_BuildDocker")) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+})
+
+object Tests_IisNomad : GitVcsRoot({
+    name = "IIS/nomad"
+    url = "git@git.warfare-tec.com:IIS/nomad.git"
+    branch = "master"
+    authMethod = uploadedKey {
+        uploadedKey = "tc_contour"
+    }
 })
