@@ -504,13 +504,6 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
             successfulOnly = true
         }
     }
-
-    dependencies {
-        snapshot(AbsoluteId("Iis_Tests_PrepareTestEnv")) {
-            onDependencyFailure = FailureAction.CANCEL
-            onDependencyCancel = FailureAction.CANCEL
-        }
-    }
 })
 
 object Tests_PrepareTestEnv : BuildType({
