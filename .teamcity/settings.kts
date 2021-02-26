@@ -472,9 +472,6 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
         }
-        snapshot(AbsoluteId("Iis_Tests_IisAcceptanceTestsSmoke")) {
-            onDependencyFailure = FailureAction.IGNORE
-        }
     }
 })
 
