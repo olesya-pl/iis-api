@@ -520,6 +520,7 @@ object Tests_PrepareTestEnv : BuildType({
     params {
         param("NOMAD_ENV", "dev3")
         param("env.NOMAD_ADDR", "http://is-dev-srv1.contour.net:4646")
+        param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
     }
 
     vcs {
