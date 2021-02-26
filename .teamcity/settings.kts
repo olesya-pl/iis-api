@@ -500,7 +500,7 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
 
     triggers {
         finishBuildTrigger {
-            buildType = "Iis_Tests_PrepareTestEnv"
+            buildType = "${Tests_PrepareTestEnv.id}"
             successfulOnly = true
         }
     }
