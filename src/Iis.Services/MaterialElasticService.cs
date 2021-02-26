@@ -12,6 +12,7 @@ using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
+using Iis.Elastic;
 
 namespace Iis.Services
 {
@@ -65,7 +66,7 @@ namespace Iis.Services
                 query = query.SetupSorting(sortColumn, sortOrder);
             }
 
-            var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct); 
+            var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
             var searchResult = elasticResult.ToSearchResult();
 
@@ -77,7 +78,22 @@ namespace Iis.Services
                  .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
             }
 
+            if (ItemsCountPossiblyExceedsMaxThreshold(searchResult))
+            {
+                var countQuery = new ExactQueryBuilder()
+                    .WithQueryString(queryString)
+                    .BuildCountQuery()
+                    .ToString();
+                searchResult.Count = await _elasticManager.CountAsync(countQuery, _elasticState.MaterialIndexes, ct);
+
+            }
+
             return searchResult;
+        }
+
+        private static bool ItemsCountPossiblyExceedsMaxThreshold(SearchResult searchResult)
+        {
+            return searchResult.Count == ElasticConstants.MaxItemsCount;
         }
 
         public async Task<SearchResult> BeginSearchByScrollAsync(SearchParams searchParams, TimeSpan scrollDuration = default, CancellationToken ct = default)
