@@ -25,6 +25,18 @@ namespace Iis.Elastic.SearchQueryExtensions
 
             jsonQuery["query"] = new JObject();
 
+            return BuildExactQuery(jsonQuery);
+        }
+        
+
+        public JObject BuildCountQuery()
+        {
+            var json = new JObject(new JProperty("query", new JObject()));
+            return BuildExactQuery(json);
+        }
+
+        private JObject BuildExactQuery(JObject jsonQuery)
+        {
             var queryStringProperty = new JObject(new JProperty("query", Query));
             if (IsLenient.HasValue) queryStringProperty.Add("lenient", IsLenient.Value);
             var queryString = new JObject(
@@ -32,6 +44,6 @@ namespace Iis.Elastic.SearchQueryExtensions
             );
             jsonQuery["query"] = queryString;
             return jsonQuery;
-        } 
+        }
     }
 }

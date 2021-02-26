@@ -8,6 +8,5 @@ namespace Iis.Interfaces.Elastic
         public const string CreatedAtField = "CreatedAt";
         public const string UpdatedAtField = "UpdatedAt";
         public const string NodeTypeTitleAlias = "Тип_ОР";
-
     }
 }
