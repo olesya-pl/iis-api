@@ -281,6 +281,7 @@ namespace Iis.OntologySchema.DataTypes
         }
         public bool HasInversed => MetaObject.Inversed != null;
         public bool IsInversed { get; private set; }
+        public bool Hidden => MetaObject.Hidden ?? false;
 
         public void SetIsInversed()
         {

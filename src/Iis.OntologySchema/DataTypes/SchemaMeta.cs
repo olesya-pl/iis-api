@@ -27,7 +27,7 @@ namespace Iis.OntologySchema.DataTypes
         public bool? IsAggregated { get; set; }
         public bool? IsImportantRelation { get; set; }
         public string Code { get; set; }
-        public bool Hidden { get; set; }
+        public bool? Hidden { get; set; }
         public bool Editable { get; set; }
 
         public SchemaMeta() { }
@@ -102,9 +102,9 @@ namespace Iis.OntologySchema.DataTypes
             {
                 Validation = ((JObject)jObj["Validation"]).ToObject<SchemaValidation>();
             }
-            if (KeyExists(jObj, "Disabled"))
+            if (KeyExists(jObj, "Hidden"))
             {
-                Hidden = bool.Parse(jObj["Disabled"].ToString());
+                Hidden = bool.Parse(jObj["Hidden"].ToString());
             }
         }
         private bool KeyExists(JObject jObj, string key) => 
