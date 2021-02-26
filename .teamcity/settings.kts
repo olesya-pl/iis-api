@@ -429,8 +429,49 @@ object Tests : Project({
     name = "Tests"
 
     vcsRoot(Tests_IisNomad)
+    vcsRoot(Tests_IisIisApiNet)
 
+    buildType(Tests_IisAcceptanceTestsSmoke)
     buildType(Tests_PrepareTestEnv)
+})
+
+object Tests_IisAcceptanceTestsSmoke : BuildType({
+    name = "IIS Acceptance Tests(Smoke)"
+
+    params {
+        param("test_filter", "smoke")
+    }
+
+    vcs {
+        root(Tests_IisIisApiNet)
+    }
+
+    steps {
+        dotnetTest {
+            name = "Run tests"
+            projects = "src/Iis.AcceptanceTests/Iis.AcceptanceTests.csproj"
+            filter = "%test_filter%"
+            logging = DotnetTestStep.Verbosity.Detailed
+            dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
+            dockerRunParameters = "-e TargetEnvironment=Dev3"
+            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
+        }
+    }
+
+    triggers {
+        finishBuildTrigger {
+            buildType = "Iis_Tests_PrepareTestEnv"
+            successfulOnly = true
+        }
+    }
+
+    dependencies {
+        snapshot(AbsoluteId("Iis_Tests_PrepareTestEnv")) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
 })
 
 object Tests_PrepareTestEnv : BuildType({
@@ -519,6 +560,15 @@ object Tests_PrepareTestEnv : BuildType({
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
         }
+    }
+})
+
+object Tests_IisIisApiNet : GitVcsRoot({
+    name = "IIS/iis-api.net"
+    url = "git@git.warfare-tec.com:IIS/iis-api.net.git"
+    branch = "develop"
+    authMethod = uploadedKey {
+        uploadedKey = "tc_contour"
     }
 })
 
