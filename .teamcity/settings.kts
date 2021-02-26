@@ -41,6 +41,7 @@ project {
     }
 
     subProject(Api)
+    subProject(Tests)
     subProject(MaterialLoader)
 }
 
@@ -421,4 +422,9 @@ object MaterialLoader_IisNomad : GitVcsRoot({
     authMethod = uploadedKey {
         uploadedKey = "tc_contour"
     }
+})
+
+
+object Tests : Project({
+    name = "Tests"
 })
