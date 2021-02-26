@@ -56,7 +56,7 @@ namespace Iis.Services
             var query = new ExactQueryBuilder()
                 .WithPagination(from, size)
                 .WithQueryString(queryString)
-                .Build()
+                .BuildSearchQuery()
                 .WithAggregation(_aggregationsFieldList)
                 .WithHighlights();
 
@@ -107,7 +107,7 @@ namespace Iis.Services
             var query = new ExactQueryBuilder()
                 .WithPagination(from, size)
                 .WithQueryString(queryString)
-                .Build();
+                .BuildSearchQuery();
 
             var elasticResult = await _elasticManager.BeginSearchByScrollAsync(query.ToString(), scrollDuration, _elasticState.MaterialIndexes, ct);
 
@@ -137,7 +137,7 @@ namespace Iis.Services
             }
 
             var queryObj = queryBuilder
-                            .Build()
+                            .BuildSearchQuery()
                             .WithHighlights();
 
             if (searchParams.Sorting != null)
@@ -173,7 +173,7 @@ namespace Iis.Services
             var queryData = new MoreLikeThisQueryBuilder()
                         .WithPagination(from, size)
                         .WithMaterialId(searchParams.Suggestion)
-                        .Build()
+                        .BuildSearchQuery()
                         .SetupSorting(sortColumn, sortOrder)
                         .ToString(Formatting.None);
 
@@ -188,7 +188,7 @@ namespace Iis.Services
 
             var query = new SearchByImageQueryBuilder(imageVector)
                 .WithPagination(from, size)
-                .Build()
+                .BuildSearchQuery()
                 .WithAggregation(_aggregationsFieldList);
 
             var searchResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);

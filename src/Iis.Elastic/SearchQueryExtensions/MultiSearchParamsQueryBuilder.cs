@@ -22,19 +22,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             return this;
         }
 
-        public override JObject Build()
-        {
-            var json = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
-            return CreateMultiParamsQuery(json);
-        }
-
-        public JObject BuildCountQuery()
-        {
-            var json = new JObject(new JProperty("query", new JObject()));
-            return CreateMultiParamsQuery(json);
-        }
-
-        private JObject CreateMultiParamsQuery(JObject json)
+        protected override JObject CreateQuery(JObject json)
         {
             json["query"]["bool"] = new JObject();
             var shouldSections = new JArray();

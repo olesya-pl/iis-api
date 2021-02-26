@@ -38,20 +38,14 @@ namespace Iis.Elastic.SearchQueryExtensions
             return this;
         }
 
-        public override JObject Build()
+        protected override JObject CreateQuery(JObject jsonQuery)
         {
-            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
-
             var boolClause = new JObject();
-
             var occurQueries = new JArray();
-
             boolClause[_occur] = occurQueries;
-
             var documentListQuery = GetDocumentListQuery(_documentList);
-
-            if(documentListQuery != null)
-            {
+            
+            if(documentListQuery != null) { 
                 occurQueries.Add(documentListQuery);
             }
 
@@ -62,11 +56,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 occurQueries.Add(exactQuery);
             }
 
-
-            jsonQuery["query"] = new JObject(
-                new JProperty("bool", boolClause)
-            );
-
+            jsonQuery["query"]["bool"] = boolClause;
             return jsonQuery;
         }
 

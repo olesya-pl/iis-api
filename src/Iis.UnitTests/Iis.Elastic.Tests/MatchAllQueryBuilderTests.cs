@@ -18,7 +18,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var actual = new MatchAllQueryBuilder()
                         .WithPagination(10, 10)
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
