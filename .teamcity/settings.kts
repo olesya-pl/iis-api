@@ -468,6 +468,10 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
     }
 
     dependencies {
+        snapshot(Tests_PrepareTestEnv) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
         snapshot(AbsoluteId("Iis_Tests_IisAcceptanceTestsSmoke")) {
             onDependencyFailure = FailureAction.IGNORE
         }
