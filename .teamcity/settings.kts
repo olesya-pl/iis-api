@@ -463,7 +463,7 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
 
     triggers {
         finishBuildTrigger {
-            buildType = "Iis_Tests_IisAcceptanceTestsSmoke"
+            buildType = "${Tests_IisAcceptanceTestsSmoke.id}"
         }
     }
 
