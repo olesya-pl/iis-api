@@ -19,23 +19,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             return this;
         }
 
-        public override JObject Build()
-        {
-            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
-
-            jsonQuery["query"] = new JObject();
-
-            return BuildExactQuery(jsonQuery);
-        }
-        
-
-        public JObject BuildCountQuery()
-        {
-            var json = new JObject(new JProperty("query", new JObject()));
-            return BuildExactQuery(json);
-        }
-
-        private JObject BuildExactQuery(JObject jsonQuery)
+        protected override JObject CreateQuery(JObject jsonQuery)
         {
             var queryStringProperty = new JObject(new JProperty("query", Query));
             if (IsLenient.HasValue) queryStringProperty.Add("lenient", IsLenient.Value);

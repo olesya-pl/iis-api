@@ -18,7 +18,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var actual = new MoreLikeThisQueryBuilder()
                         .WithPagination(10, 10)
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -33,7 +33,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new MoreLikeThisQueryBuilder()
                         .WithResultFields(resultFieldList.ToList().AsReadOnly())
                         .WithPagination(from, size)
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -65,7 +65,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new MoreLikeThisQueryBuilder()
                         .WithPagination(0, 50)
                         .WithMaterialId("f4eed773e59d49aba10f01c7fc4ca47f")
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -78,7 +78,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new MoreLikeThisQueryBuilder()
                         .WithPagination(0, 50)
                         .WithMaterialId(string.Empty)
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }

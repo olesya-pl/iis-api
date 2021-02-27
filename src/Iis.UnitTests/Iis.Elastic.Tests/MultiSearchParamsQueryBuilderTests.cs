@@ -35,7 +35,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 .WithPagination(0, 50)
                 .WithLeniency(true)
                 .WithResultFields(new[] { "*" })
-                .Build();
+                .BuildSearchQuery();
 
             var expected = JObject.Parse(@"{
   ""_source"": [
@@ -147,7 +147,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 .WithPagination(0, 50)
                 .WithLeniency(true)
                 .WithResultFields(new[] { "*" })
-                .Build()
+                .BuildSearchQuery()
                 .WithHighlights()
                 .WithAggregation(new[] { 
                     new AggregationField("affiliation.name", "Приналежність", "affiliation.nameAggregate"),

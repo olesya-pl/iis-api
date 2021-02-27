@@ -21,6 +21,20 @@ namespace Iis.Elastic.SearchQueryExtensions
             _resultFields = resultFields;
             return this as T;
         }
-        public abstract JObject Build();
+        
+        public JObject BuildSearchQuery() {
+            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
+            jsonQuery["query"] = new JObject();
+
+            return CreateQuery(jsonQuery);
+        }
+
+        public JObject BuildCountQuery() 
+        {
+            var json = new JObject(new JProperty("query", new JObject()));
+            return CreateQuery(json);
+        }
+        
+        protected abstract JObject CreateQuery(JObject json);
     }
 }

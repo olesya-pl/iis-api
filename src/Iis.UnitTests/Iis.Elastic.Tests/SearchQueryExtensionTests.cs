@@ -74,7 +74,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
                 .WithLeniency(lenient)
-                .Build();
+                .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -86,7 +86,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
-                .Build();
+                .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -99,7 +99,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
                 .WithPagination(offset, size)
-                .Build();
+                .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -113,7 +113,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 .WithQueryString(query)
                 .WithPagination(offset, size)
                 .WithResultFields(new[] { resultField })
-                .Build();
+                .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }

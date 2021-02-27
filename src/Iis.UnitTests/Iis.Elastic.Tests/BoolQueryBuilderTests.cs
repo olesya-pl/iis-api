@@ -17,7 +17,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var actual = new BoolQueryBuilder()
                         .WithPagination(10, 10)
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -30,7 +30,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new BoolQueryBuilder()
                         .WithPagination(10, 10)
                         .WithShould()
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -43,7 +43,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new BoolQueryBuilder()
                         .WithPagination(10, 10)
                         .WithMust()
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -56,7 +56,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new BoolQueryBuilder()
                         .WithPagination(10, 10)
                         .WithDocumentList(new Guid[]{Guid.Parse("6f5f83e4093f407fa843f235f62a93c8")})
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -69,7 +69,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new BoolQueryBuilder()
                         .WithPagination(10, 10)
                         .WithDocumentList(new Guid[]{Guid.Parse("6f5f83e4093f407fa843f235f62a93c8"), Guid.Parse("0208a7dc4e46477997ed9b50ec24ad88")})
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -82,7 +82,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new BoolQueryBuilder()
                         .WithPagination(10, 10)
                         .WithExactQuery("Source:iis.api")
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -96,7 +96,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                         .WithPagination(10, 10)
                         .WithDocumentList(new Guid[]{Guid.Parse("6f5f83e4093f407fa843f235f62a93c8")})
                         .WithExactQuery("Source:iis.api")
-                        .Build();
+                        .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }

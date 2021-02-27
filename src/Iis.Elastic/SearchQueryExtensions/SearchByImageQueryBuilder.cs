@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
@@ -14,9 +11,8 @@ namespace Iis.Elastic.SearchQueryExtensions
             _imageVector = imageVector;
         }
         
-        public override JObject Build()
+        protected override JObject CreateQuery(JObject jsonQuery)
         {
-            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
             jsonQuery["min_score"] = 0.1;
             jsonQuery["query"] = JObject.FromObject(new
             {

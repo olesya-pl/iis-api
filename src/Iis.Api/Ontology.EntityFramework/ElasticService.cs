@@ -103,7 +103,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
                 var queryObj = new MatchAllQueryBuilder()
                             .WithPagination(filter.Offset, filter.Limit)
-                            .Build()
+                            .BuildSearchQuery()
                             .WithHighlights();
 
                 queryObj = queryObj.WithAggregation(aggregadionFieldList);
@@ -126,7 +126,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .WithLeniency(multiSearchParams.IsLenient)
                 .WithPagination(multiSearchParams.From, multiSearchParams.Size)
                 .WithResultFields(multiSearchParams.ResultFields)
-                .Build()
+                .BuildSearchQuery()
                 .WithHighlights()
                 .WithAggregation(aggregationFieldList)
                 .ToString();
@@ -162,7 +162,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .WithPagination(multiSearchParams.From, multiSearchParams.Size)
                 .WithLeniency(multiSearchParams.IsLenient)
                 .WithResultFields(multiSearchParams.ResultFields)
-                .Build()
+                .BuildSearchQuery()
                 .ToString();
 
             var searchResult = await _elasticManager.SearchAsync(query, typeNames, ct);
@@ -204,7 +204,7 @@ namespace IIS.Core.Ontology.EntityFramework
                         .WithPagination(0, filter.Limit)
                         .WithQueryString(filter.Suggestion)
                         .WithLeniency(true)
-                        .Build();
+                        .BuildSearchQuery();
 
                     searchByHistoryResult = await _elasticManager.SearchAsync(exactQuery.ToString(), historicalIndexes, ct);
                 }
@@ -350,7 +350,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var queryData = new ExactQueryBuilder()
                 .WithPagination(filter.Offset, filter.Limit)
                 .WithQueryString(filter.Suggestion)
-                .Build()
+                .BuildSearchQuery()
                 .SetupSorting("CreatedAt", "asc")
                 .ToString(Formatting.None);
 

@@ -10,12 +10,8 @@ namespace Iis.Elastic.SearchQueryExtensions
             guid = materialId;
             return this;
         }
-        public override JObject Build()
+        protected override JObject CreateQuery(JObject jsonQuery)
         {
-            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
-
-            jsonQuery["query"] = new JObject();
-
             if(string.IsNullOrWhiteSpace(guid)) return jsonQuery;
 
             var parentNull = new JObject
