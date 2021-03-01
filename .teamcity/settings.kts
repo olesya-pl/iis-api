@@ -40,6 +40,7 @@ project {
         param("teamcity.vcsTrigger.runBuildInNewEmptyBranch", "true")
     }
 
+    subProject(OntologyManager)
     subProject(Api)
     subProject(Tests)
     subProject(MaterialLoader)
@@ -422,6 +423,11 @@ object MaterialLoader_IisNomad : GitVcsRoot({
     authMethod = uploadedKey {
         uploadedKey = "tc_contour"
     }
+})
+
+
+object OntologyManager : Project({
+    name = "OntologyManager"
 })
 
 
