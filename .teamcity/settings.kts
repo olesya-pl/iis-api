@@ -436,6 +436,8 @@ object OntologyManager : Project({
 object OntologyManager_BuildOntologyManager : BuildType({
     name = "Build OntologyManager"
 
+    artifactRules = "+:src/Iis.OntologyManager/publish => OntologyManager"
+
     vcs {
         root(DslContext.settingsRoot)
     }
