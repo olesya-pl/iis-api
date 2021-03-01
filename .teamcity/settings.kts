@@ -434,6 +434,10 @@ object OntologyManager : Project({
 
 object OntologyManager_BuildOntologyManager : BuildType({
     name = "Build OntologyManager"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
 })
 
 
