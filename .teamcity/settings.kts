@@ -428,6 +428,12 @@ object MaterialLoader_IisNomad : GitVcsRoot({
 
 object OntologyManager : Project({
     name = "OntologyManager"
+
+    buildType(OntologyManager_BuildOntologyManager)
+})
+
+object OntologyManager_BuildOntologyManager : BuildType({
+    name = "Build OntologyManager"
 })
 
 
