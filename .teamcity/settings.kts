@@ -450,6 +450,10 @@ object OntologyManager_BuildOntologyManager : BuildType({
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
         }
     }
+
+    requirements {
+        contains("env.OS", "Windows_NT")
+    }
 })
 
 
