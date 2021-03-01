@@ -108,6 +108,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
         public string Format => MetaObject?.Format;
         [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.TargetType.IsObjectOfStudy;
+        [GraphQLNonNullType] public bool IsLinkToSeparateObject => Source.TargetType.IsSeparateObject;
 
         [GraphQLType(typeof(AnyType))]
         public FormField FormField => _mapper.Map<FormField>(MetaObject?.FormField);
