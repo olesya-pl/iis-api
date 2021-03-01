@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Iis.Interfaces.Enums
 {
-    public enum AccessLevel
+    public enum AccessLevel: byte
     { 
         [Description("НВ - Не визначено")]
         Undefined = 0,

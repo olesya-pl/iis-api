@@ -124,6 +124,8 @@ namespace Iis.Api.Controllers
 
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty>
             {
+                ByteProperty.Create("SecurityAttributes.AccessLevel"),
+                ByteProperty.Create("AccessLevel"),
                 TextProperty.Create("Content", ElasticConfiguration.DefaultTermVector),
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
                 DateProperty.Create("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),

@@ -11,10 +11,23 @@ namespace Iis.Elastic.ElasticMappingProperties
 
         public static ElasticMappingProperty Create(string name, List<ElasticMappingProperty> properties)
         {
-            return new NestedProperty {
+            return new NestedProperty
+            {
                 Name = name,
                 Properties = properties
             };
+        }
+
+        public static ElasticMappingProperty Create(string propertyName, ElasticMappingProperty nestedProperty)
+        {
+            var result = new NestedProperty { Name = propertyName };
+
+            if(nestedProperty != null)
+            {
+                result.Properties.Add(nestedProperty);
+            }
+
+            return result;
         }
 
         protected override void PopulatePropertyIntoJObject(JObject result)
@@ -28,6 +41,6 @@ namespace Iis.Elastic.ElasticMappingProperties
                 }
                 result["properties"] = jProperties;
             }
-        }        
+        }
     }
 }

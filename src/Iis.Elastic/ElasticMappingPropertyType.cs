@@ -11,6 +11,7 @@ namespace Iis.Elastic
         DenseVector,
         DateRange,
         IntegerRange,
-        FloatRange
+        FloatRange,
+        Byte
     }
 }
