@@ -112,8 +112,8 @@ namespace Iis.Services
         {
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
                 KeywordProperty.Create(nameof(ReportEntity.Id), false),
-                TextProperty.Create(nameof(ReportEntity.Recipient), null, true),
-                TextProperty.Create(nameof(ReportEntity.Title), null, true),
+                TextProperty.Create(nameof(ReportEntity.Recipient), true),
+                TextProperty.Create(nameof(ReportEntity.Title), true),
                 DateProperty.Create(nameof(ReportEntity.CreatedAt), ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ReportEventIds", true)
             });

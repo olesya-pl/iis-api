@@ -1,7 +1,9 @@
-﻿using Iis.Utility;
+﻿using System;
+using System.Linq;
+using Iis.Utility;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-
+using Iis.Elastic.ElasticMappingProperties;
 namespace Iis.Elastic
 {
     public abstract class ElasticMappingProperty
@@ -24,7 +26,16 @@ namespace Iis.Elastic
         }
 
         public override string ToString() => Name;
+
+        protected static ElasticMappingProperty CreateWithNestedProperty(string propertyName, Func<string, ElasticMappingProperty> newPropertyFunc, Func<string, ElasticMappingProperty> nestedPropertyFunc)
+        {
+            var propertyNameList = propertyName.Split(PropertyNameSeparator, StringSplitOptions.RemoveEmptyEntries);
+
+            if(propertyNameList.Length == 1) return newPropertyFunc(propertyNameList.First());
+
+            var newPropertyName = string.Join(PropertyNameSeparator, propertyNameList.Skip(1));
+
+            return NestedProperty.Create(propertyNameList.First(), nestedPropertyFunc(newPropertyName));
+        }
     }
-
-
 }

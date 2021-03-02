@@ -1,53 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-
+﻿using Newtonsoft.Json.Linq;
+using Iis.Utility;
+using Iis.Elastic.Dictionaries;
 namespace Iis.Elastic.ElasticMappingProperties
 {
     public class TextProperty : ElasticMappingProperty
     {
+        private const string TermVectorPropName = "term_vector";
+        private const string IgnoreAbovePropName = "ignore_above";
         private const int IgnoreAbove = 256;
+        private TextTermVectorsEnum _termVector;
+        private bool _useNestedKeyword;
+
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Text;
-
-        public string TermVector { get; private set; }
-
-        public bool UseNestedKeyword { get; private set; }
-
         private TextProperty() { }
 
-        public static ElasticMappingProperty Create(string dotName, string termVector, bool useNestedKeyword = false)
+        public static ElasticMappingProperty Create(string propertyName, TextTermVectorsEnum termVector, bool useNestedKeyword = false)
         {
-            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Length > 1)
-            {
-                return NestedProperty.Create(splitted[0], new List<ElasticMappingProperty>
-                {
-                    Create(string.Join('.', splitted.Skip(1)), termVector, useNestedKeyword)
-                });
-            }
+            return CreateWithNestedProperty(
+                propertyName,
+                (propName) => new TextProperty{ Name = propName, _termVector = termVector, _useNestedKeyword = useNestedKeyword},
+                (propName) => Create(propName, termVector, useNestedKeyword)
+            );
+        }
 
-            return new TextProperty
-            {
-                Name = splitted[0],
-                TermVector = termVector,
-                UseNestedKeyword = useNestedKeyword
-            };
+        public static ElasticMappingProperty Create(string propertyName, bool useNestedKeyword = false)
+        {
+            return Create(propertyName, TextTermVectorsEnum.No, useNestedKeyword);
         }
 
         protected override void PopulatePropertyIntoJObject(JObject result)
         {
-            if (!string.IsNullOrWhiteSpace(TermVector))
+            if (_termVector != TextTermVectorsEnum.No)
             {
-                result["term_vector"] = TermVector;
+                result[TermVectorPropName] = _termVector.ToString().ToUnderscore();
             }
 
-            if(UseNestedKeyword)
+            if(_useNestedKeyword)
             {
                 var field = new JObject(
                     new JProperty("keyword", new JObject(
                         new JProperty("type","keyword"),
-                        new JProperty("ignore_above", IgnoreAbove)
+                        new JProperty(IgnoreAbovePropName, IgnoreAbove)
                     ))
                 );
                 result.Add("fields", field);

@@ -7,6 +7,7 @@ namespace Iis.Elastic.ElasticMappingProperties
 {
     public abstract class DateTimeProperty : ElasticMappingProperty
     {
+        protected const string FormatPropertyName = "format";
         protected List<string> Formats = new List<string>();
 
         protected DateTimeProperty() { }
@@ -15,7 +16,7 @@ namespace Iis.Elastic.ElasticMappingProperties
         {
             if (Formats.Any())
             {
-                result["format"] = string.Join("||", Formats);
+                result[FormatPropertyName] = string.Join("||", Formats);
             }
         }
     }
@@ -23,55 +24,44 @@ namespace Iis.Elastic.ElasticMappingProperties
     public class DateProperty : DateTimeProperty
     {
         private DateProperty() { }
-        
+
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Date;
 
-        public static ElasticMappingProperty Create(string dotName, IEnumerable<string> formats)
+        public static ElasticMappingProperty Create(string propertyName, IReadOnlyCollection<string> formats = null)
         {
-            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Length > 1)
-            {
-                return NestedProperty.Create(splitted[0], new List<ElasticMappingProperty>
-                    {
-                        Create(string.Join('.', splitted.Skip(1)), formats)
-                    });
-            }
-            var res = new DateProperty()
-            {
-                Name = splitted[0]
+            Func<string, ElasticMappingProperty> newPropFunc = (propName) => {
+                var property = new DateProperty{ Name = propName};
+                if(formats != null && formats.Any()) property.Formats.AddRange(formats);
+                return property;
             };
-            if (formats != null && formats.Any())
-            {
-                res.Formats.AddRange(formats);
-            }
-            return res;
+
+            return CreateWithNestedProperty(
+                propertyName,
+                newPropFunc,
+                (propName) => Create(propName, formats)
+            );
         }
     }
 
     public class DateRangeProperty : DateTimeProperty
     {
         private DateRangeProperty() { }
+
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.DateRange;
 
-        public static ElasticMappingProperty Create(string dotName, IEnumerable<string> formats)
+        public static ElasticMappingProperty Create(string propertyName, IReadOnlyCollection<string> formats = null)
         {
-            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Length > 1)
-            {
-                return NestedProperty.Create(splitted[0], new List<ElasticMappingProperty>
-                    {
-                        Create(string.Join('.', splitted.Skip(1)), formats)
-                    });
-            }
-            var res = new DateRangeProperty()
-            {
-                Name = splitted[0]
+            Func<string, ElasticMappingProperty> newPropFunc = (propName) => {
+                var property = new DateRangeProperty { Name = propName };
+                if (formats != null && formats.Any()) property.Formats.AddRange(formats);
+                return property;
             };
-            if (formats != null && formats.Any())
-            {
-                res.Formats.AddRange(formats);
-            }
-            return res;
+
+            return CreateWithNestedProperty(
+                propertyName,
+                newPropFunc,
+                (propName) => Create(propName, formats)
+            );
         }
     }
 }

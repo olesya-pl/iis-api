@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AutoFixture.Xunit2;
+using FluentAssertions;
+using FluentAssertions.Json;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests
@@ -65,7 +68,14 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             Assert.Single(prop);
             Assert.Equal(ElasticMappingPropertyType.Keyword, prop.First().Type);
             Assert.Equal(namePart1, prop.First().Name);
-            Assert.False(((KeywordProperty)prop.First()).SupportsNullValue);
+
+            var actual = prop.First().ToJObject();
+            var expected = JObject.Parse(
+                @"{
+                    'type':'keyword'
+                }"
+            );
+            actual.Should().BeEquivalentTo(expected);
         }
     }
 }
