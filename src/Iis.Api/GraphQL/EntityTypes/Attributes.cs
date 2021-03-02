@@ -58,6 +58,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType] bool Editable { get; }
         [GraphQLNonNullType] bool IsComputed { get; }
         [GraphQLNonNullType] bool IsLinkToObjectOfStudy { get; }
+        [GraphQLNonNullType] bool IsLinkToSeparateObject { get; }
 
         bool Multiple { get; }
         string Format { get; }

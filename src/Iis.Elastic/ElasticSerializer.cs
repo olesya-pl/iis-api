@@ -31,7 +31,7 @@ namespace Iis.Elastic
                 }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
-            } else if(extNode.NodeType.IsObjectOfStudy)
+            } else if(extNode.NodeType.IsObject)
             {
                 json[nameof(extNode.Id)] = extNode.Id;
             }

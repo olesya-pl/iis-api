@@ -53,6 +53,7 @@ namespace Iis.Interfaces.Ontology.Schema
         INodeTypeLinked GetProperty(string relationName);
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
         bool IsInheritedFrom(string nodeTypeName);
+        bool IsObject { get; }
         bool IsObjectOfStudy { get; }
         bool IsEvent { get; }
         bool IsObjectSign { get; }

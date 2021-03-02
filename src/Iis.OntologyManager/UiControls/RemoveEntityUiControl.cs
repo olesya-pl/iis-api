@@ -177,7 +177,7 @@ namespace Iis.OntologyManager.UiControls
 
         private bool CouldBeDeleted(INode node)
         {
-            return !node.IsArchived && (node.NodeType.IsEvent || node.NodeType.IsObjectOfStudy);
+            return !node.IsArchived && (node.NodeType.IsEvent || node.NodeType.IsObject);
         }
 
         private string GetNodeTitle(INode node)

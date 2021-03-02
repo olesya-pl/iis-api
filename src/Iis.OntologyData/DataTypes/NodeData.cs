@@ -263,7 +263,7 @@ namespace Iis.OntologyData.DataTypes
             var node = NodeType.Kind == Kind.Relation ? this.Relation.TargetNode : this;
             var sb = new StringBuilder();
 
-            while (!node.NodeType.IsObjectOfStudy)
+            while (!node.NodeType.IsObject)
             {
                 if (sb.Length > 0) sb.Insert(0, ".");
                 sb.Insert(0, node.IncomingRelations.First().Node.NodeType.Name);

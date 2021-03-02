@@ -141,7 +141,7 @@ namespace Iis.Domain
             {
                 result.Add((this as Attribute, null));
             }
-            foreach (var relation in Nodes.Where(n => !n.Type.IsObjectOfStudy))
+            foreach (var relation in Nodes.Where(n => !n.Type.IsObject))
             {
                 var children = relation.GetChildAttributesExcludingNestedObjects();
                 foreach (var child in children)

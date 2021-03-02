@@ -42,7 +42,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             List<Guid> visitedNodeIds,
             CancellationToken cancellationToken = default)
         {
-            if (node.NodeType.IsObjectOfStudy)
+            if (node.NodeType.IsObject)
             {
                 visitedNodeIds.Add(node.Id);
             }
@@ -61,7 +61,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             List<Guid> visitedNodeIds,
             CancellationToken cancellationToken = default)
         {
-            if (node.NodeType.IsObjectOfStudy)
+            if (node.NodeType.IsObject)
             {
                 visitedNodeIds.Add(node.Id);
             }
@@ -79,7 +79,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             List<Guid> visitedNodeIds,
             IReadOnlyCollection<string> filterRelationList = null)
         {
-            if (node.NodeType.IsObjectOfStudy)
+            if (node.NodeType.IsObject)
             {
                 visitedNodeIds.Add(node.Id);
             }
@@ -128,7 +128,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             string nodeTypeTitle,
             List<Guid> visitedNodeIds)
         {
-            if (node.NodeType.IsObjectOfStudy)
+            if (node.NodeType.IsObject)
             {
                 visitedNodeIds.Add(node.Id);
             }
@@ -267,7 +267,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 {
                     IReadOnlyCollection<string> relationFitler = null;
 
-                    if(node.NodeType.IsObjectOfStudy)
+                    if(node.NodeType.IsObject)
                     {
                         relationFitler = _filterNodeTypeNames;
                     }

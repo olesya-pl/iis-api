@@ -109,7 +109,7 @@ namespace Iis.OntologyManager.UiControls
         {
             var nodes = _data.GetEntitiesByTypeName(null);
             var notitleNodes = nodes
-                .Where(n => n.NodeType.IsObjectOfStudy &&
+                .Where(n => n.NodeType.IsObject &&
                     string.IsNullOrWhiteSpace(n.GetComputedValue("__title")))
                 .ToList();
         }
