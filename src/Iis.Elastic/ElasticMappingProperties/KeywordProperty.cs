@@ -1,41 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.ElasticMappingProperties
 {
     public class KeywordProperty : ElasticMappingProperty
     {
+        private const string NullValuePropertyName = "null_value";
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Keyword;
 
-        public bool SupportsNullValue { get; private set; }
+        private bool _supportsNullValue;
 
         private KeywordProperty() { }
 
-        public static ElasticMappingProperty Create(string dotName, bool supportsNullValue)
+        public static ElasticMappingProperty Create(string propertyName, bool supportsNullValue)
         {
-            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Length > 1)
-            {
-                return NestedProperty.Create(splitted[0], new List<ElasticMappingProperty>
-                    {
-                        Create(string.Join('.', splitted.Skip(1)), supportsNullValue)
-                    });
-            }
-            var res = new KeywordProperty
-            {
-                Name = splitted[0],
-                SupportsNullValue = supportsNullValue
-            };
-            return res;
+            return CreateWithNestedProperty(
+                propertyName,
+                (propName) => new KeywordProperty{ Name = propName, _supportsNullValue = supportsNullValue},
+                (propName) => Create(propName, supportsNullValue)
+            );
         }
 
         protected override void PopulatePropertyIntoJObject(JObject result)
         {
-            if (SupportsNullValue)
+            if (_supportsNullValue)
             {
-                result["null_value"] = ElasticManager.NullValue;
+                result[NullValuePropertyName] = ElasticManager.NullValue;
             }
         }
     }

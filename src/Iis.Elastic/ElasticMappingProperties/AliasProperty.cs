@@ -4,12 +4,13 @@ namespace Iis.Elastic.ElasticMappingProperties
 {
     public class AliasProperty : ElasticMappingProperty
     {
+        private const string PathPropertyName = "path";
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Alias;
 
         public string Path { get; private set; }
 
         private AliasProperty() { }
-        
+
         public static ElasticMappingProperty Create(string name, string path)
         {
             return new AliasProperty
@@ -18,10 +19,10 @@ namespace Iis.Elastic.ElasticMappingProperties
                 Path = path
             };
         }
-        
+
         protected override void PopulatePropertyIntoJObject(JObject result)
         {
-            result["path"] = Path;
+            result[PathPropertyName] = Path;
         }
     }
 }

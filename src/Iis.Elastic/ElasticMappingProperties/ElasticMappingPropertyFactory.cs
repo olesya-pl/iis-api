@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic.SearchQueryExtensions;
-
 namespace Iis.Elastic.ElasticMappingProperties
 {
     public static class ElasticMappingPropertyFactory
@@ -20,7 +19,7 @@ namespace Iis.Elastic.ElasticMappingProperties
                 switch (propertyType)
                 {
                     case ElasticMappingPropertyType.Text:
-                        var res = new List<ElasticMappingProperty>() { TextProperty.Create(name, null, true) };
+                        var res = new List<ElasticMappingProperty>() { TextProperty.Create(name, true) };
                         if (isAggregated)
                         {
                             res.Add(KeywordProperty.Create($"{name}{SearchQueryExtension.AggregateSuffix}", false));

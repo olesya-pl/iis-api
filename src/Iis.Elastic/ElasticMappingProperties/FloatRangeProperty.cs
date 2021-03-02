@@ -9,27 +9,17 @@ namespace Iis.Elastic.ElasticMappingProperties
     {
         private FloatRangeProperty() { }
 
-        public static ElasticMappingProperty Create(string dotName)
+        public static ElasticMappingProperty Create(string propertyName)
         {
-            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Length > 1)
-            {
-                return NestedProperty.Create(splitted[0], new List<ElasticMappingProperty>
-                    {
-                        Create(string.Join('.', splitted.Skip(1)))
-                    });
-            }
-            return new FloatRangeProperty
-            {
-                Name = splitted[0],
-            };
+            return CreateWithNestedProperty(
+                propertyName,
+                (propName) => new FloatRangeProperty{Name = propName},
+                (propName) => Create(propName)
+            );
         }
 
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.FloatRange;
 
-        protected override void PopulatePropertyIntoJObject(JObject result)
-        {
-
-        }
+        protected override void PopulatePropertyIntoJObject(JObject result){}
     }
 }

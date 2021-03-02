@@ -32,15 +32,14 @@ namespace Iis.Elastic.ElasticMappingProperties
 
         protected override void PopulatePropertyIntoJObject(JObject result)
         {
-            if (Properties.Count > 0)
+            if (Properties.Count == 0) return;
+
+            var jProperties = new JObject();
+            foreach (var property in Properties)
             {
-                var jProperties = new JObject();
-                foreach (var property in Properties)
-                {
-                    jProperties[property.Name] = property.ToJObject();
-                }
-                result["properties"] = jProperties;
+                jProperties[property.Name] = property.ToJObject();
             }
+            result["properties"] = jProperties;
         }
     }
 }

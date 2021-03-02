@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.ElasticMappingProperties
 {
@@ -9,27 +6,12 @@ namespace Iis.Elastic.ElasticMappingProperties
     {
         private IntegerProperty() { }
 
-        public static ElasticMappingProperty Create(string dotName)
+        public static ElasticMappingProperty Create(string propertyName)
         {
-            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Length > 1)
-            {
-                return NestedProperty.Create(splitted[0], new List<ElasticMappingProperty>
-                    {
-                        Create(string.Join('.', splitted.Skip(1)))
-                    });
-            }
-            return new IntegerProperty
-            {
-                Name = splitted[0],
-            };
+            return CreateWithNestedProperty(propertyName, (propName) => new IntegerProperty { Name = propName }, (propName) => Create(propName));
         }
-        
-        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Integer;
 
-        protected override void PopulatePropertyIntoJObject(JObject result)
-        {
-            
-        }
+        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Integer;
+        protected override void PopulatePropertyIntoJObject(JObject result) { }
     }
 }
