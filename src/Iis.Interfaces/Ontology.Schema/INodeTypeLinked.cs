@@ -65,6 +65,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes();
         bool IsComputed { get; }
         string Formula { get; }
+        string TitleAttributeName { get; }
         EmbeddingOptions EmbeddingOptions { get; }
         ScalarType ScalarTypeEnum { get; }
         INodeTypeLinked EntityType { get; }

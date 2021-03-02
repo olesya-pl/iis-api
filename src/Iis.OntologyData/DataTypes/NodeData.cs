@@ -273,5 +273,6 @@ namespace Iis.OntologyData.DataTypes
 
             return sb.ToString();
         }
+        public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value;
     }
 }

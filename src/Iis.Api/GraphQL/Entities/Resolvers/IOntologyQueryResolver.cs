@@ -29,5 +29,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx);
         Task<string> ResolveCreatedBy(IResolverContext ctx);
         string ResolveIconName(IResolverContext ctx);
+        string ResolveTitle(IResolverContext ctx);
     }
 }

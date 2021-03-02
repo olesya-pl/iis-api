@@ -12,6 +12,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
             descriptor.Field("createdAt").Type<NonNullType<DateTimeType>>();
             descriptor.Field("updatedAt").Type<NonNullType<DateTimeType>>();
             descriptor.Field("_relation").Type<RelationType>();
+            descriptor.Field("__title").Type<StringType>();
             descriptor.Description("Interface that is implemented by each ontology type");
             descriptor.ResolveAbstractType((ctx, obj) =>
                 ctx.Service<IOntologyQueryResolver>().ResolveAbstractType(ctx, obj));

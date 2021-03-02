@@ -61,6 +61,8 @@ namespace Iis.OntologySchema.DataTypes
 
         public bool IsComputed => !string.IsNullOrWhiteSpace(Formula);
         public EmbeddingOptions EmbeddingOptions => RelationType?.EmbeddingOptions ?? EmbeddingOptions.None;
+        private string _titleAttributeName;
+        public string TitleAttributeName => _titleAttributeName ?? (_titleAttributeName = GetTitleAttributeName());
 
         public string GetMetaDeep()
         {
@@ -475,6 +477,13 @@ namespace Iis.OntologySchema.DataTypes
                     .Select(nt => nt.Name)
                     .FirstOrDefault()
                 : Name;
+        }
+        private string GetTitleAttributeName()
+        {
+            return new List<string> { "__title", "name", "value", "title" }
+                .FirstOrDefault(s => GetProperty(s) != null)
+                ??
+                GetAllProperties().FirstOrDefault()?.Name;
         }
     }
 }
