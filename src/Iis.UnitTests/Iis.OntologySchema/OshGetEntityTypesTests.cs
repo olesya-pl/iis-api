@@ -57,13 +57,5 @@ namespace Iis.UnitTests.Iis.OntologySchema
             var attributes = gqlType.GetAttributes().ToList();
             AssertAttributes(attributes, new List<string> { "affiliation", "importance", "sign", "title" });
         }
-        [Fact]
-        public void TargetTypesTest()
-        {
-            var (schema, creator) = OntologyDataCreator.GetBaseTestOntology();
-            var objectOfStudy = schema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
-
-
-        }
     }
 }
