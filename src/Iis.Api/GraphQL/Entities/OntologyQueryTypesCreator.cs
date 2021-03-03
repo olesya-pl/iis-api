@@ -37,6 +37,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("coordinates").Type<ListType<ObjectType<GeoCoordinate>>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCoordinates(ctx));
             d.Field("createdByUser").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedBy(ctx));
             d.Field("__iconName").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveIconName(ctx));
+            d.Field("__title").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveTitle(ctx));
         }
 
         protected void OnRelation(INodeTypeLinked relationType, IObjectTypeDescriptor objectTypeDescriptor = null)
@@ -83,6 +84,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdAt").Type<NonNullType<DateTimeType>>();
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>();
             d.Field("_relation").Type<RelationType>();
+            d.Field("__title").Type<StringType>();
             d.ResolveAbstractType((ctx, obj) => ctx.Service<IOntologyQueryResolver>().ResolveAbstractType(ctx, obj));
         }
 

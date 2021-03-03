@@ -41,7 +41,7 @@ namespace Iis.Domain.ExtendedData
             {
                 return new List<IExtNode> { this };
             }
-            var children = Children.Where(p => !p.NodeType.IsObjectOfStudy).SelectMany(n => n.GetAttributesRecursiveWithoutNestedObjects(scalarType));
+            var children = Children.Where(p => !p.NodeType.IsObject).SelectMany(n => n.GetAttributesRecursiveWithoutNestedObjects(scalarType));
             return children.ToList();
         }
 

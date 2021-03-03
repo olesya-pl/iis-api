@@ -292,7 +292,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private async Task SaveChangesForDeletedRelation(Relation relation, Guid requestId)
         {
             var userName = GetCurrentUserName();
-            if (relation.Type.TargetType.IsObjectOfStudy)
+            if (relation.Type.TargetType.IsSeparateObject)
             {
                 await _changeHistoryService
                         .SaveNodeChange(

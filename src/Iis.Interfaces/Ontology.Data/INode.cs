@@ -32,5 +32,6 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList);
         string GetComputedValue(string name);
         string GetDotName();
+        string GetTitleValue();
     }
 }

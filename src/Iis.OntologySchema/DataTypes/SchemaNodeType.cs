@@ -61,6 +61,8 @@ namespace Iis.OntologySchema.DataTypes
 
         public bool IsComputed => !string.IsNullOrWhiteSpace(Formula);
         public EmbeddingOptions EmbeddingOptions => RelationType?.EmbeddingOptions ?? EmbeddingOptions.None;
+        private string _titleAttributeName;
+        public string TitleAttributeName => _titleAttributeName ?? (_titleAttributeName = GetTitleAttributeName());
 
         public string GetMetaDeep()
         {
@@ -229,9 +231,9 @@ namespace Iis.OntologySchema.DataTypes
         public bool IsEvent => string.Equals(Name, EntityTypeNames.Event.ToString());
         public bool IsObjectSign => Name == EntityTypeNames.ObjectSign.ToString() || IsInheritedFrom(EntityTypeNames.ObjectSign.ToString());
         public bool IsEnum => Name == EntityTypeNames.Enum.ToString() || IsInheritedFrom(EntityTypeNames.Enum.ToString());
-        public bool IsAncestorOfObjectOfStudy => IsAbstract &&
-            GetAllDescendants().All(nt => nt.IsAbstract || nt.IsObjectOfStudy);
-        public bool IsSeparateObject => IsObjectOfStudy || IsObjectSign || IsEnum || IsAncestorOfObjectOfStudy;
+        public bool IsWiki => Name == EntityTypeNames.Wiki.ToString() || IsInheritedFrom(EntityTypeNames.Wiki.ToString());
+        public bool IsObject => Name == EntityTypeNames.Object.ToString() || IsInheritedFrom(EntityTypeNames.Object.ToString());
+        public bool IsSeparateObject => IsObject || IsObjectSign || IsEnum || IsEvent;
         public bool IsLinkFromEventToObjectOfStudy =>
             RelationType.SourceType.IsEvent && RelationType.TargetType.IsObjectOfStudy;
 
@@ -361,7 +363,7 @@ namespace Iis.OntologySchema.DataTypes
 
             foreach (var relationType in GetEmbeddingRelationsIncludeInherited())
             {
-                if (relationType.TargetType.IsObjectOfStudy || relationType.TargetType.Name == Name) continue;
+                if (relationType.TargetType.IsObject || relationType.TargetType.Name == Name) continue;
 
                 var relationTypeName = $"{dotName}.{relationType.NodeType.Name}";
                 var relationAttributes = relationType._targetType.GetNodeTypesRecursive(relationTypeName);
@@ -475,6 +477,13 @@ namespace Iis.OntologySchema.DataTypes
                     .Select(nt => nt.Name)
                     .FirstOrDefault()
                 : Name;
+        }
+        private string GetTitleAttributeName()
+        {
+            return new List<string> { "__title", "name", "value", "title" }
+                .FirstOrDefault(s => GetProperty(s) != null)
+                ??
+                GetAllProperties().FirstOrDefault()?.Name;
         }
     }
 }

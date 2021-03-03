@@ -53,6 +53,7 @@ namespace Iis.Interfaces.Ontology.Schema
         INodeTypeLinked GetProperty(string relationName);
         IReadOnlyList<ISchemaCompareDiffInfo> GetDifference(INodeTypeLinked nodeType);
         bool IsInheritedFrom(string nodeTypeName);
+        bool IsObject { get; }
         bool IsObjectOfStudy { get; }
         bool IsEvent { get; }
         bool IsObjectSign { get; }
@@ -65,6 +66,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes();
         bool IsComputed { get; }
         string Formula { get; }
+        string TitleAttributeName { get; }
         EmbeddingOptions EmbeddingOptions { get; }
         ScalarType ScalarTypeEnum { get; }
         INodeTypeLinked EntityType { get; }

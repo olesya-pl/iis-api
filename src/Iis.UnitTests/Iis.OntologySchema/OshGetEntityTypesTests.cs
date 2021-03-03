@@ -48,7 +48,7 @@ namespace Iis.UnitTests.Iis.OntologySchema
         public void AttributesDeepDisabledTest()
         {
             var (schema, creator) = OntologyDataCreator.GetBaseTestOntology();
-            var objectOfStudy = GetGraphQlEntityType(schema, EntityTypeNames.ObjectOfStudy.ToString());
+            var objectOfStudy = schema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
             
             var entityType = creator.CreateEntityType("TestEntity", ancestorId: objectOfStudy.Id);
             creator.CreateAttributeType(entityType.Id, "lastConfirmedAt", meta: new SchemaMeta { Hidden = true });

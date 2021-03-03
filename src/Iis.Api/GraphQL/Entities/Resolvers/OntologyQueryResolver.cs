@@ -231,5 +231,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public string ResolveIconName(IResolverContext ctx) =>
             ctx.Parent<Node>().OriginalNode.NodeType.GetIconName();
+
+        public string ResolveTitle(IResolverContext ctx) =>
+            ctx.Parent<Node>().OriginalNode.GetTitleValue();
     }
 }

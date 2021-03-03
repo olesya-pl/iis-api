@@ -75,7 +75,7 @@ namespace Iis.Services
                 
                 var nt = node.NodeType;
 
-                return !(nt.IsObjectOfStudy || nt.IsEvent || nt.IsEnum);
+                return !(nt.IsObject || nt.IsEvent || nt.IsEnum);
             }
             return false;
         }
