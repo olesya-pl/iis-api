@@ -23,11 +23,12 @@ namespace Iis.Api.Controllers
     public class AdminController : Controller
     {
         private const string AllIndexes = "all";
-        IElasticManager _elasticManager;
-        INodeRepository _nodeRepository;
-        IMaterialService _materialService;
-        IElasticState _elasticState;
-        IUserService _userService;
+        private readonly IElasticManager _elasticManager;
+        private readonly INodeRepository _nodeRepository;
+        private readonly IMaterialService _materialService;
+        private readonly IElasticState _elasticState;
+        private readonly IUserService _userService;
+        private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
 
         public AdminController(
@@ -36,14 +37,16 @@ namespace Iis.Api.Controllers
             INodeRepository nodeRepository,
             IElasticState elasticState,
             IUserService userService,
+            IUserElasticService userElasticService,
             IAdminOntologyElasticService adminElasticService)
         {
-            _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
-            _materialService = materialService ?? throw new ArgumentNullException(nameof(materialService));
-            _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
-            _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
-            _adminElasticService = adminElasticService ?? throw new ArgumentNullException(nameof(adminElasticService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _elasticManager = elasticManager;
+            _materialService = materialService;
+            _nodeRepository = nodeRepository;
+            _elasticState = elasticState;
+            _adminElasticService = adminElasticService;
+            _userService = userService;
+            _userElasticService = userElasticService;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -168,6 +171,7 @@ namespace Iis.Api.Controllers
             _adminElasticService.Logger = log;
             await _elasticManager.CreateSecurityMappingAsync(_elasticState.MaterialIndexes, cancellationToken);
             log.AppendLine("Role created");
+            await _userElasticService.ClearNonPredefinedUsers(cancellationToken);
             await _userService.PutAllUsersToElasticSearchAsync(cancellationToken);
             log.AppendLine("Users created");
 
