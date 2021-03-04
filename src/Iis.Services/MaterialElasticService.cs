@@ -37,15 +37,14 @@ namespace Iis.Services
 
         public MaterialElasticService(IElasticManager elasticManager,
             IElasticState elasticState,
-            IElasticResponseManagerFactory elasticResponseManagerFactory
-            )
+            IElasticResponseManagerFactory elasticResponseManagerFactory)
         {
             _elasticManager = elasticManager;
             _elasticState = elasticState;
             _elasticResponseManagerFactory = elasticResponseManagerFactory;
         }
 
-        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
             var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
@@ -66,7 +65,9 @@ namespace Iis.Services
                 query = query.SetupSorting(sortColumn, sortOrder);
             }
 
-            var elasticResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
+            var elasticResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
             var searchResult = elasticResult.ToSearchResult();
 
@@ -84,7 +85,9 @@ namespace Iis.Services
                     .WithQueryString(queryString)
                     .BuildCountQuery()
                     .ToString();
-                searchResult.Count = await _elasticManager.CountAsync(countQuery, _elasticState.MaterialIndexes, ct);
+                searchResult.Count = await _elasticManager
+                    .WithUserId(userId)
+                    .CountAsync(countQuery, _elasticState.MaterialIndexes, ct);
 
             }
 
@@ -96,7 +99,7 @@ namespace Iis.Services
             return searchResult.Count == ElasticConstants.MaxItemsCount;
         }
 
-        public async Task<SearchResult> BeginSearchByScrollAsync(SearchParams searchParams, TimeSpan scrollDuration = default, CancellationToken ct = default)
+        public async Task<SearchResult> BeginSearchByScrollAsync(Guid userId, SearchParams searchParams, TimeSpan scrollDuration = default, CancellationToken ct = default)
         {
             var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
@@ -109,18 +112,23 @@ namespace Iis.Services
                 .WithQueryString(queryString)
                 .BuildSearchQuery();
 
-            var elasticResult = await _elasticManager.BeginSearchByScrollAsync(query.ToString(), scrollDuration, _elasticState.MaterialIndexes, ct);
+            var elasticResult = await _elasticManager
+                .WithUserId(userId)
+                .BeginSearchByScrollAsync(query.ToString(), scrollDuration, _elasticState.MaterialIndexes, ct);
 
             return elasticResult.ToSearchResult();
         }
 
-        public async Task<SearchResult> SearchByScroll(string scrollId, TimeSpan scrollDuration)
+        public async Task<SearchResult> SearchByScroll(Guid userId, string scrollId, TimeSpan scrollDuration)
         {
-            IElasticSearchResult elasticResult = await _elasticManager.SearchByScrollAsync(scrollId, scrollDuration);
+            var elasticResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchByScrollAsync(scrollId, scrollDuration);
             return elasticResult.ToSearchResult();
         }
 
-        public async Task<SearchResult> SearchMaterialsAsync(SearchParams searchParams, 
+        public async Task<SearchResult> SearchMaterialsAsync(Guid userId,
+            SearchParams searchParams, 
             IEnumerable<Guid> materialList, 
             CancellationToken ct = default)
         {
@@ -150,7 +158,9 @@ namespace Iis.Services
                 .WithAggregation(_aggregationsFieldList)
                 .ToString(Formatting.None);
 
-            var elasticResult = await _elasticManager.SearchAsync(query, MaterialIndexes, ct);
+            var elasticResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(query, MaterialIndexes, ct);
 
             var searchResult = elasticResult.ToSearchResult();
 
@@ -165,7 +175,7 @@ namespace Iis.Services
             return searchResult;
         }
 
-        public async Task<SearchResult> SearchMoreLikeThisAsync(SearchParams searchParams, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMoreLikeThisAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
             var (sortColumn, sortOrder) = MapSortingToElastic(searchParams.Sorting);
@@ -177,12 +187,14 @@ namespace Iis.Services
                         .SetupSorting(sortColumn, sortOrder)
                         .ToString(Formatting.None);
 
-            var searchResult = await _elasticManager.SearchAsync(queryData, _elasticState.MaterialIndexes, ct);
+            var searchResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(queryData, _elasticState.MaterialIndexes, ct);
 
             return searchResult.ToSearchResult();
         }
 
-        public async Task<SearchResult> SearchByImageVector(decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
+        public async Task<SearchResult> SearchByImageVector(Guid userId, decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
         {
             var (from, size) = page.ToElasticPage();
 
@@ -191,12 +203,14 @@ namespace Iis.Services
                 .BuildSearchQuery()
                 .WithAggregation(_aggregationsFieldList);
 
-            var searchResult = await _elasticManager.SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
+            var searchResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
 
             return searchResult.ToSearchResult();
         }
 
-        public Task<int> CountMaterialsByConfiguredFieldsAsync(SearchParams searchParams, CancellationToken ct = default)
+        public Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
             var elasticSearchParams = new IisElasticSearchParams
             {
@@ -204,7 +218,9 @@ namespace Iis.Services
                 Query = string.IsNullOrEmpty(searchParams.Suggestion) ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL"
             };
 
-            return _elasticManager.CountAsync(elasticSearchParams, ct);
+            return _elasticManager
+                .WithUserId(userId)
+                .CountAsync(elasticSearchParams, ct);
         }
 
         private static (string SortColumn, string SortOrder) MapSortingToElastic(SortingParams sorting)

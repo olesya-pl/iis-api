@@ -187,7 +187,7 @@ namespace IIS.Core
             services.AddTransient<ExportService>();
             services.AddTransient<ExportToJsonService>();
             services.AddTransient<RoleService>();
-            services.AddTransient<UserService>();
+            services.AddTransient<UserService<IIISUnitOfWork>>();
             services.AddTransient<IThemeService, ThemeService<IIISUnitOfWork>>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
@@ -317,7 +317,7 @@ namespace IIS.Core
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
 
-                var userService = context.Services.GetService<UserService>();
+                var userService = context.Services.GetService<UserService<IIISUnitOfWork>>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
 
                 var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);

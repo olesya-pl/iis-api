@@ -1,30 +1,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
+using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using IIS.Repository;
+using IIS.Repository.Factories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Iis.Services
 {
-    public class UserService : IUserService
+    public class UserService<TUnitOfWork> : BaseService<TUnitOfWork>, IUserService where TUnitOfWork : IIISUnitOfWork
     {
         private readonly OntologyContext _context;
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
         private readonly IMapper _mapper;
+        private readonly IUserElasticService _userElasticService;
+        private readonly IUserRepository _userRepository;
 
         public UserService(
             OntologyContext context,
             MaxMaterialsPerOperatorConfig maxMaterialsConfig,
-            IMapper mapper)
+            IUserElasticService userElasticService,
+            IUserRepository userRepository,
+            IMapper mapper,
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory) 
         {
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;
             _mapper = mapper;
+            _userElasticService = userElasticService;
+            _userRepository = userRepository;
         }
 
         public async Task<Guid> CreateUserAsync(User newUser)
@@ -89,17 +102,17 @@ namespace Iis.Services
                 .ToListAsync();
         }
 
-        public async Task<Guid> UpdateUserAsync(User updatedUser)
+        public async Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellation = default)
         {
             var userEntity = await GetUsersQuery()
-                                        .FirstOrDefaultAsync(e => e.Id == updatedUser.Id);
+                                        .FirstOrDefaultAsync(e => e.Id == updatedUser.Id, cancellation);
 
             if (userEntity is null)
             {
                 throw new InvalidOperationException($"Cannot find User with id:'{updatedUser.Id}'.");
             }
 
-            if (userEntity.PasswordHash == updatedUser.PasswordHash)
+            if (string.Equals(userEntity.PasswordHash, updatedUser.PasswordHash, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException($"New password must not match old.");
             }
@@ -116,12 +129,12 @@ namespace Iis.Services
             userEntity.Name = $"{userEntity.LastName} {userEntity.FirstName} {userEntity.Patronymic}";
 
             _context.RemoveRange(_context.UserRoles.Where(ur => ur.UserId == userEntity.Id));
-
             _context.Update(userEntity);
-
             _context.UserRoles.AddRange(newUserRolesEntitiesList);
+            await _context.SaveChangesAsync(cancellation);
 
-            await _context.SaveChangesAsync();
+            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
+            await _userElasticService.SaveUserAsync(elasticUser, cancellation);
 
             return userEntity.Id;
         }
@@ -254,5 +267,16 @@ namespace Iis.Services
 
             return GetUser(userId);
         }
+
+        public async Task PutAllUsersToElasticSearchAsync(CancellationToken cancellationToken)
+        {
+            var users = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetAllUsersAsync(cancellationToken));
+
+            var elasticUsers = _mapper.Map<List<ElasticUserDto>>(users);
+
+            await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
+        }
     }
+
+    
 }

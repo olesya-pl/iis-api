@@ -70,15 +70,16 @@ namespace IIS.Core.NodeMaterialRelation
             await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto }, material.Title);
         }
 
-        public async Task CreateMultipleRelations(string query, Guid nodeId, string userName)
+        public async Task CreateMultipleRelations(Guid userId, string query, Guid nodeId, string userName)
         {
             const int MaxItemsPerQuery = 10000;
 
-            var materials = await _materialElasticService.BeginSearchByScrollAsync(new SearchParams
-            {
-                Suggestion = query,
-                Page = new PaginationParams(1, MaxItemsPerQuery)
-            }, TimeSpan.FromMinutes(2));
+            var materials = await _materialElasticService.BeginSearchByScrollAsync(userId,
+                new SearchParams
+                {
+                    Suggestion = query,
+                    Page = new PaginationParams(1, MaxItemsPerQuery)
+                }, TimeSpan.FromMinutes(2));
 
             var materialsCount = materials.Items.Count;
             var materialIds = materials.Items.Keys.ToHashSet();
@@ -88,7 +89,7 @@ namespace IIS.Core.NodeMaterialRelation
             while (materialsCount > 0)
             {
                 var scrollId = materials.ScrollId;
-                materials = await _materialElasticService.SearchByScroll(scrollId, TimeSpan.FromMinutes(2));
+                materials = await _materialElasticService.SearchByScroll(userId, scrollId, TimeSpan.FromMinutes(2));
                 materialsCount = materials.Items.Count;
                 materialIds = materials.Items.Keys.ToHashSet();
                 await CreateMultipleRelations(nodeId, materialIds, userName);

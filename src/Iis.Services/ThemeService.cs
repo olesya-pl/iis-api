@@ -50,7 +50,7 @@ namespace Iis.Services
         public async Task<Guid> CreateThemeAsync(ThemeDto theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
-            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.TypeId, GetQuery(entity.QueryRequest))).Count;
+            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
 
             _context.Themes.Add(entity);
 
@@ -79,7 +79,7 @@ namespace Iis.Services
             }
             else
             {
-                entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.TypeId, GetQuery(entity.QueryRequest))).Count;
+                entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
             }
         }
 
@@ -194,7 +194,8 @@ namespace Iis.Services
                 .GroupBy(x => new 
                 {
                     Query = GetQuery(x.QueryRequest), 
-                    x.TypeId 
+                    x.TypeId,
+                    x.UserId
                 });
 
             var tasks = new List<Task<QueryResult>>();
@@ -202,7 +203,7 @@ namespace Iis.Services
             foreach (var groupedTheme in themesByQuery)
             {
                 ct.ThrowIfCancellationRequested();
-                tasks.Add(GetQueryResultsAsync(groupedTheme.Key.TypeId, groupedTheme.Key.Query));
+                tasks.Add(GetQueryResultsAsync(groupedTheme.Key.UserId, groupedTheme.Key.TypeId, groupedTheme.Key.Query));
             }
 
             var results = await Task.WhenAll(tasks);
@@ -251,7 +252,7 @@ namespace Iis.Services
             };
         }
 
-        private async Task<QueryResult> GetQueryResultsAsync(Guid typeId, string query)
+        private async Task<QueryResult> GetQueryResultsAsync(Guid userId, Guid typeId, string query)
         {
             var filter = new ElasticFilter
             {
@@ -288,7 +289,7 @@ namespace Iis.Services
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
                 var page = new PaginationParams(1, 50);
-                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(new SearchParams { Page = page, Suggestion = filter.Suggestion });
+                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(userId, new SearchParams { Page = page, Suggestion = filter.Suggestion });
                 return new QueryResult
                 {
                     Count = count,

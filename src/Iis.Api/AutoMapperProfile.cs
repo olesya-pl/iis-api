@@ -33,6 +33,7 @@ using Iis.DataModel.Reports;
 using Iis.Events.Reports;
 using Iis.Api.GraphQL.Aliases;
 using Iis.DataModel.ChangeHistory;
+using Iis.Elastic;
 
 namespace Iis.Api
 {
@@ -364,6 +365,12 @@ namespace Iis.Api
                 .ForMember(dest => dest.Items, opts => opts.MapFrom(src => src.Entities));
 
             CreateMap<SortingInput, SortingParams>();
+
+            CreateMap<UserEntity, ElasticUserDto>()
+                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => new[] { ElasticConstants.SecurityPolicyName }))
+                .ForMember(dest => dest.Password, opts => opts.MapFrom(src => ElasticConstants.DefaultPassword))
+                .ForMember(dest => dest.Enabled, opts => opts.MapFrom(src => !src.IsBlocked))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => new ElasticUserDtoMetadata(src.Id, src.Username, (int)src.AccessLevel)));
         }
     }
 }

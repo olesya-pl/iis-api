@@ -10,6 +10,7 @@ using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Iis.Services;
+using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -18,9 +19,9 @@ namespace IIS.Core.GraphQL.Users
         private IConfiguration _configuration;
         private readonly OntologyContext _context;
         private IMapper _mapper;
-        private UserService _userService;
+        private UserService<IIISUnitOfWork> _userService;
 
-        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, UserService userService)
+        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, UserService<IIISUnitOfWork> userService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _context = context ?? throw new ArgumentNullException(nameof(context));

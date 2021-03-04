@@ -14,7 +14,8 @@ namespace IIS.Core.Materials
     {
         Task<Material> GetMaterialAsync(Guid id, Guid userId);
 
-        Task<MaterialsDto> GetMaterialsAsync(string filterQuery,
+        Task<MaterialsDto> GetMaterialsAsync(Guid userId,
+            string filterQuery,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);
@@ -24,9 +25,10 @@ namespace IIS.Core.Materials
         MaterialSign GetMaterialSign(Guid id);
         Task<Material> MapAsync(MaterialEntity material);
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
-        Task<MaterialsDto> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content);
+        Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
-        Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList, 
+        Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
+            IEnumerable<Guid> nodeIdList, 
             bool includeDescendants,
             string suggestion,
             PaginationParams page,
@@ -35,7 +37,7 @@ namespace IIS.Core.Materials
         Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
-        Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid materialId, PaginationParams page, SortingParams sorting);
+        Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid userId, Guid materialId, PaginationParams page, SortingParams sorting);
         Task<bool> MaterialExists(Guid value);
     }
 }
