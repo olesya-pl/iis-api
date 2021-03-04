@@ -8,12 +8,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
+using Iis.DbLayer.Repositories;
 
 namespace Iis.Api.Materials
 {
     public class MaterialOperatorConsumer : BackgroundService
     {
-        private readonly UserService _userService;
+        private readonly UserService<IIISUnitOfWork> _userService;
         private readonly ILogger<MaterialOperatorConsumer> _logger;
         private readonly IConnection _connection;
         private readonly IModel _channel;
@@ -25,7 +26,7 @@ namespace Iis.Api.Materials
             IConnectionFactory connectionFactory,
             MaterialOperatorAssignerConfiguration configuration,
             IMaterialService materialService,
-            UserService userService)
+            UserService<IIISUnitOfWork> userService)
         {
             _userService = userService;
             _logger = logger;

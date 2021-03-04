@@ -78,6 +78,7 @@ namespace IIS.Core.Materials.EntityFramework
         }
 
         public async Task<MaterialsDto> GetMaterialsAsync(
+            Guid userId,
             string filterQuery,
             PaginationParams page,
             SortingParams sorting,
@@ -90,7 +91,7 @@ namespace IIS.Core.Materials.EntityFramework
                 Sorting = sorting
             };
 
-            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(searchParams);
+            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams);
 
             var materials = searchResult.Items.Values
                 .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -301,6 +302,7 @@ namespace IIS.Core.Materials.EntityFramework
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(
+            Guid userId,
             Guid materialId, 
             PaginationParams page,
             SortingParams sorting)
@@ -316,7 +318,7 @@ namespace IIS.Core.Materials.EntityFramework
                 Sorting = sorting
             };
 
-            var searchResult = await _materialElasticService.SearchMoreLikeThisAsync(searchParams);
+            var searchResult = await _materialElasticService.SearchMoreLikeThisAsync(userId, searchParams);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -325,7 +327,7 @@ namespace IIS.Core.Materials.EntityFramework
             return (materials, searchResult.Count);
         }
 
-        public async Task<MaterialsDto> GetMaterialsByImageAsync(PaginationParams page, string fileName, byte[] content)
+        public async Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content)
         {
             decimal[] imageVector;
             try
@@ -338,7 +340,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 throw new Exception("Failed to vectorize image", e);
             }
-            var searchResult = await _materialElasticService.SearchByImageVector(imageVector, page);
+            var searchResult = await _materialElasticService.SearchByImageVector(userId, imageVector, page);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -361,7 +363,8 @@ namespace IIS.Core.Materials.EntityFramework
             return FaceAPIResponseParser.GetEncoding(contentJson);
         }
 
-        public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(IEnumerable<Guid> nodeIdList,
+        public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
+            IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
             PaginationParams page,
@@ -395,7 +398,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             var searchParams = new SearchParams { Suggestion = suggestion, Page = page, Sorting = sorting };
 
-            var searchResult = await _materialElasticService.SearchMaterialsAsync(searchParams, materialEntitiesIdList, ct);
+            var searchResult = await _materialElasticService.SearchMaterialsAsync(userId, searchParams, materialEntitiesIdList, ct);
 
             var materials = searchResult.Items.Values
                 .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))

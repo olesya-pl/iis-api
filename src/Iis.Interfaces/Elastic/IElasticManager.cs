@@ -10,7 +10,7 @@ namespace Iis.Interfaces.Elastic
     public interface IElasticManager
     {
         Task<bool> PutDocumentAsync(string indexName, string id, string jsonDocument, CancellationToken cancellationToken = default);
-        Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, bool waitForIndexing, CancellationToken cancellationToken = default);
+        Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, bool waitForIndexing, CancellationToken cancellationToken = default);        
         Task<bool> DeleteDocumentAsync(string indexName, string documentId, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
         Task<IElasticSearchResult> BeginSearchByScrollAsync(string queryData, TimeSpan scrollLifetime, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default);
@@ -26,5 +26,8 @@ namespace Iis.Interfaces.Elastic
         Task<int> CountAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default);
         Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchByScrollAsync(string scrollId, TimeSpan scrollDuration);
+        Task<bool> CreateSecurityMappingAsync(IReadOnlyCollection<string> indexNames, CancellationToken cancellationToken);
+        Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken);
+        IElasticManager WithUserId(Guid userId);
     }
 }

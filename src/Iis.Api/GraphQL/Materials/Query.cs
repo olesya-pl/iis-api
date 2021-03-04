@@ -19,6 +19,7 @@ namespace IIS.Core.GraphQL.Materials
 
         [GraphQLType(typeof(AggregatedMaterialCollection))]
         public async Task<(IEnumerable<Material> materials, Dictionary<string, AggregationItem> aggregations, int totalCount)> GetMaterials(
+            IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
@@ -27,17 +28,17 @@ namespace IIS.Core.GraphQL.Materials
             SearchByImageInput searchByImageInput,
             SearchByRelationInput searchByRelation = null)
         {
+            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
-
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
-
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
 
             if (searchByImageInput != null && searchByImageInput.HasConditions)
             {
                 var content = Convert.FromBase64String(searchByImageInput.Content);
                 var result = await materialProvider
-                    .GetMaterialsByImageAsync(pageParam, searchByImageInput.Name, content.ToArray());
+                    .GetMaterialsByImageAsync(tokenPayload.UserId, pageParam, searchByImageInput.Name, content.ToArray());
                 var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
                 return (mapped, result.Aggregations, result.Count);
             }
@@ -45,6 +46,7 @@ namespace IIS.Core.GraphQL.Materials
             if(searchByRelation != null && searchByRelation.HasConditions)
             {
                 var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(
+                    tokenPayload.UserId,
                     searchByRelation.NodeIdentityList,
                     searchByRelation.IncludeDescendants, 
                     filterQuery,
@@ -59,7 +61,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var materialsResult = await materialProvider
-                .GetMaterialsAsync(filterQuery, pageParam, sortingParam);
+                .GetMaterialsAsync(tokenPayload.UserId, filterQuery, pageParam, sortingParam);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
@@ -158,6 +160,7 @@ namespace IIS.Core.GraphQL.Materials
         }
 
         public async Task<(IEnumerable<Material> materials, int totalCout)> GetMaterialsLikeThis(
+            IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] Guid materialId,
@@ -167,7 +170,8 @@ namespace IIS.Core.GraphQL.Materials
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
             var sortingParams = new SortingParams(sorting.ColumnName, sorting.Order);
 
-            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(materialId, pageParam, sortingParams);
+            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(tokenPayload.UserId, materialId, pageParam, sortingParams);
 
             var materials = materialsResult.Materials
                                 .Select(m => mapper.Map<Material>(m))

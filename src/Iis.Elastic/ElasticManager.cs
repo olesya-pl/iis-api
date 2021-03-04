@@ -19,7 +19,7 @@ namespace Iis.Elastic
     internal class ElasticManager: IElasticManager
     {
         public const string NullValue = "NULL";
-        private readonly ElasticLowLevelClient _lowLevelClient;
+        private ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;
         private readonly SearchResultExtractor _resultExtractor;
         private readonly ILogger<ElasticManager> _logger;
@@ -34,15 +34,20 @@ namespace Iis.Elastic
             ElasticLogUtils responseLogUtils)
         {
             _configuration = configuration;
+            CreateLowlevelClient();
 
-            var connectionPool = new StaticConnectionPool(new[] { new Uri(_configuration.Uri) });
-
-            var config = new ConnectionConfiguration(connectionPool);
-
-            _lowLevelClient = new ElasticLowLevelClient(config);
             _resultExtractor = resultExtractor;
             _logger = logger;
             _responseLogUtils = responseLogUtils;
+        }
+
+        private void CreateLowlevelClient()
+        {
+            var connectionPool = new StaticConnectionPool(new[] { new Uri(_configuration.Uri) });
+            var config = new ConnectionConfiguration(connectionPool)
+                .BasicAuthentication(_configuration.DefaultLogin, _configuration.DefaultPassword)
+                .DisablePing();
+            _lowLevelClient = new ElasticLowLevelClient(config);
         }
 
         public Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
@@ -74,7 +79,7 @@ namespace Iis.Elastic
             var response = await PostAsync(indexUrl, documents, ct);
 
             return ParseBulkBodyResponse(response.Body);
-        }
+        }        
 
         private List<ElasticBulkResponse> ParseBulkBodyResponse(string body)
         {
@@ -165,7 +170,7 @@ namespace Iis.Elastic
             TimeSpan scrollLifetime, 
             IEnumerable<string> baseIndexNameList, 
             CancellationToken cancellationToken = default)
-        {
+        { 
             var path = !baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
             var queryString = new Dictionary<string, object>() 
             {
@@ -359,6 +364,25 @@ namespace Iis.Elastic
             return ParseResponse(response);
         }
 
+        public async Task<bool> CreateSecurityMappingAsync(IReadOnlyCollection<string> indexNames, CancellationToken cancellationToken)
+        {
+            var stringifiedIndexes = string.Join(',', indexNames.Select(p => $"\"{GetRealIndexName(p)}\""));
+            var settings = $@"{{
+""indices"": [
+    {{
+        ""names"": [{stringifiedIndexes}],
+        ""privileges"": [""read""],
+        ""query"": {{
+            ""template"": {{
+                ""source"": ""{{\""bool\"":{{\""filter\"":[{{\""range\"":{{\""AccessLevel\"":{{\""lte\"":\""{{{{_user.metadata.accessLevel}}}}\""}}}}}}]}}}}""
+            }}
+        }}
+    }}]
+}}";
+            var response = await PutAsync($"_xpack/security/role/{ElasticConstants.SecurityPolicyName}", settings, cancellationToken);
+            return response.Success;
+        }
+
         private void ApplyMappingConfiguration(JObject request, JObject mappingConfiguration)
         {
             if (mappingConfiguration == null)
@@ -515,6 +539,18 @@ namespace Iis.Elastic
             }
         }
 
+        public async Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken)
+        {
+            var result = await PutAsync(path, data, cancellationToken);
+            return result.Success;
+        }
+
+        public IElasticManager WithUserId(Guid userId)
+        {
+            CreateLowlevelClient();
+            return this;
+        }
+
         private async Task<StringResponse> PutAsync(string path, string data, CancellationToken cancellationToken)
         {
             return await DoRequestAsync(HttpMethod.PUT, path, data, null, cancellationToken);
@@ -536,6 +572,6 @@ namespace Iis.Elastic
         private async Task<StringResponse> PostAsync(string path, string data, CancellationToken cancellationToken)
         {
             return await DoRequestAsync(HttpMethod.POST, path, data, null, cancellationToken);
-        }
+        }        
     }
 }

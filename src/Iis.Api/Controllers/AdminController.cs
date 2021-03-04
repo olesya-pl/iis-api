@@ -3,6 +3,7 @@ using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
+using Iis.Services;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ namespace Iis.Api.Controllers
         INodeRepository _nodeRepository;
         IMaterialService _materialService;
         IElasticState _elasticState;
+        IUserService _userService;
         private readonly IAdminOntologyElasticService _adminElasticService;
 
         public AdminController(
@@ -33,6 +35,7 @@ namespace Iis.Api.Controllers
             IElasticManager elasticManager,
             INodeRepository nodeRepository,
             IElasticState elasticState,
+            IUserService userService,
             IAdminOntologyElasticService adminElasticService)
         {
             _elasticManager = elasticManager ?? throw new ArgumentNullException(nameof(elasticManager));
@@ -40,6 +43,7 @@ namespace Iis.Api.Controllers
             _nodeRepository = nodeRepository ?? throw new ArgumentNullException(nameof(nodeRepository));
             _elasticState = elasticState ?? throw new ArgumentNullException(nameof(elasticState));
             _adminElasticService = adminElasticService ?? throw new ArgumentNullException(nameof(adminElasticService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -155,6 +159,23 @@ namespace Iis.Api.Controllers
             return Content(log.ToString());
         }
 
+        [HttpGet("RecreateElasticUserIndexes")]
+        public async Task<IActionResult> RecreateElasticUserIndexes(CancellationToken cancellationToken)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var log = new StringBuilder();
+            _adminElasticService.Logger = log;
+            await _elasticManager.CreateSecurityMappingAsync(_elasticState.MaterialIndexes, cancellationToken);
+            log.AppendLine("Role created");
+            await _userService.PutAllUsersToElasticSearchAsync(cancellationToken);
+            log.AppendLine("Users created");
+
+            log.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+
+            return Content(log.ToString());
+        }
+        
         [HttpGet("GetElasticJson/{id}")]
         public async Task<IActionResult> GetElasticJson(string id, CancellationToken cancellationToken)
         {
@@ -166,8 +187,8 @@ namespace Iis.Api.Controllers
             }
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
-        }
-
+        }        
+        
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);

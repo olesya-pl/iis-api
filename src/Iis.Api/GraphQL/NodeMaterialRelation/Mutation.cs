@@ -30,7 +30,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [GraphQLNonNullType] MultipleNodeMaterialRelationInput input)
         {
             var tokenPayload = ctx.ContextData["token"] as TokenPayload;
-            await relationService.CreateMultipleRelations(input.Query, input.NodeId, tokenPayload.User.UserName);
+            await relationService.CreateMultipleRelations(tokenPayload.UserId, input.Query, input.NodeId, tokenPayload.User.UserName);
             return new CreateRelationsResponse
             {
                 Success = true

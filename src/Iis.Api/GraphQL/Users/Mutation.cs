@@ -8,6 +8,7 @@ using HotChocolate.Types;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using Iis.DataModel;
 using Iis.Services;
+using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -20,7 +21,7 @@ namespace IIS.Core.GraphQL.Users
         }
 
         public async Task<User> CreateUser(
-            [Service] UserService userService,
+            [Service] UserService<IIISUnitOfWork> userService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] UserCreateInput user)
         {
@@ -37,7 +38,7 @@ namespace IIS.Core.GraphQL.Users
             return mapper.Map<User>(domainUser);
         }
         public async Task<User> UpdateUser(
-            [Service] UserService userService,
+            [Service] UserService<IIISUnitOfWork> userService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] UserUpdateInput user)
         {
@@ -69,7 +70,7 @@ namespace IIS.Core.GraphQL.Users
             return mapper.Map<User>(dbUser);
         }
 
-        public async Task<User> AssignRole([Service] UserService userService,
+        public async Task<User> AssignRole([Service] UserService<IIISUnitOfWork> userService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)
@@ -77,7 +78,7 @@ namespace IIS.Core.GraphQL.Users
             var user = await userService.AssignRole(userId, roleId);
             return mapper.Map<User>(user);
         }
-        public async Task<User> RejectRole([Service] UserService userService,
+        public async Task<User> RejectRole([Service] UserService<IIISUnitOfWork> userService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid userId,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid roleId)

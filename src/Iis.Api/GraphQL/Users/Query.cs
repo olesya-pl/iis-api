@@ -7,13 +7,14 @@ using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using Iis.Services;
+using Iis.DbLayer.Repositories;
 
 namespace IIS.Core.GraphQL.Users
 {
     public class Query
     {
         public async Task<User> GetUser(
-            [Service] UserService userService,
+            [Service] UserService<IIISUnitOfWork> userService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
@@ -22,7 +23,7 @@ namespace IIS.Core.GraphQL.Users
             return mapper.Map<User>(user);
         }
         public async Task<GraphQLCollection<User>> GetUsers(
-            [Service] UserService userService,
+            [Service] UserService<IIISUnitOfWork> userService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination)
         {
@@ -36,7 +37,7 @@ namespace IIS.Core.GraphQL.Users
         }
 
         public async Task<List<User>> GetOperators(
-            [Service] UserService userService,
+            [Service] UserService<IIISUnitOfWork> userService,
             [Service] IMapper mapper)
         {
             var operators = await userService.GetOperatorsAsync();
