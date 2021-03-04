@@ -9,5 +9,6 @@ namespace Iis.Services.Contracts.Interfaces
     {
         Task SaveAllUsersAsync(IReadOnlyCollection<ElasticUserDto> elasticUsers, CancellationToken cancellationToken);
         Task SaveUserAsync(ElasticUserDto elasticUser, CancellationToken cancellationToken);
+        Task ClearNonPredefinedUsers(CancellationToken cancellationToken);
     }
 }

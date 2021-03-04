@@ -21,6 +21,7 @@ namespace Iis.Services
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
+        private readonly ElasticConfiguration _elasticConfiguration;
         private string[] MaterialIndexes = { "Materials" };
         private static IReadOnlyCollection<AggregationField> _aggregationsFieldList = new List<AggregationField>
         {
@@ -37,11 +38,13 @@ namespace Iis.Services
 
         public MaterialElasticService(IElasticManager elasticManager,
             IElasticState elasticState,
-            IElasticResponseManagerFactory elasticResponseManagerFactory)
+            IElasticResponseManagerFactory elasticResponseManagerFactory,
+            ElasticConfiguration elasticConfiguration)
         {
             _elasticManager = elasticManager;
             _elasticState = elasticState;
             _elasticResponseManagerFactory = elasticResponseManagerFactory;
+            _elasticConfiguration = elasticConfiguration;
         }
 
         public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
@@ -99,13 +102,17 @@ namespace Iis.Services
             return searchResult.Count == ElasticConstants.MaxItemsCount;
         }
 
-        public async Task<SearchResult> BeginSearchByScrollAsync(Guid userId, SearchParams searchParams, TimeSpan scrollDuration = default, CancellationToken ct = default)
+        public async Task<SearchResult> BeginSearchByScrollAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
             var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
             var (from, size) = searchParams.Page.ToElasticPage();
 
             var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
+
+            var scrollDuration = _elasticConfiguration.ScrollDurationMinutes == default(int)
+                ? ElasticConstants.DefaultScrollDurationMinutes
+                : _elasticConfiguration.ScrollDurationMinutes;            
 
             var query = new ExactQueryBuilder()
                 .WithPagination(from, size)
@@ -114,16 +121,20 @@ namespace Iis.Services
 
             var elasticResult = await _elasticManager
                 .WithUserId(userId)
-                .BeginSearchByScrollAsync(query.ToString(), scrollDuration, _elasticState.MaterialIndexes, ct);
+                .BeginSearchByScrollAsync(query.ToString(), TimeSpan.FromMinutes(scrollDuration), _elasticState.MaterialIndexes, ct);
 
             return elasticResult.ToSearchResult();
         }
 
-        public async Task<SearchResult> SearchByScroll(Guid userId, string scrollId, TimeSpan scrollDuration)
+        public async Task<SearchResult> SearchByScroll(Guid userId, string scrollId)
         {
+            var scrollDuration = _elasticConfiguration.ScrollDurationMinutes == default(int)
+                ? ElasticConstants.DefaultScrollDurationMinutes
+                : _elasticConfiguration.ScrollDurationMinutes;
+
             var elasticResult = await _elasticManager
                 .WithUserId(userId)
-                .SearchByScrollAsync(scrollId, scrollDuration);
+                .SearchByScrollAsync(scrollId, TimeSpan.FromMinutes(scrollDuration));
             return elasticResult.ToSearchResult();
         }
 

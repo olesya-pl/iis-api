@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
-using Iis.Interfaces.Ontology.Data;
+using Iis.Elastic;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
@@ -19,8 +19,7 @@ namespace IIS.Core.NodeMaterialRelation
     public class NodeMaterialRelationService<TUnitOfWork> : BaseService<TUnitOfWork> where TUnitOfWork : IIISUnitOfWork
     {
         private readonly OntologyContext _context;
-        private readonly IOntologyNodesData _ontologyData;
-        IChangeHistoryService _changeHistoryService;
+        private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMaterialElasticService _materialElasticService;
 
 
@@ -28,13 +27,11 @@ namespace IIS.Core.NodeMaterialRelation
         private const string NodeIdPropertyName = "MaterialFeature.NodeId";
 
         public NodeMaterialRelationService(OntologyContext context, 
-            IOntologyNodesData ontologyData,
             IMaterialElasticService materialElasticService,
             IChangeHistoryService changeHistoryService,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _context = context;
-            _ontologyData = ontologyData;
             _materialElasticService = materialElasticService;
             _changeHistoryService = changeHistoryService;
         }
@@ -72,14 +69,12 @@ namespace IIS.Core.NodeMaterialRelation
 
         public async Task CreateMultipleRelations(Guid userId, string query, Guid nodeId, string userName)
         {
-            const int MaxItemsPerQuery = 10000;
-
             var materials = await _materialElasticService.BeginSearchByScrollAsync(userId,
                 new SearchParams
                 {
                     Suggestion = query,
-                    Page = new PaginationParams(1, MaxItemsPerQuery)
-                }, TimeSpan.FromMinutes(2));
+                    Page = new PaginationParams(1, ElasticConstants.MaxItemsCount)
+                });
 
             var materialsCount = materials.Items.Count;
             var materialIds = materials.Items.Keys.ToHashSet();
@@ -89,7 +84,7 @@ namespace IIS.Core.NodeMaterialRelation
             while (materialsCount > 0)
             {
                 var scrollId = materials.ScrollId;
-                materials = await _materialElasticService.SearchByScroll(userId, scrollId, TimeSpan.FromMinutes(2));
+                materials = await _materialElasticService.SearchByScroll(userId, scrollId);
                 materialsCount = materials.Items.Count;
                 materialIds = materials.Items.Keys.ToHashSet();
                 await CreateMultipleRelations(nodeId, materialIds, userName);

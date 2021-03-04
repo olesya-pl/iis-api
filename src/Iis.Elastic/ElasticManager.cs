@@ -13,10 +13,11 @@ using System.Threading.Tasks;
 using Iis.Elastic.SearchResult;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Elastic.SearchQueryExtensions;
+using Newtonsoft.Json;
 
 namespace Iis.Elastic
 {
-    internal class ElasticManager: IElasticManager
+    internal class ElasticManager : IElasticManager
     {
         public const string NullValue = "NULL";
         private ElasticLowLevelClient _lowLevelClient;
@@ -26,7 +27,7 @@ namespace Iis.Elastic
         private readonly ElasticLogUtils _responseLogUtils;
 
         public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
-        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^','\"', '~', ':' ,'(', ')', '{', '}', '[', ']', '\\', '/', '!' };
+        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^', '\"', '~', ':', '(', ')', '{', '}', '[', ']', '\\', '/', '!' };
 
         public ElasticManager(ElasticConfiguration configuration,
             SearchResultExtractor resultExtractor,
@@ -57,12 +58,12 @@ namespace Iis.Elastic
 
         public async Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, bool waitForIndexing, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(indexName) || string.IsNullOrWhiteSpace(documentId) || string.IsNullOrWhiteSpace(jsonDocument)) 
+            if (string.IsNullOrWhiteSpace(indexName) || string.IsNullOrWhiteSpace(documentId) || string.IsNullOrWhiteSpace(jsonDocument))
                 return false;
 
             PostData postData = jsonDocument;
 
-            var response = await _lowLevelClient.IndexAsync<StringResponse>(GetRealIndexName(indexName), documentId, postData, new IndexRequestParameters 
+            var response = await _lowLevelClient.IndexAsync<StringResponse>(GetRealIndexName(indexName), documentId, postData, new IndexRequestParameters
             {
                 Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
             });
@@ -79,7 +80,7 @@ namespace Iis.Elastic
             var response = await PostAsync(indexUrl, documents, ct);
 
             return ParseBulkBodyResponse(response.Body);
-        }        
+        }
 
         private List<ElasticBulkResponse> ParseBulkBodyResponse(string body)
         {
@@ -113,14 +114,14 @@ namespace Iis.Elastic
             return result;
         }
 
-        private ElasticResponse ParseResponse(StringResponse response) 
+        private ElasticResponse ParseResponse(StringResponse response)
         {
             var result = new ElasticResponse
             {
                 IsSuccess = response.Success
             };
 
-            if (!result.IsSuccess) 
+            if (!result.IsSuccess)
             {
                 var jBody = JObject.Parse(response.Body);
                 result.ErrorType = jBody["error"]["type"].Value<string>();
@@ -137,7 +138,7 @@ namespace Iis.Elastic
 
         public async Task<bool> DeleteDocumentAsync(string indexName, string documentId, CancellationToken ct = default)
         {
-            var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId, ctx:ct);
+            var searchResponse = await _lowLevelClient.DeleteAsync<StringResponse>(GetRealIndexName(indexName), documentId, ctx: ct);
 
             return searchResponse.Success;
         }
@@ -166,13 +167,13 @@ namespace Iis.Elastic
         }
 
         public async Task<IElasticSearchResult> BeginSearchByScrollAsync(
-            string queryData, 
-            TimeSpan scrollLifetime, 
-            IEnumerable<string> baseIndexNameList, 
+            string queryData,
+            TimeSpan scrollLifetime,
+            IEnumerable<string> baseIndexNameList,
             CancellationToken cancellationToken = default)
-        { 
+        {
             var path = !baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
-            var queryString = new Dictionary<string, object>() 
+            var queryString = new Dictionary<string, object>()
             {
                 {"scroll",  $"{(int)scrollLifetime.TotalSeconds}s"}
             };
@@ -317,11 +318,11 @@ namespace Iis.Elastic
 
         private void ApplyIndexMappingSettings(JObject request)
         {
-		    var mappingValue = new JObject(
-			    new JProperty("total_fields", new JObject(
-				    new JProperty("limit", _configuration.TotalFieldsLimit)
-			    ))
-		    );
+            var mappingValue = new JObject(
+                new JProperty("total_fields", new JObject(
+                    new JProperty("limit", _configuration.TotalFieldsLimit)
+                ))
+            );
 
             var settigns = request["settings"];
 
@@ -339,7 +340,7 @@ namespace Iis.Elastic
                 },
                 stored_fields = Array.Empty<object>()
             }),
-            ctx:token);
+            ctx: token);
 
             return searchResponse.Success || searchResponse.HttpStatusCode != 404;
         }
@@ -354,7 +355,7 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default) 
+        public async Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default)
         {
             if (!await IndexExistsAsync(indexName, ct))
                 throw new ArgumentException($"{indexName} does not exist", nameof(indexName));
@@ -401,7 +402,7 @@ namespace Iis.Elastic
             json["query"] = new JObject();
 
             PrepareHighlights(json);
-            if(!string.IsNullOrEmpty(searchParams.SortColumn) && !string.IsNullOrEmpty(searchParams.SortOrder))
+            if (!string.IsNullOrEmpty(searchParams.SortColumn) && !string.IsNullOrEmpty(searchParams.SortOrder))
             {
                 json["sort"] = new JArray()
                 {
@@ -446,7 +447,7 @@ namespace Iis.Elastic
             return json.ToString();
         }
 
-        private JObject CreateSortSection(string sortColumName, string sortOder) 
+        private JObject CreateSortSection(string sortColumName, string sortOder)
         {
             var result = new JObject();
             result.Add(sortColumName, new JObject() { new JProperty("order", sortOder) });
@@ -545,6 +546,22 @@ namespace Iis.Elastic
             return result.Success;
         }
 
+        public async Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken)
+        {
+            var result = await DeleteAsync(path, cancellationToken);
+            return result.Success;
+        }
+
+        public async Task<T> GetExactPayloadAsyncDictionary<T>(string path, CancellationToken cancellationToken)
+        {
+            var result = await GetAsync(path, null, null, cancellationToken);
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
+            return JsonConvert.DeserializeObject<T>(result.Body, jsonSerializerSettings);
+        }
+
         public IElasticManager WithUserId(Guid userId)
         {
             CreateLowlevelClient();
@@ -554,6 +571,11 @@ namespace Iis.Elastic
         private async Task<StringResponse> PutAsync(string path, string data, CancellationToken cancellationToken)
         {
             return await DoRequestAsync(HttpMethod.PUT, path, data, null, cancellationToken);
+        }
+
+        private async Task<StringResponse> DeleteAsync(string path, CancellationToken cancellationToken)
+        {
+            return await DoRequestAsync(HttpMethod.DELETE, path, null, null, cancellationToken);
         }
 
         private async Task<StringResponse> GetAsync(string path, string data, Dictionary<string, object> queryString, CancellationToken cancellationToken)
