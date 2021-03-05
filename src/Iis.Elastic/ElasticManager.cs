@@ -35,18 +35,18 @@ namespace Iis.Elastic
             ElasticLogUtils responseLogUtils)
         {
             _configuration = configuration;
-            CreateLowlevelClient();
+            CreateLowlevelClient(_configuration.DefaultLogin, _configuration.DefaultPassword);
 
             _resultExtractor = resultExtractor;
             _logger = logger;
             _responseLogUtils = responseLogUtils;
         }
 
-        private void CreateLowlevelClient()
+        private void CreateLowlevelClient(string login, string password)
         {
             var connectionPool = new StaticConnectionPool(new[] { new Uri(_configuration.Uri) });
             var config = new ConnectionConfiguration(connectionPool)
-                .BasicAuthentication(_configuration.DefaultLogin, _configuration.DefaultPassword)
+                .BasicAuthentication(login, password)
                 .DisablePing();
             _lowLevelClient = new ElasticLowLevelClient(config);
         }
@@ -564,7 +564,7 @@ namespace Iis.Elastic
 
         public IElasticManager WithUserId(Guid userId)
         {
-            CreateLowlevelClient();
+            CreateLowlevelClient(userId.ToString("N"), ElasticConstants.DefaultPassword);
             return this;
         }
 
