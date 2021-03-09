@@ -9,16 +9,15 @@ namespace Iis.DbLayer.ModifyDataScripts
     {
         private List<ModifyDataItem> _items = new List<ModifyDataItem>();
         public IReadOnlyList<ModifyDataItem> Items => _items;
-        
-        public ModifyDataItems Add(ModifyDataItem item)
+        public ModifyDataItems Add(ModifyDataItem newItem)
         {
-            if (string.IsNullOrEmpty(item.Name))
-                throw new Exception("Name of MOdifyDataItem cannot be null");
+            if (string.IsNullOrEmpty(newItem.Name))
+                throw new Exception("Name of ModifyDataItem cannot be null");
 
-            if (Items.Any(item => item.Name.Equals(item.Name, StringComparison.CurrentCultureIgnoreCase)))
-                throw new Exception($"Name {item.Name} already exists");
+            if (Items.Any(item => item.Name.Equals(newItem.Name, StringComparison.CurrentCultureIgnoreCase)))
+                throw new Exception($"Name {newItem.Name} already exists");
 
-            _items.Add(item);
+            _items.Add(newItem);
 
             return this;
         }

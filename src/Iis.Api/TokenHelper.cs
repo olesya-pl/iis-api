@@ -83,6 +83,7 @@ namespace IIS.Core
 
     public class TokenPayload
     {
+        public const string TokenPropertyName = "token";
         public readonly Guid UserId;
         public User User;
 
