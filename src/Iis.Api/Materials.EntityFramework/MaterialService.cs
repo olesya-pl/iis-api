@@ -1,28 +1,28 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
-using Newtonsoft.Json.Linq;
-using IIS.Core.Materials.EntityFramework.FeatureProcessors;
-using Iis.DataModel.Materials;
+using MediatR;
+using Iis.Utility;
+using Iis.Messages;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DbLayer.Repositories;
+using Iis.DbLayer.MaterialEnum;
+using Iis.DataModel.Materials;
+using Iis.Interfaces.Roles;
+using Iis.Interfaces.Enums;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
-using System.Threading;
-using Iis.DbLayer.MaterialEnum;
-using Iis.Interfaces.Elastic;
-using Iis.Services.Contracts.Interfaces;
-using MediatR;
-using Iis.Events.Materials;
-using Iis.Interfaces.Constants;
-using Iis.Messages;
+using Iis.Services;
+using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
-using Iis.Utility;
+using Iis.Services.Contracts.Interfaces;
+using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -35,6 +35,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMaterialSignRepository _materialSignRepository;
+        private readonly IUserService _userService;
         private readonly IMediator _mediatr;
 
         public MaterialService(IFileService fileService,
@@ -43,6 +44,7 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialProvider materialProvider,
             IMLResponseRepository mLResponseRepository,
             IChangeHistoryService changeHistoryService,
+            IUserService userService,
             IMediator mediator,
             IMaterialSignRepository materialSignRepository,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
@@ -53,6 +55,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialProvider = materialProvider;
             _mLResponseRepository = mLResponseRepository;
             _changeHistoryService = changeHistoryService;
+            _userService = userService;
             _materialSignRepository = materialSignRepository;
             _mediatr = mediator;
         }
@@ -65,7 +68,7 @@ namespace IIS.Core.Materials.EntityFramework
             var materialEntity = _mapper.Map<MaterialEntity>(material);
 
             await RunAsync(unitOfWork => { unitOfWork.MaterialRepository.AddMaterialEntity(materialEntity); });
-            
+
             var requestId = changeRequestId.GetValueOrDefault(Guid.NewGuid());
             await SaveMaterialChangeHistory(material, requestId);
             await SaveMaterialChildren(material, requestId);
@@ -166,10 +169,11 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 var changeRequestId = Guid.NewGuid();
                 var changesList = new List<ChangeHistoryDto>();
-                
+
                 if (!string.IsNullOrWhiteSpace(input.Title)) material.Title = input.Title;
-                
-                input.ImportanceId.DoIfHasValue(p => {
+
+                input.ImportanceId.DoIfHasValue(p =>
+                {
                     CreateChangeHistory(material.Id,
                         material.ImportanceSignId,
                         nameof(material.Importance),
@@ -178,7 +182,8 @@ namespace IIS.Core.Materials.EntityFramework
                     material.ImportanceSignId = p;
                 });
 
-                input.ReliabilityId.DoIfHasValue(p => {
+                input.ReliabilityId.DoIfHasValue(p =>
+                {
                     CreateChangeHistory(material.Id,
                         material.ReliabilitySignId,
                         nameof(material.Reliability),
@@ -187,7 +192,8 @@ namespace IIS.Core.Materials.EntityFramework
                     material.ReliabilitySignId = p;
                 });
 
-                input.RelevanceId.DoIfHasValue(p => {
+                input.RelevanceId.DoIfHasValue(p =>
+                {
                     CreateChangeHistory(material.Id,
                         material.RelevanceSignId,
                         nameof(material.Relevance),
@@ -196,7 +202,8 @@ namespace IIS.Core.Materials.EntityFramework
                     material.RelevanceSignId = p;
                 });
 
-                input.CompletenessId.DoIfHasValue(p => {
+                input.CompletenessId.DoIfHasValue(p =>
+                {
                     CreateChangeHistory(material.Id,
                         material.CompletenessSignId,
                         nameof(material.Completeness),
@@ -205,7 +212,8 @@ namespace IIS.Core.Materials.EntityFramework
                     material.CompletenessSignId = p;
                 });
 
-                input.SourceReliabilityId.DoIfHasValue(p => {
+                input.SourceReliabilityId.DoIfHasValue(p =>
+                {
                     CreateChangeHistory(material.Id,
                         material.SourceReliabilitySignId,
                         nameof(material.SourceReliability),
@@ -214,7 +222,8 @@ namespace IIS.Core.Materials.EntityFramework
                     material.SourceReliabilitySignId = p;
                 });
 
-                input.ProcessedStatusId.DoIfHasValue(p => {
+                input.ProcessedStatusId.DoIfHasValue(p =>
+                {
                     CreateChangeHistory(material.Id,
                         material.ProcessedStatusSignId,
                         nameof(material.ProcessedStatus),
@@ -223,7 +232,8 @@ namespace IIS.Core.Materials.EntityFramework
                     material.ProcessedStatusSignId = p;
                 });
 
-                input.SessionPriorityId.DoIfHasValue(p => {
+                input.SessionPriorityId.DoIfHasValue(p =>
+                {
                     CreateChangeHistory(material.Id,
                         material.SessionPriorityId,
                         nameof(material.SessionPriority),
@@ -232,13 +242,14 @@ namespace IIS.Core.Materials.EntityFramework
                     material.SessionPriorityId = p;
                 });
 
-                await input.AssigneeId.DoIfHasValueAsync(async p => {
+                await input.AssigneeId.DoIfHasValueAsync(async p =>
+                {
 
                     if (material.AssigneeId.HasValue && material.AssigneeId.Value == p)
                     {
                         return;
                     }
-                    
+
                     var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p));
 
                     changesList.Add(new ChangeHistoryDto
@@ -254,7 +265,7 @@ namespace IIS.Core.Materials.EntityFramework
                     material.Assignee = null;
                     material.AssigneeId = input.AssigneeId;
                 });
-                if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal)) 
+                if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal))
                 {
                     changesList.Add(new ChangeHistoryDto
                     {
@@ -267,7 +278,7 @@ namespace IIS.Core.Materials.EntityFramework
                         UserName = username
                     });
                     material.Content = input.Content;
-                } 
+                }
 
                 var loadData = MaterialLoadData.MapLoadData(material.LoadData);
 
@@ -297,9 +308,9 @@ namespace IIS.Core.Materials.EntityFramework
 
                 var addHistoryTask = _changeHistoryService.SaveMaterialChanges(changesList);
 
-                await Task.WhenAll(new []{fillElasticTask, addHistoryTask});
+                await Task.WhenAll(new[] { fillElasticTask, addHistoryTask });
 
-                if(MaterialShouldBeQueuedForMachineLearning(material))
+                if (MaterialShouldBeQueuedForMachineLearning(material))
                 {
                     QueueMaterialForMachineLearning(material);
                 }
@@ -319,7 +330,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 return;
             }
-            
+
             changesList.Add(new ChangeHistoryDto
             {
                 Date = DateTime.UtcNow,
@@ -378,7 +389,7 @@ namespace IIS.Core.Materials.EntityFramework
             await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
         }
-        
+
         private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
         {
             return new MaterialInfoEntity
@@ -403,5 +414,55 @@ namespace IIS.Core.Materials.EntityFramework
             return RunWithoutCommitAsync(async (unitOfWork)
                 => await unitOfWork.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, stoppingToken));
         }
-    }    
+
+        public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, byte accessLevel, User user)
+        {
+            var accessLevelValidationResult = IsValidAccessLevel(accessLevel);
+
+            if (!accessLevelValidationResult.IsValid) throw new ArgumentException("Wrong Access level value");
+
+            if( !IsUserAuthorizedForChangeAccessLevel(user) || !_userService.IsAccessLevelAllowedForUser(user.AccessLevel, accessLevelValidationResult.Value))
+            {
+                throw new InvalidOperationException($"Unable to change AccessLevel by user {user.UserName}");
+            }
+
+            var material = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
+
+            var changeHistory = new ChangeHistoryDto
+            {
+                Date = DateTime.UtcNow,
+                NewValue = accessLevelValidationResult.Value.ToString("D"),
+                OldValue = material.AccessLevel.ToString("D"),
+                PropertyName = nameof(material.AccessLevel),
+                RequestId = Guid.NewGuid(),
+                TargetId = material.Id,
+                UserName = user.UserName
+            };
+
+            material.AccessLevel = accessLevelValidationResult.Value;
+
+            Run(uow => uow.MaterialRepository.EditMaterial(material));
+
+            var elasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true));
+
+            var changeHistoryTask = _changeHistoryService.SaveMaterialChanges(new[] { changeHistory });
+
+            var getMaterialTask = _materialProvider.GetMaterialAsync(materialId, user.Id);
+
+            await Task.WhenAll(new[] { elasticTask, changeHistoryTask, getMaterialTask });
+
+            return getMaterialTask.Result;
+        }
+
+        private (bool IsValid, AccessLevel Value) IsValidAccessLevel(byte accessLevel)
+        {
+            var isValid = Enum.IsDefined(typeof(AccessLevel), accessLevel);
+
+            return (IsValid: isValid, Value: isValid ? (AccessLevel)accessLevel : AccessLevel.Undefined);
+        }
+        private bool IsUserAuthorizedForChangeAccessLevel(User user)
+        {
+            return user.IsGranted(AccessKind.AccessLevelChange, AccessOperation.Update);
+        }
+    }
 }

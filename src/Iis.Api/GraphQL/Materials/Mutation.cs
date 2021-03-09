@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
+using HotChocolate.Types;
 using HotChocolate.Resolvers;
 using IIS.Core.Materials;
 
@@ -14,8 +16,23 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             var material = await materialService.UpdateMaterialAsync(input, tokenPayload.UserId, tokenPayload.User.UserName);
+            return mapper.Map<Material>(material);
+        }
+
+        public async Task<Material> ChangeMaterialAccessLevel(
+            IResolverContext context,
+            [Service] IMaterialService materialService,
+            [Service] IMapper mapper,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId,
+            [GraphQLType(typeof(byte))] byte newAccessLevel
+        )
+        {
+            var tokenPayload = context.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+
+            var material = await materialService.ChangeMaterialAccessLevel(materialId, newAccessLevel, tokenPayload.User);
+
             return mapper.Map<Material>(material);
         }
     }

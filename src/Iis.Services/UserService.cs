@@ -8,6 +8,7 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DbLayer.Repositories;
+using Iis.Interfaces.Enums;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -268,6 +269,11 @@ namespace Iis.Services
             return GetUser(userId);
         }
 
+        public bool IsAccessLevelAllowedForUser(AccessLevel userAccessLevel, AccessLevel newAccessLevel)
+        {
+            return userAccessLevel >= newAccessLevel;
+        }
+
         public async Task PutAllUsersToElasticSearchAsync(CancellationToken cancellationToken)
         {
             var users = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetAllUsersAsync(cancellationToken));
@@ -277,6 +283,4 @@ namespace Iis.Services
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
         }
     }
-
-    
 }
