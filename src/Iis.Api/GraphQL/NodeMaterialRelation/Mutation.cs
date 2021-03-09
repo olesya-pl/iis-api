@@ -18,7 +18,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.UserId);
             return mapper.Map<Material>(material);
@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [GraphQLNonNullType] MultipleNodeMaterialRelationInput input)
         {
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             await relationService.CreateMultipleRelations(tokenPayload.UserId, input.Query, input.NodeId, tokenPayload.User.UserName);
             return new CreateRelationsResponse
             {
@@ -44,7 +44,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             await relationService.Delete(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.UserId);
             return mapper.Map<Material>(material);

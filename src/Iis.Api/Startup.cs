@@ -335,7 +335,7 @@ namespace IIS.Core
                     }
                 }
 
-                context.ContextData.Add("token", validatedToken);
+                context.ContextData.Add(TokenPayload.TokenPropertyName, validatedToken);
             }
         }
 
