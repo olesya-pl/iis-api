@@ -20,7 +20,7 @@ namespace IIS.Core.GraphQL.Entities
     public class OntologyFilterableQuery
     {
         private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString()};
-        private static readonly string[] ObjectTypeList = new[] { EntityTypeNames.Object.ToString() };
+        private static readonly string[] EntityList = new[] { EntityTypeNames.ObjectOfStudy.ToString(), EntityTypeNames.Wiki.ToString() };
         public async Task<OntologyFilterableQueryResponse> EntityObjectOfStudyFilterableList(
             [Service] IOntologyService ontologyService,
             [Service] IOntologyNodesData nodesData,
@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL.Entities
             AllEntitiesFilterInput filter
             )
         {
-            var types = filter.Types is null || !filter.Types.Any() ? ObjectTypeList : filter.Types;
+            var types = filter.Types is null || !filter.Types.Any() ? EntityList : filter.Types;
 
             var response = await ontologyService.FilterNodeAsync(types, new ElasticFilter
             {
