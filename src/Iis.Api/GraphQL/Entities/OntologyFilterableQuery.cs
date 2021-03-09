@@ -19,8 +19,8 @@ namespace IIS.Core.GraphQL.Entities
 {
     public class OntologyFilterableQuery
     {
-        private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString()};
-        private static readonly string[] ObjectTypeList = new[] { EntityTypeNames.Object.ToString() };
+        private static readonly string[] ObjectOfStudyTypeList = { EntityTypeNames.ObjectOfStudy.ToString()};
+        private static readonly string[] ObjectTypeList = { EntityTypeNames.Object.ToString() };
         public async Task<OntologyFilterableQueryResponse> EntityObjectOfStudyFilterableList(
             [Service] IOntologyService ontologyService,
             [Service] IOntologyNodesData nodesData,
@@ -35,7 +35,9 @@ namespace IIS.Core.GraphQL.Entities
             {
                 Limit = pagination.PageSize,
                 Offset = pagination.Offset(),
-                Suggestion = filter?.Suggestion ?? filter?.SearchQuery
+                Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
+                CherryPickedItems = filter.CherryPickedItems.ToList(),
+                FilteredItems = filter.FilteredItems.ToList()
             });
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);

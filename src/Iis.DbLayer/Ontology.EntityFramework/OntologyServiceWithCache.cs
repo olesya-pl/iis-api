@@ -360,17 +360,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .GetEntityTypesByName(typeNameList, true)
                 .Select(nt => nt.Name)
                 .Distinct();
-
-            var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
-
-            if (isElasticSearch)
-            {
-                return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
-            }
-            else
-            {
-                return new SearchEntitiesByConfiguredFieldsResult();
-            }
+            
+            return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, 

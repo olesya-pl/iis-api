@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Iis.Interfaces.Elastic;
 using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
