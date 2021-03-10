@@ -1,38 +1,45 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json.Linq;
 using FluentAssertions;
 using FluentAssertions.Json;
 using Xunit;
-
 using Iis.Elastic.SearchQueryExtensions;
+using Iis.Interfaces.Elastic;
+using Newtonsoft.Json;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests
 {
     public class SearchQueryExtensionTests
     {
+        private static string BasePathToJson = "Iis.Elastic.Tests/SearchQueryExtensionTestJson";
         [Theory]
-        [InlineData(new[] { "*" }, 1, 5)]
-        [InlineData(new[] { "Id", "Type", "Source" }, 0, 3)]
+        [InlineData(new[] {"*"}, 1, 5)]
+        [InlineData(new[] {"Id", "Type", "Source"}, 0, 3)]
         public void WithSearchJson_Success(IEnumerable<string> resultFieldList, int from, int size)
         {
-            var expected = JObject.Parse("{\"_source\":[" + string.Join(",", resultFieldList.Select(x => $"\"{x}\"")) + "], \"from\":" + from + ",\"size\":" + size + ",\"query\": {}}");
+            var expected = JObject.Parse("{\"_source\":[" + string.Join(",", resultFieldList.Select(x => $"\"{x}\"")) +
+                                         "], \"from\":" + from + ",\"size\":" + size + ",\"query\": {}}");
 
             var actual = SearchQueryExtension.WithSearchJson(resultFieldList, from, size);
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Theory]
         [InlineData(1, 5)]
         public void WithSearchJson_DefaultResultFieldList(int from, int size)
         {
-            var expected = JObject.Parse("{\"_source\":[\"*\"], \"from\":" + from + ",\"size\":" + size + ",\"query\": {}}");
+            var expected =
+                JObject.Parse("{\"_source\":[\"*\"], \"from\":" + from + ",\"size\":" + size + ",\"query\": {}}");
 
             var actual = SearchQueryExtension.WithSearchJson(null, from, size);
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Fact]
         public void SetupHighlights_Success()
         {
@@ -42,6 +49,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Fact]
         public void SetupHighlights_Null()
         {
@@ -51,6 +59,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeNull();
         }
+
         [Fact]
         public void SetupHighlights_UpdateExistingProperty()
         {
@@ -64,12 +73,16 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Theory]
         [InlineData("fieldName:fieldValue", true)]
         [InlineData("fieldName:fieldValue", false)]
         public void SetupExactQuery_Success(string query, bool lenient)
         {
-            var expected = JObject.Parse("{\"_source\": [\"*\"], \"from\": 0, \"size\": 0,\"query\":{\"query_string\":{\"query\":\"" + query + "\", \"lenient\":" + lenient.ToString().ToLower() + "}}}");
+            var expected =
+                JObject.Parse(
+                    "{\"_source\": [\"*\"], \"from\": 0, \"size\": 0,\"query\":{\"query_string\":{\"query\":\"" +
+                    query + "\", \"lenient\":" + lenient.ToString().ToLower() + "}}}");
 
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
@@ -78,11 +91,15 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Theory]
         [InlineData("fieldName:fieldValue")]
         public void SetupExactQuery_Success_NoLenient(string query)
         {
-            var expected = JObject.Parse("{\"_source\": [\"*\"], \"from\": 0, \"size\": 0,\"query\":{\"query_string\":{\"query\":\"" + query + "\"}}}");
+            var expected =
+                JObject.Parse(
+                    "{\"_source\": [\"*\"], \"from\": 0, \"size\": 0,\"query\":{\"query_string\":{\"query\":\"" +
+                    query + "\"}}}");
 
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
@@ -90,11 +107,13 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Theory]
         [InlineData("fieldName:fieldValue", 14, 88)]
         public void SetupExactQuery_Success_WithPagination(string query, int offset, int size)
         {
-            var expected = JObject.Parse("{\"_source\": [\"*\"], \"from\": " + offset + ", \"size\": " + size + ",\"query\":{\"query_string\":{\"query\":\"" + query + "\"}}}");
+            var expected = JObject.Parse("{\"_source\": [\"*\"], \"from\": " + offset + ", \"size\": " + size +
+                                         ",\"query\":{\"query_string\":{\"query\":\"" + query + "\"}}}");
 
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
@@ -103,20 +122,25 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Theory]
         [InlineData("fieldName:fieldValue", 21, 69, "Id")]
-        public void SetupExactQuery_Success_WithPagination_AndResultFields(string query, int offset, int size, string resultField)
+        public void SetupExactQuery_Success_WithPagination_AndResultFields(string query, int offset, int size,
+            string resultField)
         {
-            var expected = JObject.Parse("{\"_source\": [\"" + resultField + "\"], \"from\": " + offset + ", \"size\": " + size + ",\"query\":{\"query_string\":{\"query\":\"" + query + "\"}}}");
+            var expected = JObject.Parse("{\"_source\": [\"" + resultField + "\"], \"from\": " + offset +
+                                         ", \"size\": " + size + ",\"query\":{\"query_string\":{\"query\":\"" + query +
+                                         "\"}}}");
 
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
                 .WithPagination(offset, size)
-                .WithResultFields(new[] { resultField })
+                .WithResultFields(new[] {resultField})
                 .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Theory]
         [InlineData("fieldName", "asc")]
         [InlineData("fieldName", "desc")]
@@ -128,6 +152,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Theory]
         [InlineData(null, "asc")]
         [InlineData("fieldName", null)]
@@ -139,10 +164,13 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeNull();
         }
+
         [Fact]
         public void SetupSorting_UpdateExistingProperty()
         {
-            var expected = JObject.Parse("{\"sort\":[{\"fieldName1\":{\"order\":\"asc\"}}, {\"fieldName2\":{\"order\":\"desc\"}}]}");
+            var expected =
+                JObject.Parse(
+                    "{\"sort\":[{\"fieldName1\":{\"order\":\"asc\"}}, {\"fieldName2\":{\"order\":\"desc\"}}]}");
 
             var stubValue = JObject.Parse("{\"sort\":[{\"fieldName1\":{\"order\":\"asc\"}}]}");
 
@@ -150,6 +178,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Fact]
         public void SetupSorting_SortIsNotArray()
         {
@@ -163,6 +192,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Fact]
         public void SetupAggregation_EmptyFieldNameList()
         {
@@ -174,10 +204,13 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Fact]
         public void SetupAggregation_OneField_Success()
         {
-            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"missing\":\"__hasNoValue\",\"size\": 100}}}}");
+            var expected =
+                JObject.Parse(
+                    "{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"missing\":\"__hasNoValue\",\"size\": 100}}}}");
 
             var aggregationFieldList = new[]
             {
@@ -188,10 +221,12 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Fact]
         public void SetupAggregation_TwoField_Success()
         {
-            var expected = JObject.Parse("{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\",\"missing\":\"__hasNoValue\", \"size\": 100}}, \"NodeName\":{\"terms\":{\"field\":\"NodeNameAggregate\", \"missing\":\"__hasNoValue\", \"size\": 100}}}}");
+            var expected = JObject.Parse(
+                "{\"aggs\":{\"NodeType\":{\"terms\":{\"field\":\"NodeTypeAggregate\",\"missing\":\"__hasNoValue\", \"size\": 100}}, \"NodeName\":{\"terms\":{\"field\":\"NodeNameAggregate\", \"missing\":\"__hasNoValue\", \"size\": 100}}}}");
 
             var aggregationFieldList = new[]
             {
@@ -203,10 +238,13 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             actual.Should().BeEquivalentTo(expected);
         }
+
         [Fact]
         public void SetupAggregation_OneAlias_Success()
         {
-            var expected = JObject.Parse("{\"aggs\":{\"NodeAlias\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"missing\":\"__hasNoValue\",\"size\": 100}}}}");
+            var expected =
+                JObject.Parse(
+                    "{\"aggs\":{\"NodeAlias\":{\"terms\":{\"field\":\"NodeTypeAggregate\", \"missing\":\"__hasNoValue\",\"size\": 100}}}}");
 
             var aggregationFieldList = new[]
             {
@@ -216,6 +254,92 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var actual = new JObject().WithAggregation(aggregationFieldList);
 
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void WithAggregation_WithFilter_OnlyFilteredItemsAvailable()
+        {
+            var expected = GetActualJObject(nameof(WithAggregation_WithFilter_OnlyFilteredItemsAvailable));
+            
+            var aggregationFieldList = new[]
+            {
+                new AggregationField($"amount.name{SearchQueryExtension.AggregateSuffix}", "",
+                    $"amount.name{SearchQueryExtension.AggregateSuffix}", "amount.name")
+            };
+
+            var filter = new ElasticFilter
+            {
+                FilteredItems = new List<Property>
+                {
+                    new Property {Name = "amount.name", Value = "Батальйон"},
+                    new Property {Name = "classifiers.corps.name", Value = "ППО"}
+                }
+            };
+
+            var actual = new JObject().WithAggregation(aggregationFieldList, filter);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        
+        [Fact]
+        public void WithAggregation_WithFilter_WithSuggestion()
+        {
+            var expected = GetActualJObject(nameof(WithAggregation_WithFilter_WithSuggestion));
+            
+            var aggregationFieldList = new[]
+            {
+                new AggregationField($"amount.name{SearchQueryExtension.AggregateSuffix}", "",
+                    $"amount.name{SearchQueryExtension.AggregateSuffix}", "amount.name")
+            };
+
+            var filter = new ElasticFilter
+            {
+                Suggestion = "омсбр",
+                FilteredItems = new List<Property>
+                {
+                    new Property {Name = "amount.name", Value = "Батальйон"},
+                    new Property {Name = "classifiers.corps.name", Value = "ППО"}
+                }
+            };
+
+            var actual = new JObject().WithAggregation(aggregationFieldList, filter);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        
+        [Fact]
+        public void WithAggregation_WithFilter_WithOneFilteredItems()
+        {
+            var expected = GetActualJObject(nameof(WithAggregation_WithFilter_WithOneFilteredItems));
+            
+            var aggregationFieldList = new[]
+            {
+                new AggregationField($"amount.name{SearchQueryExtension.AggregateSuffix}", "",
+                    $"amount.name{SearchQueryExtension.AggregateSuffix}", "amount.name")
+            };
+
+            var filter = new ElasticFilter
+            {
+                FilteredItems = new List<Property>
+                {
+                    new Property {Name = "amount.name", Value = "Батальйон"},
+                }
+            };
+
+            var actual = new JObject().WithAggregation(aggregationFieldList, filter);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        private JObject GetActualJObject(string name)
+        {
+            var path = $"{BasePathToJson}/{name.Replace("_", "")}.json";
+            if(!File.Exists(path))
+                throw new FileNotFoundException($"file was not found by path {path}");
+
+            var jsonContent = File.ReadAllText(path);
+            
+            return JObject.Parse(jsonContent);
         }
     }
 }

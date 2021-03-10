@@ -38,4 +38,16 @@
     <Folder Include="OntologyService\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Iis.Elastic.Tests\SearchQueryExtensionTestJson\WithAggregationWithFilterOnlyFilteredItemsAvailable.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Iis.Elastic.Tests\SearchQueryExtensionTestJson\WithAggregationWithFilterWithSuggestion.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Iis.Elastic.Tests\SearchQueryExtensionTestJson\WithAggregationWithFilterWithOneFilteredItems.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

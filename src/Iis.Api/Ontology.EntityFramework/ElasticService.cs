@@ -123,7 +123,7 @@ namespace IIS.Core.Ontology.EntityFramework
 
             var aggregationFieldList = multiSearchParams.SearchParams.SelectMany(p => p.Fields)
                                     .Where(p => p.IsAggregated)
-                                    .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
+                                    .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Name))
                                     .ToArray();
 
             var multiSearchQuery = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
