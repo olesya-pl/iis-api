@@ -53,5 +53,11 @@ namespace Iis.DbLayer.ModifyDataScripts
             );
             context.SaveChanges();
         }
+        
+        public void AddAccessLevels(OntologyContext context, IOntologyNodesData data)
+        {
+            var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
+            data.Schema.CreateEntityType("AccessLevels", "Access Levels", false, enumEntityType.Id);
+        }
     }
 }
