@@ -103,17 +103,20 @@ namespace IIS.Core.Ontology.EntityFramework
         {
             if(ShouldReturnAllEntities(filter))
             {
-                var aggregadionFieldList = _elasticConfiguration
-                    .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)))
-                    .Where(e => e.IsAggregated)
-                    .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}"))
-                    .ToArray();
-
+                var defaultAggregations = new List<AggregationField>
+                {
+                    new AggregationField(
+                        ElasticConfigConstants.NodeTypeTitleAggregateField,
+                        ElasticConfigConstants.NodeTypeTitleAlias,
+                        ElasticConfigConstants.NodeTypeTitleAggregateField)
+                };
+                
                 var query = new MatchAllQueryBuilder()
-                            .WithPagination(filter.Offset, filter.Limit)
-                            .BuildSearchQuery()
-                            .WithHighlights()
-                            .WithAggregation(aggregadionFieldList).ToString(Formatting.None);
+                    .WithPagination(filter.Offset, filter.Limit)
+                    .BuildSearchQuery()
+                    .WithAggregation(defaultAggregations)
+                    .WithHighlights()
+                    .ToString();
                 
                 var results = await _elasticManager.SearchAsync(query, typeNames, ct);
                 return results.ToOutputSearchResult();
@@ -132,10 +135,16 @@ namespace IIS.Core.Ontology.EntityFramework
                 .WithResultFields(multiSearchParams.ResultFields)
                 .BuildSearchQuery()
                 .WithHighlights()
-                .WithAggregation(aggregationFieldList)
+                .ToString();
+            
+            var aggregationQuery = new MatchAllQueryBuilder()
+                .WithPagination(0, 0)
+                .BuildSearchQuery()
+                .WithAggregation(aggregationFieldList, filter)
                 .ToString();
 
             var searchResult = await _elasticManager.SearchAsync(multiSearchQuery, typeNames, ct);
+            var aggregationResult = await _elasticManager.SearchAsync(aggregationQuery, typeNames, ct);
 
             if (historicalResult != null && historicalResult.Count > 0)
             {
@@ -152,7 +161,12 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }
 
-            return searchResult.ToOutputSearchResult();
+            return searchResult.ToOutputSearchResult(ExtractSubAggregations(aggregationResult.Aggregations));
+        }
+
+        private Dictionary<string, AggregationItem> ExtractSubAggregations(Dictionary<string, AggregationItem> aggregations)
+        {
+            return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(

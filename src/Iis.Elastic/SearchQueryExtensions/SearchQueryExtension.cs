@@ -84,8 +84,8 @@ namespace Iis.Elastic.SearchQueryExtensions
                 if (string.IsNullOrWhiteSpace(field.TermFieldName) || string.IsNullOrWhiteSpace(field.Name)) continue;
 
                 var fieldName = GetFieldName(field);
-                var filterSection = CreateAggregationFilter(field.OriginFieldName, filter);
-                var subAggsSection = CreateSubAggs($"sub_{fieldName}", field);
+                var filterSection = CreateAggregationFilter(field, filter);
+                var subAggsSection = CreateSubAggs("sub_aggs", field);
 
                 aggregations[fieldName] = new JObject
                 {
@@ -108,16 +108,19 @@ namespace Iis.Elastic.SearchQueryExtensions
 
             return new JObject
             {
-                {name, new JObject() {{"terms", aggregation}}}
+                {name, new JObject {{"terms", aggregation}}}
             };
         }
 
-        private static JObject CreateAggregationFilter(string originFieldName, ElasticFilter filter)
+        private static JObject CreateAggregationFilter(AggregationField field, ElasticFilter filter)
         {
+            // var fi = filter.FilteredItems.First();
+            // var s = fi.Name == field.OriginFieldName || fi.Name == field.Alias;
+            // var s1 = !(fi.Name == field.OriginFieldName || fi.Name == field.Alias);
             var fieldSpecificFilter = new ElasticFilter
             {
                 Suggestion = filter.Suggestion,
-                FilteredItems = filter.FilteredItems.Where(x => x.Name != originFieldName).ToList()
+                FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.OriginFieldName || x.Name == field.Alias)).ToList()
             };
 
             var possibleQuery = fieldSpecificFilter.ToQueryString();
