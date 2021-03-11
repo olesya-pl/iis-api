@@ -7,7 +7,7 @@ using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
-using Iis.Services;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;

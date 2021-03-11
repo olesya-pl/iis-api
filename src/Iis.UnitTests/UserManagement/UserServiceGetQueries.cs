@@ -10,6 +10,7 @@ using Iis.DataModel.Roles;
 using Iis.Services;
 using Iis.UnitTests.TestHelpers;
 using Iis.DbLayer.Repositories;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.UnitTests.UserManagement
 {
@@ -39,7 +40,7 @@ namespace Iis.UnitTests.UserManagement
         [Fact(DisplayName = "No such user with exception")]
         public async Task GetUserById_NoSuchUser()
         {
-            var service = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IUserService>();
 
             //act
             ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(() => service.GetUserAsync(Guid.Empty));
@@ -55,7 +56,7 @@ namespace Iis.UnitTests.UserManagement
             UserEntity userEntity)
         {
             // arrange: begin
-            var service = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IUserService>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
@@ -97,7 +98,7 @@ namespace Iis.UnitTests.UserManagement
             RoleEntity roleEntity)
         {
             // arrange:begin
-            var service = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IUserService>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
@@ -138,7 +139,7 @@ namespace Iis.UnitTests.UserManagement
             RoleEntity roleEntity)
         {
             // arrange:begin
-            var service = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IUserService>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 

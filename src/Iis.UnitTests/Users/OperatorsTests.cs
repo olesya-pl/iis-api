@@ -7,6 +7,7 @@ using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DbLayer.Repositories;
 using Iis.Services;
+using Iis.Services.Contracts.Interfaces;
 using Iis.UnitTests.TestHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -47,7 +48,7 @@ namespace Iis.UnitTests.Users
             context.SaveChanges();
 
             //act
-            var sut = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var sut = _serviceProvider.GetRequiredService<IUserService>();
             var result = await sut.GetOperatorsAsync();
 
             //assert
@@ -119,7 +120,7 @@ namespace Iis.UnitTests.Users
             }
 
             //act
-            var sut = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var sut = _serviceProvider.GetRequiredService<IUserService>();
             var result = await sut.GetAvailableOperatorIdsAsync();
 
             //assert
@@ -155,7 +156,7 @@ namespace Iis.UnitTests.Users
             context.SaveChanges();
 
             //act
-            var sut = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var sut = _serviceProvider.GetRequiredService<IUserService>();
             var result = await sut.GetAvailableOperatorIdsAsync();
 
             //assert

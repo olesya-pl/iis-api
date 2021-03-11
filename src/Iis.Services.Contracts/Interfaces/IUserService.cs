@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Iis.Services
+namespace Iis.Services.Contracts.Interfaces
 {
     public interface IUserService
     {
