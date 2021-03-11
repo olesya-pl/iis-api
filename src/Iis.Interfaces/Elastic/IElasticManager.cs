@@ -27,6 +27,8 @@ namespace Iis.Interfaces.Elastic
         Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchByScrollAsync(string scrollId, TimeSpan scrollDuration);
         Task<bool> CreateSecurityMappingAsync(IReadOnlyCollection<string> indexNames, CancellationToken cancellationToken);
+        Task<T> GetExactPayloadAsyncDictionary<T>(string path, CancellationToken cancellationToken);
+        Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken);
         Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken);
         IElasticManager WithUserId(Guid userId);
     }

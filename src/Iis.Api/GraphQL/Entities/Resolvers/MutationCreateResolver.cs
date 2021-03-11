@@ -289,7 +289,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (_resolverContext is null) return null;
 
-            var tokenPayload = _resolverContext.ContextData["token"] as TokenPayload;
+            var tokenPayload = _resolverContext.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             return tokenPayload?.User;
         }
     }

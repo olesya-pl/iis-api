@@ -1,9 +1,9 @@
-﻿using Iis.Services.Contracts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Iis.Interfaces.Enums;
+using Iis.Services.Contracts;
 namespace Iis.Services.Contracts.Interfaces
 {
     public interface IUserService
@@ -17,6 +17,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<User> GetUserAsync(Guid userId);
         Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(int offset, int pageSize);
         Task<User> RejectRole(Guid userId, Guid roleId);
+        bool IsAccessLevelAllowedForUser(AccessLevel userAccessLevel, AccessLevel newAccessLevel);
         Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellationToken = default);
         Task PutAllUsersToElasticSearchAsync(CancellationToken cancellationToken);
     }

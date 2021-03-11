@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HealthChecks.Elasticsearch;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -266,7 +267,9 @@ namespace IIS.Core
                 services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
                 .AddRabbitMQ(mqConnectionString, (SslOption)null)
-                .AddElasticsearch(elasticConfiguration.Uri);
+                .AddElasticsearch(options => options
+                    .UseServer(elasticConfiguration.Uri)
+                    .UseBasicAuthentication(elasticConfiguration.DefaultLogin, elasticConfiguration.DefaultPassword));
             }
 
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
@@ -332,7 +335,7 @@ namespace IIS.Core
                     }
                 }
 
-                context.ContextData.Add("token", validatedToken);
+                context.ContextData.Add(TokenPayload.TokenPropertyName, validatedToken);
             }
         }
 
