@@ -42,7 +42,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement ShowMLResultsButton;
 
-        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(4)")]
+        [FindsBy(How = How.CssSelector, Using = ".action-tab--connection")]
         public IWebElement RelationsTab;
 
         [FindsBy(How = How.CssSelector, Using = ".action-tab--features")]
@@ -66,7 +66,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .el-input__inner")]
+        [FindsBy(How = How.CssSelector, Using = "[aria-describedby] .el-input__inner")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);

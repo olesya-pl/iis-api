@@ -76,6 +76,8 @@ Feature: MaterialsSectionUI - Smoke
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6190 - Open ML tab in the materials card
         When I navigated to Materials page
+        And I clicked search button in the Materials section
+        And I searched 20201015_Resilience_Application_Form.docx data in the materials
         And I clicked on the first material in the Materials list
         And I clicked on the ML tab in the material card
         Then I must see Show button in the ML tab

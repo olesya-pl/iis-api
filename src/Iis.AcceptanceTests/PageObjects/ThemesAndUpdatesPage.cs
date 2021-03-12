@@ -16,7 +16,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar .sidebar__nav-item[name='themes']")]
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Теми та оновлення ')]")]
         [CacheLookup]
         public IWebElement ThemesAndUpdatesSection;
 
