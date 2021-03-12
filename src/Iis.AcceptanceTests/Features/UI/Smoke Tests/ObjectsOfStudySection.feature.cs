@@ -244,7 +244,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         testRunner.Then("I must see the object of study small card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 28
-        testRunner.Then("I must see the title тест графа наземного базування in the small card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must see the title Тестовий Центр ППО in the small card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -25,7 +25,7 @@ Feature: ObjectsOfStudySection - smoke
     Scenario: IIS-6207 - Open a small object of study card
         When I clicked on first object of study
         Then I must see the object of study small card
-        Then I must see the title тест графа наземного базування in the small card
+        Then I must see the title Тестовий Центр ППО in the small card
 
     @smoke @sanity @UI @ObjectOfStudySmallCardUI
     Scenario: IIS-6208 - Open a big object of study card

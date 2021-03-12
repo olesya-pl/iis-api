@@ -19,7 +19,7 @@ namespace AcceptanceTests.PageObjects
 			PageFactory.InitElements(driver, this);
 		}
 
-		[FindsBy(How = How.XPath, Using = "//li[@name='events']")]
+		[FindsBy(How = How.XPath, Using = "//div[contains(text(),'Події')]")]
 		public IWebElement EventsPage;
 
 		[FindsBy(How = How.CssSelector, Using = ".add-button")]
@@ -38,6 +38,9 @@ namespace AcceptanceTests.PageObjects
 
 		[FindsBy(How = How.CssSelector, Using = "[aria-describedby] .el-input__inner")]
 		public IWebElement SearchField;
+
+		[FindsBy(How = How.CssSelector, Using = "textarea[name='description']")]
+		public IWebElement AdditionalDataTextField;
 
 		public List<Event> GetEventsByName(string eventName)
 		{

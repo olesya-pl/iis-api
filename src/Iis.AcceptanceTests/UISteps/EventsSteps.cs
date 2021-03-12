@@ -73,6 +73,7 @@ namespace AcceptanceTests.UISteps
             eventPage.EventTitle.SendKeys(eventUniqueName);
             eventPage.DescriptionField.SendKeys("Додаткові тестові дані");
             eventPage.AverageImportaceRadioButton.Click();
+            eventPage.NotHappenRadioButton.Click();
             eventPage.FlawRadioButton.Click();
             eventPage.CountrySelectionDropDown.Click();
             var countryInput = eventPage.CountrySelectionDropDown.FindElement(By.TagName("input"));
@@ -103,6 +104,7 @@ namespace AcceptanceTests.UISteps
             var eventUniqueName = context.Get<string>(eventName);
             eventsSection.SearchField.SendKeys($"\"{eventUniqueName}\"");
             eventsSection.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
         }
 
         [When(@"I pressed the edit event button")]
@@ -165,6 +167,14 @@ namespace AcceptanceTests.UISteps
         {
             eventPage.MaterialsRelatedToEvent.FirstOrDefault(relatedMaterial => relatedMaterial.Title == materialName).DeleteRelation();
         }
+
+        [When(@"I entered (.*) text in the addition data text field")]
+        public void WhenIEnteredTextInTheAdditionDataTextField(string additionalText)
+        {
+            context.Set(additionalText, "additionalText");
+            eventPage.AdditionalDataTextField.SendKeys(additionalText);
+        }
+
         #endregion
 
         #region Then
@@ -197,6 +207,15 @@ namespace AcceptanceTests.UISteps
         {
             Assert.DoesNotContain(eventPage.MaterialsRelatedToEvent, _ => _.Title == materialName);
         }
+
+        [Then(@"I must see the (.*) text in the additional data text field")]
+        public void ThenIMustSeeTheAdditionalDataInTheAdditionalTextField(string text)
+        {
+            var additionalText = context.Get<string>("additionalText");
+            var actualText = eventPage.AdditionalDataTextField.GetAttribute("value");
+            Assert.Contains(additionalText, actualText);
+        }
+
         #endregion
     }
 }
