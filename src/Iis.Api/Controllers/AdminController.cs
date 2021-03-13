@@ -4,8 +4,10 @@ using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
 using Iis.Services.Contracts.Interfaces;
+using IIS.Core;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,7 @@ namespace Iis.Api.Controllers
         private readonly IUserService _userService;
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
+        IHost _host;
 
         public AdminController(
             IMaterialService materialService,
@@ -37,7 +40,8 @@ namespace Iis.Api.Controllers
             IElasticState elasticState,
             IUserService userService,
             IUserElasticService userElasticService,
-            IAdminOntologyElasticService adminElasticService)
+            IAdminOntologyElasticService adminElasticService,
+            IHost host)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -46,6 +50,7 @@ namespace Iis.Api.Controllers
             _adminElasticService = adminElasticService;
             _userService = userService;
             _userElasticService = userElasticService;
+            _host = host;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -190,8 +195,15 @@ namespace Iis.Api.Controllers
             }
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
-        }        
-        
+        }
+
+        [HttpPost("RestartApplication")]
+        public async Task RestartApplication()
+        {
+            Program.NeedToStart = true;
+            await _host.StopAsync();
+        }
+
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);

@@ -11,13 +11,22 @@ namespace IIS.Core
     public class Program
     {
         public static bool IsStartedFromMain { get; set; }
+        public static bool NeedToStart { get; set; } = true;
         public static async Task Main(string[] args)
         {
             IsStartedFromMain = true;
-            IHost host = CreateWebHostBuilder(args).Build();
-            if (await host.RunUpAsync())
+            while (NeedToStart)
             {
-                host.Run();
+                try
+                {
+                    NeedToStart = false;
+                    IHost host = CreateWebHostBuilder(args).Build();
+                    if (await host.RunUpAsync())
+                    {
+                        host.Run();
+                    }
+                }
+                catch { }
             }
         }
 
