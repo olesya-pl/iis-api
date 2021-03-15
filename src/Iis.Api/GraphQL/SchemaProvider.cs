@@ -55,6 +55,7 @@ namespace IIS.Core.GraphQL
 
         private ISchema LoadSchema()
         {
+            _logger.LogInformation("SchemaProvider. LoadSchema. Starting schema load");
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
             RegisterTypes(builder);
             TryRegisterOntologyTypes(builder);
@@ -114,7 +115,9 @@ namespace IIS.Core.GraphQL
             });
             try
             {
-                return builder.Create();
+                var res = builder.Create();
+                _logger.LogInformation("SchemaProvider. LoadSchema. Ending building schema");
+                return res;
             }
             catch (Exception e)
             {
