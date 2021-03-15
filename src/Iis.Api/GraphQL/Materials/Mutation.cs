@@ -5,7 +5,6 @@ using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Resolvers;
 using IIS.Core.Materials;
-
 namespace IIS.Core.GraphQL.Materials
 {
     public class Mutation
