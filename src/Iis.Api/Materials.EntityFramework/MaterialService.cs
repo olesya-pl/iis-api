@@ -74,7 +74,12 @@ namespace IIS.Core.Materials.EntityFramework
             await SaveMaterialChildren(material, requestId);
             await SaveMaterialInfoEntities(material);
 
-            _eventProducer.PublishMaterialCreatedMessage(new MaterialCreatedMessage
+            _eventProducer.PublishMaterialCreatedMessage(CreatedMessage(material));
+        }
+
+        private MaterialCreatedMessage CreatedMessage(Material material)
+        {
+            return new MaterialCreatedMessage
             {
                 MaterialId = material.Id,
                 FileId = material.FileId,
@@ -82,16 +87,17 @@ namespace IIS.Core.Materials.EntityFramework
                 CreatedDate = material.CreatedDate,
                 Type = material.Type,
                 Source = material.Source
-            });
+            };
         }
 
         private Task SaveMaterialChangeHistory(Material material, Guid changeRequestId)
         {
+            var timeSpan = DateTime.UtcNow;
             var changeItems = new List<ChangeHistoryDto>
             {
                 new ChangeHistoryDto
                 {
-                    Date = DateTime.UtcNow,
+                    Date = timeSpan,
                     NewValue = material.Id.ToString(),
                     PropertyName = nameof(material.Id),
                     RequestId = changeRequestId,
@@ -99,9 +105,25 @@ namespace IIS.Core.Materials.EntityFramework
                 },
                 new ChangeHistoryDto
                 {
-                    Date = DateTime.UtcNow,
+                    Date = timeSpan,
                     NewValue = material.Source,
                     PropertyName = nameof(material.Source),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                },
+                new ChangeHistoryDto
+                {
+                    Date = timeSpan,
+                    NewValue = material.LoadData.LoadedBy,
+                    PropertyName = nameof(material.LoadData.LoadedBy),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                },
+                new ChangeHistoryDto
+                {
+                    Date = timeSpan,
+                    NewValue = material.AccessLevel.ToString("D"),
+                    PropertyName = nameof(material.AccessLevel),
                     RequestId = changeRequestId,
                     TargetId = material.Id,
                 }

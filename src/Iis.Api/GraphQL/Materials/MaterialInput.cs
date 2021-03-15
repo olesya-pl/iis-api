@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Interfaces.Enums;
 using Iis.Interfaces.Materials;
 using IIS.Core.GraphQL.Scalars;
 using Newtonsoft.Json.Linq;
@@ -32,6 +33,7 @@ namespace IIS.Core.GraphQL.Materials
         public DateTime? CreationDate { get; set; }
         public IEnumerable<DateTime> ModificationDates { get; set; }
         public string Coordinates { get; set; }
+        public AccessLevel AccessLevel { get; set; }
     }
 
     public class MaterialLoadData : IMaterialLoadData
