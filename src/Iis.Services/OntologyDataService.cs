@@ -11,11 +11,11 @@ using System.Text;
 
 namespace Iis.Services
 {
-    public class NodesDataService: INodesDataService
+    public class OntologyDataService: IOntologyDataService
     {
         IOntologyNodesData _ontologyData;
 
-        public NodesDataService(IOntologyNodesData ontologyData)
+        public OntologyDataService(IOntologyNodesData ontologyData)
         {
             _ontologyData = ontologyData;
         }

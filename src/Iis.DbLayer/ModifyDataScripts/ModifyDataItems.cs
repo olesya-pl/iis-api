@@ -21,9 +21,9 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             return this;
         }
-        public ModifyDataItems Add(string name, ModifyDataAction action)
+        public ModifyDataItems Add(string name, ModifyDataAction action, bool hostRestartNeeded = false)
         {
-            return Add(new ModifyDataItem(name, action));
+            return Add(new ModifyDataItem(name, action, hostRestartNeeded));
         }
     }
 }

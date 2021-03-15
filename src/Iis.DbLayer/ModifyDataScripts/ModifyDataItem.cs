@@ -11,11 +11,13 @@ namespace Iis.DbLayer.ModifyDataScripts
     {
         public string Name { get; }
         public ModifyDataAction Action { get; }
+        public bool HostRestartNeeded { get; }
 
-        public ModifyDataItem(string name, ModifyDataAction action)
+        public ModifyDataItem(string name, ModifyDataAction action, bool hostRestartNeeded = false)
         {
             Name = name;
             Action = action;
+            HostRestartNeeded = hostRestartNeeded;
         }
     }
 }

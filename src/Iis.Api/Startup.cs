@@ -78,13 +78,14 @@ namespace IIS.Core
     {
         public IConfiguration Configuration { get; }
 
-#if DEBUG
-        public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-#endif
+        public ILoggerFactory MyLoggerFactory;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+#if DEBUG
+            MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+#endif
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -108,12 +109,12 @@ namespace IIS.Core
 
             services.AddMemoryCache();
 
-            var dbConnectionString = Configuration.GetConnectionString("db", "DB_");
-            var flightRadarDbConnectionString = Configuration.GetConnectionString("db-flightradar", "DB_");
+            var connectionStringService = new ConnectionStringService(Configuration);
+            var dbConnectionString = connectionStringService.GetIisApiConnectionString();
+            var flightRadarDbConnectionString = connectionStringService.GetFlightRadarConnectionString();
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
-#if DEBUG
                 services.AddDbContext<OntologyContext>(
                     options => options
                         .UseNpgsql(dbConnectionString)
@@ -128,20 +129,6 @@ namespace IIS.Core
                         .AddInterceptors(new FlightsContextInterceptor()),
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
-#else
-                services.AddDbContext<OntologyContext>(
-                                    options => options
-                                        .UseNpgsql(dbConnectionString),
-                                    contextLifetime: ServiceLifetime.Transient,
-                                    optionsLifetime: ServiceLifetime.Transient);
-
-                services.AddDbContext<FlightsContext>(
-                                    options => options
-                                        .UseNpgsql(flightRadarDbConnectionString)
-                                        .AddInterceptors(new FlightsContextInterceptor()),
-                                    contextLifetime: ServiceLifetime.Transient,
-                                    optionsLifetime: ServiceLifetime.Transient);
-#endif
 
                 var schemaSource = new OntologySchemaSource
                 {
@@ -190,8 +177,10 @@ namespace IIS.Core
             services.AddTransient<RoleService>();
             services.AddTransient<IUserService, UserService<IIISUnitOfWork>>();
             services.AddTransient<IThemeService, ThemeService<IIISUnitOfWork>>();
-            services.AddTransient<INodesDataService, NodesDataService>();
+            services.AddTransient<IOntologyDataService, OntologyDataService>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
+            services.AddTransient<IOntologySchemaService, OntologySchemaService>();
+            services.AddTransient<IConnectionStringService, ConnectionStringService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
@@ -400,7 +389,12 @@ namespace IIS.Core
                 catch { }
 
                 var modifyDataRunner = serviceScope.ServiceProvider.GetService<ModifyDataRunner>();
-                modifyDataRunner.Run();
+                if (modifyDataRunner.Run())
+                {
+                    var host = serviceScope.ServiceProvider.GetService<IHost>();
+                    Program.NeedToStart = true;
+                    host.StopAsync().Wait();
+                }
             }
         }
 

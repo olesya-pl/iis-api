@@ -32,6 +32,7 @@ namespace Iis.Interfaces.Ontology.Data
         void SetNodeIsArchived(Guid nodeId);
         void SetNodeUpdatedAt(Guid nodeId, DateTime updatedAt);
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);
+        void AddValueByDotName(Guid entityId, string value, string dotName);
         void AddValueByDotName(Guid entityId, string value, string[] dotNameParts);
     }
 }

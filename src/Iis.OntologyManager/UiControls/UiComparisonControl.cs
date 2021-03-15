@@ -3,6 +3,7 @@ using Iis.DbLayer.OntologySchema;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Comparison;
 using Iis.OntologySchema.Saver;
+using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,7 +16,7 @@ namespace Iis.OntologyManager.UiControls
     public class UiComparisonControl: UIBaseControl
     {
         IReadOnlyCollection<IOntologySchemaSource> _schemaSources;
-        OntologySchemaService _schemaService;
+        IOntologySchemaService _schemaService;
         IOntologySchema _schema;
         ISchemaCompareResult _compareResult;
         CompareResultForGrid _compareResultForGrid;
@@ -35,7 +36,7 @@ namespace Iis.OntologyManager.UiControls
         Color _aliasColor = Color.DarkBlue;
 
         public UiComparisonControl(IReadOnlyCollection<IOntologySchemaSource> schemaSources,
-            OntologySchemaService schemaService,
+            IOntologySchemaService schemaService,
             IOntologySchema schema)
         {
             _schemaSources = schemaSources;

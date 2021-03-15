@@ -1,5 +1,6 @@
 ﻿using Iis.DataModel;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,31 +12,43 @@ namespace Iis.DbLayer.ModifyDataScripts
     {
         OntologyContext _context;
         IOntologyNodesData _ontologyData;
+        IOntologySchemaService _ontologySchemaService;
+        IConnectionStringService _connectionStringService;
         ModifyDataItems _items = new ModifyDataItems();
 
-        public ModifyDataRunner(OntologyContext context, IOntologyNodesData ontologyData)
+        public ModifyDataRunner(            
+            OntologyContext context, 
+            IOntologyNodesData ontologyData, 
+            IOntologySchemaService ontologySchemaService,
+            IConnectionStringService connectionStringService)
         {
             _context = context;
             _ontologyData = ontologyData;
+            _ontologySchemaService = ontologySchemaService;
+            _connectionStringService = connectionStringService;
             AddItems();
         }
 
         private void AddItems()
         {
-            var actions = new ModifyDataActions();
+            var actions = new ModifyDataActions(_ontologySchemaService, _connectionStringService);
             _items.Add("RemoveEventWikiLinks", actions.RemoveEventWikiLinks);
             _items.Add("AddAccessLevelAccessObject", actions.AddAccessLevelAccessObject);
             _items.Add("AddAccessLevels", actions.AddAccessLevels);
         }
-        public void Run()
+        public bool Run()
         {
+            var restartNeeded = false;
             foreach (var item in _items.Items)
             {
                 if (!ActionDeployed(item.Name))
                 {
                     Run(item);
+                    if (item.HostRestartNeeded)
+                        restartNeeded = true;
                 }
             }
+            return restartNeeded;
         }
         private void Run(ModifyDataItem item)
         {

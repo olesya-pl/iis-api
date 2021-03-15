@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Iis.Services.Contracts.Interfaces
 {
-    public interface INodesDataService
+    public interface IOntologyDataService
     {
         void ReloadOntologyData(string connectionString);
     }

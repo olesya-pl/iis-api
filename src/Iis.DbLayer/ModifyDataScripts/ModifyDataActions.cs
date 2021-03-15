@@ -6,11 +6,19 @@ using Iis.DataModel.Roles;
 using Iis.Interfaces.Roles;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
     public class ModifyDataActions
     {
+        private IOntologySchemaService _ontologySchemaService;
+        private IConnectionStringService _connectionStringService;
+        public ModifyDataActions(IOntologySchemaService ontologySchemaService, IConnectionStringService connectionStringService)
+        {
+            _ontologySchemaService = ontologySchemaService;
+            _connectionStringService = connectionStringService;
+        }
         public void RemoveEventWikiLinks(OntologyContext context, IOntologyNodesData data)
         {
             var list = new List<IRelation>();
@@ -56,8 +64,42 @@ namespace Iis.DbLayer.ModifyDataScripts
         
         public void AddAccessLevels(OntologyContext context, IOntologyNodesData data)
         {
+            if (data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString()) != null) return;
+
+            const string NAME = "name";
+            const string NUMERIC_INDEX = "numericIndex";
+
             var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
-            data.Schema.CreateEntityType("AccessLevels", "Access Levels", false, enumEntityType.Id);
+            var accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Гріфи (рівні доступу)", false, enumEntityType.Id);
+            data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
+            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
+
+            data.WriteLock(() =>
+            {
+                var node = data.CreateNode(accessLevelType.Id);
+                data.AddValueByDotName(node.Id, "НВ - Не визначено", NAME);
+                data.AddValueByDotName(node.Id, "0", NUMERIC_INDEX);
+
+                node = data.CreateNode(accessLevelType.Id);
+                data.AddValueByDotName(node.Id, "НТ - Не таємно", NAME);
+                data.AddValueByDotName(node.Id, "1", NUMERIC_INDEX);
+
+                node = data.CreateNode(accessLevelType.Id);
+                data.AddValueByDotName(node.Id, "ДСВ - Для службового використання", NAME);
+                data.AddValueByDotName(node.Id, "2", NUMERIC_INDEX);
+
+                node = data.CreateNode(accessLevelType.Id);
+                data.AddValueByDotName(node.Id, "Т - Таємно", NAME);
+                data.AddValueByDotName(node.Id, "3", NUMERIC_INDEX);
+
+                node = data.CreateNode(accessLevelType.Id);
+                data.AddValueByDotName(node.Id, "ЦТ - Цілком таємно", NAME);
+                data.AddValueByDotName(node.Id, "4", NUMERIC_INDEX);
+
+                node = data.CreateNode(accessLevelType.Id);
+                data.AddValueByDotName(node.Id, "ОС - Особливої важливості", NAME);
+                data.AddValueByDotName(node.Id, "5", NUMERIC_INDEX);
+            });
         }
     }
 }

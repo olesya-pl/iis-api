@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using System.Net.Http;
 using System.Text;
 using static Iis.OntologyManager.UiControls.UiFilterControl;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.OntologyManager
 {
@@ -42,7 +43,7 @@ namespace Iis.OntologyManager
         IOntologyManagerStyle _style;
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
-        OntologySchemaService _schemaService;
+        IOntologySchemaService _schemaService;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         UserCredentials _userCredentials;
         RequestSettings _requestSettings;
@@ -88,7 +89,7 @@ namespace Iis.OntologyManager
 
         public MainForm(
             IConfiguration configuration,
-            OntologySchemaService schemaService,
+            IOntologySchemaService schemaService,
             ILogger logger)
         {
             InitializeComponent();

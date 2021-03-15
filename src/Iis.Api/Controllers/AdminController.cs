@@ -38,8 +38,8 @@ namespace Iis.Api.Controllers
         private readonly IAdminOntologyElasticService _adminElasticService;
         private readonly IHost _host;
         private readonly IConfiguration _configuration;
-        private readonly INodesDataService _nodesDataService;
-        
+        private readonly IOntologyDataService _nodesDataService;
+        private readonly IConnectionStringService _connectionStringService;
 
         public AdminController(
             IMaterialService materialService,
@@ -50,8 +50,8 @@ namespace Iis.Api.Controllers
             IUserElasticService userElasticService,
             IAdminOntologyElasticService adminElasticService,
             IHost host,
-            IConfiguration configuration,
-            INodesDataService nodesDataService)
+            IConnectionStringService connectionStringService,
+            IOntologyDataService nodesDataService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -61,8 +61,8 @@ namespace Iis.Api.Controllers
             _userService = userService;
             _userElasticService = userElasticService;
             _host = host;
-            _configuration = configuration;
             _nodesDataService = nodesDataService;
+            _connectionStringService = connectionStringService;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -219,7 +219,7 @@ namespace Iis.Api.Controllers
         [HttpPost("ReloadOntologyData")]
         public async Task<IActionResult> ReloadOntologyData()
         {
-            var connectionString = _configuration.GetConnectionString("db", "DB_");
+            var connectionString = _connectionStringService.GetIisApiConnectionString();
             _nodesDataService.ReloadOntologyData(connectionString);
             return Content("Success");
         }
@@ -264,7 +264,7 @@ namespace Iis.Api.Controllers
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 
-            return Content(_adminElasticService.Logger.ToString()); 
+            return Content(_adminElasticService.Logger.ToString());
         }
     }
 }

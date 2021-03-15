@@ -18,6 +18,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.DbLayer.OntologySchema;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Services;
 
 namespace Iis.UnitTests
 {

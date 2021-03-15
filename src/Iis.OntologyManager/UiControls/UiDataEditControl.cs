@@ -67,7 +67,7 @@ namespace Iis.OntologyManager.UiControls
                 var textBox = (TextBox)_controls[attribute.Name];
                 var newValue = textBox.Text.Trim();
                 if (!string.IsNullOrEmpty(newValue))
-                    _ontologyData.AddValueByDotName(_node.Id, newValue, new[] { attribute.Name });
+                    _ontologyData.AddValueByDotName(_node.Id, newValue, attribute.Name);
             }
         }
         private void Update()
@@ -84,7 +84,7 @@ namespace Iis.OntologyManager.UiControls
                     continue;
 
                 if (!string.IsNullOrEmpty(newValue))
-                    _ontologyData.AddValueByDotName(_node.Id, newValue, new[] { attribute.Name });
+                    _ontologyData.AddValueByDotName(_node.Id, newValue, attribute.Name);
 
                 if (property != null)
                 {

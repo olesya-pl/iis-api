@@ -90,6 +90,8 @@ namespace Iis.OntologyData
         {
             return Locker.ReadLock(() => ids.Where(id => _storage.Nodes.ContainsKey(id)).Select(id => _storage.Nodes[id]).ToList());
         }
+        public void AddValueByDotName(Guid entityId, string value, string dotName) =>
+            AddValueByDotName(entityId, value, dotName.Split('.'));
 
         public void AddValueByDotName(Guid entityId, string value, string[] dotNameParts)
         {
