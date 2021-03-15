@@ -12,6 +12,7 @@ namespace Iis.Interfaces.Ontology.Data
         IOntologySchema Schema { get; }
         IOntologyPatch Patch { get; }
         void ClearPatch();
+        void ReloadData(INodesRawData rawData);
         INode GetNode(Guid id);
         T ReadLock<T>(Func<T> func);
         T WriteLock<T>(Func<T> func);

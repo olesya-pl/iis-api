@@ -36,6 +36,9 @@ namespace Iis.OntologyData
             Locker.OnCommingChanges += () => _saver.SavePatch(Patch);
         }
 
+        public void ReloadData(INodesRawData rawData) =>
+            Locker.WriteLock(() => { _storage = new DataStorage(rawData, _mapper, Schema, this); });
+
         private IMapper GetMapper()
         {
             var configuration = new MapperConfiguration(cfg =>

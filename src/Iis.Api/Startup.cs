@@ -190,6 +190,7 @@ namespace IIS.Core
             services.AddTransient<RoleService>();
             services.AddTransient<IUserService, UserService<IIISUnitOfWork>>();
             services.AddTransient<IThemeService, ThemeService<IIISUnitOfWork>>();
+            services.AddTransient<INodesDataService, NodesDataService>();
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();

@@ -1,12 +1,17 @@
-﻿using Iis.DbLayer.Repositories;
+﻿using Iis.DataModel;
+using Iis.DbLayer.OntologyData;
+using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyData;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using System;
@@ -31,7 +36,10 @@ namespace Iis.Api.Controllers
         private readonly IUserService _userService;
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
-        IHost _host;
+        private readonly IHost _host;
+        private readonly IConfiguration _configuration;
+        private readonly INodesDataService _nodesDataService;
+        
 
         public AdminController(
             IMaterialService materialService,
@@ -41,7 +49,9 @@ namespace Iis.Api.Controllers
             IUserService userService,
             IUserElasticService userElasticService,
             IAdminOntologyElasticService adminElasticService,
-            IHost host)
+            IHost host,
+            IConfiguration configuration,
+            INodesDataService nodesDataService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -51,6 +61,8 @@ namespace Iis.Api.Controllers
             _userService = userService;
             _userElasticService = userElasticService;
             _host = host;
+            _configuration = configuration;
+            _nodesDataService = nodesDataService;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -99,7 +111,7 @@ namespace Iis.Api.Controllers
             {
                 await _adminElasticService.FillIndexesFromMemoryAsync(indexes, fieldsToExclude, ct);
             }
-            else 
+            else
             {
                 await _adminElasticService.FillIndexesFromMemoryAsync(indexes, false, ct);
             }
@@ -111,13 +123,13 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("RecreateElasticReportIndex")]
-        public async Task<IActionResult> RecreateReportIndex(CancellationToken ct) 
+        public async Task<IActionResult> RecreateReportIndex(CancellationToken ct)
         {
             _adminElasticService.Logger = new StringBuilder();
             var index = _elasticState.ReportIndex;
 
             await _adminElasticService.DeleteIndexesAsync(new string[] { index }, ct);
-            await _adminElasticService.CreateReportIndexWithMappingsAsync(ct);            
+            await _adminElasticService.CreateReportIndexWithMappingsAsync(ct);
             await _adminElasticService.FillReportIndexAsync(ct);
 
             return Content(_adminElasticService.Logger.ToString());
@@ -183,7 +195,7 @@ namespace Iis.Api.Controllers
 
             return Content(log.ToString());
         }
-        
+
         [HttpGet("GetElasticJson/{id}")]
         public async Task<IActionResult> GetElasticJson(string id, CancellationToken cancellationToken)
         {
@@ -202,6 +214,14 @@ namespace Iis.Api.Controllers
         {
             Program.NeedToStart = true;
             await _host.StopAsync();
+        }
+
+        [HttpPost("ReloadOntologyData")]
+        public async Task<IActionResult> ReloadOntologyData()
+        {
+            var connectionString = _configuration.GetConnectionString("db", "DB_");
+            _nodesDataService.ReloadOntologyData(connectionString);
+            return Content("Success");
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
