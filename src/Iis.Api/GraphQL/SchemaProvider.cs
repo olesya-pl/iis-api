@@ -121,12 +121,13 @@ namespace IIS.Core.GraphQL
             }
             catch (Exception e)
             {
-                _logger.LogError("SchemaProvider. LoadSchema. Exception {e}", e);
+                _logger.LogInformation("SchemaProvider. LoadSchema. Exception {e}", e);
                 if (e.InnerException != null)
                 {
-                    _logger.LogError("SchemaProvider. LoadSchema. InnerException {e}", e.InnerException);
+                    _logger.LogInformation("SchemaProvider. LoadSchema. InnerException {e}", e.InnerException);
                 }
-                throw;
+                _logger.LogInformation("SchemaProvider. LoadSchema. Attempting retry");
+                return builder.Create();
             }
         }
 
