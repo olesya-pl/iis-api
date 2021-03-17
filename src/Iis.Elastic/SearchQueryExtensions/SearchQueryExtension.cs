@@ -13,6 +13,7 @@ namespace Iis.Elastic.SearchQueryExtensions
         private const int MaxBucketsCount = 100;
         public const string AggregateSuffix = "Aggregate";
         public const string MissingValueKey = "__hasNoValue";
+        public const string NoExistsValue = "-_exists_";
 
         public static bool IsExactQuery(string query)
         {
@@ -182,37 +183,22 @@ namespace Iis.Elastic.SearchQueryExtensions
         public static string ToQueryString(this ElasticFilter filter)
         {
             var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({filter.Suggestion})";
-            var defaultFilteredItems = filter.FilteredItems
-                .Where(x => x.Name == ElasticConfigConstants.NodeTypeTitleAlias)
-                .ToArray();
-            
-            var defaultFilteredQuery = new StringBuilder();
-            for (var i = 0; i < defaultFilteredItems.Length; i++)
-            {
-                var item = defaultFilteredItems[i];
-                var lastOne = i + 1 == defaultFilteredItems.Length;
-                defaultFilteredQuery.Append(lastOne ? $"{item.Name}:\"{item.Value}\" " : $"{item.Name}:\"{item.Value}\" OR ");
-                if (lastOne)
-                {
-                    result = string.IsNullOrEmpty(result) ? $"({defaultFilteredQuery})" : $"({result} AND ({defaultFilteredQuery}))";
-                }
-            }
-
 
             var filteredItems = filter.FilteredItems
-                .Where(x => x.Name != ElasticConfigConstants.NodeTypeTitleAlias)
-                .ToArray();
-            var filteredQuery = new StringBuilder();
-            for (var i = 0; i < filteredItems.Length; i++)
+                .GroupBy(x => x.Name, x => x.Value);
+            var filteredQueries = new List<string>();
+            foreach (var filteredItem in filteredItems)
             {
-                var item = filteredItems[i];
-                var lastOne = i + 1 == filteredItems.Length;
-                filteredQuery.Append(lastOne ? $"{item.Name}:\"{item.Value}\" " : $"{item.Name}:\"{item.Value}\" AND ");
-                if (lastOne)
-                {
-                    result = string.IsNullOrEmpty(result) ? $"({filteredQuery})" : $"({result} AND {filteredQuery})";
-                }
+                var queryForOneField = string.Join(" OR ", filteredItem.Select(x => GetFieldQuery(filteredItem.Key, x)).ToArray());
+                if (queryForOneField.Length > 0)
+                    filteredQueries.Add($"({queryForOneField})");
             }
+
+            if (filteredQueries.Any())
+            {
+                var generalFilteredQuery = string.Join(" AND ", filteredQueries);
+                result = string.IsNullOrEmpty(result) ? $"({generalFilteredQuery})" : $"({result} AND ({generalFilteredQuery}))";
+            }   
 
             var pickedQuery = new StringBuilder();
             for (var i = 0; i < filter.CherryPickedItems.Count; i++)
@@ -229,6 +215,13 @@ namespace Iis.Elastic.SearchQueryExtensions
             }
 
             return result;
+        }
+
+        private static string GetFieldQuery(string field, string value)
+        {
+            return value == MissingValueKey ? 
+                $"{NoExistsValue}:\"{field}\"" :
+                $"{field}:\"{value}\"";
         }
 
         private static JObject CreateSortingProperty(string sortColumn, string sortOrder)

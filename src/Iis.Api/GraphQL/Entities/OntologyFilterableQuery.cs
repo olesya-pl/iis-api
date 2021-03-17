@@ -31,14 +31,19 @@ namespace IIS.Core.GraphQL.Entities
         {
             var types = filter.Types is null || !filter.Types.Any() ? EntityList : filter.Types;
 
-            var response = await ontologyService.FilterNodeAsync(types, new ElasticFilter
+            var elasticFilter = new ElasticFilter
             {
                 Limit = pagination.PageSize,
                 Offset = pagination.Offset(),
-                Suggestion = filter?.Suggestion ?? filter?.SearchQuery
-            });
+                Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
+                CherryPickedItems = filter.CherryPickedItems.ToList(),
+                FilteredItems = filter.FilteredItems
+            };
+            var response = await ontologyService.FilterNodeAsync(types, elasticFilter);
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
+            EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
+            
             return mapped;
         }
 
@@ -132,6 +137,30 @@ namespace IIS.Core.GraphQL.Entities
                 }
             }
             return res;
+        }
+
+        private static void EnrichWithSelectedFilteredItems(Dictionary<string, AggregationItem> aggregations, ElasticFilter filter)
+        {
+            var result = new Dictionary<string, AggregationItem>();
+            var selectedItems = filter.FilteredItems.GroupBy(x => x.Name).ToDictionary(x => x.Key, x => x.Select(i => i.Value));
+            foreach (var item in selectedItems)
+            {
+                if (aggregations.ContainsKey(item.Key))
+                {
+                    foreach (var value in item.Value)
+                    {
+                        if (!aggregations[item.Key].Buckets.Any(x => x.Key == value))
+                        {
+                            aggregations[item.Key].Buckets.Add(new AggregationBucket()
+                            {
+                                DocCount = 0,
+                                Key = value
+                            });
+                        }
+                    }
+                    
+                }
+            }
         }
     }
 }
