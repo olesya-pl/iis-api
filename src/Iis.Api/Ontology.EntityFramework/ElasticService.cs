@@ -200,39 +200,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .ToString();
             return await _elasticManager.CountAsync(query, typeNames, ct);
         }
-
-        public string CreateFullQueryString(ElasticFilter filter)
-        {
-            var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({filter.Suggestion})";
-            var filteredQuery = new StringBuilder();
-            for(var i = 0; i < filter.FilteredItems.Count; i++)
-            {
-                var item = filter.FilteredItems[i];
-                var lastOne = i + 1 == filter.FilteredItems.Count;
-                filteredQuery.Append(lastOne ? $"{item.Name}:\"{item.Value}\" " : $"{item.Name}:\"{item.Value}\" AND ");
-                if (lastOne)
-                {
-                    result = string.IsNullOrEmpty(result) ? $"({filteredQuery})" : $"({result} AND {filteredQuery})";
-                }
-            }
-            
-            var pickedQuery = new StringBuilder();
-            for(var i = 0; i < filter.CherryPickedItems.Count; i++)
-            {
-                var item = filter.CherryPickedItems[i];
-                var lastOne = i + 1 == filter.CherryPickedItems.Count;
-                pickedQuery.Append($"Id:{item} OR ");
-                pickedQuery.Append($"parent.Id:{item}~0.95 OR ");
-                pickedQuery.Append(lastOne ? $"bePartOf.Id:{item}~0.95 " : $"bePartOf.Id:{item}~0.95 OR ");
-                if (lastOne)
-                {
-                    result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} AND ({pickedQuery}))";
-                }
-            }
-
-            return result;
-        }
-
+        
         private async Task<(MultiElasticSearchParams MultiSearchParams, IElasticSearchResult HistoricalResult)> PrepareMultiElasticSearchParamsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default) 
         {
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
@@ -248,7 +216,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = filter.Limit,
                 SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
                 {
-                    (ShouldReturnAllEntities(filter) ? "*" : $"{CreateFullQueryString(filter)}", searchFields)
+                    (ShouldReturnAllEntities(filter) ? "*" : $"{filter.ToQueryString()}", searchFields)
                 }
             };
             
@@ -274,7 +242,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 var historySearchParams = new IisElasticSearchParams
                 {
                     BaseIndexNames = historicalIndexes,
-                    Query = CreateFullQueryString(filter),
+                    Query = filter.ToQueryString(),
                     From = 0,
                     Size = filter.Limit,
                     SearchFields = searchFields,

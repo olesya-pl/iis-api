@@ -114,9 +114,6 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         private static JObject CreateAggregationFilter(AggregationField field, ElasticFilter filter)
         {
-            // var fi = filter.FilteredItems.First();
-            // var s = fi.Name == field.OriginFieldName || fi.Name == field.Alias;
-            // var s1 = !(fi.Name == field.OriginFieldName || fi.Name == field.Alias);
             var fieldSpecificFilter = new ElasticFilter
             {
                 Suggestion = filter.Suggestion,
@@ -185,11 +182,31 @@ namespace Iis.Elastic.SearchQueryExtensions
         public static string ToQueryString(this ElasticFilter filter)
         {
             var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({filter.Suggestion})";
-            var filteredQuery = new StringBuilder();
-            for (var i = 0; i < filter.FilteredItems.Count; i++)
+            var defaultFilteredItems = filter.FilteredItems
+                .Where(x => x.Name == ElasticConfigConstants.NodeTypeTitleAlias)
+                .ToArray();
+            
+            var defaultFilteredQuery = new StringBuilder();
+            for (var i = 0; i < defaultFilteredItems.Length; i++)
             {
-                var item = filter.FilteredItems[i];
-                var lastOne = i + 1 == filter.FilteredItems.Count;
+                var item = defaultFilteredItems[i];
+                var lastOne = i + 1 == defaultFilteredItems.Length;
+                defaultFilteredQuery.Append(lastOne ? $"{item.Name}:\"{item.Value}\" " : $"{item.Name}:\"{item.Value}\" OR ");
+                if (lastOne)
+                {
+                    result = string.IsNullOrEmpty(result) ? $"({defaultFilteredQuery})" : $"({result} AND ({defaultFilteredQuery}))";
+                }
+            }
+
+
+            var filteredItems = filter.FilteredItems
+                .Where(x => x.Name != ElasticConfigConstants.NodeTypeTitleAlias)
+                .ToArray();
+            var filteredQuery = new StringBuilder();
+            for (var i = 0; i < filteredItems.Length; i++)
+            {
+                var item = filteredItems[i];
+                var lastOne = i + 1 == filteredItems.Length;
                 filteredQuery.Append(lastOne ? $"{item.Name}:\"{item.Value}\" " : $"{item.Name}:\"{item.Value}\" AND ");
                 if (lastOne)
                 {
@@ -207,7 +224,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 pickedQuery.Append(lastOne ? $"bePartOf.Id:{item}~0.95 " : $"bePartOf.Id:{item}~0.95 OR ");
                 if (lastOne)
                 {
-                    result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} AND ({pickedQuery}))";
+                    result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
                 }
             }
 
