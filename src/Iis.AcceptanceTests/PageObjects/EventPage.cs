@@ -26,8 +26,14 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//textarea[@name='description']")]
         public IWebElement DescriptionField;
 
-        [FindsBy(How = How.CssSelector, Using = "div[name='importance']  div[role='radiogroup'] > label:nth-of-type(1)  .el-radio__inner")]
+        [FindsBy(How = How.CssSelector, Using = ".normal .el-radio__inner")]
         public IWebElement AverageImportaceRadioButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".notHappen .el-radio__inner")]
+        public IWebElement NotHappenRadioButton;
+
+        [FindsBy(How = How.XPath, Using = "//div[@name='dateInterval']/div/div/input[1]")]
+        public IWebElement StartEventDateField;
 
         [FindsBy(How = How.CssSelector, Using = "div[name='state']  div[role='radiogroup'] > label:nth-of-type(1)  .el-radio__inner")]
         public IWebElement FlawRadioButton;
@@ -56,14 +62,13 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".event-card__objects-associated-with-event .container")]
         public IWebElement BindedObjectsOfStudyField;
 
+        [FindsBy(How = How.CssSelector, Using = "textarea[name='description']")]
+        public IWebElement AdditionalDataTextField;
+
         public Event GetRelatedObjectOfStudyNameBindedToTheEvent(string title)
         {
             return new Event(driver, title);
         }
-
-        //private IWebElement Container => driver.FindElement(By.CssSelector(".event-card__linked-materials .container"));
-
-        //private IReadOnlyCollection<IWebElement> RelatedItems => Container.FindElements(By.CssSelector(".el-tag--mini"));
 
         public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
                     .Select(webElement => new Event(driver, webElement)).ToList();
@@ -83,7 +88,7 @@ namespace AcceptanceTests.PageObjects
 
         public bool IsEventVisible(string eventName)
         {
-            var eventInTheList = driver.FindElement(By.XPath($"//span[contains(text(),'{eventName}')]"));
+            var eventInTheList = driver.FindElement(By.XPath($"//div[contains(text(),'{eventName}')]"));
             return eventInTheList.Displayed;
         }
     }

@@ -53,7 +53,7 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(7);
+            driver.WaitFor(12);
 
         }
 
@@ -155,7 +155,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheSaveButtonToCreateANewObjectOfStudy()
         {
             objectsOfStudyPage.SaveObjectOfStudyButton.Click();
-            driver.WaitFor(1);
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the confirm save button to create a new object of study")]

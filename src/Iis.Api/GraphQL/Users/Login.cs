@@ -45,7 +45,7 @@ namespace IIS.Core.GraphQL.Users
         }
 
         public async Task<LoginResponse> RefreshToken(IResolverContext ctx) {
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
 
             if (tokenPayload == null)
                 throw new NullReferenceException("Expected to have \"token\" in context's data.");

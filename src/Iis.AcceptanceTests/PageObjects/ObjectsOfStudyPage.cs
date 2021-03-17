@@ -27,8 +27,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='text-ellipsis title']")]
-        [CacheLookup]
+        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none tbody .el-table__row:nth-of-type(1)")]
         public IWebElement FirstSearchResultTitle;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]

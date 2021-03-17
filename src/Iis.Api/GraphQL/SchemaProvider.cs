@@ -14,6 +14,7 @@ using Iis.Api.Ontology;
 using Iis.Api.GraphQL;
 using Iis.Api.GraphQL.CreateMenu;
 using Iis.Interfaces.Ontology.Schema;
+using Microsoft.Extensions.Logging;
 
 namespace IIS.Core.GraphQL
 {
@@ -25,14 +26,21 @@ namespace IIS.Core.GraphQL
         private readonly IOntologyFieldPopulator _populator;
         private readonly IConfiguration _configuration;
         private ISchema _hotChocolateSchema;
+        private readonly ILogger<SchemaProvider> _logger;
 
-        public SchemaProvider(IServiceProvider serviceProvider, TypeRepository typeRepository, IOntologySchema ontologySchema, IOntologyFieldPopulator populator, IConfiguration configuration)
+        public SchemaProvider(IServiceProvider serviceProvider, 
+            TypeRepository typeRepository, 
+            IOntologySchema ontologySchema, 
+            IOntologyFieldPopulator populator, 
+            IConfiguration configuration,
+            ILogger<SchemaProvider> logger)
         {
             _serviceProvider = serviceProvider;
             _typeRepository = typeRepository;
             _ontologySchema = ontologySchema;
             _populator = populator;
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _configuration = configuration;
+            _logger = logger;
         }
 
         public ISchema GetSchema()
@@ -47,6 +55,7 @@ namespace IIS.Core.GraphQL
 
         private ISchema LoadSchema()
         {
+            _logger.LogInformation("SchemaProvider. LoadSchema. Starting schema load");
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
             RegisterTypes(builder);
             TryRegisterOntologyTypes(builder);
@@ -104,7 +113,22 @@ namespace IIS.Core.GraphQL
                 if (_ontologySchema != null)
                     ConfigureOntologyMutation(d, _ontologySchema);
             });
-            return builder.Create();
+            try
+            {
+                var res = builder.Create();
+                _logger.LogInformation("SchemaProvider. LoadSchema. Ending building schema");
+                return res;
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation("SchemaProvider. LoadSchema. Exception {e}", e);
+                if (e.InnerException != null)
+                {
+                    _logger.LogInformation("SchemaProvider. LoadSchema. InnerException {e}", e.InnerException);
+                }
+                _logger.LogInformation("SchemaProvider. LoadSchema. Attempting retry");
+                return builder.Create();
+            }
         }
 
         public static void RegisterTypes(ISchemaBuilder schemaBuilder)
@@ -134,7 +158,7 @@ namespace IIS.Core.GraphQL
         protected void ConfigureOntologyQuery(IObjectTypeDescriptor descriptor, IOntologySchema schema)
         {
             var typesToPopulate = schema.GetEntityTypes().ToList();
-
+            _logger.LogInformation($"SchemaProvider. ConfigureOntologyQuery. Fetched {typesToPopulate.Count} items. These are {string.Join(',', typesToPopulate.Select(p => p.Name))}");
             _populator.PopulateFields(descriptor, typesToPopulate, Operation.Read);
             if (typesToPopulate.Count == 0) return;
             ConfigureAllEntitiesQueries(descriptor);
@@ -152,7 +176,8 @@ namespace IIS.Core.GraphQL
         protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, IOntologySchema schema)
         {
             var typesToPopulate = schema.GetEntityTypes();
-            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract);
+            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract).ToList();            
+            _logger.LogInformation($"SchemaProvider. ConfigureOntologyMutation. Fetched {typesToPopulate.Count()} items. These are {string.Join(',', typesToPopulate.Select(p => p.Name))}");
             _populator.PopulateFields(descriptor, typesToPopulate,
                 Operation.Create, Operation.Update, Operation.Delete);
         }

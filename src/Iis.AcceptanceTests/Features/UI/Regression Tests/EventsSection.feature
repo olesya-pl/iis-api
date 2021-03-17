@@ -4,6 +4,7 @@
     - IIS-6051 - Ability to connect the material to an event from a material
     - IIS-5993 - Ability to loose connection between the material to an event from the event section
     - IIS-5992 - Ability to connect the event and a material
+    - IIS-5826 - Ability to edit the event
 
 
     Background:
@@ -58,3 +59,17 @@
         And I clicked on the first material in the Materials list
         When I clicked on the relations tab in the material card
         Then I must see Тестова подія as the related event to the material
+
+  @regression @UI @Events
+    Scenario: IIS-5826 - Ability to edit the event
+        When I navigated to Events page
+        And I created a new Тестова подія event
+        When I searched for the Тестова подія created event
+        Then I must see the Тестова подія event in the event search results
+        When I pressed the edit event button
+        And I entered Зміни до події text in the addition data text field
+        And I pressed the save event changes button
+        And I pressed the confirm save changes in the event
+        When I reloaded the event page
+        Then I must see the Зміни до події text in the additional data text field
+       

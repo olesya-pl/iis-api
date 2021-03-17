@@ -1,11 +1,12 @@
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Iis.Domain.MachineLearning;
-using Material = Iis.Domain.Materials.Material;
-using Iis.Interfaces.Materials;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Iis.Services.Contracts;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Materials;
+using Iis.Domain.MachineLearning;
+using Material = Iis.Domain.Materials.Material;
 
 namespace IIS.Core.Materials
 {
@@ -18,5 +19,6 @@ namespace IIS.Core.Materials
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken stoppingToken);
+        Task<Material> ChangeMaterialAccessLevel(Guid materialId, byte accessLevel, User user);
     }
 }

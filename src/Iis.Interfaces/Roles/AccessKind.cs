@@ -13,5 +13,6 @@
         MaterialsTab = 8,
         MaterialDorLink = 9,
         EventLink = 10,
+        AccessLevelChange = 11
     }
 }

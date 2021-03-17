@@ -1,10 +1,11 @@
-﻿using Iis.DataModel;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using Iis.DataModel;
+using Iis.DataModel.Roles;
+using Iis.Interfaces.Roles;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
@@ -22,7 +23,7 @@ namespace Iis.DbLayer.ModifyDataScripts
                         .Where(r => r.Node.NodeType.Name == "associatedWithEvent"
                             && !r.TargetNode.NodeType.IsObjectOfStudy)
                         .ToList();
-                    
+
                     foreach (var relation in relations)
                     {
                         list.Add(relation);
@@ -30,6 +31,27 @@ namespace Iis.DbLayer.ModifyDataScripts
                     }
                 }
             });
+        }
+
+        public void AddAccessLevelAccessObject(OntologyContext context, IOntologyNodesData data)
+        {
+            var entityId = new Guid("a60af6c5d930476c96218ea5c0147fb7");
+
+            var existingEntity = context.AccessObjects.Find(entityId);
+
+            if( existingEntity != null) return;
+
+            context.AccessObjects.Add(
+                new AccessObjectEntity
+                {
+                    Id = entityId,
+                    Title = "Зміна грифу обмеження доступу",
+                    Kind = AccessKind.AccessLevelChange,
+                    Category = AccessCategory.Entity,
+                    UpdateAllowed = true
+                }
+            );
+            context.SaveChanges();
         }
     }
 }

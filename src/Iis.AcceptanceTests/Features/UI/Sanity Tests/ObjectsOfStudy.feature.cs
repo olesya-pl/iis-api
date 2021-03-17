@@ -257,7 +257,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 43
-        testRunner.And("I searched 3 омсбр data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched 3 окрема мотострілецька бригада data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
         testRunner.And("I clicked on the first search result title in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -272,7 +272,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.And("I clicked on the Direct reporting relationship link in the big card window", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 48
-        testRunner.Then("I must see the specified title in the small object of study card", "3 окрема мотострілецька бригада \"Беркут\"", ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must see the specified title in the small object of study card", "1 АК", ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 53
         testRunner.When("I clicked on enlarge small card button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
@@ -281,7 +281,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
         testRunner.When("I clicked on the General info block in the big card window", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 55
-        testRunner.Then("I must see the specified title in the name real full section", "3 окрема мотострілецька бригада \"Беркут\"", ((TechTalk.SpecFlow.Table)(null)), "Then ");
+        testRunner.Then("I must see the specified title in the name real full section", "1 армійський корпус", ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

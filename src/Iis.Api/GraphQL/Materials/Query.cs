@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.Materials
             SearchByImageInput searchByImageInput,
             SearchByRelationInput searchByRelation = null)
         {
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
 
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             Guid materialId)
         {
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             var material = await materialProvider.GetMaterialAsync(materialId, tokenPayload.UserId);
             var res = mapper.Map<Material>(material);
             return res;
@@ -170,7 +170,7 @@ namespace IIS.Core.GraphQL.Materials
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
             var sortingParams = new SortingParams(sorting.ColumnName, sorting.Order);
 
-            var tokenPayload = ctx.ContextData["token"] as TokenPayload;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(tokenPayload.UserId, materialId, pageParam, sortingParams);
 
             var materials = materialsResult.Materials

@@ -40,7 +40,7 @@ Feature: ObjectsOfStudySection - sanity
     @sanity @UI @ObjectOfStudySectionUI
     Scenario: IIS-6370 - View and interact with data in profile in the objects section
         When I clicked on search button in the Object of study section
-        And I searched 3 омсбр data in the Objects of study section
+        And I searched 3 окрема мотострілецька бригада data in the Objects of study section
         And I clicked on the first search result title in the Objects of study section
         And I clicked on enlarge small card button
         And I clicked on the Classifier block in the big card window
@@ -48,14 +48,14 @@ Feature: ObjectsOfStudySection - sanity
         Then I must see the specified title in the small object of study card
 
             """
-            3 окрема мотострілецька бригада "Беркут"
+            1 АК
             """
         When I clicked on enlarge small card button
         When I clicked on the General info block in the big card window
         Then I must see the specified title in the name real full section
 
             """
-            3 окрема мотострілецька бригада "Беркут"
+            1 армійський корпус
             """
 
     @sanity @UI @ObjectOfStudySectionUI

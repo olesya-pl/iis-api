@@ -89,20 +89,20 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="IS-6326 - Themes and updates section can be opened")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6326 - Themes and updates section can be opened")]
         [Xunit.TraitAttribute("FeatureTitle", "ThemesAndUpdate - smoke")]
-        [Xunit.TraitAttribute("Description", "IS-6326 - Themes and updates section can be opened")]
+        [Xunit.TraitAttribute("Description", "IIS-6326 - Themes and updates section can be opened")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "ThemesAndUpdatesSectionUI")]
-        public virtual void IS_6326_ThemesAndUpdatesSectionCanBeOpened()
+        public virtual void IIS_6326_ThemesAndUpdatesSectionCanBeOpened()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
                     "UI",
                     "ThemesAndUpdatesSectionUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IS-6326 - Themes and updates section can be opened", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6326 - Themes and updates section can be opened", null, tagsOfScenario, argumentsOfScenario);
 #line 9
  this.ScenarioInitialize(scenarioInfo);
 #line hidden
