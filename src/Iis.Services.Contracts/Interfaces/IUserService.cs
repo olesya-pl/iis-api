@@ -17,7 +17,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<User> GetUserAsync(Guid userId);
         Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(int offset, int pageSize);
         Task<User> RejectRole(Guid userId, Guid roleId);
-        bool IsAccessLevelAllowedForUser(AccessLevel userAccessLevel, AccessLevel newAccessLevel);
+        bool IsAccessLevelAllowedForUser(int userAccessLevel, int newAccessLevel);
         Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellationToken = default);
         Task PutAllUsersToElasticSearchAsync(CancellationToken cancellationToken);
     }

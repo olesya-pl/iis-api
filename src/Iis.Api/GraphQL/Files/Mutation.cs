@@ -122,7 +122,7 @@ namespace IIS.Core.GraphQL.Files
             }
             using (var sw = File.CreateText(fullDataName))
             {
-                await sw.WriteLineAsync($"{accessLevelLinePrefix} {(int)input.AccessLevel}");                
+                await sw.WriteLineAsync($"{accessLevelLinePrefix} {input.AccessLevel}");                
             }
             return new UploadResult
             {

@@ -15,7 +15,7 @@ namespace Iis.DataModel
                 .HasForeignKey(ur => ur.UserId);
 
             builder.Property(x => x.AccessLevel)
-                .HasDefaultValue(AccessLevel.Unclassified);
+                .HasDefaultValue(0);
         }
     }
 }

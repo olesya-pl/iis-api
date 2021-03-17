@@ -6,6 +6,6 @@ namespace IIS.Core.GraphQL.Files
     {
         public byte[] Content { get; set; }
         public string Name { get; set; }
-        public AccessLevel AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
     }
 }

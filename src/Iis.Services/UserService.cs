@@ -269,7 +269,7 @@ namespace Iis.Services
             return GetUser(userId);
         }
 
-        public bool IsAccessLevelAllowedForUser(AccessLevel userAccessLevel, AccessLevel newAccessLevel)
+        public bool IsAccessLevelAllowedForUser(int userAccessLevel, int newAccessLevel)
         {
             return userAccessLevel >= newAccessLevel;
         }

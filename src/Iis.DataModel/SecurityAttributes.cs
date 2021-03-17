@@ -4,6 +4,6 @@ namespace Iis.DataModel
 {
     public class SecurityAttributes
     {
-        public AccessLevel AccessLevel {get;set;}
+        public int AccessLevel { get; set; }
     }
 }

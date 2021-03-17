@@ -415,7 +415,7 @@ namespace IIS.Core.Materials.EntityFramework
                 => await unitOfWork.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, stoppingToken));
         }
 
-        public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, byte accessLevel, User user)
+        public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user)
         {
             var accessLevelValidationResult = IsValidAccessLevel(accessLevel);
 
@@ -431,8 +431,8 @@ namespace IIS.Core.Materials.EntityFramework
             var changeHistory = new ChangeHistoryDto
             {
                 Date = DateTime.UtcNow,
-                NewValue = accessLevelValidationResult.Value.ToString("D"),
-                OldValue = material.AccessLevel.ToString("D"),
+                NewValue = accessLevelValidationResult.Value.ToString(),
+                OldValue = material.AccessLevel.ToString(),
                 PropertyName = nameof(material.AccessLevel),
                 RequestId = Guid.NewGuid(),
                 TargetId = material.Id,
@@ -454,11 +454,13 @@ namespace IIS.Core.Materials.EntityFramework
             return getMaterialTask.Result;
         }
 
-        private (bool IsValid, AccessLevel Value) IsValidAccessLevel(byte accessLevel)
+        private (bool IsValid, int Value) IsValidAccessLevel(int accessLevel)
         {
-            var isValid = Enum.IsDefined(typeof(AccessLevel), accessLevel);
+            //TODO: 
+            //var isValid = Enum.IsDefined(typeof(AccessLevel), accessLevel);
+            var isValid = true;
 
-            return (IsValid: isValid, Value: isValid ? (AccessLevel)accessLevel : AccessLevel.Undefined);
+            return (IsValid: isValid, Value: isValid ? accessLevel : 0);
         }
         private bool IsUserAuthorizedForChangeAccessLevel(User user)
         {
