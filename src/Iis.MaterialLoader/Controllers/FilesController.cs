@@ -30,7 +30,9 @@ namespace Iis.MaterialLoader.Controllers
             CancellationToken token)
         {
             var material = JsonConvert.DeserializeObject<MaterialInput>(input);
+
             var fileSaveResult = await _fileService.SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
+
             material.FileId = fileSaveResult.Id;
             if (fileSaveResult.IsDuplicate)
             {

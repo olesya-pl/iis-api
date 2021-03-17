@@ -44,13 +44,20 @@ namespace Iis.MaterialLoader.Services
 
             _dbContext.Materials.Add(materialEntity);
             await _dbContext.SaveChangesAsync();
-            
+
             var requestId = changeRequestId.GetValueOrDefault(Guid.NewGuid());
             await SaveMaterialChangeHistory(material, requestId);
             await SaveMaterialChildren(material, requestId);
             await SaveMaterialInfoEntities(material);
 
-            _eventProducer.PublishMaterialCreatedMessage(new MaterialCreatedMessage
+            _eventProducer.PublishMaterialCreatedMessage(CreatedMessage(material));
+
+            return material;
+        }
+
+        private MaterialCreatedMessage CreatedMessage(Material material)
+        {
+            return new MaterialCreatedMessage
             {
                 MaterialId = material.Id,
                 FileId = material.FileId,
@@ -58,9 +65,7 @@ namespace Iis.MaterialLoader.Services
                 CreatedDate = material.CreatedDate,
                 Type = material.Type,
                 Source = material.Source
-            });
-
-            return material;
+            };
         }
 
         public Task<Material> SaveAsync(MaterialInput materialInput)
@@ -83,7 +88,7 @@ namespace Iis.MaterialLoader.Services
         {
             if (string.IsNullOrEmpty(signValue))
                 return null;
-            
+
             var entity = _dbContext.MaterialSigns
                 .AsNoTracking()
                 .Include(x => x.MaterialSignType)
@@ -94,11 +99,12 @@ namespace Iis.MaterialLoader.Services
 
         private Task SaveMaterialChangeHistory(Material material, Guid changeRequestId)
         {
+            var timeStamp = DateTime.UtcNow;
             var changeItems = new List<ChangeHistoryDto>
             {
                 new ChangeHistoryDto
                 {
-                    Date = DateTime.UtcNow,
+                    Date = timeStamp,
                     NewValue = material.Id.ToString(),
                     PropertyName = nameof(material.Id),
                     RequestId = changeRequestId,
@@ -106,9 +112,25 @@ namespace Iis.MaterialLoader.Services
                 },
                 new ChangeHistoryDto
                 {
-                    Date = DateTime.UtcNow,
+                    Date = timeStamp,
                     NewValue = material.Source,
                     PropertyName = nameof(material.Source),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                },
+                new ChangeHistoryDto
+                {
+                    Date = timeStamp,
+                    NewValue = material.LoadData.LoadedBy,
+                    PropertyName = nameof(material.LoadData.LoadedBy),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                },
+                new ChangeHistoryDto
+                {
+                    Date = timeStamp,
+                    NewValue = material.AccessLevel.ToString("D"),
+                    PropertyName = nameof(material.AccessLevel),
                     RequestId = changeRequestId,
                     TargetId = material.Id,
                 }
@@ -170,7 +192,7 @@ namespace Iis.MaterialLoader.Services
                 SourceVersion = info.SourceVersion,
             };
         }
-        
+
         private IQueryable<MaterialEntity> GetMaterialsQuery()
         {
             return _dbContext.Materials
