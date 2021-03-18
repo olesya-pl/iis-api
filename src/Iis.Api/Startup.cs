@@ -287,7 +287,7 @@ namespace IIS.Core
                     Configuration["activeDirectory:password"]));
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
-            // services.AddHostedService<ThemeCounterBackgroundService>();
+            services.AddHostedService<ThemeCounterBackgroundService>();
             services.AddServices();
 
             services.AddControllers();

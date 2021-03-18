@@ -207,7 +207,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 var lastOne = i + 1 == filter.CherryPickedItems.Count;
                 pickedQuery.Append($"Id:{item} OR ");
                 pickedQuery.Append($"parent.Id:{item}~0.95 OR ");
-                pickedQuery.Append(lastOne ? $"bePartOf.Id:{item}~0.95 " : $"bePartOf.Id:{item}~0.95 OR ");
+                pickedQuery.Append(lastOne ? $"bePartOf.Id:{item}~0.95" : $"bePartOf.Id:{item}~0.95 OR ");
                 if (lastOne)
                 {
                     result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";

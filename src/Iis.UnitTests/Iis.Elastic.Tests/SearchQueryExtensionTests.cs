@@ -331,24 +331,6 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Fact]
-        public void test()
-        {
-            var filter = new ElasticFilter
-            {
-                FilteredItems = new List<Property>()
-                {
-                    new Property(){Name = "Чисельність", Value = "Бригада"},
-                    new Property(){Name = "Чисельність", Value = "Батальйон"},
-                    new Property(){Name = "Рід_військ", Value = "Міномет"},
-                    new Property(){Name = "Тип_ОР", Value = "Особа"},
-                    new Property(){Name = "Рід_військ", Value = "__hasNoValue"}
-                }
-            };
-
-            var s = filter.ToQueryString();
-        }
-
         private JObject GetActualJObject(string name)
         {
             var path = $"{BasePathToJson}/{name.Replace("_", "")}.json";
