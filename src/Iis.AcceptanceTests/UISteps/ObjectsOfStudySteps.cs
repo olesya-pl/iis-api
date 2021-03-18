@@ -126,6 +126,25 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.CreateAMilitaryOrganizationButton.Click();
         }
 
+        [When(@"I clicked on all expandable blocks")]
+        public void WhenIClickedOnAllExpandableBlocks()
+        {
+            foreach (var block in driver.FindElements(By.CssSelector(".el-collapse-item")))
+            {
+                block.Click();
+                driver.WaitFor(0.1);
+            }
+        }
+
+        [When(@"I entered a value (.*) in the (.*) text form")]
+        public void WhenIEnteredAValueInTheTextForm(string valueToEnter, string fieldName)
+        {
+            var formToEnterValue = driver.FindElement(By.XPath(fieldName));
+            formToEnterValue.SendKeys(valueToEnter);
+        }
+
+
+
         [When(@"I entered the (.*) value in the affiliation field")]
         public void WhenIEnteredTheValueInTheAffiliationField(string value)
         {
@@ -251,10 +270,48 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.ScrollDown(element);
         }
 
+        [When(@"I scrolled up to the (.*) element")]
+        public void WhenIScrolledUpToTheElementElement(string elementName)
+        {
+            var elementToScroll = driver.FindElement(By.XPath(elementName));
+            Actions actions = new Actions(driver);
+            actions.MoveToElement(elementToScroll);
+            actions.Perform();
+        }
+
+
         [When(@"I navigated to the Events tab in the big object of study card")]
         public void WhenINavigatedToTheEventTabInTheBigObjectOfStudyCard()
         {
             objectsOfStudyPage.EventsTabInTheBigObjectOfStudyCard.Click();
+        }
+
+        [When(@"I filled in the form")]
+        public void WhenFillTheForm(Table table)
+        {
+
+            for (int i = 0; i < table.Header.Count(); i++)
+            {
+                var elementName = table.Header.ElementAt(i);
+                var elementValue = table.Rows[0].Values.ElementAt(i);
+                
+                    
+                var textField =
+                    driver.FindElement(
+                        By.XPath($"//label[contains(text(),'{elementName}')]//following::textarea[1]"));
+
+                if (textField.)
+                textField.SendKeys(elementValue);
+                driver.WaitFor(0.1);
+
+                var dropDown =
+                    driver.FindElement(By.XPath($"//label[contains(text(),'{elementName}')]/following::input[1]"));
+
+                dropDown.SendKeys(elementValue);
+                driver.WaitFor(2);
+                dropDown.SendKeys(Keys.Down);
+                dropDown.SendKeys(Keys.Enter);
+            }
         }
         #endregion
 
