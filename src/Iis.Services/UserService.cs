@@ -32,7 +32,7 @@ namespace Iis.Services
             IUserElasticService userElasticService,
             IUserRepository userRepository,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory) 
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;

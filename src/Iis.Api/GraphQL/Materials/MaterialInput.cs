@@ -33,7 +33,7 @@ namespace IIS.Core.GraphQL.Materials
         public DateTime? CreationDate { get; set; }
         public IEnumerable<DateTime> ModificationDates { get; set; }
         public string Coordinates { get; set; }
-        public AccessLevel AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
     }
 
     public class MaterialLoadData : IMaterialLoadData

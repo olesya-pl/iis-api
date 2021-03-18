@@ -20,6 +20,7 @@ using Iis.Api.Modules;
 using Iis.Api.Ontology;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
+using Iis.DbLayer.Common;
 using Iis.DbLayer.Elastic;
 using Iis.DbLayer.ModifyDataScripts;
 using Iis.DbLayer.Ontology.EntityFramework;
@@ -30,6 +31,7 @@ using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
 using Iis.FlightRadar.DataModel;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
@@ -137,7 +139,7 @@ namespace IIS.Core
                     Data = dbConnectionString
                 };
                 services.AddTransient<IOntologyPatchSaver, OntologyPatchSaver>();
-                services.AddSingleton<IOntologyNodesData, OntologyNodesData>(provider => 
+                services.AddSingleton<IOntologyNodesData, OntologyNodesData>(provider =>
                 {
                     using var context = OntologyContext.GetContext(dbConnectionString);
 
@@ -149,6 +151,12 @@ namespace IIS.Core
                 });
                 services.AddSingleton<IOntologyCache, OntologyCache>();
                 services.AddSingleton<IOntologySchema>(provider => (new OntologySchemaService()).GetOntologySchema(schemaSource));
+                services.AddSingleton<ICommonData>(provider =>
+                {
+                    var ontologyData = provider.GetRequiredService<IOntologyNodesData>();
+                    return new CommonData(ontologyData.GetAccessLevels());
+                });
+
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
                 services.AddTransient<INodeRepository, NodeRepository>();
                 services.AddTransient<ElasticConfiguration>();

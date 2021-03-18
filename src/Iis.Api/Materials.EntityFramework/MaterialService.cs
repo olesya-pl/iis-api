@@ -23,6 +23,7 @@ using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
+using Iis.Interfaces.Common;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -37,6 +38,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
         private readonly IMediator _mediatr;
+        private readonly ICommonData _commonData;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -47,7 +49,8 @@ namespace IIS.Core.Materials.EntityFramework
             IUserService userService,
             IMediator mediator,
             IMaterialSignRepository materialSignRepository,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            ICommonData commonData) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -58,6 +61,7 @@ namespace IIS.Core.Materials.EntityFramework
             _userService = userService;
             _materialSignRepository = materialSignRepository;
             _mediatr = mediator;
+            _commonData = commonData;
         }
 
         public async Task SaveAsync(Material material, Guid? changeRequestId = null)
@@ -478,9 +482,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         private (bool IsValid, int Value) IsValidAccessLevel(int accessLevel)
         {
-            //TODO: 
-            //var isValid = Enum.IsDefined(typeof(AccessLevel), accessLevel);
-            var isValid = true;
+            var isValid = _commonData.AccessLevels.IndexIsValid(accessLevel);
 
             return (IsValid: isValid, Value: isValid ? accessLevel : 0);
         }

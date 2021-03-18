@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Interfaces.AccessLevels;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 
@@ -34,5 +35,6 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);
         void AddValueByDotName(Guid entityId, string value, string dotName);
         void AddValueByDotName(Guid entityId, string value, string[] dotNameParts);
+        IAccessLevels GetAccessLevels();
     }
 }
