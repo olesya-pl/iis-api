@@ -12,7 +12,7 @@ namespace Iis.Api.GraphQL.Access
         {
             AddRange(new List<GraphQLAccessItem>
             {
-                new GraphQLAccessItem(AccessKind.FreeForAll, AccessOperation.None, @"getEntityTypes"),
+                new GraphQLAccessItem(AccessKind.FreeForAll, AccessOperation.None, @"getEntityTypes", @"getEntityTypeIcons"),
                 new GraphQLAccessItem(AccessKind.Dor, AccessOperation.Create, @"createEntity.*"),
                 new GraphQLAccessItem(AccessKind.Dor, AccessOperation.Read, @"getEntity.*"),
                 new GraphQLAccessItem(AccessKind.Dor, AccessOperation.Update, @"updateEntity.*"),
