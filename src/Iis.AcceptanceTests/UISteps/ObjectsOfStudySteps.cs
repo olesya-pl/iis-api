@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
@@ -294,24 +295,33 @@ namespace AcceptanceTests.UISteps
             {
                 var elementName = table.Header.ElementAt(i);
                 var elementValue = table.Rows[0].Values.ElementAt(i);
-                
-                    
-                var textField =
-                    driver.FindElement(
-                        By.XPath($"//label[contains(text(),'{elementName}')]//following::textarea[1]"));
 
-                textField.SendKeys(elementValue);
+                var xpathList = new List<string>();
+                var textAreaLocator = $"//label[contains(text(),'{elementName}')]//following::textarea[1]";
+                var inputLocator = $"//label[contains(text(),'{elementName}')]//following::textarea[1]";
+                xpathList.Add(textAreaLocator);
+                xpathList.Add(inputLocator);
+                var element = driver.FindElementByAnyXpath(xpathList);
+                element.SendKeys(elementValue);
+                element.SendKeys(Keys.Down);//?
+                element.SendKeys(Keys.Enter);//?
+                //var textField =
+                //    driver.FindElement(
+                //        By.XPath($"//label[contains(text(),'{elementName}')]//following::textarea[1]"));
+
+                //textField.SendKeys(elementValue);
                 driver.WaitFor(0.1);
 
-                var dropDown =
-                    driver.FindElement(By.XPath($"//label[contains(text(),'{elementName}')]/following::input[1]"));
+                //var dropDown =
+                //    driver.FindElement(By.XPath($"//label[contains(text(),'{elementName}')]/following::input[1]"));
 
-                dropDown.SendKeys(elementValue);
-                driver.WaitFor(2);
-                dropDown.SendKeys(Keys.Down);
-                dropDown.SendKeys(Keys.Enter);
+                //dropDown.SendKeys(elementValue);
+                //driver.WaitFor(2);
+                //dropDown.SendKeys(Keys.Down);
+                //dropDown.SendKeys(Keys.Enter);
             }
         }
+
         #endregion
 
         #region Then
