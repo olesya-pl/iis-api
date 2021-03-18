@@ -300,7 +300,6 @@ namespace AcceptanceTests.UISteps
                     driver.FindElement(
                         By.XPath($"//label[contains(text(),'{elementName}')]//following::textarea[1]"));
 
-                if (textField.)
                 textField.SendKeys(elementValue);
                 driver.WaitFor(0.1);
 
