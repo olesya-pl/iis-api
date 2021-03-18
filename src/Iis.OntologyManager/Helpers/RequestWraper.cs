@@ -27,6 +27,7 @@ namespace Iis.OntologyManager.Helpers
             { IndexKeys.Materials, IndexRelativePaths.Materials},
             { IndexKeys.Wiki, IndexRelativePaths.Wiki },
             { IndexKeys.WikiHistorical, IndexRelativePaths.WikiHistorical },
+            { IndexKeys.Users, IndexRelativePaths.Users },
         };
 
         public RequestWraper(string apiAddress, UserCredentials userCredentials, RequestSettings requestSettings, ILogger logger)

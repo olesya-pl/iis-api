@@ -15,5 +15,6 @@
         public const string Materials = "RecreateElasticMaterialIndexes";
         public const string Wiki = "ReInitializeWikiIndexes/all";
         public const string WikiHistorical = "ReInitializeHistoricalWikiIndexes/all";
+        public const string Users = "RecreateElasticUserIndexes";
     }
 }
