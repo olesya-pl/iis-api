@@ -19,8 +19,7 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             return query.Contains(":", StringComparison.Ordinal)
                    || query.Contains(" AND ", StringComparison.Ordinal)
-                   || query.Contains(" OR ", StringComparison.Ordinal)
-                   || query.Contains("\"", StringComparison.Ordinal);
+                   || query.Contains(" OR ", StringComparison.Ordinal);
         }
 
         public static bool IsMatchAll(string query) =>

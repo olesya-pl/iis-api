@@ -141,24 +141,22 @@ namespace IIS.Core.GraphQL.Entities
 
         private static void EnrichWithSelectedFilteredItems(Dictionary<string, AggregationItem> aggregations, ElasticFilter filter)
         {
-            var result = new Dictionary<string, AggregationItem>();
             var selectedItems = filter.FilteredItems.GroupBy(x => x.Name).ToDictionary(x => x.Key, x => x.Select(i => i.Value));
             foreach (var item in selectedItems)
             {
-                if (aggregations.ContainsKey(item.Key))
+                if (!aggregations.ContainsKey(item.Key))
+                    continue;
+                
+                foreach (var value in item.Value)
                 {
-                    foreach (var value in item.Value)
+                    if (aggregations[item.Key].Buckets.All(x => x.Key != value))
                     {
-                        if (!aggregations[item.Key].Buckets.Any(x => x.Key == value))
+                        aggregations[item.Key].Buckets.Add(new AggregationBucket()
                         {
-                            aggregations[item.Key].Buckets.Add(new AggregationBucket()
-                            {
-                                DocCount = 0,
-                                Key = value
-                            });
-                        }
+                            DocCount = 0,
+                            Key = value
+                        });
                     }
-                    
                 }
             }
         }
