@@ -7,6 +7,7 @@ using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Iis.Interfaces.Elastic;
 using Attribute = Iis.Domain.Attribute;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
