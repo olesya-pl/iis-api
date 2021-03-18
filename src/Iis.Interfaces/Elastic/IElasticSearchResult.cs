@@ -15,6 +15,8 @@ namespace Iis.Interfaces.Elastic
     public class AggregationItem
     {
         public AggregationBucket[] Buckets { get; set; }
+
+        public AggregationItem SubAggs { get; set; }
     }
 
 

@@ -9,6 +9,7 @@
         Reports,
         Materials,
         Wiki,
-        WikiHistorical
+        WikiHistorical,
+        Users
     }
 }

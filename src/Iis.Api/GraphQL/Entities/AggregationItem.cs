@@ -1,7 +1,9 @@
-﻿namespace IIS.Core.GraphQL.Entities
+﻿using System.Collections.Generic;
+
+namespace IIS.Core.GraphQL.Entities
 {
     public class AggregationItem
     {
-        public AggregationBucket[] Buckets { get; set; }
+        public List<AggregationBucket> Buckets { get; set; }
     }
 }

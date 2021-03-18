@@ -9,6 +9,7 @@ using HotChocolate.Resolvers;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Domain;
+using Iis.Interfaces.Elastic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Iis.Services.Contracts.Interfaces;
