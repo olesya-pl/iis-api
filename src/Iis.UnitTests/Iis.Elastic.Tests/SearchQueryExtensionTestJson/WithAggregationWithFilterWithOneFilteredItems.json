@@ -13,7 +13,7 @@
         }
       },
       "aggs": {
-        "sub_amount.nameAggregate": {
+        "sub_aggs": {
           "terms": {
             "field": "amount.nameAggregate",
             "missing": "__hasNoValue",
