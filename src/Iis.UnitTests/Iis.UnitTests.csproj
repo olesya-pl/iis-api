@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Iis.Ontology.OntologyEnum\**" />
+    <Compile Remove="Iis.OntologyModelWrapper\**" />
+    <Compile Remove="OntologyService\**" />
+    <EmbeddedResource Remove="Iis.Ontology.OntologyEnum\**" />
+    <EmbeddedResource Remove="Iis.OntologyModelWrapper\**" />
+    <EmbeddedResource Remove="OntologyService\**" />
+    <None Remove="Iis.Ontology.OntologyEnum\**" />
+    <None Remove="Iis.OntologyModelWrapper\**" />
+    <None Remove="OntologyService\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.11.0" />
     <PackageReference Include="AutoFixture.Xunit2" Version="4.11.0" />
     <PackageReference Include="DeepEqual" Version="2.0.0" />
@@ -30,13 +42,7 @@
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Iis.Ontology.OntologyEnum\" />
-    <Folder Include="Iis.OntologyModelWrapper\" />
-    <Folder Include="OntologyService\" />
-  </ItemGroup>
+  </ItemGroup>  
 
   <ItemGroup>
     <None Update="Iis.Elastic.Tests\SearchQueryExtensionTestJson\WithAggregationWithFilterOnlyFilteredItemsAvailable.json">
@@ -49,5 +55,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>
