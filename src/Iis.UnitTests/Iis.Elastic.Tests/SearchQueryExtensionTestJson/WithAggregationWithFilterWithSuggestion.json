@@ -6,7 +6,7 @@
           "should": [
             {
               "query_string": {
-                "query": "((омсбр) AND ((classifiers.corps.name:\"ППО\")))"
+                "query": "((омсбр) AND ((classifiers.corps.nameAggregate:\"ППО\")))"
               }
             }
           ]

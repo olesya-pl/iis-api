@@ -271,8 +271,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             {
                 FilteredItems = new List<Property>
                 {
-                    new Property {Name = "amount.name", Value = "Батальйон"},
-                    new Property {Name = "classifiers.corps.name", Value = "ППО"}
+                    new Property {Name = $"amount.name{SearchQueryExtension.AggregateSuffix}", Value = "Батальйон"},
+                    new Property {Name = $"classifiers.corps.name{SearchQueryExtension.AggregateSuffix}", Value = "ППО"}
                 }
             };
 
@@ -297,8 +297,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 Suggestion = "омсбр",
                 FilteredItems = new List<Property>
                 {
-                    new Property {Name = "amount.name", Value = "Батальйон"},
-                    new Property {Name = "classifiers.corps.name", Value = "ППО"}
+                    new Property {Name = $"amount.name{SearchQueryExtension.AggregateSuffix}", Value = "Батальйон"},
+                    new Property {Name = $"classifiers.corps.name{SearchQueryExtension.AggregateSuffix}", Value = "ППО"}
                 }
             };
 
@@ -322,7 +322,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             {
                 FilteredItems = new List<Property>
                 {
-                    new Property {Name = "amount.name", Value = "Батальйон"},
+                    new Property {Name = $"amount.name{SearchQueryExtension.AggregateSuffix}", Value = "Батальйон"},
                 }
             };
 
