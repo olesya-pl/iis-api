@@ -128,6 +128,7 @@ namespace Iis.DataModel.Materials
         public MaterialSignEntity Reliability { get; set; }
         public MaterialSignEntity Relevance { get; set; }
         public MaterialSignEntity Completeness { get; set; }
+
         public MaterialSignEntity SourceReliability { get; set; }
         public MaterialSignEntity SessionPriority { get; set; }
         public string Title { get; set; }
@@ -149,5 +150,9 @@ namespace Iis.DataModel.Materials
             }
             return true;
         }
+
+        public bool CanBeAccessedBy(int accessLevel) => accessLevel >= AccessLevel;
+
+
     }
 }

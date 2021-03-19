@@ -7,12 +7,13 @@ using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Params;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts;
 
 namespace IIS.Core.Materials
 {
     public interface IMaterialProvider
     {
-        Task<Material> GetMaterialAsync(Guid id, Guid userId);
+        Task<Material> GetMaterialAsync(Guid id, User user);
 
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,

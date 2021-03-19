@@ -88,14 +88,16 @@ namespace Iis.UnitTests
 
         private static Utils CreateInstance()
         {
-            var startup = new Startup(new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                             .AddJsonFile("appsettings.json", optional: true)
-                            .Build());
+                            .Build();
+            var startup = new Startup(configuration);
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddDbContext<OntologyContext>(
                 options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()),
                 ServiceLifetime.Transient);
             startup.RegisterServices(serviceCollection, false);
+            serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.AddSingleton<IOntologyCache, OntologyCache>();
             serviceCollection.AddSingleton(new Mock<IOntologySchema>().Object);
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
