@@ -87,7 +87,7 @@ namespace IIS.Core.GraphQL.Materials
             Guid materialId)
         {
             var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
-            var material = await materialProvider.GetMaterialAsync(materialId, tokenPayload.UserId);
+            var material = await materialProvider.GetMaterialAsync(materialId, tokenPayload.User);
             var res = mapper.Map<Material>(material);
             return res;
         }
