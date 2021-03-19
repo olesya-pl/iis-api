@@ -8,11 +8,14 @@ namespace Iis.DbLayer.Common
 {
     public class CommonData : ICommonData
     {
-        public IAccessLevels AccessLevels { get; }
+        Func<IAccessLevels> _getAccessLevelsFunc;
+        private IAccessLevels _accessLevels;
+        public IAccessLevels AccessLevels =>
+            _accessLevels ?? (_accessLevels = _getAccessLevelsFunc());
 
-        public CommonData(IAccessLevels accessLevels)
+        public CommonData(Func<IAccessLevels> getAccessLevelsFunc)
         {
-            AccessLevels = accessLevels;
+            _getAccessLevelsFunc = getAccessLevelsFunc;
         }
     }
 }
