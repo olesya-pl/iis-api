@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Iis.DataModel;
 using Iis.DbLayer.OntologySchema;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
@@ -37,6 +38,5 @@ namespace Iis.OntologyManager
             services.AddTransient<IOntologySchemaService, OntologySchemaService>();
             services.AddAutoMapper(typeof(Startup));
         }
-
     }
 }

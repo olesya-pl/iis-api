@@ -24,6 +24,7 @@ using System.Net.Http;
 using System.Text;
 using static Iis.OntologyManager.UiControls.UiFilterControl;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.AccessLevels;
 
 namespace Iis.OntologyManager
 {
@@ -64,6 +65,7 @@ namespace Iis.OntologyManager
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
+        IAccessLevels _accessLevels;
 
         #endregion
 
@@ -179,12 +181,15 @@ namespace Iis.OntologyManager
             _uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlOntologyData = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            _uiAccessLevelControl = new UiAccessLevelControl(_uiControlsCreator);
-            _uiAccessLevelControl.Initialize("AccessLevelControl", pnlOntologyData);
             _uiOntologyDataControl = new UiOntologyDataControl(_uiControlsCreator);
             _uiOntologyDataControl.Initialize("OntologyDataControl", pnlOntologyData);
 
+            var pnlAccessLevels = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiAccessLevelControl = new UiAccessLevelControl(_uiControlsCreator, _accessLevels);
+            _uiAccessLevelControl.Initialize("AccessLevelControl", pnlAccessLevels);
+
             _dataViewControls[EntityTypeNames.AccessLevel.ToString()] = _uiAccessLevelControl;
+            //_dataViewControls[DefaultName] = _uiAccessLevelControl;
             _dataViewControls[DefaultName] = _uiOntologyDataControl;
 
             _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
@@ -290,7 +295,7 @@ namespace Iis.OntologyManager
             menuElastic.Items[6].Click += (sender, e) => { ReindexElastic(IndexKeys.Wiki); };
             menuElastic.Items.Add("Історічні Індекси Wiki");
             menuElastic.Items[7].Click += (sender, e) => { ReindexElastic(IndexKeys.WikiHistorical); };
-            var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
+            var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic };
             btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
             container.Add(btnMenu);
 
@@ -497,7 +502,6 @@ namespace Iis.OntologyManager
                 schemaSource.SourceKind == SchemaSourceKind.Database ?
                 GetOntologyData(schemaSource.Data) :
                 null;
-
         }
 
         private void UpdateSchemaSources()
@@ -594,7 +598,9 @@ namespace Iis.OntologyManager
             }
         }
         private IDataViewControl GetDataViewControl(string nodeTypeName) =>
-            _dataViewControls.GetValueOrDefault(nodeTypeName) ?? _dataViewControls[DefaultName];
+            nodeTypeName == null ?
+                _dataViewControls[DefaultName] :
+                _dataViewControls.GetValueOrDefault(nodeTypeName) ?? _dataViewControls[DefaultName];
 
         private void CreateNewNodeType(NodeViewType nodeViewType, Guid? parentTypeId)
         {
@@ -641,7 +647,7 @@ namespace Iis.OntologyManager
             {
                 var nodeViewType = GetNodeViewType(nodeType);
                 SetNodeTypeViewVisibility(nodeViewType);
-                _uiOntologyDataControl.Visible = false;
+                SetDataViewVisibility(null);
                 var aliases = nodeType.Kind == Kind.Entity ? _schema.Aliases.GetStrings(nodeType.Name) : new List<string>();
                 _nodeTypeControls[nodeViewType].SetUiValues(nodeType, aliases);
 

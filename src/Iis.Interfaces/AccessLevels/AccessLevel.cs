@@ -7,11 +7,11 @@ namespace Iis.Interfaces.AccessLevels
     public class AccessLevel
     {
         public Guid Id { get; }
-        public string Name { get; }
-        public int NumericIndex { get; }
+        public string Name { get; set; }
+        public int NumericIndex { get; set; }
         public AccessLevel(Guid id, string name, int numericIndex)
         {
-            Id = Id;
+            Id = id;
             Name = name;
             NumericIndex = numericIndex;
         }
