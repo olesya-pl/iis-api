@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.ChangeParameters;
 using Iis.OntologySchema.Comparison;
 using Iis.OntologySchema.DataTypes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -344,6 +346,60 @@ namespace Iis.OntologySchema
             }
             ResetCaches();
             return null;
+        }
+        public INodeTypeLinked CreateEntityType(string name, string title = null, bool isAbstract = false, Guid? ancestorId = null)
+        {
+            var updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = name,
+                Title = title ?? name,
+                IsAbstract = isAbstract
+            };
+            var nodeType = UpdateNodeType(updateParameter);
+
+            if (ancestorId != null)
+            {
+                SetInheritance(nodeType.Id, (Guid)ancestorId);
+            }
+            return nodeType;
+        }
+        public INodeTypeLinked CreateAttributeType(
+            Guid parentId,
+            string name,
+            string title = null,
+            ScalarType scalarType = ScalarType.String,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            ISchemaMeta meta = null)
+        {
+            var updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = name,
+                Title = title ?? name,
+                EmbeddingOptions = embeddingOptions,
+                ScalarType = scalarType,
+                ParentTypeId = parentId,
+                Meta = meta == null ? null : JsonConvert.SerializeObject(meta)
+            };
+            return UpdateNodeType(updateParameter);
+        }
+        public INodeTypeLinked CreateRelationType(
+            Guid sourceId,
+            Guid targetId,
+            string name,
+            string title = null,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            ISchemaMeta meta = null)
+        {
+            var updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = name,
+                Title = title ?? name,
+                EmbeddingOptions = embeddingOptions,
+                ParentTypeId = sourceId,
+                TargetTypeId = targetId,
+                Meta = meta == null ? null : JsonConvert.SerializeObject(meta)
+            };
+            return UpdateNodeType(updateParameter);
         }
         private void ValidateNodeTypeUpdateParameter(INodeTypeUpdateParameter updateParameter)
         {

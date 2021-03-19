@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Interfaces.AccessLevels;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 
@@ -12,6 +13,7 @@ namespace Iis.Interfaces.Ontology.Data
         IOntologySchema Schema { get; }
         IOntologyPatch Patch { get; }
         void ClearPatch();
+        void ReloadData(INodesRawData rawData);
         INode GetNode(Guid id);
         T ReadLock<T>(Func<T> func);
         T WriteLock<T>(Func<T> func);
@@ -31,6 +33,8 @@ namespace Iis.Interfaces.Ontology.Data
         void SetNodeIsArchived(Guid nodeId);
         void SetNodeUpdatedAt(Guid nodeId, DateTime updatedAt);
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList);
+        void AddValueByDotName(Guid entityId, string value, string dotName);
         void AddValueByDotName(Guid entityId, string value, string[] dotNameParts);
+        IAccessLevels GetAccessLevels();
     }
 }

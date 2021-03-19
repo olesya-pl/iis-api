@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Iis.DataModel;
 using Iis.DbLayer.OntologySchema;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Iis.OntologyManager.UiControls;
+using Iis.Services;
+using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,9 +35,8 @@ namespace Iis.OntologyManager
             services.AddSingleton<IConfiguration>(configuration);
             services.AddTransient<IOntologySchema, Iis.OntologySchema.OntologySchema>();
             services.AddTransient<MainForm>();
-            services.AddTransient<OntologySchemaService>();
+            services.AddTransient<IOntologySchemaService, OntologySchemaService>();
             services.AddAutoMapper(typeof(Startup));
         }
-
     }
 }

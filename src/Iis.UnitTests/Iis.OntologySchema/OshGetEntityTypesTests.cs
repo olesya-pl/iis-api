@@ -34,10 +34,10 @@ namespace Iis.UnitTests.Iis.OntologySchema
         public void AttributesDirectDisabledTest()
         {
             var (schema, creator) = OntologyDataCreator.GetBaseTestOntology();
-            var entityType = creator.CreateEntityType("TestEntity");
-            creator.CreateAttributeType(entityType.Id, "field1");
-            creator.CreateAttributeType(entityType.Id, "field2");
-            creator.CreateAttributeType(entityType.Id, "field3", meta: new SchemaMeta { Hidden = true });
+            var entityType = schema.CreateEntityType("TestEntity");
+            schema.CreateAttributeType(entityType.Id, "field1");
+            schema.CreateAttributeType(entityType.Id, "field2");
+            schema.CreateAttributeType(entityType.Id, "field3", meta: new SchemaMeta { Hidden = true });
 
             var gqlType = GetGraphQlEntityType(schema, "TestEntity");
 
@@ -50,8 +50,8 @@ namespace Iis.UnitTests.Iis.OntologySchema
             var (schema, creator) = OntologyDataCreator.GetBaseTestOntology();
             var objectOfStudy = schema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
             
-            var entityType = creator.CreateEntityType("TestEntity", ancestorId: objectOfStudy.Id);
-            creator.CreateAttributeType(entityType.Id, "lastConfirmedAt", meta: new SchemaMeta { Hidden = true });
+            var entityType = schema.CreateEntityType("TestEntity", ancestorId: objectOfStudy.Id);
+            schema.CreateAttributeType(entityType.Id, "lastConfirmedAt", meta: new SchemaMeta { Hidden = true });
 
             var gqlType = GetGraphQlEntityType(schema, "TestEntity");
             var attributes = gqlType.GetAttributes().ToList();

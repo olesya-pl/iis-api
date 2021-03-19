@@ -80,7 +80,7 @@ namespace Iis.DataModel.Materials
                 .HasDefaultValue("");
 
             builder.Property(e => e.AccessLevel)
-                .HasDefaultValue(AccessLevel.Undefined);
+                .HasDefaultValue(0);
         }
     }
 }

@@ -160,7 +160,7 @@ namespace Iis.OntologyData.Migration
                 {
                     Log($"        {dotNameValue.Value} => {value}");
                 }
-                _data.AddValueByDotName(entity.Id, value, targetDotName.Split('.'));
+                _data.AddValueByDotName(entity.Id, value, targetDotName);
                 _data.SetNodesIsArchived(dotNameValue.Nodes.Select(n => n.Id));
             }
         }

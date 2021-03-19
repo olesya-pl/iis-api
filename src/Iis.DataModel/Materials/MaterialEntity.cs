@@ -139,7 +139,7 @@ namespace Iis.DataModel.Materials
         public Guid? AssigneeId { get; set; }
         public virtual UserEntity Assignee { get; set; }
         public int MlHandlersCount { get; set; }
-        public AccessLevel AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
 
         public bool CanBeEdited(Guid userId)
         {

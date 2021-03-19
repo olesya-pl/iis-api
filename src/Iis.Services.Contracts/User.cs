@@ -18,7 +18,7 @@ namespace Iis.Services.Contracts
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
-        public AccessLevel AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
         public IEnumerable<Role> Roles {get;set;} = new List<Role>();
         public AccessGrantedList AccessGrantedItems { get; set; } = new AccessGrantedList();
         public List<AccessGranted> Tabs => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Tab).ToList();

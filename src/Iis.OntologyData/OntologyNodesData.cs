@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData.DataTypes;
+using Iis.OntologyData.IisAccessLevels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +37,9 @@ namespace Iis.OntologyData
             Locker = new ReadWriteLocker();
             Locker.OnCommingChanges += () => _saver.SavePatch(Patch);
         }
+
+        public void ReloadData(INodesRawData rawData) =>
+            Locker.WriteLock(() => { _storage = new DataStorage(rawData, _mapper, Schema, this); });
 
         private IMapper GetMapper()
         {
@@ -87,6 +92,8 @@ namespace Iis.OntologyData
         {
             return Locker.ReadLock(() => ids.Where(id => _storage.Nodes.ContainsKey(id)).Select(id => _storage.Nodes[id]).ToList());
         }
+        public void AddValueByDotName(Guid entityId, string value, string dotName) =>
+            AddValueByDotName(entityId, value, dotName.Split('.'));
 
         public void AddValueByDotName(Guid entityId, string value, string[] dotNameParts)
         {
@@ -190,6 +197,28 @@ namespace Iis.OntologyData
         public IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<Guid> entityIdList, IEnumerable<string> relationTypeNameList)
         {
             return GetNodes(entityIdList).SelectMany(n => n.GetIncomingRelations(relationTypeNameList)).ToList();
+        }
+
+        public IAccessLevels GetAccessLevels()
+        {
+            var accessLevelNodeType = Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
+            if (accessLevelNodeType == null) 
+                throw new Exception("Тип сутності AccessLevel не існує");
+            var nodes = GetNodesByTypeId(accessLevelNodeType.Id);
+            var list = new List<AccessLevel>();
+            foreach (var node in nodes)
+            {
+                var nameProperty = node.GetSingleProperty(Schema.GetDotName("name"));
+                if (nameProperty == null)
+                    throw new Exception($"Атрибут name не існує для сутності {node.Id}");
+                var numericIndexProperty = node.GetSingleProperty(Schema.GetDotName("numericIndex"));
+                if (numericIndexProperty == null)
+                    throw new Exception($"Атрибут numericIndex не існує для сутності {node.Id}");
+
+                list.Add(new AccessLevel(node.Id, nameProperty.Value, int.Parse(numericIndexProperty.Value)));
+            }
+
+            return new AccessLevels(list);
         }
     }
 }
