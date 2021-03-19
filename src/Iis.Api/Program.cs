@@ -26,7 +26,11 @@ namespace IIS.Core
                         host.Run();
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{ex.Message}; {ex.InnerException?.Message}");
+                    Console.WriteLine(ex.StackTrace);
+                }
             }
         }
 
