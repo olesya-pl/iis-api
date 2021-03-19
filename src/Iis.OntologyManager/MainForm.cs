@@ -23,6 +23,8 @@ using System.Windows.Forms;
 using System.Net.Http;
 using System.Text;
 using static Iis.OntologyManager.UiControls.UiFilterControl;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.AccessLevels;
 
 namespace Iis.OntologyManager
 {
@@ -33,6 +35,7 @@ namespace Iis.OntologyManager
         const string EnvironmentPropertiesSectionName = "environmentProperties";
         const string UserCredentialsSectionName = "userCredentials";
         const string RequestSettingsSectionName = "requestSettings";
+        const string DefaultName = "__default";
 
         IReadOnlyCollection<SchemaDataSource> _schemaSources;
 
@@ -42,7 +45,7 @@ namespace Iis.OntologyManager
         IOntologyManagerStyle _style;
         UiControlsCreator _uiControlsCreator;
         INodeTypeLinked _currentNodeType;
-        OntologySchemaService _schemaService;
+        IOntologySchemaService _schemaService;
         IList<INodeTypeLinked> _history = new List<INodeTypeLinked>();
         UserCredentials _userCredentials;
         RequestSettings _requestSettings;
@@ -54,12 +57,15 @@ namespace Iis.OntologyManager
         UiRelationAttributeControl _uiRelationAttributeControl;
         UiRelationEntityControl _uiRelationEntityControl;
         UiOntologyDataControl _uiOntologyDataControl;
+        UiAccessLevelControl _uiAccessLevelControl;
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
+        Dictionary<string, IDataViewControl> _dataViewControls = new Dictionary<string, IDataViewControl>();
         const string VERSION = "1.32";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
+        IAccessLevels _accessLevels;
 
         #endregion
 
@@ -88,7 +94,7 @@ namespace Iis.OntologyManager
 
         public MainForm(
             IConfiguration configuration,
-            OntologySchemaService schemaService,
+            IOntologySchemaService schemaService,
             ILogger logger)
         {
             InitializeComponent();
@@ -177,6 +183,14 @@ namespace Iis.OntologyManager
             var pnlOntologyData = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiOntologyDataControl = new UiOntologyDataControl(_uiControlsCreator);
             _uiOntologyDataControl.Initialize("OntologyDataControl", pnlOntologyData);
+
+            var pnlAccessLevels = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiAccessLevelControl = new UiAccessLevelControl(_uiControlsCreator, _accessLevels);
+            _uiAccessLevelControl.Initialize("AccessLevelControl", pnlAccessLevels);
+
+            _dataViewControls[EntityTypeNames.AccessLevel.ToString()] = _uiAccessLevelControl;
+            //_dataViewControls[DefaultName] = _uiAccessLevelControl;
+            _dataViewControls[DefaultName] = _uiOntologyDataControl;
 
             _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
             _nodeTypeControls[NodeViewType.RelationEntity] = _uiRelationEntityControl;
@@ -490,7 +504,6 @@ namespace Iis.OntologyManager
                 schemaSource.SourceKind == SchemaSourceKind.Database ?
                 GetOntologyData(schemaSource.Data) :
                 null;
-
         }
 
         private void UpdateSchemaSources()
@@ -578,6 +591,19 @@ namespace Iis.OntologyManager
                 _nodeTypeControls[key].Visible = nodeViewType == key;
             }
         }
+        private void SetDataViewVisibility(string nodeTypeName)
+        {
+            var selectedControl = GetDataViewControl(nodeTypeName);
+            foreach (var control in _dataViewControls.Values)
+            {
+                control.Visible = control == selectedControl;
+            }
+        }
+        private IDataViewControl GetDataViewControl(string nodeTypeName) =>
+            nodeTypeName == null ?
+                _dataViewControls[DefaultName] :
+                _dataViewControls.GetValueOrDefault(nodeTypeName) ?? _dataViewControls[DefaultName];
+
         private void CreateNewNodeType(NodeViewType nodeViewType, Guid? parentTypeId)
         {
             SetNodeTypeViewVisibility(nodeViewType);
@@ -616,14 +642,14 @@ namespace Iis.OntologyManager
             if (_ontologyDataView)
             {
                 SetNodeTypeViewVisibility(null);
-                _uiOntologyDataControl.Visible = true;
-                _uiOntologyDataControl.SetUiValues(nodeType, _ontologyData);
+                SetDataViewVisibility(nodeType.Name);
+                GetDataViewControl(nodeType.Name).SetUiValues(nodeType, _ontologyData);
             }
             else
             {
                 var nodeViewType = GetNodeViewType(nodeType);
                 SetNodeTypeViewVisibility(nodeViewType);
-                _uiOntologyDataControl.Visible = false;
+                SetDataViewVisibility(null);
                 var aliases = nodeType.Kind == Kind.Entity ? _schema.Aliases.GetStrings(nodeType.Name) : new List<string>();
                 _nodeTypeControls[nodeViewType].SetUiValues(nodeType, aliases);
 

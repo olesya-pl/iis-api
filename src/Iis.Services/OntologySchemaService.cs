@@ -1,7 +1,10 @@
 ﻿using Iis.DataModel;
+using Iis.DbLayer.OntologySchema;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema;
+using Iis.OntologySchema.Saver;
+using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -10,16 +13,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Iis.DbLayer.OntologySchema
+namespace Iis.Services
 {
-    public class OntologySchemaService
+    public class OntologySchemaService : IOntologySchemaService
     {
         public IOntologySchema LoadFromFile(IOntologySchemaSource schemaSource)
         {
             var json = File.ReadAllText(schemaSource.Data);
             var rawData = JsonConvert.DeserializeObject<OntologyRawDataDeserializable>(json);
             var ontologyRawData = new OntologyRawData(rawData.NodeTypes, rawData.RelationTypes, rawData.AttributeTypes, rawData.Aliases);
-            var ontologySchema = Iis.OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
+            var ontologySchema = OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
             return ontologySchema;
         }
 
@@ -40,20 +43,31 @@ namespace Iis.DbLayer.OntologySchema
                     context.RelationTypes.AsNoTracking(),
                     context.AttributeTypes.AsNoTracking(),
                     context.Aliases.Where(x => x.Type == AliasType.Ontology).AsNoTracking());
-                var ontologySchema = Iis.OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
+                var ontologySchema = OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
                 return ontologySchema;
             }
             catch
             {
-                return Iis.OntologySchema.OntologySchema.GetInstance(null, schemaSource);
+                return OntologySchema.OntologySchema.GetInstance(null, schemaSource);
             }
+        }
+
+        public void SaveToDatabase(IOntologySchema schema, string connectionString)
+        {
+            using var context = OntologyContext.GetContext(connectionString);
+            var schemaSource = new OntologySchemaSource { SourceKind = SchemaSourceKind.Database, Data = connectionString };
+            var oldSchema = GetOntologySchema(schemaSource);
+            var compareResult = schema.CompareTo(oldSchema);
+            var schemaSaver = new OntologySchemaSaver(context, compareResult.SchemaTo);
+
+            schemaSaver.SaveToDatabase(compareResult);
         }
 
         public IOntologySchema GetOntologySchema(IOntologySchemaSource schemaSource)
         {
             if (schemaSource == null)
             {
-                return new Iis.OntologySchema.OntologySchema(null);
+                return new OntologySchema.OntologySchema(null);
             }
             switch (schemaSource.SourceKind)
             {
@@ -62,7 +76,7 @@ namespace Iis.DbLayer.OntologySchema
                 case SchemaSourceKind.Database:
                     return LoadFromDatabase(schemaSource);
                 case SchemaSourceKind.New:
-                    return new Iis.OntologySchema.OntologySchema(schemaSource);
+                    return new OntologySchema.OntologySchema(schemaSource);
             }
             throw new ArgumentException($"Invalid argument sourceKind = {schemaSource.SourceKind}");
         }

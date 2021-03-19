@@ -45,7 +45,7 @@ namespace Iis.Domain.Materials
         public IEnumerable<JObject> Events { get; set; }
         public IEnumerable<JObject> Features { get; set; }
         public bool CanBeEdited { get; set; }
-        public AccessLevel AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
 
         public bool HasAttachedFile() => File != null;
 

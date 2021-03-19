@@ -5,10 +5,10 @@ using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Iis.Services;
 using Microsoft.Extensions.Configuration;
 using IIS.Core;
 using Iis.DbLayer.Repositories;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.Api.Filters
 {
@@ -48,7 +48,7 @@ namespace Iis.Api.Filters
 
         public bool IsAuthorized(AuthorizationFilterContext context, string username, string password)
         {
-            var userService = context.HttpContext.RequestServices.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
             var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
             var passwordHash = configuration.GetPasswordHashAsBase64String(password);
 

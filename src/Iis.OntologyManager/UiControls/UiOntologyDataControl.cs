@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiOntologyDataControl : UIBaseControl
+    public class UiOntologyDataControl : UIBaseControl, IDataViewControl
     {
         DataGridView grid;
         Button btnAdd;

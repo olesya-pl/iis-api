@@ -32,7 +32,7 @@ namespace Iis.Services
             IUserElasticService userElasticService,
             IUserRepository userRepository,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory) 
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
         {
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;
@@ -269,7 +269,7 @@ namespace Iis.Services
             return GetUser(userId);
         }
 
-        public bool IsAccessLevelAllowedForUser(AccessLevel userAccessLevel, AccessLevel newAccessLevel)
+        public bool IsAccessLevelAllowedForUser(int userAccessLevel, int newAccessLevel)
         {
             return userAccessLevel >= newAccessLevel;
         }

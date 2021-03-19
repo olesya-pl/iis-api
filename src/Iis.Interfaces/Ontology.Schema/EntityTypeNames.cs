@@ -8,6 +8,7 @@
         Event, 
         Enum,
         Wiki,
-        Object
+        Object,
+        AccessLevel
     }
 }

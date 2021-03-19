@@ -9,6 +9,7 @@ using Iis.Services.Contracts;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Iis.DbLayer.Repositories;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core
 {
@@ -46,7 +47,7 @@ namespace IIS.Core
             );
         }
 
-        public static TokenPayload ValidateToken(string token, IConfiguration config, UserService<IIISUnitOfWork> userService)
+        public static TokenPayload ValidateToken(string token, IConfiguration config, IUserService userService)
         {
             if (!_securityTokenHandler.CanReadToken(token))
                 throw new AuthenticationException("Unable to read token");

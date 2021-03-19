@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId,
-            [GraphQLType(typeof(byte))] byte newAccessLevel
+            [GraphQLType(typeof(int))] int newAccessLevel
         )
         {
             var tokenPayload = context.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;

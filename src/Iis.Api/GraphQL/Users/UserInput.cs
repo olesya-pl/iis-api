@@ -25,7 +25,7 @@ namespace IIS.Core.GraphQL.Users
         public string UserNameActiveDirectory { get; set; }
         public bool? IsBlocked { get; set; }
         [GraphQLNonNullType]
-        public AccessLevel AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
         [GraphQLNonNullType]
         public IEnumerable<Guid> Roles { get; set; }
     }

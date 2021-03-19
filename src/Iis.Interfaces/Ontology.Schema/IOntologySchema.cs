@@ -19,6 +19,21 @@ namespace Iis.Interfaces.Ontology.Schema
         Dictionary<string, INodeTypeLinked> GetStringCodes();
         INodeTypeLinked GetNodeTypeByStringCode(string code);
         INodeTypeLinked UpdateNodeType(INodeTypeUpdateParameter updateParameter);
+        INodeTypeLinked CreateEntityType(string name, string title = null, bool isAbstract = false, Guid? ancestorId = null);
+        INodeTypeLinked CreateAttributeType(
+            Guid parentId,
+            string name,
+            string title = null,
+            ScalarType scalarType = ScalarType.String,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            ISchemaMeta meta = null);
+        INodeTypeLinked CreateRelationType(
+            Guid sourceId,
+            Guid targetId,
+            string name,
+            string title = null,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            ISchemaMeta meta = null);
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
         void RemoveInheritance(Guid sourceTypeId, Guid targetTypeId);
