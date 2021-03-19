@@ -43,8 +43,8 @@ Scenario: IIS-6127 - Fill all the fields in the military organization and save i
 	When I clicked on the create a new object of study button
 	And I clicked on the create a new military organization button
 	And I clicked on all expandable blocks
-	And I scrolled up to the //label[contains(text(),'Бойовий досвід')]/following-sibling::div element
+	#And I scrolled up to the //label[contains(text(),'Бойовий досвід')]/following-sibling::div element
 	And I filled in the form
 
-		| Бойовий досвід       | Війскова частина | Країна | 
-		| тестовое значение БО | тест номер ВЧ    | Китай  |
+	| Приналежність | Важливість    | Безпосереднє підпорядкування | Бойовий досвід                    | Війскова частина | Військовий гарнізон | Країна | Країна |
+	| ворожий       | першочерговий | 1 бру                        | тестове значення бойового досвіду | тест номер ВЧ    | Гарнізон перший     | Китай  | Китай  |

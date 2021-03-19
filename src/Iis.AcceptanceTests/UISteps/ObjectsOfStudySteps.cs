@@ -297,29 +297,33 @@ namespace AcceptanceTests.UISteps
                 var elementValue = table.Rows[0].Values.ElementAt(i);
 
                 var xpathList = new List<string>();
-                var textAreaLocator = $"//label[contains(text(),'{elementName}')]//following::textarea[1]";
-                var inputLocator = $"//label[contains(text(),'{elementName}')]//following::textarea[1]";
+                var textAreaLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::textarea[1]";
+                var inputLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::input";
+                var textAreaLocatorWithoutParentNode = $"//label[contains(text(),'{elementName}')]//following::textarea[1]";
                 xpathList.Add(textAreaLocator);
                 xpathList.Add(inputLocator);
+                xpathList.Add(textAreaLocatorWithoutParentNode);
+
                 var element = driver.FindElementByAnyXpath(xpathList);
-                element.SendKeys(elementValue);
-                element.SendKeys(Keys.Down);//?
-                element.SendKeys(Keys.Enter);//?
-                //var textField =
-                //    driver.FindElement(
-                //        By.XPath($"//label[contains(text(),'{elementName}')]//following::textarea[1]"));
-
-                //textField.SendKeys(elementValue);
-                driver.WaitFor(0.1);
-
-                //var dropDown =
-                //    driver.FindElement(By.XPath($"//label[contains(text(),'{elementName}')]/following::input[1]"));
-
-                //dropDown.SendKeys(elementValue);
-                //driver.WaitFor(2);
-                //dropDown.SendKeys(Keys.Down);
-                //dropDown.SendKeys(Keys.Enter);
+                if (element.TagName == "input")
+                {
+                    element.SendKeys(elementValue);
+                    driver.WaitFor(0.2);
+                    element.SendKeys(Keys.Down);
+                    element.SendKeys(Keys.Enter);
+                }
+                else if (element.TagName == "textarea")
+                {
+                    element.SendKeys(elementValue);
+                }
+               
+                //driver.WaitFor(0.1);
             }
+
+            objectsOfStudyPage.SaveObjectOfStudyButton.Click();
+            driver.WaitFor(2);
+            objectsOfStudyPage.ConfirmSaveOfANewObjectOfStudyButton.Click();
+            driver.WaitFor(2);
         }
 
         #endregion

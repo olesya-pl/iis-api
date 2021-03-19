@@ -393,17 +393,23 @@ this.FeatureBackground();
 #line 45
  testRunner.And("I clicked on all expandable blocks", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 46
- testRunner.And("I scrolled up to the //label[contains(text(),\'Бойовий досвід\')]/following-sibling" +
-                        "::div element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Приналежність",
+                            "Важливість",
+                            "Безпосереднє підпорядкування",
                             "Бойовий досвід",
                             "Війскова частина",
+                            "Військовий гарнізон",
+                            "Країна",
                             "Країна"});
                 table1.AddRow(new string[] {
-                            "тестовое значение БО",
+                            "ворожий",
+                            "першочерговий",
+                            "1 бру",
+                            "тестове значення бойового досвіду",
                             "тест номер ВЧ",
+                            "Гарнізон перший",
+                            "Китай",
                             "Китай"});
 #line 47
  testRunner.And("I filled in the form", ((string)(null)), table1, "And ");
