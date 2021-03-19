@@ -117,7 +117,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             var fieldSpecificFilter = new ElasticFilter
             {
                 Suggestion = filter.Suggestion,
-                FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.OriginFieldName || x.Name == field.Alias)).ToList()
+                FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.Name || x.Name == field.Alias)).ToList()
             };
 
             var possibleQuery = fieldSpecificFilter.ToQueryString();

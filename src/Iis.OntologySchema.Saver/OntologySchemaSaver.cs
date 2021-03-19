@@ -28,14 +28,14 @@ namespace Iis.OntologySchema.Saver
         {
             _createdEntityTypes = new List<INodeType>();
             AddNodes(compareResult.ItemsToAdd
-                .Where(item => parameters?.IsChecked(item) == true)
+                .Where(item => parameters?.IsChecked(item) != false)
                 .OrderBy(item => item.Kind));
-            DeleteNodes(compareResult.ItemsToDelete.Where(item => parameters?.IsChecked(item) == true));
-            UpdateNodes(compareResult.ItemsToUpdate.Where(item => parameters?.IsChecked(item) == true));
+            DeleteNodes(compareResult.ItemsToDelete.Where(item => parameters?.IsChecked(item) != false));
+            UpdateNodes(compareResult.ItemsToUpdate.Where(item => parameters?.IsChecked(item) != false));
 
-            AddAliases(compareResult.AliasesToAdd.Where(item => parameters?.IsChecked(item) == true));
-            UpdateAliases(compareResult.AliasesToUpdate.Where(item => parameters?.IsChecked(item) == true));
-            DeleteAliases(compareResult.AliasesToDelete.Where(item => parameters?.IsChecked(item) == true));
+            AddAliases(compareResult.AliasesToAdd.Where(item => parameters?.IsChecked(item) != false));
+            UpdateAliases(compareResult.AliasesToUpdate.Where(item => parameters?.IsChecked(item) != false));
+            DeleteAliases(compareResult.AliasesToDelete.Where(item => parameters?.IsChecked(item) != false));
 
             _context.SaveChanges();
         }

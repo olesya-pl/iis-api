@@ -126,13 +126,18 @@ namespace IIS.Core.Materials.EntityFramework
             return material;
         }
 
-        public async Task<Material> GetMaterialAsync(Guid id, Guid userId)
+        public async Task<Material> GetMaterialAsync(Guid id, User user)
         {
             var entity = await RunWithoutCommitAsync(async (unitOfWork) =>
                 await unitOfWork.MaterialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
 
+            if (entity is null || !entity.CanBeAccessedBy(user.AccessLevel))
+            {
+                throw new ArgumentException($"Cannot find material with id {id}");
+            }
+
             var mapped = await MapAsync(entity);
-            mapped.CanBeEdited = entity.CanBeEdited(userId);
+            mapped.CanBeEdited = entity.CanBeEdited(user.Id);
             return mapped;
         }
 

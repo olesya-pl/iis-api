@@ -10,6 +10,7 @@ using Iis.DataModel.Roles;
 using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.DbLayer.Repositories;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.UnitTests.UserManagement
 {
@@ -40,7 +41,7 @@ namespace Iis.UnitTests.UserManagement
             RoleEntity roleEntity)
         {
             // arrange:begin
-            var service = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IUserService>();
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
             roleEntity.RoleAccessEntities = new List<RoleAccessEntity>();
@@ -80,7 +81,7 @@ namespace Iis.UnitTests.UserManagement
             UserEntity userEntity)
         {
             // arrange:begin
-            var service = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IUserService>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 
@@ -121,7 +122,7 @@ namespace Iis.UnitTests.UserManagement
             UserEntity userEntity)
         {
             // arrange:begin
-            var service = _serviceProvider.GetRequiredService<UserService<IIISUnitOfWork>>();
+            var service = _serviceProvider.GetRequiredService<IUserService>();
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
 

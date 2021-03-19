@@ -58,7 +58,7 @@ namespace IIS.Core.GraphQL.Materials
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public bool CanBeEdited { get; set; }
-        public byte AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

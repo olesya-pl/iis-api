@@ -23,6 +23,7 @@ using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
+using Iis.Interfaces.Common;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -37,6 +38,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
         private readonly IMediator _mediatr;
+        private readonly ICommonData _commonData;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -47,7 +49,8 @@ namespace IIS.Core.Materials.EntityFramework
             IUserService userService,
             IMediator mediator,
             IMaterialSignRepository materialSignRepository,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            ICommonData commonData) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -58,6 +61,7 @@ namespace IIS.Core.Materials.EntityFramework
             _userService = userService;
             _materialSignRepository = materialSignRepository;
             _mediatr = mediator;
+            _commonData = commonData;
         }
 
         public async Task SaveAsync(Material material, Guid? changeRequestId = null)
@@ -183,11 +187,11 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MLResponse>(responseEntity);
         }
 
-        public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, Guid userId, string username)
+        public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, User user)
         {
             var material = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetByIdAsync(input.Id, new[] { MaterialIncludeEnum.WithChildren }));
-
-            if (material.CanBeEdited(userId))
+            var username = user.UserName;
+            if (material.CanBeEdited(user.Id))
             {
                 var changeRequestId = Guid.NewGuid();
                 var changesList = new List<ChangeHistoryDto>();
@@ -337,7 +341,7 @@ namespace IIS.Core.Materials.EntityFramework
                     QueueMaterialForMachineLearning(material);
                 }
             }
-            return await _materialProvider.GetMaterialAsync(input.Id, userId);
+            return await _materialProvider.GetMaterialAsync(input.Id, user);
         }
 
         private void CreateChangeHistory(Guid targetId,
@@ -437,7 +441,7 @@ namespace IIS.Core.Materials.EntityFramework
                 => await unitOfWork.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, stoppingToken));
         }
 
-        public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, byte accessLevel, User user)
+        public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user)
         {
             var accessLevelValidationResult = IsValidAccessLevel(accessLevel);
 
@@ -453,8 +457,8 @@ namespace IIS.Core.Materials.EntityFramework
             var changeHistory = new ChangeHistoryDto
             {
                 Date = DateTime.UtcNow,
-                NewValue = accessLevelValidationResult.Value.ToString("D"),
-                OldValue = material.AccessLevel.ToString("D"),
+                NewValue = accessLevelValidationResult.Value.ToString(),
+                OldValue = material.AccessLevel.ToString(),
                 PropertyName = nameof(material.AccessLevel),
                 RequestId = Guid.NewGuid(),
                 TargetId = material.Id,
@@ -469,18 +473,18 @@ namespace IIS.Core.Materials.EntityFramework
 
             var changeHistoryTask = _changeHistoryService.SaveMaterialChanges(new[] { changeHistory });
 
-            var getMaterialTask = _materialProvider.GetMaterialAsync(materialId, user.Id);
+            var getMaterialTask = _materialProvider.GetMaterialAsync(materialId, user);
 
             await Task.WhenAll(new[] { elasticTask, changeHistoryTask, getMaterialTask });
 
             return getMaterialTask.Result;
         }
 
-        private (bool IsValid, AccessLevel Value) IsValidAccessLevel(byte accessLevel)
+        private (bool IsValid, int Value) IsValidAccessLevel(int accessLevel)
         {
-            var isValid = Enum.IsDefined(typeof(AccessLevel), accessLevel);
+            var isValid = _commonData.AccessLevels.IndexIsValid(accessLevel);
 
-            return (IsValid: isValid, Value: isValid ? (AccessLevel)accessLevel : AccessLevel.Undefined);
+            return (IsValid: isValid, Value: isValid ? accessLevel : 0);
         }
         private bool IsUserAuthorizedForChangeAccessLevel(User user)
         {

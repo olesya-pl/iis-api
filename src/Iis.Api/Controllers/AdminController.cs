@@ -1,12 +1,18 @@
-﻿using Iis.DbLayer.Repositories;
+﻿using Iis.DataModel;
+using Iis.DbLayer.OntologyData;
+using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
-using Iis.Services;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyData;
 using Iis.Services.Contracts.Interfaces;
+using IIS.Core;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
@@ -30,6 +36,10 @@ namespace Iis.Api.Controllers
         private readonly IUserService _userService;
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
+        private readonly IHost _host;
+        private readonly IConfiguration _configuration;
+        private readonly IOntologyDataService _nodesDataService;
+        private readonly IConnectionStringService _connectionStringService;
 
         public AdminController(
             IMaterialService materialService,
@@ -38,7 +48,10 @@ namespace Iis.Api.Controllers
             IElasticState elasticState,
             IUserService userService,
             IUserElasticService userElasticService,
-            IAdminOntologyElasticService adminElasticService)
+            IAdminOntologyElasticService adminElasticService,
+            IHost host,
+            IConnectionStringService connectionStringService,
+            IOntologyDataService nodesDataService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -47,6 +60,9 @@ namespace Iis.Api.Controllers
             _adminElasticService = adminElasticService;
             _userService = userService;
             _userElasticService = userElasticService;
+            _host = host;
+            _nodesDataService = nodesDataService;
+            _connectionStringService = connectionStringService;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -95,7 +111,7 @@ namespace Iis.Api.Controllers
             {
                 await _adminElasticService.FillIndexesFromMemoryAsync(indexes, fieldsToExclude, ct);
             }
-            else 
+            else
             {
                 await _adminElasticService.FillIndexesFromMemoryAsync(indexes, false, ct);
             }
@@ -107,13 +123,13 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("RecreateElasticReportIndex")]
-        public async Task<IActionResult> RecreateReportIndex(CancellationToken ct) 
+        public async Task<IActionResult> RecreateReportIndex(CancellationToken ct)
         {
             _adminElasticService.Logger = new StringBuilder();
             var index = _elasticState.ReportIndex;
 
             await _adminElasticService.DeleteIndexesAsync(new string[] { index }, ct);
-            await _adminElasticService.CreateReportIndexWithMappingsAsync(ct);            
+            await _adminElasticService.CreateReportIndexWithMappingsAsync(ct);
             await _adminElasticService.FillReportIndexAsync(ct);
 
             return Content(_adminElasticService.Logger.ToString());
@@ -179,7 +195,7 @@ namespace Iis.Api.Controllers
 
             return Content(log.ToString());
         }
-        
+
         [HttpGet("GetElasticJson/{id}")]
         public async Task<IActionResult> GetElasticJson(string id, CancellationToken cancellationToken)
         {
@@ -191,8 +207,23 @@ namespace Iis.Api.Controllers
             }
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
-        }        
-        
+        }
+
+        [HttpPost("RestartApplication")]
+        public async Task RestartApplication()
+        {
+            Program.NeedToStart = true;
+            await _host.StopAsync();
+        }
+
+        [HttpPost("ReloadOntologyData")]
+        public async Task<IActionResult> ReloadOntologyData()
+        {
+            var connectionString = _connectionStringService.GetIisApiConnectionString();
+            _nodesDataService.ReloadOntologyData(connectionString);
+            return Content("Success");
+        }
+
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);
@@ -233,7 +264,7 @@ namespace Iis.Api.Controllers
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 
-            return Content(_adminElasticService.Logger.ToString()); 
+            return Content(_adminElasticService.Logger.ToString());
         }
     }
 }

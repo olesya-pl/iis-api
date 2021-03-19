@@ -132,7 +132,7 @@ namespace IIS.Core.GraphQL.Files
             }
             using (var sw = File.CreateText(fullDataName))
             {
-                sw.WriteLine($"{AccessLevelPropertyName}: {input.AccessLevel.ToString("D")}");
+                await sw.WriteLineAsync($"{AccessLevelPropertyName} {input.AccessLevel}");                
                 sw.WriteLine($"{LoadedByPropertyName}: {userName}");
             }
             return new UploadResult

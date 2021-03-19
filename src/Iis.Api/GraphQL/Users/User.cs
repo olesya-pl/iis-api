@@ -24,7 +24,7 @@ namespace IIS.Core.GraphQL.Users
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
-        public AccessLevel AccessLevel { get; set; }
+        public int AccessLevel { get; set; }
         public IEnumerable<Role> Roles { get; set; }
         public IEnumerable<AccessEntity> Entities { get; set; }
         public IEnumerable<AccessTab> Tabs { get; set; }
