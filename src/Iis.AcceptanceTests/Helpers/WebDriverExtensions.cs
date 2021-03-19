@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
@@ -31,6 +32,23 @@ namespace AcceptanceTests.Helpers
             {
                 throw;
             }
+        }
+
+        public static IWebElement FindElementByAnyXpath(this IWebDriver driver, IEnumerable<string> xPathCollection)
+        {
+            foreach (var selector in xPathCollection)
+            {
+                try
+                {
+                    var element = driver.FindElement(By.XPath(selector));
+                    return element;
+                }
+                catch (NoSuchElementException e)
+                {
+                    continue;
+                }
+            }
+            throw new NoSuchElementException();
         }
     }
 }

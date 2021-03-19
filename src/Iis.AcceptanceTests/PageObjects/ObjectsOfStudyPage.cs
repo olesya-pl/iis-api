@@ -218,5 +218,18 @@ namespace AcceptanceTests.PageObjects
             var elementToClick = driver.FindElement(By.XPath($"//div[contains(text(),'{relationshipLinkTitle}')]"));
             elementToClick.Click();
         }
+
+        public void FindARightWebElement(string elementToFind)
+		{
+			try
+			{
+                driver.FindElement(By.XPath(elementToFind));
+			}
+			catch (NoSuchElementException ex)
+			{
+
+				throw;
+			}
+		}
     }
 }

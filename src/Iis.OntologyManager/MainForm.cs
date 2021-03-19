@@ -295,7 +295,9 @@ namespace Iis.OntologyManager
             menuElastic.Items[6].Click += (sender, e) => { ReindexElastic(IndexKeys.Wiki); };
             menuElastic.Items.Add("Історічні Індекси Wiki");
             menuElastic.Items[7].Click += (sender, e) => { ReindexElastic(IndexKeys.WikiHistorical); };
-            var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic };
+            menuElastic.Items.Add("Індекси Користувачів");
+            menuElastic.Items[8].Click += (sender, e) => { ReindexElastic(IndexKeys.Users); };
+            var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
             btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
             container.Add(btnMenu);
 
