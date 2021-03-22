@@ -5045,6 +5045,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "755b2d77-350d-4cf8-a538-ee0eddf26d07",
+      "Name": "Is",
+      "Title": null,
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "4020f259-a989-463a-b1a8-cf8c07c13484",
       "Name": "constructionSites",
       "Title": "Ділянки будівельних робіт",
@@ -9270,19 +9283,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "755b2d77-350d-4cf8-a538-ee0eddf26d07",
-      "Name": "Is",
-      "Title": null,
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "75f28333-83c9-4e90-bec3-f7aa53a2d21b",
       "Name": "track",
       "Title": "Колія",
@@ -11129,6 +11129,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "9ce0964e-8c4e-41e9-baa1-f034d4de0ccf",
+      "Name": "code",
+      "Title": "Код",
+      "Meta": "{\r\n  \"Kind\": 0\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "8db398a3-5bac-49a1-83d4-d07c5568022a",
       "Name": "accuracyOfNavigationBinding",
       "Title": "Точність навігаційної привязки, м",
@@ -11701,6 +11714,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "9c26b203-ea5a-4744-88e7-1c890f30646c",
+      "Name": "description",
+      "Title": "Примітка",
+      "Meta": "{\r\n  \"SortOrder\": 3,\r\n  \"Multiple\": false\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "95e25542-6fdc-4f37-955e-f27721835e34",
       "Name": "parent",
       "Title": "Пряме підпорядкування",
@@ -12268,32 +12294,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "9c26b203-ea5a-4744-88e7-1c890f30646c",
-      "Name": "description",
-      "Title": "Примітка",
-      "Meta": "{\r\n  \"SortOrder\": 3,\r\n  \"Multiple\": false\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "9ce0964e-8c4e-41e9-baa1-f034d4de0ccf",
-      "Name": "code",
-      "Title": "Код",
-      "Meta": "{\r\n  \"Kind\": 0\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -14132,6 +14132,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "cf20528a-6d11-4c21-bbab-8e75a9a62021",
+      "Name": "Is",
+      "Title": null,
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "b7510e61-0e2b-43f2-9eb3-aecf3fdebdbb",
       "Name": "poligonsOwn",
       "Title": "Власні полігони",
@@ -15302,6 +15315,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "fde3a01b-7895-4669-a86f-ea67bc14d1e0",
+      "Name": "Is",
+      "Title": null,
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "c6d6951b-7a05-4583-b6c4-fc6992bf3735",
       "Name": "militaryBaseShortName",
       "Title": "Війскова частина",
@@ -15908,19 +15934,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "cf20528a-6d11-4c21-bbab-8e75a9a62021",
-      "Name": "Is",
-      "Title": null,
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -19098,19 +19111,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "fde3a01b-7895-4669-a86f-ea67bc14d1e0",
-      "Name": "Is",
-      "Title": null,
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "fde9fd5d-182e-477b-a72f-517d460b6e5f",
       "Name": "undegraundStorages",
       "Title": "Напівпідземних сховищ",
@@ -19262,6 +19262,97 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "d56771b6-4ab7-4289-b9a0-3e0250538078",
+      "Name": "accessLevel",
+      "Title": "Рівень доступу",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "2ecd3787-e1d7-4119-b332-69058fcc923f",
+      "Name": "accessLevel",
+      "Title": "Гриф",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "d7bdfc9d-8eb2-44cc-bfc6-cbbdf5cb877f",
+      "Name": "AccessLevel",
+      "Title": "Гріфи (рівні доступу)",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "cbf57d54-adac-4930-88c3-8800dfbceab6",
+      "Name": "Is",
+      "Title": null,
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "48faaed0-dae8-4678-90b9-ae917b1ab85b",
+      "Name": "numericIndex",
+      "Title": "Числовий індекс",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "8c94d58b-d9e4-41aa-b459-e96f2e564b0e",
+      "Name": "numericIndex",
+      "Title": "Числовий індекс",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "e7e369fd-f84a-4dba-8638-fab3e0e4849b",
+      "Name": "accessLevel",
+      "Title": "Гриф",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -25105,6 +25196,27 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "959fb9b5-6587-49aa-b8c7-84297949358c",
       "TargetTypeId": "ec107134-6121-41ce-8e2d-655edc9742b0"
+    },
+    {
+      "Id": "cbf57d54-adac-4930-88c3-8800dfbceab6",
+      "Kind": 1,
+      "EmbeddingOptions": 0,
+      "SourceTypeId": "d7bdfc9d-8eb2-44cc-bfc6-cbbdf5cb877f",
+      "TargetTypeId": "a6bff9b2-3275-4e96-aa0b-60d444c74238"
+    },
+    {
+      "Id": "48faaed0-dae8-4678-90b9-ae917b1ab85b",
+      "Kind": 0,
+      "EmbeddingOptions": 2,
+      "SourceTypeId": "d7bdfc9d-8eb2-44cc-bfc6-cbbdf5cb877f",
+      "TargetTypeId": "8c94d58b-d9e4-41aa-b459-e96f2e564b0e"
+    },
+    {
+      "Id": "e7e369fd-f84a-4dba-8638-fab3e0e4849b",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "a45cc484-c39b-48b0-9e07-1ead14608808",
+      "TargetTypeId": "d7bdfc9d-8eb2-44cc-bfc6-cbbdf5cb877f"
     }
   ],
   "AttributeTypes": [
@@ -26971,6 +27083,18 @@
     {
       "Id": "e826f886-0019-47c4-b176-f8771cb9aa49",
       "ScalarType": 2
+    },
+    {
+      "Id": "d56771b6-4ab7-4289-b9a0-3e0250538078",
+      "ScalarType": 1
+    },
+    {
+      "Id": "2ecd3787-e1d7-4119-b332-69058fcc923f",
+      "ScalarType": 1
+    },
+    {
+      "Id": "8c94d58b-d9e4-41aa-b459-e96f2e564b0e",
+      "ScalarType": 1
     }
   ],
   "Aliases": [

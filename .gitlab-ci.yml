@@ -19,11 +19,6 @@ build_job:
     expire_in: 1 month
   tags:
     - ci
-  # only:
-  #   - master
-  #   - /^v.+$/
-  #   - /^sprint\..+$/
-  #   - /^Release_*/
   when: manual
 
 unit_test:
@@ -40,12 +35,7 @@ unit_test:
   allow_failure: true
   tags:
     - ci
-  # only:
-  #   - master
-  #   - /^v.+$/
-  #   - /^sprint\..+$/
-  #   - /^Release_*/
-
+  when: manual
 
 
 ### Docker ###
@@ -68,6 +58,7 @@ build_docker:
     - /^rc-*/
     - master
     - develop
+  when: manual
 
 push docker(master):
   variables:
@@ -81,6 +72,7 @@ push docker(master):
     - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:master
   tags:
     - docker
+  when: manual
 
 push docker(latest):
   variables:
@@ -94,6 +86,7 @@ push docker(latest):
     - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
   tags:
     - docker
+  when: manual
 
 
 push docker(tag):
@@ -108,6 +101,7 @@ push docker(tag):
     - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:$CI_COMMIT_REF_NAME
   tags:
     - docker
+  when: manual
 
 .deploy_nomad:
   variables:
@@ -125,15 +119,6 @@ push docker(tag):
     - nomad run iis-dev/$NOMAD_ENV/$NOMAD_JOB
   tags:
     - nomad
-
-deploy_dev_nomad_auto:
-  extends: .deploy_nomad
-  variables:
-    NOMAD_ENV: dev
-  only:
-    - /^Release_*/
-    - master
-    - develop
 
 deploy_dev_nomad_manual:
   extends: .deploy_nomad
@@ -185,3 +170,4 @@ acceptance_test:
   allow_failure: true
   tags:
     - ci
+  when: manual
