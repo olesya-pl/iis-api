@@ -56,10 +56,10 @@ namespace AcceptanceTests.UISteps
             var themeUniqueName = themeName + Guid.NewGuid();
             context.Set(themeUniqueName, themeName);
             objectsOfStudyPageObjects.SearchLoopButton.Click();
-            materialsSectionPage.ObjectsTabSearch.SendKeys("Попов");
+            objectsOfStudyPageObjects.SearchField.SendKeys("Попов");
             driver.WaitFor(2);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Down);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Enter);
+            objectsOfStudyPageObjects.SearchField.SendKeys(Keys.Down);
+            objectsOfStudyPageObjects.SearchField.SendKeys(Keys.Enter);
             objectsOfStudyPageObjects.CreateThemeButton.Click();
             themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(themeUniqueName);
             themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(Keys.Enter);
