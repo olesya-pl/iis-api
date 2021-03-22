@@ -22,7 +22,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSection;
 
-        [FindsBy(How = How.XPath, Using = "//tr[@class='el-table__row']/td[1]")]
+        [FindsBy(How = How.XPath, Using = "//table[@class='el-table__body']/tbody/tr[1]")]
         public IWebElement FirstMaterialInTheMaterialsList;
 
         [FindsBy(How = How.CssSelector, Using = ".el-button--default")]
@@ -66,7 +66,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MLTabSearch;
 
-        [FindsBy(How = How.CssSelector, Using = "[aria-describedby] .el-input__inner")]
+		[FindsBy(How = How.XPath, Using = "//div[contains(text(), \"Об'єкти\")]//following::input")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);
@@ -97,7 +97,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-button--prev-page span")]
         public IWebElement PreviousMaterialButton;
 
-		[FindsBy(How = How.CssSelector, Using = ".table-zones__body .el-table  .el-table__body  .el-table__row")]
+		[FindsBy(How = How.CssSelector, Using = ".el-table__row.expanded")]
 		public IWebElement FirstSearchResult;
 
         [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .el-button--default")]

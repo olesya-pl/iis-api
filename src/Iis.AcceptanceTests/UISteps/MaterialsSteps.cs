@@ -74,7 +74,7 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.SearchField.SendKeys(input);
             driver.WaitFor(2);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(2);
+            driver.WaitFor(5);
         }
 
         [When(@"I set importance (.*) value")]
@@ -106,7 +106,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressProcessedButton()
         {
             materialsSectionPage.ProcessedButton.Click();
-            driver.WaitFor(3);
+            driver.WaitFor(15);
         }
 
         [When(@"I pressed Back button")]
@@ -182,7 +182,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedConfirmButton()
         {
             materialsSectionPage.ConfirmDeleteRelationButton.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(4);
 
         }
 
