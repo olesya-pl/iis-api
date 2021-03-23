@@ -321,7 +321,9 @@ namespace IIS.Core
                 var userService = context.Services.GetService<IUserService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
 
-                var graphQLAccessItem = graphQLAccessList.GetAccessItem(context.Request.OperationName ?? fieldNode.Name.Value);
+                var operationName = context.Request.OperationName ?? fieldNode.Name.Value;
+
+                var graphQLAccessItem = graphQLAccessList.GetAccessItem(operationName);
 
                 var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
 
@@ -329,7 +331,7 @@ namespace IIS.Core
                 {
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
                     {
-                        throw new AccessViolationException($"Access denied to {context.Request.OperationName} for user {validatedToken.User.UserName}");
+                        throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
                     }
                 }
 

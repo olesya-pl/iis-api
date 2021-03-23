@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using AutoMapper;
 using Iis.DataModel.FlightRadar;
 using Iis.DbLayer.Repositories;
@@ -9,7 +9,6 @@ using Iis.Domain;
 using Iis.Domain.FlightRadar;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyData;
 using IIS.Repository;
 using IIS.Repository.Factories;
 
@@ -17,11 +16,17 @@ namespace IIS.Core.FlightRadar
 {
     public class FlightRadarService<TUnitOfWork> : BaseService<TUnitOfWork>, IFlightRadarService where TUnitOfWork : IIISUnitOfWork
     {
-        private const string SignName = "ICAOSign";
+        private const string SignTypeName = "ICAOSign";
+        private const string SignTypePropName = "value";
+        private const string RegisteredAtPropName = "registeredAt";
+        private const string LocationPropName = "location";
+        private const string TypePropName = "type";
+        private const string CoordinatesPropName = "coordinates";
         private readonly IMapper _mapper;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
-        private IOntologyNodesData _ontologyData;
+        private readonly IOntologyNodesData _ontologyData;
+        private readonly INodeTypeLinked _icaoSignNodeType;
 
         public FlightRadarService(IMapper mapper,
             IOntologySchema ontologySchema,
@@ -33,69 +38,77 @@ namespace IIS.Core.FlightRadar
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
             _ontologyData = ontologyData;
-        }
-        public async Task SaveFlightRadarDataAsync(string icao, IReadOnlyCollection<FlightRadarHistory> historyItems)
-        {
-            var signs = GetIcaoSigns(icao);
 
-            if (!signs.Any())
+            _icaoSignNodeType = _ontologySchema.GetEntityTypeByName(SignTypeName);
+
+        }
+        public async Task SaveFlightRadarDataAsync(string icaoValue, IReadOnlyCollection<FlightRadarHistory> historyItemList)
+        {
+            var signList = GetSignEntityListByValue(icaoValue);
+
+            if (!signList.Any())
             {
                 return;
             }
 
-            var signEntityRelations = GetIncomingEntities(signs);
-            SaveSignsLocations(signs, historyItems);
-            await SaveHistoryEntitiesAsync(historyItems, signEntityRelations);
+            UpdateSignListWithLocation(signList, GetLatestLocation(historyItemList));
+
+            await AddSignListLocationHistoryAsync(signList, historyItemList);
 
         }
 
-        private void SaveSignsLocations(IEnumerable<INode> signs, IReadOnlyCollection<FlightRadarHistory> historyItems)
+        private FlightRadarHistory GetLatestLocation(IReadOnlyCollection<FlightRadarHistory> historyItemList)
         {
-            var latestValue = historyItems.OrderBy(p => p.RegisteredAt).LastOrDefault();
-            if (latestValue is null)
-                return;
-            foreach (var sign in signs)
+            return historyItemList.OrderBy(p => p.RegisteredAt).LastOrDefault();
+        }
+
+        private void UpdateSignListWithLocation(IReadOnlyCollection<INode> signList, FlightRadarHistory newLocation)
+        {
+            if(newLocation is null) return;
+
+            foreach (var sign in signList)
             {
-                var node = (_ontologyService.GetNode(sign.Id)) as Entity;
-                var registeredAt = node.GetAttributeValue("registeredAt");
-                if (registeredAt is null || (registeredAt is DateTime && (DateTime)registeredAt < latestValue.RegisteredAt))
+                var signNode = _ontologyService.GetNode(sign.Id) as Entity;
+                var registeredAtValue = signNode.GetAttributeValue(RegisteredAtPropName);
+
+                if(IsNewLocationIsLessRecent(registeredAtValue, newLocation.RegisteredAt)) continue;
+
+                signNode.SetProperty(RegisteredAtPropName, newLocation.RegisteredAt);
+                signNode.SetProperty(LocationPropName, new Dictionary<string, object>
                 {
-                    node.SetProperty("location", new Dictionary<string, object> {
-                        { "type", "Point" },
-                        { "coordinates", new [] {latestValue.Lat, latestValue.Long} }
-                    });
-                    node.SetProperty("registeredAt", latestValue.RegisteredAt);
-                    _ontologyService.SaveNode(node);
-                }                
+                    {TypePropName, "Point"},
+                    {CoordinatesPropName, new []{newLocation.Lat, newLocation.Long}}
+                });
+                _ontologyService.SaveNode(signNode);
             }
         }
 
-        private IEnumerable<SignEntityRelation> GetIncomingEntities(IEnumerable<INode> signs)
+        private bool IsNewLocationIsLessRecent(object currentRegisteredAt, DateTime newRegisteredAt)
         {
-            return signs
-                .SelectMany(p => p.IncomingRelations.Where(r => r.IsLinkToSeparateObject)
-                .Select(r => new SignEntityRelation(r.TargetNodeId, r.SourceNodeId)));
+            if(currentRegisteredAt != null && currentRegisteredAt is DateTime registeredAt && registeredAt > newRegisteredAt) return true;
+            return false;
         }
 
-        private async Task SaveHistoryEntitiesAsync(IReadOnlyCollection<FlightRadarHistory> historyItems, IEnumerable<SignEntityRelation> signEntityRelations)
+        private Task AddSignListLocationHistoryAsync(IReadOnlyCollection<INode> signList, IReadOnlyCollection<FlightRadarHistory> historyItemList)
         {
-            var histotyEntities = signEntityRelations.SelectMany(relation =>
-                _mapper.Map<List<LocationHistoryEntity>>(historyItems)
-                    .Select(p =>
-                    {
+            var historyEntityList = signList.SelectMany(sign => 
+                _mapper.Map<LocationHistoryEntity[]>(historyItemList)
+                    .Select(p => {
                         p.Id = Guid.NewGuid();
-                        p.EntityId = relation.EntityId;
-                        p.NodeId = relation.NodeId;
+                        p.EntityId = sign.Id;
+                        p.NodeId = sign.Id;
                         return p;
                     })
-            ).ToList();
+            ).ToArray();
 
-            await RunAsync(async unitOfWork => await unitOfWork.FlightRadarRepository.SaveAsync(histotyEntities));
+            return RunAsync(unitOfWork => unitOfWork.FlightRadarRepository.SaveAsync(historyEntityList));
         }
 
-        private IEnumerable<INode> GetIcaoSigns(string icao)
+        private IReadOnlyCollection<INode> GetSignEntityListByValue(string icaoValue)
         {
-            return _ontologyData.GetEntitiesByTypeName(SignName).Where(p => p.HasPropertyWithValue("value", icao));
+            return _ontologyData
+                        .GetNodesByUniqueValue(_icaoSignNodeType.Id, icaoValue,SignTypePropName)
+                        .ToArray();
         }
 
         public Task UpdateLastProcessedIdAsync(FlightRadarHistorySyncJobConfig minId, int newMinId)
@@ -111,18 +124,6 @@ namespace IIS.Core.FlightRadar
         public async Task<FlightRadarHistorySyncJobConfig> GetLastProcessedIdAsync()
         {
             return await RunWithoutCommitAsync(async unitOfWork => await unitOfWork.FlightRadarRepository.GetLastProcessedIdAsync());
-        }
-
-        private class SignEntityRelation
-        {
-            public SignEntityRelation(Guid nodeId, Guid entityId)
-            {
-                NodeId = nodeId;
-                EntityId = entityId;
-            }
-
-            public Guid NodeId { get; set; }
-            public Guid EntityId { get; set; }
         }
     }
 }

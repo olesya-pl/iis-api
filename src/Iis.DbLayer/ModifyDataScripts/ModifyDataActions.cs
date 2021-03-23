@@ -61,7 +61,32 @@ namespace Iis.DbLayer.ModifyDataScripts
             );
             context.SaveChanges();
         }
-        
+
+        public void FixFlightRadarLocationHistory(OntologyContext context, IOntologyNodesData data)
+        {
+            var signType = data.Schema.GetEntityTypeByName("ICAOSign");
+
+            var signList = data.GetNodesByTypeId(signType.Id)
+                .Select(sign => sign.Id)
+                .ToList();
+
+            if(signList.Count == 0) return;
+
+            var entityList = context.LocationHistory
+                .Where(e => e.NodeId != null && e.NodeId != e.EntityId && signList.Contains(e.NodeId.Value))
+                .ToList();
+
+            if(entityList.Count == 0) return;
+
+            foreach (var entity in entityList)
+            {
+                entity.EntityId = entity.NodeId;
+            }
+
+            context.LocationHistory.UpdateRange(entityList);
+
+            context.SaveChanges();
+        }
         public void AddAccessLevels(OntologyContext context, IOntologyNodesData data)
         {
             if (data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString()) != null) return;
