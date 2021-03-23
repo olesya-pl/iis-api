@@ -114,6 +114,15 @@ namespace Iis.OntologyData
             CreateAttribute(node.Id, value);
             return CreateRelation(sourceNodeId, node.Id, nodeTypeId);
         }
+        internal RelationData CreateRelationWithAttribute(Guid sourceNodeId, string relationTypeName, string value)
+        {
+            var sourceNode = Nodes[sourceNodeId];
+            var nodeType = _schema.GetNodeTypeById(sourceNode.NodeTypeId);
+            var relationType = nodeType.GetProperty(relationTypeName);
+            var node = CreateNode(relationType.RelationType.TargetTypeId);
+            CreateAttribute(node.Id, value);
+            return CreateRelation(sourceNodeId, node.Id, relationType.Id);
+        }
         internal RelationData UpdateRelationTarget(Guid id, Guid targetId)
         {
             var relation = Relations[id];

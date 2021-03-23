@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Iis.Interfaces.AccessLevels
 {
     public interface IAccessLevels
     {
-        IReadOnlyList<AccessLevel> Items { get; }
+        List<AccessLevel> Items { get; }
         bool IndexIsValid(int numericIndex);
+        AccessLevel GetItemById(Guid id);
+        AccessLevel GetItemByNumericIndex(int numericIndex);
     }
 }

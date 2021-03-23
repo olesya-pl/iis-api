@@ -25,6 +25,7 @@ using System.Text;
 using static Iis.OntologyManager.UiControls.UiFilterControl;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.AccessLevels;
+using System.Threading.Tasks;
 
 namespace Iis.OntologyManager
 {
@@ -61,7 +62,7 @@ namespace Iis.OntologyManager
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         Dictionary<string, IDataViewControl> _dataViewControls = new Dictionary<string, IDataViewControl>();
-        const string VERSION = "1.32";
+        const string VERSION = "1.33";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -301,9 +302,42 @@ namespace Iis.OntologyManager
             btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
             container.Add(btnMenu);
 
+            var menuReload = new ContextMenuStrip();
+            menuReload.Items.Add("Кеш Онтології");
+            menuReload.Items[0].Click += (sender, e) => { ReloadOntologyData(); };
+            menuReload.Items.Add("Бек-енд вцілому");
+            menuReload.Items[1].Click += (sender, e) => { RestartIisApp(); };
+            var btnReload = new Button { Text = "Перезавантажити " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuReload };
+            btnReload.Click += (sender, e) => { menuReload.Show(btnReload, new Point(0, btnReload.Height)); };
+            container.Add(btnReload);
+
             panelTop.ResumeLayout();
         }
         #endregion
+
+        private void ReloadOntologyData()
+        {
+            if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
+
+            WaitCursorAction(() =>
+            {
+                var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+
+
+                var result = requestWrapper.ReloadOntologyData().ConfigureAwait(false).GetAwaiter().GetResult();
+
+                var sb = new StringBuilder()
+                    .AppendLine($"Адреса:{result.RequestUrl}")
+                    .AppendLine($"Повідомлення: {result.Message}");
+
+                ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+            });
+        }
+
+        private void RestartIisApp()
+        {
+
+        }
 
         #region UI Control Events
         private void GoBack()

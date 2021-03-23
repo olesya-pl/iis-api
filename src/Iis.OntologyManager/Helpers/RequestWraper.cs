@@ -58,6 +58,41 @@ namespace Iis.OntologyManager.Helpers
             return SendDeleteRequestAsync(requestUri);
         }
 
+        public async Task RestartIisApp()
+        {
+            var uri = "admin/RestartApplication";
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+            await httpClient.PostAsync(uri, null).ConfigureAwait(false);
+        }
+        public async Task<RequestResult> ReloadOntologyData()
+        {
+            var uri = new Uri("admin/ReloadOntologyData", UriKind.Relative);
+
+            HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            try
+            {
+                response = await httpClient.PostAsync(uri, null);
+
+                response.EnsureSuccessStatusCode();
+
+                var msg = response.Content.ReadAsStringAsync().Result;
+                if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
+
+                return RequestResult.Success(msg, response.RequestMessage.RequestUri);
+            }
+            catch (Exception exception)
+            {
+                var msg = response.Content.ReadAsStringAsync().Result;
+                _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
+
+                return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
+            }
+            //return await SendRequest(() => httpClient.PostAsync(uri, null), uri);
+        }
+
         public async Task<RequestResult> ReIndexAsync(IndexKeys indexKey)
         {
             var pathFound = IndexPaths.TryGetValue(indexKey, out string requestUrl);
@@ -89,6 +124,33 @@ namespace Iis.OntologyManager.Helpers
                 return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
             }
         }
+
+        private async Task<RequestResult> SendRequest(Func<Task<HttpResponseMessage>> func, Uri uri)
+        {
+            HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            try
+            {
+                response = await func();
+
+                response.EnsureSuccessStatusCode();
+
+                var msg = response.Content.ReadAsStringAsync().Result;
+                if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
+
+                return RequestResult.Success(msg, response.RequestMessage.RequestUri);
+            }
+            catch (Exception exception)
+            {
+                var msg = response.Content.ReadAsStringAsync().Result;
+                _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
+
+                return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
+            }
+        }
+
 
         private async Task<RequestResult> SendDeleteRequestAsync(Uri requestUri)
         {
