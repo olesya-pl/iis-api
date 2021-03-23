@@ -304,7 +304,7 @@ namespace Iis.OntologyManager
 
             var menuReload = new ContextMenuStrip();
             menuReload.Items.Add("Кеш Онтології");
-            menuReload.Items[0].Click += (sender, e) => { ReloadOntologyData(); };
+            menuReload.Items[0].Click += async (sender, e) => { await ReloadOntologyData(); };
             menuReload.Items.Add("Бек-енд вцілому");
             menuReload.Items[1].Click += (sender, e) => { RestartIisApp(); };
             var btnReload = new Button { Text = "Перезавантажити " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuReload };
@@ -315,23 +315,24 @@ namespace Iis.OntologyManager
         }
         #endregion
 
-        private void ReloadOntologyData()
+        private async Task ReloadOntologyData()
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
 
-            WaitCursorAction(() =>
-            {
-                var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+            await WaitCursorActionAsync(DoReloadOntologyData);
+        }
 
+        private async Task DoReloadOntologyData()
+        {
+            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
 
-                var result = requestWrapper.ReloadOntologyData().ConfigureAwait(false).GetAwaiter().GetResult();
+            var result = await requestWrapper.ReloadOntologyData();
 
-                var sb = new StringBuilder()
-                    .AppendLine($"Адреса:{result.RequestUrl}")
-                    .AppendLine($"Повідомлення: {result.Message}");
+            var sb = new StringBuilder()
+                .AppendLine($"Адреса:{result.RequestUrl}")
+                .AppendLine($"Повідомлення: {result.Message}");
 
-                ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
-            });
+            ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
         }
 
         private void RestartIisApp()
@@ -476,6 +477,21 @@ namespace Iis.OntologyManager
             finally
             {
                 Cursor.Current = Cursors.Default;
+            }
+        }
+
+        private async Task WaitCursorActionAsync(Func<Task> action)
+        {
+            //Cursor.Current = Cursors.WaitCursor;
+            this.UseWaitCursor = true;
+            try
+            {
+                await action();
+            }
+            finally
+            {
+                //Cursor.Current = Cursors.Default;
+                this.UseWaitCursor = false;
             }
         }
         public void ShowMessage(string message, string header = null)

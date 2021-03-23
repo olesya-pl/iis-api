@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Iis.Interfaces.AccessLevels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.Interfaces.AccessLevels
+namespace Iis.OntologyData.IisAccessLevels
 {
-    public class AccessLevel
+    public class AccessLevel: IAccessLevel
     {
         public Guid Id { get; }
         public string Name { get; set; }

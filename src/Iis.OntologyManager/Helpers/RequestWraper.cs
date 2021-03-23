@@ -68,29 +68,9 @@ namespace Iis.OntologyManager.Helpers
         {
             var uri = new Uri("admin/ReloadOntologyData", UriKind.Relative);
 
-            HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
-
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
-            try
-            {
-                response = await httpClient.PostAsync(uri, null);
-
-                response.EnsureSuccessStatusCode();
-
-                var msg = response.Content.ReadAsStringAsync().Result;
-                if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
-
-                return RequestResult.Success(msg, response.RequestMessage.RequestUri);
-            }
-            catch (Exception exception)
-            {
-                var msg = response.Content.ReadAsStringAsync().Result;
-                _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
-
-                return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
-            }
-            //return await SendRequest(() => httpClient.PostAsync(uri, null), uri);
+            return await SendRequest(() => httpClient.PostAsync(uri, null), uri);
         }
 
         public async Task<RequestResult> ReIndexAsync(IndexKeys indexKey)
@@ -101,28 +81,32 @@ namespace Iis.OntologyManager.Helpers
 
             var uri = new Uri($"admin/{requestUrl}", UriKind.Relative);
 
-            HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
-
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
-            try
-            {
-                response = await httpClient.GetAsync(uri).ConfigureAwait(false);
+            return await SendRequest(() => httpClient.GetAsync(uri), uri);
 
-                response.EnsureSuccessStatusCode();
+            //HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
 
-                var msg = response.Content.ReadAsStringAsync().Result;
-                if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
+            
 
-                return RequestResult.Success(msg, response.RequestMessage.RequestUri);
-            }
-            catch (Exception exception)
-            {
-                var msg = response.Content.ReadAsStringAsync().Result;
-                _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
+            //try
+            //{
+            //    response = await httpClient.GetAsync(uri).ConfigureAwait(false);
 
-                return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
-            }
+            //    response.EnsureSuccessStatusCode();
+
+            //    var msg = response.Content.ReadAsStringAsync().Result;
+            //    if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
+
+            //    return RequestResult.Success(msg, response.RequestMessage.RequestUri);
+            //}
+            //catch (Exception exception)
+            //{
+            //    var msg = response.Content.ReadAsStringAsync().Result;
+            //    _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
+
+            //    return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
+            //}
         }
 
         private async Task<RequestResult> SendRequest(Func<Task<HttpResponseMessage>> func, Uri uri)
@@ -133,7 +117,7 @@ namespace Iis.OntologyManager.Helpers
 
             try
             {
-                response = await func();
+                response = await func().ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
 

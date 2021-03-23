@@ -5,9 +5,9 @@ namespace Iis.Interfaces.AccessLevels
 {
     public interface IAccessLevels
     {
-        List<AccessLevel> Items { get; }
+        IReadOnlyList<IAccessLevel> Items { get; }
         bool IndexIsValid(int numericIndex);
-        AccessLevel GetItemById(Guid id);
-        AccessLevel GetItemByNumericIndex(int numericIndex);
+        IAccessLevel GetItemById(Guid id);
+        IAccessLevel GetItemByNumericIndex(int numericIndex);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyData.IisAccessLevels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Iis.OntologyManager.UiControls
         ContextMenuStrip _menu;
         INodeTypeLinked _nodeType;
         IOntologyNodesData _ontologyData;
-        IAccessLevels _accessLevels;
+        AccessLevels _accessLevels;
         bool _editMode = false;
 
         DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
@@ -66,7 +67,7 @@ namespace Iis.OntologyManager.UiControls
         public void SetUiValues(INodeTypeLinked nodeType, IOntologyNodesData ontologyData)
         {
             _ontologyData = ontologyData;
-            _accessLevels = _ontologyData.GetAccessLevels();
+            _accessLevels = (AccessLevels)_ontologyData.GetAccessLevels();
             BindGrid();
         }
         private void BindGrid()
@@ -120,7 +121,7 @@ namespace Iis.OntologyManager.UiControls
             {
                 _editMode = false;
                 SetControlsState();
-                _accessLevels = _ontologyData.GetAccessLevels();
+                _accessLevels = (AccessLevels)_ontologyData.GetAccessLevels();
                 BindGrid();
             }
         }
@@ -152,16 +153,15 @@ namespace Iis.OntologyManager.UiControls
             {
                 if (accessLevel == null)
                 {
-                    _accessLevels.Items.Add(new AccessLevel(Guid.NewGuid(), editControl.AccessLevelName, _accessLevels.Items.Count));
+                    _accessLevels.Add(new AccessLevel(Guid.NewGuid(), editControl.AccessLevelName, _accessLevels.Items.Count));
                 }
                 else
                 {
-                    SelectedItem.Name = editControl.AccessLevelName;
+                    _accessLevels.ChangeName(SelectedItem.Id, editControl.AccessLevelName);
                 }
                 
                 form.Close();
                 form.DialogResult = DialogResult.OK;
-                Reindex();
                 BindGrid();
             };
             form.ShowDialog();
@@ -187,10 +187,8 @@ namespace Iis.OntologyManager.UiControls
             var index = GetIndex(item);
             if (index > 0)
             {
-                _accessLevels.Items[index] = _accessLevels.Items[index - 1];
-                _accessLevels.Items[index - 1] = item;
+                _accessLevels.SwapItems(index, index - 1);
             }
-            Reindex();
             BindGrid();
         }
         private void MoveDown()
@@ -200,18 +198,9 @@ namespace Iis.OntologyManager.UiControls
             var index = GetIndex(item);
             if (index < _accessLevels.Items.Count - 1)
             {
-                _accessLevels.Items[index] = _accessLevels.Items[index + 1];
-                _accessLevels.Items[index + 1] = item;
+                _accessLevels.SwapItems(index, index + 1);
             }
-            Reindex();
             BindGrid();
-        }
-        private void Reindex()
-        {
-            for (int i = 0; i < _accessLevels.Items.Count; i++)
-            {
-                _accessLevels.Items[i].NumericIndex = i;
-            }
         }
         private void AddNewItem()
         {

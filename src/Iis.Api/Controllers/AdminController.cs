@@ -3,6 +3,7 @@ using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
+using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
@@ -222,6 +223,12 @@ namespace Iis.Api.Controllers
             var connectionString = _connectionStringService.GetIisApiConnectionString();
             _nodesDataService.ReloadOntologyData(connectionString);
             return Content("Success");
+        }
+
+        [HttpPost()]
+        public async Task ChangeAccessLevels(IAccessLevels newAccessLevels)
+        {
+
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
