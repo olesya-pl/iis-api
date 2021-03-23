@@ -16,7 +16,7 @@ namespace Iis.DbLayer.ModifyDataScripts
         IConnectionStringService _connectionStringService;
         ModifyDataItems _items = new ModifyDataItems();
 
-        public ModifyDataRunner(            
+        public ModifyDataRunner(
             OntologyContext context, 
             IOntologyNodesData ontologyData, 
             IOntologySchemaService ontologySchemaService,
@@ -34,6 +34,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             var actions = new ModifyDataActions(_ontologySchemaService, _connectionStringService);
             _items.Add("RemoveEventWikiLinks", actions.RemoveEventWikiLinks);
             _items.Add("AddAccessLevelAccessObject", actions.AddAccessLevelAccessObject);
+            _items.Add("FixFlightRadarLocationHistory", actions.FixFlightRadarLocationHistory);
             _items.Add("AddAccessLevels", actions.AddAccessLevels);
         }
         public bool Run()
