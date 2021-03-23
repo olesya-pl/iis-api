@@ -42,9 +42,15 @@ Scenario: IIS-6207 - Open a small object of study card
 Scenario: IIS-6127 - Fill all the fields in the military organization and save it
 	When I clicked on the create a new object of study button
 	And I clicked on the create a new military organization button
-	And I clicked on all expandable blocks
-	#And I scrolled up to the //label[contains(text(),'Бойовий досвід')]/following-sibling::div element
+	#And I expand all blocks
 	And I filled in the form
-
-	| Приналежність | Важливість    | Безпосереднє підпорядкування | Бойовий досвід                    | Війскова частина | Військовий гарнізон | Країна | Країна |
-	| ворожий       | першочерговий | 1 бру                        | тестове значення бойового досвіду | тест номер ВЧ    | Гарнізон перший     | Китай  | Китай  |
+		#| # | #         | #             | #     | # | # | # | Приналежність | Важливість    | Безпосереднє підпорядкування | Бойовий досвід                    | Війскова частина | Військовий гарнізон | Країна | Країна |
+		#| # | #         | #             | #     | # | # | # | ворожий       | першочерговий | 1 бру                        | тестове значення бойового досвіду | тест номер ВЧ    | Гарнізон перший     | Китай  | Китай |
+		| Accordion                    | FieldName                    | FieldValueValue                   |
+		|                              | Приналежність                | ворожий                           |
+		|                              | Важливість                   | першочерговий                     |
+		| Безпосереднє підпорядкування | Безпосереднє підпорядкування | 1 бру                             |
+		| Бойовий досвід               | Бойовий досвід               | тестове значення бойового досвіду |
+		| Війскова частина             | Війскова частина             | тест номер ВЧ                     |
+		| Військовий гарнізон          | Військовий гарнізон          | Гарнізон перший                   |
+		| Дислокація                   | Країна                       | Китай                             |

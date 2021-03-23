@@ -50,5 +50,11 @@ namespace AcceptanceTests.Helpers
             }
             throw new NoSuchElementException();
         }
+
+
+        public static bool HasClass(this IWebElement element, string className)
+        {
+            return element.GetAttribute("class").Contains(className);
+        }
     }
 }
