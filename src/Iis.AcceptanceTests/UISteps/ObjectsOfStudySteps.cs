@@ -295,10 +295,10 @@ namespace AcceptanceTests.UISteps
                 var accordionName = row[0];
                 var elementName = row[1];
                 var elementValue = row[2];
-                if (!string.IsNullOrWhiteSpace(accordionName))
-                    ExpandAccordion(accordionName);
                 var accordionElement = driver.FindElement(
                     By.XPath($"//div[contains(@class, 'el-collapse-item__header')  and contains (.,\'{accordionName}\')]"));
+                if (!string.IsNullOrWhiteSpace(accordionName))
+                    ToggleAccordion(accordionElement, true);
                 var xpathList = new List<string>();
                 var textAreaLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::textarea[1]";
                 var inputLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::input";
@@ -318,6 +318,8 @@ namespace AcceptanceTests.UISteps
                 {
                     element.SendKeys(elementValue);
                 }
+                if (!string.IsNullOrWhiteSpace(accordionName))
+                    ToggleAccordion(accordionElement, false);
             }
 
             objectsOfStudyPage.SaveObjectOfStudyButton.Click();
@@ -326,14 +328,11 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
-        private void ExpandAccordion(string accordionName)
+        private void ToggleAccordion(IWebElement accordionElement, bool open)
         {
-            var element =
-                driver.FindElement(
-                    By.XPath($"//div[contains(@class, 'el-collapse-item__header')  and contains (.,'{accordionName}')]"));
-            if (element.FindElement(By.TagName("i")).HasClass("is-active"))
-                return;
-            element.Click();
+            if ((open && !accordionElement.FindElement(By.TagName("i")).HasClass("is-active")) ||
+                (!open && accordionElement.FindElement(By.TagName("i")).HasClass("is-active")))
+                accordionElement.Click();
         }
 
         #endregion
