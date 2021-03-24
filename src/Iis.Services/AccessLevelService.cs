@@ -31,8 +31,8 @@ namespace Iis.Services
         {
             var numericIndexMapping = GetNumericIndexMapping(newAccessLevels, mappings);
             var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping);
-            await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
             await _context.SaveChangesAsync();
+            //await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
         }
 
         private List<Guid> ChangeAccessLevelsMaterials(Dictionary<int, int> mappings)
@@ -48,21 +48,21 @@ namespace Iis.Services
             return result;
         }
 
-        private Dictionary<int, int> GetNumericIndexMapping(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> mappings)
+        private Dictionary<int, int> GetNumericIndexMapping(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> deletedMappings)
         {
             var dict = new Dictionary<int, int>();
             
-            foreach (var deletedId in mappings.Keys)
+            foreach (var deletedId in deletedMappings.Keys)
             {
                 var oldIndex = _commonData.AccessLevels.GetItemById(deletedId).NumericIndex;
-                var newIndex = newAccessLevels.GetItemById(mappings[deletedId]).NumericIndex;
+                var newIndex = newAccessLevels.GetItemById(deletedMappings[deletedId]).NumericIndex;
                 if (oldIndex != newIndex)
                 {
                     dict[oldIndex] = newIndex;
                 }
             }
 
-            foreach (var oldItem in _commonData.AccessLevels.Items)
+            foreach (var oldItem in _commonData.AccessLevels.Items.Where(x => !deletedMappings.ContainsKey(x.Id)))
             {
                 var newItem = newAccessLevels.GetItemById(oldItem.Id);
                 if (oldItem.NumericIndex != newItem.NumericIndex)

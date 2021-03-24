@@ -7,7 +7,7 @@ namespace Iis.Services.Contracts.Params
 {
     public class ChangeAccessLevelsParams
     {
-        public List<IAccessLevel> AccessLevelList { get; set; }
+        public List<AccessLevel> AccessLevelList { get; set; }
         public Dictionary<Guid, Guid> DeletedMappings { get; set; }
     }
 }
