@@ -56,6 +56,7 @@ namespace Iis.Services
 
             reportEntity.Recipient = report.Recipient;
             reportEntity.Title = report.Title;
+            reportEntity.AccessLevel = report.AccessLevel;
 
             await RunAsync(uow => uow.ReportRepository.Update(reportEntity));
 

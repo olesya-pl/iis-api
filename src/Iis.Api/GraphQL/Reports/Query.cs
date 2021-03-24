@@ -39,7 +39,7 @@ namespace IIS.Core.GraphQL.Reports
 
             if(report is null) 
                 return null;
-            
+
             return new Report(report);
         }
     }

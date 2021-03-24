@@ -1,16 +1,10 @@
+using System;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.DataLoaders;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Iis.DataModel;
-using Iis.DataModel.Reports;
-using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Reports
 {
@@ -21,7 +15,8 @@ namespace IIS.Core.GraphQL.Reports
             var report = await reportService.CreateAsync(new ReportDto
             {
                 Recipient = data.Recipient,
-                Title = data.Title
+                Title = data.Title,
+                AccessLevel = data.AccessLevel
             });
 
             return new Report(report);
@@ -33,9 +28,10 @@ namespace IIS.Core.GraphQL.Reports
             {
                 Id = id,
                 Title = data.Title,
-                Recipient = data.Recipient
+                Recipient = data.Recipient,
+                AccessLevel = data.AccessLevel
             });
-            
+
             return new Report(updatedReport);
         }
 
