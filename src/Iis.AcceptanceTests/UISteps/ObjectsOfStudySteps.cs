@@ -295,10 +295,10 @@ namespace AcceptanceTests.UISteps
                 var accordionName = row[0];
                 var elementName = row[1];
                 var elementValue = row[2];
-                if (string.IsNullOrWhiteSpace(accordionName))
+                if (!string.IsNullOrWhiteSpace(accordionName))
                     ExpandAccordion(accordionName);
                 var accordionElement = driver.FindElement(
-                    By.XPath($"//div[contains(@class, 'el-collapse-item__header')  and contains (.,'{accordionName}')]"));
+                    By.XPath($"//div[contains(@class, 'el-collapse-item__header')  and contains (.,\'{accordionName}\')]"));
                 var xpathList = new List<string>();
                 var textAreaLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::textarea[1]";
                 var inputLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::input";
@@ -306,11 +306,11 @@ namespace AcceptanceTests.UISteps
                 xpathList.Add(textAreaLocator);
                 xpathList.Add(inputLocator);
                 xpathList.Add(textAreaLocatorWithoutParentNode);
-                var element = driver.FindElementByAnyXpath(xpathList);
+                var element = accordionElement.FindElementByAnyXpath(xpathList);
                 if (element.TagName == "input")
                 {
                     element.SendKeys(elementValue);
-                    driver.WaitFor(0.2);
+                    driver.WaitFor(1);
                     element.SendKeys(Keys.Down);
                     element.SendKeys(Keys.Enter);
                 }
@@ -319,38 +319,6 @@ namespace AcceptanceTests.UISteps
                     element.SendKeys(elementValue);
                 }
             }
-
-
-            //for (int i = 0; i < table.Header.Count(); i++)
-            //{
-            //    var elementName = table.Header.ElementAt(i);
-            //    var elementValue = table.Rows[0].Values.ElementAt(i);
-
-            //    var xpathList = new List<string>();
-            //    var textAreaLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::textarea[1]";
-            //    var inputLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::input";
-            //    var textAreaLocatorWithoutParentNode = $"//label[contains(text(),'{elementName}')]//following::textarea[1]";
-            //    xpathList.Add(textAreaLocator);
-            //    xpathList.Add(inputLocator);
-            //    xpathList.Add(textAreaLocatorWithoutParentNode);
-
-
-
-            //    var element = driver.FindElementByAnyXpath(xpathList);
-            //    if (element.TagName == "input")
-            //    {
-            //        element.SendKeys(elementValue);
-            //        driver.WaitFor(0.2);
-            //        element.SendKeys(Keys.Down);
-            //        element.SendKeys(Keys.Enter);
-            //    }
-            //    else if (element.TagName == "textarea")
-            //    {
-            //        element.SendKeys(elementValue);
-            //    }
-
-            //    //driver.WaitFor(0.1);
-            //}
 
             objectsOfStudyPage.SaveObjectOfStudyButton.Click();
             driver.WaitFor(2);

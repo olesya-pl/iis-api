@@ -34,20 +34,26 @@ namespace AcceptanceTests.Helpers
             }
         }
 
-        public static IWebElement FindElementByAnyXpath(this IWebDriver driver, IEnumerable<string> xPathCollection)
+        public static IWebElement FindElementByAnyXpath(this IWebElement driver, IEnumerable<string> xPathCollection)
         {
+            //var oldTime = driver.Manage().Timeouts().ImplicitWait;
+            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(1);
+
             foreach (var selector in xPathCollection)
             {
                 try
                 {
                     var element = driver.FindElement(By.XPath(selector));
+                    //driver.Manage().Timeouts().ImplicitWait = oldTime;
                     return element;
                 }
-                catch (NoSuchElementException e)
-                {
+				catch (NoSuchElementException)
+				{
                     continue;
                 }
             }
+
+            //driver.Manage().Timeouts().ImplicitWait = oldTime;
             throw new NoSuchElementException();
         }
 
