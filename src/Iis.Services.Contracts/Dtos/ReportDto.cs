@@ -8,6 +8,7 @@ namespace Iis.Services.Contracts.Dtos
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string Recipient { get; set; }
+        public int AccessLevel { get; set; }
         public DateTime CreatedAt { get; set; }
         public IEnumerable<Guid> ReportEventIds { get; set; }
     }

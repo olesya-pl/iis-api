@@ -10,27 +10,25 @@ namespace IIS.Core.GraphQL.Reports
     {
         [GraphQLType(typeof(NonNullType<IdType>))] 
         public Guid Id { get; set; }
-        
         [GraphQLNonNullType] 
         public string Title { get; set; }
-        
         [GraphQLNonNullType] 
         public string Recipient { get; set; }
-        
+        public int AccessLevel { get; set; }
         [GraphQLNonNullType] 
         public DateTime CreatedAt { get; set; }
-        
         [GraphQLIgnore] 
         public Guid[] EventIds { get; set; }
 
-        public Report(ReportDto report) : this(report.Id, report.Title, report.Recipient, report.CreatedAt, report.ReportEventIds.ToArray()) { }
+        public Report(ReportDto report) : this(report.Id, report.Title, report.Recipient, report.CreatedAt, report.AccessLevel, report.ReportEventIds.ToArray()) { }
 
-        public Report(Guid id, string title, string recepient, DateTime createdAt, Guid[] events)
+        public Report(Guid id, string title, string recepient, DateTime createdAt, int accessLevel, Guid[] events)
         {
             Id = id;
             Title = title ?? throw new ArgumentNullException(nameof(title));
             Recipient = recepient ?? throw new ArgumentNullException(nameof(recepient));
             CreatedAt = createdAt;
+            AccessLevel = accessLevel;
             EventIds = events;
         }
     }
