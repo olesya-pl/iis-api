@@ -8,13 +8,19 @@ namespace Iis.OntologyData.IisAccessLevels
     public class AccessLevel: IAccessLevel
     {
         public Guid Id { get; }
-        public string Name { get; set; }
-        public int NumericIndex { get; set; }
+        public string Name { get; set;  }
+        public int NumericIndex { get; set;  }
         public AccessLevel(Guid id, string name, int numericIndex)
         {
             Id = id;
             Name = name;
             NumericIndex = numericIndex;
+        }
+        public AccessLevel(IAccessLevel accessLevel)
+        {
+            Id = accessLevel.Id;
+            Name = accessLevel.Name;
+            NumericIndex = accessLevel.NumericIndex;
         }
     }
 }

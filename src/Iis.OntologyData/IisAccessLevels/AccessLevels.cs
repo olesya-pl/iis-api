@@ -13,9 +13,12 @@ namespace Iis.OntologyData.IisAccessLevels
         public bool IndexIsValid(int numericIndex) =>
             Items.Any(item => item.NumericIndex == numericIndex);
 
-        public AccessLevels(IEnumerable<AccessLevel> items)
+        public AccessLevels(IEnumerable<IAccessLevel> items)
         {
-            _items = items.OrderBy(x => x.NumericIndex).ToList();
+            _items = items
+                .OrderBy(x => x.NumericIndex)
+                .Select(x => new AccessLevel(x))
+                .ToList();
         }
 
         public IAccessLevel GetItemById(Guid id) =>
@@ -62,6 +65,12 @@ namespace Iis.OntologyData.IisAccessLevels
             }
 
             return dict;
+        }
+
+        public void Remove(AccessLevel accessLevel)
+        {
+            _items.Remove(accessLevel);
+            Reindex();
         }
     }
 }

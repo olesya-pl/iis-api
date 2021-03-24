@@ -2,6 +2,9 @@
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData.IisAccessLevels;
+using Iis.OntologyManager.DTO;
+using Iis.OntologyManager.Helpers;
+using Iis.Services.Contracts.Params;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +22,16 @@ namespace Iis.OntologyManager.UiControls
         Button btnCancelEditing;
         Button btnCommitEditing;
         ContextMenuStrip _menu;
-        INodeTypeLinked _nodeType;
         IOntologyNodesData _ontologyData;
         AccessLevels _accessLevels;
         bool _editMode = false;
+        Dictionary<Guid, Guid> _deletedMappings = new Dictionary<Guid, Guid>();
+        public event Func<ChangeAccessLevelsParams, RequestResult> OnSave;
 
         DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
         AccessLevel SelectedItem => SelectedRow == null ? null : (AccessLevel)SelectedRow.DataBoundItem;
 
-        public UiAccessLevelControl(UiControlsCreator uiControlsCreator, IAccessLevels accessLevels)
+        public UiAccessLevelControl(UiControlsCreator uiControlsCreator)
         {
             _uiControlsCreator = uiControlsCreator;
         }
@@ -60,6 +64,8 @@ namespace Iis.OntologyManager.UiControls
             _menu.Items[0].Click += (sender, e) => { MoveUp(); };
             _menu.Items.Add("Опустити вниз");
             _menu.Items[1].Click += (sender, e) => { MoveDown(); };
+            _menu.Items.Add("Знищити");
+            _menu.Items[2].Click += (sender, e) => { RemoveItem(); };
             grid.ContextMenuStrip = _menu;
 
             _container.Add(grid, null, true);
@@ -98,8 +104,7 @@ namespace Iis.OntologyManager.UiControls
             btnStartEditing.Enabled = !_editMode;
             btnCancelEditing.Enabled = _editMode;
             btnCommitEditing.Enabled = _editMode;
-            _menu.Items[0].Enabled = _editMode;
-            _menu.Items[1].Enabled = _editMode;
+            _menu.Enabled = _editMode;
         }
         private void StartEditing()
         {
@@ -132,7 +137,13 @@ namespace Iis.OntologyManager.UiControls
                 "Попередження",
                 MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                _ontologyData.SaveAccessLevels(_accessLevels);
+                var param = new ChangeAccessLevelsParams
+                {
+                    AccessLevelList = _accessLevels.Items.ToList(),
+                    DeletedMappings = _deletedMappings
+                };
+                OnSave.Invoke(param);
+                //_ontologyData.SaveAccessLevels(_accessLevels);
                 _editMode = false;
                 SetControlsState();
             }
@@ -205,6 +216,30 @@ namespace Iis.OntologyManager.UiControls
         private void AddNewItem()
         {
             ShowEditForm(null);
+        }
+        private void RemoveItem()
+        {
+            var deletedItem = SelectedItem;
+            if (deletedItem == null) return;
+            if (MessageBox.Show($"Ви дійсно хочете знищити { deletedItem.Name }? Треба буде вибрати чим його заменити", "Попередження", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                var items = new List<IAccessLevel>(_accessLevels.Items);
+                items.Remove(deletedItem);
+                var item = _uiControlsCreator.ChooseFromModalComboBox(items, "Name");
+                if (item == null) return;
+
+                foreach (var key in _deletedMappings.Keys)
+                {
+                    if (_deletedMappings[key] == deletedItem.Id)
+                    {
+                        _deletedMappings[key] = item.Id;
+                    }
+                }
+                _deletedMappings[deletedItem.Id] = item.Id;
+
+                _accessLevels.Remove(SelectedItem);
+                BindGrid();
+            }
         }
     }
 }

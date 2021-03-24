@@ -8,7 +8,9 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
+using Iis.OntologyData.IisAccessLevels;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 using IIS.Core;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +43,7 @@ namespace Iis.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
+        private readonly IAccessLevelService _accessLevelService;
 
         public AdminController(
             IMaterialService materialService,
@@ -52,7 +55,8 @@ namespace Iis.Api.Controllers
             IAdminOntologyElasticService adminElasticService,
             IHost host,
             IConnectionStringService connectionStringService,
-            IOntologyDataService nodesDataService)
+            IOntologyDataService nodesDataService,
+            IAccessLevelService accessLevelService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -64,6 +68,7 @@ namespace Iis.Api.Controllers
             _host = host;
             _nodesDataService = nodesDataService;
             _connectionStringService = connectionStringService;
+            _accessLevelService = accessLevelService;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -225,10 +230,11 @@ namespace Iis.Api.Controllers
             return Content("Success");
         }
 
-        [HttpPost()]
-        public async Task ChangeAccessLevels(IAccessLevels newAccessLevels)
+        [HttpPost("ChangeAccessLevels")]
+        public async Task ChangeAccessLevels(ChangeAccessLevelsParams param, CancellationToken ct)
         {
-
+            var newAccessLevels = new AccessLevels(param.AccessLevelList);
+            await _accessLevelService.ChangeAccessLevels(newAccessLevels, param.DeletedMappings, ct);
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)

@@ -27,7 +27,7 @@ using Iis.Interfaces.Common;
 
 namespace IIS.Core.Materials.EntityFramework
 {
-    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService where TUnitOfWork : IIISUnitOfWork
+    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService, IMaterialPutToElasticService where TUnitOfWork : IIISUnitOfWork
     {
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
@@ -489,6 +489,10 @@ namespace IIS.Core.Materials.EntityFramework
         private bool IsUserAuthorizedForChangeAccessLevel(User user)
         {
             return user.IsGranted(AccessKind.AccessLevelChange, AccessOperation.Update);
+        }
+        public List<Guid> ChangeAccessLevels(Dictionary<int, int> mappings)
+        {
+            return null;
         }
     }
 }

@@ -166,6 +166,7 @@ namespace IIS.Core
 
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
+            services.AddTransient<IMaterialPutToElasticService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IOntologyService, OntologyServiceWithCache>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
@@ -189,6 +190,7 @@ namespace IIS.Core
             services.AddTransient<IAnnotationsService, AnnotationsService>();
             services.AddTransient<IOntologySchemaService, OntologySchemaService>();
             services.AddTransient<IConnectionStringService, ConnectionStringService>();
+            services.AddTransient<IAccessLevelService, AccessLevelService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();

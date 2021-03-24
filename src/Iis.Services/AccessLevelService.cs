@@ -1,0 +1,77 @@
+﻿using Iis.DataModel;
+using Iis.Interfaces.AccessLevels;
+using Iis.Interfaces.Common;
+using Iis.Services.Contracts.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Iis.Services
+{
+    public class AccessLevelService : IAccessLevelService
+    {
+        OntologyContext _context;
+        ICommonData _commonData;
+        IMaterialPutToElasticService _materialService;
+
+        public AccessLevelService(
+            OntologyContext context,
+            ICommonData commonData,
+            IMaterialPutToElasticService materialService)
+        {
+            _context = context;
+            _commonData = commonData;
+            _materialService = materialService;
+        }
+
+        public async Task ChangeAccessLevels(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> mappings, CancellationToken ct)
+        {
+            var numericIndexMapping = GetNumericIndexMapping(newAccessLevels, mappings);
+            var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping);
+            await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
+            await _context.SaveChangesAsync();
+        }
+
+        private List<Guid> ChangeAccessLevelsMaterials(Dictionary<int, int> mappings)
+        {
+            var result = new List<Guid>();
+            var materials = _context.Materials.Where(m => mappings.Keys.Contains(m.AccessLevel));
+            foreach (var material in materials)
+            {
+                material.AccessLevel = mappings[material.AccessLevel];
+                result.Add(material.Id);
+            }
+
+            return result;
+        }
+
+        private Dictionary<int, int> GetNumericIndexMapping(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> mappings)
+        {
+            var dict = new Dictionary<int, int>();
+            
+            foreach (var deletedId in mappings.Keys)
+            {
+                var oldIndex = _commonData.AccessLevels.GetItemById(deletedId).NumericIndex;
+                var newIndex = newAccessLevels.GetItemById(mappings[deletedId]).NumericIndex;
+                if (oldIndex != newIndex)
+                {
+                    dict[oldIndex] = newIndex;
+                }
+            }
+
+            foreach (var oldItem in _commonData.AccessLevels.Items)
+            {
+                var newItem = newAccessLevels.GetItemById(oldItem.Id);
+                if (oldItem.NumericIndex != newItem.NumericIndex)
+                {
+                    dict[oldItem.NumericIndex] = newItem.NumericIndex;
+                }
+            }
+            
+            return dict;
+        }
+    }
+}

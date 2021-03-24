@@ -26,6 +26,8 @@ using static Iis.OntologyManager.UiControls.UiFilterControl;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.AccessLevels;
 using System.Threading.Tasks;
+using Iis.Services.Contracts.Params;
+using Iis.OntologyManager.DTO;
 
 namespace Iis.OntologyManager
 {
@@ -186,11 +188,11 @@ namespace Iis.OntologyManager
             _uiOntologyDataControl.Initialize("OntologyDataControl", pnlOntologyData);
 
             var pnlAccessLevels = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            _uiAccessLevelControl = new UiAccessLevelControl(_uiControlsCreator, _accessLevels);
+            _uiAccessLevelControl = new UiAccessLevelControl(_uiControlsCreator);
             _uiAccessLevelControl.Initialize("AccessLevelControl", pnlAccessLevels);
+            _uiAccessLevelControl.OnSave += SaveAccessLevels;
 
             _dataViewControls[EntityTypeNames.AccessLevel.ToString()] = _uiAccessLevelControl;
-            //_dataViewControls[DefaultName] = _uiAccessLevelControl;
             _dataViewControls[DefaultName] = _uiOntologyDataControl;
 
             _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
@@ -322,11 +324,15 @@ namespace Iis.OntologyManager
             await WaitCursorActionAsync(DoReloadOntologyData);
         }
 
+        private RequestWraper GetRequestWrapper() =>
+            new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+
+
         private async Task DoReloadOntologyData()
         {
-            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+            var requestWrapper = GetRequestWrapper();
 
-            var result = await requestWrapper.ReloadOntologyData();
+            var result = await requestWrapper.ReloadOntologyDataAsync();
 
             var sb = new StringBuilder()
                 .AppendLine($"Адреса:{result.RequestUrl}")
@@ -469,29 +475,27 @@ namespace Iis.OntologyManager
 
         private void WaitCursorAction(Action action)
         {
-            Cursor.Current = Cursors.WaitCursor;
+            UseWaitCursor = true;
             try
             {
                 action();
             }
             finally
             {
-                Cursor.Current = Cursors.Default;
+                UseWaitCursor = false;
             }
         }
 
         private async Task WaitCursorActionAsync(Func<Task> action)
         {
-            //Cursor.Current = Cursors.WaitCursor;
-            this.UseWaitCursor = true;
+            UseWaitCursor = true;
             try
             {
                 await action();
             }
             finally
             {
-                //Cursor.Current = Cursors.Default;
-                this.UseWaitCursor = false;
+                UseWaitCursor = false;
             }
         }
         public void ShowMessage(string message, string header = null)
@@ -508,13 +512,28 @@ namespace Iis.OntologyManager
             form.Close();
         }
 
+        private RequestResult SaveAccessLevels(ChangeAccessLevelsParams param)
+        {
+            var requestWrapper = GetRequestWrapper();
+
+            var result = requestWrapper.ChangeAccessLevelsAsync(param).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            var sb = new StringBuilder()
+                    .AppendLine($"Адреса:{result.RequestUrl}")
+                    .AppendLine($"Повідомлення: {result.Message}");
+
+            ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+
+            return result;
+        }
+
         private void ReindexElastic(IndexKeys indexKey)
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
 
             WaitCursorAction(() =>
             {
-                var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+                var requestWrapper = GetRequestWrapper();
 
                 var result = requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -528,7 +547,7 @@ namespace Iis.OntologyManager
 
         private void OnRemove(Guid entityId)
         {
-            var requestWrapper = new RequestWraper(SelectedSchemaSource.ApiAddress, _userCredentials, _requestSettings, _logger);
+            var requestWrapper = GetRequestWrapper();
 
             var result = requestWrapper.DeleteEntityAsync(entityId).ConfigureAwait(false).GetAwaiter().GetResult();
 
