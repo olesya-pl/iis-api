@@ -35,6 +35,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("RemoveEventWikiLinks", actions.RemoveEventWikiLinks);
             _items.Add("AddAccessLevelAccessObject", actions.AddAccessLevelAccessObject);
             _items.Add("AddAccessLevels", actions.AddAccessLevels);
+            _items.Add("AddAccessLevelToObject", actions.AddAccessLevelToObject);
         }
         public bool Run()
         {

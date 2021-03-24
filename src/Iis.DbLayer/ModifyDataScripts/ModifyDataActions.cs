@@ -101,5 +101,27 @@ namespace Iis.DbLayer.ModifyDataScripts
                 data.AddValueByDotName(node.Id, "5", NUMERIC_INDEX);
             });
         }
+
+        public void AddAccessLevelToObject(OntologyContext context, IOntologyNodesData data)
+        {
+            const string ACCESS_LEVEL = "accessLevel";
+            
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
+
+            var accessLevel = objectType.GetProperty(ACCESS_LEVEL);
+            if (accessLevel == null) return;
+            var jsonMeta = "{ \"FormField\": {\"Type\": \"dropdown\" }}";
+
+            data.Schema.CreateRelationTypeJson(
+                objectType.Id, 
+                accessLevelType.Id, 
+                ACCESS_LEVEL, 
+                "Гріф (рівень доступу)", 
+                EmbeddingOptions.Optional,
+                jsonMeta);
+
+            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
+        }
     }
 }

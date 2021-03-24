@@ -139,7 +139,7 @@ namespace Iis.OntologyManager.UiControls
             {
                 var param = new ChangeAccessLevelsParams
                 {
-                    AccessLevelList = _accessLevels.Items.ToList(),
+                    AccessLevelList = _accessLevels.OriginalItems.ToList(),
                     DeletedMappings = _deletedMappings
                 };
                 OnSave.Invoke(param);

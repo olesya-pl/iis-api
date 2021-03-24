@@ -10,6 +10,7 @@ namespace Iis.OntologyData.IisAccessLevels
     {
         private List<AccessLevel> _items;
         public IReadOnlyList<IAccessLevel> Items => _items;
+        public List<AccessLevel> OriginalItems => _items;
         public bool IndexIsValid(int numericIndex) =>
             Items.Any(item => item.NumericIndex == numericIndex);
 

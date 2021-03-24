@@ -363,13 +363,13 @@ namespace Iis.OntologySchema
             }
             return nodeType;
         }
-        public INodeTypeLinked CreateAttributeType(
+        public INodeTypeLinked CreateAttributeTypeJson(
             Guid parentId,
             string name,
             string title = null,
             ScalarType scalarType = ScalarType.String,
             EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
-            ISchemaMeta meta = null)
+            string jsonMeta = null)
         {
             var updateParameter = new NodeTypeUpdateParameter
             {
@@ -378,7 +378,37 @@ namespace Iis.OntologySchema
                 EmbeddingOptions = embeddingOptions,
                 ScalarType = scalarType,
                 ParentTypeId = parentId,
-                Meta = meta == null ? null : JsonConvert.SerializeObject(meta)
+                Meta = jsonMeta
+            };
+            return UpdateNodeType(updateParameter);
+        }
+        public INodeTypeLinked CreateAttributeType(
+            Guid parentId,
+            string name,
+            string title = null,
+            ScalarType scalarType = ScalarType.String,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            ISchemaMeta meta = null)
+        {
+            return CreateAttributeTypeJson(parentId, name, title, scalarType, embeddingOptions,
+                meta == null ? null : JsonConvert.SerializeObject(meta));
+        }
+        public INodeTypeLinked CreateRelationTypeJson(
+            Guid sourceId,
+            Guid targetId,
+            string name,
+            string title = null,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            string jsonMeta = null)
+        {
+            var updateParameter = new NodeTypeUpdateParameter
+            {
+                Name = name,
+                Title = title ?? name,
+                EmbeddingOptions = embeddingOptions,
+                ParentTypeId = sourceId,
+                TargetTypeId = targetId,
+                Meta = jsonMeta
             };
             return UpdateNodeType(updateParameter);
         }
@@ -390,16 +420,8 @@ namespace Iis.OntologySchema
             EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
             ISchemaMeta meta = null)
         {
-            var updateParameter = new NodeTypeUpdateParameter
-            {
-                Name = name,
-                Title = title ?? name,
-                EmbeddingOptions = embeddingOptions,
-                ParentTypeId = sourceId,
-                TargetTypeId = targetId,
-                Meta = meta == null ? null : JsonConvert.SerializeObject(meta)
-            };
-            return UpdateNodeType(updateParameter);
+            return CreateRelationTypeJson(sourceId, targetId, name, title, embeddingOptions,
+                meta == null ? null : JsonConvert.SerializeObject(meta));
         }
         private void ValidateNodeTypeUpdateParameter(INodeTypeUpdateParameter updateParameter)
         {
