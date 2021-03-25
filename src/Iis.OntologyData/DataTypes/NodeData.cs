@@ -133,6 +133,14 @@ namespace Iis.OntologyData.DataTypes
                     ?.TargetNode;
             });
         }
+        public IRelation GetSingleDirectRelation(string name)
+        {
+            return AllData.Locker.ReadLock(() =>
+            {
+                return _outgoingRelations
+                    .SingleOrDefault(r => r.Node.NodeType.Name == name);
+            });
+        }
         public INode GetSingleProperty(IDotName dotName)
         {
             return AllData.Locker.ReadLock(() =>
@@ -274,5 +282,14 @@ namespace Iis.OntologyData.DataTypes
             return sb.ToString();
         }
         public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value;
+
+        public IRelation GetAccessLevelRelationId() =>
+            GetSingleDirectRelation("accessLevel");
+
+        public int GetAccessLevelIndex()
+        {
+            var node = GetSingleProperty("accessLevel.numericIndex");
+            return node?.Value == null ? 0 : int.Parse(node?.Value);
+        }
     }
 }

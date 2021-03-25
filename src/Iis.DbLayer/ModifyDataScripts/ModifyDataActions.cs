@@ -110,7 +110,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
 
             var accessLevel = objectType.GetProperty(ACCESS_LEVEL);
-            if (accessLevel == null) return;
+            if (accessLevel != null) return;
             var jsonMeta = "{ \"FormField\": {\"Type\": \"dropdown\" }}";
 
             data.Schema.CreateRelationTypeJson(

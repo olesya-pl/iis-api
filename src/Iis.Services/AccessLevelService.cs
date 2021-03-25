@@ -1,6 +1,7 @@
 ﻿using Iis.DataModel;
 using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,20 +17,24 @@ namespace Iis.Services
         OntologyContext _context;
         ICommonData _commonData;
         IMaterialPutToElasticService _materialService;
+        IOntologyNodesData _ontologyData;
 
         public AccessLevelService(
             OntologyContext context,
             ICommonData commonData,
-            IMaterialPutToElasticService materialService)
+            IMaterialPutToElasticService materialService,
+            IOntologyNodesData ontologyData)
         {
             _context = context;
             _commonData = commonData;
             _materialService = materialService;
+            _ontologyData = ontologyData;
         }
 
         public async Task ChangeAccessLevels(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> mappings, CancellationToken ct)
         {
             var numericIndexMapping = GetNumericIndexMapping(newAccessLevels, mappings);
+            ChangeAccessLevelsDors(mappings);
             var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping);
             await _context.SaveChangesAsync();
             //await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
@@ -46,6 +51,25 @@ namespace Iis.Services
             }
 
             return result;
+        }
+
+        private void ChangeAccessLevelsDors(Dictionary<Guid, Guid> mappings)
+        {
+            var objectTypeIds = _ontologyData.Schema
+                .GetEntityTypes()
+                .Where(nt => nt.IsObject)
+                .Select(nt => nt.Id)
+                .ToList();
+
+            var nodes = _ontologyData.GetNodesByTypeIds(objectTypeIds);
+            foreach (var node in nodes)
+            {
+                var accessLevelRelation = node.GetAccessLevelRelationId();
+                if (accessLevelRelation != null && mappings.ContainsKey(accessLevelRelation.TargetNodeId))
+                {
+                    _ontologyData.UpdateRelationTarget(accessLevelRelation.Id, mappings[accessLevelRelation.TargetNodeId]);
+                }
+            }
         }
 
         private Dictionary<int, int> GetNumericIndexMapping(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> deletedMappings)
