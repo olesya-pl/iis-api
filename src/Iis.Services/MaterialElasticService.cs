@@ -247,6 +247,6 @@ namespace Iis.Services
                 "nodes" => ("NodesCount", sorting.Order),
                 _ => (null, null)
             };
-        }        
+        }
     }
 }

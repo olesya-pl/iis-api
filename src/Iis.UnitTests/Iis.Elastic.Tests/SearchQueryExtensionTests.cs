@@ -142,11 +142,11 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         }
 
         [Theory]
-        [InlineData("fieldName", "asc")]
-        [InlineData("fieldName", "desc")]
-        public void SetupSorting_Success(string sortColumn, string sortOrder)
+        [InlineData("fieldName", "asc", "_last")]
+        [InlineData("fieldName", "desc", "_first")]
+        public void SetupSorting_Success(string sortColumn, string sortOrder, string missing)
         {
-            var expected = JObject.Parse("{\"sort\":[{\"" + sortColumn + "\":{\"order\":\"" + sortOrder + "\"}}]}");
+            var expected = JObject.Parse("{\"sort\":[{\"" + sortColumn + "\":{\"order\":\"" + sortOrder + "\", \"missing\":\""+missing+"\"}}]}");
 
             var actual = new JObject().SetupSorting(sortColumn, sortOrder);
 
@@ -170,9 +170,9 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var expected =
                 JObject.Parse(
-                    "{\"sort\":[{\"fieldName1\":{\"order\":\"asc\"}}, {\"fieldName2\":{\"order\":\"desc\"}}]}");
+                    "{\"sort\":[{\"fieldName1\":{\"order\":\"asc\", \"missing\":\"_last\"}}, {\"fieldName2\":{\"order\":\"desc\", \"missing\":\"_first\"}}]}");
 
-            var stubValue = JObject.Parse("{\"sort\":[{\"fieldName1\":{\"order\":\"asc\"}}]}");
+            var stubValue = JObject.Parse("{\"sort\":[{\"fieldName1\":{\"order\":\"asc\", \"missing\":\"_last\"}}]}");
 
             var actual = stubValue.SetupSorting("fieldName2", "desc");
 

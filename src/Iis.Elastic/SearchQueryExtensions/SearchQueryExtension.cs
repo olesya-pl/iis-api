@@ -226,8 +226,16 @@ namespace Iis.Elastic.SearchQueryExtensions
         private static JObject CreateSortingProperty(string sortColumn, string sortOrder)
         {
             return new JObject(
-                new JProperty(sortColumn, new JObject {new JProperty("order", sortOrder)})
+                new JProperty(sortColumn, new JObject {
+                    new JProperty("order", sortOrder),
+                    new JProperty("missing", GetMissingValueSorting(sortOrder))
+                })
             );
+        }
+
+        private static string GetMissingValueSorting(string sortOrder)
+        {
+            return sortOrder == "asc" ?  "_last" : "_first";
         }
     }
 }
