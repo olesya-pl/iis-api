@@ -114,7 +114,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             var jsonMeta = "{ \"FormField\": {\"Type\": \"dropdown\" }}";
 
             data.Schema.CreateRelationTypeJson(
-                objectType.Id, 
+                objectType.Id,
                 accessLevelType.Id, 
                 ACCESS_LEVEL, 
                 "Гріф (рівень доступу)", 

@@ -34,7 +34,7 @@ namespace Iis.Services
         public async Task ChangeAccessLevels(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> mappings, CancellationToken ct)
         {
             var numericIndexMapping = GetNumericIndexMapping(newAccessLevels, mappings);
-            ChangeAccessLevelsDors(mappings);
+            ChangeAccessLevelsOntology(mappings);
             var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping);
             await _context.SaveChangesAsync();
             //await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
@@ -53,7 +53,7 @@ namespace Iis.Services
             return result;
         }
 
-        private void ChangeAccessLevelsDors(Dictionary<Guid, Guid> mappings)
+        private void ChangeAccessLevelsOntology(Dictionary<Guid, Guid> mappings)
         {
             var objectTypeIds = _ontologyData.Schema
                 .GetEntityTypes()
@@ -64,10 +64,13 @@ namespace Iis.Services
             var nodes = _ontologyData.GetNodesByTypeIds(objectTypeIds);
             foreach (var node in nodes)
             {
-                var accessLevelRelation = node.GetAccessLevelRelationId();
-                if (accessLevelRelation != null && mappings.ContainsKey(accessLevelRelation.TargetNodeId))
+                if (node.Id == new Guid("6dcc1ceb-c50d-4b68-8a1e-bdbd55a2605d"))
                 {
-                    _ontologyData.UpdateRelationTarget(accessLevelRelation.Id, mappings[accessLevelRelation.TargetNodeId]);
+                    var accessLevelRelation = node.GetAccessLevelRelationId();
+                    if (accessLevelRelation != null && mappings.ContainsKey(accessLevelRelation.TargetNodeId))
+                    {
+                        _ontologyData.UpdateRelationTarget(accessLevelRelation.Id, mappings[accessLevelRelation.TargetNodeId]);
+                    }
                 }
             }
         }
