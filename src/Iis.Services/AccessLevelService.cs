@@ -64,13 +64,10 @@ namespace Iis.Services
             var nodes = _ontologyData.GetNodesByTypeIds(objectTypeIds);
             foreach (var node in nodes)
             {
-                if (node.Id == new Guid("6dcc1ceb-c50d-4b68-8a1e-bdbd55a2605d"))
+                var accessLevelRelation = node.GetAccessLevelRelationId();
+                if (accessLevelRelation != null && mappings.ContainsKey(accessLevelRelation.TargetNodeId))
                 {
-                    var accessLevelRelation = node.GetAccessLevelRelationId();
-                    if (accessLevelRelation != null && mappings.ContainsKey(accessLevelRelation.TargetNodeId))
-                    {
-                        _ontologyData.UpdateRelationTarget(accessLevelRelation.Id, mappings[accessLevelRelation.TargetNodeId]);
-                    }
+                    _ontologyData.UpdateRelationTarget(accessLevelRelation.Id, mappings[accessLevelRelation.TargetNodeId]);
                 }
             }
         }
