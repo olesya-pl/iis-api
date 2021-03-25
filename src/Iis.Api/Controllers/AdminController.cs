@@ -235,6 +235,7 @@ namespace Iis.Api.Controllers
         {
             var newAccessLevels = new AccessLevels(param.AccessLevelList);
             await _accessLevelService.ChangeAccessLevels(newAccessLevels, param.DeletedMappings, ct);
+            await ReInitializeOntologyIndexes("all", ct);
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
