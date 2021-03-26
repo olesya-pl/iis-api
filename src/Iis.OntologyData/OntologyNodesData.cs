@@ -83,6 +83,9 @@ namespace Iis.OntologyData
         public IRelation CreateRelationWithAttribute(Guid sourceNodeId, Guid nodeTypeId, string value) =>
             Locker.WriteLock(() => _storage.CreateRelationWithAttribute(sourceNodeId, nodeTypeId, value));
 
+        public IRelation CreateRelationWithAttribute(Guid sourceNodeId, string relationTypeName, string value) =>
+            Locker.WriteLock(() => _storage.CreateRelationWithAttribute(sourceNodeId, relationTypeName, value));
+
         internal NodeData GetNodeData(Guid id)
         {
             return Locker.ReadLock(() => _storage.Nodes.GetValueOrDefault(id));
@@ -219,6 +222,52 @@ namespace Iis.OntologyData
             }
 
             return new AccessLevels(list);
+        }
+        public void SaveAccessLevels(IAccessLevels newAccessLevels)
+        {
+            const string NAME = "name";
+            const string NUMERIC_INDEX = "numericIndex";
+
+            var oldAccessLevels = GetAccessLevels();
+            var accessLevelType = Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
+            Locker.WriteLock(() => 
+            {
+                foreach (var newItem in newAccessLevels.Items)
+                {
+                    var oldItem = oldAccessLevels.GetItemById(newItem.Id);
+                    if (oldItem == null)
+                    {
+                        var node = CreateNode(accessLevelType.Id, newItem.Id);
+                        CreateRelationWithAttribute(node.Id, NAME, newItem.Name);
+                        CreateRelationWithAttribute(node.Id, NUMERIC_INDEX, newItem.NumericIndex.ToString());
+                    }
+                    else
+                    {
+                        var node = GetNode(oldItem.Id);
+                        var nameNode = node.GetSingleDirectProperty(NAME);
+                        if (nameNode.Value != newItem.Name)
+                        {
+                            RemoveNodeAndRelations(nameNode.Id);
+                            CreateRelationWithAttribute(node.Id, NAME, newItem.Name);
+                        }
+                        
+                        var numericIndexNode = node.GetSingleDirectProperty(NUMERIC_INDEX);
+                        if (numericIndexNode.Value != newItem.NumericIndex.ToString())
+                        {
+                            RemoveNodeAndRelations(numericIndexNode.Id);
+                            CreateRelationWithAttribute(node.Id, NUMERIC_INDEX, newItem.NumericIndex.ToString());
+                        }
+                    }
+                }
+
+                foreach (var oldItem in oldAccessLevels.Items)
+                {
+                    if (!newAccessLevels.Items.Any(x => x.Id == oldItem.Id))
+                    {
+                        RemoveNodeAndRelations(oldItem.Id);
+                    }
+                }
+            });
         }
     }
 }

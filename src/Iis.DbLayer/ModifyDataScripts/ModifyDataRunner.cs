@@ -36,6 +36,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("AddAccessLevelAccessObject", actions.AddAccessLevelAccessObject);
             _items.Add("FixFlightRadarLocationHistory", actions.FixFlightRadarLocationHistory);
             _items.Add("AddAccessLevels", actions.AddAccessLevels);
+            _items.Add("AddAccessLevelToObject", actions.AddAccessLevelToObject);
         }
         public bool Run()
         {

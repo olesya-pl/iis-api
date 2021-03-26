@@ -29,7 +29,7 @@ using Serilog;
 
 namespace IIS.Core.Materials.EntityFramework
 {
-    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService where TUnitOfWork : IIISUnitOfWork
+    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService, IMaterialPutToElasticService where TUnitOfWork : IIISUnitOfWork
     {
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
@@ -39,7 +39,6 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
-        private readonly IMediator _mediatr;
         private readonly ICommonData _commonData;
         private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
 
@@ -63,7 +62,6 @@ namespace IIS.Core.Materials.EntityFramework
             _changeHistoryService = changeHistoryService;
             _userService = userService;
             _materialSignRepository = materialSignRepository;
-            _mediatr = mediator;
             _commonData = commonData;
         }
 

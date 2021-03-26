@@ -33,5 +33,7 @@ namespace Iis.Interfaces.Ontology.Data
         string GetComputedValue(string name);
         string GetDotName();
         string GetTitleValue();
+        IRelation GetAccessLevelRelationId();
+        int GetAccessLevelIndex();
     }
 }

@@ -3,11 +3,14 @@ using Iis.DbLayer.OntologyData;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
+using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
+using Iis.OntologyData.IisAccessLevels;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 using IIS.Core;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +43,7 @@ namespace Iis.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
+        private readonly IAccessLevelService _accessLevelService;
 
         public AdminController(
             IMaterialService materialService,
@@ -51,7 +55,8 @@ namespace Iis.Api.Controllers
             IAdminOntologyElasticService adminElasticService,
             IHost host,
             IConnectionStringService connectionStringService,
-            IOntologyDataService nodesDataService)
+            IOntologyDataService nodesDataService,
+            IAccessLevelService accessLevelService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -63,6 +68,7 @@ namespace Iis.Api.Controllers
             _host = host;
             _nodesDataService = nodesDataService;
             _connectionStringService = connectionStringService;
+            _accessLevelService = accessLevelService;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -229,6 +235,14 @@ namespace Iis.Api.Controllers
             var connectionString = _connectionStringService.GetIisApiConnectionString();
             _nodesDataService.ReloadOntologyData(connectionString);
             return Content("Success");
+        }
+
+        [HttpPost("ChangeAccessLevels")]
+        public async Task ChangeAccessLevels(ChangeAccessLevelsParams param, CancellationToken ct)
+        {
+            var newAccessLevels = new AccessLevels(param.AccessLevelList);
+            await _accessLevelService.ChangeAccessLevels(newAccessLevels, param.DeletedMappings, ct);
+            await ReInitializeOntologyIndexes("all", ct);
         }
 
         [HttpPost("RemoveMaterials")]
