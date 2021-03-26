@@ -14,6 +14,7 @@ namespace Iis.OntologyManager.UiControls
         int _numericIndex;
 
         public event Action OnSave;
+        public string AccessLevelName => txtName.Text;
 
         public UiAccessLevelEditControl(AccessLevel accessLevel, int numericIndex)
         {
@@ -22,8 +23,8 @@ namespace Iis.OntologyManager.UiControls
         }
         protected override void CreateControls()
         {
-            var textBox = new TextBox { ReadOnly = false };
-            _container.Add(textBox, $"Назва");
+            txtName = new TextBox { ReadOnly = false };
+            _container.Add(txtName, $"Назва");
             _container.Add(btnSave = new Button { Text = "Зберегти" });
             btnSave.Click += (sender, e) => { Save(); };
         }

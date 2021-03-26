@@ -95,7 +95,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             const string NUMERIC_INDEX = "numericIndex";
 
             var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
-            var accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Гріфи (рівні доступу)", false, enumEntityType.Id);
+            var accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Грифи (рівні доступу)", false, enumEntityType.Id);
             data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
             _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
 
@@ -125,6 +125,28 @@ namespace Iis.DbLayer.ModifyDataScripts
                 data.AddValueByDotName(node.Id, "ОС - Особливої важливості", NAME);
                 data.AddValueByDotName(node.Id, "5", NUMERIC_INDEX);
             });
+        }
+
+        public void AddAccessLevelToObject(OntologyContext context, IOntologyNodesData data)
+        {
+            const string ACCESS_LEVEL = "accessLevel";
+            
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
+
+            var accessLevel = objectType.GetProperty(ACCESS_LEVEL);
+            if (accessLevel != null) return;
+            var jsonMeta = "{ \"FormField\": {\"Type\": \"dropdown\" }}";
+
+            data.Schema.CreateRelationTypeJson(
+                objectType.Id,
+                accessLevelType.Id, 
+                ACCESS_LEVEL, 
+                "Гриф (рівень доступу)", 
+                EmbeddingOptions.Optional,
+                jsonMeta);
+
+            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
         }
     }
 }

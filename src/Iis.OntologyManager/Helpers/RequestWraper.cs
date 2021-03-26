@@ -8,6 +8,8 @@ using Serilog;
 using Iis.OntologyManager.DTO;
 using Iis.OntologyManager.Dictionaries;
 using Iis.OntologyManager.Configurations;
+using Iis.Services.Contracts.Params;
+using Newtonsoft.Json;
 
 namespace Iis.OntologyManager.Helpers
 {
@@ -58,6 +60,21 @@ namespace Iis.OntologyManager.Helpers
             return SendDeleteRequestAsync(requestUri);
         }
 
+        public async Task RestartIisAppAsync()
+        {
+            var uri = "admin/RestartApplication";
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+            await httpClient.PostAsync(uri, null).ConfigureAwait(false);
+        }
+        public async Task<RequestResult> ReloadOntologyDataAsync()
+        {
+            var uri = new Uri("admin/ReloadOntologyData", UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            return await SendRequest(() => httpClient.PostAsync(uri, null), uri);
+        }
+
         public async Task<RequestResult> ReIndexAsync(IndexKeys indexKey)
         {
             var pathFound = IndexPaths.TryGetValue(indexKey, out string requestUrl);
@@ -66,13 +83,29 @@ namespace Iis.OntologyManager.Helpers
 
             var uri = new Uri($"admin/{requestUrl}", UriKind.Relative);
 
-            HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            return await SendRequest(() => httpClient.GetAsync(uri), uri);
+        }
+
+        public async Task<RequestResult> ChangeAccessLevelsAsync(ChangeAccessLevelsParams param)
+        {
+            var uri = new Uri("admin/ChangeAccessLevels", UriKind.Relative);
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
+            var json = JsonConvert.SerializeObject(param);
+
+            return await SendRequest(() => httpClient.PostAsync(uri, new StringContent(json)), uri);
+        }
+
+        private async Task<RequestResult> SendRequest(Func<Task<HttpResponseMessage>> func, Uri uri)
+        {
+            HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
+
             try
             {
-                response = await httpClient.GetAsync(uri).ConfigureAwait(false);
+                response = await func().ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
 

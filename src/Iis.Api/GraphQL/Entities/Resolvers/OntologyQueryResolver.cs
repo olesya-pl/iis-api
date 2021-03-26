@@ -1,4 +1,4 @@
-using HotChocolate.Resolvers;
+﻿using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
@@ -26,6 +26,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
     public class OntologyQueryResolver : IOntologyQueryResolver
     {
         private const string LastRelation = "LastRelation";
+        private const string ObjectNotFound = "Об'єкт не знайдено";
 
         public ObjectType ResolveAbstractType(IResolverContext context, object resolverResult)
         {
@@ -44,7 +45,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public async Task<Entity> ResolveEntity(IResolverContext ctx, INodeTypeLinked type)
         {
             var id = ctx.Argument<Guid>("id");
+            var userService = ctx.Service<IUserService>();
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, INodeTypeLinked>(id, null), default);
+
+            if (!userService.IsAccessLevelAllowedForUser(tokenPayload.User.AccessLevel, node.OriginalNode.GetAccessLevelIndex()))
+                throw new Exception(ObjectNotFound);
+
             return node as Entity; // return null if node was not entity
         }
 

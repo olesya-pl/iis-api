@@ -27,6 +27,13 @@ namespace Iis.Interfaces.Ontology.Schema
             ScalarType scalarType = ScalarType.String,
             EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
             ISchemaMeta meta = null);
+        INodeTypeLinked CreateAttributeTypeJson(
+            Guid parentId,
+            string name,
+            string title = null,
+            ScalarType scalarType = ScalarType.String,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            string jsonMeta = null);
         INodeTypeLinked CreateRelationType(
             Guid sourceId,
             Guid targetId,
@@ -34,6 +41,13 @@ namespace Iis.Interfaces.Ontology.Schema
             string title = null,
             EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
             ISchemaMeta meta = null);
+        INodeTypeLinked CreateRelationTypeJson(
+            Guid sourceId,
+            Guid targetId,
+            string name,
+            string title = null,
+            EmbeddingOptions embeddingOptions = EmbeddingOptions.Optional,
+            string jsonMeta = null);
         void UpdateTargetType(Guid relationTypeId, Guid targetTypeId);
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
         void RemoveInheritance(Guid sourceTypeId, Guid targetTypeId);
