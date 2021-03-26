@@ -333,6 +333,17 @@ namespace Iis.DbLayer.Repositories
             return GetMaterialsQuery()
                         .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
         }
+
+        public async Task RemoveMaterialsAndRelatedData()
+        {
+            var fileIds = await Context.Materials.Select(x => x.FileId).ToListAsync();
+            
+            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE MaterialFeatures");
+            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE MaterialInfos");
+            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Materials");
+            await Context.Database.ExecuteSqlRawAsync("DELETE FROM Files WHERE Id in ({0})", string.Join(" , ", fileIds));
+        }
+
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);

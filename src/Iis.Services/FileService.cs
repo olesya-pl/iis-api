@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -21,10 +22,10 @@ namespace Iis.Services
         private readonly ILogger _logger;
 
         public FileService(
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, 
-            FilesConfiguration configuration, 
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            FilesConfiguration configuration,
             ILogger<FileService<IIISUnitOfWork>> logger)
-            :base(unitOfWorkFactory)
+            : base(unitOfWorkFactory)
         {
             _configuration = configuration;
             _logger = logger;
@@ -36,8 +37,9 @@ namespace Iis.Services
 
             return await IsDuplicatedAsync(contents, hash);
         }
-        
-        public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType, CancellationToken token)
+
+        public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType,
+            CancellationToken token)
         {
             var contents = await ConvertToBytes(stream, token);
             var hash = ComputeHash(contents);
@@ -116,23 +118,56 @@ namespace Iis.Services
             return new FileDto(id, file.Name, file.ContentType, ms, file.IsTemporary);
         }
 
+        public int RemoveFiles(List<Guid> ids)
+        {
+            var successOperation = 0;
+            if (string.IsNullOrEmpty(_configuration.Path))
+                throw new ArgumentException("Configuration.Path can not be null");
+            foreach (var id in ids)
+            {
+                var path = Path.Combine(_configuration.Path, id.ToString("D"));
+                if (!File.Exists(path)) 
+                    continue;
+                
+                if (TryDelete(path))
+                    successOperation++;
+            }
+
+            return successOperation;
+        }
+
+        private static bool TryDelete(string path)
+        {
+            try
+            {
+                File.Delete(path);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task FlushTemporaryFilesAsync(Predicate<DateTime> predicate)
         {
-            var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.IsTemporary && predicate(f.UploadTime)));
+            var files = await RunWithoutCommitAsync(uow =>
+                uow.FileRepository.GetManyAsync(f => f.IsTemporary && predicate(f.UploadTime)));
 
             await RunAsync(uow => uow.FileRepository.RemoveRange(files));
         }
 
         public async Task MarkFilePermanentAsync(Guid fileId)
         {
-            var file = await RunWithoutCommitAsync(uow => uow.FileRepository.GetAsync(f => f.IsTemporary && f.Id == fileId));
+            var file = await RunWithoutCommitAsync(uow =>
+                uow.FileRepository.GetAsync(f => f.IsTemporary && f.Id == fileId));
             if (file == null)
                 throw new ArgumentException($"There is no temporary file with id {fileId}");
             file.IsTemporary = false;
 
             await RunAsync(uow => uow.FileRepository.Update(file));
         }
-        
+
         private async Task<FileIdDto> IsDuplicatedAsync(byte[] contents, Guid hash, CancellationToken token = default)
         {
             var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.ContentHash == hash));
@@ -172,13 +207,13 @@ namespace Iis.Services
                     };
                 }
             }
-            
+
             return new FileIdDto
             {
                 IsDuplicate = false
             };
         }
-        
+
         private static Guid ComputeHash(byte[] data)
         {
             using HashAlgorithm algorithm = MD5.Create();

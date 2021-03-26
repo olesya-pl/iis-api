@@ -224,6 +224,13 @@ namespace Iis.Api.Controllers
             return Content("Success");
         }
 
+        [HttpPost("RemoveMaterials")]
+        public async Task<IActionResult> RemoveMaterials()
+        {
+            await _materialService.RemoveMaterials();
+            return Ok();
+        }
+
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);

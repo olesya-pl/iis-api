@@ -20,5 +20,6 @@ namespace IIS.Core.Materials
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken stoppingToken);
         Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user);
+        Task RemoveMaterials();
     }
 }

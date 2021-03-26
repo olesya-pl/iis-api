@@ -32,6 +32,14 @@ namespace Iis.DbLayer.Repositories
             Context.Files.RemoveRange(files);
         }
 
+        public Task<List<Guid>> GetMaterialFileIds()
+        {
+            return Context.Materials
+                .Where(x => x.FileId.HasValue)
+                .Select(x => x.FileId.Value)
+                .ToListAsync();
+        }
+
         public void Update(FileEntity entity)
         {
             Context.Files.Update(entity);

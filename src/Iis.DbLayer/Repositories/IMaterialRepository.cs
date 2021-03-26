@@ -56,5 +56,7 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId);
 
         Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
+
+        Task RemoveMaterialsAndRelatedData();
     }
 }

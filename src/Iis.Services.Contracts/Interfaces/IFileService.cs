@@ -1,5 +1,6 @@
 using Iis.Services.Contracts.Dtos;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,5 +14,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task FlushTemporaryFilesAsync(Predicate<DateTime> predicate);
         Task MarkFilePermanentAsync(Guid fileId);
         Task<FileIdDto> IsDuplicatedAsync(byte[] contents);
+        int RemoveFiles(List<Guid> ids);
     }
 }

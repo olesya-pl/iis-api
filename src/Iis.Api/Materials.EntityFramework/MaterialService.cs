@@ -24,6 +24,8 @@ using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using Iis.Interfaces.Common;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -39,6 +41,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IUserService _userService;
         private readonly IMediator _mediatr;
         private readonly ICommonData _commonData;
+        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -478,6 +481,16 @@ namespace IIS.Core.Materials.EntityFramework
             await Task.WhenAll(new[] { elasticTask, changeHistoryTask, getMaterialTask });
 
             return getMaterialTask.Result;
+        }
+
+        public async Task RemoveMaterials()
+        {
+            _logger.LogDebug("Start RemoveMaterials");
+            var fileIds = await RunWithoutCommitAsync(uow => uow.FileRepository.GetMaterialFileIds());
+            _logger.LogDebug("Found {Count} files to remove", fileIds.Count);
+            await RunAsync(uow => uow.MaterialRepository.RemoveMaterialsAndRelatedData());
+            var removeFiles = _fileService.RemoveFiles(fileIds);
+            _logger.LogDebug("Removed {Count} files", removeFiles);
         }
 
         private (bool IsValid, int Value) IsValidAccessLevel(int accessLevel)

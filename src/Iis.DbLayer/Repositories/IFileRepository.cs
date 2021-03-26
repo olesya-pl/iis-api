@@ -13,5 +13,6 @@ namespace Iis.DbLayer.Repositories
         void Create(FileEntity entity);
         void Update(FileEntity entity);
         void RemoveRange(IEnumerable<FileEntity> files);
+        Task<List<Guid>> GetMaterialFileIds();
     }
 }
