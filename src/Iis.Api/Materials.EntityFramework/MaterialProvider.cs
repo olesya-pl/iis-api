@@ -136,7 +136,7 @@ namespace IIS.Core.Materials.EntityFramework
                 throw new ArgumentException($"Cannot find material with id {id}");
             }
 
-            var mapped = await MapAsync(entity);
+            var mapped = Map(entity);
             mapped.CanBeEdited = entity.CanBeEdited(user.Id);
             return mapped;
         }
@@ -168,7 +168,7 @@ namespace IIS.Core.Materials.EntityFramework
             return _mapper.Map<MaterialSign>(entity);
         }
 
-        public async Task<Material> MapAsync(MaterialEntity material)
+        private Material Map(MaterialEntity material)
         {
             if (material == null) return null;
 
@@ -176,9 +176,8 @@ namespace IIS.Core.Materials.EntityFramework
 
             result.Infos.AddRange(MapInfos(material));
 
-            result.Children.AddRange(await MapChildren(material));
-
-            result.Assignee = _mapper.Map<User>(material.Assignee);
+            result.Children.AddRange(MapChildren(material));
+                        result.Assignee = _mapper.Map<User>(material.Assignee);
 
             var nodes = result.Infos
                                 .SelectMany(p => p.Features.Select(x => x.Node))
@@ -239,8 +238,8 @@ namespace IIS.Core.Materials.EntityFramework
             //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
 
             mappingTasks = materialsByNode
-                                 .Select(async e => await MapAsync(await RunWithoutCommitAsync(async (unitOfWork) =>
-                                     await unitOfWork.MaterialRepository.GetByIdAsync(e.Id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures))));
+                                 .Select(async e => Map(await RunWithoutCommitAsync((unitOfWork) =>
+                                     unitOfWork.MaterialRepository.GetByIdAsync(e.Id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures))));
 
             materials = await Task.WhenAll(mappingTasks);
 
@@ -513,14 +512,13 @@ namespace IIS.Core.Materials.EntityFramework
             return result;
         }
 
-        private async Task<Material[]> MapChildren(MaterialEntity material)
+        private IReadOnlyCollection<Material> MapChildren(MaterialEntity material)
         {
-            var mapChildrenTasks = new List<Task<Material>>();
-            foreach (var child in material.Children ?? new List<MaterialEntity>())
+            if (material.Children == null)
             {
-                mapChildrenTasks.Add(MapAsync(child));
+                return Array.Empty<Material>();
             }
-            return await Task.WhenAll(mapChildrenTasks);
+            return material.Children.Select(child => Map(child)).ToArray();
         }
 
         private IReadOnlyCollection<MaterialInfo> MapInfos(MaterialEntity material)
