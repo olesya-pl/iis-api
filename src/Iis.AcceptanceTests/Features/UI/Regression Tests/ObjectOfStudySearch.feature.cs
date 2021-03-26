@@ -390,28 +390,27 @@ this.FeatureBackground();
 #line 44
  testRunner.And("I clicked on the create a new military organization button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 45
- testRunner.And("I clicked on all expandable blocks", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Приналежність",
-                            "Важливість",
-                            "Безпосереднє підпорядкування",
-                            "Бойовий досвід",
-                            "Війскова частина",
-                            "Військовий гарнізон",
-                            "Країна",
-                            "Країна"});
+                            "Accordion",
+                            "FieldName",
+                            "FieldValueValue"});
                 table1.AddRow(new string[] {
-                            "ворожий",
-                            "першочерговий",
-                            "1 бру",
-                            "тестове значення бойового досвіду",
-                            "тест номер ВЧ",
-                            "Гарнізон перший",
-                            "Китай",
+                            "",
+                            "Приналежність",
+                            "ворожий"});
+                table1.AddRow(new string[] {
+                            "",
+                            "Важливість",
+                            "першочерговий"});
+                table1.AddRow(new string[] {
+                            "Дислокація",
+                            "Країна",
+                            "Болгарія"});
+                table1.AddRow(new string[] {
+                            "Країна",
+                            "Країна",
                             "Китай"});
-#line 47
+#line 45
  testRunner.And("I filled in the form", ((string)(null)), table1, "And ");
 #line hidden
             }

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Support.UI;
 
 namespace AcceptanceTests.Helpers
 {
-    public static class WebDriverExtensions 
+    public static class WebDriverExtensions
     {
         public static IWebDriver WithTimeout(this IWebDriver driver, double seconds)
         {
@@ -24,7 +25,7 @@ namespace AcceptanceTests.Helpers
                 wait.Until(d => false);
                 return driver;
             }
-            catch(WebDriverTimeoutException timeOutException) when (timeOutException.Message == expectedMessage)
+            catch (WebDriverTimeoutException timeOutException) when (timeOutException.Message == expectedMessage)
             {
                 return driver;
             }
@@ -34,20 +35,27 @@ namespace AcceptanceTests.Helpers
             }
         }
 
-        public static IWebElement FindElementByAnyXpath(this IWebDriver driver, IEnumerable<string> xPathCollection)
+        public static IWebElement FindElementByAnyXpath(this IWebElement driver, IEnumerable<string> xPathCollection)
         {
+            var remoteWebElement = (driver as RemoteWebElement);//possible change to ChromeWebElement
+            var oldTime = remoteWebElement.WrappedDriver.Manage().Timeouts().ImplicitWait;
+            remoteWebElement.WrappedDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(1);
+
             foreach (var selector in xPathCollection)
             {
                 try
                 {
-                    var element = driver.FindElement(By.XPath(selector));
+                    var element = remoteWebElement.FindElement(By.XPath(selector));
+                    remoteWebElement.WrappedDriver.Manage().Timeouts().ImplicitWait = oldTime;
                     return element;
                 }
-                catch (NoSuchElementException e)
+                catch (NoSuchElementException)
                 {
                     continue;
                 }
             }
+
+            remoteWebElement.WrappedDriver.Manage().Timeouts().ImplicitWait = oldTime;
             throw new NoSuchElementException();
         }
 

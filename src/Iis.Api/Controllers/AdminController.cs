@@ -157,13 +157,19 @@ namespace Iis.Api.Controllers
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
                 DenseVectorProperty.Create("ImageVector", MaterialDocument.ImageVectorDimensionsCount),
+                TextProperty.Create("Type", true),
+                TextProperty.Create("Source", true),
                 KeywordProperty.Create("ProcessedStatus.Title", false),
+                ByteProperty.Create("ProcessedStatus.OrderNumber"),
                 KeywordProperty.Create("Completeness.Title", false),
                 KeywordProperty.Create("Importance.Title", false),
+                ByteProperty.Create("Importance.OrderNumber"),
                 KeywordProperty.Create("Reliability.Title", false),
                 KeywordProperty.Create("Relevance.Title", false),
                 KeywordProperty.Create("SourceReliability.Title", false),
                 KeywordProperty.Create("SessionPriority.Title", false),
+                ByteProperty.Create("SessionPriority.OrderNumber"),
+                IntegerProperty.Create("NodesCount")
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
@@ -175,6 +181,7 @@ namespace Iis.Api.Controllers
             await _adminElasticService.AddAliasesToIndexAsync(AliasType.Material, cancellationToken);
 
             LogElasticResult(log, response);
+
             return Content(log.ToString());
         }
 

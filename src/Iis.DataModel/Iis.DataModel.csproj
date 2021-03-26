@@ -5,6 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ConnectionString\**" />
+    <Compile Remove="Meta\**" />
+    <EmbeddedResource Remove="ConnectionString\**" />
+    <EmbeddedResource Remove="Meta\**" />
+    <None Remove="ConnectionString\**" />
+    <None Remove="Meta\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Migrations\20200310140737_MaterialSigns.cs" />
     <Compile Remove="Migrations\20200310140737_MaterialSigns.Designer.cs" />
     <Compile Remove="Migrations\20200310141625_MaterialSigns.cs" />
@@ -37,11 +46,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ConnectionString\" />
-    <Folder Include="Meta\" />
   </ItemGroup>
 
 </Project>
