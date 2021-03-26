@@ -24,7 +24,6 @@ namespace IIS.Core.Materials
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(string signValue);
         MaterialSign GetMaterialSign(Guid id);
-        Task<Material> MapAsync(MaterialEntity material);
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
