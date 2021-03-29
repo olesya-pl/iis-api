@@ -10,6 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
+using Iis.Services.Contracts;
+using Iis.Interfaces.AccessLevels;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -130,7 +132,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .ToArray();
         }
 
-        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema
                 .GetNodeTypes(types.Select(t => t.Id))
@@ -147,30 +149,41 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             else
             {
                 var nodes = GetNodesWithSuggestion(derivedTypes.Select(nt => nt.Id), filter);
-                return nodes.Select(n => MapNode(n));
+                var filteredNodes = FilterAccessLevels(nodes, user);
+                return filteredNodes.Select(n => MapNode(n));
             }
         }
+
+        private IEnumerable<INode> FilterAccessLevels(IEnumerable<INode> nodes, User user)
+        {
+            var accessLevels = nodes
+                .Where(p => string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal))
+                .Where(p => {
+                    var stringValue = p.OutgoingRelations.FirstOrDefault(r => string.Equals(r.TypeName, "numericIndex", StringComparison.Ordinal)).TargetNode.Value;
+                    _ = int.TryParse(stringValue, out var value);
+                    return value <= user.AccessLevel;
+                });
+
+            return accessLevels
+                .Concat(nodes.Where(p => !string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal)));
+        }
+
         private List<INode> GetNodesWithSuggestion(IEnumerable<Guid> derived, ElasticFilter filter)
         {
-            return _data.GetNodesByTypeIds(derived)
-                .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
-                    n.OutgoingRelations.Any(
-                        r => r.TargetNode.Value != null && 
-                        r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)))
+            return GetNodesWithSuggestionCore(derived, filter)
                 .Skip(filter.Offset)
                 .Take(filter.Limit)
                 .ToList();
         }
-        private int GetNodesCountWithSuggestion(IEnumerable<Guid> derived, ElasticFilter filter)
+        private IEnumerable<INode> GetNodesWithSuggestionCore(IEnumerable<Guid> derived, ElasticFilter filter)
         {
             return _data.GetNodesByTypeIds(derived)
                 .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
                     n.OutgoingRelations.Any(
                         r => r.TargetNode.Value != null &&
-                        r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)))
-                .Count();
+                        r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)));
         }
-        public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
 
@@ -181,7 +194,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             else
             {
-                return GetNodesCountWithSuggestion(derivedTypes.Select(nt => nt.Id), filter);
+                var nodes = GetNodesWithSuggestionCore(derivedTypes.Select(nt => nt.Id), filter);
+                nodes = FilterAccessLevels(nodes, user);
+                return nodes.Count();
             }
         }
         public (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)

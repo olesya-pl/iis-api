@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts;
 
 namespace Iis.Domain
 {
     public interface IOntologyService
     {
-        Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, CancellationToken cancellationToken = default);
+        Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default);
         IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId);
         IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId);
         Dictionary<Guid, int> CountEventsAssociatedWithEntities(HashSet<Guid> entityIds);
