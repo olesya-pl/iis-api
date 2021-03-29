@@ -283,23 +283,23 @@ namespace Iis.OntologyManager
 
             var menuElastic = new ContextMenuStrip();
             menuElastic.Items.Add("Індекси Онтології");
-            menuElastic.Items[0].Click += (sender, e) => { ReindexElastic(IndexKeys.Ontology); };
+            menuElastic.Items[0].Click += (sender, e) => { ReIndexElastic(IndexKeys.Ontology); };
             menuElastic.Items.Add("Історічні Індекси");
-            menuElastic.Items[1].Click += (sender, e) => { ReindexElastic(IndexKeys.OntologyHistorical); };
+            menuElastic.Items[1].Click += (sender, e) => { ReIndexElastic(IndexKeys.OntologyHistorical); };
             menuElastic.Items.Add("Індекси Ознак");
-            menuElastic.Items[2].Click += (sender, e) => { ReindexElastic(IndexKeys.Signs); };
+            menuElastic.Items[2].Click += (sender, e) => { ReIndexElastic(IndexKeys.Signs); };
             menuElastic.Items.Add("Індекси Подій");
-            menuElastic.Items[3].Click += (sender, e) => { ReindexElastic(IndexKeys.Events); };
+            menuElastic.Items[3].Click += (sender, e) => { ReIndexElastic(IndexKeys.Events); };
             menuElastic.Items.Add("Індекси Звітів");
-            menuElastic.Items[4].Click += (sender, e) => { ReindexElastic(IndexKeys.Reports); };
+            menuElastic.Items[4].Click += (sender, e) => { ReIndexElastic(IndexKeys.Reports); };
             menuElastic.Items.Add("Індекси Матеріалів");
-            menuElastic.Items[5].Click += (sender, e) => { ReindexElastic(IndexKeys.Materials); };
+            menuElastic.Items[5].Click += (sender, e) => { ReIndexElastic(IndexKeys.Materials); };
             menuElastic.Items.Add("Індекси Wiki");
-            menuElastic.Items[6].Click += (sender, e) => { ReindexElastic(IndexKeys.Wiki); };
+            menuElastic.Items[6].Click += (sender, e) => { ReIndexElastic(IndexKeys.Wiki); };
             menuElastic.Items.Add("Історічні Індекси Wiki");
-            menuElastic.Items[7].Click += (sender, e) => { ReindexElastic(IndexKeys.WikiHistorical); };
+            menuElastic.Items[7].Click += (sender, e) => { ReIndexElastic(IndexKeys.WikiHistorical); };
             menuElastic.Items.Add("Індекси Користувачів");
-            menuElastic.Items[8].Click += (sender, e) => { ReindexElastic(IndexKeys.Users); };
+            menuElastic.Items[8].Click += (sender, e) => { ReIndexElastic(IndexKeys.Users); };
             var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
             btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
             container.Add(btnMenu);
@@ -527,7 +527,7 @@ namespace Iis.OntologyManager
             return result;
         }
 
-        private void ReindexElastic(IndexKeys indexKey)
+        private void ReIndexElastic(IndexKeys indexKey)
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
 

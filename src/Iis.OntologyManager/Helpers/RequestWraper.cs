@@ -10,7 +10,6 @@ using Iis.OntologyManager.Dictionaries;
 using Iis.OntologyManager.Configurations;
 using Iis.Services.Contracts.Params;
 using Newtonsoft.Json;
-
 namespace Iis.OntologyManager.Helpers
 {
     public class RequestWraper
@@ -21,15 +20,15 @@ namespace Iis.OntologyManager.Helpers
         private readonly RequestSettings _requestSettings;
         private readonly static IReadOnlyDictionary<IndexKeys, string> IndexPaths = new Dictionary<IndexKeys, string>
         {
-            { IndexKeys.Ontology, IndexRelativePaths.Ontology },
-            { IndexKeys.OntologyHistorical, IndexRelativePaths.OntologyHistorical },
-            { IndexKeys.Signs, IndexRelativePaths.Signs },
-            { IndexKeys.Events, IndexRelativePaths.Events },
-            { IndexKeys.Reports, IndexRelativePaths.Reports },
-            { IndexKeys.Materials, IndexRelativePaths.Materials},
-            { IndexKeys.Wiki, IndexRelativePaths.Wiki },
-            { IndexKeys.WikiHistorical, IndexRelativePaths.WikiHistorical },
-            { IndexKeys.Users, IndexRelativePaths.Users },
+            {IndexKeys.Ontology, ApiRouteList.OntologyReIndex},
+            {IndexKeys.OntologyHistorical, ApiRouteList.OntologyHistoricalReIndex},
+            {IndexKeys.Signs, ApiRouteList.SignsReIndex},
+            {IndexKeys.Events, ApiRouteList.EventsReIndex},
+            {IndexKeys.Reports, ApiRouteList.ReportsReIndex},
+            {IndexKeys.Materials, ApiRouteList.MaterialsReIndex},
+            {IndexKeys.Wiki, ApiRouteList.WikiReIndex},
+            {IndexKeys.WikiHistorical, ApiRouteList.WikiHistoricalReIndex},
+            {IndexKeys.Users, ApiRouteList.UsersReIndex},
         };
 
         public RequestWraper(string apiAddress, UserCredentials userCredentials, RequestSettings requestSettings, ILogger logger)
@@ -43,7 +42,7 @@ namespace Iis.OntologyManager.Helpers
         private HttpResponseMessage BadGatewayResponseMessage(Uri baseAddress, Uri relativeAddress)
         {
             return new HttpResponseMessage
-            { 
+            {
                 StatusCode = System.Net.HttpStatusCode.BadGateway,
                 ReasonPhrase = "Адреса не відповідає",
                 RequestMessage = new HttpRequestMessage
@@ -53,7 +52,7 @@ namespace Iis.OntologyManager.Helpers
             };
         }
 
-        public Task<RequestResult> DeleteEntityAsync(Guid entityId) 
+        public Task<RequestResult> DeleteEntityAsync(Guid entityId)
         {
             var requestUri = GetDeleteEntityRequestUri(entityId);
 
@@ -62,13 +61,12 @@ namespace Iis.OntologyManager.Helpers
 
         public async Task RestartIisAppAsync()
         {
-            var uri = "admin/RestartApplication";
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
-            await httpClient.PostAsync(uri, null).ConfigureAwait(false);
+            await httpClient.PostAsync(ApiRouteList.ApplicationRestart, null).ConfigureAwait(false);
         }
         public async Task<RequestResult> ReloadOntologyDataAsync()
         {
-            var uri = new Uri("admin/ReloadOntologyData", UriKind.Relative);
+            var uri = new Uri(ApiRouteList.OntologyReloadData, UriKind.Relative);
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
@@ -81,7 +79,7 @@ namespace Iis.OntologyManager.Helpers
 
             if (!pathFound) return RequestResult.Fail("Шлях для перебудови індекса не знайдено.", new Uri("about:blank"));
 
-            var uri = new Uri($"admin/{requestUrl}", UriKind.Relative);
+            var uri = new Uri(requestUrl, UriKind.Relative);
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
@@ -90,7 +88,7 @@ namespace Iis.OntologyManager.Helpers
 
         public async Task<RequestResult> ChangeAccessLevelsAsync(ChangeAccessLevelsParams param)
         {
-            var uri = new Uri("admin/ChangeAccessLevels", UriKind.Relative);
+            var uri = new Uri(ApiRouteList.AccessLevelChange, UriKind.Relative);
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
