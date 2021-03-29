@@ -35,7 +35,8 @@ namespace Iis.Services
         {
             var numericIndexMapping = GetNumericIndexMapping(newAccessLevels, mappings);
             ChangeAccessLevelsOntology(mappings);
-            var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping);
+            var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping)
+                .Take(1000).ToList();
             await _context.SaveChangesAsync();
             await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
         }

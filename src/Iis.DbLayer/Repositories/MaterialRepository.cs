@@ -21,6 +21,7 @@ using Iis.Domain.Elastic;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Schema;
 using IIS.Repository;
+using System.Diagnostics;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -166,10 +167,11 @@ namespace Iis.DbLayer.Repositories
             .Where(p => materialIds.Contains(p.Id))
             .ToListAsync();
 
+            var sw = Stopwatch.StartNew();
             var materialDocuments = materials
                     .Select(p => MapEntityToDocument(p))
                     .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
-
+            sw.Stop();
             return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), materialDocuments, token);
         }
 

@@ -26,7 +26,7 @@ namespace Iis.OntologyManager.UiControls
         AccessLevels _accessLevels;
         bool _editMode = false;
         Dictionary<Guid, Guid> _deletedMappings = new Dictionary<Guid, Guid>();
-        public event Func<ChangeAccessLevelsParams, RequestResult> OnSave;
+        public event Func<ChangeAccessLevelsParams, Task<RequestResult>> OnSave;
 
         DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
         AccessLevel SelectedItem => SelectedRow == null ? null : (AccessLevel)SelectedRow.DataBoundItem;

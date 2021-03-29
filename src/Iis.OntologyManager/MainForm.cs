@@ -512,11 +512,11 @@ namespace Iis.OntologyManager
             form.Close();
         }
 
-        private RequestResult SaveAccessLevels(ChangeAccessLevelsParams param)
+        private async Task<RequestResult> SaveAccessLevels(ChangeAccessLevelsParams param)
         {
             var requestWrapper = GetRequestWrapper();
 
-            var result = requestWrapper.ChangeAccessLevelsAsync(param).ConfigureAwait(false).GetAwaiter().GetResult();
+            var result = await requestWrapper.ChangeAccessLevelsAsync(param);
 
             var sb = new StringBuilder()
                     .AppendLine($"Адреса:{result.RequestUrl}")
