@@ -5,6 +5,8 @@ using HotChocolate.Resolvers;
 using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts;
+using System.Linq;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -28,10 +30,11 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public Entity DeleteEntity(IResolverContext ctx, string typeName)
         {
             var id = ctx.Argument<Guid>("id");
-            return DeleteEntity(id, typeName);
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            return DeleteEntity(id, typeName, tokenPayload.User);
         }
 
-        public Entity DeleteEntity(Guid id, string typeName)
+        private Entity DeleteEntity(Guid id, string typeName, User user)
         {
             var node = (Entity)_ontologyService.GetNode(id); // load only type
             if (node == null)
@@ -39,8 +42,18 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var type = _ontologySchema.GetEntityTypeByName(typeName);
             if (!node.Type.IsSubtypeOf(type))
                 throw new QueryException($"Entity with id {id} is of type {node.Type.Name}, not of type {type.Name}");
+            VerifyAccess(node, user);
             _ontologyService.RemoveNodeAndRelations(node);
             return node;
+        }
+
+        private void VerifyAccess(Entity node, User user)
+        {
+            var existingAccessLevel = node.OriginalNode.GetAccessLevelIndex();
+            if (existingAccessLevel > user.AccessLevel)
+            {
+                throw new QueryException($"Entity with was not found");
+            }
         }
     }
 }
