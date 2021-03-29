@@ -141,6 +141,20 @@ namespace IIS.Core.Materials.EntityFramework
             return mapped;
         }
 
+        public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)
+        {
+            var entities = await RunWithoutCommitAsync(async (unitOfWork) =>
+                await unitOfWork.MaterialRepository.GetByIdsAsync(ids, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
+
+            return entities.Where(p => p.CanBeAccessedBy(user.AccessLevel))
+                .Select(entity => {
+                    var mapped = Map(entity);
+                    mapped.CanBeEdited = entity.CanBeEdited(user.Id);
+                    return mapped;
+                })
+                .ToArray();         
+        }
+
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
         {
             return RunWithoutCommitAsync(async (unitOfWork) =>
