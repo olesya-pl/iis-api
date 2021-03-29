@@ -355,6 +355,7 @@ namespace Iis.Api
 
             CreateMap<ChangeHistoryEntity, ChangeHistoryDto>().ReverseMap();
             CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>()
+                .ForMember(dest => dest.EntityId, opts => opts.MapFrom(src => src.TargetId))
                 .ForMember(dest => dest.OldValue, opts => opts.MapFrom(src => src.OldTitle ?? src.OldValue))
                 .ForMember(dest => dest.NewValue, opts => opts.MapFrom(src => src.NewTitle ?? src.NewValue));
 

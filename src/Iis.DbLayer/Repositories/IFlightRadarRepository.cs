@@ -11,7 +11,8 @@ namespace Iis.DbLayer.Repositories
         void RemoveSyncJobConfig();
         Task AddSyncJobConfigAsync(FlightRadarHistorySyncJobConfig configToAdd);
         Task<FlightRadarHistorySyncJobConfig> GetLastProcessedIdAsync();
-        Task<List<LocationHistoryEntity>> GetLocationHistory(Guid entityId);
+        Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(Guid entityId);
+        Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(IReadOnlyCollection<Guid> entityIdList, DateTime? dateFrom, DateTime? dateTo);
         Task<List<LocationHistoryEntity>> GetLocationHistory(Guid entityId, DateTime? dateFrom, DateTime? dateTo);
     }
 }

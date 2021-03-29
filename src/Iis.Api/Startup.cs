@@ -196,7 +196,7 @@ namespace IIS.Core
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
-            services.AddSingleton<IisVocabulary>();
+            services.AddSingleton<PropertyTranslator>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
             services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();

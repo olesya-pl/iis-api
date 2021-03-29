@@ -31,7 +31,7 @@ namespace Iis.DbLayer.Repositories
             return Context.AddRangeAsync(entities);
         }
 
-        public async Task<List<LocationHistoryEntity>> GetLocationHistory(Guid entityId)
+        public async Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(Guid entityId)
         {
             return await Context.LocationHistory
                 .Where(lh => lh.EntityId == entityId)
@@ -43,6 +43,25 @@ namespace Iis.DbLayer.Repositories
         {
             var query = Context.LocationHistory.Where(e => e.EntityId == entityId);
 
+            query = AddDatePeriod(query, dateFrom, dateTo);
+
+            return query.OrderByDescending(e => e.RegisteredAt).ToListAsync();
+        }
+
+        public async Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(IReadOnlyCollection<Guid> entityIdList, DateTime? dateFrom, DateTime? dateTo)
+        {
+            var query = Context.LocationHistory.Where(lh => lh.EntityId != null && entityIdList.Contains(lh.EntityId.Value));
+
+            query = AddDatePeriod(query, dateFrom, dateTo);
+
+            return await Context.LocationHistory
+                .Where(lh => lh.EntityId != null && entityIdList.Contains(lh.EntityId.Value))
+                .OrderByDescending(lh => lh.RegisteredAt)
+                .ToListAsync();
+        }
+
+        private static IQueryable<LocationHistoryEntity> AddDatePeriod(IQueryable<LocationHistoryEntity> query, DateTime? dateFrom, DateTime? dateTo)
+        {
             if(dateFrom.HasValue)
             {
                 query = query.Where(e => e.RegisteredAt >= dateFrom);
@@ -52,8 +71,7 @@ namespace Iis.DbLayer.Repositories
             {
                 query = query.Where(e => e.RegisteredAt <= dateTo);
             }
-
-            return query.OrderByDescending(e => e.RegisteredAt).ToListAsync();
+            return query;
         }
     }
 }

@@ -17,53 +17,72 @@ namespace IIS.Core.GraphQL.ChangeHistory
 {
     public class Query
     {
-        public async Task<GraphQLCollection<ChangeHistoryItemGroup>> GetChangeHistory(
+        public async Task<GraphQLCollection<EntityChangeHistory>> GetChangeHistory(
             [Service] IChangeHistoryService service,
             [Service] IMapper mapper,
-            [Service] IisVocabulary vocabulary,
-            [GraphQLType(typeof(NonNullType<IdType>))] Guid targetId,
+            [Service] PropertyTranslator propertyTranslator,
+            Guid[] entityIdList,
             string propertyName = "",
             DateRangeFilter dateRangeFilter = null,
-            bool? includeLocationHistory = null)
+            bool? includeLocationHistory = true)
         {
-            DateTime? dateFrom = null;
-            DateTime? dateTo = null;
-
-            if (dateRangeFilter != null)
+            var queryParams = new ChangeHistoryParams
             {
-                (dateFrom, dateTo) = dateRangeFilter.ToRange();
-            }
-
-            var changeHistoryParams = new ChangeHistoryParams
-            {
-                DateFrom = dateFrom,
-                DateTo = dateTo,
+                EntityIdentityList = entityIdList,
                 PropertyName = propertyName,
-                TargetId = targetId,
                 ApplyAliases = true
             };
 
-            var items = await service.GetChangeHistory(changeHistoryParams);
-
-            if (!includeLocationHistory.HasValue || includeLocationHistory == true)
+            if (dateRangeFilter != null)
             {
-                var locationItems = await service.GetLocationHistory(changeHistoryParams);
-
-                items.AddRange(locationItems);
+                (queryParams.DateFrom, queryParams.DateTo) = dateRangeFilter.ToRange();
             }
 
-            TranslatePropertyNames(vocabulary, items);
+            var entityHistoryList = await service.GetChangeHistoryAsync(queryParams);
 
-            var graphQLItems = MapToGraphQlItems(mapper, items);
+            if (includeLocationHistory.GetValueOrDefault(true) == true)
+            {
+                var entityLocationHistoryList = await service.GetLocationHistoryAsync(queryParams);
 
-            return new GraphQLCollection<ChangeHistoryItemGroup>(graphQLItems, graphQLItems.Count);
+                entityHistoryList.AddRange(entityLocationHistoryList);
+            }
+
+            TranslatePropertyNames(propertyTranslator, entityHistoryList);
+
+            var qraphQlResult = MapToEntityChangeHistoryList(entityHistoryList, mapper);
+
+            return new GraphQLCollection<EntityChangeHistory>(qraphQlResult, qraphQlResult.Count);
         }
 
-        private static List<ChangeHistoryItemGroup> MapToGraphQlItems(IMapper mapper, List<ChangeHistoryDto> items)
+        private static IList<EntityChangeHistory> MapToEntityChangeHistoryList(IReadOnlyCollection<ChangeHistoryDto> source, IMapper mapper)
+        {
+            var groupedByEntityList = source
+                .Select(mapper.Map<ChangeHistoryItem>)
+                .GroupBy(e => e.EntityId);
+
+            return groupedByEntityList
+                .Select(e =>
+                {
+                    var result = new EntityChangeHistory { EntityId = e.Key };
+
+                    result.Groups = e.GroupBy(p => p.RequestId)
+                                    .Select(p => new ChangeHistoryGroup
+                                    {
+                                        RequestId = p.Key,
+                                        Items = p.OrderBy(item => item.PropertyName == "lastConfirmedAt" ? 1 : 0).ToList()
+                                    })
+                                    .ToArray();
+
+                    return result;
+                })
+                .ToArray();
+        }
+
+        private static List<ChangeHistoryGroup> MapToGraphQlItems(IMapper mapper, List<ChangeHistoryDto> items)
         {
             return items.Select(item => mapper.Map<ChangeHistoryItem>(item))
                             .GroupBy(p => p.RequestId)
-                            .Select(p => new ChangeHistoryItemGroup()
+                            .Select(p => new ChangeHistoryGroup()
                             {
                                 RequestId = p.Key,
                                 Items = p.OrderBy(item => item.PropertyName == "lastConfirmedAt" ? 1 : 0).ToList()
@@ -71,20 +90,20 @@ namespace IIS.Core.GraphQL.ChangeHistory
                             .ToList();
         }
 
-        private static void TranslatePropertyNames(IisVocabulary vocabulary, List<ChangeHistoryDto> items)
+        private static void TranslatePropertyNames(PropertyTranslator propertyTranslator, IReadOnlyCollection<ChangeHistoryDto> source)
         {
-            foreach (var item in items)
+            foreach (var item in source)
             {
-                item.PropertyName = vocabulary.Translate(item.PropertyName);
+                item.PropertyName = propertyTranslator.GetTranslation(item.PropertyName);
             }
         }
 
         public async Task<MapHistoryResponse> GetMapChanges(
-            [Service] IOntologySchema ontology, 
+            [Service] IOntologySchema ontology,
             [Service] IOntologyNodesData nodesData,
             [Service] IChangeHistoryService service,
             [Service] IMapper mapper,
-            [Service] IisVocabulary vocabulary,
+            [Service] PropertyTranslator vocabulary,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid targetId,
             DateRangeFilter dateRangeFilter = null)
         {
@@ -101,7 +120,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 DateFrom = dateFrom,
                 DateTo = dateTo,
                 PropertyName = string.Empty,
-                TargetId = targetId,
+                EntityIdentityList = new[] { targetId },
                 ApplyAliases = true
             };
 
@@ -112,11 +131,11 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 throw new ArgumentNullException(nameof(targetId));
             }
 
-            var items = await service.GetChangeHistory(changeHistoryParams);
+            var items = await service.GetChangeHistoryAsync(changeHistoryParams);
             TranslatePropertyNames(vocabulary, items);
 
             var geoHistory = PrepareGeoHistory(ontology, node, items);
-            var locationItems = await service.GetLocationHistory(changeHistoryParams);
+            var locationItems = await service.GetLocationHistoryAsync(changeHistoryParams);
             geoHistory.AddRange(locationItems);
             var graphQLItems = MapToGraphQlItems(mapper, geoHistory);
 

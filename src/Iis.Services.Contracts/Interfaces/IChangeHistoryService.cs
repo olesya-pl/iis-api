@@ -10,10 +10,10 @@ namespace Iis.Services.Contracts.Interfaces
     {
         Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes, string materialTitle = null);
         Task SaveNodeChange(string attributeDotName, Guid targetId, string userName, object oldValue, object newValue, string parentTypeName, Guid requestId);
-        Task<List<ChangeHistoryDto>> GetChangeHistory(ChangeHistoryParams parameters);
+        Task<List<ChangeHistoryDto>> GetChangeHistoryAsync(ChangeHistoryParams parameters);
         Task<List<ChangeHistoryDto>> GetChangeHistory(IEnumerable<Guid> ids);
         Task<List<ChangeHistoryDto>> GetChangeHistoryByRequest(Guid requestId);
         Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(Guid entityId);
-        Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(ChangeHistoryParams parameters);
+        Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistoryAsync(ChangeHistoryParams parameters);
     }
 }
