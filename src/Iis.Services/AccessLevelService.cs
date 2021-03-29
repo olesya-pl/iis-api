@@ -34,6 +34,7 @@ namespace Iis.Services
         public async Task ChangeAccessLevels(IAccessLevels newAccessLevels, Dictionary<Guid, Guid> mappings, CancellationToken ct)
         {
             var numericIndexMapping = GetNumericIndexMapping(newAccessLevels, mappings);
+            var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping);
             ChangeAccessLevelsOntology(mappings);
             _ontologyData.SaveAccessLevels(newAccessLevels);
             await _context.SaveChangesAsync();
