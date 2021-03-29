@@ -20,6 +20,7 @@ using Iis.Interfaces.Elastic;
 using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
+using Iis.Services.Contracts;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -159,7 +160,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         // ------ All entities ----- //
 
-        public Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>> GetAllEntities(IResolverContext ctx)
+        public Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>, User>> GetAllEntities(IResolverContext ctx)
         {
             var filter = ctx.Argument<AllEntitiesFilterInput>("filter");
             var schema = ctx.Service<IOntologySchema>();
@@ -174,8 +175,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 ids = filter.MatchList;
             }
-
-            return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids));
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids, tokenPayload.User));
         }
         public Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
         {

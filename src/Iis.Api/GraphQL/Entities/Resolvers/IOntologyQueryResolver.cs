@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Iis.Interfaces.Elastic;
 using Attribute = Iis.Domain.Attribute;
+using Iis.Services.Contracts;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -26,7 +27,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<Relation> ResolveParentRelation(IResolverContext ctx);
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
-        Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>>  GetAllEntities(IResolverContext ctx);
+        Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>, User>>  GetAllEntities(IResolverContext ctx);
         Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx);
         Task<string> ResolveCreatedBy(IResolverContext ctx);
         string ResolveIconName(IResolverContext ctx);
