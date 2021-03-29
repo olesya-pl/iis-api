@@ -94,7 +94,7 @@ namespace Iis.OntologyManager.Helpers
 
             var json = JsonConvert.SerializeObject(param);
 
-            return await SendRequest(() => httpClient.PostAsync(uri, new StringContent(json)), uri);
+            return await SendRequest(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri);
         }
 
         private async Task<RequestResult> SendRequest(Func<Task<HttpResponseMessage>> func, Uri uri)
@@ -107,16 +107,20 @@ namespace Iis.OntologyManager.Helpers
 
                 response.EnsureSuccessStatusCode();
 
-                var msg = response.Content.ReadAsStringAsync().Result;
+                var msg = await response.Content?.ReadAsStringAsync();
                 if (string.IsNullOrEmpty(msg)) msg = response.ReasonPhrase;
 
                 return RequestResult.Success(msg, response.RequestMessage.RequestUri);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                var msg = response.Content.ReadAsStringAsync().Result;
-                _logger.Error($"Uri:{response.RequestMessage.RequestUri} Exception:{exception}");
+                _logger.Error($"Uri:{uri} Exception:{ex}");
 
+                if (response == null)
+                {
+                    return RequestResult.Fail(ex.Message, uri);
+                }
+                var msg = response.Content == null ? null : await response.Content.ReadAsStringAsync();
                 return RequestResult.Fail($"Code={response.StatusCode}:{response.ReasonPhrase}:{msg}", response.RequestMessage.RequestUri);
             }
         }

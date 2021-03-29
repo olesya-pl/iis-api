@@ -21,6 +21,8 @@ using Iis.Domain.Elastic;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Schema;
 using IIS.Repository;
+using System.Diagnostics;
+using System.Text;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -150,10 +152,10 @@ namespace Iis.DbLayer.Repositories
                             p.ImageVector = imageVector;
                         }
                         return p;
-                    })
-                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
+                    });
 
-                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), materialDocuments, token);
+                var json = ConvertToJson(materialDocuments);
+                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, token);
                 responses.AddRange(response);
             }
 
@@ -166,11 +168,20 @@ namespace Iis.DbLayer.Repositories
             .Where(p => materialIds.Contains(p.Id))
             .ToListAsync();
 
-            var materialDocuments = materials
-                    .Select(p => MapEntityToDocument(p))
-                    .Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{JsonConvert.SerializeObject(p)}\n");
+            var materialDocuments = materials.Select(p => MapEntityToDocument(p));
+            var json = ConvertToJson(materialDocuments);
 
-            return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), materialDocuments, token);
+            return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, token);
+        }
+
+        public string ConvertToJson(IEnumerable<MaterialDocument> materialDocuments)
+        {
+            var sb = new StringBuilder();
+            foreach (var materialDocument in materialDocuments)
+            {
+                sb.AppendLine($"{{ \"index\":{{ \"_id\": \"{materialDocument.Id:N}\" }} }}\n{JsonConvert.SerializeObject(materialDocument)}");
+            }
+            return sb.ToString();
         }
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, 
