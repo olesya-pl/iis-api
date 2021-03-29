@@ -12,6 +12,9 @@ using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts.Interfaces;
 using Iis.OntologySchema.DataTypes;
+using Iis.Services.Contracts;
+using Iis.Interfaces.AccessLevels;
+using Iis.Interfaces.Ontology.Data;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -23,19 +26,23 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMediator _mediator;
         private readonly IResolverContext _resolverContext;
+        private readonly IAccessLevels _accessLevels;
         private Guid _rootNodeId;
+
         private const string LastConfirmedFieldName = "lastConfirmedAt";
 
         public MutationUpdateResolver(IOntologyService ontologyService,
             IOntologySchema ontologySchema,
             IChangeHistoryService changeHistoryService,
             IMediator mediator,
+            IOntologyNodesData ontologyNodesData,
             MutationCreateResolver mutationCreateResolver)
         {
             _mutationCreateResolver = mutationCreateResolver;
             _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _changeHistoryService = changeHistoryService;
+            _accessLevels = ontologyNodesData.GetAccessLevels();
             _mediator = mediator;
         }
         public MutationUpdateResolver(IResolverContext ctx)
@@ -45,6 +52,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
+            _accessLevels = ctx.Service<IOntologyNodesData>().GetAccessLevels();
             _resolverContext = ctx;
         }
 
@@ -55,11 +63,46 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!data.ContainsKey(LastConfirmedFieldName))
                 data.Add(LastConfirmedFieldName, DateTime.UtcNow);
 
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            VerifyAccess(id, data, tokenPayload.User);
+
             var type = _ontologySchema.GetEntityTypeByName(typeName);
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
             return await UpdateEntity(type, id, data, string.Empty, requestId);
         }
+
+        private void VerifyAccess(Guid id, Dictionary<string, object> data, User user)
+        {
+            VerifyExistingAccessLevel(id, user);
+            VerifyNewAccessLevel(data, user);
+        }
+
+        private void VerifyNewAccessLevel(Dictionary<string, object> data, User user)
+        {
+            if (data.ContainsKey("accessLevel"))
+            {
+                var accessLevelTarget = data["accessLevel"] as Dictionary<string, object>;
+                var accessLevelProperty = accessLevelTarget["create"] as Dictionary<string, object>;
+                var accessId = Guid.Parse(accessLevelProperty["targetId"].ToString());
+                var newAccessLevel = _accessLevels.GetItemById(accessId);
+                if (newAccessLevel.NumericIndex > user.AccessLevel)
+                {
+                    throw new AccessViolationException("Unable to create entitiy with given access level");
+                }
+            }
+        }
+
+        private void VerifyExistingAccessLevel(Guid id, User user)
+        {
+            var node = (Entity)_ontologyService.GetNode(id);
+            var existingAccessLevel = node.OriginalNode.GetAccessLevelIndex();
+            if (existingAccessLevel > user.AccessLevel)
+            {
+                throw new AccessViolationException("Unable to create entitiy with given access level");
+            }
+        }
+
         public Task<Entity> UpdateEntity(INodeTypeLinked type, Guid id, Dictionary<string, object> properties)
         {
             _rootNodeId = id;

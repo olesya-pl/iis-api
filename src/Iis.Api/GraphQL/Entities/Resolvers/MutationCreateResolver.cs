@@ -9,8 +9,8 @@ using Iis.Services.Contracts.Interfaces;
 using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts;
-using Newtonsoft.Json;
-using Iis.OntologySchema.DataTypes;
+using Iis.Interfaces.AccessLevels;
+using Iis.Interfaces.Ontology.Data;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -22,18 +22,21 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly IResolverContext _resolverContext;
+        private readonly IAccessLevels _accessLevels;
 
         public MutationCreateResolver(IOntologySchema ontologySchema, 
             IOntologyService ontologyService,
             IFileService fileService,
             IChangeHistoryService changeHistoryService,
-            IMediator mediator)
+            IMediator mediator,
+            IOntologyNodesData ontologyNodesData)
         {
             _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _fileService = fileService;
             _changeHistoryService = changeHistoryService;
             _mediator = mediator;
+            _accessLevels = ontologyNodesData.GetAccessLevels();
         }
 
         public MutationCreateResolver(IResolverContext ctx)
@@ -43,6 +46,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _ontologyService = ctx.Service<IOntologyService>();
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
+            _accessLevels = ctx.Service<IOntologyNodesData>().GetAccessLevels();
             _resolverContext = ctx;
         }
 
@@ -50,8 +54,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
-            var type = _ontologySchema.GetEntityTypeByName(typeName);            
-            var entity = await CreateRootEntity(Guid.NewGuid(), type, data);
+            var type = _ontologySchema.GetEntityTypeByName(typeName);
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var entity = await CreateRootEntity(Guid.NewGuid(), type, data, tokenPayload.User);
             return entity;
         }
 
@@ -77,9 +82,25 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private Task<Entity> CreateRootEntity(
             Guid entityId,
             INodeTypeLinked type,
-            Dictionary<string, object> properties)
+            Dictionary<string, object> properties, 
+            User user)
         {
+            VerifyAccess(user, properties);
             return CreateEntityCore(entityId, type, properties, string.Empty, entityId, Guid.NewGuid());
+        }
+
+        private void VerifyAccess(User user, Dictionary<string, object> properties)
+        {
+            if (properties.ContainsKey("accessLevel"))
+            {
+                var accessLevelProperty = properties["accessLevel"] as Dictionary<string, object>;
+                var accessId = Guid.Parse(accessLevelProperty["targetId"].ToString());
+                var accessLevel = _accessLevels.GetItemById(accessId);
+                if (accessLevel.NumericIndex > user.AccessLevel)
+                {
+                    throw new AccessViolationException("Unable to create entitiy with given access level");
+                }
+            }
         }
 
         public Task<Entity> CreateEntity(
