@@ -13,6 +13,7 @@ namespace Iis.DbLayer.Repositories
     {
         string[] MaterialIndexes { get; }
         Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
+        Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
 

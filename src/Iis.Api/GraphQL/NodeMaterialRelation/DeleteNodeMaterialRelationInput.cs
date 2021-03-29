@@ -4,11 +4,11 @@ using HotChocolate.Types;
 
 namespace IIS.Core.GraphQL.NodeMaterialRelation
 {
-    public class NodeMaterialRelationInput
+    public class DeleteNodeMaterialRelationInput
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid NodeId { get; set; }
-        [GraphQLType(typeof(ListType<NonNullType<IdType>>))]
-        public Guid[] MaterialIds { get; set; }
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public Guid MaterialId { get; set; }
     }
 }

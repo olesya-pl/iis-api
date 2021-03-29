@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using HotChocolate.Resolvers;
@@ -11,7 +12,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
 {
     public class Mutation
     {
-        public async Task<Material> CreateNodeMaterialRelation(
+        public async Task<Material[]> CreateNodeMaterialRelation(
             IResolverContext ctx,
             [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [Service] IMaterialProvider materialProvider,
@@ -19,9 +20,10 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
             var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
-            await relationService.Create(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
-            var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.User);
-            return mapper.Map<Material>(material);
+            var materialsSet = input.MaterialIds.ToHashSet();
+            await relationService.CreateMultipleRelations(input.NodeId, materialsSet, tokenPayload.User.UserName);
+            var material = await materialProvider.GetMaterialsByIdsAsync(materialsSet, tokenPayload.User);
+            return mapper.Map<Material[]>(material);
         }
 
         public async Task<CreateRelationsResponse> CreateMultipleNodeMaterialRelations(
@@ -42,7 +44,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
-            [GraphQLNonNullType] NodeMaterialRelationInput input)
+            [GraphQLNonNullType] DeleteNodeMaterialRelationInput input)
         {
             var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             await relationService.Delete(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);

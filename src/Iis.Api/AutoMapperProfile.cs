@@ -132,7 +132,7 @@ namespace Iis.Api
             CreateMap<Iis.Domain.MachineLearning.MLResponse, IIS.Core.GraphQL.ML.MachineLearningResult>()
                 .ForMember(dest => dest.ProcessingDateTime, opts => opts.MapFrom(src => src.ProcessingDate.ToString("MM/dd/yyyy HH:mm:ss")));
 
-            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.NodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
+            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.DeleteNodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
 
             CreateMap<IIisElasticField, ElasticFieldEntity>();
             CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();
