@@ -130,7 +130,7 @@ namespace Iis.DbLayer.ModifyDataScripts
         public void AddAccessLevelToObject(OntologyContext context, IOntologyNodesData data)
         {
             const string ACCESS_LEVEL = "accessLevel";
-            
+
             var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
             var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
 
