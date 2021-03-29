@@ -58,6 +58,7 @@ namespace Iis.OntologyData
             }
 
             RemoveArchivedItems();
+            Patch.Clear();
         }
 
         internal NodeData CreateNode(Guid nodeTypeId, Guid? id = null)
