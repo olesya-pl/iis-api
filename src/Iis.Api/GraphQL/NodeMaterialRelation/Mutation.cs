@@ -21,7 +21,8 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
         {
             var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             var materialsSet = input.MaterialIds.ToHashSet();
-            await relationService.CreateMultipleRelations(input.NodeId, materialsSet, tokenPayload.User.UserName);
+            var nodesSet = input.NodeIds.ToHashSet();
+            await relationService.CreateMultipleRelations(nodesSet, materialsSet, tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialsByIdsAsync(materialsSet, tokenPayload.User);
             return mapper.Map<Material[]>(material);
         }
