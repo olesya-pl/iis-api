@@ -14,6 +14,7 @@ namespace IIS.Core.Materials
     public interface IMaterialProvider
     {
         Task<Material> GetMaterialAsync(Guid id, User user);
+        Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user);
 
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,

@@ -91,7 +91,7 @@ namespace IIS.Core.NodeMaterialRelation
             }
         }
 
-        private async Task CreateMultipleRelations(Guid nodeId, HashSet<Guid> materialIds, string userName)
+        public async Task CreateMultipleRelations(Guid nodeId, HashSet<Guid> materialIds, string userName)
         {
             var existingItems = await RunWithoutCommitAsync(uow => uow.NodeMaterialRelationRepository.GetExistingRelationMaterialIds(nodeId, materialIds));
 

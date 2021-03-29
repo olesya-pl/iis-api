@@ -59,6 +59,13 @@ namespace Iis.DbLayer.Repositories
                     .SingleOrDefaultAsync(e => e.Id == id);
         }
 
+        public Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes)
+        {
+            return GetMaterialsQuery(includes)
+                    .Where(e => ids.Contains(e.Id))
+                    .ToArrayAsync();
+        }
+
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes)
         {
             return await GetMaterialsQuery(includes)
