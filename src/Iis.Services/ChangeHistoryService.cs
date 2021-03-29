@@ -151,26 +151,38 @@ namespace Iis.Services
             };
         }
 
-        public async Task<List<ChangeHistoryDto>> GetChangeHistory(ChangeHistoryParams parameters)
+        public async Task<List<ChangeHistoryDto>> GetChangeHistoryAsync(ChangeHistoryParams parameters)
         {
-            var entities = await RunWithoutCommitAsync(uow => uow.ChangeHistoryRepository.GetManyAsync(parameters.TargetId, parameters.PropertyName, parameters.DateFrom, parameters.DateTo));
-            var result = _mapper.Map<List<ChangeHistoryDto>>(entities);
+            var entityList = await RunWithoutCommitAsync(uow =>
+                uow.ChangeHistoryRepository.GetManyAsync(
+                    parameters.EntityIdentityList,
+                    parameters.PropertyName,
+                    parameters.DateFrom,
+                    parameters.DateTo)
+            );
+
+            var dtoList = _mapper.Map<List<ChangeHistoryDto>>(entityList);
 
             if (parameters.ApplyAliases) 
             {
-                var node = _ontologyNodesData.GetNode(parameters.TargetId);
-                if (node == null)
-                    return result;
+                var nodeList = _ontologyNodesData.GetNodes(parameters.EntityIdentityList);
 
-                foreach (var item in result)
+                if (nodeList.Count == 0) return dtoList;
+
+                foreach (var node in nodeList)
                 {
-                    var alias = _ontologyNodesData.Schema.GetAlias($"{node.NodeType.Name}.{item.PropertyName}");
-                    item.PropertyName = alias ?? item.PropertyName;
+                    foreach (var dto in dtoList)
+                    {
+                        var alias = _ontologyNodesData.Schema.GetAlias($"{node.NodeType.Name}.{dto.PropertyName}");
+                        dto.PropertyName = alias ?? dto.PropertyName;
+                    }
                 }
             }
 
-            return result;
+            return dtoList;
         }
+
+
 
         public async Task<List<ChangeHistoryDto>> GetChangeHistory(IEnumerable<Guid> ids)
         {
@@ -188,16 +200,18 @@ namespace Iis.Services
 
         public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(Guid entityId)
         {
-            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistory(entityId));
+            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(entityId));
 
             return locations.Select(LocationHistoryToDTO).ToArray();
         }
 
-        public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistory(ChangeHistoryParams parameters)
+        public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistoryAsync(ChangeHistoryParams parameters)
         {
-            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistory(parameters.TargetId, parameters.DateFrom, parameters.DateTo));
+            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(parameters.EntityIdentityList, parameters.DateFrom, parameters.DateTo));
 
-            return locations.Select(LocationHistoryToDTO).ToArray();
+            return locations
+                .Select(LocationHistoryToDTO)
+                .ToArray();
         }
 
         private static ChangeHistoryDto LocationHistoryToDTO(LocationHistoryEntity entity)

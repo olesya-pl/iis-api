@@ -12,10 +12,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
         [GraphQLIgnore]
         public (DateTime From, DateTime To) ToRange()
         {
-            var localFrom = From.ToLocalTime();
-            var localTo = To.ToLocalTime();
-
-            return (From: new DateTime(localFrom.Year, localFrom.Month, localFrom.Day, 00, 00, 00), To: new DateTime(localTo.Year, localTo.Month, localTo.Day, 23, 59, 59));
+            return (From: new DateTime(From.Year, From.Month, From.Day, 00, 00, 00), To: new DateTime(To.Year, To.Month, To.Day, 23, 59, 59));
         }
     }
 }

@@ -20,15 +20,20 @@ namespace Iis.DbLayer.Repositories
                 query = query.Where(ch => ch.PropertyName == propertyName);
             }
 
-            if (dateFrom.HasValue)
+            query = AddDatePeriod(query, dateFrom, dateTo);
+
+            return query.OrderByDescending(ch => ch.Date).ToListAsync();
+        }
+        public Task<List<ChangeHistoryEntity>> GetManyAsync(IReadOnlyCollection<Guid> targetIdList, string propertyName, DateTime? dateFrom = null, DateTime? dateTo = null)
+        {
+            var query = Context.ChangeHistory.AsNoTracking().Where(ch => targetIdList.Contains(ch.TargetId));
+
+            if (!string.IsNullOrEmpty(propertyName))
             {
-                query = query.Where(e => e.Date >= dateFrom);
+                query = query.Where(ch => ch.PropertyName == propertyName);
             }
 
-            if (dateTo.HasValue)
-            {
-                query = query.Where(e => e.Date <= dateTo);
-            }
+            query = AddDatePeriod(query, dateFrom, dateTo);
 
             return query.OrderByDescending(ch => ch.Date).ToListAsync();
         }
@@ -57,6 +62,20 @@ namespace Iis.DbLayer.Repositories
         public void AddRange(IReadOnlyCollection<ChangeHistoryEntity> entities)
         {
             Context.AddRange(entities);
+        }
+
+        private static IQueryable<ChangeHistoryEntity> AddDatePeriod(IQueryable<ChangeHistoryEntity> query, DateTime? dateFrom, DateTime? dateTo)
+        {
+            if(dateFrom.HasValue)
+            {
+                query = query.Where(e => e.Date >= dateFrom);
+            }
+
+            if(dateTo.HasValue)
+            {
+                query = query.Where(e => e.Date <= dateTo);
+            }
+            return query;
         }
     }
 }
