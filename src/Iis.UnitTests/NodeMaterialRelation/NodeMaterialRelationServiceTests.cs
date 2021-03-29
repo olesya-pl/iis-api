@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
@@ -20,7 +21,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
         }
 
         [Theory, RecursiveAutoData]
-        public async Task Create_SuccessPath(NodeEntity node, MaterialEntity material)
+        public async Task Create_SuccessPath(NodeEntity node, MaterialEntity material, string username)
         {
             //arrange
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
@@ -30,11 +31,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
 
             //act
             var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService<IIISUnitOfWork>>();
-            await sut.Create(new IIS.Core.NodeMaterialRelation.NodeMaterialRelation
-            {
-                NodeId = node.Id,
-                MaterialId = material.Id
-            });
+            await sut.CreateMultipleRelations (node.Id, new HashSet<Guid>(new[] { material.Id }), username);
 
             //assert
             Assert.True(context.MaterialFeatures.Any(p => p.NodeId == node.Id
@@ -42,7 +39,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
         }
 
         [Theory, RecursiveAutoData]
-        public async Task Create_RelationAlreadyExists_Throws(NodeEntity node, MaterialEntity material)
+        public async Task Create_RelationAlreadyExists_Throws(NodeEntity node, MaterialEntity material, string username)
         {
             //arrange
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
@@ -60,11 +57,7 @@ namespace Iis.UnitTests.NodeMaterialRelation
 
             //act
             var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService<IIISUnitOfWork>>();
-            await Assert.ThrowsAsync<Exception>(() => sut.Create(new IIS.Core.NodeMaterialRelation.NodeMaterialRelation
-            {
-                NodeId = node.Id,
-                MaterialId = material.Id
-            }));
+            await sut.CreateMultipleRelations(node.Id, new HashSet<Guid>(new[] { material.Id }), username);
 
             //assert
             Assert.Equal(1, context.MaterialFeatures.Count(p => p.NodeId == node.Id

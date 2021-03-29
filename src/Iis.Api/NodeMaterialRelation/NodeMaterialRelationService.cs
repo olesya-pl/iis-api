@@ -22,8 +22,6 @@ namespace IIS.Core.NodeMaterialRelation
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMaterialElasticService _materialElasticService;
 
-
-        private const string UniqueConstraintViolationMessage = "Could not create relation since there is already relation between given node and material.";
         private const string NodeIdPropertyName = "MaterialFeature.NodeId";
 
         public NodeMaterialRelationService(OntologyContext context, 
@@ -34,37 +32,6 @@ namespace IIS.Core.NodeMaterialRelation
             _context = context;
             _materialElasticService = materialElasticService;
             _changeHistoryService = changeHistoryService;
-        }
-
-        public async Task Create(NodeMaterialRelation relation, string userName = null)
-        {
-            var material = GetMaterial(relation.MaterialId);
-
-            if(material == null) throw new InvalidOperationException($"There is no Material with ID:{relation.MaterialId}");
-
-            ValidateUniquness(relation);
-
-            _context.MaterialFeatures.Add(new MaterialFeatureEntity
-            {
-                NodeId = relation.NodeId,
-                MaterialInfo = new MaterialInfoEntity
-                {
-                    MaterialId = relation.MaterialId
-                }
-            });
-            await _context.SaveChangesAsync();
-
-            var changeHistoryDto = new ChangeHistoryDto
-            {
-                Date = DateTime.UtcNow,
-                NewValue = relation.NodeId.ToString("N"),
-                OldValue = null,
-                PropertyName = NodeIdPropertyName,
-                RequestId = Guid.NewGuid(),
-                TargetId = relation.MaterialId,
-                UserName = userName
-            };
-            await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto }, material.Title);
         }
 
         public async Task CreateMultipleRelations(Guid userId, string query, Guid nodeId, string userName)
@@ -115,15 +82,6 @@ namespace IIS.Core.NodeMaterialRelation
                 });
             }
             await _changeHistoryService.SaveMaterialChanges(changeHistoryList);
-        }
-
-        private void ValidateUniquness(NodeMaterialRelation relation)
-        {
-            if (_context.MaterialFeatures.Any(p => p.NodeId == relation.NodeId
-                            && p.MaterialInfo.MaterialId == relation.MaterialId))
-            {
-                throw new Exception(UniqueConstraintViolationMessage);
-            }
         }
 
         private MaterialEntity GetMaterial(Guid materialId)
