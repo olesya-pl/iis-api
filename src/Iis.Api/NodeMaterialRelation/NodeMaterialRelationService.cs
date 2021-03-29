@@ -46,7 +46,7 @@ namespace IIS.Core.NodeMaterialRelation
             var materialsCount = materials.Items.Count;
             var materialIds = materials.Items.Keys.ToHashSet();
 
-            await CreateMultipleRelations(nodeId, materialIds, userName);
+            await CreateMultipleRelations(new HashSet<Guid>(new[] { nodeId }), materialIds, userName);
 
             while (materialsCount > 0)
             {
@@ -54,33 +54,36 @@ namespace IIS.Core.NodeMaterialRelation
                 materials = await _materialElasticService.SearchByScroll(userId, scrollId);
                 materialsCount = materials.Items.Count;
                 materialIds = materials.Items.Keys.ToHashSet();
-                await CreateMultipleRelations(nodeId, materialIds, userName);
+                await CreateMultipleRelations(new HashSet<Guid>(new[] { nodeId }), materialIds, userName);
             }
         }
 
-        public async Task CreateMultipleRelations(Guid nodeId, HashSet<Guid> materialIds, string userName)
+        public async Task CreateMultipleRelations(HashSet<Guid> nodeIds, HashSet<Guid> materialIds, string userName)
         {
-            var existingItems = await RunWithoutCommitAsync(uow => uow.NodeMaterialRelationRepository.GetExistingRelationMaterialIds(nodeId, materialIds));
-
-            var newMaterials = materialIds.Except(existingItems).ToList();
-
-            await RunAsync(uow => uow.NodeMaterialRelationRepository.CreateRelations(nodeId, newMaterials));
-
             var changeHistoryList = new List<ChangeHistoryDto>();
+            var tasks = new List<Task>();
 
-            foreach (var materialId in materialIds)
+            foreach (var nodeId in nodeIds)
             {
-                changeHistoryList.Add(new ChangeHistoryDto
+                var existingItems = await RunWithoutCommitAsync(uow => uow.NodeMaterialRelationRepository.GetExistingRelationMaterialIds(nodeId, materialIds));
+                var newMaterials = materialIds.Except(existingItems).ToList();
+                await RunAsync(uow => uow.NodeMaterialRelationRepository.CreateRelations(nodeId, newMaterials));
+
+                foreach (var materialId in materialIds)
                 {
-                    Date = DateTime.UtcNow,
-                    NewValue = nodeId.ToString("N"),
-                    OldValue = null,
-                    PropertyName = NodeIdPropertyName,
-                    RequestId = Guid.NewGuid(),
-                    TargetId = materialId,
-                    UserName = userName
-                });
+                    changeHistoryList.Add(new ChangeHistoryDto
+                    {
+                        Date = DateTime.UtcNow,
+                        NewValue = nodeId.ToString("N"),
+                        OldValue = null,
+                        PropertyName = NodeIdPropertyName,
+                        RequestId = Guid.NewGuid(),
+                        TargetId = materialId,
+                        UserName = userName
+                    });
+                }
             }
+
             await _changeHistoryService.SaveMaterialChanges(changeHistoryList);
         }
 
