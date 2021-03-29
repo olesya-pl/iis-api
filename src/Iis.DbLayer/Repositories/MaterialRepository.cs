@@ -168,10 +168,7 @@ namespace Iis.DbLayer.Repositories
             .Where(p => materialIds.Contains(p.Id))
             .ToListAsync();
 
-            var sw = Stopwatch.StartNew();
-            var materialDocuments = materials
-                    .Select(p => MapEntityToDocument(p));
-            sw.Stop();
+            var materialDocuments = materials.Select(p => MapEntityToDocument(p));
             var json = ConvertToJson(materialDocuments);
 
             return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, token);
