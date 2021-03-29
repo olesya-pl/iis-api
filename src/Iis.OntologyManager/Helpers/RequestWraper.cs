@@ -94,7 +94,7 @@ namespace Iis.OntologyManager.Helpers
 
             var json = JsonConvert.SerializeObject(param);
 
-            return await SendRequest(() => httpClient.PostAsync(uri, new StringContent(json)), uri);
+            return await SendRequest(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri);
         }
 
         private async Task<RequestResult> SendRequest(Func<Task<HttpResponseMessage>> func, Uri uri)
