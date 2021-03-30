@@ -15,7 +15,8 @@ namespace IIS.Core.Materials
         Task SaveAsync(Material material, Guid? changeRequestId = null);
         Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response);
         Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, User user);
-        Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId);
+        Task AssignMaterialsOperatorAsync(ISet<Guid> materialIds, Guid assigneeId, User user);
+        Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken stoppingToken);

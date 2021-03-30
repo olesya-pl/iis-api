@@ -387,11 +387,25 @@ namespace IIS.Core.Materials.EntityFramework
             return material.ProcessedStatusSignId.HasValue && material.ProcessedStatusSignId == MaterialEntity.ProcessingStatusProcessedSignId;
         }
 
-        public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId)
+        public Task AssignMaterialsOperatorAsync(ISet<Guid> materialIds, Guid assigneeId, User user)
         {
+            var tasks = new List<Task>();
+
+            foreach (var materialId in materialIds)
+            {
+                tasks.Add(AssignMaterialOperatorAsync(materialId, assigneeId, user));
+            }
+
+            return Task.WhenAll(tasks);
+        }
+
+        public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null)
+        {
+            var accessLevel = user?.AccessLevel ?? int.MaxValue;
+            
             var material = await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
-            if (material == null)
+            if (material == null || !material.CanBeAccessedBy(accessLevel))
             {
                 return;
             }
