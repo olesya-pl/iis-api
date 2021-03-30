@@ -296,13 +296,13 @@ namespace AcceptanceTests.UISteps
                 var elementName = row[1];
                 var elementValue = row[2];
                 var accordionElement = driver.FindElement(
-                    By.XPath($"//div[contains(@class, 'el-collapse-item__header')  and contains (.,\'{accordionName}\')]"));
+                    By.XPath($"//div[contains(@class, 'el-collapse-item__header')  and contains (.,\"{accordionName}\")]"));
                 if (!string.IsNullOrWhiteSpace(accordionName))
                     ToggleAccordion(accordionElement, true);
                 var xpathList = new List<string>();
                 var textAreaLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::textarea[1]";
-                var inputLocator = $"//label[contains(text(),'{elementName}')]//parent::div//following-sibling::input";
-                var textAreaLocatorWithoutParentNode = $"//label[contains(text(),'{elementName}')]//following::textarea[1]";
+                var inputLocator = $"//label[contains(text(),\"{elementName}\")]//parent::div//following-sibling::input";
+                var textAreaLocatorWithoutParentNode = $"//label[contains(text(),\"{elementName}\")]//following::textarea[1]";
                 xpathList.Add(textAreaLocator);
                 xpathList.Add(inputLocator);
                 xpathList.Add(textAreaLocatorWithoutParentNode);
@@ -316,7 +316,8 @@ namespace AcceptanceTests.UISteps
                 }
                 else if (element.TagName == "textarea")
                 {
-                    element.SendKeys(elementValue);
+					element.SendKeys($"{ elementValue } { DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}");
+                    driver.WaitFor(0.5);
                 }
                 if (!string.IsNullOrWhiteSpace(accordionName))
                     ToggleAccordion(accordionElement, false);

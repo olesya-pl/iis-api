@@ -15,7 +15,6 @@ namespace AcceptanceTests.APISteps
     {
         private readonly ScenarioContext context;
         private readonly GraphQLHttpClient graphQlClient;
-        private object dictionary;
 
         public EntityesSteps(ScenarioContext injectedContext)
         {
