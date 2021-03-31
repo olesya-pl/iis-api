@@ -527,22 +527,22 @@ namespace Iis.OntologyManager
             return result;
         }
 
-        private void ReIndexElastic(IndexKeys indexKey)
+        private async Task ReIndexElastic(IndexKeys indexKey)
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
 
-            WaitCursorAction(() =>
-            {
-                var requestWrapper = GetRequestWrapper();
+            await WaitCursorActionAsync(async () =>
+              {
+                  var requestWrapper = GetRequestWrapper();
 
-                var result = requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false).GetAwaiter().GetResult();
+                  var result = await requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false);
 
-                var sb = new StringBuilder()
-                    .AppendLine($"Адреса:{result.RequestUrl}")
-                    .AppendLine($"Повідомлення: {result.Message}");
+                  var sb = new StringBuilder()
+                      .AppendLine($"Адреса:{result.RequestUrl}")
+                      .AppendLine($"Повідомлення: {result.Message}");
 
-                ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
-            });
+                  ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+              });
         }
 
         private void OnRemove(Guid entityId)
