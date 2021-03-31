@@ -64,7 +64,7 @@ namespace Iis.OntologyManager
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         Dictionary<string, IDataViewControl> _dataViewControls = new Dictionary<string, IDataViewControl>();
-        const string VERSION = "1.34";
+        const string VERSION = "1.35";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
