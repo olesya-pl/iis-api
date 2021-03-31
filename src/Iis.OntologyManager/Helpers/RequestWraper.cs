@@ -83,7 +83,7 @@ namespace Iis.OntologyManager.Helpers
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
-            return await SendRequest(() => httpClient.GetAsync(uri), uri);
+            return await SendRequest(() => httpClient.GetAsync(uri), uri).ConfigureAwait(false);
         }
 
         public async Task<RequestResult> ChangeAccessLevelsAsync(ChangeAccessLevelsParams param)
