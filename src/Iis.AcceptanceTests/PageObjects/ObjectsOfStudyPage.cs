@@ -18,6 +18,8 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Обʼєкти')]")]
+        public IWebElement ObjectOfStudySectionButton;
 
         [FindsBy(How = How.CssSelector, Using = ".entity-search .entity-search__toggle button")]
         [CacheLookup]
@@ -68,7 +70,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement ObjectOfStudySmallCardWindow;
 
-        [FindsBy(How = How.CssSelector, Using = ".text-ellipsis span")]
+        [FindsBy(How = How.CssSelector, Using = ".text-ellipsis.is-align-middle")]
         [CacheLookup]
         public IWebElement ObjectTitleInTheSmallCard;
 
@@ -80,6 +82,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-full-screen']")]
         public IWebElement EnlargeObjectOfStudySmallCardButton;
+
+        [FindsBy(How = How.XPath, Using = "//button[@name='btn-collapse']")]
+        public IWebElement MinimizeObjectOfStudyBigCardButton;
 
         [FindsBy(How = How.CssSelector, Using = ".el-menu > [role='menuitem']:nth-of-type(1)")]
         [CacheLookup]

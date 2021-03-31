@@ -25,6 +25,13 @@ namespace AcceptanceTests.UISteps
 
         #region When
 
+        [When(@"I clicked on the Objects section")]
+        public void WhenIClickedOnTheObjectsSection()
+        {
+            objectsOfStudyPage.ObjectOfStudySectionButton.Click();
+        }
+
+
         [When(@"I clicked on search button in the Object of study section")]
         public void IClickedOnSearchButton()
         {
@@ -36,6 +43,14 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.EnlargeObjectOfStudySmallCardButton.Click();
         }
+
+        [When(@"I clicked on minimize big card object of study card button")]
+        public void WhenIClickedOnMinimizeBigCardObjectOfStudyCardButton()
+        {
+            driver.WaitFor(2);
+            objectsOfStudyPage.MinimizeObjectOfStudyBigCardButton.Click();
+        }
+
 
         [When(@"I got search counter value in the Object of study section")]
         public void IGetSearchCounterValueInTheObjectOfStudySection()
@@ -62,6 +77,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
             objectsOfStudyPage.FirstSearchResultTitle.Click();
+            driver.WaitFor(0.5);
         }
 
         [When(@"I clicked on the Edit button in the Objects of study section")]

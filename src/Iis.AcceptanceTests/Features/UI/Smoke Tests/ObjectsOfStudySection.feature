@@ -23,9 +23,25 @@ Feature: ObjectsOfStudySection - smoke
 
     @smoke @sanity @UI @ObjectOfStudySmallCardUI
     Scenario: IIS-6207 - Open a small object of study card
-        When I clicked on first object of study
-        Then I must see the object of study small card
-        Then I must see the title Тестовий Центр ППО in the small card
+        When I clicked on the create a new object of study button
+        And I clicked on the create a new military organization button
+        When I filled in the form
+		
+		 | Accordion                    | FieldName                    | FieldValueValue                   |
+		 |                              | Приналежність                | ворожий                           |
+		 |                              | Важливість                   | першочерговий                     |
+		 | Загальна інформація                            | Найменування дійсне повне розширене                             | Тестове найменування дійсне повне розширене                            |
+		 | Загальна інформація                            | Найменування дійсне скорочене                                   | Тестове найменування дійсне скорочене                                  |
+		 | Загальна інформація                            | Умовне (відкрите) найменування                                  | Тестове умовне (відкрите) найменування                                 |
+		 | Загальна інформація                            | Оперативне (бойове) призначення                                 | Тестове оперативне (бойове) призначення                                |
+
+        Then I must see Тестове найменування дійсне скорочене title of the object
+        When I clicked on the Objects section
+        And I clicked on search button in the Object of study section
+        And I searched Тестове найменування дійсне скорочене data in the Objects of study section
+        When I clicked on the first search result title in the Objects of study section
+        Then I must see the title Тестове найменування дійсне скорочене in the small card
+
 
     @smoke @sanity @UI @ObjectOfStudySmallCardUI
     Scenario: IIS-6208 - Open a big object of study card

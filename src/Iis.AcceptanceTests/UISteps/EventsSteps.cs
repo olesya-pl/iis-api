@@ -181,7 +181,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the Events page")]
         public void ThenIMustSeeEventCreationButton()
         {
-            Assert.Contains("events/?page=1", driver.Url);
+            Assert.Contains("events/?query=&page=1", driver.Url);
         }
 
         [Then(@"I must see first event in the events list")]

@@ -50,7 +50,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I redirected to objects page")]
         public void ThenIRedirectedToObjectsPage()
         {
-            Assert.Contains("objects/?page=1", driver.Url);
+            Assert.Contains("objects/?query=&page=1", driver.Url);
         }
 
         [Then(@"Login button is active")]

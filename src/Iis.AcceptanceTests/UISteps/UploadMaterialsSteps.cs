@@ -10,11 +10,14 @@ namespace AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
+        private UploadMaterialsPageObjects uploadMaterialsPageObjects;
 
         public UploadMaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
+            uploadMaterialsPageObjects = new UploadMaterialsPageObjects(driver);
             context = injectedContext;
             this.driver = driver;
+            
         }
 
         #region When
@@ -30,8 +33,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see choose file for upload button in the Upload materials section")]
         public void ThenIMustSeeChooseFileForUploadButtonInTheUploadMaterialsSection()
         {
-            var uploadMaterialsPage = new UploadMaterialsPageObjects(driver);
-            Assert.True(uploadMaterialsPage.UploadMaterialButton.Displayed);
+            Assert.True(uploadMaterialsPageObjects.UploadMaterialButton.Displayed);
         }
         #endregion
     }

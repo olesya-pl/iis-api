@@ -17,7 +17,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement LoadMaterialsSection;
 
-        [FindsBy(How = How.CssSelector, Using = ".files-uploader__action")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='upload__form-controls']//span[contains(text(),'Завантажити')]")]
         [CacheLookup]
         public IWebElement UploadMaterialButton;
     }
