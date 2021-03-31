@@ -38,7 +38,8 @@ namespace Iis.Services
             ChangeAccessLevelsOntology(mappings);
             _ontologyData.SaveAccessLevels(newAccessLevels);
             await _context.SaveChangesAsync();
-            await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
+            if (materialIds.Any())
+                await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
         }
 
         private List<Guid> ChangeAccessLevelsMaterials(Dictionary<int, int> mappings)
