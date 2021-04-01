@@ -64,7 +64,7 @@ namespace Iis.OntologyManager
         RemoveEntityUiControl _removeEntityUiControl;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         Dictionary<string, IDataViewControl> _dataViewControls = new Dictionary<string, IDataViewControl>();
-        const string VERSION = "1.33";
+        const string VERSION = "1.35";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -308,7 +308,7 @@ namespace Iis.OntologyManager
             menuReload.Items.Add("Тільки кеш Онтології (дані Онтології, що зберігаются у веб-додадку)");
             menuReload.Items[0].Click += async (sender, e) => { await ReloadOntologyData(); };
             menuReload.Items.Add("Весь веб-додаток");
-            menuReload.Items[1].Click += (sender, e) => { RestartIisApp(); };
+            menuReload.Items[1].Click += async (sender, e) => { await RestartIisApp(); };
             var btnReload = new Button { Text = "Перезавантажити " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuReload };
             btnReload.Click += (sender, e) => { menuReload.Show(btnReload, new Point(0, btnReload.Height)); };
             container.Add(btnReload);
@@ -321,7 +321,10 @@ namespace Iis.OntologyManager
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
 
-            await WaitCursorActionAsync(DoReloadOntologyData);
+            if (MessageBox.Show("Ви дійсно бажаєте перезавантажити кеш онтології?", "Попередження", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                await WaitCursorActionAsync(DoReloadOntologyData);
+            }
         }
 
         private RequestWraper GetRequestWrapper() =>
@@ -341,9 +344,26 @@ namespace Iis.OntologyManager
             ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
         }
 
-        private void RestartIisApp()
+        private async Task DoRestartIisApp()
         {
+            var requestWrapper = GetRequestWrapper();
 
+            try
+            {
+                await requestWrapper.RestartIisAppAsync();
+            }
+            finally
+            {
+                MessageBox.Show("Перезавантаження почато. Це займатиме декілька хвилин");
+            }
+        }
+
+        private async Task RestartIisApp()
+        {
+            if (MessageBox.Show("Ви дійсно бажаєте перезавантажити веб додаток?", "Попередження", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                await DoRestartIisApp();
+            }
         }
 
         #region UI Control Events
@@ -432,11 +452,13 @@ namespace Iis.OntologyManager
             ontologyPatchSaver.SavePatch(ontologyData.Patch);
             return result;
         }
-        private void gridTypes_SelectionChanged(object sender, EventArgs e)
+        private void GridTypesSelectionChanged()
         {
             if (SelectedNodeType == null) return;
             _history.Clear();
             SetNodeTypeView(SelectedNodeType, false);
+            _ontologyDataView = false;
+            SetSwitchViewTypeText();
         }
         private void SourceSelectionChanged(object sender, EventArgs e)
         {
@@ -475,14 +497,14 @@ namespace Iis.OntologyManager
 
         private void WaitCursorAction(Action action)
         {
-            UseWaitCursor = true;
+            Cursor.Current = Cursors.WaitCursor;
             try
             {
                 action();
             }
             finally
             {
-                UseWaitCursor = false;
+                Cursor.Current = Cursors.Default;
             }
         }
 
@@ -527,22 +549,22 @@ namespace Iis.OntologyManager
             return result;
         }
 
-        private void ReIndexElastic(IndexKeys indexKey)
+        private async Task ReIndexElastic(IndexKeys indexKey)
         {
             if (SelectedSchemaSource?.SourceKind != SchemaSourceKind.Database) return;
 
-            WaitCursorAction(() =>
-            {
-                var requestWrapper = GetRequestWrapper();
+            await WaitCursorActionAsync(async () =>
+              {
+                  var requestWrapper = GetRequestWrapper();
 
-                var result = requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false).GetAwaiter().GetResult();
+                  var result = await requestWrapper.ReIndexAsync(indexKey).ConfigureAwait(false);
 
-                var sb = new StringBuilder()
-                    .AppendLine($"Адреса:{result.RequestUrl}")
-                    .AppendLine($"Повідомлення: {result.Message}");
+                  var sb = new StringBuilder()
+                      .AppendLine($"Адреса:{result.RequestUrl}")
+                      .AppendLine($"Повідомлення: {result.Message}");
 
-                ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
-            });
+                  ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+              });
         }
 
         private void OnRemove(Guid entityId)
@@ -573,6 +595,7 @@ namespace Iis.OntologyManager
                 schemaSource.SourceKind == SchemaSourceKind.Database ?
                 GetOntologyData(schemaSource.Data) :
                 null;
+            GridTypesSelectionChanged();
         }
 
         private void UpdateSchemaSources()

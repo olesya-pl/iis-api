@@ -37,7 +37,7 @@ namespace Iis.OntologyManager.UiControls
         }
         protected override void CreateControls()
         {
-            _container.Add(btnStartEditing = new Button { Text = "Почати редактування" });
+            _container.Add(btnStartEditing = new Button { Text = "Почати редагування" });
             btnStartEditing.Click += (sender, e) => StartEditing();
 
             _container.Add(btnCancelEditing = new Button { Text = "Скасувати зміни" });
@@ -109,7 +109,7 @@ namespace Iis.OntologyManager.UiControls
         private void StartEditing()
         {
             if (MessageBox.Show(
-                "Редактування ціх даних може привести до тяжких наслідків. Ви впевнені що хочете редактувати?", 
+                "Редагування ціх даних може привести до тяжких наслідків. Ви впевнені що хочете редагувати?", 
                 "Попередження", 
                 MessageBoxButtons.YesNo) == DialogResult.Yes)
             {

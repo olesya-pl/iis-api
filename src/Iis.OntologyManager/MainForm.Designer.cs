@@ -94,7 +94,7 @@ namespace Iis.OntologyManager
             this.gridTypes.RowHeadersVisible = false;
             this.gridTypes.Size = new System.Drawing.Size(257, 269);
             this.gridTypes.TabIndex = 0;
-            this.gridTypes.SelectionChanged += new System.EventHandler(this.gridTypes_SelectionChanged);
+            this.gridTypes.SelectionChanged += (sender, e) => GridTypesSelectionChanged();
             // 
             // panelTypeHeader
             // 
