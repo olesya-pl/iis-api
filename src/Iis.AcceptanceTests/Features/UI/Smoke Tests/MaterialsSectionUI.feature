@@ -38,7 +38,6 @@ Feature: MaterialsSectionUI - Smoke
     Scenario: IIS-6188 - Ensure that the material card can be opened
         When I navigated to Materials page
         And I clicked on the first material in the Materials list
-        Then I must see processed button in the materials card
         Then I must see relevance drop down in the materials card
 
     @smoke @UI @MaterialsCardEventsTabUI

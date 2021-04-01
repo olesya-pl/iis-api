@@ -22,7 +22,7 @@ namespace AcceptanceTests.Helpers
             var environmentVariable = Environment.GetEnvironmentVariable("TargetEnvironment");
             TargetEnvironment targetEnvironment = (!string.IsNullOrWhiteSpace(environmentVariable)) ?
                 Enum.Parse<TargetEnvironment>(environmentVariable)
-                : TargetEnvironment.Dev3;
+                : TargetEnvironment.QA;
             if (targetEnvironment != TargetEnvironment.Dev3 && string.IsNullOrWhiteSpace(environmentVariable))
                 Console.Out.WriteLine($"YOU ARE TESTING ON {targetEnvironment}!!!");
             ReadTestData(targetEnvironment.ToString());

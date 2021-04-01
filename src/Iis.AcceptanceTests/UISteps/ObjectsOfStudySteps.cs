@@ -393,7 +393,7 @@ namespace AcceptanceTests.UISteps
         public void IMustSeeTheTitleInTheSmallCard(string expectedTitle)
         {
             var actualTitle = objectsOfStudyPage.ObjectTitleInTheSmallCard.Text;
-            Assert.Equal(expectedTitle, actualTitle);
+            Assert.Contains(expectedTitle, actualTitle);
         }
 
         [Then(@"I must see these tabs in the big object of study card")]

@@ -1,3 +1,4 @@
+using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
@@ -10,11 +11,11 @@ namespace AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
-        private UploadMaterialsPageObjects uploadMaterialsPageObjects;
+        private UploadMaterialsPageObjects uploadMaterialsPage;
 
         public UploadMaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
-            uploadMaterialsPageObjects = new UploadMaterialsPageObjects(driver);
+            uploadMaterialsPage = new UploadMaterialsPageObjects(driver);
             context = injectedContext;
             this.driver = driver;
             
@@ -24,8 +25,8 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to the Upload materials page")]
         public void WhenINavigatedToUploadMaterialsPage()
         {
-            var uploadMaterialsPage = new UploadMaterialsPageObjects(driver);
             uploadMaterialsPage.LoadMaterialsSection.Click();
+            driver.WaitFor(0.5);
         }
         #endregion
 
@@ -33,7 +34,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see choose file for upload button in the Upload materials section")]
         public void ThenIMustSeeChooseFileForUploadButtonInTheUploadMaterialsSection()
         {
-            Assert.True(uploadMaterialsPageObjects.UploadMaterialButton.Displayed);
+            Assert.True(uploadMaterialsPage.UploadMaterialButton.Displayed);
         }
         #endregion
     }

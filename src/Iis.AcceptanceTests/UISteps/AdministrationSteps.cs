@@ -10,20 +10,20 @@ namespace AcceptanceTests.UISteps
     public class AdministrationSteps
     {
         private readonly IWebDriver driver;
-        private readonly ScenarioContext context;
+		private readonly ScenarioContext context;
+        private AdministrationPageObjects administrationPage;
 
         public AdministrationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
+            administrationPage = new AdministrationPageObjects(driver);
             context = injectedContext;
             this.driver = driver;
         }
 
         [When(@"I navigated to Administration page")]
         public void IWantNavigateToAdministrationPage()
-        {
-            var administrationPage = new AdministrationPageObjects(driver);
+        {        
             administrationPage.AdministrationPage.Click();
-
             driver.WaitFor(5);
         }
 
@@ -36,8 +36,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see first user in the user list")]
         public void ThenIMustSeeFirstUserInTheUsersList()
         {
-            var eventsPage = new AdministrationPageObjects(driver);
-            Assert.True(eventsPage.FirstUserOnTheAdminPage.Displayed);
+            Assert.True(administrationPage.FirstUserOnTheAdminPage.Displayed);
         }
     }
 }
