@@ -25,6 +25,7 @@ namespace Iis.OntologyManager
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
+                .AddUserSecrets<Startup>()
                 .Build();
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.File("!log.txt")
