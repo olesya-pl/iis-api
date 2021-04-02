@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.Ontology.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,14 +9,17 @@ namespace Iis.DbLayer.Common
 {
     public class CommonData : ICommonData
     {
-        Func<IAccessLevels> _getAccessLevelsFunc;
-        private IAccessLevels _accessLevels;
-        public IAccessLevels AccessLevels =>
-            _accessLevels ?? (_accessLevels = _getAccessLevelsFunc());
+        private IOntologyNodesData _ontologyData;
+        public IAccessLevels AccessLevels { get; private set; }
 
-        public CommonData(Func<IAccessLevels> getAccessLevelsFunc)
+        public CommonData(IOntologyNodesData ontologyData)
         {
-            _getAccessLevelsFunc = getAccessLevelsFunc;
+            _ontologyData = ontologyData;
+            _ontologyData.OnAccessLevelsChanged += RefreshAccessLevels;
+            RefreshAccessLevels();
         }
+
+        private void RefreshAccessLevels() =>
+            AccessLevels = _ontologyData.GetAccessLevels();
     }
 }

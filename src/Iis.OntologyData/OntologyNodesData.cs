@@ -28,6 +28,8 @@ namespace Iis.OntologyData
 
         internal ReadWriteLocker Locker { get; set; }
 
+        public event Action OnAccessLevelsChanged;
+
         public OntologyNodesData(INodesRawData rawData, IOntologySchema schema, IOntologyPatchSaver saver)
         {
             _mapper = GetMapper();
@@ -267,6 +269,8 @@ namespace Iis.OntologyData
                         RemoveNodeAndRelations(oldItem.Id);
                     }
                 }
+
+                OnAccessLevelsChanged?.Invoke();
             });
         }
     }

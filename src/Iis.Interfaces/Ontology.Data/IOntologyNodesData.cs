@@ -37,5 +37,7 @@ namespace Iis.Interfaces.Ontology.Data
         void AddValueByDotName(Guid entityId, string value, string[] dotNameParts);
         IAccessLevels GetAccessLevels();
         void SaveAccessLevels(IAccessLevels newAccessLevels);
+
+        event Action OnAccessLevelsChanged;
     }
 }
