@@ -32,7 +32,7 @@ namespace Iis.Services
             EventIndexes = new [] { "Event" };
             MaterialIndexes = new [] { "Materials" };
             ReportIndex = "Reports";
-            SignIndexes = new [] { "CellphoneSign", "SatellitePhoneSign" };
+            SignIndexes = new [] { "CellphoneSign", "SatellitePhoneSign", "SatelliteIridiumPhoneSign"};
             FieldsToExcludeByIndex = new Dictionary<string, IEnumerable<string>>()
             {
                 { "Event", new [] { "associatedWithEvent" } }

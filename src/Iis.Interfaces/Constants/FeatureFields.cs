@@ -14,11 +14,13 @@ namespace Iis.Interfaces.Constants
         public const string Beam = "Beam";
         public const string LocationX = "LocationX";
         public const string LocationY = "LocationY";
+        public const string Latitude = "Latitude";
+        public const string Longitude = "Longitude";
         public const string Mcc = "MCC";
         public const string Mnc = "MNC";
         public const string Lac = "LAC";
         public const string CellId = "CellID";
         public const string RegTime = "RegTime";
-        
+        public const string PagerId = "Pid";
     }
 }
