@@ -27,13 +27,13 @@ namespace Iis.Services
             {   
                 DateFormatString = _dataDateFormatString,
             }));
-            
+
             if (model == null || !CouldBeLocationExtracted(model))
                 return;
 
             var (lat, @long) = await RunWithoutCommitAsync(x =>
                 x.TowerLocationRepository.GetByCellGlobalIdentityAsync(model.Mcc, model.Mnc, model.Lac, model.CellId));
-            
+
             if (lat == default || @long == default)
                 return;
 
@@ -58,7 +58,7 @@ namespace Iis.Services
                 && !string.IsNullOrEmpty(model.CellId)
                 && model.Features.Any(x => x.Id.HasValue);
         }
-        
+
         private class Feature
         {
             [JsonProperty(FeatureFields.featureId)]

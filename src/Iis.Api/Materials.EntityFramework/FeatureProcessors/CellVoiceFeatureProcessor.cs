@@ -17,7 +17,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private readonly IGsmLocationService _gsmLocationService;
         protected override string SignTypeName => "CellphoneSign";
 
-        protected override List<string> PrioritizedFields => new List<string>
+        protected override IReadOnlyCollection<string> PrioritizedFields => new string[]
         {
             SignFields.IMSI,
             SignFields.PhoneNumber,
