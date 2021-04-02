@@ -154,7 +154,7 @@ namespace IIS.Core
                 services.AddSingleton<ICommonData>(provider =>
                 {
                     var ontologyData = provider.GetRequiredService<IOntologyNodesData>();
-                    return new CommonData(() => ontologyData.GetAccessLevels());
+                    return new CommonData(ontologyData);
                 });
 
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
