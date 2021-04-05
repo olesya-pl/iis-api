@@ -520,6 +520,18 @@ namespace Iis.OntologyManager
                 UseWaitCursor = false;
             }
         }
+        private async Task<T> WaitCursorActionAsync<T>(Func<Task<T>> func)
+        {
+            UseWaitCursor = true;
+            try
+            {
+                return await func();
+            }
+            finally
+            {
+                UseWaitCursor = false;
+            }
+        }
         public void ShowMessage(string message, string header = null)
         {
             var form = _uiControlsCreator.GetModalForm(this);
@@ -536,17 +548,22 @@ namespace Iis.OntologyManager
 
         private async Task<RequestResult> SaveAccessLevels(ChangeAccessLevelsParams param)
         {
-            var requestWrapper = GetRequestWrapper();
+            return await WaitCursorActionAsync(async () =>
+            {
+                var requestWrapper = GetRequestWrapper();
 
-            var result = await requestWrapper.ChangeAccessLevelsAsync(param);
+                var result = await requestWrapper.ChangeAccessLevelsAsync(param);
 
-            var sb = new StringBuilder()
-                    .AppendLine($"Адреса:{result.RequestUrl}")
-                    .AppendLine($"Повідомлення: {result.Message}");
+                var sb = new StringBuilder()
+                        .AppendLine($"Адреса:{result.RequestUrl}")
+                        .AppendLine($"Повідомлення: {result.Message}");
 
-            ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+                LoadCurrentSchema(SelectedSchemaSource);
 
-            return result;
+                ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+
+                return result;
+            });
         }
 
         private async Task ReIndexElastic(IndexKeys indexKey)

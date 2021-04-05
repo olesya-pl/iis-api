@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Constants;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
-using Iis.Interfaces.Constants;
-using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
@@ -13,7 +13,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
     {
         protected override string SignTypeName => "SatellitePhoneSign";
 
-        protected override List<string> PrioritizedFields => new List<string>
+        protected override IReadOnlyCollection<string> PrioritizedFields => new string[]
         {
             SignFields.PhoneNumber,
             SignFields.DBObject,

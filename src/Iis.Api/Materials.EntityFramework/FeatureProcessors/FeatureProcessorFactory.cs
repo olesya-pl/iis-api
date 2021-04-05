@@ -30,6 +30,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             {
                 "cell.voice" when materialType == "audio" => new CellVoiceFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState, _gsmLocationService),
                 "sat.voice" when materialType == "audio" => new SatVoiceFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState),
+                "sat.iridium.voice" when materialType == "audio" => new SatVoiceIridiumFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState),
+                "sat.iridium.paging" when materialType == "text" => new SatPagingIridiumFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState),
                 _ => new DummyFeatureProcessor()
             };
         }

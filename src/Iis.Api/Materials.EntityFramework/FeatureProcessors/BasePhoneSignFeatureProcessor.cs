@@ -31,7 +31,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         protected readonly MutationCreateResolver _createResolver;
         protected readonly MutationUpdateResolver _updateResolver;
         protected abstract string SignTypeName { get; }
-        protected abstract List<string> PrioritizedFields { get; }
+        protected abstract IReadOnlyCollection<string> PrioritizedFields { get; }
         protected abstract Dictionary<string, string> SignFieldsMapping { get; }
 
         public virtual bool IsDummy => false;
