@@ -38,6 +38,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdByUser").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedBy(ctx));
             d.Field("__iconName").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveIconName(ctx));
             d.Field("__title").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveTitle(ctx));
+            d.Field("__accessLevel").Type<IntType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveAccessLevel(ctx));
         }
 
         protected void OnRelation(INodeTypeLinked relationType, IObjectTypeDescriptor objectTypeDescriptor = null)

@@ -365,7 +365,10 @@ namespace Iis.Elastic
             return ParseResponse(response);
         }
 
-        public async Task<bool> CreateSecurityMappingAsync(IReadOnlyCollection<string> indexNames, CancellationToken cancellationToken)
+        public async Task<bool> CreateSecurityMappingAsync(
+            IReadOnlyCollection<string> indexNames, 
+            string accessLevelFieldName,
+            CancellationToken cancellationToken)
         {
             var stringifiedIndexes = string.Join(',', indexNames.Select(p => $"\"{GetRealIndexName(p)}\""));
             var settings = $@"{{
@@ -375,7 +378,7 @@ namespace Iis.Elastic
         ""privileges"": [""read""],
         ""query"": {{
             ""template"": {{
-                ""source"": ""{{\""bool\"":{{\""filter\"":[{{\""range\"":{{\""AccessLevel\"":{{\""lte\"":\""{{{{_user.metadata.accessLevel}}}}\""}}}}}}]}}}}""
+                ""source"": ""{{\""bool\"":{{\""filter\"":[{{\""range\"":{{\""{accessLevelFieldName}\"":{{\""lte\"":\""{{{{_user.metadata.accessLevel}}}}\""}}}}}}]}}}}""
             }}
         }}
     }}]
