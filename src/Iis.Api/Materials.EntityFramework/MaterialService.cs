@@ -410,6 +410,7 @@ namespace IIS.Core.Materials.EntityFramework
                 return;
             }
             material.AssigneeId = assigneeId;
+            material.Assignee = null;
             Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
             await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
