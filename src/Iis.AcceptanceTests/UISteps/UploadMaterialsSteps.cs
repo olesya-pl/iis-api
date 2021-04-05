@@ -26,7 +26,7 @@ namespace AcceptanceTests.UISteps
         public void WhenINavigatedToUploadMaterialsPage()
         {
             uploadMaterialsPage.LoadMaterialsSection.Click();
-            driver.WaitFor(0.5);
+            //driver.WaitFor(0.5);
         }
         #endregion
 

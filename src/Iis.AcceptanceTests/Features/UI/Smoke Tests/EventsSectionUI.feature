@@ -1,6 +1,6 @@
 ﻿Feature: EventsTabUI - Smoke
 
-	- Open Event section
+	- IIS-6226 - Ensure that Events section is opened
 
 Background: 
 	Given I sign in with the user olya and password 123 in the Contour
