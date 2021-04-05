@@ -37,6 +37,8 @@ namespace Iis.Services
             var materialIds = ChangeAccessLevelsMaterials(numericIndexMapping);
             ChangeAccessLevelsOntology(mappings);
             _ontologyData.SaveAccessLevels(newAccessLevels);
+            ChangeAccessLevelsUsers(numericIndexMapping);
+            ChangeAccessLevelsReports(numericIndexMapping);
             await _context.SaveChangesAsync();
             if (materialIds.Any())
                 await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
@@ -53,6 +55,24 @@ namespace Iis.Services
             }
 
             return result;
+        }
+
+        private void ChangeAccessLevelsUsers(Dictionary<int, int> mappings)
+        {
+            var users = _context.Users.Where(m => mappings.Keys.Contains(m.AccessLevel));
+            foreach (var user in users)
+            {
+                user.AccessLevel = mappings[user.AccessLevel];
+            }
+        }
+
+        private void ChangeAccessLevelsReports(Dictionary<int, int> mappings)
+        {
+            var reports = _context.Reports.Where(m => mappings.Keys.Contains(m.AccessLevel));
+            foreach (var report in reports)
+            {
+                report.AccessLevel = mappings[report.AccessLevel];
+            }
         }
 
         private void ChangeAccessLevelsOntology(Dictionary<Guid, Guid> mappings)
