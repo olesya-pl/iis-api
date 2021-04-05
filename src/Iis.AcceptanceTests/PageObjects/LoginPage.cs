@@ -21,7 +21,7 @@ namespace AcceptanceTests.PageObjects
 
         public void Navigate()
         {
-            driver.WithTimeout(10).Navigate().GoToUrl(LoginPageUrl);
+            driver.WithTimeout(5).Navigate().GoToUrl(LoginPageUrl);
         }
 
 

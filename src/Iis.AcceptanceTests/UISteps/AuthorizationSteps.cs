@@ -29,7 +29,7 @@ namespace AcceptanceTests.UISteps
             loginPageObjects.LoginField.SendKeys(login);
             loginPageObjects.PasswordField.SendKeys(password);
             loginPageObjects.LoginButton.Click();
-            driver.WithTimeout(20);
+            driver.WaitFor(15);
         }
 
         [When(@"I pressed Sign out button")]
@@ -49,6 +49,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I redirected to objects page")]
         public void ThenIRedirectedToObjectsPage()
         {
+            var actualLink = driver.Url;
             Assert.Contains("objects/?query=&page=1", driver.Url);
         }
 

@@ -1,6 +1,6 @@
 ﻿Feature: Authorization UI
 
-	- Valid authorization
+	- Authorize by using valid credentials
 	- IIS-5795 - Invalid authorization
 
 	@smoke @UI @AuthorizationSmokeUI
