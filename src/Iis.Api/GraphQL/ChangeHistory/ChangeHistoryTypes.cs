@@ -29,5 +29,6 @@ namespace IIS.Core.GraphQL.ChangeHistory
         public string NewValue { get; set; }
         [GraphQLType(typeof(IdType))]
         public Guid RequestId { get; set; }
+        public bool IsCoordinate {get;set;}
     }
 }
