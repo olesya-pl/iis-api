@@ -461,6 +461,7 @@ object OntologyManager_BuildOntologyManager : BuildType({
 object Tests : Project({
     name = "Tests"
 
+    vcsRoot(Tests_IisPerfTests)
     vcsRoot(Tests_IisNomad)
     vcsRoot(Tests_IisIisApiNet)
     vcsRoot(Tests_IisIisApiNet1)
@@ -552,6 +553,10 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
 
 object Tests_IisPerformanceTest : BuildType({
     name = "IIS Performance Test"
+
+    vcs {
+        root(Tests_IisPerfTests)
+    }
 
     steps {
         exec {
@@ -673,6 +678,15 @@ object Tests_IisIisApiNet1 : GitVcsRoot({
 object Tests_IisNomad : GitVcsRoot({
     name = "IIS/nomad"
     url = "git@git.warfare-tec.com:IIS/nomad.git"
+    branch = "master"
+    authMethod = uploadedKey {
+        uploadedKey = "tc_contour"
+    }
+})
+
+object Tests_IisPerfTests : GitVcsRoot({
+    name = "iis-perf-tests"
+    url = "git@git.warfare-tec.com:eocheretnyi/iis-perf-tests.git"
     branch = "master"
     authMethod = uploadedKey {
         uploadedKey = "tc_contour"
