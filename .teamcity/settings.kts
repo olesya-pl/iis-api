@@ -564,6 +564,7 @@ object Tests_IisPerformanceTest : BuildType({
                 bzt test-config.yml
             """.trimIndent()
             dockerImage = "blazemeter/taurus"
+            dockerRunParameters = "-v ${'$'}(pwd)/jmeter_output:/tmp/artifacts"
         }
     }
 })
