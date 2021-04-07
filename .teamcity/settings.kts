@@ -6,7 +6,6 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dockerCommand
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetPublish
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetTest
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.exec
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -559,9 +558,12 @@ object Tests_IisPerformanceTest : BuildType({
     }
 
     steps {
-        exec {
-            path = """C:\jmeter\bin\jmeter.bat"""
-            arguments = """-n -t c:\jmeter\test.jmx -l test.jtl"""
+        script {
+            scriptContent = """
+                #!/bin/sh
+                bzt test-config.yml
+            """.trimIndent()
+            dockerImage = "blazemeter/taurus"
         }
     }
 })
