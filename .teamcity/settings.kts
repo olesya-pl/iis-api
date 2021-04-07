@@ -580,7 +580,6 @@ object Tests_IisPerformanceTest : BuildType({
             param("perfTest.agg.assert", "true")
             param("perfTest.agg.respCode", "true")
             param("perfTest.agg.file", "jmeter_output/kpi.jtl")
-            param("perfTest.agg.testGroups", "true")
             param("perfTest.agg.total", "true")
         }
     }
