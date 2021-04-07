@@ -567,6 +567,21 @@ object Tests_IisPerformanceTest : BuildType({
             dockerRunParameters = "-v ${'$'}(pwd)/jmeter_output:/tmp/artifacts"
         }
     }
+
+    features {
+        feature {
+            type = "performance_test_analyzer"
+            param("perfTest.agg.max", "true")
+            param("perfTest.agg.avg", "true")
+            param("perfTest.agg.min", "true")
+            param("perfTest.agg.90line", "true")
+            param("perfTest.agg.assert", "true")
+            param("perfTest.agg.respCode", "true")
+            param("perfTest.agg.file", "jmeter_output/*.jtl")
+            param("perfTest.agg.testGroups", "true")
+            param("perfTest.agg.total", "true")
+        }
+    }
 })
 
 object Tests_PrepareTestEnv : BuildType({
