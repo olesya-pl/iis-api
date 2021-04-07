@@ -555,6 +555,8 @@ object Tests_IisPerformanceTest : BuildType({
 
     vcs {
         root(Tests_IisPerfTests)
+
+        cleanCheckout = true
     }
 
     steps {
