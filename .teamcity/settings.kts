@@ -466,6 +466,7 @@ object Tests : Project({
 
     buildType(Tests_IisAcceptanceTestsSanity)
     buildType(Tests_IisAcceptanceTestsSmoke)
+    buildType(Tests_IisPerformanceTest)
     buildType(Tests_PrepareTestEnv)
 })
 
@@ -546,6 +547,10 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
             onDependencyCancel = FailureAction.CANCEL
         }
     }
+})
+
+object Tests_IisPerformanceTest : BuildType({
+    name = "IIS Performance Test"
 })
 
 object Tests_PrepareTestEnv : BuildType({
