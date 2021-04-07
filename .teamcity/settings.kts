@@ -577,9 +577,9 @@ object Tests_IisPerformanceTest : BuildType({
             param("perfTest.agg.avg", "true")
             param("perfTest.agg.min", "true")
             param("perfTest.agg.90line", "true")
-            param("perfTest.agg.assert", "true")
             param("perfTest.agg.respCode", "true")
             param("perfTest.agg.file", "jmeter_output/kpi.jtl")
+            param("perfTest.agg.testFormat", "true")
         }
     }
 })
