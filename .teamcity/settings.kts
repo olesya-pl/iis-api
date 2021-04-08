@@ -497,6 +497,7 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
 
     triggers {
         finishBuildTrigger {
+            enabled = false
             buildType = "${Tests_IisAcceptanceTestsSmoke.id}"
         }
     }
