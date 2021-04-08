@@ -198,7 +198,14 @@ namespace Iis.Api.Controllers
 
             var log = new StringBuilder();
             _adminElasticService.Logger = log;
-            await _elasticManager.CreateSecurityMappingAsync(_elasticState.MaterialIndexes, cancellationToken);
+
+            var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>{
+                (_elasticState.MaterialIndexes, "AccessLevel"),
+                (_elasticState.OntologyIndexes, "__accessLevel"),
+                (_elasticState.WikiIndexes, "__accessLevel"),
+            };
+            await _elasticManager.CreateSecurityMappingAsync(indexSecurityParam, cancellationToken);
+
             log.AppendLine("Role created");
             await _userElasticService.ClearNonPredefinedUsers(cancellationToken);
             await _userService.PutAllUsersToElasticSearchAsync(cancellationToken);

@@ -14,6 +14,7 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Services.Contracts.Params;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
+using HotChocolate.Resolvers;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -22,6 +23,7 @@ namespace IIS.Core.GraphQL.Entities
         private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString()};
         private static readonly string[] EntityList = new[] { EntityTypeNames.ObjectOfStudy.ToString(), EntityTypeNames.Wiki.ToString() };
         public async Task<OntologyFilterableQueryResponse> EntityObjectOfStudyFilterableList(
+            IResolverContext ctx,
             [Service] IOntologyService ontologyService,
             [Service] IOntologyNodesData nodesData,
             [Service] IMapper mapper,
@@ -29,6 +31,7 @@ namespace IIS.Core.GraphQL.Entities
             AllEntitiesFilterInput filter
             )
         {
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
             var types = filter.Types is null || !filter.Types.Any() ? EntityList : filter.Types;
 
             var elasticFilter = new ElasticFilter
@@ -39,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities
                 CherryPickedItems = filter.CherryPickedItems.ToList(),
                 FilteredItems = filter.FilteredItems
             };
-            var response = await ontologyService.FilterNodeAsync(types, elasticFilter);
+            var response = await ontologyService.FilterNodeAsync(types, elasticFilter, tokenPayload.UserId);
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);

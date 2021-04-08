@@ -32,5 +32,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<string> ResolveCreatedBy(IResolverContext ctx);
         string ResolveIconName(IResolverContext ctx);
         string ResolveTitle(IResolverContext ctx);
+        int ResolveAccessLevel(IResolverContext ctx);
     }
 }

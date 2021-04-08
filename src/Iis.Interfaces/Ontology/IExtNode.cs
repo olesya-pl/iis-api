@@ -13,6 +13,7 @@ namespace Iis.Interfaces.Ontology
         string EntityTypeName { get; }
         object AttributeValue { get; }
         ScalarType? ScalarType { get; }
+        int? AccessLevel { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }
         IReadOnlyList<IExtNode> Children { get; }

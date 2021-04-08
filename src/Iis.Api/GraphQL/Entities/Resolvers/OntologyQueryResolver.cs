@@ -246,5 +246,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public string ResolveTitle(IResolverContext ctx) =>
             ctx.Parent<Node>().OriginalNode.GetTitleValue();
+
+        public int ResolveAccessLevel(IResolverContext ctx) =>
+            ctx.Parent<Node>().OriginalNode.GetAccessLevelIndex();
     }
 }

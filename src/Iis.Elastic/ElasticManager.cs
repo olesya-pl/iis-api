@@ -14,6 +14,7 @@ using Iis.Elastic.SearchResult;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Elastic.SearchQueryExtensions;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Iis.Elastic
 {
@@ -365,22 +366,35 @@ namespace Iis.Elastic
             return ParseResponse(response);
         }
 
-        public async Task<bool> CreateSecurityMappingAsync(IReadOnlyCollection<string> indexNames, CancellationToken cancellationToken)
+        public async Task<bool> CreateSecurityMappingAsync(
+            List<(
+                IReadOnlyCollection<string> indexNames, 
+                string accessLevelFieldName)> parameters,
+            CancellationToken cancellationToken)
         {
-            var stringifiedIndexes = string.Join(',', indexNames.Select(p => $"\"{GetRealIndexName(p)}\""));
-            var settings = $@"{{
-""indices"": [
-    {{
-        ""names"": [{stringifiedIndexes}],
-        ""privileges"": [""read""],
-        ""query"": {{
-            ""template"": {{
-                ""source"": ""{{\""bool\"":{{\""filter\"":[{{\""range\"":{{\""AccessLevel\"":{{\""lte\"":\""{{{{_user.metadata.accessLevel}}}}\""}}}}}}]}}}}""
-            }}
+            var settings = new StringBuilder("{\"indices\": [");
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                var param = parameters[i];
+                if (i > 0) settings.Append(",");
+
+                var stringifiedIndexes = string.Join(',', param.indexNames.Select(p => $"\"{GetRealIndexName(p)}\""));
+                settings.AppendLine();
+                var indexSection = $@"
+{{
+    ""names"": [{stringifiedIndexes}],
+    ""privileges"": [""read""],
+    ""query"": {{
+        ""template"": {{
+            ""source"": ""{{\""bool\"":{{\""filter\"":[{{\""range\"":{{\""{param.accessLevelFieldName}\"":{{\""lte\"":\""{{{{_user.metadata.accessLevel}}}}\""}}}}}}]}}}}""
         }}
-    }}]
+    }}
 }}";
-            var response = await PutAsync($"_xpack/security/role/{ElasticConstants.SecurityPolicyName}", settings, cancellationToken);
+                settings.AppendLine(indexSection);
+            }
+            settings.AppendLine("]}");
+
+            var response = await PutAsync($"_xpack/security/role/{ElasticConstants.SecurityPolicyName}", settings.ToString(), cancellationToken);
             return response.Success;
         }
 

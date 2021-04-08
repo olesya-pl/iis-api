@@ -98,7 +98,8 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(
             IEnumerable<string> typeNames, 
-            ElasticFilter filter, 
+            ElasticFilter filter,
+            Guid userId,
             CancellationToken ct = default)
         {
             if(ShouldReturnAllEntities(filter))
@@ -118,7 +119,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     .WithHighlights()
                     .ToString();
                 
-                var results = await _elasticManager.SearchAsync(query, typeNames, ct);
+                var results = await _elasticManager.WithUserId(userId).SearchAsync(query, typeNames, ct);
                 return results.ToOutputSearchResult();
             }
 

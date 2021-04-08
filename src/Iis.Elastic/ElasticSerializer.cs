@@ -24,6 +24,10 @@ namespace Iis.Elastic
             {
                 json[nameof(extNode.Id)] = extNode.Id;
                 json[nameof(extNode.NodeTypeName)] = extNode.NodeTypeName;
+                
+                if (extNode.AccessLevel.HasValue)
+                    json["__accessLevel"] = extNode.AccessLevel;
+
                 if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
                 {
                     json[nameof(extNode.NodeTypeTitle)] = extNode.NodeTypeTitle;
