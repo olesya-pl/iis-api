@@ -460,12 +460,14 @@ object OntologyManager_BuildOntologyManager : BuildType({
 object Tests : Project({
     name = "Tests"
 
+    vcsRoot(Tests_IisPerfTests)
     vcsRoot(Tests_IisNomad)
     vcsRoot(Tests_IisIisApiNet)
     vcsRoot(Tests_IisIisApiNet1)
 
     buildType(Tests_IisAcceptanceTestsSanity)
     buildType(Tests_IisAcceptanceTestsSmoke)
+    buildType(Tests_IisPerformanceTest)
     buildType(Tests_PrepareTestEnv)
 })
 
@@ -495,6 +497,7 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
 
     triggers {
         finishBuildTrigger {
+            enabled = false
             buildType = "${Tests_IisAcceptanceTestsSmoke.id}"
         }
     }
@@ -544,6 +547,40 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
         snapshot(Tests_PrepareTestEnv) {
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+})
+
+object Tests_IisPerformanceTest : BuildType({
+    name = "IIS Performance Test"
+
+    vcs {
+        root(Tests_IisPerfTests)
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+            scriptContent = """
+                #!/bin/sh
+                bzt test-config.yml
+            """.trimIndent()
+            dockerImage = "blazemeter/taurus"
+            dockerRunParameters = "-v ${'$'}(pwd)/jmeter_output:/tmp/artifacts"
+        }
+    }
+
+    features {
+        feature {
+            type = "performance_test_analyzer"
+            param("perfTest.agg.max", "true")
+            param("perfTest.agg.avg", "true")
+            param("perfTest.agg.min", "true")
+            param("perfTest.agg.90line", "true")
+            param("perfTest.agg.respCode", "true")
+            param("perfTest.agg.file", "jmeter_output/kpi.jtl")
+            param("perfTest.agg.testFormat", "true")
         }
     }
 })
@@ -660,6 +697,15 @@ object Tests_IisIisApiNet1 : GitVcsRoot({
 object Tests_IisNomad : GitVcsRoot({
     name = "IIS/nomad"
     url = "git@git.warfare-tec.com:IIS/nomad.git"
+    branch = "master"
+    authMethod = uploadedKey {
+        uploadedKey = "tc_contour"
+    }
+})
+
+object Tests_IisPerfTests : GitVcsRoot({
+    name = "iis-perf-tests"
+    url = "git@git.warfare-tec.com:eocheretnyi/iis-perf-tests.git"
     branch = "master"
     authMethod = uploadedKey {
         uploadedKey = "tc_contour"

@@ -54,8 +54,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
         public IWebElement ObjectsTab;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(2)")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Обробка ML')]")]
         public IWebElement MLTab;
 
         [FindsBy(How = How.CssSelector, Using = ".material-events__header .el-input__inner")]

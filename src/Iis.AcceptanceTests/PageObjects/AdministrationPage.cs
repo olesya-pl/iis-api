@@ -14,12 +14,10 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "li:nth-of-type(7) > .sidebar__nav-item-title")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Адміністрування')]")]
         public IWebElement AdministrationPage;
 
         [FindsBy(How = How.CssSelector, Using = "tbody > tr:nth-of-type(1)")]
-        [CacheLookup]
         public IWebElement FirstUserOnTheAdminPage;
 
 

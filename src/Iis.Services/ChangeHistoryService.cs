@@ -18,6 +18,7 @@ namespace Iis.Services
 {
     public class ChangeHistoryService<TUnitOfWork> : BaseService<TUnitOfWork>, IChangeHistoryService where TUnitOfWork : IIISUnitOfWork
     {
+        private const string DefaultSignLocationPropName = "sign.location";
         private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IMapper _mapper;
         public ChangeHistoryService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, IMapper mapper, IOntologyNodesData ontologyNodesData) : base(unitOfWorkFactory)
@@ -72,7 +73,7 @@ namespace Iis.Services
             {
                 var node = _ontologyNodesData.GetNode(id);
                 if (node == null) return false;
-                
+
                 var nt = node.NodeType;
 
                 return !(nt.IsObject || nt.IsEvent || nt.IsEnum);
@@ -202,30 +203,53 @@ namespace Iis.Services
         {
             var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(entityId));
 
-            return locations.Select(LocationHistoryToDTO).ToArray();
+            return locations.Select(e => LocationHistoryToDTO(e)).ToArray();
         }
 
         public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistoryAsync(ChangeHistoryParams parameters)
         {
             var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(parameters.EntityIdentityList, parameters.DateFrom, parameters.DateTo));
 
+            var propertyNameDict = parameters.EntityIdentityList
+                .Select(id => (Id:id, PropertyName: GetSignPropertyName(id)))
+                .ToDictionary(kv => kv.Id, kv => kv.PropertyName);
+
             return locations
-                .Select(LocationHistoryToDTO)
+                .Select(e => LocationHistoryToDTO(e, propertyNameDict[e.EntityId.Value]))
                 .ToArray();
         }
 
-        private static ChangeHistoryDto LocationHistoryToDTO(LocationHistoryEntity entity)
+        private static ChangeHistoryDto LocationHistoryToDTO(LocationHistoryEntity entity, string propertyName = DefaultSignLocationPropName)
         {
             if(entity is null) return null;
 
             return new ChangeHistoryDto
             {
                 Date = entity.RegisteredAt,
-                NewValue = "{\"type\":\"Point\",\"coordinates\":[" + entity.Lat.ToString() + "," + entity.Long.ToString() + "]}",
-                PropertyName = "sign.location",
+                NewValue = GetPointValue(entity.Lat, entity.Long),
+                PropertyName = propertyName,
                 TargetId = entity.EntityId.Value,
                 Type = 0
             };
+        }
+        private string GetSignPropertyName(Guid entityId, string defaultPropertyName = DefaultSignLocationPropName)
+        {
+            var node = _ontologyNodesData.GetNode(entityId);
+
+            if(node is null || !node.NodeType.IsObjectSign) return defaultPropertyName;
+
+            var nodeValue = node.GetSingleProperty("value")?.Value;
+
+            var propertyValue = string.IsNullOrWhiteSpace(nodeValue)
+                ? string.Empty
+                : $"[{nodeValue}]";
+
+            return $"{node.NodeType.Title}{propertyValue}";
+        }
+
+        private static string GetPointValue(decimal latitude, decimal longitude)
+        {
+            return "{\"type\":\"Point\",\"coordinates\":[" + latitude.ToString() + "," + longitude.ToString() + "]}";
         }
     }
 }
