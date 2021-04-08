@@ -57,20 +57,22 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             return node as Entity; // return null if node was not entity
         }
 
-        public Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, INodeTypeLinked type)
+        public Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>, User>> ResolveEntityList(IResolverContext ctx, INodeTypeLinked type)
         {
             var nf = ctx.CreateNodeFilter(type);
 
             var filter = ctx.Argument<FilterInput>("filter");
 
-            IEnumerable<Guid> ids = new List<Guid>();
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+
+            IEnumerable<Guid> ids = Array.Empty<Guid>();
 
             if (filter != null && filter.MatchList?.Any() == true)
             {
                 ids = filter.MatchList;
             }
 
-            var result = Tuple.Create((IEnumerable<INodeTypeLinked>) new[] {type}, nf, ids);
+            var result = Tuple.Create((IEnumerable<INodeTypeLinked>) new[] {type}, nf, ids, tokenPayload.User);
 
             return Task.FromResult(result);
         }
