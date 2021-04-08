@@ -26,7 +26,11 @@ namespace Iis.Interfaces.Elastic
         Task<int> CountAsync(string queryData, IEnumerable<string> baseIndexNameList, CancellationToken cancellationToken = default);
         Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchByScrollAsync(string scrollId, TimeSpan scrollDuration);
-        Task<bool> CreateSecurityMappingAsync(IReadOnlyCollection<string> indexNames, string accessLevelFieldName, CancellationToken cancellationToken);
+        Task<bool> CreateSecurityMappingAsync(
+            List<(
+                IReadOnlyCollection<string> indexNames,
+                string accessLevelFieldName)> parameters,
+            CancellationToken cancellationToken);
         Task<T> GetExactPayloadAsyncDictionary<T>(string path, CancellationToken cancellationToken);
         Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken);
         Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken);
