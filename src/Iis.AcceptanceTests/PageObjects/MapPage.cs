@@ -13,11 +13,11 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "li:nth-of-type(5) > .sidebar__nav-item-title")]
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Мапа')]")]
         [CacheLookup]
         public IWebElement MapSection;
 
-        [FindsBy(How = How.XPath, Using = "//div[contains(@class, 'esri-search__input-container')]")]
+        [FindsBy(How = How.XPath, Using = "//form[@role='search']")]
         [CacheLookup]
         public IWebElement MapSearch;
     }

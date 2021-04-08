@@ -35,6 +35,7 @@ namespace AcceptanceTests.UISteps
         public void IClieckedOnTheFirstMaterialInTheMaterialsList()
         {
             materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
+            driver.WaitFor(1);
         }
 
         [When(@"I clicked on the relations tab in the material card")]
