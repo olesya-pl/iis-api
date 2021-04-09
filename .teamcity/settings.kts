@@ -728,6 +728,8 @@ object Tests_PrepareTestEnv : BuildType({
 
     dependencies {
         snapshot(Api_BuildDocker) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
         }
         snapshot(MaterialLoader_BuildDocker) {
             onDependencyFailure = FailureAction.CANCEL
