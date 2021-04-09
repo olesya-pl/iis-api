@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Iis.DataModel;
 using Iis.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,14 @@ namespace Iis.Services
 {
     public class AccessObjectService : IAccessObjectService
     {
+        private readonly IMapper _mapper;
         OntologyContext _context;
 
-        public AccessObjectService(OntologyContext context)
+        public AccessObjectService(
+            IMapper mapper,
+            OntologyContext context)
         {
+            _mapper = mapper;
             _context = context;
         }
 
@@ -19,13 +24,7 @@ namespace Iis.Services
         {
             return _context.AccessObjects
                 .AsNoTracking()
-                .Select(ag => new AccessGranted
-                {
-                    Id = ag.Id,
-                    Kind = ag.Kind,
-                    Category = ag.Category,
-                    Title = ag.Title
-                })
+                .Select(ag => _mapper.Map<AccessGranted>(ag))
                 .ToList();
         }
     }

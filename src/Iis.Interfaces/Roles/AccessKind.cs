@@ -3,16 +3,17 @@
     public enum AccessKind
     {
         FreeForAll = 0,
-        Dor = 1, 
+        Entity = 1, 
         Material = 2, 
         Event = 3, 
         MapTab = 4,
         AdminTab = 5,
-        EventsTab = 6,
-        DorTab = 7,
-        MaterialsTab = 8,
         MaterialDorLink = 9,
         EventLink = 10,
-        AccessLevelChange = 11
+        AccessLevelChange = 11,
+        Report = 12,
+        ThemesTab = 13,
+        MaterialUpoadTab = 14,
+        WikiTab = 15
     }
 }

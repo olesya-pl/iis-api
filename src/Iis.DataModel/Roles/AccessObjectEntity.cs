@@ -1,8 +1,6 @@
 ﻿using Iis.Interfaces.Roles;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Iis.DataModel.Roles
 {
@@ -15,7 +13,9 @@ namespace Iis.DataModel.Roles
         public bool CreateAllowed { get; set; }
         public bool ReadAllowed { get; set; }
         public bool UpdateAllowed { get; set; }
-        public bool DeleteAllowed { get; set; }
+        public bool SearchAllowed { get; set; }
+        public bool CommentingAllowed { get; set; }
+        public bool AccessLevelUpdateAllowed { get; set; }
         public List<RoleAccessEntity> RoleAccessEntities { get; set; }
     }
 }

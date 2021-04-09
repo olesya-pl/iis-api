@@ -100,7 +100,6 @@ namespace Iis.UnitTests.Roles
                         Title = p.Title,
                         Category = p.Category,
                         CreateGranted = true,
-                        DeleteGranted = true,
                         UpdateGranted = true
                     }))
             });
@@ -110,7 +109,6 @@ namespace Iis.UnitTests.Roles
             Assert.False(result.AccessGrantedItems.First().ReadGranted);
             Assert.True(result.AccessGrantedItems.First().UpdateGranted);
             Assert.True(result.AccessGrantedItems.First().CreateGranted);
-            Assert.True(result.AccessGrantedItems.First().DeleteGranted);
 
             Assert.Equal("updated", result.Description);
             Assert.Equal("updated_name", result.Name);
@@ -145,7 +143,8 @@ namespace Iis.UnitTests.Roles
                 ActiveDirectoryGroupIds = new List<Guid>
                 {
                     Guid.Parse("79F363CD-D2F5-4D19-B0EE-ACA8E6872746")
-                }
+                },
+                AccessGrantedItems = new AccessGrantedList()
             });
 
             //assert
