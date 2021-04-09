@@ -466,9 +466,51 @@ object Tests : Project({
     vcsRoot(Tests_IisIisApiNet1)
 
     buildType(Tests_IisAcceptanceTestsSanity)
+    buildType(Tests_IisAcceptanceTestsRegression)
     buildType(Tests_IisAcceptanceTestsSmoke)
     buildType(Tests_IisPerformanceTest)
     buildType(Tests_PrepareTestEnv)
+})
+
+object Tests_IisAcceptanceTestsRegression : BuildType({
+    name = "IIS Acceptance Tests(Regression)"
+
+    params {
+        param("test_filter", "sanity")
+    }
+
+    vcs {
+        root(Tests_IisIisApiNet1)
+    }
+
+    steps {
+        dotnetTest {
+            name = "Run tests"
+            projects = "src/Iis.AcceptanceTests/Iis.AcceptanceTests.csproj"
+            filter = "%test_filter%"
+            logging = DotnetTestStep.Verbosity.Detailed
+            dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
+            dockerRunParameters = "-e TargetEnvironment=Dev3"
+            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
+        }
+    }
+
+    triggers {
+        finishBuildTrigger {
+            enabled = false
+            buildType = "${Tests_IisAcceptanceTestsSmoke.id}"
+        }
+    }
+
+    dependencies {
+        snapshot(Tests_IisAcceptanceTestsSmoke) {
+        }
+        snapshot(Tests_PrepareTestEnv) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
 })
 
 object Tests_IisAcceptanceTestsSanity : BuildType({
