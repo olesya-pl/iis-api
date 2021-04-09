@@ -6,6 +6,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dockerCommand
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetPublish
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetTest
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.exec
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -700,6 +701,10 @@ object Tests_PrepareTestEnv : BuildType({
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
             dockerPull = true
             dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        exec {
+            name = "Wait apps to start"
+            path = "sleep 180"
         }
     }
 
