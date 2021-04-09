@@ -7,7 +7,7 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 using Iis.Api.GraphQL.Roles;
 using Iis.Services;
 using Iis.Services.Contracts;
-
+using System.Linq;
 
 namespace IIS.Core.GraphQL.Roles
 {
@@ -42,8 +42,8 @@ namespace IIS.Core.GraphQL.Roles
             IEnumerable<AccessEntity> entities)
         {
             var mappedTabs = mapper.Map<AccessGrantedList>(tabs);
-            var mapperEntities = mapper.Map<AccessGrantedList>(entities);
-            role.AccessGrantedItems = mappedTabs.Merge(mapperEntities);
+            var mappedEntities = mapper.Map<AccessGrantedList>(entities);
+            role.AccessGrantedItems = mappedTabs.Merge(mappedEntities);
         }
     }
 }

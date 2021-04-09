@@ -87,6 +87,7 @@ namespace Iis.Api
             CreateMap<AccessGranted, AccessObjectEntity>();
             CreateMap<RoleEntity, Role>()
                 .ForMember(dest => dest.AccessGrantedItems, opts => opts.MapFrom(src => src.RoleAccessEntities))
+                .ForMember(dest => dest.AllowedItems, opts => opts.MapFrom(src => src.RoleAccessEntities.Select(p => p.AccessObject)))
                 .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.RoleGroups.Select(r => r.GroupId)));
             CreateMap<Role, RoleEntity>()
                 .ForMember(dest => dest.RoleAccessEntities, opts => opts.MapFrom(src => new List<RoleAccessEntity>()));
@@ -98,14 +99,31 @@ namespace Iis.Api
             CreateMap<AccessGranted, AccessEntity>();
             CreateMap<AccessEntity, AccessGranted>()
                 .ForMember(dest => dest.Category, opts => opts.MapFrom(src => AccessCategory.Entity))
-                .ForMember(dest => dest.ReadGranted, opts => opts
+                .ForMember(dest => dest.ReadAllowed, opts => opts
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.ReadAccessName)))
-                .ForMember(dest => dest.CreateGranted, opts => opts
+                .ForMember(dest => dest.CreateAllowed, opts => opts
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.CreateAccessName)))
-                .ForMember(dest => dest.UpdateGranted, opts => opts
+                .ForMember(dest => dest.UpdateAllowed, opts => opts
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.UpdateAccessName)))
-                .ForMember(dest => dest.DeleteGranted, opts => opts
-                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.DeleteAccessName)));
+                .ForMember(dest => dest.SearchAllowed, opts => opts
+                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.SearchAccessName)))
+                .ForMember(dest => dest.CommentingAllowed, opts => opts
+                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.CommentingAccessName)))
+                .ForMember(dest => dest.AccessLevelUpdateGranted, opts => opts
+                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.AccessLevelUpdateAccessName)))
+                .ForMember(dest => dest.ReadGranted, opts => opts
+                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.ReadAccessName)))
+                .ForMember(dest => dest.CreateGranted, opts => opts
+                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.CreateAccessName)))
+                .ForMember(dest => dest.UpdateGranted, opts => opts
+                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.UpdateAccessName)))
+                .ForMember(dest => dest.SearchGranted, opts => opts
+                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.SearchAccessName)))
+                .ForMember(dest => dest.CommentingGranted, opts => opts
+                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.CommentingAccessName)))
+                .ForMember(dest => dest.AccessLevelUpdateGranted, opts => opts
+                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.AccessLevelUpdateAccessName)));
+            CreateMap<AccessObjectEntity, AccessGranted>();
             CreateMap<ActiveDirectoryGroupDto, Group>();
 
             CreateMap<Role, IIS.Core.GraphQL.Roles.Role>()

@@ -6,6 +6,13 @@ namespace Iis.Services.Contracts
 {
     public class AccessGrantedList: List<AccessGranted>
     {
+        public AccessGrantedList() { }
+
+        public AccessGrantedList(IEnumerable<AccessGranted> accesses)
+        {
+            Merge(accesses);
+        }
+
         public AccessGrantedList Merge(IEnumerable<AccessGranted> otherList)
         {
             foreach (var otherItem in otherList)
@@ -17,7 +24,7 @@ namespace Iis.Services.Contracts
                 }
                 else
                 {
-                    localItem.Add(otherItem);
+                    localItem.MergeGranted(otherItem);
                 }
             }
             return this;
