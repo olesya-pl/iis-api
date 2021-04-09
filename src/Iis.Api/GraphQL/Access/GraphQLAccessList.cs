@@ -13,7 +13,7 @@ namespace Iis.Api.GraphQL.Access
             AddRange(new List<GraphQLAccessItem>
             {
                 new GraphQLAccessItem(AccessKind.FreeForAll, AccessOperation.None, @"getEntityTypes", @"getEntityTypeIcons"),
-                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Create, @"createEntity.*"),
+                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Create, @"createEntity*"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Read, @"getEntity*", @"getObjects"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Update, @"updateEntity.*"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Delete, @"deleteEntity.*"),
@@ -23,10 +23,13 @@ namespace Iis.Api.GraphQL.Access
                 new GraphQLAccessItem(AccessKind.Material, AccessOperation.Update, @"updateMaterial.*"),
                 new GraphQLAccessItem(AccessKind.Material, AccessOperation.Delete, @"deleteMaterial.*"),
 
-                new GraphQLAccessItem(AccessKind.Event, AccessOperation.Create, @"createEvent.*"),
-                new GraphQLAccessItem(AccessKind.Event, AccessOperation.Read, @"getEvent.*"),
+                new GraphQLAccessItem(AccessKind.Event, AccessOperation.Create, @"createEntityEvent"),
+                new GraphQLAccessItem(AccessKind.Event, AccessOperation.Read, @"getEvents"),
                 new GraphQLAccessItem(AccessKind.Event, AccessOperation.Update, @"updateEvent.*"),
                 new GraphQLAccessItem(AccessKind.Event, AccessOperation.Delete, @"deleteEvent.*"),
+
+                new GraphQLAccessItem(AccessKind.Report, AccessOperation.Create, @"createReport"),
+                new GraphQLAccessItem(AccessKind.Report, AccessOperation.Read, @"getReports"),
 
                 new GraphQLAccessItem(AccessKind.Material, AccessOperation.AccessLevelUpdate, @"changeMaterialAccessLevel"),
             });

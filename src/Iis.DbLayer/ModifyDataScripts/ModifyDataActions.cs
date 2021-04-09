@@ -384,5 +384,36 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             context.SaveChanges();
         }
+
+        public void RemoveCreareFromMaterialEntityAccess(OntologyContext context, IOntologyNodesData data)
+        {
+            var materialsEntityId = new Guid("02c1895f7d444512a0a97ebbf6c6690c");
+            var materialsEntity = context.AccessObjects.Find(materialsEntityId);
+            if (materialsEntity == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("02c1895f7d444512a0a97ebbf6c6690c"),
+                    Title = "Матеріали",
+                    Kind = AccessKind.Material,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = false,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                });
+            }
+            else
+            {
+                materialsEntity.AccessLevelUpdateAllowed = materialsEntity.CommentingAllowed = materialsEntity.SearchAllowed = true;
+                materialsEntity.CreateAllowed = false;
+                context.AccessObjects.Update(materialsEntity);
+            }
+            context.SaveChanges();
+        }
     }
+
+    
 }
