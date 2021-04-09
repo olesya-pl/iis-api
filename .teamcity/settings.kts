@@ -724,6 +724,11 @@ object Tests_PrepareTestEnv : BuildType({
             pattern = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:latest"
             replacement = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:%dep.Iis_Ui_BuildDocker.gitHashShort%"
         }
+        replaceContent {
+            fileRules = "2"
+            pattern = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:latest"
+            replacement = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:${MaterialLoader_BuildDocker.depParamRefs["gitHashShort"]}"
+        }
     }
 
     dependencies {
