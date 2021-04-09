@@ -652,6 +652,16 @@ object Tests_PrepareTestEnv : BuildType({
             dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
         }
         script {
+            name = "Nomad plan material-loader"
+            scriptContent = """
+                #!/bin/sh
+                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_material_loader.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
             name = "Nomad plan ui"
             scriptContent = """
                 #!/bin/sh
@@ -686,16 +696,6 @@ object Tests_PrepareTestEnv : BuildType({
             scriptContent = """
                 #!/bin/sh
                 levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_ui.hcl
-            """.trimIndent()
-            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
-            dockerPull = true
-            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
-        }
-        script {
-            name = "Nomad plan material-loader"
-            scriptContent = """
-                #!/bin/sh
-                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_material_loader.hcl
             """.trimIndent()
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
             dockerPull = true
