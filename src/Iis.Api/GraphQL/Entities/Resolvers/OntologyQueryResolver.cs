@@ -21,6 +21,7 @@ using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
 using Iis.Services.Contracts;
+using Iis.Interfaces.Constants;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -50,9 +51,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
 
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, INodeTypeLinked>(id, null), default);
-
+            
             if (!userService.IsAccessLevelAllowedForUser(tokenPayload.User.AccessLevel, node.OriginalNode.GetAccessLevelIndex()))
-                throw new Exception(ObjectNotFound);
+                throw new Exception($"{FrontEndErrorCodes.NotFound}:{ObjectNotFound}");
 
             return node as Entity; // return null if node was not entity
         }
