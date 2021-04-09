@@ -707,7 +707,8 @@ object Tests_PrepareTestEnv : BuildType({
         }
         exec {
             name = "Wait apps to start"
-            path = "sleep 180"
+            path = "sleep"
+            arguments = "180"
         }
     }
 
