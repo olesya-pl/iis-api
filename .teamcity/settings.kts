@@ -729,6 +729,10 @@ object Tests_PrepareTestEnv : BuildType({
     dependencies {
         snapshot(Api_BuildDocker) {
         }
+        snapshot(MaterialLoader_BuildDocker) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
         snapshot(AbsoluteId("Iis_Ui_BuildDocker")) {
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
