@@ -14,7 +14,7 @@ namespace Iis.Api.GraphQL.Access
             {
                 new GraphQLAccessItem(AccessKind.FreeForAll, AccessOperation.None, @"getEntityTypes", @"getEntityTypeIcons"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Create, @"createEntity.*"),
-                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Read, @"getEntity.*"),
+                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Read, @"getEntity*", @"getObjects"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Update, @"updateEntity.*"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Delete, @"deleteEntity.*"),
 
