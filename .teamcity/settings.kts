@@ -504,8 +504,6 @@ object Tests_IisAcceptanceTestsRegression : BuildType({
     }
 
     dependencies {
-        snapshot(Tests_IisAcceptanceTestsSmoke) {
-        }
         snapshot(Tests_PrepareTestEnv) {
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
