@@ -725,7 +725,7 @@ object Tests_PrepareTestEnv : BuildType({
             replacement = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:%dep.Iis_Ui_BuildDocker.gitHashShort%"
         }
         replaceContent {
-            fileRules = "2"
+            fileRules = "+:iis-dev/%NOMAD_ENV%/iis_material_loader.hcl"
             pattern = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:latest"
             replacement = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:${MaterialLoader_BuildDocker.depParamRefs["gitHashShort"]}"
         }
