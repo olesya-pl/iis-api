@@ -530,6 +530,7 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
             filter = "%test_filter%"
             logging = DotnetTestStep.Verbosity.Detailed
             dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerPull = true
             dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
             dockerRunParameters = "-e TargetEnvironment=Dev3"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
