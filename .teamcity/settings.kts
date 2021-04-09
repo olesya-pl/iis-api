@@ -476,7 +476,7 @@ object Tests_IisAcceptanceTestsRegression : BuildType({
     name = "IIS Acceptance Tests(Regression)"
 
     params {
-        param("test_filter", "sanity")
+        param("test_filter", "regression")
     }
 
     vcs {
