@@ -78,6 +78,7 @@ namespace Iis.UnitTests
             startup.RegisterServices(serviceCollection, false);
             serviceCollection.AddSingleton<IOntologyCache, OntologyCache>();
             serviceCollection.AddSingleton(new Mock<IOntologySchema>().Object);
+            serviceCollection.AddSingleton(new Mock<IOntologyNodesData>().Object);
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
             serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
             serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
