@@ -325,17 +325,20 @@ namespace IIS.Core
 
                 var operationName = context.Request.OperationName ?? fieldNode.Name.Value;
 
-                var graphQLAccessItem = graphQLAccessList.GetAccessItem(operationName);
+                var graphQLAccessItems = graphQLAccessList.GetAccessItem(operationName, context.Request.VariableValues);
 
                 var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
 
-                if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
+                foreach (var graphQLAccessItem in graphQLAccessItems)
                 {
-                    if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
+                    if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
                     {
-                        throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
+                        if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
+                        {
+                            throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
+                        }
                     }
-                }
+                }               
 
                 context.ContextData.Add(TokenPayload.TokenPropertyName, validatedToken);
             }
