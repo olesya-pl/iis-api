@@ -33,6 +33,7 @@ namespace Iis.DbLayer.Repositories
         public int ProcessedMlHandlersCount { get; set; }
         public Guid[] NodeIds { get; set; }
         public int NodesCount { get; set; }
+        public int ObjectsOfStudyCount { get; set; }
         public Assignee Assignee { get; set; }
         public JObject MLResponses { get; set; }
         public string Title { get; set; }

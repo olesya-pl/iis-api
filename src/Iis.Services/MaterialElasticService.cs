@@ -244,7 +244,7 @@ namespace Iis.Services
                 "processedStatus" => ("ProcessedStatus.OrderNumber", sorting.Order),
                 "sessionPriority" => ("SessionPriority.OrderNumber", sorting.Order),
                 "importance" => ("Importance.OrderNumber", sorting.Order),
-                "nodes" => ("NodesCount", sorting.Order),
+                "nodes" => ("ObjectsOfStudyCount", sorting.Order),
                 _ => (null, null)
             };
         }
