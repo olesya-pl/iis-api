@@ -14,5 +14,7 @@ namespace Iis.DataModel.Themes
             = new Guid("043ae699-e070-4336-8513-e90c87555c58");
         public static readonly Guid EntityEventId
             = new Guid("42f61965-8baa-4026-ab33-0378be8a6c3e");
+        public static readonly Guid EntityReportId
+            = new Guid("2b4b2a5a-bd2a-4159-839e-02e169fc018c");
     }
 }
