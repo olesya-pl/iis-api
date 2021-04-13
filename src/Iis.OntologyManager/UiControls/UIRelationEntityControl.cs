@@ -26,10 +26,15 @@ namespace Iis.OntologyManager.UiControls
         }
         protected override void CreateControls()
         {
-            _container.Add(txtId = new TextBox { ReadOnly = true }, "Id");
-            _container.Add(txtName = new TextBox(), "Name");
-            _container.Add(txtTitle = new TextBox(), "Title");
-            _container.Add(cmbEmbedding = _uiControlsCreator.GetEnumComboBox(typeof(EmbeddingOptions)), "Embedding Options");
+            var panels = _uiControlsCreator.GetLeftRightPanels(MainPanel, _style.ControlWidthDefault);
+            var containerLeft = new UiContainerManager("MainOptions", panels.panelLeft);
+            var containerRight = new UiContainerManager("MetaOptions", panels.panelRight);
+
+            containerLeft.Add(txtId = new TextBox { ReadOnly = true }, "Id");
+            containerLeft.Add(txtName = new TextBox(), "Name");
+            containerLeft.Add(txtTitle = new TextBox(), "Title");
+            containerLeft.Add(cmbEmbedding = _uiControlsCreator.GetEnumComboBox(typeof(EmbeddingOptions)), "Embedding Options");
+
             cmbTargetType = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
@@ -37,13 +42,12 @@ namespace Iis.OntologyManager.UiControls
                 ValueMember = "Id",
                 BackColor = _style.BackgroundColor
             };
-            _container.Add(cmbTargetType);
+            containerLeft.Add(cmbTargetType);
 
             btnSave = new Button { Text = "Save" };
             btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
-            _container.Add(btnSave);
-            _container.GoToNewColumn();
-            _container.Add(txtMeta = new RichTextBox(), "Meta", true);
+            containerLeft.Add(btnSave);
+            containerLeft.Add(txtMeta = new RichTextBox(), "Meta", true);
         }
         public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
         {
