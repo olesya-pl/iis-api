@@ -56,6 +56,17 @@ namespace Iis.Services
             return (searchResult.Count, searchResult.Items.Select(x => x.SearchResult.ToObject<ReportDto>()).ToList());
         }
 
+        public async Task<int> CountAsync(ReportSearchParams search)
+        {
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = new List<string> { _elasticIndex },
+                Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"{search.Suggestion}"
+            };
+
+            return await _elasticManager.CountAsync(searchParams);
+        }
+
         public async Task<ReportDto> GetAsync(Guid id) 
         {
             var document = await _elasticManager.GetDocumentByIdAsync(new string[] { _elasticIndex }, id.ToString("N"));
