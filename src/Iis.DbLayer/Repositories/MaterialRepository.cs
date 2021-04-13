@@ -350,14 +350,25 @@ namespace Iis.DbLayer.Repositories
                         .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
         }
 
-        public async Task RemoveMaterialsAndRelatedData()
+        public async Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList)
         {
-            var fileIds = await Context.Materials.Select(x => x.FileId).ToListAsync();
+            var removeFileIdList = fileIdList
+                .Select(e => $"'{e.ToString("N")}'")
+                .ToArray();
 
-            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE MaterialFeatures");
-            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE MaterialInfos");
-            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Materials");
-            await Context.Database.ExecuteSqlRawAsync("DELETE FROM Files WHERE Id in ({0})", string.Join(" , ", fileIds));
+            using(var transaction = await Context.Database.BeginTransactionAsync())
+            {
+                await Context.Database.ExecuteSqlRawAsync("DELETE FROM public.\"LocationHistory\" where \"MaterialId\" is not null");
+                await Context.Database.ExecuteSqlRawAsync("DELETE FROM public.\"MaterialFeatures\"");
+                Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MaterialInfos\"");
+                Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Materials\"");
+                if(removeFileIdList.Any())
+                {
+                    Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Files\" WHERE \"Id\"::text in ({0})", string.Join(" , ", fileIdList));
+                }
+
+                await transaction.CommitAsync();
+            }
         }
 
         private MaterialDocument MapEntityToDocument(MaterialEntity material)

@@ -58,6 +58,6 @@ namespace Iis.DbLayer.Repositories
 
         Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
 
-        Task RemoveMaterialsAndRelatedData();
+        Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
     }
 }
