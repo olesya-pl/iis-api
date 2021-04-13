@@ -4,17 +4,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DbLayer.Repositories;
-using Iis.Interfaces.Enums;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Iis.Services
 {
