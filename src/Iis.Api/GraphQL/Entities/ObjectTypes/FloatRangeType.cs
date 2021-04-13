@@ -102,7 +102,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 value = serialized.ToString();
                 return true;
             }
-            catch (ArgumentException e)
+            catch
             {
                 return false;
             }
@@ -116,7 +116,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
                 serialized = Serialize(value);
                 return true;
             }
-            catch (ArgumentException e)
+            catch
             {
                 return false;
             }
