@@ -21,9 +21,12 @@ namespace Iis.Api.BackgroundServices
         private static bool _objectUpdateNeeded = false;
         private static bool _eventUpdateNeeded = false;
         private static bool _materialUpdateNeeded = false;
+        private static bool _reportUpdateNeeded = false;
+
         private static bool UpdateNeeded => _objectUpdateNeeded 
             || _eventUpdateNeeded 
-            || _materialUpdateNeeded;
+            || _materialUpdateNeeded
+            || _reportUpdateNeeded;
 
         public static void SignalMaterialUpdateNeeded()
         {
@@ -38,6 +41,11 @@ namespace Iis.Api.BackgroundServices
         public static void SignalEventUpdateNeeded()
         {
             _eventUpdateNeeded = true;
+        }
+
+        public static void SignalReportUpdateNeeded()
+        {
+            _reportUpdateNeeded = true;
         }
 
         public ThemeCounterBackgroundService(IServiceProvider serviceProvider, ILogger<ThemeCounterBackgroundService> logger)
@@ -96,6 +104,10 @@ namespace Iis.Api.BackgroundServices
             {
                 res.Add(ThemeTypeEntity.EntityMaterialId);
             }
+            if (_reportUpdateNeeded)
+            {
+                res.Add(ThemeTypeEntity.EntityReportId);
+            }
 
             return res.ToArray();
         }
@@ -105,6 +117,7 @@ namespace Iis.Api.BackgroundServices
             _objectUpdateNeeded = false;
             _eventUpdateNeeded = false;
             _materialUpdateNeeded = false;
+            _reportUpdateNeeded = false;
         }
     }
 }
