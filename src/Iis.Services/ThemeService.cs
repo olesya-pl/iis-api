@@ -303,14 +303,12 @@ namespace Iis.Services
             }
             else if (typeId == ThemeTypeEntity.EntityReportId)
             {
-                var response = await _reportService.SearchAsync(new ReportSearchParams { 
-                    Suggestion = filter.Suggestion,
-                    Offset = 1,
-                    PageSize = 50
+                var count = await _reportService.CountAsync(new ReportSearchParams { 
+                    Suggestion = filter.Suggestion
                 });
                 return new QueryResult
                 {
-                    Count = response.Count,
+                    Count = count,
                     Query = query,
                     TypeId = typeId
                 };
