@@ -9,7 +9,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -167,6 +166,10 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private Dictionary<string, AggregationItem> ExtractSubAggregations(Dictionary<string, AggregationItem> aggregations)
         {
+            if (aggregations == null)
+            {
+                return SearchResultsExtension.EmptyAggregation;
+            }
             return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs);
         }
 

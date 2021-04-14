@@ -9,7 +9,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public static class SearchResultsExtension
     {
-        private static readonly Dictionary<string, AggregationItem> EmptyAggregation =
+        public static readonly Dictionary<string, AggregationItem> EmptyAggregation =
             new Dictionary<string, AggregationItem>();
 
         private static Dictionary<string, AggregationItem> RemoveOnlyOtherValuesAggregations(
