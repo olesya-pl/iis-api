@@ -221,7 +221,7 @@ namespace IIS.Core
                     catch (Exception e)
                     {
                         if (!(e is AuthenticationException) && !(e is InvalidOperationException) && !(e is AccessViolationException))
-                            throw e;
+                            throw;
 
                         var errorHandler = context.Services.GetService<IErrorHandler>();
                         var error = ErrorBuilder.New()
@@ -333,7 +333,7 @@ namespace IIS.Core
                 {
                     if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
                     {
-                        if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
+                        if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation, AccessCategory.Entity))
                         {
                             throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
                         }

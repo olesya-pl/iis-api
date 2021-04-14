@@ -516,7 +516,7 @@ namespace IIS.Core.Materials.EntityFramework
         }
         private bool IsUserAuthorizedForChangeAccessLevel(User user)
         {
-            return user.IsGranted(AccessKind.Material, AccessOperation.AccessLevelUpdate);
+            return user.IsGranted(AccessKind.Material, AccessOperation.AccessLevelUpdate, AccessCategory.Entity);
         }
     }
 }
