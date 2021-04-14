@@ -143,8 +143,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 .WithAggregation(aggregationFieldList, filter)
                 .ToString();
 
-            var searchResult = await _elasticManager.SearchAsync(multiSearchQuery, typeNames, ct);
-            var aggregationResult = await _elasticManager.SearchAsync(aggregationQuery, typeNames, ct);
+            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQuery, typeNames, ct);
+            var aggregationResult = await _elasticManager.WithUserId(userId).SearchAsync(aggregationQuery, typeNames, ct);
 
             if (historicalResult != null && historicalResult.Count > 0)
             {
