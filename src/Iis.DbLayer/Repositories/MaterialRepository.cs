@@ -1,10 +1,15 @@
 using System;
+using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using Iis.DataModel;
 using Iis.DataModel.Materials;
@@ -12,17 +17,11 @@ using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories.Helpers;
 using Iis.Interfaces.Elastic;
-using AutoMapper;
-using Newtonsoft.Json;
-using System.Threading;
-using Newtonsoft.Json.Linq;
-using Iis.Utility;
-using Iis.Domain.Elastic;
-using Iis.Domain.Materials;
+using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Domain.Materials;
 using IIS.Repository;
-using System.Diagnostics;
-using System.Text;
+using Iis.Utility;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -39,20 +38,19 @@ namespace Iis.DbLayer.Repositories
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IElasticManager _elasticManager;
         private readonly IMapper _mapper;
-        private readonly IOntologySchema ontologySchema;
-
-        public string[] MaterialIndexes { get; }
+        private readonly IOntologySchema _ontologySchema;
+        private readonly IOntologyNodesData _ontologyData;
+        public string[] MaterialIndexes => new[] { "Materials" };
 
         public MaterialRepository(IMLResponseRepository mLResponseRepository,
             IElasticManager elasticManager,
-            IMapper mapper, IOntologySchema ontologySchema)
+            IMapper mapper, IOntologySchema ontologySchema, IOntologyNodesData ontologyData)
         {
             _mLResponseRepository = mLResponseRepository;
             _elasticManager = elasticManager;
             _mapper = mapper;
-            this.ontologySchema = ontologySchema;
-
-            MaterialIndexes = new[] { "Materials" };
+            _ontologySchema = ontologySchema;
+            _ontologyData = ontologyData;
         }
 
         public Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
@@ -189,7 +187,7 @@ namespace Iis.DbLayer.Repositories
             bool waitForIndexing = false)
         {
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-            .SingleOrDefaultAsync(p => p.Id == materialId);
+                .SingleOrDefaultAsync(p => p.Id == materialId);
 
             var materialDocument = MapEntityToDocument(material);
 
@@ -232,7 +230,7 @@ namespace Iis.DbLayer.Repositories
 
         public List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
         {
-            var type = ontologySchema.GetEntityTypeByName("ObjectSign");
+            var type = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
 
             var typeIdList = new List<Guid>();
 
@@ -252,7 +250,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds)
         {
-            var type = ontologySchema.GetEntityTypeByName("ObjectSign");
+            var type = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
 
             var typeIdList = new List<Guid>();
 
@@ -352,14 +350,25 @@ namespace Iis.DbLayer.Repositories
                         .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
         }
 
-        public async Task RemoveMaterialsAndRelatedData()
+        public async Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList)
         {
-            var fileIds = await Context.Materials.Select(x => x.FileId).ToListAsync();
-            
-            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE MaterialFeatures");
-            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE MaterialInfos");
-            await Context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Materials");
-            await Context.Database.ExecuteSqlRawAsync("DELETE FROM Files WHERE Id in ({0})", string.Join(" , ", fileIds));
+            var removeFileIdList = fileIdList
+                .Select(e => $"'{e.ToString("N")}'")
+                .ToArray();
+
+            using(var transaction = await Context.Database.BeginTransactionAsync())
+            {
+                await Context.Database.ExecuteSqlRawAsync("DELETE FROM public.\"LocationHistory\" where \"MaterialId\" is not null");
+                await Context.Database.ExecuteSqlRawAsync("DELETE FROM public.\"MaterialFeatures\"");
+                Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MaterialInfos\"");
+                Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Materials\"");
+                if(removeFileIdList.Any())
+                {
+                    Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Files\" WHERE \"Id\"::text in ({0})", string.Join(" , ", fileIdList));
+                }
+
+                await transaction.CommitAsync();
+            }
         }
 
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
@@ -375,9 +384,20 @@ namespace Iis.DbLayer.Repositories
                 .Select(p => p.NodeId)
                 .ToArray();
 
+            materialDocument.ObjectsOfStudyCount = GetObjectOfStudyCount(materialDocument.NodeIds);
+
             materialDocument.NodesCount = materialDocument.NodeIds.Count();
 
             return materialDocument;
+        }
+
+        private int GetObjectOfStudyCount(IReadOnlyCollection<Guid> nodeIdList)
+        {
+            if(nodeIdList is null || !nodeIdList.Any()) return 0;
+
+            var nodeList = _ontologyData.GetNodes(nodeIdList);
+
+            return nodeList.Count(n => n.NodeType.IsObjectOfStudy);
         }
 
         private async Task<(JObject mlResponses, int mlResponsesCount, decimal[] imageVector)> PopulateMLResponses(Guid materialId)

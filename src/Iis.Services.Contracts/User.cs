@@ -23,9 +23,9 @@ namespace Iis.Services.Contracts
         public AccessGrantedList AccessGrantedItems { get; set; } = new AccessGrantedList();
         public List<AccessGranted> Tabs => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Tab).ToList();
         public List<AccessGranted> Entities => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Entity).ToList();
-        public bool IsGranted(AccessKind kind, AccessOperation operation)
+        public bool IsGranted(AccessKind kind, AccessOperation operation, AccessCategory category)
         {
-            return IsAdmin || AccessGrantedItems.IsGranted(kind, operation);
+            return IsAdmin || AccessGrantedItems.IsGranted(kind, operation, category);
         }
     }
 }

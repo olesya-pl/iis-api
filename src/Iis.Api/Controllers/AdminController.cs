@@ -159,6 +159,7 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
                 DateProperty.Create("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("Metadata.RegDate", formats:ElasticConfiguration.DefaultDateFormats),
+                TextProperty.Create("Metadata.Duration"),
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
@@ -198,7 +199,14 @@ namespace Iis.Api.Controllers
 
             var log = new StringBuilder();
             _adminElasticService.Logger = log;
-            await _elasticManager.CreateSecurityMappingAsync(_elasticState.MaterialIndexes, cancellationToken);
+
+            var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>{
+                (_elasticState.MaterialIndexes, "AccessLevel"),
+                (_elasticState.OntologyIndexes, "__accessLevel"),
+                (_elasticState.WikiIndexes, "__accessLevel"),
+            };
+            await _elasticManager.CreateSecurityMappingAsync(indexSecurityParam, cancellationToken);
+
             log.AppendLine("Role created");
             await _userElasticService.ClearNonPredefinedUsers(cancellationToken);
             await _userService.PutAllUsersToElasticSearchAsync(cancellationToken);
@@ -274,7 +282,7 @@ namespace Iis.Api.Controllers
             var stopwatch = Stopwatch.StartNew();
 
             var indexes = indexNames == AllIndexes ? baseIndexList : indexNames.Split(",");
-                
+
             var notValidIndexes = indexes.Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase)).ToList();
 
             if (notValidIndexes.Any())

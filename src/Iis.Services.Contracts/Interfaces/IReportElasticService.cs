@@ -13,6 +13,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<bool> PutAsync(ReportDto report);
         Task<bool> RemoveAsync(Guid id);
         Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search);
+        Task<int> CountAsync(ReportSearchParams search);
         Task<ReportDto> GetAsync(Guid id);
     }
 }

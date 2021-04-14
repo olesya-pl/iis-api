@@ -369,14 +369,18 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             result.OriginalNode = node;
             return result;
         }
-        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default)
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(
+            IEnumerable<string> typeNameList, 
+            ElasticFilter filter,
+            Guid userId, 
+            CancellationToken cancellationToken = default)
         {
             var derivedTypeNames = _data.Schema
                 .GetEntityTypesByName(typeNameList, true)
                 .Select(nt => nt.Name)
                 .Distinct();
             
-            return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter);
+            return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, userId);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, 

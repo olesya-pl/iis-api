@@ -3,15 +3,17 @@ using System;
 using Iis.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Iis.DataModel.Migrations
+namespace IIS.Core.Migrations
 {
     [DbContext(typeof(OntologyContext))]
-    partial class OntologyContextModelSnapshot : ModelSnapshot
+    [Migration("20210401105101_AccessObjectsUpdateActions")]
+    partial class AccessObjectsUpdateActions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1224,13 +1226,6 @@ namespace Iis.DataModel.Migrations
                             EntityTypeName = "EntityEvent",
                             ShortTitle = "П",
                             Title = "Подія"
-                        },
-                        new
-                        {
-                            Id = new Guid("2b4b2a5a-bd2a-4159-839e-02e169fc018c"),
-                            EntityTypeName = "EntityReport",
-                            ShortTitle = "З",
-                            Title = "Звіт"
                         });
                 });
 

@@ -152,7 +152,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 NodeTypeName = nodeTypeName,
                 NodeTypeTitle = nodeTypeTitle,
                 CreatedAt = node.CreatedAt,
-                UpdatedAt = node.UpdatedAt
+                UpdatedAt = node.UpdatedAt,
+                AccessLevel = node.NodeType.IsObject ? node.GetAccessLevelIndex() : (int?)null
             };
         }
 

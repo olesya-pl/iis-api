@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Iis.Api.BackgroundServices;
 using Iis.Events.Reports;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -25,16 +26,19 @@ namespace Iis.Api.EventHandlers
 
         public Task Handle(ReportRemovedEvent notification, CancellationToken cancellationToken)
         {
+            ThemeCounterBackgroundService.SignalReportUpdateNeeded();
             return _reportElasticService.RemoveAsync(notification.Id);
         }
 
         public Task Handle(ReportUpdatedEvent notification, CancellationToken cancellationToken)
         {
+            ThemeCounterBackgroundService.SignalReportUpdateNeeded();
             return _reportElasticService.PutAsync(_mapper.Map<ReportDto>(notification));
         }
 
         public Task Handle(ReportCreatedEvent notification, CancellationToken cancellationToken)
         {
+            ThemeCounterBackgroundService.SignalReportUpdateNeeded();
             return _reportElasticService.PutAsync(_mapper.Map<ReportDto>(notification));
         }
     }

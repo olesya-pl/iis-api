@@ -6,6 +6,9 @@
         Create,
         Read,
         Update,
-        Delete
+        Delete,
+        Search,
+        Commenting,
+        AccessLevelUpdate
     }
 }

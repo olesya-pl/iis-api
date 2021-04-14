@@ -18,7 +18,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         ObjectType ResolveAbstractType(IResolverContext context, object resolverResult);
         Task<Guid> ResolveId(IResolverContext ctx);
         Task<Entity> ResolveEntity(IResolverContext ctx, INodeTypeLinked type);
-        Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, INodeTypeLinked type);
+        Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>, User>> ResolveEntityList(IResolverContext ctx, INodeTypeLinked type);
         Task<object> ResolveAttributeRelation(IResolverContext ctx, INodeTypeLinked relationType);
         Task<IEnumerable<Relation>> ResolveMultipleAttributeRelation(IResolverContext ctx, INodeTypeLinked relationType);
         Task<object> ResolveMultipleAttributeRelationTarget(IResolverContext ctx);
@@ -32,5 +32,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<string> ResolveCreatedBy(IResolverContext ctx);
         string ResolveIconName(IResolverContext ctx);
         string ResolveTitle(IResolverContext ctx);
+        int ResolveAccessLevel(IResolverContext ctx);
     }
 }

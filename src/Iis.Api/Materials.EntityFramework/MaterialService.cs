@@ -52,7 +52,8 @@ namespace IIS.Core.Materials.EntityFramework
             IMediator mediator,
             IMaterialSignRepository materialSignRepository,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
-            ICommonData commonData) : base(unitOfWorkFactory)
+            ICommonData commonData,
+            ILogger<MaterialService<TUnitOfWork>> logger) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -63,6 +64,7 @@ namespace IIS.Core.Materials.EntityFramework
             _userService = userService;
             _materialSignRepository = materialSignRepository;
             _commonData = commonData;
+            _logger = logger;
         }
 
         public async Task SaveAsync(Material material, Guid? changeRequestId = null)
@@ -501,7 +503,7 @@ namespace IIS.Core.Materials.EntityFramework
             _logger.LogDebug("Start RemoveMaterials");
             var fileIds = await RunWithoutCommitAsync(uow => uow.FileRepository.GetMaterialFileIds());
             _logger.LogDebug("Found {Count} files to remove", fileIds.Count);
-            await RunAsync(uow => uow.MaterialRepository.RemoveMaterialsAndRelatedData());
+            await RunAsync(uow => uow.MaterialRepository.RemoveMaterialsAndRelatedData(fileIds));
             var removeFiles = _fileService.RemoveFiles(fileIds);
             _logger.LogDebug("Removed {Count} files", removeFiles);
         }
@@ -514,7 +516,7 @@ namespace IIS.Core.Materials.EntityFramework
         }
         private bool IsUserAuthorizedForChangeAccessLevel(User user)
         {
-            return user.IsGranted(AccessKind.AccessLevelChange, AccessOperation.Update);
+            return user.IsGranted(AccessKind.Material, AccessOperation.AccessLevelUpdate, AccessCategory.Entity);
         }
     }
 }

@@ -11,6 +11,7 @@ using Iis.Events.Entities;
 using Iis.Services.Contracts;
 using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Common;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -29,14 +30,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             IFileService fileService,
             IChangeHistoryService changeHistoryService,
             IMediator mediator,
-            IOntologyNodesData ontologyNodesData)
+            ICommonData commonData)
         {
             _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _fileService = fileService;
             _changeHistoryService = changeHistoryService;
             _mediator = mediator;
-            _accessLevels = ontologyNodesData.GetAccessLevels();
+            _accessLevels = commonData.AccessLevels;
         }
 
         public MutationCreateResolver(IResolverContext ctx)

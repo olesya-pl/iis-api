@@ -6,6 +6,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dockerCommand
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetPublish
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dotnetTest
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.exec
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -466,9 +467,50 @@ object Tests : Project({
     vcsRoot(Tests_IisIisApiNet1)
 
     buildType(Tests_IisAcceptanceTestsSanity)
+    buildType(Tests_IisAcceptanceTestsRegression)
     buildType(Tests_IisAcceptanceTestsSmoke)
     buildType(Tests_IisPerformanceTest)
     buildType(Tests_PrepareTestEnv)
+})
+
+object Tests_IisAcceptanceTestsRegression : BuildType({
+    name = "IIS Acceptance Tests(Regression)"
+
+    params {
+        param("test_filter", "regression")
+    }
+
+    vcs {
+        root(Tests_IisIisApiNet1)
+    }
+
+    steps {
+        dotnetTest {
+            name = "Run tests"
+            projects = "src/Iis.AcceptanceTests/Iis.AcceptanceTests.csproj"
+            filter = "%test_filter%"
+            logging = DotnetTestStep.Verbosity.Detailed
+            dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
+            dockerRunParameters = "-e TargetEnvironment=Dev3"
+            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
+        }
+    }
+
+    triggers {
+        finishBuildTrigger {
+            enabled = false
+            buildType = "${Tests_IisAcceptanceTestsSmoke.id}"
+        }
+    }
+
+    dependencies {
+        snapshot(Tests_PrepareTestEnv) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
 })
 
 object Tests_IisAcceptanceTestsSanity : BuildType({
@@ -489,6 +531,7 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
             filter = "%test_filter%"
             logging = DotnetTestStep.Verbosity.Detailed
             dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerPull = true
             dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
             dockerRunParameters = "-e TargetEnvironment=Dev3"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
@@ -503,8 +546,6 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
     }
 
     dependencies {
-        snapshot(Tests_IisAcceptanceTestsSmoke) {
-        }
         snapshot(Tests_PrepareTestEnv) {
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
@@ -530,6 +571,7 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
             filter = "%test_filter%"
             logging = DotnetTestStep.Verbosity.Detailed
             dockerImagePlatform = DotnetTestStep.ImagePlatform.Linux
+            dockerPull = true
             dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
             dockerRunParameters = "-e TargetEnvironment=Dev3"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
@@ -612,6 +654,16 @@ object Tests_PrepareTestEnv : BuildType({
             dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
         }
         script {
+            name = "Nomad plan material-loader"
+            scriptContent = """
+                #!/bin/sh
+                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_material_loader.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
             name = "Nomad plan ui"
             scriptContent = """
                 #!/bin/sh
@@ -632,6 +684,16 @@ object Tests_PrepareTestEnv : BuildType({
             dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
         }
         script {
+            name = "Nomad run material loader"
+            scriptContent = """
+                #!/bin/sh
+                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_material_loader.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
             name = "Nomad run ui"
             scriptContent = """
                 #!/bin/sh
@@ -640,6 +702,11 @@ object Tests_PrepareTestEnv : BuildType({
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
             dockerPull = true
             dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        exec {
+            name = "Wait apps to start"
+            path = "sleep"
+            arguments = "180"
         }
     }
 
@@ -664,10 +731,21 @@ object Tests_PrepareTestEnv : BuildType({
             pattern = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:latest"
             replacement = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:%dep.Iis_Ui_BuildDocker.gitHashShort%"
         }
+        replaceContent {
+            fileRules = "+:iis-dev/%NOMAD_ENV%/iis_material_loader.hcl"
+            pattern = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:latest"
+            replacement = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:${MaterialLoader_BuildDocker.depParamRefs["gitHashShort"]}"
+        }
     }
 
     dependencies {
         snapshot(Api_BuildDocker) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+        snapshot(MaterialLoader_BuildDocker) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
         }
         snapshot(AbsoluteId("Iis_Ui_BuildDocker")) {
             onDependencyFailure = FailureAction.CANCEL

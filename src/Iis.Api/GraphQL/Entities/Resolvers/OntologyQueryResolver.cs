@@ -21,6 +21,7 @@ using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
 using Iis.Services.Contracts;
+using Iis.Interfaces.Constants;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -50,27 +51,29 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
 
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, INodeTypeLinked>(id, null), default);
-
+            
             if (!userService.IsAccessLevelAllowedForUser(tokenPayload.User.AccessLevel, node.OriginalNode.GetAccessLevelIndex()))
-                throw new Exception(ObjectNotFound);
+                throw new Exception($"{FrontEndErrorCodes.NotFound}:{ObjectNotFound}");
 
             return node as Entity; // return null if node was not entity
         }
 
-        public Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>>> ResolveEntityList(IResolverContext ctx, INodeTypeLinked type)
+        public Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>, User>> ResolveEntityList(IResolverContext ctx, INodeTypeLinked type)
         {
             var nf = ctx.CreateNodeFilter(type);
 
             var filter = ctx.Argument<FilterInput>("filter");
 
-            IEnumerable<Guid> ids = new List<Guid>();
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+
+            IEnumerable<Guid> ids = Array.Empty<Guid>();
 
             if (filter != null && filter.MatchList?.Any() == true)
             {
                 ids = filter.MatchList;
             }
 
-            var result = Tuple.Create((IEnumerable<INodeTypeLinked>) new[] {type}, nf, ids);
+            var result = Tuple.Create((IEnumerable<INodeTypeLinked>) new[] {type}, nf, ids, tokenPayload.User);
 
             return Task.FromResult(result);
         }
@@ -244,5 +247,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public string ResolveTitle(IResolverContext ctx) =>
             ctx.Parent<Node>().OriginalNode.GetTitleValue();
+
+        public int ResolveAccessLevel(IResolverContext ctx) =>
+            ctx.Parent<Node>().OriginalNode.GetAccessLevelIndex();
     }
 }

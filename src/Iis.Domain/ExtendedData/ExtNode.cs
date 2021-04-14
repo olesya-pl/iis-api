@@ -19,6 +19,7 @@ namespace Iis.Domain.ExtendedData
         public string EntityTypeName { get; set; }
         public object AttributeValue { get; set; }
         public ScalarType? ScalarType { get; set; }
+        public int? AccessLevel { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public IReadOnlyList<IExtNode> Children { get; set; } = new List<ExtNode>();

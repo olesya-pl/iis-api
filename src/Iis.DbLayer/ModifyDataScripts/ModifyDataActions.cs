@@ -148,5 +148,272 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
         }
+
+        public void InitNewColumnsForAccessObjects(OntologyContext context, IOntologyNodesData data)
+        {
+            var accesEntityId = new Guid("a60af6c5d930476c96218ea5c0147fb7");
+            var accessEntity = context.AccessObjects.Find(accesEntityId);
+            if (accessEntity != null)
+            {
+                context.AccessObjects.Remove(accessEntity);
+            }
+            context.SaveChanges();
+
+            var reportsEntityId = new Guid("bb2fe99de99645528e89acc5bd7232e7");
+            var reportsEntity = context.AccessObjects.Find(reportsEntityId);
+            if (reportsEntity == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("bb2fe99de99645528e89acc5bd7232e7"),
+                    Title = "Звіти",
+                    Kind = AccessKind.Report,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = true,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                });
+            }
+
+            var reportsTabId = new Guid("56c3dd7aeb8a424882ce82862c3c4388");
+            var reportsTab = context.AccessObjects.Find(reportsTabId);
+            if (reportsTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("56c3dd7aeb8a424882ce82862c3c4388"),
+                    Title = "Звіти",
+                    Kind = AccessKind.Report,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+
+            context.SaveChanges();
+
+            var themesTabId = new Guid("1d20fd240de84531a19c4986cb2d277b");
+            var themesTab = context.AccessObjects.Find(themesTabId);
+            if (themesTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("1d20fd240de84531a19c4986cb2d277b"),
+                    Title = "Теми та оновлення",
+                    Kind = AccessKind.ThemesTab,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+
+            context.SaveChanges();
+
+            var materialUploadTabId = new Guid("b51766b93422450ca165d9f9d98a1fb0");
+            var materialUploadTab = context.AccessObjects.Find(materialUploadTabId);
+            if (themesTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("b51766b93422450ca165d9f9d98a1fb0"),
+                    Title = "Завантаження матеріалів",
+                    Kind = AccessKind.MaterialUpoadTab,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+
+            context.SaveChanges();
+
+            var wikiTabId = new Guid("cda32d549dd4403a94c391f8ff6d5bca");
+            var wikiTab = context.AccessObjects.Find(wikiTabId);
+            if (themesTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("cda32d549dd4403a94c391f8ff6d5bca"),
+                    Title = "Довідник ОІВТ",
+                    Kind = AccessKind.WikiTab,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+
+            context.SaveChanges();
+
+            var enityIds = new[] { new Guid("01380557fb27480c96ed6c56b8ae45a8"), new Guid("036137a67db34a0e9566f4ce9691a878") };
+            var entities = context.AccessObjects.Where(p => enityIds.Contains(p.Id));
+            foreach (var entity in entities)
+            {
+                entity.SearchAllowed = entity.CommentingAllowed = entity.AccessLevelUpdateAllowed = true;
+                
+            }
+            context.AccessObjects.UpdateRange(entities);
+            context.SaveChanges();
+
+            var materialsEntityId = new Guid("02c1895f7d444512a0a97ebbf6c6690c");
+            var materialsEntity = context.AccessObjects.Find(materialsEntityId);
+            if (materialsEntity == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("02c1895f7d444512a0a97ebbf6c6690c"),
+                    Title = "Матеріали",
+                    Kind = AccessKind.Material,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = true,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                });
+            }
+            else
+            {
+                materialsEntity.AccessLevelUpdateAllowed = materialsEntity.CommentingAllowed = materialsEntity.SearchAllowed = true;
+                materialsEntity.CreateAllowed = true;
+                context.AccessObjects.Update(materialsEntity);
+            }
+            context.SaveChanges();
+
+            var materialsTabId = new Guid("08e273695e9a49ee8eb4daa305cf9029");
+            var materialsTab = context.AccessObjects.Find(materialsTabId);
+            if (materialsTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("08e273695e9a49ee8eb4daa305cf9029"),
+                    Title = "Матеріали",
+                    Kind = AccessKind.Material,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+            else
+            {
+                materialsTab.Title = "Матеріали";
+                materialsTab.Kind = AccessKind.Material;
+                context.AccessObjects.Update(materialsTab);
+            }
+            context.SaveChanges();
+
+            var eventsTabId = new Guid("06be568c17aa4c38983aae5e80dac279");
+            var eventsTab = context.AccessObjects.Find(eventsTabId);
+            if (eventsTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("06be568c17aa4c38983aae5e80dac279"),
+                    Title = "Події",
+                    Kind = AccessKind.Event,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+            else
+            {
+                eventsTab.Kind = AccessKind.Event;
+                context.AccessObjects.Update(eventsTab);
+            }
+            context.SaveChanges();
+
+            var entityTabId = new Guid("076b6fd6204b46d7afc923b3328687a4");
+            var entityTab = context.AccessObjects.Find(entityTabId);
+            if (entityTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("076b6fd6204b46d7afc923b3328687a4"),
+                    Title = "Об'єкти розвідки",
+                    Kind = AccessKind.Entity,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+            else
+            {
+                entityTab.Kind = AccessKind.Entity;
+                context.AccessObjects.Update(entityTab);
+            }
+            context.SaveChanges();
+
+            var materialsEntityRelationTabId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45");
+            var materialsEntityRelationTab = context.AccessObjects.Find(materialsEntityRelationTabId);
+            if (materialsEntityRelationTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"),
+                    Title = "Прив'язка матеріалів до об'єктів розвідки",
+                    Kind = AccessKind.MaterialDorLink,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = true,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                });
+            }
+            else
+            {
+                materialsEntityRelationTab.Title = "Прив'язка матеріалів до об'єктів розвідки";
+                context.AccessObjects.Update(materialsTab);
+            }
+            context.SaveChanges();
+
+            var eventRelationTabId = new Guid("102617ecd2514b5f97e8be1a9bf99bc3");
+            var eventRelationTab = context.AccessObjects.Find(eventRelationTabId);
+            if (materialsEntityRelationTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("102617ecd2514b5f97e8be1a9bf99bc3"),
+                    Title = "Прив'язка подій до об'єктів розвідки та матеріалів",
+                    Kind = AccessKind.EventLink,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = true,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                });
+            }
+            else
+            {
+                eventRelationTab.Title = "Прив'язка подій до об'єктів розвідки та матеріалів";
+                context.AccessObjects.Update(materialsTab);
+            }
+
+            context.SaveChanges();
+        }
+
+        public void RemoveCreareFromMaterialEntityAccess(OntologyContext context, IOntologyNodesData data)
+        {
+            var materialsEntityId = new Guid("02c1895f7d444512a0a97ebbf6c6690c");
+            var materialsEntity = context.AccessObjects.Find(materialsEntityId);
+            if (materialsEntity == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("02c1895f7d444512a0a97ebbf6c6690c"),
+                    Title = "Матеріали",
+                    Kind = AccessKind.Material,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = false,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                });
+            }
+            else
+            {
+                materialsEntity.AccessLevelUpdateAllowed = materialsEntity.CommentingAllowed = materialsEntity.SearchAllowed = true;
+                materialsEntity.CreateAllowed = false;
+                context.AccessObjects.Update(materialsEntity);
+            }
+            context.SaveChanges();
+        }
     }
+
+    
 }

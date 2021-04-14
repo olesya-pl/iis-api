@@ -24,12 +24,14 @@ namespace Iis.DataModel.Roles
                 {
                     Id = new Guid("01380557fb27480c96ed6c56b8ae45a8"),
                     Title = "Об'єкти розвідки",
-                    Kind = AccessKind.Dor,
+                    Kind = AccessKind.Entity,
                     Category = AccessCategory.Entity,
                     CreateAllowed = true,
                     ReadAllowed = true,
                     UpdateAllowed = true,
-                    DeleteAllowed = true
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
                 },
                 new AccessObjectEntity
                 {
@@ -37,10 +39,12 @@ namespace Iis.DataModel.Roles
                     Title = "Матеріали",
                     Kind = AccessKind.Material,
                     Category = AccessCategory.Entity,
-                    CreateAllowed = true,
+                    CreateAllowed = false,
                     ReadAllowed = true,
                     UpdateAllowed = true,
-                    DeleteAllowed = true
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
                 },
                 new AccessObjectEntity
                 {
@@ -51,7 +55,30 @@ namespace Iis.DataModel.Roles
                     CreateAllowed = true,
                     ReadAllowed = true,
                     UpdateAllowed = true,
-                    DeleteAllowed = true
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                },
+                new AccessObjectEntity
+                {
+                    Id = new Guid("bb2fe99de99645528e89acc5bd7232e7"),
+                    Title = "Звіти",
+                    Kind = AccessKind.Report,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = true,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                },
+                new AccessObjectEntity
+                {
+                    Id = new Guid("56c3dd7aeb8a424882ce82862c3c4388"),
+                    Title = "Звіти",
+                    Kind = AccessKind.Report,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
                 },
                 new AccessObjectEntity
                 {
@@ -71,9 +98,33 @@ namespace Iis.DataModel.Roles
                 },
                 new AccessObjectEntity
                 {
+                    Id = new Guid("1d20fd240de84531a19c4986cb2d277b"),
+                    Title = "Теми та оновлення",
+                    Kind = AccessKind.ThemesTab,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                },
+                new AccessObjectEntity
+                {
+                    Id = new Guid("b51766b93422450ca165d9f9d98a1fb0"),
+                    Title = "Завантаження матеріалів",
+                    Kind = AccessKind.MaterialUpoadTab,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                },
+                new AccessObjectEntity
+                {
+                    Id = new Guid("cda32d549dd4403a94c391f8ff6d5bca"),
+                    Title = "Довідник ОІВТ",
+                    Kind = AccessKind.WikiTab,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                },
+                new AccessObjectEntity
+                {
                     Id = new Guid("06be568c17aa4c38983aae5e80dac279"),
                     Title = "Події",
-                    Kind = AccessKind.EventsTab,
+                    Kind = AccessKind.Event,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 },
@@ -81,39 +132,37 @@ namespace Iis.DataModel.Roles
                 {
                     Id = new Guid("076b6fd6204b46d7afc923b3328687a4"),
                     Title = "Об'єкти розвідки",
-                    Kind = AccessKind.DorTab,
+                    Kind = AccessKind.Entity,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 },
                 new AccessObjectEntity
                 {
                     Id = new Guid("08e273695e9a49ee8eb4daa305cf9029"),
-                    Title = "Вхідний поток",
-                    Kind = AccessKind.MaterialsTab,
+                    Title = "Матеріали",
+                    Kind = AccessKind.Material,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 },
                 new AccessObjectEntity
                 {
                     Id = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"),
-                    Title = "Прив'язка матеріалів к ДОР",
+                    Title = "Прив'язка матеріалів до об'єктів розвідки",
                     Kind = AccessKind.MaterialDorLink,
                     Category = AccessCategory.Entity,
                     CreateAllowed = true,
                     ReadAllowed = true,
                     UpdateAllowed = true,
-                    DeleteAllowed = true
                 },
                 new AccessObjectEntity
                 {
                     Id = new Guid("102617ecd2514b5f97e8be1a9bf99bc3"),
-                    Title = "Прив'язка подій к ДОР та матеріалам",
+                    Title = "Прив'язка подій до об'єктів розвідки та матеріалів",
                     Kind = AccessKind.EventLink,
                     Category = AccessCategory.Entity,
                     CreateAllowed = true,
                     ReadAllowed = true,
                     UpdateAllowed = true,
-                    DeleteAllowed = true
                 },
             });
 
