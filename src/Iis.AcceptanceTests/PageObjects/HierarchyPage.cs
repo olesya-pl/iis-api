@@ -11,18 +11,20 @@ namespace AcceptanceTests.PageObjects
 
         private readonly IWebElement card;
 
-        private readonly IWebElement expand;
+        private readonly string title;
 
         private readonly Actions actions;
+
+        private IWebElement toggle => driver.FindElement(By.XPath($@"//div[contains(text(),""{title}"")]/following::div[1]"));
 
         public bool Displayed => card.Displayed;
 
         public HierarchyCard(IWebDriver driver, string title)
         {
             this.driver = driver;
+            this.title = title;
             actions = new Actions(driver);
             card = driver.FindElement(By.XPath($@"//div[contains(text(),""{title}"")]"));
-            expand = driver.FindElement(By.XPath($@"//div[contains(text(),""{title}"")]/following::*"));
         }
 
         public void DoubleClickOnCard()
@@ -31,10 +33,15 @@ namespace AcceptanceTests.PageObjects
             driver.WaitFor(1);
         }
 
-        public void Expand()
-        {
-            actions.DoubleClick(expand).Perform();
-            driver.WaitFor(2);
-        }
+        public void Toggle()
+		{
+            toggle.Click();
+            driver.WaitFor(1);
+		}
+
+        public bool IsCollapsed()
+		{
+            return !toggle.HasClass("is-opened");
+		}
     }
 }

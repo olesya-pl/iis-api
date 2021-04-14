@@ -128,6 +128,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultInTheMaterialsSection()
         {
             materialsSectionPage.FirstSearchResult.Click();
+            driver.WaitFor(1);
         }
 
         [When(@"I pressed Show button to show Text classifier ML output")]

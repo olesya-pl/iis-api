@@ -20,7 +20,7 @@ namespace Iis.AcceptanceTests.PageObjects.Controls
         public Report(IWebDriver driver, string value)
         {
             this.driver = driver;
-            reportElement = driver.FindElement(By.XPath($@"//span[contains(text(),'{value}')]"));
+            reportElement = driver.FindElement(By.XPath($@"//div[contains(text(),'{value}')]"));
         }
 
         public void MouseHoverOnReport()

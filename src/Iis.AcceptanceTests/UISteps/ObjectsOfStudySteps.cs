@@ -111,7 +111,7 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.RelationsTab.Click();
         }
 
-        [When(@"I clicked on Hierarchy tab in the Object of study section")]
+        [When(@"I clicked on the hierarchy tab in the object of study section")]
         public void WhenIClickedOnHierarchyTabInTheObjectOfStudySectiion()
         {
             objectsOfStudyPage.HierarchyTab.Click();
@@ -124,10 +124,20 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.GetHierarchyCardByTitle(cardName).DoubleClickOnCard();
         }
 
-        [When(@"I double clicked on the (.*) expand button in the hierarchy")]
-        public void WhenIDoubleClickedOnTheExpandButtonInTheHierarchy(string cardName)
+        [When(@"I collapsed relation of the (.*) parent card")]
+        public void WhenICollapsedRelationOfTheParentCard(string cardName)
         {
-            objectsOfStudyPage.GetHierarchyCardByTitle(cardName).Expand();
+            var card = objectsOfStudyPage.GetHierarchyCardByTitle(cardName);
+            card.Toggle();
+            Assert.True(card.IsCollapsed());
+        }
+
+        [When(@"I expanded relation of the (.*) parent card")]
+        public void WhenIExpandedRelationOfTheÑèëîâ³ÑòðóêòóðèParentCard(string cardName)
+        {
+            var card = objectsOfStudyPage.GetHierarchyCardByTitle(cardName);
+            card.Toggle();
+            Assert.False(card.IsCollapsed());
         }
 
         [When(@"I clicked on the create a new object of study button")]

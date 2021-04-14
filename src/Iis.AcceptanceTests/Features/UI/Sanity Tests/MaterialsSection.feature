@@ -23,7 +23,7 @@ Feature: MaterialsSectionUI - Sanity
     Scenario: IIS-6374 - ML results display for DOCX material
         When I navigated to Materials page
         And I clicked search button in the Materials section
-        And I searched 20201015_Resilience_Application_Form.docx data in the materials
+        And I searched 130403-Project_Application_Guidelines.docx data in the materials
         And I clicked on the first search result in the Materials section
         And I clicked on the ML tab in the material card
         And I pressed Show button to show Text classifier ML output
@@ -33,7 +33,7 @@ Feature: MaterialsSectionUI - Sanity
     Scenario: IIS-5837- Connect a material with an object of study from material
         When I navigated to Materials page
         And I clicked search button in the Materials section
-        And I searched 20201015_Resilience_Application_Form.docx data in the materials
+        And I searched 130403-Project_Application_Guidelines.docx data in the materials
         And I clicked on the first search result in the Materials section
         And I clicked on the relations tab in the material card
         And I enter Романов value in the search object field
