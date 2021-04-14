@@ -133,7 +133,7 @@ namespace AcceptanceTests.UISteps
         }
 
         [When(@"I expanded relation of the (.*) parent card")]
-        public void WhenIExpandedRelationOfTheÑèëîâ³ÑòğóêòóğèParentCard(string cardName)
+        public void WhenIExpandedRelationOfTheParentCard(string cardName)
         {
             var card = objectsOfStudyPage.GetHierarchyCardByTitle(cardName);
             card.Toggle();
