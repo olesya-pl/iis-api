@@ -7,6 +7,7 @@ using Iis.Interfaces.Roles;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
+using Iis.OntologySchema.ChangeParameters;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
@@ -412,6 +413,41 @@ namespace Iis.DbLayer.ModifyDataScripts
                 context.AccessObjects.Update(materialsEntity);
             }
             context.SaveChanges();
+        }
+        public void DefaultAccessLevelsForDors(OntologyContext context, IOntologyNodesData data)
+        {
+            const string ACCESS_LEVEL = "accessLevel";
+            var noAccessLevelNodes = data.GetAllNodes()
+                .Where(n =>
+                    n.NodeType.IsObject && n.GetSingleProperty(ACCESS_LEVEL) == null)
+                .ToList();
+
+            var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
+            if (accessLevelType == null)
+                throw new Exception("Сутність AccessType не знайдена в Онтології");
+
+            var defaultAccessLevelId = data.GetNodesByTypeId(accessLevelType.Id)
+                .Where(n => n.GetSingleProperty("numericIndex").Value == "0")
+                .Select(n => n.Id)
+                .Single();
+
+            var objectEntity = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            var accessLevelRelationType = objectEntity.GetProperty("accessLevel");
+
+            data.WriteLock(() =>
+            {
+                foreach (var node in noAccessLevelNodes)
+                {
+                    data.CreateRelation(node.Id, defaultAccessLevelId, accessLevelRelationType.Id);
+                }
+            });
+
+            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter 
+            { 
+                Id = accessLevelRelationType.Id,
+                EmbeddingOptions = EmbeddingOptions.Required
+            });
+            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
         }
     }
 

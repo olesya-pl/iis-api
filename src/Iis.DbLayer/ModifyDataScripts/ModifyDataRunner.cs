@@ -39,6 +39,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("AddAccessLevelToObject", actions.AddAccessLevelToObject);
             _items.Add("InitNewColumnsForAccessObjects", actions.InitNewColumnsForAccessObjects);
             _items.Add("RemoveCreareFromMaterialEntityAccess", actions.RemoveCreareFromMaterialEntityAccess);
+            _items.Add("DefaultAccessLevelsForDors", actions.DefaultAccessLevelsForDors);
         }
         public bool Run()
         {

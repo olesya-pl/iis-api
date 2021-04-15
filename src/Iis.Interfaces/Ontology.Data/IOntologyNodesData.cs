@@ -18,6 +18,7 @@ namespace Iis.Interfaces.Ontology.Data
         T ReadLock<T>(Func<T> func);
         T WriteLock<T>(Func<T> func);
         void WriteLock(Action action);
+        IReadOnlyList<INode> GetAllNodes();
         IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids);
         IReadOnlyList<INode> GetNodesByTypeIds(IEnumerable<Guid> nodeTypeIds);
         IReadOnlyList<INode> GetNodesByTypeId(Guid nodeTypeId);
