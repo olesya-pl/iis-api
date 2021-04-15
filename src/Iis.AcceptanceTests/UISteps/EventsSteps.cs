@@ -173,6 +173,7 @@ namespace AcceptanceTests.UISteps
         {
             context.Set(additionalText, "additionalText");
             eventPage.AdditionalDataTextField.SendKeys(additionalText);
+            driver.WaitFor(0.5);
         }
 
         #endregion

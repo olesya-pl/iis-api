@@ -69,7 +69,7 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(12);
+            driver.WaitFor(3);
 
         }
 
