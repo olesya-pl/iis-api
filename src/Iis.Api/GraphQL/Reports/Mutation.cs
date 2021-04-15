@@ -59,7 +59,8 @@ namespace IIS.Core.GraphQL.Reports
             var copiedReport = await reportService.CopyAsync(id, new ReportDto 
             {
                 Title = data.Title,
-                Recipient = data.Recipient
+                Recipient = data.Recipient,
+                AccessLevel = data.AccessLevel
             });
             return new Report(copiedReport);
         }
