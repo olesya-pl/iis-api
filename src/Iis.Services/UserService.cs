@@ -64,6 +64,9 @@ namespace Iis.Services
 
             await _context.SaveChangesAsync();
 
+            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
+            await _userElasticService.SaveUserAsync(elasticUser, CancellationToken.None);
+
             return userEntity.Id;
         }
 
