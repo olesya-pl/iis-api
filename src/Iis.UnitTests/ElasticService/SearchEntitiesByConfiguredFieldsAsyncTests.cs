@@ -25,6 +25,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             elasticConfigurationMock
                 .Setup(e => e.GetOntologyIncludedFields(It.IsAny<IEnumerable<string>>()))
                 .Returns(new List<IIisElasticField>());
+
+            elasticServiceMock.Setup(e => e.WithUserId(userId)).Returns(elasticServiceMock.Object);
                 
             var ontologySchemaMock = new Mock<IOntologySchema>();
             var nodeRepositoryMock = new Mock<INodeRepository>();
