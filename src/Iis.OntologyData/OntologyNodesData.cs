@@ -193,6 +193,7 @@ namespace Iis.OntologyData
 
         public INode GetNode(Guid id) => GetNodeData(id);
 
+        public IReadOnlyList<INode> GetAllNodes() => Nodes.ToList();
         public IReadOnlyList<INode> GetNodes(IEnumerable<Guid> ids) => GetNodesData(ids);
 
         public IReadOnlyList<INode> GetNodesByTypeIds(IEnumerable<Guid> nodeTypeIds)

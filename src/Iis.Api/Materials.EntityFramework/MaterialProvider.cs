@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Iis.Api.Ontology;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
@@ -7,6 +7,7 @@ using Iis.DbLayer.Repositories.Helpers;
 using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Constants;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -133,7 +134,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             if (entity is null || !entity.CanBeAccessedBy(user.AccessLevel))
             {
-                throw new ArgumentException($"Cannot find material with id {id}");
+                throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
             }
 
             var mapped = Map(entity);
