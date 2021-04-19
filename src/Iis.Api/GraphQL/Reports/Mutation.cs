@@ -16,7 +16,8 @@ namespace IIS.Core.GraphQL.Reports
             {
                 Recipient = data.Recipient,
                 Title = data.Title,
-                AccessLevel = data.AccessLevel
+                AccessLevel = data.AccessLevel,
+                Annotation = data.Annotation
             });
 
             return new Report(report);
@@ -29,7 +30,8 @@ namespace IIS.Core.GraphQL.Reports
                 Id = id,
                 Title = data.Title,
                 Recipient = data.Recipient,
-                AccessLevel = data.AccessLevel
+                AccessLevel = data.AccessLevel,
+                Annotation = data.Annotation
             });
 
             return new Report(updatedReport);

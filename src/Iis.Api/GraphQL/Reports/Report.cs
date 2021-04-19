@@ -19,10 +19,11 @@ namespace IIS.Core.GraphQL.Reports
         public DateTime CreatedAt { get; set; }
         [GraphQLIgnore] 
         public Guid[] EventIds { get; set; }
+        public string Annotation { get; set; }
 
-        public Report(ReportDto report) : this(report.Id, report.Title, report.Recipient, report.CreatedAt, report.AccessLevel, report.ReportEventIds.ToArray()) { }
+        public Report(ReportDto report) : this(report.Id, report.Title, report.Recipient, report.CreatedAt, report.AccessLevel, report.ReportEventIds.ToArray(), report.Annotation) { }
 
-        public Report(Guid id, string title, string recepient, DateTime createdAt, int accessLevel, Guid[] events)
+        public Report(Guid id, string title, string recepient, DateTime createdAt, int accessLevel, Guid[] events, string annotation)
         {
             Id = id;
             Title = title ?? throw new ArgumentNullException(nameof(title));
@@ -30,6 +31,7 @@ namespace IIS.Core.GraphQL.Reports
             CreatedAt = createdAt;
             AccessLevel = accessLevel;
             EventIds = events;
+            Annotation = annotation;
         }
     }
 }
