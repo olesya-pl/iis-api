@@ -10,6 +10,7 @@ namespace Iis.DataModel.Reports
         public string Recipient { get; set; }
         public int AccessLevel { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string Annotation { get; set; }
         public virtual ICollection<ReportEventEntity> ReportEvents { get; set; } = new List<ReportEventEntity>();
 
         public ReportEntity() { }
