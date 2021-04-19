@@ -20,6 +20,8 @@ namespace Iis.DbLayer.ModifyDataScripts
             _ontologySchemaService = ontologySchemaService;
             _connectionStringService = connectionStringService;
         }
+        private void SaveOntologySchema(IOntologySchema schema) =>
+            _ontologySchemaService.SaveToDatabase(schema, _connectionStringService.GetIisApiConnectionString());
         public void RemoveEventWikiLinks(OntologyContext context, IOntologyNodesData data)
         {
             var list = new List<IRelation>();
@@ -98,7 +100,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
             var accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Грифи (рівні доступу)", false, enumEntityType.Id);
             data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
-            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
+            SaveOntologySchema(data.Schema);
 
             data.WriteLock(() =>
             {
@@ -147,7 +149,7 @@ namespace Iis.DbLayer.ModifyDataScripts
                 EmbeddingOptions.Optional,
                 jsonMeta);
 
-            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
+            SaveOntologySchema(data.Schema);
         }
 
         public void InitNewColumnsForAccessObjects(OntologyContext context, IOntologyNodesData data)
@@ -447,9 +449,22 @@ namespace Iis.DbLayer.ModifyDataScripts
                 Id = accessLevelRelationType.Id,
                 EmbeddingOptions = EmbeddingOptions.Required
             });
-            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
+            SaveOntologySchema(data.Schema);
+        }
+
+        public void AddPhotosToObject(OntologyContext context, IOntologyNodesData data)
+        {
+            const string PHOTO = "Photo";
+            if (data.Schema.GetEntityTypeByName(PHOTO) != null) return;
+
+            var photoType = data.Schema.CreateEntityType(PHOTO);
+            data.Schema.CreateAttributeType(photoType.Id, "image", "Фото", ScalarType.File, EmbeddingOptions.Required);
+            data.Schema.CreateAttributeType(photoType.Id, "title", "Заголовок", ScalarType.String, EmbeddingOptions.Optional);
+
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            data.Schema.CreateRelationType(objectType.Id, photoType.Id, "photos", "Фото", EmbeddingOptions.Multiple);
+
+            SaveOntologySchema(data.Schema);
         }
     }
-
-    
 }

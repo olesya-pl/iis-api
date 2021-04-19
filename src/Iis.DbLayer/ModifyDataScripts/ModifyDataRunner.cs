@@ -40,6 +40,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("InitNewColumnsForAccessObjects", actions.InitNewColumnsForAccessObjects);
             _items.Add("RemoveCreareFromMaterialEntityAccess", actions.RemoveCreareFromMaterialEntityAccess);
             _items.Add("DefaultAccessLevelsForDors", actions.DefaultAccessLevelsForDors);
+            _items.Add("AddPhotosToObject", actions.AddPhotosToObject);
         }
         public bool Run()
         {
