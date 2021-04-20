@@ -113,6 +113,8 @@ namespace Iis.DbLayer.Repositories
             var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                 .CountAsync();
 
+            if(materialsCount == 0) return new List<ElasticBulkResponse>();
+
             var responses = new List<ElasticBulkResponse>(materialsCount);
             for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
             {
@@ -358,10 +360,12 @@ namespace Iis.DbLayer.Repositories
 
             using(var transaction = await Context.Database.BeginTransactionAsync())
             {
-                await Context.Database.ExecuteSqlRawAsync("DELETE FROM public.\"LocationHistory\" where \"MaterialId\" is not null");
-                await Context.Database.ExecuteSqlRawAsync("DELETE FROM public.\"MaterialFeatures\"");
+                Context.Database.ExecuteSqlRaw("DELETE FROM public.\"LocationHistory\" where \"MaterialId\" is not null");
+                Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MaterialFeatures\"");
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MaterialInfos\"");
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Materials\"");
+                Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MLResponses\"");
+
                 if(removeFileIdList.Any())
                 {
                     Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Files\" WHERE \"Id\"::text in ({0})", string.Join(" , ", fileIdList));
