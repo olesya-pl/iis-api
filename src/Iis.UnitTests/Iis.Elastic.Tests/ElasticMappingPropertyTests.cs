@@ -145,6 +145,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = JObject.Parse(
                 @"{
+                    'type': 'nested',
                     'properties':{
                         'NestedPropertyName':{
                             'type':'byte'
@@ -187,6 +188,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = JObject.Parse(
                 @"{
+                    'type': 'nested',
                     'properties':{
                         'NestedPropertyName':{
                             'type':'integer'
@@ -234,6 +236,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = JObject.Parse(
                 @"{
+                    'type': 'nested',
                     'properties':{
                         'NestedPropertyName':{
                             'type':'keyword',
@@ -286,6 +289,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = JObject.Parse(
                 @"{
+                    'type': 'nested',
                     'properties':{
                         'NestedPropertyName':{
                             'type':'date_range'
@@ -304,6 +308,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = JObject.Parse(
                 @"{
+                    'type': 'nested',
                     'properties':{
                         'NestedPropertyName':{
                             'type':'date_range',
@@ -337,6 +342,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = JObject.Parse(
                 @"{
+                    'type': 'nested',
                     'properties':{
                         'NestedPropertyName':{
                             'type':'float_range'
@@ -369,6 +375,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             var expected = JObject.Parse(
                 @"{
+                    'type': 'nested',
                     'properties':{
                         'NestedPropertyName':{
                             'type':'integer_range'

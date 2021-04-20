@@ -348,18 +348,18 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content)
         {
-            decimal[] imageVector;
+            IReadOnlyCollection<decimal[]> imageVectorList;
             try
             {
-                imageVector = await VectorizeImage(content, fileName);
+                imageVectorList = await VectorizeImage(content, fileName);
 
-                if (imageVector is null) throw new Exception("Image vector is empty.");
+                if (!imageVectorList.Any()) throw new Exception("No image vectors have found.");
             }
             catch (Exception e)
             {
                 throw new Exception("Failed to vectorize image", e);
             }
-            var searchResult = await _materialElasticService.SearchByImageVector(userId, imageVector, page);
+            var searchResult = await _materialElasticService.SearchByImageVector(userId, imageVectorList, page);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -369,7 +369,7 @@ namespace IIS.Core.Materials.EntityFramework
             return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
-        public async Task<decimal[]> VectorizeImage(byte[] fileContent, string fileName)
+        private async Task<IReadOnlyCollection<decimal[]>> VectorizeImage(byte[] fileContent, string fileName)
         {
             using var form = new MultipartFormDataContent();
             using var content = new ByteArrayContent(fileContent);
@@ -379,7 +379,7 @@ namespace IIS.Core.Materials.EntityFramework
             var response = await httpClient.PostAsync(_imageVectorizerUrl, form);
             response.EnsureSuccessStatusCode();
             var contentJson = await response.Content.ReadAsStringAsync();
-            return FaceAPIResponseParser.GetEncoding(contentJson);
+            return FaceAPIResponseParser.GetFaceVectorList(contentJson);
         }
 
         public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,

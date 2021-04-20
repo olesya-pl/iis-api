@@ -8,6 +8,7 @@ namespace Iis.Elastic
 {
     public abstract class ElasticMappingProperty
     {
+        private const string TypePropertyName = "type";
         protected const char PropertyNameSeparator = '.';
         public string Name { get; set; }
         public abstract ElasticMappingPropertyType Type { get; }
@@ -16,12 +17,12 @@ namespace Iis.Elastic
 
         public JObject ToJObject()
         {
-            var result = new JObject();
+            var result = new JObject(
+                new JProperty(TypePropertyName, Type.ToString().ToUnderscore())
+            );
+
             PopulatePropertyIntoJObject(result);
-            if (Type != ElasticMappingPropertyType.Nested || Properties.Count == 0)
-            {
-                result["type"] = Type.ToString().ToUnderscore();
-            }
+
             return result;
         }
 

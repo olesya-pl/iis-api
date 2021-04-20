@@ -1,38 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.ElasticMappingProperties
 {
     public class DenseVectorProperty : ElasticMappingProperty
     {
+        private const string DimensionsPropName = "dims";
+
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.DenseVector;
 
         public int Dimensions { get; private set; }
 
         private DenseVectorProperty() { }
 
-        public static ElasticMappingProperty Create(string dotName, int dimensions)
+        public static ElasticMappingProperty Create(string propertyName, int dimensions)
         {
-            var splitted = dotName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (splitted.Length > 1)
-            {
-                return NestedProperty.Create(splitted[0], new List<ElasticMappingProperty>
-                    {
-                        Create(string.Join('.', splitted.Skip(1)), dimensions)
-                    });
-            }
-            return new DenseVectorProperty
-            {
-                Name = splitted[0],
-                Dimensions = dimensions
-            };
+            return CreateWithNestedProperty(
+                propertyName,
+                (propName) => new DenseVectorProperty{ Name = propertyName, Dimensions = dimensions},
+                (propName) => Create(propName, dimensions)
+            );
         }
 
         protected override void PopulatePropertyIntoJObject(JObject result)
         {
-            result["dims"] = Dimensions;
+            result[DimensionsPropName] = Dimensions;
         }
     }
 }

@@ -163,7 +163,6 @@ namespace Iis.Api.Controllers
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
-                DenseVectorProperty.Create("ImageVector", MaterialDocument.ImageVectorDimensionsCount),
                 TextProperty.Create("Type", true),
                 TextProperty.Create("Source", true),
                 KeywordProperty.Create("ProcessedStatus.Title", false),
@@ -176,7 +175,8 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create("SourceReliability.Title", false),
                 KeywordProperty.Create("SessionPriority.Title", false),
                 ByteProperty.Create("SessionPriority.OrderNumber"),
-                IntegerProperty.Create("NodesCount")
+                IntegerProperty.Create("NodesCount"),
+                DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },

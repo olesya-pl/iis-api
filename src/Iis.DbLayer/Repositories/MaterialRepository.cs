@@ -145,12 +145,10 @@ namespace Iis.DbLayer.Repositories
 
                         p.ProcessedMlHandlersCount = mlResponsesByEntity.Count();
 
-                        decimal[] imageVector = ExtractLatestImageVector(mlResponsesByEntity);
+                        p.ImageVectors = GetLatestImageVectorList(mlResponsesByEntity)
+                                            .Select(e => new ImageVector(e))
+                                            .ToArray();
 
-                        if (imageVector != null)
-                        {
-                            p.ImageVector = imageVector;
-                        }
                         return p;
                     });
 
@@ -193,16 +191,14 @@ namespace Iis.DbLayer.Repositories
 
             var materialDocument = MapEntityToDocument(material);
 
-            var (mlResponses, mlResponsesCount, imageVector) = await PopulateMLResponses(materialId);
+            var (mlResponses, mlResponsesCount, imageVectorList) = await PopulateMLResponses(materialId);
 
             materialDocument.MLResponses = mlResponses;
 
             materialDocument.ProcessedMlHandlersCount = mlResponsesCount;
 
-            if (imageVector != null)
-            {
-                materialDocument.ImageVector = imageVector;
-            }
+            materialDocument.ImageVectors = imageVectorList;
+
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
@@ -283,6 +279,7 @@ namespace Iis.DbLayer.Repositories
                 .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material).ToList();
         }
+
         public async Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds)
         {
             return await Context.Materials
@@ -294,6 +291,7 @@ namespace Iis.DbLayer.Repositories
                 .Select(m => m.MaterialFeature.NodeId)
                 .ToListAsync();
         }
+
         public Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds)
         {
             return Context.Materials
@@ -306,6 +304,7 @@ namespace Iis.DbLayer.Repositories
                 .Select(m => m.MaterialInfoJoined.Material)
                 .ToListAsync();
         }
+
         public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds)
         {
             return Context.Materials
@@ -346,6 +345,7 @@ namespace Iis.DbLayer.Repositories
                     .Select(e => e.Id)
                     .ToArrayAsync();
         }
+
         public Task<bool> CheckMaterialExistsAndHasContent(Guid materialId)
         {
             return GetMaterialsQuery()
@@ -404,13 +404,15 @@ namespace Iis.DbLayer.Repositories
             return nodeList.Count(n => n.NodeType.IsObjectOfStudy);
         }
 
-        private async Task<(JObject mlResponses, int mlResponsesCount, decimal[] imageVector)> PopulateMLResponses(Guid materialId)
+        private async Task<(JObject mlResponses, int mlResponsesCount, ImageVector[] imageVector)> PopulateMLResponses(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
 
-            decimal[] imageVector = ExtractLatestImageVector(mlResponses);
+            var imageVectorList = GetLatestImageVectorList(mlResponses)
+                                    .Select(e => new ImageVector(e))
+                                    .ToArray();
 
-            return (MapMlResponseEntities(mlResponses), mlResponses.Count, imageVector);
+            return (MapMlResponseEntities(mlResponses), mlResponses.Count, imageVectorList);
         }
 
         private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)
@@ -531,14 +533,13 @@ namespace Iis.DbLayer.Repositories
             return resultQuery;
         }
 
-        private static decimal[] ExtractLatestImageVector(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        private static IReadOnlyCollection<decimal[]> GetLatestImageVectorList(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
         {
             var response = mlResponsesByEntity
                                     .OrderByDescending(e => e.ProcessingDate)
-                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode)?
-                                    .OriginalResponse;
+                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode);
 
-            return FaceAPIResponseParser.GetEncoding(response);
-       }
+            return FaceAPIResponseParser.GetFaceVectorList(response?.OriginalResponse);
+        }
     }
 }
