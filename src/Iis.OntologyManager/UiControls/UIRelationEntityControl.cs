@@ -18,6 +18,7 @@ namespace Iis.OntologyManager.UiControls
         private ComboBox cmbTargetType;
         private Button btnSave;
         Func<List<INodeTypeLinked>> _getAllEntities;
+        UiNodeTypeMetaControl _metaControl;
         public event Action<INodeTypeUpdateParameter> OnSave;
         public UiRelationEntityControl(UiControlsCreator uiControlsCreator, Func<List<INodeTypeLinked>> getAllEntities)
         {
@@ -26,10 +27,9 @@ namespace Iis.OntologyManager.UiControls
         }
         protected override void CreateControls()
         {
-            var panels = _uiControlsCreator.GetLeftRightPanels(MainPanel, _style.ControlWidthDefault);
+            var panels = _uiControlsCreator.GetLeftRightPanels(MainPanel, _style.ControlWidthDefault + 2 * _style.MarginHor);
             var containerLeft = new UiContainerManager("MainOptions", panels.panelLeft);
-            var containerRight = new UiContainerManager("MetaOptions", panels.panelRight);
-
+            
             containerLeft.Add(txtId = new TextBox { ReadOnly = true }, "Id");
             containerLeft.Add(txtName = new TextBox(), "Name");
             containerLeft.Add(txtTitle = new TextBox(), "Title");
@@ -48,6 +48,9 @@ namespace Iis.OntologyManager.UiControls
             btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
             containerLeft.Add(btnSave);
             containerLeft.Add(txtMeta = new RichTextBox(), "Meta", true);
+
+            _metaControl = new UiNodeTypeMetaControl();
+            _metaControl.Initialize("NodeTypeMetaControl", panels.panelRight);
         }
         public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
         {
@@ -58,6 +61,7 @@ namespace Iis.OntologyManager.UiControls
             _uiControlsCreator.SetSelectedValue(cmbEmbedding, nodeType.RelationType.EmbeddingOptions.ToString());
             cmbTargetType.DataSource = _getAllEntities();
             _uiControlsCreator.SetSelectedValue(cmbTargetType, nodeType.RelationType.TargetType.Name);
+            _metaControl.SetUiValues(nodeType.MetaObject);
         }
         public void CreateNew()
         {

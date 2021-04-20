@@ -58,7 +58,9 @@ namespace Iis.OntologyManager
         UiDuplicatesControl _duplicatesControl;
         UiEntityTypeControl _uiEntityTypeControl;
         UiRelationAttributeControl _uiRelationAttributeControl;
-        UiRelationEntityControl _uiRelationEntityControl;
+        //UiRelationEntityControl _uiRelationEntityControl;
+        UiRelationControl _uiRelationToEntityControl;
+        UiRelationControl _uiRelationToAttributeControl;
         UiOntologyDataControl _uiOntologyDataControl;
         UiAccessLevelControl _uiAccessLevelControl;
         RemoveEntityUiControl _removeEntityUiControl;
@@ -101,6 +103,7 @@ namespace Iis.OntologyManager
             ILogger logger)
         {
             InitializeComponent();
+            this.WindowState = FormWindowState.Maximized;
             Text = $"Володар Онтології {VERSION}";
 
             _configuration = configuration;
@@ -173,15 +176,24 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnRemoveInheritance += RemoveInheritance;
             _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
-            var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            _uiRelationAttributeControl = new UiRelationAttributeControl(_uiControlsCreator);
-            _uiRelationAttributeControl.Initialize("RelationAttributeControl", pnlRelationAttribute);
-            _uiRelationAttributeControl.OnSave += OnNodeTypeSaveClick;
+            //var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            //_uiRelationAttributeControl = new UiRelationAttributeControl(_uiControlsCreator);
+            //_uiRelationAttributeControl.Initialize("RelationAttributeControl", pnlRelationAttribute);
+            //_uiRelationAttributeControl.OnSave += OnNodeTypeSaveClick;
 
-            var pnlRelationEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            _uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator, GetAllEntities);
-            _uiRelationEntityControl.Initialize("RelationEntityControl", pnlRelationEntity);
-            _uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
+            var pnlRelationToAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiRelationToAttributeControl = new UiRelationControl(_uiControlsCreator, GetAllEntities, RelationControlMode.ToAttribute);
+            _uiRelationToAttributeControl.Initialize("RelationControl", pnlRelationToAttribute);
+            _uiRelationToAttributeControl.OnSave += OnNodeTypeSaveClick;
+
+            //var pnlRelationEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            //_uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator, GetAllEntities);
+            //_uiRelationEntityControl.Initialize("RelationEntityControl", pnlRelationEntity);
+            //_uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
+            var pnlRelationToEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
+            _uiRelationToEntityControl = new UiRelationControl(_uiControlsCreator, GetAllEntities, RelationControlMode.ToEntity);
+            _uiRelationToEntityControl.Initialize("RelationControl", pnlRelationToEntity);
+            _uiRelationToEntityControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlOntologyData = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiOntologyDataControl = new UiOntologyDataControl(_uiControlsCreator);
@@ -196,8 +208,8 @@ namespace Iis.OntologyManager
             _dataViewControls[DefaultName] = _uiOntologyDataControl;
 
             _nodeTypeControls[NodeViewType.Entity] = _uiEntityTypeControl;
-            _nodeTypeControls[NodeViewType.RelationEntity] = _uiRelationEntityControl;
-            _nodeTypeControls[NodeViewType.RelationAttribute] = _uiRelationAttributeControl;
+            _nodeTypeControls[NodeViewType.RelationEntity] = _uiRelationToEntityControl;
+            _nodeTypeControls[NodeViewType.RelationAttribute] = _uiRelationToAttributeControl;
 
             rootPanel.SuspendLayout();
             rootPanel.Controls.Add(pnlTop);
@@ -283,26 +295,26 @@ namespace Iis.OntologyManager
 
             var menuElastic = new ContextMenuStrip();
             menuElastic.Items.Add("Індекси Онтології");
-            menuElastic.Items[0].Click += (sender, e) => { ReIndexElastic(IndexKeys.Ontology); };
+            menuElastic.Items[0].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.Ontology); };
             menuElastic.Items.Add("Історічні Індекси");
-            menuElastic.Items[1].Click += (sender, e) => { ReIndexElastic(IndexKeys.OntologyHistorical); };
+            menuElastic.Items[1].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.OntologyHistorical); };
             menuElastic.Items.Add("Індекси Ознак");
-            menuElastic.Items[2].Click += (sender, e) => { ReIndexElastic(IndexKeys.Signs); };
+            menuElastic.Items[2].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.Signs); };
             menuElastic.Items.Add("Індекси Подій");
-            menuElastic.Items[3].Click += (sender, e) => { ReIndexElastic(IndexKeys.Events); };
+            menuElastic.Items[3].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.Events); };
             menuElastic.Items.Add("Індекси Звітів");
-            menuElastic.Items[4].Click += (sender, e) => { ReIndexElastic(IndexKeys.Reports); };
+            menuElastic.Items[4].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.Reports); };
             menuElastic.Items.Add("Індекси Матеріалів");
-            menuElastic.Items[5].Click += (sender, e) => { ReIndexElastic(IndexKeys.Materials); };
+            menuElastic.Items[5].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.Materials); };
             menuElastic.Items.Add("Індекси Wiki");
-            menuElastic.Items[6].Click += (sender, e) => { ReIndexElastic(IndexKeys.Wiki); };
+            menuElastic.Items[6].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.Wiki); };
             menuElastic.Items.Add("Історічні Індекси Wiki");
-            menuElastic.Items[7].Click += (sender, e) => { ReIndexElastic(IndexKeys.WikiHistorical); };
+            menuElastic.Items[7].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.WikiHistorical); };
             menuElastic.Items.Add("Індекси Користувачів");
-            menuElastic.Items[8].Click += (sender, e) => { ReIndexElastic(IndexKeys.Users); };
-            var btnMenu = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
-            btnMenu.Click += (sender, e) => { menuElastic.Show(btnMenu, new Point(0, btnMenu.Height)); };
-            container.Add(btnMenu);
+            menuElastic.Items[8].Click += async (sender, e) => { await ReIndexElastic(IndexKeys.Users); };
+            var btnElastic = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
+            btnElastic.Click += (sender, e) => { menuElastic.Show(btnElastic, new Point(0, btnElastic.Height)); };
+            container.Add(btnElastic);
 
             var menuReload = new ContextMenuStrip();
             menuReload.Items.Add("Тільки кеш Онтології (дані Онтології, що зберігаются у веб-додадку)");
@@ -312,6 +324,10 @@ namespace Iis.OntologyManager
             var btnReload = new Button { Text = "Перезавантажити " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuReload };
             btnReload.Click += (sender, e) => { menuReload.Show(btnReload, new Point(0, btnReload.Height)); };
             container.Add(btnReload);
+
+            var btnSearch = new Button { Text = "Шукати" };
+            btnSearch.Click += (sender, e) => SearchNodeTypes();
+            container.Add(btnSearch);
 
             panelTop.ResumeLayout();
         }
@@ -439,6 +455,7 @@ namespace Iis.OntologyManager
             form.ShowDialog();
             form.Close();
         }
+
         private IMigrationResult Migrate(IMigration migration, IMigrationOptions migrationOptions)
         {
             if (SelectedConnectionString == null) return null;
@@ -451,6 +468,16 @@ namespace Iis.OntologyManager
             var ontologyPatchSaver = new OntologyPatchSaver(context);
             ontologyPatchSaver.SavePatch(ontologyData.Patch);
             return result;
+        }
+        private void SearchNodeTypes()
+        {
+            var form = _uiControlsCreator.GetModalForm(this);
+            var rootPanel = _uiControlsCreator.GetFillPanel(form);
+            var control = new UiNodeTypeSearch(_schema);
+            control.Initialize("NodeTypeSearch", rootPanel);
+
+            form.ShowDialog();
+            form.Close();
         }
         private void GridTypesSelectionChanged()
         {

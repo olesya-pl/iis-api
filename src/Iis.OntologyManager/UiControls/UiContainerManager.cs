@@ -57,11 +57,12 @@ namespace Iis.OntologyManager.UiControls
             {
                 label = new Label
                 {
-                    Left = _left,
+                    Left = _left - 2,
                     Top = Top,
                     Width = _colWidth,
                     Text = labelText
                 };
+                label.Height -= 4;
                 AddToRoot(label);
                 Top += label.Height;
             }
@@ -71,8 +72,8 @@ namespace Iis.OntologyManager.UiControls
 
             if (stretchToDown)
             {
-                control.Height = _bottom > control.Top ? 
-                    _bottom - control.Top  :
+                control.Height = _bottom > control.Top ?
+                    _bottom - control.Top :
                     _rect.Height - control.Top;
             }
 
