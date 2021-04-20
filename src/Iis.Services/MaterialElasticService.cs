@@ -205,11 +205,11 @@ namespace Iis.Services
             return searchResult.ToSearchResult();
         }
 
-        public async Task<SearchResult> SearchByImageVector(Guid userId, decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
+        public async Task<SearchResult> SearchByImageVector(Guid userId, IReadOnlyCollection<decimal[]> imageVectorList, PaginationParams page, CancellationToken ct = default)
         {
             var (from, size) = page.ToElasticPage();
 
-            var query = new SearchByImageQueryBuilder(imageVector)
+            var query = new SearchByImageQueryBuilder(imageVectorList)
                 .WithPagination(from, size)
                 .BuildSearchQuery()
                 .WithAggregation(_aggregationsFieldList);
