@@ -54,7 +54,7 @@ namespace Iis.Api.GraphQL.Access
                         }
                     }
 
-                    if (request.ContainsKey("SearchByRelationInput"))
+                    if (request.ContainsKey("searchByRelationInput"))
                     {
                         var searchByRelation = JsonConvert.DeserializeObject<SearchByRelationInput>(JsonConvert.SerializeObject(request["searchByRelation"]));
                         if (searchByRelation != null)

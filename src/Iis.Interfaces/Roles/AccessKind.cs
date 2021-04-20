@@ -14,6 +14,6 @@
         Report = 12,
         ThemesTab = 13,
         MaterialUpoadTab = 14,
-        WikiTab = 15
+        Wiki = 15
     }
 }

@@ -331,12 +331,13 @@ namespace IIS.Core
 
                 foreach (var graphQLAccessItem in graphQLAccessItems)
                 {
-                    if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
+                    if (graphQLAccessItem == null || graphQLAccessItem.Kind == AccessKind.FreeForAll)
                     {
-                        if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation, AccessCategory.Entity))
-                        {
-                            throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
-                        }
+                        break;   
+                    }
+                    if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation, AccessCategory.Entity))
+                    {
+                        throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
                     }
                 }               
 

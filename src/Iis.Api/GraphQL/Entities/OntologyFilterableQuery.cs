@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities
                 CherryPickedItems = filter.CherryPickedItems.ToList(),
                 FilteredItems = filter.FilteredItems
             };
-            var response = await ontologyService.FilterNodeAsync(types, elasticFilter, tokenPayload.UserId);
+            var response = await ontologyService.FilterNodeAsync(types, elasticFilter, tokenPayload.User);
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);

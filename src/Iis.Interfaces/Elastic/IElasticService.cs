@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,5 +23,6 @@ namespace Iis.Interfaces.Elastic
         Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default);
         Task<int> CountEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default);
         Task<bool> DeleteNodeAsync(Guid id, string typeName, CancellationToken ct = default);
+        bool TypeIsAvalilable(INodeTypeLinked type, bool entitySearchGranted, bool wikiSearchGranted);
     }
 }

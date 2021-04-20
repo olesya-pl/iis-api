@@ -3,6 +3,7 @@ using Iis.Domain.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -389,6 +390,12 @@ namespace IIS.Core.Ontology.EntityFramework
             var indexName = _elasticState.OntologyIndexes.Union(_elasticState.EventIndexes).FirstOrDefault(e => e.Equals(typeName, StringComparison.OrdinalIgnoreCase));
 
             return _elasticManager.DeleteDocumentAsync(indexName, id.ToString("N"), ct);
+        }
+
+        public bool TypeIsAvalilable(INodeTypeLinked type, bool entitySearchGranted, bool wikiSearchGranted)
+        {
+            return (entitySearchGranted && _elasticState.OntologyIndexes.Contains(type.Name))
+                || (wikiSearchGranted && _elasticState.WikiIndexes.Contains(type.Name));
         }
     }
 }

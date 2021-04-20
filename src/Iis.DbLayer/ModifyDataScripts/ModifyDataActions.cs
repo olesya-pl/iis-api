@@ -237,7 +237,7 @@ namespace Iis.DbLayer.ModifyDataScripts
                 {
                     Id = new Guid("cda32d549dd4403a94c391f8ff6d5bca"),
                     Title = "Довідник ОІВТ",
-                    Kind = AccessKind.WikiTab,
+                    Kind = AccessKind.Wiki,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 });
@@ -466,5 +466,28 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             SaveOntologySchema(data.Schema);
         }
+
+        public void AddWikiEntityAccessObject(OntologyContext context, IOntologyNodesData data)
+        {
+            var wikiEntityId = new Guid("c28c097bd74e49d1a8cbbeb0ecf43b08");
+            var wikiEntity = context.AccessObjects.Find(wikiEntityId);
+            if (wikiEntity == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("c28c097bd74e49d1a8cbbeb0ecf43b08"),
+                    Title = "Довідник ОІВТ",
+                    Kind = AccessKind.Wiki,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = true,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                });
+            }
+        }
+            
     }
 }
