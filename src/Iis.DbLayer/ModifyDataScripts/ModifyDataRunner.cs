@@ -41,6 +41,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("RemoveCreareFromMaterialEntityAccess", actions.RemoveCreareFromMaterialEntityAccess);
             _items.Add("DefaultAccessLevelsForDors", actions.DefaultAccessLevelsForDors);
             _items.Add("AddPhotosToObject", actions.AddPhotosToObject);
+            _items.Add("AddWikiEntityAccessObject", actions.AddWikiEntityAccessObject);
         }
         public bool Run()
         {

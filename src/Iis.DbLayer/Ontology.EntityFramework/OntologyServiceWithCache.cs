@@ -12,6 +12,7 @@ using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
 using Iis.Services.Contracts;
 using Iis.Interfaces.AccessLevels;
+using Iis.Interfaces.Roles;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -136,7 +137,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var derivedTypes = _data.Schema
                 .GetNodeTypes(types.Select(t => t.Id))
-                .Where(type => !type.IsAbstract);
+                .Where(type => !type.IsAbstract 
+                    && _elasticService.TypeIsAvalilable(type, 
+                        user.IsEntitySearchGranted(),
+                        user.IsWikiSearchGranted()));
 
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
 
@@ -372,15 +376,17 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(
             IEnumerable<string> typeNameList, 
             ElasticFilter filter,
-            Guid userId, 
+            User user, 
             CancellationToken cancellationToken = default)
         {
             var derivedTypeNames = _data.Schema
                 .GetEntityTypesByName(typeNameList, true)
+                .Where(type => _elasticService.TypeIsAvalilable(type,
+                        user.IsEntitySearchGranted(),
+                        user.IsWikiSearchGranted()))
                 .Select(nt => nt.Name)
                 .Distinct();
-            
-            return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, userId);
+            return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, 

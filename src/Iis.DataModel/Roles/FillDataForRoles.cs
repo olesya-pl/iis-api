@@ -116,7 +116,7 @@ namespace Iis.DataModel.Roles
                 {
                     Id = new Guid("cda32d549dd4403a94c391f8ff6d5bca"),
                     Title = "Довідник ОІВТ",
-                    Kind = AccessKind.WikiTab,
+                    Kind = AccessKind.Wiki,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 },
