@@ -89,7 +89,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return _elasticManager.CountAsync(searchParams, ct);
         }
 
-        private bool ShouldReturnAllEntities(ElasticFilter filter)
+        public bool ShouldReturnAllEntities(ElasticFilter filter)
         {
             return SearchQueryExtension.IsMatchAll(filter.Suggestion) 
                    && !filter.FilteredItems.Any() 
