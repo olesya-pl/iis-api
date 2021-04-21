@@ -395,7 +395,8 @@ namespace IIS.Core.Ontology.EntityFramework
         public bool TypeIsAvalilable(INodeTypeLinked type, bool entitySearchGranted, bool wikiSearchGranted)
         {
             return (entitySearchGranted && _elasticState.OntologyIndexes.Contains(type.Name))
-                || (wikiSearchGranted && _elasticState.WikiIndexes.Contains(type.Name));
+                || (wikiSearchGranted && _elasticState.WikiIndexes.Contains(type.Name))
+                || (!_elasticState.WikiIndexes.Contains(type.Name) && !_elasticState.OntologyIndexes.Contains(type.Name));
         }
     }
 }
