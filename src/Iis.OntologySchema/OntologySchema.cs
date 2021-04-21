@@ -515,6 +515,18 @@ namespace Iis.OntologySchema
             _storage.RemoveNodeType(relationType.Id);
             _storage.RemoveRelationType(relationType.Id);
             relationType._sourceType.RemoveRelationType(relationType.Id);
+            _storage.SetDotNameTypes();
+        }
+
+        public void RemoveRelation(string entityTypeName, string relationTypeName)
+        {
+            var entityType = GetEntityTypeByName(entityTypeName);
+            if (entityType == null) throw new Exception($"Entity type {entityTypeName} is not found");
+
+            var relationType = entityType.GetRelationTypeByName(relationTypeName);
+            if (relationType == null) throw new Exception($"Entity type {relationTypeName} for {entityTypeName} is not found");
+
+            RemoveRelation(relationType.Id);
         }
         
         public IEnumerable<INodeTypeLinked> GetAllNodeTypes()
