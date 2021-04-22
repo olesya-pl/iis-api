@@ -24,5 +24,6 @@ namespace Iis.Interfaces.Elastic
         Task<int> CountEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default);
         Task<bool> DeleteNodeAsync(Guid id, string typeName, CancellationToken ct = default);
         bool TypeIsAvalilable(INodeTypeLinked type, bool entitySearchGranted, bool wikiSearchGranted);
+        bool ShouldReturnAllEntities(ElasticFilter filter);
     }
 }
