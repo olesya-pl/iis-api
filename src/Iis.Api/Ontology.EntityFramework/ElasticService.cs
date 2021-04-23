@@ -89,7 +89,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return _elasticManager.CountAsync(searchParams, ct);
         }
 
-        private bool ShouldReturnAllEntities(ElasticFilter filter)
+        public bool ShouldReturnAllEntities(ElasticFilter filter)
         {
             return SearchQueryExtension.IsMatchAll(filter.Suggestion) 
                    && !filter.FilteredItems.Any() 
@@ -395,7 +395,8 @@ namespace IIS.Core.Ontology.EntityFramework
         public bool TypeIsAvalilable(INodeTypeLinked type, bool entitySearchGranted, bool wikiSearchGranted)
         {
             return (entitySearchGranted && _elasticState.OntologyIndexes.Contains(type.Name))
-                || (wikiSearchGranted && _elasticState.WikiIndexes.Contains(type.Name));
+                || (wikiSearchGranted && _elasticState.WikiIndexes.Contains(type.Name))
+                || (!_elasticState.WikiIndexes.Contains(type.Name) && !_elasticState.OntologyIndexes.Contains(type.Name));
         }
     }
 }

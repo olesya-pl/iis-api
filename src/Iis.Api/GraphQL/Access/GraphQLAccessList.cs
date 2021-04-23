@@ -14,8 +14,8 @@ namespace Iis.Api.GraphQL.Access
             AddRange(new List<GraphQLAccessItem>
             {
                 new GraphQLAccessItem(AccessKind.FreeForAll, AccessOperation.None, @"getEntityTypes", @"getEntityTypeIcons"),
-                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Create, @"createEntity*"),
-                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Read, @"getEntity*", @"getObjects"),
+                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Create, @"createEntity(?!Event)"),
+                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Read, @"getEntity(?!Event)", @"getObjects"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Search, request => {
                     if (!request.ContainsKey("filter"))
                     {
@@ -28,7 +28,7 @@ namespace Iis.Api.GraphQL.Access
                     }
                     return !string.IsNullOrEmpty(filter?.Suggestion ?? filter?.SearchQuery) || filter.CherryPickedItems.Any() || filter.FilteredItems.Any();
                 }, @"getObjects"),
-                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Update, @"updateEntity*"),
+                new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Update, @"updateEntity(?!Event)"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Delete, @"deleteEntity.*"),
 
                 new GraphQLAccessItem(AccessKind.Material, AccessOperation.Read, @"getMaterial*"),
@@ -68,7 +68,7 @@ namespace Iis.Api.GraphQL.Access
                 new GraphQLAccessItem(AccessKind.Material, AccessOperation.Delete, @"deleteMaterial.*"),
 
                 new GraphQLAccessItem(AccessKind.Event, AccessOperation.Create, @"createEntityEvent"),
-                new GraphQLAccessItem(AccessKind.Event, AccessOperation.Read, @"getEvents"),
+                new GraphQLAccessItem(AccessKind.Event, AccessOperation.Read, @"getEvents", @"getEntityEvent"),
                 new GraphQLAccessItem(AccessKind.Event, AccessOperation.Search, request => {
                 if (!request.ContainsKey("filter"))
                     {

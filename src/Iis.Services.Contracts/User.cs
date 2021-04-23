@@ -27,7 +27,9 @@ namespace Iis.Services.Contracts
         {
             return IsAdmin || AccessGrantedItems.IsGranted(kind, operation, category);
         }
+        public bool IsEntityReadGranted() => IsGranted(AccessKind.Entity, AccessOperation.Read, AccessCategory.Entity);
         public bool IsEntitySearchGranted() => IsGranted(AccessKind.Entity, AccessOperation.Search, AccessCategory.Entity);
+        public bool IsWikiReadGranted() => IsGranted(AccessKind.Wiki, AccessOperation.Read, AccessCategory.Entity);
         public bool IsWikiSearchGranted() => IsGranted(AccessKind.Wiki, AccessOperation.Search, AccessCategory.Entity);
     }
 }
