@@ -38,6 +38,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div[name='state']  div[role='radiogroup'] > label:nth-of-type(1)  .el-radio__inner")]
         public IWebElement FlawRadioButton;
 
+        [FindsBy(How = How.XPath, Using = "//div[@name='accessLevel']//input[@type='text']")]
+        public IWebElement SecurityClassificationField;
+
         [FindsBy(How = How.CssSelector, Using = "div[name='relatesToCountry'] > .el-form-item__content")]
         public IWebElement CountrySelectionDropDown;
 

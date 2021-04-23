@@ -42,6 +42,9 @@ namespace AcceptanceTests.UISteps
             eventPage.EventTitle.SendKeys(eventUniqueName);
             eventPage.AverageImportaceRadioButton.Click();
             eventPage.FlawRadioButton.Click();
+            eventPage.SecurityClassificationField.SendKeys("НВ");
+            eventPage.SecurityClassificationField.SendKeys(Keys.Down);
+            eventPage.SecurityClassificationField.SendKeys(Keys.Enter);
             eventPage.CountrySelectionDropDown.Click();
             var countryInput = eventPage.CountrySelectionDropDown.FindElement(By.TagName("input"));
             countryInput.SendKeys("Росія");
@@ -75,6 +78,9 @@ namespace AcceptanceTests.UISteps
             eventPage.AverageImportaceRadioButton.Click();
             eventPage.NotHappenRadioButton.Click();
             eventPage.FlawRadioButton.Click();
+            eventPage.SecurityClassificationField.SendKeys("НВ");
+            eventPage.SecurityClassificationField.SendKeys(Keys.Down);
+            eventPage.SecurityClassificationField.SendKeys(Keys.Enter);
             eventPage.CountrySelectionDropDown.Click();
             var countryInput = eventPage.CountrySelectionDropDown.FindElement(By.TagName("input"));
             countryInput.SendKeys("Росія");

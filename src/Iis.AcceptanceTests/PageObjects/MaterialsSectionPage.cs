@@ -22,7 +22,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSection;
 
-        [FindsBy(How = How.XPath, Using = "//table[@class='el-table__body']/tbody/tr[1]")]
+        [FindsBy(How = How.XPath, Using = "//tr[@class='el-table__row expanded']")]
         public IWebElement FirstMaterialInTheMaterialsList;
 
         [FindsBy(How = How.CssSelector, Using = ".el-button--default")]
