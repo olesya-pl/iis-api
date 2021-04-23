@@ -17,13 +17,24 @@ namespace Iis.Elastic
 
         public JObject ToJObject()
         {
-            var result = new JObject(
-                new JProperty(TypePropertyName, Type.ToString().ToUnderscore())
-            );
-
+            var result = new JObject();
             PopulatePropertyIntoJObject(result);
+            if (!IsNonEmptyNestedProperty() || IsDenseVectorContainer())
+            {
+                result[TypePropertyName] = Type.ToString().ToUnderscore();
+            }
 
             return result;
+        }
+
+        private bool IsDenseVectorContainer()
+        {
+            return Properties.Any(p => p.Type == ElasticMappingPropertyType.DenseVector);
+        }
+
+        private bool IsNonEmptyNestedProperty()
+        {
+            return (Type == ElasticMappingPropertyType.Nested && Properties.Count != 0);
         }
 
         public override string ToString() => Name;
