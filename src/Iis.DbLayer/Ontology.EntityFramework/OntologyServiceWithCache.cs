@@ -149,7 +149,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, user.Id, cancellationToken);
                 var nodes = _data.GetNodes(searchResult.Items.Select(e => e.Key));
                 return nodes.Select(n => MapNode(n));
             }
@@ -416,7 +416,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter)
+        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user)
         {
             if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortOrder))
             {
@@ -424,7 +424,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 filter.SortOrder = filter.SortOrder;
             }
 
-            var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter);
+            var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter, user.Id);
 
             return new SearchEntitiesByConfiguredFieldsResult()
             {
