@@ -202,8 +202,10 @@ namespace Iis.Api.Controllers
 
             var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>{
                 (_elasticState.MaterialIndexes, "AccessLevel"),
+                (new [] { _elasticState.ReportIndex }, "AccessLevel"),
                 (_elasticState.OntologyIndexes, "__accessLevel"),
                 (_elasticState.WikiIndexes, "__accessLevel"),
+                (_elasticState.EventIndexes, "__accessLevel"),
             };
             await _elasticManager.CreateSecurityMappingAsync(indexSecurityParam, cancellationToken);
 
