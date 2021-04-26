@@ -46,7 +46,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return _elasticManager.CountAsync(searchParams, ct);
         }
 
-        public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default)
+        public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, Guid userId, CancellationToken ct = default)
         {
             var ontologyFields
                 = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)));
@@ -62,7 +62,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 SortOrder = filter.SortOrder
             };
 
-            var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
+            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(searchParams, ct);
 
             return new SearchResult
             {

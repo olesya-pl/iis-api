@@ -70,6 +70,7 @@ namespace IIS.Core.GraphQL.Entities
         }
 
         public async Task<OntologyFilterableQueryResponse> GetEventList(
+            IResolverContext ctx,
             [Service] IOntologyService ontologyService,
             [Service] IMapper mapper,
             PaginationInput pagination,
@@ -78,6 +79,7 @@ namespace IIS.Core.GraphQL.Entities
         )
         {
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
+            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
 
             var response = await ontologyService.SearchEventsAsync(new ElasticFilter
             {
@@ -86,7 +88,7 @@ namespace IIS.Core.GraphQL.Entities
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
                 SortColumn = sortingParam.ColumnName,
                 SortOrder = sortingParam.Order
-            });
+            }, tokenPayload.User);
 
             return new OntologyFilterableQueryResponse()
             {
