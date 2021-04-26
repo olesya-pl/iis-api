@@ -50,8 +50,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement DirectReportingRelationshipLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-table__row:nth-of-type(1) .text-ellipsis.title")]
-        [CacheLookup]
+        [FindsBy(How = How.XPath, Using = "//div[@class='summary-person-row text-ellipsis']/span[@class='title']")]
         public IWebElement TitleOfTheFirstObject;
 
         [FindsBy(How = How.CssSelector, Using = ".summary-person-row .title")]

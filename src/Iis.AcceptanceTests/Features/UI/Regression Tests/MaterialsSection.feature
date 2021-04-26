@@ -22,7 +22,7 @@ Feature: Materials - regression
 
             """
 
-            "380713066027"
+            "380713176787"
 
             """
 
@@ -98,7 +98,7 @@ Feature: Materials - regression
         Then I must not see Тестова подія as the related event to the material
 
     @regression @UI @Material
-    Scenario: IIS-6051 - Ability to connect the material to an event from a material
+    Scenario: IIS-6051 - Ability to connect the material to an event from a material section
         When I navigated to Events page
         And I created a new Тестова подія event
         When I searched for the Тестова подія created event
