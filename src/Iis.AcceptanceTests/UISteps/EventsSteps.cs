@@ -113,6 +113,14 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
+        [When(@"I pressed the review event button")]
+        public void WhenIPressedTheReviewEventButton()
+        {
+            eventsSection.ReviewEventButton.Click();
+            driver.WaitFor(1);
+        }
+
+
         [When(@"I pressed the edit event button")]
         public void WhenIPressedTheEditEventButton()
         {

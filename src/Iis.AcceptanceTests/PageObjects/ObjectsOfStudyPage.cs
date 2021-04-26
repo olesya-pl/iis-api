@@ -29,8 +29,11 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none tbody .el-table__row:nth-of-type(1)")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='summary-person-row text-ellipsis']/span[@class='title']")]
         public IWebElement FirstSearchResultTitle;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='el-table__body-wrapper is-scrolling-none']//tr[1]")]
+        public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
         [CacheLookup]
@@ -50,7 +53,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement DirectReportingRelationshipLink;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='summary-person-row text-ellipsis']/span[@class='title']")]
+        [FindsBy(How = How.XPath, Using = "(//div[@class='text-ellipsis title'])[1]")]
         public IWebElement TitleOfTheFirstObject;
 
         [FindsBy(How = How.CssSelector, Using = ".summary-person-row .title")]
@@ -154,6 +157,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = "div[name='importance'] .el-input__inner")]
         public IWebElement ImportanceField;
+
+        [FindsBy(How = How.XPath, Using = "//div[@name='accessLevel']//input[@type='text']")]
+        public IWebElement SecurityClassificationField;
 
         [FindsBy(How = How.CssSelector, Using = "//div[contains(text(),' Класифікатори ')]")]
         public IWebElement ClassifiersBlock;

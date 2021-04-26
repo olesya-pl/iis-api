@@ -59,10 +59,10 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-close'] > .el-icon-close")]
         public IWebElement CloseEventCreationWindow;
 
-        [FindsBy(How = How.CssSelector, Using = ".event-card__linked-materials .container")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='event-card__linked-materials']")]
         public IWebElement BindedMaterialsField;
 
-        [FindsBy(How = How.CssSelector, Using = ".event-card__objects-associated-with-event .container")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='el-form-item event-card__objects-associated-with-event el-form-item--small']")]
         public IWebElement BindedObjectsOfStudyField;
 
         [FindsBy(How = How.CssSelector, Using = "textarea[name='description']")]
