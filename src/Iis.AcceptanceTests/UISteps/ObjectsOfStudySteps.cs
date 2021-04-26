@@ -189,7 +189,7 @@ namespace AcceptanceTests.UISteps
         }
 
         [When(@"I entered the (.*) value in the security classification")]
-        public void WhenIEnteredTheÍÂ_ÍåÂèçíà÷åíîValueInTheSecurityClassification(string securityClassificationValue)
+        public void WhenIEnteredTheValueInTheSecurityClassification(string securityClassificationValue)
         {
             objectsOfStudyPage.SecurityClassificationField.SendKeys(securityClassificationValue);
             objectsOfStudyPage.SecurityClassificationField.SendKeys(Keys.Down);
