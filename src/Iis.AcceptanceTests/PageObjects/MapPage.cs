@@ -14,11 +14,9 @@ namespace AcceptanceTests.PageObjects
         }
 
         [FindsBy(How = How.XPath, Using = "//div[@class='sidebar__body']//li[starts-with(@class, 'el-menu-item sidebar__nav-item')]//div[contains(text(),'Мапа')]")]
-        [CacheLookup]
         public IWebElement MapSection;
 
         [FindsBy(How = How.XPath, Using = "//form[@role='search']")]
-        [CacheLookup]
         public IWebElement MapSearch;
     }
 }
