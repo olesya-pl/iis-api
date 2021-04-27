@@ -13,7 +13,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Мапа')]")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='sidebar__body']//li[starts-with(@class, 'el-menu-item sidebar__nav-item')]//div[contains(text(),'Мапа')]")]
         [CacheLookup]
         public IWebElement MapSection;
 
