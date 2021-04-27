@@ -9,7 +9,7 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
 {
     public class PredictableDateType : ScalarType
     {
-        private const string DateFormat = "yyyy-mm-ddThh:mm:ss.fff";
+        private const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fff";
         
         public PredictableDateType() : base("PredictableDateType")
         {
