@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Api.GraphQL.Entities.ObjectTypes;
 using Iis.Interfaces.Materials;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Scalars;
@@ -37,6 +38,7 @@ namespace IIS.Core.GraphQL.Materials
         public string LoadedBy { get; set; }
         public string Coordinates { get; set; }
         public string Code { get; set; }
+        [GraphQLType(typeof(PredictableDateType))]
         public DateTime? ReceivingDate { get; set; }
         public IEnumerable<string> Objects { get; set; } = new List<string>();
         public IEnumerable<string> Tags { get; set; } = new List<string>();
