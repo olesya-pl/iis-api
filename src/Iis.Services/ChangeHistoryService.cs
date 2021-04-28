@@ -156,7 +156,7 @@ namespace Iis.Services
         {
             var entityList = await RunWithoutCommitAsync(uow =>
                 uow.ChangeHistoryRepository.GetManyAsync(
-                    parameters.EntityIdentityList,
+                    parameters.EntityIdentityList.ToArray(),
                     parameters.PropertyName,
                     parameters.DateFrom,
                     parameters.DateTo)
@@ -208,7 +208,7 @@ namespace Iis.Services
 
         public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistoryAsync(ChangeHistoryParams parameters)
         {
-            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(parameters.EntityIdentityList, parameters.DateFrom, parameters.DateTo));
+            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(parameters.EntityIdentityList.ToArray(), parameters.DateFrom, parameters.DateTo));
 
             var propertyNameDict = parameters.EntityIdentityList
                 .Select(id => (Id:id, PropertyName: GetSignPropertyName(id)))
