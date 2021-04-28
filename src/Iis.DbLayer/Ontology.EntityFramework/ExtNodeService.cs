@@ -1,6 +1,4 @@
-﻿using Iis.DataModel;
-using Iis.DbLayer.Repositories;
-using Iis.Domain.ExtendedData;
+﻿using Iis.Domain.ExtendedData;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -17,7 +15,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class ExtNodeService: IExtNodeService
     {
-        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private readonly IReadOnlyCollection<string> _filterNodeTypeNames = new [] {"__title", "title", "lastConfirmedAt"};
 
         public IExtNode GetExtNode(INode node)
@@ -172,17 +169,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             {
                 case ScalarType.Int:
                     return Convert.ToInt32(value);
-                case ScalarType.Date:
-                    {
-                        if (DateTime.TryParse(value, out DateTime dateTimeValue))
-                        {
-                            return dateTimeValue.ToString(Iso8601DateFormat);
-                        }
-                        else
-                        {
-                            return value;
-                        }
-                    }
                 case ScalarType.File:
                     return new
                     {
