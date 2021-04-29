@@ -19,6 +19,11 @@ namespace Iis.Utility
 
             foreach (var item in changeItems)
             {
+                if (string.IsNullOrEmpty(item.Path))
+                {
+                    continue;
+                }
+                
                 var jToken = TryGetJToken(jObject, item.Path);
                 if(jToken == null)
                 {
