@@ -512,5 +512,14 @@ namespace Iis.DbLayer.ModifyDataScripts
                 }
             }
         }
+
+        public void RemoveMaterialLinkAccessObjects(OntologyContext context, IOntologyNodesData data)
+        {
+            var materialDorLinkId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45");
+            var eventLinkId = new Guid("102617ecd2514b5f97e8be1a9bf99bc3");
+            var enitiesToRemove = new[] { materialDorLinkId, eventLinkId };
+            context.AccessObjects.RemoveRange(context.AccessObjects.Where(p => enitiesToRemove.Contains(p.Id)));
+            context.SaveChanges();
+        }
     }
 }
