@@ -47,7 +47,7 @@ namespace Iis.Services
                 TargetId = targetId,
                 UserName = userName,
                 PropertyName = attributeDotName,
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 OldValue = oldInfo.value,
                 NewValue = newInfo.value,
                 RequestId = requestId,
