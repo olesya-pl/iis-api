@@ -69,14 +69,14 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(3);
+            driver.WaitFor(4);
 
         }
 
         [When(@"I clicked on the first search result title in the Objects of study section")]
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
-            objectsOfStudyPage.FirstSearchResultTitle.Click();
+            objectsOfStudyPage.FirstSearchResultRow.Click();
             driver.WaitFor(0.5);
         }
 
@@ -187,6 +187,15 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.ImportanceField.SendKeys(Keys.Down);
             objectsOfStudyPage.ImportanceField.SendKeys(Keys.Enter);
         }
+
+        [When(@"I entered the (.*) value in the security classification")]
+        public void WhenIEnteredTheValueInTheSecurityClassification(string securityClassificationValue)
+        {
+            objectsOfStudyPage.SecurityClassificationField.SendKeys(securityClassificationValue);
+            objectsOfStudyPage.SecurityClassificationField.SendKeys(Keys.Down);
+            objectsOfStudyPage.SecurityClassificationField.SendKeys(Keys.Enter);
+        }
+
 
         [When(@"I entered the (.*) value in the name real full field")]
         public void WhenIEnteredTheValueInTheRealNameFullField(string objectOfStudyName)
@@ -368,14 +377,14 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see object of study (.*) as first search result")]
         public void IMustSeeObjectOfStudyInTheSearchResults(string objectOfStudyTitle)
         {
-            var actualTitle = objectsOfStudyPage.TitleOfTheFirstObject.Text;
+            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle.Text;
             Assert.Equal(objectOfStudyTitle, actualTitle);
         }
 
         [Then(@"I must not see object of study (.*) as first search result")]
         public void IMustNotSeeObjectOfStudyAsFirstResult(string objectOfStudyTitle)
         {
-            var actualTitle = objectsOfStudyPage.TitleOfTheFirstObject.Text;
+            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle.Text;
             Assert.NotEqual(objectOfStudyTitle, actualTitle);
         }
 

@@ -208,6 +208,7 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(1);
             materialsSectionPage.EventsSearch.SendKeys(Keys.Down);
             materialsSectionPage.EventsSearch.SendKeys(Keys.Enter);
+            materialsSectionPage.EventsSearch.SendKeys(Keys.Escape);
             driver.WaitFor(2);
         }
 

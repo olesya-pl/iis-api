@@ -26,7 +26,7 @@ namespace AcceptanceTests.UISteps
         public void WhenINavigatedToUploadMaterialsPage()
         {
             uploadMaterialsPage.LoadMaterialsSection.Click();
-            driver.WaitFor(2);
+            //driver.WaitFor(2);
         }
         #endregion
 
@@ -34,7 +34,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see choose file for upload button in the Upload materials section")]
         public void ThenIMustSeeChooseFileForUploadButtonInTheUploadMaterialsSection()
         {
-            Assert.True(uploadMaterialsPage.UploadMaterialButton.Displayed);
+            Assert.True(uploadMaterialsPage.UploadFunctionalityWindow.Displayed);
         }
         #endregion
     }

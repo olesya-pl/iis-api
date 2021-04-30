@@ -5,6 +5,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using Iis.Services;
+using Iis.Services.Contracts;
 using Moq;
 using Newtonsoft.Json.Linq;
 using System;
@@ -73,7 +74,7 @@ namespace Iis.UnitTests.Services
             var service = GetService();
 
             //Act
-            var entities = await service.GetEntitiesAsync("some text", ObjectOfStudyTypeList, 5);
+            var entities = await service.GetEntitiesAsync("some text", ObjectOfStudyTypeList, 5, new User{ Id = Guid.NewGuid()});
 
             //Assert
             entities.Should().HaveCount(2);
@@ -90,7 +91,7 @@ namespace Iis.UnitTests.Services
             var service = GetService();
 
             //Act
-            var entities = await service.GetEntitiesAsync("rpg", ObjectOfStudyTypeList, 5);
+            var entities = await service.GetEntitiesAsync("rpg", ObjectOfStudyTypeList, 5, new User{ Id = Guid.NewGuid()});
 
             //Assert
             entities.Should().HaveCount(2);
@@ -143,7 +144,7 @@ namespace Iis.UnitTests.Services
                 .Returns(true);
 
             _elasticServiceMock
-                .Setup(x => x.SearchByFieldsAsync("*some text*", It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.SearchByFieldsAsync("*some text*", It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ElasticSearchResultItem>()
                 {
                     new ElasticSearchResultItem
@@ -170,7 +171,7 @@ namespace Iis.UnitTests.Services
                 });
 
             _elasticServiceMock
-                .Setup(x => x.SearchByFieldsAsync("*rpg*", It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.SearchByFieldsAsync("*rpg*", It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<int>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<ElasticSearchResultItem>()
                 {
                     new ElasticSearchResultItem

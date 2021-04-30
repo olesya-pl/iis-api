@@ -57,6 +57,7 @@ Feature: ObjectsOfStudySection - sanity
         And I clicked on the create a new military organization button
         And I entered the джокер value in the affiliation field
         And I entered the першочерговий value in the importance field
+        And I entered the НВ - Не визначено value in the security classification
         And I clicked on the classifiers block
         And I entered the 28 обр РХБЗ value in the direct reporting relationship field
         And I clicked on the general info block

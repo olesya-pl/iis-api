@@ -55,6 +55,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName);
         IAliases Aliases { get; }
         void RemoveRelation(Guid relationId);
+        void RemoveRelation(string entityTypeName, string relationTypeName);
         IEnumerable<INodeTypeLinked> GetAllNodeTypes();
         void PutInOrder();
         void RemoveEntity(Guid id);

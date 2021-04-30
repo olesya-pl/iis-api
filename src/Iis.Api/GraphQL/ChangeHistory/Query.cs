@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
         {
             var queryParams = new ChangeHistoryParams
             {
-                EntityIdentityList = entityIdList,
+                EntityIdentityList = entityIdList.ToHashSet(),
                 PropertyName = propertyName,
                 ApplyAliases = true
             };
@@ -120,7 +120,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
                 DateFrom = dateFrom,
                 DateTo = dateTo,
                 PropertyName = string.Empty,
-                EntityIdentityList = new[] { targetId },
+                EntityIdentityList = new HashSet<Guid>{ targetId },
                 ApplyAliases = true
             };
 

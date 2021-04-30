@@ -135,18 +135,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default)
         {
+            var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
+            var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
+
             var derivedTypes = _data.Schema
                 .GetNodeTypes(types.Select(t => t.Id))
                 .Where(type => !type.IsAbstract 
-                    && _elasticService.TypeIsAvalilable(type, 
-                        user.IsEntitySearchGranted(),
-                        user.IsWikiSearchGranted()));
+                    && _elasticService.TypeIsAvalilable(type,
+                        entitySearchGranted,
+                        wikiSearchGranted));
 
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
 
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
+                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, user.Id, cancellationToken);
                 var nodes = _data.GetNodes(searchResult.Items.Select(e => e.Key));
                 return nodes.Select(n => MapNode(n));
             }
@@ -379,11 +382,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             User user, 
             CancellationToken cancellationToken = default)
         {
+            var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
+            var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
+
             var derivedTypeNames = _data.Schema
                 .GetEntityTypesByName(typeNameList, true)
                 .Where(type => _elasticService.TypeIsAvalilable(type,
-                        user.IsEntitySearchGranted(),
-                        user.IsWikiSearchGranted()))
+                        entitySearchGranted,
+                        wikiSearchGranted))
                 .Select(nt => nt.Name)
                 .Distinct();
             return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id);
@@ -410,7 +416,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter)
+        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user)
         {
             if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortOrder))
             {
@@ -418,7 +424,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 filter.SortOrder = filter.SortOrder;
             }
 
-            var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter);
+            var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter, user.Id);
 
             return new SearchEntitiesByConfiguredFieldsResult()
             {

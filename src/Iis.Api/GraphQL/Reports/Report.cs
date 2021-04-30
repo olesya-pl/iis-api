@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Api.GraphQL.Entities.ObjectTypes;
 using Iis.Services.Contracts.Dtos;
 using System;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace IIS.Core.GraphQL.Reports
         [GraphQLNonNullType] 
         public string Recipient { get; set; }
         public int AccessLevel { get; set; }
-        [GraphQLNonNullType] 
+        [GraphQLNonNullType]
+        [GraphQLType(typeof(PredictableDateType))]
         public DateTime CreatedAt { get; set; }
         [GraphQLIgnore] 
         public Guid[] EventIds { get; set; }

@@ -488,6 +488,38 @@ namespace Iis.DbLayer.ModifyDataScripts
                 });
             }
         }
-            
+
+        public void AddTitlePhotosToObject(OntologyContext context, IOntologyNodesData data)
+        {
+            var photoType = data.Schema.GetEntityTypeByName("Photo");
+            if (photoType == null) throw new Exception("Photo entity type is not found");
+            var imageProperty = photoType.GetRelationByName("image");
+
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            var titlePhotosProperty = data.Schema.CreateRelationType(objectType.Id, photoType.Id, "titlePhotos", "Фото в заголовку", EmbeddingOptions.Multiple);
+
+            SaveOntologySchema(data.Schema);
+
+            var objectNodes = data.GetAllNodes().Where(n => n.NodeType.IsObject);
+            foreach (var node in objectNodes)
+            {
+                var photoProperty = node.GetSingleProperty("photo");
+                if (photoProperty != null)
+                {
+                    var photoNode = data.CreateNode(photoType.Id);
+                    data.CreateRelationWithAttribute(photoNode.Id, imageProperty.Id, photoProperty.Value);
+                    data.CreateRelation(node.Id, photoNode.Id, titlePhotosProperty.Id);
+                }
+            }
+        }
+
+        public void RemoveMaterialLinkAccessObjects(OntologyContext context, IOntologyNodesData data)
+        {
+            var materialDorLinkId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45");
+            var eventLinkId = new Guid("102617ecd2514b5f97e8be1a9bf99bc3");
+            var enitiesToRemove = new[] { materialDorLinkId, eventLinkId };
+            context.AccessObjects.RemoveRange(context.AccessObjects.Where(p => enitiesToRemove.Contains(p.Id)));
+            context.SaveChanges();
+        }
     }
 }

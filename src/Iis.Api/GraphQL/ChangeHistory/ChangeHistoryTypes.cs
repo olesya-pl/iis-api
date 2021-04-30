@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Api.GraphQL.Entities.ObjectTypes;
 
 namespace IIS.Core.GraphQL.ChangeHistory
 {
@@ -24,6 +25,7 @@ namespace IIS.Core.GraphQL.ChangeHistory
         public Guid EntityId { get; set; }
         public string UserName { get; set; }
         public string PropertyName { get; set; }
+        [GraphQLType(typeof(PredictableDateType))]
         public DateTime Date { get; set; }
         public string OldValue { get; set; }
         public string NewValue { get; set; }

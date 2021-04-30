@@ -38,6 +38,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div[name='state']  div[role='radiogroup'] > label:nth-of-type(1)  .el-radio__inner")]
         public IWebElement FlawRadioButton;
 
+        [FindsBy(How = How.XPath, Using = "//div[@name='accessLevel']//input[@type='text']")]
+        public IWebElement SecurityClassificationField;
+
         [FindsBy(How = How.CssSelector, Using = "div[name='relatesToCountry'] > .el-form-item__content")]
         public IWebElement CountrySelectionDropDown;
 
@@ -56,10 +59,10 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-close'] > .el-icon-close")]
         public IWebElement CloseEventCreationWindow;
 
-        [FindsBy(How = How.CssSelector, Using = ".event-card__linked-materials .container")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='event-card__linked-materials']")]
         public IWebElement BindedMaterialsField;
 
-        [FindsBy(How = How.CssSelector, Using = ".event-card__objects-associated-with-event .container")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='el-form-item event-card__objects-associated-with-event el-form-item--small']")]
         public IWebElement BindedObjectsOfStudyField;
 
         [FindsBy(How = How.CssSelector, Using = "textarea[name='description']")]

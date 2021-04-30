@@ -12,7 +12,7 @@ Background:
 Scenario: IIS-6140 - Search by two criteria by using OR operator
 	When I clicked on search button in the Object of study section
 	And I searched Олександр OR Іванович data in the Objects of study section
-	Then I must see object of study ОТРОЩЕНКО Олександр Іванович as first search result
+	Then I must see object of study ОТРОЩЕНКО О.І as first search result
 
 @functional @UI @ObjectsOfStudySearchUI
 Scenario: IIS-6139 - Search by two criteria by using NOT operator
@@ -24,7 +24,7 @@ Scenario: IIS-6139 - Search by two criteria by using NOT operator
 Scenario: IIS-6138 - Search by two criteria by using AND operator
 	When I clicked on search button in the Object of study section
 	And I searched Ткачук AND "3 омсбр" data in the Objects of study section
-	Then I must see object of study ТКАЧУК Руслан Юрійович as first search result
+	Then I must see object of study ТКАЧУК Р.Ю as first search result
 	Then I must see search results counter value that equal to 1 value
 
 @functional @sanity @UI @ObjectsOfStudySearchUI

@@ -33,8 +33,11 @@ namespace AcceptanceTests.PageObjects
 		[FindsBy(How = How.CssSelector, Using = ".el-tooltip")]
 		public IWebElement SearchButton;
 
-		[FindsBy(How = How.CssSelector, Using = ".action-button--edit")]
+		[FindsBy(How = How.XPath, Using = "//button[@name='btn-edit']")]
 		public IWebElement EditButton;
+
+		[FindsBy(How = How.XPath, Using = "//button[@class='el-button el-tooltip action-button--full-screen el-button--default']")]
+		public IWebElement ReviewEventButton;
 
 		[FindsBy(How = How.CssSelector, Using = "[aria-describedby] .el-input__inner")]
 		public IWebElement SearchField;
