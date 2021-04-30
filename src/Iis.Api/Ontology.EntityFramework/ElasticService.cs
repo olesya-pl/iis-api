@@ -1,17 +1,18 @@
-﻿using Iis.DbLayer.Repositories;
-using Iis.Domain.Elastic;
-using Iis.Elastic.SearchQueryExtensions;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Services.Contracts.Interfaces;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using Iis.DbLayer.Repositories;
+using Iis.Domain.Elastic;
+using Iis.Elastic.SearchQueryExtensions;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -111,14 +112,14 @@ namespace IIS.Core.Ontology.EntityFramework
                         ElasticConfigConstants.NodeTypeTitleAlias,
                         ElasticConfigConstants.NodeTypeTitleAggregateField)
                 };
-                
+
                 var query = new MatchAllQueryBuilder()
                     .WithPagination(filter.Offset, filter.Limit)
                     .BuildSearchQuery()
                     .WithAggregation(defaultAggregations)
                     .WithHighlights()
                     .ToString();
-                
+
                 var results = await _elasticManager.WithUserId(userId).SearchAsync(query, typeNames, ct);
                 return results.ToOutputSearchResult();
             }
@@ -137,7 +138,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .BuildSearchQuery()
                 .WithHighlights()
                 .ToString();
-            
+
             var aggregationQuery = new MatchAllQueryBuilder()
                 .WithPagination(0, 0)
                 .BuildSearchQuery()
@@ -201,11 +202,11 @@ namespace IIS.Core.Ontology.EntityFramework
             var (multiSearchParams, _)= await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
             var query = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
                 .WithLeniency(multiSearchParams.IsLenient)
-                .BuildCountQuery()                
+                .BuildCountQuery()
                 .ToString();
             return await _elasticManager.CountAsync(query, typeNames, ct);
         }
-        
+
         private async Task<(MultiElasticSearchParams MultiSearchParams, IElasticSearchResult HistoricalResult)> PrepareMultiElasticSearchParamsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default) 
         {
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
@@ -353,7 +354,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return response.All(x => x.IsSuccess);
         }
 
-        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, IReadOnlyCollection<string> fieldNames, IReadOnlyCollection<string> typeNames, int size, CancellationToken ct = default)
+        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, IReadOnlyCollection<string> fieldNames, IReadOnlyCollection<string> typeNames, int size, Guid userId, CancellationToken ct = default)
         {
             var searchParams = new IisElasticSearchParams
             {
@@ -362,7 +363,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = size,
                 SearchFields = fieldNames.Select(x => new IisElasticField { Name = x}).ToArray()
             };
-            var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
+            var searchResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(searchParams, ct);
             return searchResult.Items;
         }
 
