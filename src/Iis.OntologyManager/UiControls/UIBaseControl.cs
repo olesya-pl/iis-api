@@ -48,5 +48,9 @@ namespace Iis.OntologyManager.UiControls
         }
 
         protected abstract void CreateControls();
+
+        public void Enable() => MainPanel.Enabled = true;
+        public void Disable() => MainPanel.Enabled = false;
+        public void SetEnabled(bool enabled) => MainPanel.Enabled = enabled;
     }
 }
