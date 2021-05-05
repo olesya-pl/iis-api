@@ -7,5 +7,6 @@ namespace Iis.Services.Contracts.ExternalUserServices
     public class ExternalUser
     {
         public string AccountName { get; set; }
+        public List<ExternalRole> Roles { get; set; }
     }
 }

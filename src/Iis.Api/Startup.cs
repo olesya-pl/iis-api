@@ -42,6 +42,7 @@ using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.DI;
+using Iis.Services.ExternalUserServices;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
@@ -298,8 +299,10 @@ namespace IIS.Core
             services.RegisterElasticModules();
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
-        }
 
+            var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
+            services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
+        }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {
