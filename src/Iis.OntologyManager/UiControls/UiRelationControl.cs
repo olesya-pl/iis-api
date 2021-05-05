@@ -108,7 +108,7 @@ namespace Iis.OntologyManager.UiControls
                 cmbFormat = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList };
                 cmbFormat.DataSource = _valuesForFormat;
                 containerTop.Add(cmbFormat, "Формат");
-                containerTop.Add(txtFormFieldLines = new TextBox(), "Кількість рядків");
+                containerTop.Add(txtFormFieldLines = new TextBox(), "Рядків у текстовому полі");
 
                 containerTop.Add(cbIsAggregated = new CheckBox { Text = "Агрегація" });
             }
