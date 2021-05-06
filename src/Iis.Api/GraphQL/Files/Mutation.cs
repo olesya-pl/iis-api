@@ -59,6 +59,10 @@ namespace IIS.Core.GraphQL.Files
                 {
                     return await UploadFileAsync(fileService, uploadConfiguration.VideoDirectory, input, user);
                 }
+                else if (input.Name.EndsWith(".mp3"))
+                {
+                    return await UploadFileAsync(fileService, uploadConfiguration.AudioDirectory, input, user);
+                }
                 else if (input.Name.EndsWith(".png"))
                 {
                     return await UploadPng(fileService, materialService, input, user);
