@@ -19,6 +19,7 @@ namespace Iis.DataModel
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public int AccessLevel { get; set; }
+        public UserSource Source { get; set; }
         public List<UserRoleEntity> UserRoles { get; set; }
         public List<MaterialEntity> Materials { get; internal set; }
     }
