@@ -43,6 +43,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("AddPhotosToObject", actions.AddPhotosToObject);
             _items.Add("AddWikiEntityAccessObject", actions.AddWikiEntityAccessObject);
             _items.Add("AddTitlePhotosToObject", actions.AddTitlePhotosToObject);
+            _items.Add("RemoveMaterialLinkAccessObjects", actions.RemoveMaterialLinkAccessObjects);
         }
         public bool Run()
         {

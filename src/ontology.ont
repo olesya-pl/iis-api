@@ -53,6 +53,123 @@
       "IconBase64Body": null
     },
     {
+      "Id": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
+      "Name": "SatelliteIridiumPhoneSign",
+      "Title": "Супутниковий телефон Iridium",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": "value",
+      "IconBase64Body": null
+    },
+    {
+      "Id": "5fdf4e3f-e0e0-4e2f-9572-c9a5a1428d30",
+      "Name": "Is",
+      "Title": null,
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "38ca4a4d-1110-40a5-bcac-2d0aa8cb8556",
+      "Name": "imei",
+      "Title": "IMEI",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "22168a85-59be-494e-a94c-263e0030291b",
+      "Name": "imei",
+      "Title": "IMEI",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "66a32e6b-7085-4fdb-be0c-214b29f23e48",
+      "Name": "imsi",
+      "Title": "IMSI",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "6e4be0b4-eb1e-4d85-a03d-d0d1d4bb5066",
+      "Name": "imsi",
+      "Title": "IMSI",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "bb24b7dd-8d39-4b79-a3d3-ad0fa7d50b1d",
+      "Name": "tmsi",
+      "Title": "TMSI",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "c4fabe1f-bb7c-4501-a029-ffe6ca95ee59",
+      "Name": "tmsi",
+      "Title": "TMSI",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "dd1a65e5-345e-4f02-be95-5b532b5607b9",
+      "Name": "image",
+      "Title": "Фото",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "001a00f6-0738-4015-8ab8-3ba36432236b",
       "Name": "damageLevel",
       "Title": "Ступінь важкості",
@@ -118,6 +235,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "0ded1de2-a275-4f23-90c9-f94624deaffd",
+      "Name": "title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "1d6c32fb-c14b-4a95-854a-1e2f2bb8cf00",
       "Name": "baseCode",
       "Title": "Номер військової частини",
@@ -165,6 +295,58 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "077946f8-c103-4238-ab29-b3d6b96ba349",
+      "Name": "Organization",
+      "Title": "Організація",
+      "Meta": "{\r\n  \"SortOrder\": 7\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "19c73810-19c0-480e-8f64-63d54bd1a70b",
+      "Name": "Radionetwork",
+      "Title": "Радіомережа",
+      "Meta": "{\r\n  \"SortOrder\": 81\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "4e58e0dc-2c99-489d-b9ea-d88133c7e893",
+      "Name": "Unknown",
+      "Title": "Невизначений",
+      "Meta": "{\r\n  \"SortOrder\": 156\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "3dd7c815-b1e3-404a-9121-18d3480f3e83",
+      "Name": "accessLevel",
+      "Title": "Гриф (рівень доступу)",
+      "Meta": "{ \"FormField\": {\"Type\": \"dropdown\" }}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -235,6 +417,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "b6df721d-a9c9-4ba9-9a71-d6a3e5f8c5be",
+      "Name": "Photo",
+      "Title": "Photo",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "c07f592e-fc52-411e-8765-e3523908b1cd",
       "Name": "name",
       "Title": "Imya",
@@ -243,6 +438,84 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "6115a6bb-f25e-4dd7-bf09-51db1fdeac32",
+      "Name": "image",
+      "Title": "Фото",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "f0527f07-dc67-4dc8-a969-6ef20bd3f1d3",
+      "Name": "image",
+      "Title": "Фото",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "58a4f02a-0365-4fb4-be87-6756691a280c",
+      "Name": "title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "a35b1129-a676-4a97-b288-cb8c03bfeea1",
+      "Name": "title",
+      "Title": "Заголовок",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "334e9062-232c-406a-a051-e74116aa95e1",
+      "Name": "titlePhotos",
+      "Title": "Фото в заголовку",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [0,1,2],\n  \"FormField\": {\n    \"Type\": \"photo\"\n  }\n}\n",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "a2e210dc-f046-4333-8f9d-4608862bfd86",
+      "Name": "photos",
+      "Title": "Фото",
+      "Meta": "{\n  \"AcceptsEntityOperations\": [0,1,2],\n  \"FormField\": {\n    \"Type\": \"photo\"\n  }\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -1249,6 +1522,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "12458b47-90e9-42e4-bb87-fe54be413b81",
+      "Name": "MilitaryOrganization",
+      "Title": "Військовий підрозділ",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "0ddda53e-cf4a-4b47-8069-dfe8d3bf8655",
       "Name": "otherDislocationPlaces",
       "Title": "Інші місця дислокації підрозділу",
@@ -1340,19 +1626,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "12458b47-90e9-42e4-bb87-fe54be413b81",
-      "Name": "MilitaryOrganization",
-      "Title": "Військовий підрозділ",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "12714279-135c-4e93-af46-43235f9f94b9",
       "Name": "ObjectOfStudy",
       "Title": "Об'єкт розвідки",
@@ -1370,6 +1643,19 @@
       "Name": "Order",
       "Title": "Наказ",
       "Meta": "{\r\n  \"SortOrder\": 373\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "0e18c118-94cd-4c82-87af-8f68ab885451",
+      "Name": "Person",
+      "Title": "Особа",
+      "Meta": "{\r\n  \"SortOrder\": 56,\r\n  \"Container\": {\r\n    \"Id\": \"cbfb512a-5698-40d0-a95d-951c42e03079\",\r\n    \"Title\": \"Нерозібране (тимчасово)\",\r\n    \"Type\": \"Accordion\"\r\n  }\r\n}",
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
@@ -1400,19 +1686,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "0e18c118-94cd-4c82-87af-8f68ab885451",
-      "Name": "Person",
-      "Title": "Особа",
-      "Meta": "{\r\n  \"SortOrder\": 56,\r\n  \"Container\": {\r\n    \"Id\": \"cbfb512a-5698-40d0-a95d-951c42e03079\",\r\n    \"Title\": \"Нерозібране (тимчасово)\",\r\n    \"Type\": \"Accordion\"\r\n  }\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -2263,19 +2536,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "19c73810-19c0-480e-8f64-63d54bd1a70b",
-      "Name": "Radionetwork",
-      "Title": "Радіомережа",
-      "Meta": "{\r\n  \"SortOrder\": 81\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "19f0896c-ed3f-4073-bc01-0d588978e64a",
       "Name": "sign",
       "Title": "Ознаки",
@@ -2505,19 +2765,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "077946f8-c103-4238-ab29-b3d6b96ba349",
-      "Name": "Organization",
-      "Title": "Організація",
-      "Meta": "{\r\n  \"SortOrder\": 7\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -3186,19 +3433,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "2ee7c76f-1cc9-4156-84d3-1c82317ede81",
-      "Name": "code",
-      "Title": "Код",
-      "Meta": "{\r\n  \"SortOrder\": 1,\r\n  \"Multiple\": false\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "00dc62b2-1f6b-447b-bc9c-05752e9120de",
       "Name": "timeOfWork",
       "Title": "Час безперервної роботи",
@@ -3792,6 +4026,19 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "2ee7c76f-1cc9-4156-84d3-1c82317ede81",
+      "Name": "code",
+      "Title": "Код",
+      "Meta": "{\r\n  \"SortOrder\": 1,\r\n  \"Multiple\": false\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -8646,19 +8893,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "4e58e0dc-2c99-489d-b9ea-d88133c7e893",
-      "Name": "Unknown",
-      "Title": "Невизначений",
-      "Meta": "{\r\n  \"SortOrder\": 156\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "5052ca12-f4e6-4b29-9caf-e3d546742441",
       "Name": "Is",
       "Title": null,
@@ -12234,19 +12468,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "9b711958-26e2-4d80-bb56-7582c0bdf7a5",
-      "Name": "Infrastructure",
-      "Title": "Інфраструктура",
-      "Meta": "{\r\n  \"SortOrder\": 286\r\n}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "9b9f3b37-4772-40b1-b007-72b10c028e17",
       "Name": "CountOffrequenciesForReb",
       "Title": "Кількість частот, що одночасно подавлюються, од.",
@@ -12702,6 +12923,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "9b711958-26e2-4d80-bb56-7582c0bdf7a5",
+      "Name": "Infrastructure",
+      "Title": "Інфраструктура",
+      "Meta": "{\r\n  \"SortOrder\": 286\r\n}",
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 0,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "a27ec5d4-6f57-4291-96b4-70e78c55d321",
       "Name": "caterpillar",
       "Title": "гусиничне",
@@ -12944,19 +13178,6 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "ac53d3c7-b481-487a-87ca-edf559b9a30b",
-      "Name": "countOfDirections",
-      "Title": "Кількість напрямків зв’язку, од.",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -13503,6 +13724,19 @@
       "UpdatedAt": "0001-01-01T00:00:00",
       "IsArchived": false,
       "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "ac53d3c7-b481-487a-87ca-edf559b9a30b",
+      "Name": "countOfDirections",
+      "Title": "Кількість напрямків зв’язку, од.",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
@@ -15926,19 +16160,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "c145a4df-e2b9-47d9-9aa1-5bdffcf187c7",
-      "Name": "width",
-      "Title": "Ширина",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "ce90c525-986a-4298-b328-6b3a3bda0957",
       "Name": "protectAndDefense",
       "Title": "Засоби охорони та оборони",
@@ -17109,6 +17330,19 @@
       "IconBase64Body": null
     },
     {
+      "Id": "c145a4df-e2b9-47d9-9aa1-5bdffcf187c7",
+      "Name": "width",
+      "Title": "Ширина",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 2,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
       "Id": "e1625aed-2ab4-4fb3-a5b0-2f0d42903005",
       "Name": "fleet",
       "Title": "Флот",
@@ -17746,19 +17980,6 @@
       "IconBase64Body": null
     },
     {
-      "Id": "f80a1686-4e95-4614-8e51-6ecf13a2e615",
-      "Name": "embankedLaunchPads",
-      "Title": "набережні площадки",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
       "Id": "e92b1b8b-a8b4-4d2e-bc81-6ad7385b162e",
       "Name": "combatTrainingEvents",
       "Title": "Основні заходи бойової підготовки",
@@ -18386,6 +18607,19 @@
       "Id": "f7e55dff-eb07-46ae-9c51-729f32e16f7c",
       "Name": "registeredAt",
       "Title": "Дата реєстрації",
+      "Meta": null,
+      "CreatedAt": "0001-01-01T00:00:00",
+      "UpdatedAt": "0001-01-01T00:00:00",
+      "IsArchived": false,
+      "Kind": 1,
+      "IsAbstract": false,
+      "UniqueValueFieldName": null,
+      "IconBase64Body": null
+    },
+    {
+      "Id": "f80a1686-4e95-4614-8e51-6ecf13a2e615",
+      "Name": "embankedLaunchPads",
+      "Title": "набережні площадки",
       "Meta": null,
       "CreatedAt": "0001-01-01T00:00:00",
       "UpdatedAt": "0001-01-01T00:00:00",
@@ -19317,123 +19551,6 @@
       "IsAbstract": false,
       "UniqueValueFieldName": null,
       "IconBase64Body": null
-    },
-    {
-      "Id": "879fbbcd-7661-4072-b5e2-1d9646cebb14",
-      "Name": "accessLevel",
-      "Title": "Гриф (рівень доступу)",
-      "Meta": "{ \"FormField\": {\"Type\": \"dropdown\" }}",
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
-      "Name": "SatelliteIridiumPhoneSign",
-      "Title": "Супутниковий телефон Iridium",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 0,
-      "IsAbstract": false,
-      "UniqueValueFieldName": "value",
-      "IconBase64Body": null
-    },
-    {
-      "Id": "5fdf4e3f-e0e0-4e2f-9572-c9a5a1428d30",
-      "Name": "Is",
-      "Title": null,
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "38ca4a4d-1110-40a5-bcac-2d0aa8cb8556",
-      "Name": "imei",
-      "Title": "IMEI",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "22168a85-59be-494e-a94c-263e0030291b",
-      "Name": "imei",
-      "Title": "IMEI",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "66a32e6b-7085-4fdb-be0c-214b29f23e48",
-      "Name": "imsi",
-      "Title": "IMSI",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "6e4be0b4-eb1e-4d85-a03d-d0d1d4bb5066",
-      "Name": "imsi",
-      "Title": "IMSI",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "bb24b7dd-8d39-4b79-a3d3-ad0fa7d50b1d",
-      "Name": "tmsi",
-      "Title": "TMSI",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 1,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
-    },
-    {
-      "Id": "c4fabe1f-bb7c-4501-a029-ffe6ca95ee59",
-      "Name": "tmsi",
-      "Title": "TMSI",
-      "Meta": null,
-      "CreatedAt": "0001-01-01T00:00:00",
-      "UpdatedAt": "0001-01-01T00:00:00",
-      "IsArchived": false,
-      "Kind": 2,
-      "IsAbstract": false,
-      "UniqueValueFieldName": null,
-      "IconBase64Body": null
     }
   ],
   "RelationTypes": [
@@ -19450,6 +19567,69 @@
       "EmbeddingOptions": 2,
       "SourceTypeId": "ac09b94b-f127-4a97-abfb-fe8e19ebea8e",
       "TargetTypeId": "a655b718-c463-4fd6-9bcf-97a690a06056"
+    },
+    {
+      "Id": "5fdf4e3f-e0e0-4e2f-9572-c9a5a1428d30",
+      "Kind": 1,
+      "EmbeddingOptions": 0,
+      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
+      "TargetTypeId": "46ac8cd9-0db4-41d6-8069-d335fb3f7ab8"
+    },
+    {
+      "Id": "38ca4a4d-1110-40a5-bcac-2d0aa8cb8556",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
+      "TargetTypeId": "22168a85-59be-494e-a94c-263e0030291b"
+    },
+    {
+      "Id": "66a32e6b-7085-4fdb-be0c-214b29f23e48",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
+      "TargetTypeId": "6e4be0b4-eb1e-4d85-a03d-d0d1d4bb5066"
+    },
+    {
+      "Id": "bb24b7dd-8d39-4b79-a3d3-ad0fa7d50b1d",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
+      "TargetTypeId": "c4fabe1f-bb7c-4501-a029-ffe6ca95ee59"
+    },
+    {
+      "Id": "6115a6bb-f25e-4dd7-bf09-51db1fdeac32",
+      "Kind": 0,
+      "EmbeddingOptions": 2,
+      "SourceTypeId": "b6df721d-a9c9-4ba9-9a71-d6a3e5f8c5be",
+      "TargetTypeId": "f0527f07-dc67-4dc8-a969-6ef20bd3f1d3"
+    },
+    {
+      "Id": "58a4f02a-0365-4fb4-be87-6756691a280c",
+      "Kind": 0,
+      "EmbeddingOptions": 1,
+      "SourceTypeId": "b6df721d-a9c9-4ba9-9a71-d6a3e5f8c5be",
+      "TargetTypeId": "a35b1129-a676-4a97-b288-cb8c03bfeea1"
+    },
+    {
+      "Id": "334e9062-232c-406a-a051-e74116aa95e1",
+      "Kind": 0,
+      "EmbeddingOptions": 3,
+      "SourceTypeId": "a45cc484-c39b-48b0-9e07-1ead14608808",
+      "TargetTypeId": "b6df721d-a9c9-4ba9-9a71-d6a3e5f8c5be"
+    },
+    {
+      "Id": "a2e210dc-f046-4333-8f9d-4608862bfd86",
+      "Kind": 0,
+      "EmbeddingOptions": 3,
+      "SourceTypeId": "a45cc484-c39b-48b0-9e07-1ead14608808",
+      "TargetTypeId": "b6df721d-a9c9-4ba9-9a71-d6a3e5f8c5be"
+    },
+    {
+      "Id": "3dd7c815-b1e3-404a-9121-18d3480f3e83",
+      "Kind": 0,
+      "EmbeddingOptions": 2,
+      "SourceTypeId": "a45cc484-c39b-48b0-9e07-1ead14608808",
+      "TargetTypeId": "ac09b94b-f127-4a97-abfb-fe8e19ebea8e"
     },
     {
       "Id": "001a00f6-0738-4015-8ab8-3ba36432236b",
@@ -25288,41 +25468,6 @@
       "EmbeddingOptions": 1,
       "SourceTypeId": "959fb9b5-6587-49aa-b8c7-84297949358c",
       "TargetTypeId": "ec107134-6121-41ce-8e2d-655edc9742b0"
-    },
-    {
-      "Id": "879fbbcd-7661-4072-b5e2-1d9646cebb14",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "a45cc484-c39b-48b0-9e07-1ead14608808",
-      "TargetTypeId": "ac09b94b-f127-4a97-abfb-fe8e19ebea8e"
-    },
-    {
-      "Id": "5fdf4e3f-e0e0-4e2f-9572-c9a5a1428d30",
-      "Kind": 1,
-      "EmbeddingOptions": 0,
-      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
-      "TargetTypeId": "46ac8cd9-0db4-41d6-8069-d335fb3f7ab8"
-    },
-    {
-      "Id": "38ca4a4d-1110-40a5-bcac-2d0aa8cb8556",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
-      "TargetTypeId": "22168a85-59be-494e-a94c-263e0030291b"
-    },
-    {
-      "Id": "66a32e6b-7085-4fdb-be0c-214b29f23e48",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
-      "TargetTypeId": "6e4be0b4-eb1e-4d85-a03d-d0d1d4bb5066"
-    },
-    {
-      "Id": "bb24b7dd-8d39-4b79-a3d3-ad0fa7d50b1d",
-      "Kind": 0,
-      "EmbeddingOptions": 1,
-      "SourceTypeId": "40f8aae6-9538-41be-94f8-d6d4e573f0a2",
-      "TargetTypeId": "c4fabe1f-bb7c-4501-a029-ffe6ca95ee59"
     }
   ],
   "AttributeTypes": [
@@ -25331,7 +25476,35 @@
       "ScalarType": 1
     },
     {
+      "Id": "22168a85-59be-494e-a94c-263e0030291b",
+      "ScalarType": 0
+    },
+    {
+      "Id": "6e4be0b4-eb1e-4d85-a03d-d0d1d4bb5066",
+      "ScalarType": 0
+    },
+    {
+      "Id": "c4fabe1f-bb7c-4501-a029-ffe6ca95ee59",
+      "ScalarType": 0
+    },
+    {
       "Id": "1d6c32fb-c14b-4a95-854a-1e2f2bb8cf00",
+      "ScalarType": 0
+    },
+    {
+      "Id": "dd1a65e5-345e-4f02-be95-5b532b5607b9",
+      "ScalarType": 6
+    },
+    {
+      "Id": "0ded1de2-a275-4f23-90c9-f94624deaffd",
+      "ScalarType": 0
+    },
+    {
+      "Id": "f0527f07-dc67-4dc8-a969-6ef20bd3f1d3",
+      "ScalarType": 6
+    },
+    {
+      "Id": "a35b1129-a676-4a97-b288-cb8c03bfeea1",
       "ScalarType": 0
     },
     {
@@ -27193,18 +27366,6 @@
     {
       "Id": "e826f886-0019-47c4-b176-f8771cb9aa49",
       "ScalarType": 2
-    },
-    {
-      "Id": "22168a85-59be-494e-a94c-263e0030291b",
-      "ScalarType": 0
-    },
-    {
-      "Id": "6e4be0b4-eb1e-4d85-a03d-d0d1d4bb5066",
-      "ScalarType": 0
-    },
-    {
-      "Id": "c4fabe1f-bb7c-4501-a029-ffe6ca95ee59",
-      "ScalarType": 0
     }
   ],
   "Aliases": [

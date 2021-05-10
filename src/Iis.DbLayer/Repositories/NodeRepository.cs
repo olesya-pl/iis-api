@@ -101,11 +101,12 @@ namespace Iis.DbLayer.Repositories
         public async Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
         {
             var actualNode = _nodeFlattener.FlattenNode(id);
+            var entityIdList = new HashSet<Guid>{ id };
             var getNodeChanges = requestId.HasValue ?
                 _changeHistoryService.GetChangeHistoryByRequest(requestId.Value) :
                 _changeHistoryService.GetChangeHistoryAsync(new ChangeHistoryParams
                 {
-                    EntityIdentityList = new[] { id }
+                    EntityIdentityList = entityIdList
                 });
 
             var nodeChanges = await getNodeChanges;

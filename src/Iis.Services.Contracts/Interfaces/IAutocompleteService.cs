@@ -1,4 +1,5 @@
-﻿using Iis.Services.Contracts.Dtos;
+﻿
+using Iis.Services.Contracts.Dtos;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,6 @@ namespace Iis.Services.Contracts.Interfaces
     {
         IReadOnlyCollection<string> GetTips(string query, int count);
 
-        Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, CancellationToken ct = default);
+        Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, User user, CancellationToken ct = default);
     }
 }

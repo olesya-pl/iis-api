@@ -1,11 +1,12 @@
-﻿using HotChocolate;
+﻿using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.Types;
+using HotChocolate.Resolvers;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace IIS.Core.GraphQL.Autocomplete
 {
@@ -23,6 +24,7 @@ namespace IIS.Core.GraphQL.Autocomplete
         }
 
         public Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntities(
+            IResolverContext context,
             [Service] IAutocompleteService autocomplete,
             [GraphQLNonNullType] string query,
             [GraphQLType(typeof(ListType<NonNullType<StringType>>))] string[] types,
@@ -30,7 +32,9 @@ namespace IIS.Core.GraphQL.Autocomplete
         {
             types = types is null || !types.Any() ? ObjectTypeList : types;
 
-            return autocomplete.GetEntitiesAsync(query, types, size.GetValueOrDefault(DefaultTipsCount));
+            var token = context.GetToken();
+
+            return autocomplete.GetEntitiesAsync(query, types, size.GetValueOrDefault(DefaultTipsCount), token.User);
         }
     }
 }
