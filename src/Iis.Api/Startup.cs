@@ -18,6 +18,7 @@ using Iis.Api.FlightRadar;
 using Iis.Api.GraphQL.Access;
 using Iis.Api.Modules;
 using Iis.Api.Ontology;
+using Iis.Core.Tools;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DbLayer.Common;
@@ -302,6 +303,7 @@ namespace IIS.Core
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
+            services.AddTransient<ExternalUserSeeder>();
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)

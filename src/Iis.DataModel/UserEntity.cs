@@ -3,6 +3,7 @@ using Iis.DataModel.Roles;
 using System.Collections.Generic;
 using Iis.Interfaces.Enums;
 using System;
+using Iis.Interfaces.Users;
 
 namespace Iis.DataModel
 {

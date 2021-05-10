@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Iis.Core.Tools;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +16,11 @@ namespace IIS.Core.Tools
             using IServiceScope scope = host.ApplicationServices.CreateScope();
             UserSeeder utilities = scope.ServiceProvider.GetRequiredService<UserSeeder>();
             utilities.SeedDataAsync().GetAwaiter().GetResult();
+        }
+        public static void SeedExternalUsers(this IApplicationBuilder host)
+        {
+            using IServiceScope scope = host.ApplicationServices.CreateScope();
+            var externalUserSeeder = scope.ServiceProvider.GetRequiredService<ExternalUserSeeder>();
         }
     }
 }
