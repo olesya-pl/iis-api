@@ -1,18 +1,19 @@
 using System;
 using HotChocolate;
-
+using HotChocolate.Types;
 namespace IIS.Core.GraphQL.ChangeHistory
 {
     public class DateRangeFilter
     {
-        [GraphQLNonNullType]
+        [GraphQLType(typeof(NonNullType<DateType>))]
         public DateTime From { get; set; }
-        [GraphQLNonNullType]
+        [GraphQLType(typeof(NonNullType<DateType>))]
         public DateTime To { get; set; }
         [GraphQLIgnore]
         public (DateTime From, DateTime To) ToRange()
         {
-            return (From: new DateTime(From.Year, From.Month, From.Day, 00, 00, 00), To: new DateTime(To.Year, To.Month, To.Day, 23, 59, 59));
+            var dayBeforeTo = To.AddDays(-1);
+            return (From: new DateTime(From.Year, From.Month, From.Day, 00, 00, 00), To: new DateTime(dayBeforeTo.Year, dayBeforeTo.Month, dayBeforeTo.Day, 23, 59, 59));
         }
     }
 }
