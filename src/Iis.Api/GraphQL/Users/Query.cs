@@ -6,8 +6,8 @@ using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
-using Iis.Services;
-using Iis.DbLayer.Repositories;
+using Iis.Services.Contracts.Enums;
+using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Users
@@ -26,9 +26,13 @@ namespace IIS.Core.GraphQL.Users
         public async Task<GraphQLCollection<User>> GetUsers(
             [Service] IUserService userService,
             [Service] IMapper mapper,
-            [GraphQLNonNullType] PaginationInput pagination)
+            [GraphQLNonNullType] PaginationInput pagination,
+            UserFilterInput filter)
         {
-            var usersResult = await userService.GetUsersAsync(pagination.Offset(), pagination.PageSize);
+            var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
+            var userStatusFilterValue = filter?.UserStatus ?? UserStatusType.All;
+
+            var usersResult = await userService.GetUsersByStatusAsync(pageParam, userStatusFilterValue);
 
             var graphQLUsers = usersResult.Users
                                     .Select(user => mapper.Map<User>(user))
