@@ -339,7 +339,7 @@ namespace IIS.Core
                     {
                         throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
                     }
-                }               
+                }
 
                 context.ContextData.Add(TokenPayload.TokenPropertyName, validatedToken);
             }

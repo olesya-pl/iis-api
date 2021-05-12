@@ -48,10 +48,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var id = ctx.Argument<Guid>("id");
             var userService = ctx.Service<IUserService>();
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
 
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, INodeTypeLinked>(id, null), default);
-            
+
             if (!userService.IsAccessLevelAllowedForUser(tokenPayload.User.AccessLevel, node.OriginalNode.GetAccessLevelIndex()))
                 throw new Exception($"{FrontEndErrorCodes.NotFound}:{ObjectNotFound}");
 
@@ -64,7 +64,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             var filter = ctx.Argument<FilterInput>("filter");
 
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
 
             IEnumerable<Guid> ids = Array.Empty<Guid>();
 
@@ -186,7 +186,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 ids = filter.MatchList;
             }
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids, tokenPayload.User));
         }
         public Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)

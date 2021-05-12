@@ -34,7 +34,7 @@ namespace IIS.Core.GraphQL.Files
         {
             var uploadTasks = new List<Task<UploadResult>>();
 
-            var tokenPayload = context.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = context.GetToken();
 
             foreach (var file in inputs)
             {

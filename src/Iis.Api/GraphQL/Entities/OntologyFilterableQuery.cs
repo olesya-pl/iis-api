@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.Entities
             AllEntitiesFilterInput filter
             )
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var types = filter.Types is null || !filter.Types.Any() ? EntityList : filter.Types;
 
             var elasticFilter = new ElasticFilter
@@ -79,7 +79,7 @@ namespace IIS.Core.GraphQL.Entities
         )
         {
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
 
             var response = await ontologyService.SearchEventsAsync(new ElasticFilter
             {

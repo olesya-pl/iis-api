@@ -56,7 +56,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var data = ctx.Argument<Dictionary<string, object>>("data");
 
             var type = _ontologySchema.GetEntityTypeByName(typeName);
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var entity = await CreateRootEntity(Guid.NewGuid(), type, data, tokenPayload.User);
             return entity;
         }
@@ -311,7 +311,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (_resolverContext is null) return null;
 
-            var tokenPayload = _resolverContext.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = _resolverContext.GetToken();
             return tokenPayload?.User;
         }
     }

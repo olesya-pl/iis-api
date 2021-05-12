@@ -22,7 +22,7 @@ namespace IIS.Core.GraphQL.Reports
             SortingInput sorting, 
             FilterInput filter)
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
 
             var (count, items) = await reportElasticService.SearchAsync(new ReportSearchParams
             {

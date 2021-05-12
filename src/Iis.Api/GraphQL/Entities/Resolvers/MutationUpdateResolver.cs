@@ -64,7 +64,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!data.ContainsKey(LastConfirmedFieldName))
                 data.Add(LastConfirmedFieldName, DateTime.UtcNow);
 
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             VerifyAccess(id, data, tokenPayload.User);
 
             var type = _ontologySchema.GetEntityTypeByName(typeName);
@@ -329,7 +329,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (_resolverContext is null) return "system";
 
-            var tokenPayload = _resolverContext.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = _resolverContext.GetToken();
             return tokenPayload?.User?.UserName;
         }
 

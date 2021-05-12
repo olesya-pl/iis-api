@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         {
             Validator.ValidateObject(data, new ValidationContext(data), true);
 
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var query = new Iis.DataModel.Analytics.AnalyticQueryEntity {
                 Id = Guid.NewGuid(),
                 CreatorId = tokenPayload.UserId,
@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             if (query == null)
                 throw new InvalidOperationException($"Cannot find analytics query with id = {id}");
 
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             _mapInputToModel(data, query);
             await _tryToToggleIndicators(context, query, data.Indicators);
             query.LastUpdaterId = tokenPayload.UserId;
