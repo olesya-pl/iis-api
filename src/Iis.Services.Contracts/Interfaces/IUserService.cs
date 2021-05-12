@@ -4,6 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Interfaces.Enums;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Enums;
+using Iis.Services.Contracts.Params;
+
 namespace Iis.Services.Contracts.Interfaces
 {
     public interface IUserService
@@ -15,7 +18,7 @@ namespace Iis.Services.Contracts.Interfaces
         User GetUser(Guid userId);
         User GetUser(string userName, string passwordHash);
         Task<User> GetUserAsync(Guid userId);
-        Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(int offset, int pageSize);
+        Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, UserStatusType userStatusFilter, CancellationToken ct = default);
         Task<User> RejectRole(Guid userId, Guid roleId);
         bool IsAccessLevelAllowedForUser(int userAccessLevel, int newAccessLevel);
         Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellationToken = default);
