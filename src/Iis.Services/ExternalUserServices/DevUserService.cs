@@ -19,8 +19,8 @@ namespace Iis.Services.ExternalUserServices
                     UserName = "ExternalUser1",
                     Roles = new List<ExternalRole>
                     {
-                        new ExternalRole { Name = "ExternalRole1"},
-                        new ExternalRole { Name = "ExternalRole2"}
+                        new ExternalRole { Name = "Оператор"},
+                        new ExternalRole { Name = "Аналітик 1"}
                     }
                 },
                 new ExternalUser
@@ -28,8 +28,8 @@ namespace Iis.Services.ExternalUserServices
                     UserName = "ExternalUser2",
                     Roles = new List<ExternalRole>
                     {
-                        new ExternalRole { Name = "ExternalRole1"},
-                        new ExternalRole { Name = "ExternalRole3"}
+                        new ExternalRole { Name = "Оператор"},
+                        new ExternalRole { Name = "Аналітик 2"}
                     }
                 },
             };
