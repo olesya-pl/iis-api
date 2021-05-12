@@ -358,6 +358,7 @@ namespace IIS.Core
             }
             UpdateDatabase(app);
             app.SeedUser();
+            app.SeedExternalUsers();
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 

@@ -21,6 +21,7 @@ namespace IIS.Core.Tools
         {
             using IServiceScope scope = host.ApplicationServices.CreateScope();
             var externalUserSeeder = scope.ServiceProvider.GetRequiredService<ExternalUserSeeder>();
+            externalUserSeeder.Seed();
         }
     }
 }
