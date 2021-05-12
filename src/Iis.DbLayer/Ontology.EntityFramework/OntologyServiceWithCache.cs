@@ -169,6 +169,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     var stringValue = p.OutgoingRelations.FirstOrDefault(r => string.Equals(r.TypeName, "numericIndex", StringComparison.Ordinal)).TargetNode.Value;
                     _ = int.TryParse(stringValue, out var value);
                     return user.IsAdmin || value <= user.AccessLevel;
+                })
+                .OrderBy(n => {
+                    var p = n.GetSingleProperty("numericIndex");
+                    return p == null ? 0 : int.Parse(p.Value);
                 });
 
             return accessLevels
