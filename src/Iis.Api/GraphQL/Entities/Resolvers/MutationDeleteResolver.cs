@@ -30,7 +30,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         public Entity DeleteEntity(IResolverContext ctx, string typeName)
         {
             var id = ctx.Argument<Guid>("id");
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             return DeleteEntity(id, typeName, tokenPayload.User);
         }
 
