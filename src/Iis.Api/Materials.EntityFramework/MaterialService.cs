@@ -279,7 +279,7 @@ namespace IIS.Core.Materials.EntityFramework
                         return;
                     }
 
-                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p));
+                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p, CancellationToken.None));
 
                     changesList.Add(new ChangeHistoryDto
                     {
