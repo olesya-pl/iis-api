@@ -270,5 +270,69 @@ namespace Iis.UnitTests.UserManagement
             Assert.Equal(2, usersResult.TotalCount);
             Assert.Equal(1, usersResult.Users.Count());
         }
+
+        [Theory(DisplayName = "Get Operators list"), RecursiveAutoData]
+        public async Task GetOperatorsList(
+            List<AccessObjectEntity> existingAccesses,
+            List<UserEntity> userEntities,
+            RoleEntity roleEntity)
+        {
+            // arrange:begin
+            var service = _serviceProvider.GetRequiredService<IUserService>();
+
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+
+            roleEntity.RoleAccessEntities = new List<RoleAccessEntity>();
+
+            roleEntity.UserRoles = null;
+
+            var operatorRoleEntity = new RoleEntity
+            {
+                Id = RoleEntity.OperatorRoleId,
+                UserRoles = null,
+                RoleAccessEntities = new List<RoleAccessEntity>()
+            };
+
+            userEntities.ForEach(e => e.UserRoles = null);
+
+            existingAccesses.ForEach(e => e.RoleAccessEntities = null);
+
+            var userRolesEntitiesList = userEntities
+                .Select(userEntity => new UserRoleEntity { Id = Guid.NewGuid(), UserId = userEntity.Id, RoleId = roleEntity.Id })
+                .ToArray();
+
+            userRolesEntitiesList.First().RoleId = operatorRoleEntity.Id;
+
+            context.Roles.Add(roleEntity);
+            context.Roles.Add(operatorRoleEntity);
+            context.Users.AddRange(userEntities);
+            context.UserRoles.AddRange(userRolesEntitiesList);
+            context.AccessObjects.AddRange(existingAccesses);
+            context.SaveChanges();
+            foreach (var access in existingAccesses)
+            {
+                context.RoleAccess.Add(new RoleAccessEntity
+                {
+                    AccessObjectId = access.Id,
+                    RoleId = roleEntity.Id
+                });
+                context.RoleAccess.Add(new RoleAccessEntity
+                {
+                    AccessObjectId = access.Id,
+                    RoleId = operatorRoleEntity.Id
+                });
+            }
+            context.SaveChanges();
+
+            var page = new PaginationParams(1, 10);
+
+            // arrange: end
+
+            //act
+            var operatorList = await service.GetOperatorsAsync();
+
+            //assert
+            Assert.Equal(1, operatorList.Count);
+        }
      }
 }

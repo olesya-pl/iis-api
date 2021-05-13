@@ -14,7 +14,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<User> AssignRole(Guid userId, Guid roleId);
         Task<Guid> CreateUserAsync(User newUser);
         Task<List<Guid>> GetAvailableOperatorIdsAsync();
-        Task<List<User>> GetOperatorsAsync();
+        Task<List<User>> GetOperatorsAsync(CancellationToken ct = default);
         User GetUser(Guid userId);
         User GetUser(string userName, string passwordHash);
         Task<User> GetUserAsync(Guid userId);

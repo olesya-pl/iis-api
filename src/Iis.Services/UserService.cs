@@ -70,22 +70,16 @@ namespace Iis.Services
             return userEntity.Id;
         }
 
-        private IQueryable<UserEntity> GetOperatorsQuery()
+        public async Task<List<User>> GetOperatorsAsync(CancellationToken ct = default)
         {
-            return _context.Users
-                .Include(p => p.UserRoles)
-                .Where(p => p.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
-                .AsNoTracking();
+            var userEntityList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(ct));
+
+            return userEntityList
+                .Select(e => _mapper.Map<User>(e))
+                .ToList();
         }
 
-        public Task<List<User>> GetOperatorsAsync()
-        {
-            return GetOperatorsQuery()
-                .Select(p => _mapper.Map<User>(p))
-                .ToListAsync();
-        }
-
-        public Task<List<Guid>> GetAvailableOperatorIdsAsync()
+        public async Task<List<Guid>> GetAvailableOperatorIdsAsync()
         {
             var maxMaterialsCount = _maxMaterialsConfig.Value;
 
@@ -97,18 +91,19 @@ namespace Iis.Services
                     && p.AssigneeId != null)
                 .GroupBy(p => p.AssigneeId)
                 .Where(group => group.Count() >= maxMaterialsCount)
-                .Select(group => group.Key);
+                .Select(group => group.Key)
+                .Where(key => key.HasValue)
+                .Select(key => key)
+                .ToArray();
 
-            return GetOperatorsQuery()
-                .Select(p => p.Id)
-                .Where(p => !unavailableOperators.Contains(p))
-                .ToListAsync();
+            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id), CancellationToken.None));
+
+            return userList.Select(e => e.Id).ToList();
         }
 
         public async Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellation = default)
         {
-            var userEntity = await GetUsersQuery()
-                                        .FirstOrDefaultAsync(e => e.Id == updatedUser.Id, cancellation);
+            var userEntity = await RunWithoutCommitAsync(uow => uow.UserRepository.GetByIdAsync(updatedUser.Id, cancellation));
 
             if (userEntity is null)
             {
@@ -144,8 +139,7 @@ namespace Iis.Services
 
         public async Task<User> GetUserAsync(Guid userId)
         {
-            var userEntity = await GetUsersQuery()
-                                    .SingleOrDefaultAsync(u => u.Id == userId);
+            var userEntity = await RunWithoutCommitAsync(uow => uow.UserRepository.GetByIdAsync(userId, CancellationToken.None));
 
             if (userEntity == null)
             {
@@ -162,8 +156,7 @@ namespace Iis.Services
 
         public User GetUser(string userName, string passwordHash)
         {
-            var userEntity = GetUsersQuery()
-                                    .SingleOrDefault(x => x.Username == userName && x.PasswordHash == passwordHash);
+            var userEntity = RunWithoutCommit(uow => uow.UserRepository.GetByUserNameAndHash(userName, passwordHash));
 
             return Map(userEntity);
         }
@@ -192,16 +185,6 @@ namespace Iis.Services
                             .ToArray();
 
             return (mappedUser, userCount);
-        }
-
-        private IQueryable<UserEntity> GetUsersQuery()
-        {
-            return _context.Users
-                .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                .ThenInclude(r => r.RoleAccessEntities)
-                .ThenInclude(ra => ra.AccessObject)
-                .AsNoTracking();
         }
 
         private User Map(UserEntity entity)
