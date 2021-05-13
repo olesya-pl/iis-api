@@ -28,7 +28,7 @@ namespace Iis.Elastic
         private readonly ElasticLogUtils _responseLogUtils;
 
         public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
-        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^', '\"', '~', ':', '(', ')', '{', '}', '[', ']', '\\', '/', '!' };
+        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^', '\"', '~', ':', '{', '}', '[', ']', '\\', '/', '!' };
 
         public ElasticManager(ElasticConfiguration configuration,
             SearchResultExtractor resultExtractor,
