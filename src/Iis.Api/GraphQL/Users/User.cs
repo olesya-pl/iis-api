@@ -5,6 +5,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Roles;
 using Iis.Interfaces.Enums;
+using Iis.Interfaces.Users;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -25,6 +26,8 @@ namespace IIS.Core.GraphQL.Users
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
         public int AccessLevel { get; set; }
+        public UserSource Source { get; set; }
+        public bool IsExternalUser => Source != UserSource.Internal;
         public IEnumerable<Role> Roles { get; set; }
         public IEnumerable<AccessEntity> Entities { get; set; }
         public IEnumerable<AccessTab> Tabs { get; set; }
