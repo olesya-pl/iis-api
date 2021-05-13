@@ -8,6 +8,6 @@ namespace Iis.Interfaces.Users
     {
         Internal = 0,
         ActiveDirectory = 1,
-        Dev = 2
+        Dummy = 2
     }
 }

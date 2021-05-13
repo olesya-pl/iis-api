@@ -16,7 +16,7 @@ namespace Iis.DataModel
         public string Patronymic { get; set; }
         public string Comment { get; set; }
         public string PasswordHash { get; set; }
-        [Obsolete]
+        [Obsolete("Deprecated in favor of Source")]
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public int AccessLevel { get; set; }

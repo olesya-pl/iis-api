@@ -26,11 +26,11 @@ namespace Iis.Services.ExternalUserServices
             using (var ctx = new PrincipalContext(ContextType.Domain, _connectionString))
             {
 
-                var userPrinciple = new UserPrincipal(ctx);
+                var userPrincipal = new UserPrincipal(ctx);
 
-                using (var search = new PrincipalSearcher(userPrinciple))
+                using (var search = new PrincipalSearcher(userPrincipal))
                 {
-                    foreach (UserPrincipal domainUser in search.FindAll().OrderBy(u => u.DisplayName))
+                    foreach (UserPrincipal domainUser in search.FindAll())
                     {
                         var externalUser = new ExternalUser
                         {

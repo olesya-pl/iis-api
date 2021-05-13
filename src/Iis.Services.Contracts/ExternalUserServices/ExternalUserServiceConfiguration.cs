@@ -8,5 +8,6 @@ namespace Iis.Api.Configuration
     public class ExternalUserServiceConfiguration
     {
         public string ServiceType { get; set; }
+        public string ConnectionString { get; set; }
     }
 }

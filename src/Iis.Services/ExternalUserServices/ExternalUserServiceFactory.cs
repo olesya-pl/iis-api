@@ -1,4 +1,5 @@
 ﻿using Iis.Api.Configuration;
+using Iis.Interfaces.Users;
 using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,15 @@ namespace Iis.Services.ExternalUserServices
     {
         public IExternalUserService GetInstance(ExternalUserServiceConfiguration configuration)
         {
-            if (configuration.ServiceType.Equals("dev", StringComparison.OrdinalIgnoreCase))
+            switch (configuration.ServiceType.ToLower())
             {
-                return new DevUserService();
+                case "activedirectory":
+                    return new ActiveDirectoryUserService(configuration.ConnectionString);
+                case "dummy":
+                    return new DummyUserService();
+                default:
+                    return null;
             }
-
-            return null;
         }
     }
 }

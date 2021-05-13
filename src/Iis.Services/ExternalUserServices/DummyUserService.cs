@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Iis.Services.ExternalUserServices
 {
-    public class DevUserService : IExternalUserService
+    public class DummyUserService : IExternalUserService
     {
-        public UserSource GetUserSource() => UserSource.Dev;
+        public UserSource GetUserSource() => UserSource.Dummy;
         public List<ExternalUser> GetUsers()
         {
             return new List<ExternalUser>
