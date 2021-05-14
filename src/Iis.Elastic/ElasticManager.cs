@@ -20,13 +20,12 @@ namespace Iis.Elastic
 {
     internal class ElasticManager : IElasticManager
     {
-        public const string NullValue = "NULL";
         private ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;
         private readonly SearchResultExtractor _resultExtractor;
         private readonly ILogger<ElasticManager> _logger;
         private readonly ElasticLogUtils _responseLogUtils;
-
+        public const string NullValue = "NULL";
         public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
         public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^', '\"', '~', ':', '{', '}', '[', ']', '\\', '/', '!' };
 
@@ -283,6 +282,9 @@ namespace Iis.Elastic
             mappingConfiguration.Properties.Add(KeywordProperty.Create($"{ElasticConfigConstants.NodeTypeTitleField}{SearchQueryExtension.AggregateSuffix}", false));
             mappingConfiguration.Properties.Add(TextProperty.Create(ElasticConfigConstants.NodeTypeTitleField, true));
             mappingConfiguration.Properties.Add(AliasProperty.Create(ElasticConfigConstants.NodeTypeTitleAlias, ElasticConfigConstants.NodeTypeTitleAggregateField));
+            mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.CreatedAtField, ElasticConfiguration.DefaultDateFormats));
+            mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.UpdatedAtField, ElasticConfiguration.DefaultDateFormats));
+
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
