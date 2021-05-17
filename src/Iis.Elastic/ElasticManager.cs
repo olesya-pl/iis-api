@@ -15,6 +15,7 @@ using Iis.Elastic.ElasticMappingProperties;
 using Iis.Elastic.SearchQueryExtensions;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Iis.Elastic
 {
@@ -27,7 +28,7 @@ namespace Iis.Elastic
         private readonly ElasticLogUtils _responseLogUtils;
         public const string NullValue = "NULL";
         public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
-        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^', '\"', '~', ':', '{', '}', '[', ']', '\\', '/', '!' };
+        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^',   ':', '{', '}', '[', ']', '/', '!' };
 
         public ElasticManager(ElasticConfiguration configuration,
             SearchResultExtractor resultExtractor,
@@ -536,12 +537,22 @@ namespace Iis.Elastic
                 return input;
             }
 
+            if(IsDoubleQuoted(input))
+            {
+                return $"{input} OR {input}~";
+            }
+
             return $"\"{input}\" OR {input}~";
         }
 
         private static bool IsWildCard(string input)
         {
             return input.Contains('*');
+        }
+
+        private static bool IsDoubleQuoted(string input)
+        {
+            return input.StartsWith('\"') && input.EndsWith('\"');
         }
 
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, IRequestParameters requestParameters, CancellationToken cancellationToken)
