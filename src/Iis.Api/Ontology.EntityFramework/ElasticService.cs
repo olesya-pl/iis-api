@@ -38,10 +38,12 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default)
         {
+            var queryExpression = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}";
+
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
-                Query = $"*{filter.Suggestion}*"
+                Query = SearchQueryExtension.IsExactQuery(queryExpression) ? queryExpression : $"*{queryExpression}*"
             };
 
             return _elasticManager.CountAsync(searchParams, ct);
