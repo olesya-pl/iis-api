@@ -34,8 +34,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var json = serializer.GetJsonObjectByExtNode(extNode);
             Assert.Equal(extNode.Id, json["Id"]);
             Assert.Equal(extNode.NodeTypeName, json["NodeTypeName"]);
-            Assert.Equal(extNode.CreatedAt, Convert.ToDateTime(json["CreatedAt"]));
-            Assert.Equal(extNode.UpdatedAt, Convert.ToDateTime(json["UpdatedAt"]));
+            Assert.Equal(extNode.CreatedAt, Convert.ToDateTime(json["CreatedAt"]).ToUniversalTime());
+            Assert.Equal(extNode.UpdatedAt, Convert.ToDateTime(json["UpdatedAt"]).ToUniversalTime());
         }
 
         [Fact]
@@ -92,8 +92,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var json = serializer.GetJsonObjectByExtNode(extNode);
             Assert.Equal(extNode.Id, json["Id"]);
             Assert.Equal(extNode.NodeTypeName, json["NodeTypeName"]);
-            Assert.Equal(extNode.CreatedAt, Convert.ToDateTime(json["CreatedAt"]));
-            Assert.Equal(extNode.UpdatedAt, Convert.ToDateTime(json["UpdatedAt"]));
+            Assert.Equal(extNode.CreatedAt, Convert.ToDateTime(json["CreatedAt"]).ToUniversalTime());
+            Assert.Equal(extNode.UpdatedAt, Convert.ToDateTime(json["UpdatedAt"]).ToUniversalTime());
 
             Assert.Equal("abcde", json["name"]);
             var affiliation = json["affiliation"];
@@ -122,8 +122,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var json = serializer.GetJsonObjectByExtNode(extNode);
             Assert.Equal(extNode.Id, json["Id"]);
             Assert.Equal(extNode.NodeTypeName, json["NodeTypeName"]);
-            Assert.Equal(extNode.CreatedAt, Convert.ToDateTime(json["CreatedAt"]));
-            Assert.Equal(extNode.UpdatedAt, Convert.ToDateTime(json["UpdatedAt"]));
+            Assert.Equal(extNode.CreatedAt, Convert.ToDateTime(json["CreatedAt"]).ToUniversalTime());
+            Assert.Equal(extNode.UpdatedAt, Convert.ToDateTime(json["UpdatedAt"]).ToUniversalTime());
         }
 
         [Theory]
