@@ -227,12 +227,12 @@ namespace IIS.Core.Ontology.EntityFramework
                     (ShouldReturnAllEntities(filter) ? "*" : $"{filter.ToQueryString()}", searchFields)
                 }
             };
-            
+
             if(!useHistoricalSearch)
                 return (multiSearchParams, null);
-            
+
             IElasticSearchResult historySearchResult;
-            
+
             var historicalIndexes = typeNames.Select(GetHistoricalIndex).ToList();
             if (SearchQueryExtension.IsExactQuery(filter.Suggestion))
             {
