@@ -16,7 +16,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 {
                     Suggestion = "омсбр"
                 },
-                "(омсбр)"
+                "омсбр"
             };
             yield return new object[]
             {
