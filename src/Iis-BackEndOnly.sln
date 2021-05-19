@@ -39,9 +39,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Events", "Iis.Events\Ii
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventHandlers", "Iis.EventHandlers\Iis.EventHandlers.csproj", "{7D081911-CBC0-4A0C-9662-C3D23804F692}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Messages", "Iis.Messages\Iis.Messages.csproj", "{FB3A9232-9235-4CAE-B1AE-1C04A466084E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Messages", "Iis.Messages\Iis.Messages.csproj", "{FB3A9232-9235-4CAE-B1AE-1C04A466084E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.MaterialLoader", "Iis.MaterialLoader\Iis.MaterialLoader.csproj", "{6B74487D-EC74-4E41-A911-0F56C97A8EB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.MaterialLoader", "Iis.MaterialLoader\Iis.MaterialLoader.csproj", "{6B74487D-EC74-4E41-A911-0F56C97A8EB6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventMaterialAutoAssignment.DataModel", "Iis.EventMaterialAutoAssignment.DataModel\Iis.EventMaterialAutoAssignment.DataModel.csproj", "{48F3CAB4-F6E1-44CC-A745-73C67F49065C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.EventMaterialAutoAssignment", "Iis.EventMaterialAutoAssignment\Iis.EventMaterialAutoAssignment.csproj", "{40CCFA2D-4010-4B93-9A8A-E0AE10ACE21E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +133,14 @@ Global
 		{6B74487D-EC74-4E41-A911-0F56C97A8EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B74487D-EC74-4E41-A911-0F56C97A8EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B74487D-EC74-4E41-A911-0F56C97A8EB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48F3CAB4-F6E1-44CC-A745-73C67F49065C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48F3CAB4-F6E1-44CC-A745-73C67F49065C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48F3CAB4-F6E1-44CC-A745-73C67F49065C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48F3CAB4-F6E1-44CC-A745-73C67F49065C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40CCFA2D-4010-4B93-9A8A-E0AE10ACE21E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40CCFA2D-4010-4B93-9A8A-E0AE10ACE21E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40CCFA2D-4010-4B93-9A8A-E0AE10ACE21E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40CCFA2D-4010-4B93-9A8A-E0AE10ACE21E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

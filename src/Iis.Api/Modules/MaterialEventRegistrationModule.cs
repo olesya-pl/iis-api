@@ -28,7 +28,7 @@ namespace Iis.Api.Modules
             var featureHandlerConfig = configuration.GetSection(featureHandlerSectionName)
                                                     .Get<FeatureHandlerConfig>();
             var elasticSaver = configuration.GetSection(elasticSaverSectionName)
-                                                    .Get<CreatedMaterialElasticSaverConfiguration>();
+                                                    .Get<MaterialElasticSaverConfiguration>();
 
             return services
                         .AddSingleton<MaterialEventConfiguration>(serviceProvider => meConfig)

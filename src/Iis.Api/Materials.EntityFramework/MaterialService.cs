@@ -26,6 +26,8 @@ using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -40,7 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
         private readonly ICommonData _commonData;
-        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
+        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;        
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -294,8 +296,10 @@ namespace IIS.Core.Materials.EntityFramework
                     material.Assignee = null;
                     material.AssigneeId = input.AssigneeId;
                 });
+                var eventReassignmentNeeded = false;
                 if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal))
                 {
+                    eventReassignmentNeeded = true;
                     changesList.Add(new ChangeHistoryDto
                     {
                         Date = DateTime.UtcNow,
@@ -339,12 +343,22 @@ namespace IIS.Core.Materials.EntityFramework
 
                 await Task.WhenAll(new[] { fillElasticTask, addHistoryTask });
 
+                if (eventReassignmentNeeded)
+                {
+                    SendMaterialUpdatedMessage(material);
+                }
+
                 if (MaterialShouldBeQueuedForMachineLearning(material))
                 {
                     QueueMaterialForMachineLearning(material);
                 }
             }
             return await _materialProvider.GetMaterialAsync(input.Id, user);
+        }
+
+        private void SendMaterialUpdatedMessage(MaterialEntity material)
+        {
+            _eventProducer.SendMaterialSavedToElastic(new List<Guid>() { material.Id });
         }
 
         private void CreateChangeHistory(Guid targetId,

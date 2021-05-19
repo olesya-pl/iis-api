@@ -9,6 +9,8 @@ using Iis.Api.Configuration;
 using Iis.Api.Materials;
 using Iis.Messages;
 using Iis.Utility;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace IIS.Core.Materials
 {
@@ -19,6 +21,7 @@ namespace IIS.Core.Materials
         void SendMaterialFeatureEvent(MaterialEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
         void SaveMaterialToElastic(Guid id);
+        void SendMaterialSavedToElastic(List<Guid> ids);
 
         void PublishMaterialCreatedMessage(MaterialCreatedMessage message);
     }
@@ -32,13 +35,13 @@ namespace IIS.Core.Materials
         private readonly IModel _materialEventChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
-        private readonly CreatedMaterialElasticSaverConfiguration _elasticSaverConfiguration;
+        private readonly MaterialElasticSaverConfiguration _elasticSaverConfiguration;
 
         public MaterialEventProducer(IConnectionFactory connectionFactory,
             ILoggerFactory loggerFactory,
             MaterialEventConfiguration eventConfiguration,
             MaterialOperatorAssignerConfiguration assignerConfiguration,
-            CreatedMaterialElasticSaverConfiguration elasticSaverConfiguration)
+            MaterialElasticSaverConfiguration elasticSaverConfiguration)
         {
             _logger = loggerFactory.CreateLogger<MaterialEventProducer>();
 
@@ -170,6 +173,24 @@ namespace IIS.Core.Materials
                 routingKey: MaterialRabbitConsts.QueueName,
                 basicProperties: null,
                 body: body);
+        }
+
+        public void SendMaterialSavedToElastic(List<Guid> ids)
+        {
+            _channel.QueueDeclare(queue: _elasticSaverConfiguration.OutgoingQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+
+            _channel.QueueBind(_elasticSaverConfiguration.OutgoingQueueName, _elasticSaverConfiguration.OutgoingExchangeName, _elasticSaverConfiguration.OutgoingRoutingKey);
+
+            var json = JsonConvert.SerializeObject(ids);
+            var body = Encoding.UTF8.GetBytes(json);
+
+            _channel.BasicPublish(exchange: _elasticSaverConfiguration.OutgoingExchangeName,
+                                routingKey: _elasticSaverConfiguration.OutgoingRoutingKey,
+                                basicProperties: null,
+                                body: body);
         }
     }
 }
