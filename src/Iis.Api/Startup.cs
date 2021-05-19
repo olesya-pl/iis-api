@@ -31,6 +31,7 @@ using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
+using Iis.EventMaterialAutoAssignment;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
@@ -120,6 +121,13 @@ namespace IIS.Core
             if (enableContext)
             {
                 services.AddDbContext<OntologyContext>(
+                    options => options
+                        .UseNpgsql(dbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Transient);
+
+                services.AddDbContext<AssignmentConfigContext>(
                     options => options
                         .UseNpgsql(dbConnectionString)
                         .UseLoggerFactory(MyLoggerFactory),
@@ -300,6 +308,7 @@ namespace IIS.Core
             services.RegisterElasticModules();
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
+            services.RegisterEventMaterialAutoAssignment(Configuration);
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
@@ -404,6 +413,14 @@ namespace IIS.Core
                 try
                 {
                     using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                    {
+                        context.Database.Migrate();
+                    }
+                }
+                catch { }
+                try
+                {
+                    using (var context = serviceScope.ServiceProvider.GetService<AssignmentConfigContext>())
                     {
                         context.Database.Migrate();
                     }
