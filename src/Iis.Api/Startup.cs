@@ -52,7 +52,6 @@ using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Materials.FeatureProcessors;
-using IIS.Core.NodeMaterialRelation;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Tools;
 using IIS.Repository.Factories;
@@ -202,7 +201,6 @@ namespace IIS.Core
             services.AddTransient<IConnectionStringService, ConnectionStringService>();
             services.AddTransient<IAccessLevelService, AccessLevelService>();
             services.AddTransient<AccessObjectService>();
-            services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
