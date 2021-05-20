@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IIS.Core.NodeMaterialRelation
+namespace Iis.Services
 {
     public class NodeMaterialRelation
     {
