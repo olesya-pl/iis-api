@@ -498,25 +498,27 @@ namespace Iis.DbLayer.ModifyDataScripts
             var imageProperty = photoType.GetRelationByName("image");
 
             var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
-            //"{ \"FormField\": {\"Type\": \"dropdown\" }}";
-            var jsonMeta = @"  
-{
+            var titlePhotosProperty = objectType.GetProperty("titlePhotos");
+            if (titlePhotosProperty == null)
+            {
+                var jsonMeta = @"{
     ""AcceptsEntityOperations"": [0,1,2],
     ""FormField"": {
         ""Type"": ""photo""
     }
 }";
 
-            var titlePhotosProperty = data.Schema.CreateRelationTypeJson(
-                objectType.Id, 
-                photoType.Id, 
-                "titlePhotos", 
-                "Фото в заголовку", 
-                EmbeddingOptions.Multiple,
-                jsonMeta
-            );
+                titlePhotosProperty = data.Schema.CreateRelationTypeJson(
+                    objectType.Id,
+                    photoType.Id,
+                    "titlePhotos",
+                    "Фото в заголовку",
+                    EmbeddingOptions.Multiple,
+                    jsonMeta
+                );
 
-            SaveOntologySchema(data.Schema);
+                SaveOntologySchema(data.Schema);
+            }
 
             var objectNodes = data.GetAllNodes().Where(n => n.NodeType.IsObject);
             foreach (var node in objectNodes)
