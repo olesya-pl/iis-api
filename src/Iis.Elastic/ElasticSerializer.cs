@@ -11,6 +11,8 @@ namespace Iis.Elastic
 {
     public class ElasticSerializer : IElasticSerializer
     {
+        private const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+
         public string GetJsonByExtNode(IExtNode extNode)
         {
             return GetJsonObjectByExtNode(extNode).ToString();
@@ -24,7 +26,7 @@ namespace Iis.Elastic
             {
                 json[nameof(extNode.Id)] = extNode.Id;
                 json[nameof(extNode.NodeTypeName)] = extNode.NodeTypeName;
-                
+
                 if (extNode.AccessLevel.HasValue)
                     json["__accessLevel"] = extNode.AccessLevel;
 
@@ -33,8 +35,9 @@ namespace Iis.Elastic
                     json[nameof(extNode.NodeTypeTitle)] = extNode.NodeTypeTitle;
                     json[$"{nameof(extNode.NodeTypeTitle)}{SearchQueryExtension.AggregateSuffix}"] = extNode.NodeTypeTitle;
                 }
-                json[nameof(extNode.CreatedAt)] = extNode.CreatedAt;
-                json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt;
+                json[nameof(extNode.CreatedAt)] = extNode.CreatedAt.ToString(DateFormat);
+                json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt.ToString(DateFormat);
+
             } else if(extNode.NodeType.IsObject)
             {
                 json[nameof(extNode.Id)] = extNode.Id;
@@ -89,8 +92,8 @@ namespace Iis.Elastic
 
             try
             {
-                var date = new DateTime((int)year, (int)month, (int)day);
-                return JToken.FromObject(date);
+                var date = new DateTime(year.Value, month, day);
+                return JToken.FromObject(date.ToString(DateFormat));
             }
             catch
             {
@@ -98,11 +101,27 @@ namespace Iis.Elastic
             }
         }
 
+        private JToken GetDateTimeJToken(IExtNode extNode)
+        {
+            var returnValue = extNode.AttributeValue;
+
+            if(DateTime.TryParse(extNode.AttributeValue.ToString(), out DateTime dateTimeValue))
+            {
+                returnValue = dateTimeValue.ToString(DateFormat);
+            }
+            return JToken.FromObject(returnValue);
+        }
+
         private JToken GetExtNodeValue(IExtNode extNode)
         {
             if (extNode.EntityTypeName == EntityTypeNames.FuzzyDate.ToString())
             {
                 return GetFuzzyDateJToken(extNode);
+            }
+
+            if(extNode.ScalarType.HasValue && extNode.ScalarType.Value == ScalarType.Date)
+            {
+                return GetDateTimeJToken(extNode);
             }
 
             if (extNode.IsAttribute && extNode.AttributeValue != null)

@@ -53,7 +53,7 @@ namespace Iis.Services
 
             var (from, size) = searchParams.Page.ToElasticPage();
 
-            var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
+            var queryString = noSuggestion ? "ParentId:NULL" : $"({searchParams.Suggestion}) AND ParentId:NULL";
 
             var query = new ExactQueryBuilder()
                 .WithPagination(from, size)
@@ -70,7 +70,7 @@ namespace Iis.Services
 
             var elasticResult = await _elasticManager
                 .WithUserId(userId)
-                .SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
+                .SearchAsync(query.ToString(Formatting.None), _elasticState.MaterialIndexes, ct);
 
             var searchResult = elasticResult.ToSearchResult();
 

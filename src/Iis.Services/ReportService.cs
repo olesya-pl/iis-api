@@ -86,8 +86,9 @@ namespace Iis.Services
 
             var copiedReport = new ReportEntity(sourceReport, Guid.NewGuid(), DateTime.UtcNow);
 
-            copiedReport.Title = newReport.Title ?? newReport.Title;
-            copiedReport.Recipient = newReport.Recipient ?? newReport.Recipient;
+            copiedReport.Title = newReport.Title ?? copiedReport.Title;
+            copiedReport.Recipient = newReport.Recipient ?? copiedReport.Recipient;
+            copiedReport.AccessLevel = newReport.AccessLevel;
 
             await RunAsync(uow => uow.ReportRepository.Create(copiedReport));
 

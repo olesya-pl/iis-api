@@ -362,7 +362,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
             else
             {
-                var children = relation.GetChildAttributes();
+                var children = relation.GetTopLevelAttributes();
                 foreach (var child in children)
                 {
                     var value = child.attribute.Value.ToString();
