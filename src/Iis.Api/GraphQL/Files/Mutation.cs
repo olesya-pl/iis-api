@@ -9,9 +9,10 @@ using HotChocolate.Resolvers;
 using IIS.Core.Materials;
 using Iis.Api.Configuration;
 using Iis.Domain.Materials;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
+using File = Iis.Domain.Materials.File;
+using Iis.Domain.Users;
 
 namespace IIS.Core.GraphQL.Files
 {
@@ -116,7 +117,7 @@ namespace IIS.Core.GraphQL.Files
                         type = "image"
                     }),
                     LoadData = loadData,
-                    File = new FileDto(fileSaveResult.Id),
+                    File = new File(fileSaveResult.Id),
                     CreatedDate = DateTime.UtcNow,
                     AccessLevel = input.AccessLevel,
                 };
@@ -142,7 +143,7 @@ namespace IIS.Core.GraphQL.Files
             {
                 await fs.WriteAsync(byteArray, 0, byteArray.Length);
             }
-            using (var sw = File.CreateText(fullDataName))
+            using (var sw = System.IO.File.CreateText(fullDataName))
             {
                 await sw.WriteLineAsync($"{AccessLevelPropertyName} {input.AccessLevel}");                
                 sw.WriteLine($"{LoadedByPropertyName}: {userName}");

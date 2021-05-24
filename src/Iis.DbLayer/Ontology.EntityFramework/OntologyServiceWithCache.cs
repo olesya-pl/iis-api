@@ -10,9 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
-using Iis.Services.Contracts;
 using Iis.Interfaces.AccessLevels;
-using Iis.Interfaces.Roles;
+using Iis.Domain.Users;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {

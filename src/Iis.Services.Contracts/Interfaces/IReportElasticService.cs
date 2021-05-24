@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Elastic;
+﻿using Iis.Domain.Users;
+using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Params;
 using System;

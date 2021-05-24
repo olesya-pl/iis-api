@@ -7,8 +7,8 @@ using Xunit;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
 using Iis.Services;
-using Iis.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Iis.Domain.Users;
 
 namespace Iis.UnitTests.Roles
 {

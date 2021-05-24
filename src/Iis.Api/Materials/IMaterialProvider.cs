@@ -6,8 +6,7 @@ using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Params;
-using Iis.Interfaces.Elastic;
-using Iis.Services.Contracts;
+using Iis.Domain.Users;
 
 namespace IIS.Core.Materials
 {

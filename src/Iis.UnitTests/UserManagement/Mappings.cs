@@ -3,8 +3,8 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using AutoMapper;
-using Iis.Services.Contracts;
 using GraphUsers = IIS.Core.GraphQL.Users;
+using Iis.Domain.Users;
 
 namespace Iis.UnitTests.UserManagement
 {

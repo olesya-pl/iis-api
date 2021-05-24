@@ -1,4 +1,5 @@
-﻿using Iis.Services.Contracts;
+﻿using Iis.Domain.Users;
+using Iis.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

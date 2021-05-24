@@ -1,14 +1,12 @@
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Themes;
-using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using System.Threading;
 using IIS.Repository;
@@ -18,6 +16,7 @@ using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Domain.Users;
 
 namespace Iis.Services
 {

@@ -2,11 +2,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Iis.Services.Contracts;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using Iis.Domain.MachineLearning;
 using Material = Iis.Domain.Materials.Material;
+using Iis.Domain.Users;
 
 namespace IIS.Core.Materials
 {

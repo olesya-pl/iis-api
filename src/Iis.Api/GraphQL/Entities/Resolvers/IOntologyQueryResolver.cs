@@ -3,13 +3,12 @@ using HotChocolate.Types;
 using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Iis.Interfaces.Elastic;
 using Attribute = Iis.Domain.Attribute;
-using Iis.Services.Contracts;
+using Iis.Domain.Users;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

@@ -2,11 +2,7 @@
 using HotChocolate.Types;
 using Iis.Api.GraphQL.Entities;
 using Iis.Domain;
-using Iis.Domain.Meta;
-using Iis.Interfaces.Meta;
-using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologySchema.DataTypes;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.DataLoaders;
 using IIS.Core.GraphQL.Entities.InputTypes;
@@ -20,8 +16,8 @@ using Iis.Interfaces.Elastic;
 using Attribute = Iis.Domain.Attribute;
 using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
-using Iis.Services.Contracts;
 using Iis.Interfaces.Constants;
+using Iis.Domain.Users;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

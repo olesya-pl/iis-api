@@ -4,12 +4,10 @@ using System.Security.Claims;
 using System.Collections.Generic;
 using System.Security.Authentication;
 using System.IdentityModel.Tokens.Jwt;
-using Iis.Services;
-using Iis.Services.Contracts;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
-using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Domain.Users;
 
 namespace IIS.Core
 {
