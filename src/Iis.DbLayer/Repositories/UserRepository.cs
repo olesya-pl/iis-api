@@ -19,16 +19,16 @@ namespace Iis.DbLayer.Repositories
                 .SingleOrDefault(e => e.Username == userName && e.PasswordHash == passwordHash);
         }
 
+        public UserEntity GetByUserName(string userName)
+        {
+            return GetUsersQuery()
+                .SingleOrDefault(e => e.Username == userName);
+        }
+
         public Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct)
         {
             return GetUsersQuery()
                 .FirstOrDefaultAsync(e => e.Id == userId, ct);
-        }
-
-        public Task<UserEntity> GetByUserNameAndHashAsync(string userName, string passwordHash, CancellationToken ct)
-        {
-            return GetUsersQuery()
-                .SingleOrDefaultAsync(e => e.Username == userName && e.PasswordHash == passwordHash, ct);
         }
 
         public Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct)

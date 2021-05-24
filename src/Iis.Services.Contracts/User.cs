@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Roles;
+using Iis.Interfaces.Users;
 
 namespace Iis.Services.Contracts
 {
@@ -19,6 +20,7 @@ namespace Iis.Services.Contracts
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
         public int AccessLevel { get; set; }
+        public UserSource Source { get; set; }
         public IEnumerable<Role> Roles {get;set;} = new List<Role>();
         public AccessGrantedList AccessGrantedItems { get; set; } = new AccessGrantedList();
         public List<AccessGranted> Tabs => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Tab).ToList();

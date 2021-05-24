@@ -10,6 +10,7 @@ using Iis.DataModel;
 using Iis.Services;
 using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Utility;
 
 namespace IIS.Core.GraphQL.Users
 {

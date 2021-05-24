@@ -3,7 +3,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace IIS.Core
+namespace Iis.Utility
 {
     public static class Hasher
     {

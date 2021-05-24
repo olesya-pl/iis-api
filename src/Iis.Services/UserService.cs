@@ -17,6 +17,10 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Enums;
+using Microsoft.Extensions.Configuration;
+using Iis.Utility;
+using System.Security.Authentication;
+using Iis.Interfaces.Users;
 
 namespace Iis.Services
 {
@@ -26,18 +30,24 @@ namespace Iis.Services
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
         private readonly IMapper _mapper;
         private readonly IUserElasticService _userElasticService;
+        private IConfiguration _configuration;
+        private IExternalUserService _externalUserService;
 
         public UserService(
             OntologyContext context,
             MaxMaterialsPerOperatorConfig maxMaterialsConfig,
             IUserElasticService userElasticService,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            IConfiguration configuration,
+            IExternalUserService externalUserService) : base(unitOfWorkFactory)
         {
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;
             _mapper = mapper;
             _userElasticService = userElasticService;
+            _configuration = configuration;
+            _externalUserService = externalUserService;
         }
 
         public async Task<Guid> CreateUserAsync(User newUser)
@@ -159,6 +169,40 @@ namespace Iis.Services
             var userEntity = RunWithoutCommit(uow => uow.UserRepository.GetByUserNameAndHash(userName, passwordHash));
 
             return Map(userEntity);
+        }
+
+        public User GetUserByUserName(string userName)
+        {
+            var userEntity = RunWithoutCommit(uow => uow.UserRepository.GetByUserName(userName));
+
+            return Map(userEntity);
+        }
+
+        public bool ValidateCredentials(string userName, string password)
+        {
+            var hash = _configuration.GetPasswordHashAsBase64String(password);
+            var userEntity = GetUserByUserName(userName);
+            return userEntity.PasswordHash == hash;
+        }
+
+        public User ValidateAndGetUser(string username, string password)
+        {
+            var user = GetUserByUserName(username);
+
+            if (user == null)
+                throw new InvalidCredentialException($"User {username} does not exists");
+
+            if (user.IsBlocked)
+                throw new InvalidCredentialException($"User {username} is blocked");
+
+            if (user.Source == UserSource.Internal && !ValidateCredentials(username, password) ||
+                user.Source != UserSource.Internal && user.Source != _externalUserService.GetUserSource() ||
+                user.Source == _externalUserService.GetUserSource() && !_externalUserService.ValidateCredentials(username, password))
+            {
+                throw new InvalidCredentialException($"Wrong password");
+            }
+
+            return user;
         }
 
         public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, UserStatusType userStatusFilter, CancellationToken ct = default)
