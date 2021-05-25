@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Iis.Interfaces.Roles;
 
-namespace Iis.Services.Contracts
+namespace Iis.Domain.Users
 {
     public class Role
     {

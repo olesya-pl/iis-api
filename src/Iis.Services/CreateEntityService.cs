@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Iis.Domain;
+using Iis.Domain.Users;
 using Iis.Events.Entities;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using MediatR;
 using Attribute = Iis.Domain.Attribute;

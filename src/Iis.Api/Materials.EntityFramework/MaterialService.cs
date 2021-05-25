@@ -13,21 +13,16 @@ using Iis.DbLayer.Repositories;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Roles;
-using Iis.Interfaces.Enums;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using Iis.Services;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using System.Text;
-using Newtonsoft.Json;
+using Iis.Domain.Users;
 
 namespace IIS.Core.Materials.EntityFramework
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using AutoMapper;
 using Iis.DataModel;
-using Iis.Services.Contracts;
+using Iis.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Iis.Services

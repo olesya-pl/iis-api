@@ -1,4 +1,5 @@
 using System;
+using Iis.Domain.Users;
 
 namespace Iis.Services.Contracts.Dtos
 {

@@ -3,12 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Iis.Services.Contracts.Dtos;
+using Iis.Domain.Materials;
 
 namespace IIS.Core
 {
     public interface IGsmTranscriber
     {
-        Task<JObject> TranscribeAsync(FileDto file, CancellationToken cancellationToken = default);
+        Task<JObject> TranscribeAsync(File file, CancellationToken cancellationToken = default);
     }
 
     public class GsmTranscriber : IGsmTranscriber
@@ -21,7 +22,7 @@ namespace IIS.Core
             _gsmWorkerUrl = gsmWorkerUrl;
         }
 
-        public async Task<JObject> TranscribeAsync(FileDto file, CancellationToken cancellationToken = default)
+        public async Task<JObject> TranscribeAsync(File file, CancellationToken cancellationToken = default)
         {
             var content = new MultipartFormDataContent();
             content.Add(new StringContent("1"), "trim");

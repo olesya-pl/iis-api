@@ -1,9 +1,11 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
-namespace Iis.Services.Contracts.Dtos
+namespace Iis.Domain.Materials
 {
-    public class FileDto
+    public class File
     {
         public Guid Id { get; }
         public string Name { get; }
@@ -21,7 +23,7 @@ namespace Iis.Services.Contracts.Dtos
             }
         }
 
-        public FileDto(Guid id, string name, string contentType, Stream contents, bool isTemporary)
+        public File(Guid id, string name, string contentType, Stream contents, bool isTemporary)
         {
             Id = id;
             Name = name;
@@ -30,7 +32,7 @@ namespace Iis.Services.Contracts.Dtos
             IsTemporary = isTemporary;
         }
 
-        public FileDto(Guid id) : this(id, null, null, null, false)
+        public File(Guid id) : this(id, null, null, null, false)
         {
         }
     }

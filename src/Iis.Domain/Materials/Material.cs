@@ -1,9 +1,7 @@
+using Iis.Domain.Users;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using Iis.Interfaces.Enums;
-using Iis.Services.Contracts;
-using Iis.Services.Contracts.Dtos;
 
 namespace Iis.Domain.Materials
 {
@@ -31,7 +29,7 @@ namespace Iis.Domain.Materials
         public MaterialSign SessionPriority { get; set; }
         public Guid? SessionPriorityId => SessionPriority?.Id;
         public List<Material> Children { get; set; } = new List<Material>();
-        public FileDto File { get; set; }
+        public File File { get; set; }
         public Guid? FileId => File?.Id;
         public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
         public DateTime CreatedDate { get; set; }

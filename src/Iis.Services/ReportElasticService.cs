@@ -1,12 +1,11 @@
 ﻿using Iis.Domain.Elastic;
+using Iis.Domain.Users;
 using Iis.Interfaces.Elastic;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using MoreLinq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;

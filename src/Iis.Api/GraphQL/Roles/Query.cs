@@ -2,9 +2,9 @@
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Api.GraphQL.Roles;
+using Iis.Domain.Users;
 using Iis.Interfaces.Roles;
 using Iis.Services;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Common;
 using System;

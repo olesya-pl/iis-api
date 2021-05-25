@@ -88,7 +88,7 @@ namespace Iis.Services
             };
         }
 
-        public async Task<FileDto> GetFileAsync(Guid id)
+        public async Task<Iis.Domain.Materials.File> GetFileAsync(Guid id)
         {
             var file = await RunWithoutCommitAsync(uow => uow.FileRepository.GetAsync(f => f.Id == id));
             if (file == null) return null;
@@ -115,7 +115,7 @@ namespace Iis.Services
             if (contents == null) return null;
 
             var ms = new MemoryStream(contents);
-            return new FileDto(id, file.Name, file.ContentType, ms, file.IsTemporary);
+            return new Iis.Domain.Materials.File(id, file.Name, file.ContentType, ms, file.IsTemporary);
         }
 
         public int RemoveFiles(List<Guid> ids)
