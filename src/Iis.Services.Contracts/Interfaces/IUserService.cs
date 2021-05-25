@@ -26,5 +26,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task PutAllUsersToElasticSearchAsync(CancellationToken cancellationToken);
         bool ValidateCredentials(string userName, string password);
         User ValidateAndGetUser(string username, string password);
+        string GetPasswordHashAsBase64String(string password);
+        int ImportUsersFromExternalSource(IEnumerable<string> userNames = null);
     }
 }

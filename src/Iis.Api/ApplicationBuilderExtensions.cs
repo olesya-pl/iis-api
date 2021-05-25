@@ -6,6 +6,7 @@ using Iis.DataModel;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Services.Contracts.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,6 +81,13 @@ namespace Iis.Api
             catch (Exception e)
             {
             }
+        }
+
+        public static void SeedExternalUsers(this IApplicationBuilder host)
+        {
+            using IServiceScope scope = host.ApplicationServices.CreateScope();
+            var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+            userService.ImportUsersFromExternalSource();
         }
     }
 }

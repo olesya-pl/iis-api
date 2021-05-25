@@ -21,6 +21,8 @@ using Microsoft.Extensions.Configuration;
 using Iis.Utility;
 using System.Security.Authentication;
 using Iis.Interfaces.Users;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Iis.Services
 {
@@ -180,7 +182,7 @@ namespace Iis.Services
 
         public bool ValidateCredentials(string userName, string password)
         {
-            var hash = _configuration.GetPasswordHashAsBase64String(password);
+            var hash = GetPasswordHashAsBase64String(password);
             var userEntity = GetUserByUserName(userName);
             return userEntity.PasswordHash == hash;
         }
@@ -195,8 +197,10 @@ namespace Iis.Services
             if (user.IsBlocked)
                 throw new InvalidCredentialException($"User {username} is blocked");
 
+            if (user.Source != UserSource.Internal && user.Source != _externalUserService.GetUserSource())
+                throw new InvalidCredentialException($"User {username} has wrong source");
+
             if (user.Source == UserSource.Internal && !ValidateCredentials(username, password) ||
-                user.Source != UserSource.Internal && user.Source != _externalUserService.GetUserSource() ||
                 user.Source == _externalUserService.GetUserSource() && !_externalUserService.ValidateCredentials(username, password))
             {
                 throw new InvalidCredentialException($"Wrong password");
@@ -322,6 +326,76 @@ namespace Iis.Services
             var elasticUsers = _mapper.Map<List<ElasticUserDto>>(users);
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
+        }
+
+        private string ComputeHash(string s)
+        {
+            using (var sha1 = new SHA1Managed())
+            {
+                var hash = Encoding.UTF8.GetBytes(s);
+                var generatedHash = sha1.ComputeHash(hash);
+                var generatedHashString = Convert.ToBase64String(generatedHash);
+                return generatedHashString;
+            }
+        }
+
+        public string GetPasswordHashAsBase64String(string password)
+        {
+            var salt = _configuration.GetValue<string>("salt", string.Empty);
+            return ComputeHash(password + salt);
+        }
+
+        public int ImportUsersFromExternalSource(IEnumerable<string> userNames = null)
+        {
+            var externalUsers = _externalUserService.GetUsers()
+                .Where(eu => userNames == null || userNames.Contains(eu.UserName));
+
+            var users = _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ToList();
+
+            var roles = _context.Roles.ToList();
+
+            int cnt = 0;
+
+            foreach (var externalUser in externalUsers)
+            {
+                var user = users.FirstOrDefault(u => u.Username == externalUser.UserName);
+
+                if (user == null)
+                {
+                    user = new UserEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Username = externalUser.UserName,
+                        Source = _externalUserService.GetUserSource(),
+                        UserRoles = new List<UserRoleEntity>()
+                    };
+                    _context.Users.Add(user);
+                    cnt++;
+                }
+
+                foreach (var externalRole in externalUser.Roles)
+                {
+                    if (!user.UserRoles.Any(ur => ur.Role.Name == externalRole.Name))
+                    {
+                        var role = roles.FirstOrDefault(r => r.Name == externalRole.Name);
+
+                        if (role != null)
+                        {
+                            var userRole = new UserRoleEntity
+                            {
+                                UserId = user.Id,
+                                RoleId = role.Id
+                            };
+                        }
+                    }
+                }
+            }
+            _context.SaveChanges();
+
+            return cnt;
         }
     }
 }

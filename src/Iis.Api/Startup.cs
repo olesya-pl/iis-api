@@ -18,7 +18,6 @@ using Iis.Api.FlightRadar;
 using Iis.Api.GraphQL.Access;
 using Iis.Api.Modules;
 using Iis.Api.Ontology;
-using Iis.Core.Tools;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DbLayer.Common;
@@ -53,7 +52,6 @@ using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Ontology.EntityFramework;
-using IIS.Core.Tools;
 using IIS.Repository.Factories;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -107,8 +105,6 @@ namespace IIS.Core
             });
 
             services
-                .RegisterRunUpTools()
-                .RegisterSeederTools()
                 .AddConfigurations(Configuration);
 
             services.AddMemoryCache();
@@ -310,7 +306,6 @@ namespace IIS.Core
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
-            services.AddTransient<ExternalUserSeeder>();
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
@@ -364,7 +359,6 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
-            app.SeedUser();
             app.SeedExternalUsers();
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
