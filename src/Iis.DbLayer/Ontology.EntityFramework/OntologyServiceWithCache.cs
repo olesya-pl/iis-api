@@ -134,6 +134,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
         public async Task<IEnumerable<Node>> GetNodesAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default)
         {
+            if(string.IsNullOrWhiteSpace(filter.Suggestion)) return Array.Empty<Node>();
+
             var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
             var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
 
@@ -195,6 +197,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         }
         public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default)
         {
+            if(string.IsNullOrWhiteSpace(filter.Suggestion)) return 0;
+
             var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
 
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
