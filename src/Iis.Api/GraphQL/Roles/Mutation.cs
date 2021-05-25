@@ -8,6 +8,7 @@ using Iis.Api.GraphQL.Roles;
 using Iis.Services;
 using Iis.Services.Contracts;
 using System.Linq;
+using Iis.Domain.Users;
 
 namespace IIS.Core.GraphQL.Roles
 {
@@ -18,7 +19,7 @@ namespace IIS.Core.GraphQL.Roles
             [GraphQLNonNullType] CreateRoleModel data) 
         {
             Validator.ValidateObject(data, new ValidationContext(data), true);
-            var mapped = mapper.Map<Iis.Services.Contracts.Role>(data);
+            var mapped = mapper.Map<Iis.Domain.Users.Role>(data);
             PopulateAccessGrantedItems(mapper, mapped, data.Tabs, data.Entities);
             var role = await roleSaver.CreateRoleAsync(mapped);
             return mapper.Map<Role>(role);
@@ -29,7 +30,7 @@ namespace IIS.Core.GraphQL.Roles
             [GraphQLNonNullType] UpdateRoleModel data)
         {
             Validator.ValidateObject(data, new ValidationContext(data), true);
-            var mapped = mapper.Map<Iis.Services.Contracts.Role>(data);
+            var mapped = mapper.Map<Iis.Domain.Users.Role>(data);
             PopulateAccessGrantedItems(mapper, mapped, data.Tabs, data.Entities);
             var role = await roleSaver.UpdateRoleAsync(mapped);
             return mapper.Map<Role>(role);
@@ -37,7 +38,7 @@ namespace IIS.Core.GraphQL.Roles
 
         private void PopulateAccessGrantedItems(
             IMapper mapper,
-            Iis.Services.Contracts.Role role, 
+            Iis.Domain.Users.Role role, 
             IEnumerable<AccessTab> tabs,
             IEnumerable<AccessEntity> entities)
         {

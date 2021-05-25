@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Services.Contracts;
 using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Common;
 using Iis.Services;
+using Iis.Domain.Users;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

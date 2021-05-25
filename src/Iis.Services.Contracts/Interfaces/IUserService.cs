@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.Interfaces.Enums;
-using Iis.Services.Contracts;
+using Iis.Domain.Users;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Params;
 

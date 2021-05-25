@@ -17,6 +17,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Enums;
+using Iis.Domain.Users;
 using Microsoft.Extensions.Configuration;
 using Iis.Utility;
 using System.Security.Authentication;

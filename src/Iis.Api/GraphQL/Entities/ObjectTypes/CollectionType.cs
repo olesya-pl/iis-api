@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types;
 using Iis.Domain;
+using Iis.Domain.Users;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologySchema.DataTypes;
-using Iis.Services.Contracts;
 
 namespace IIS.Core.GraphQL.Entities.ObjectTypes
 {

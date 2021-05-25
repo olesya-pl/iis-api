@@ -1,7 +1,6 @@
 ﻿using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Elastic.SearchQueryExtensions;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Newtonsoft.Json.Linq;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.Domain.Users;
 
 namespace Iis.Services
 {

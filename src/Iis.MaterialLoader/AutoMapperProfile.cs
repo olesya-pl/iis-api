@@ -2,6 +2,7 @@
 using AutoMapper;
 using Iis.DataModel.ChangeHistory;
 using Iis.DataModel.Materials;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Materials;
 using Iis.MaterialLoader.Models;
 using Iis.Services.Contracts.Dtos;
@@ -37,7 +38,7 @@ namespace Iis.MaterialLoader
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileDto((Guid)src.FileId): null ))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File((Guid)src.FileId): null ))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))
                 .ForMember(dest => dest.CreatedDate,
                     opts => opts.MapFrom(src => !src.CreationDate.HasValue ? DateTime.Now : src.CreationDate))

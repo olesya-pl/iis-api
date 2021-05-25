@@ -29,7 +29,7 @@ namespace IIS.Core.GraphQL.Users
         {
             Validator.ValidateObject(user, new ValidationContext(user), true);
 
-            var domainUser = mapper.Map<Iis.Services.Contracts.User>(user);
+            var domainUser = mapper.Map<Iis.Domain.Users.User>(user);
 
             domainUser.PasswordHash = userService.GetPasswordHashAsBase64String(user.Password);
 
@@ -46,7 +46,7 @@ namespace IIS.Core.GraphQL.Users
         {
             Validator.ValidateObject(user, new ValidationContext(user), true);
 
-            var domainUser = mapper.Map<Iis.Services.Contracts.User>(user);
+            var domainUser = mapper.Map<Iis.Domain.Users.User>(user);
 
             if (!string.IsNullOrWhiteSpace(user.Password)) 
             {

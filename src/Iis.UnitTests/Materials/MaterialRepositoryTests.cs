@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,9 +47,16 @@ namespace Iis.UnitTests.Materials
             materialEntity.LoadData = null;
             materialEntity.MaterialInfos = null;
 
+
+            responses.First().MaterialId = materialId;
+
             var mlRepoMock = new Mock<IMLResponseRepository>();
             mlRepoMock.Setup(e => e.GetAllForMaterialAsync(materialId))
                 .ReturnsAsync(responses);
+            mlRepoMock.Setup(e => e.GetAllForMaterialListAsync(It.IsAny<IReadOnlyCollection<Guid>>()))
+                .ReturnsAsync(responses);
+
+            var expectedResponsesCount = responses.Count(e => e.MaterialId == materialId);
 
             var elasticManagerMock = new Mock<IElasticManager>();
 
@@ -72,7 +80,7 @@ namespace Iis.UnitTests.Materials
                 .Verify(
                     e => e.PutDocumentAsync("Materials", 
                         materialId.ToString("N"),
-                        It.Is<string>(s => JObject.Parse(s).Value<int>("ProcessedMlHandlersCount") == responses.Count), 
+                        It.Is<string>(s => JObject.Parse(s).Value<int>("ProcessedMlHandlersCount") == expectedResponsesCount), 
                         It.IsAny<bool>(),
                         It.IsAny<CancellationToken>()), 
                     Times.Once);

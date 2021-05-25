@@ -7,10 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
-using Iis.Services;
-using Iis.Services.Contracts;
-using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Domain.Users;
 
 namespace Iis.UnitTests.UserManagement
 {
