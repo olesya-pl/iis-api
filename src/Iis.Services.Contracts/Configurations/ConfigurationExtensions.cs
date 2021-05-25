@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Iis.Services.Contracts.Configurations;
 
-namespace Iis.Api.Configuration
+namespace Iis.Services.Contracts.Configurations
 {
     public static class ConfigurationExtensions
     {

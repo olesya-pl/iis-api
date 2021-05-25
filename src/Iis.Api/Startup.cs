@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using HealthChecks.Elasticsearch;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -42,6 +41,7 @@ using Iis.Interfaces.Roles;
 using Iis.OntologyData;
 using Iis.Services;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.DI;
 using Iis.Services.ExternalUserServices;

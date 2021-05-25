@@ -8,6 +8,7 @@ using IIS.Core.Materials.Handlers;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.Api.Materials;
 using Iis.Api.Materials.Handlers;
+using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Api.Modules
 {

@@ -11,6 +11,7 @@ using Iis.Messages;
 using Iis.Utility;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Iis.Services.Contracts.Configurations;
 
 namespace IIS.Core.Materials
 {
