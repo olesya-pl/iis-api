@@ -45,7 +45,7 @@ namespace IIS.Core.GraphQL.Users
     /// <summary>
     /// Represents input model for User in case of Update
     /// </summary>
-    public class UserUpdateInput: BaseUserInput
+    public class UserUpdateInput : BaseUserInput
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id { get; set; }
@@ -53,5 +53,6 @@ namespace IIS.Core.GraphQL.Users
         [StringLength(255, MinimumLength = 6, ErrorMessage = "{0} must have at least {2} symbols, maximum length is {1}")]
         [RegularExpression(@"^[a-zA-Z0-9_=-]+$", ErrorMessage = "Use only latin letters, numbers and symbols '_' '=' '-' please")]
         public string Password { get; set; }
+        public bool IsExternalUser { get; set; }
     }
 }
