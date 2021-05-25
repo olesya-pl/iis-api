@@ -10,8 +10,8 @@ namespace Iis.DbLayer.Repositories
     public interface IUserRepository
     {
         UserEntity GetByUserNameAndHash(string userName, string passwordHash);
+        UserEntity GetByUserName(string userName);
         Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct);
-        Task<UserEntity> GetByUserNameAndHashAsync(string userName, string passwordHash, CancellationToken ct);
         Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct);
         Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct);
         Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct);

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using IIS.Core;
+using Iis.Utility;
 using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
 
@@ -49,10 +49,8 @@ namespace Iis.Api.Filters
         public bool IsAuthorized(AuthorizationFilterContext context, string username, string password)
         {
             var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-            var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-            var passwordHash = configuration.GetPasswordHashAsBase64String(password);
 
-            var user = userService.GetUser(username, passwordHash);
+            var user = userService.ValidateAndGetUser(username, password);
 
             return user != null && user.IsAdmin;
         }

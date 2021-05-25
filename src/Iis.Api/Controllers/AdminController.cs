@@ -232,6 +232,7 @@ namespace Iis.Api.Controllers
             return Content(json);
         }
 
+
         [HttpPost("RestartApplication")]
         public async Task RestartApplication()
         {
@@ -260,6 +261,22 @@ namespace Iis.Api.Controllers
         {
             await _materialService.RemoveMaterials();
             return Ok();
+        }
+
+        [HttpGet("ExportUsers/{userNames}")]
+        public async Task<IActionResult> ExportUsers(string userNames, CancellationToken ct)
+        {
+            var cnt = _userService.ImportUsersFromExternalSource(userNames.Split(','));
+
+            return Content($"{cnt} users where successfully imported");
+        }
+
+        [HttpGet("ExportUsers")]
+        public async Task<IActionResult> ExportUsers(CancellationToken ct)
+        {
+            var cnt = _userService.ImportUsersFromExternalSource();
+
+            return Content($"{cnt} users where successfully imported");
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
@@ -304,5 +321,7 @@ namespace Iis.Api.Controllers
 
             return Content(_adminElasticService.Logger.ToString());
         }
+
+
     }
 }

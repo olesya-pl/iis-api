@@ -10,6 +10,7 @@ using Iis.DataModel;
 using Iis.Services;
 using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Utility;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -30,7 +31,7 @@ namespace IIS.Core.GraphQL.Users
 
             var domainUser = mapper.Map<Iis.Domain.Users.User>(user);
 
-            domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+            domainUser.PasswordHash = userService.GetPasswordHashAsBase64String(user.Password);
 
             var userId = await userService.CreateUserAsync(domainUser);
             
@@ -49,7 +50,7 @@ namespace IIS.Core.GraphQL.Users
 
             if (!string.IsNullOrWhiteSpace(user.Password)) 
             {
-                domainUser.PasswordHash = _configuration.GetPasswordHashAsBase64String(user.Password);
+                domainUser.PasswordHash = userService.GetPasswordHashAsBase64String(user.Password);
             }
 
             var userId = await userService.UpdateUserAsync(domainUser);

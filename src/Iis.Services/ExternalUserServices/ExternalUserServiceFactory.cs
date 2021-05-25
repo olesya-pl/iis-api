@@ -13,8 +13,8 @@ namespace Iis.Services.ExternalUserServices
         {
             switch (configuration.ServiceType.ToLower())
             {
-                case "activedirectory":
-                    return new ActiveDirectoryUserService(configuration.ConnectionString);
+                case "ad":
+                    return new ActiveDirectoryUserService(configuration);
                 case "dummy":
                     return new DummyUserService();
                 default:

@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using IIS.Core.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -21,10 +20,7 @@ namespace IIS.Core
                 {
                     NeedToStart = false;
                     IHost host = CreateWebHostBuilder(args).Build();
-                    if (await host.RunUpAsync())
-                    {
-                        host.Run();
-                    }
+                    host.Run();
                 }
                 catch (Exception ex)
                 {
