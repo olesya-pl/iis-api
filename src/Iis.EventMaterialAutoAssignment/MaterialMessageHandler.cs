@@ -17,19 +17,19 @@ using RabbitMQ.Client.Exceptions;
 
 namespace Iis.EventMaterialAutoAssignment
 {
-    public class Worker : BackgroundService
+    public class MaterialMessageHandler : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
-        private readonly EventMaterialAssignerConfiguration _configuration;
+        private readonly ILogger<MaterialMessageHandler> _logger;
+        private readonly MaterialMessageHandlerConfiguration _configuration;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IConnection _connection;
         private readonly IModel _incommingChannel;
         private readonly IModel _outgoingChannel;
 
 
-        public Worker(ILogger<Worker> logger,
+        public MaterialMessageHandler(ILogger<MaterialMessageHandler> logger,
             IConnectionFactory connectionFactory,
-            EventMaterialAssignerConfiguration configuration,
+            MaterialMessageHandlerConfiguration configuration,
             IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
@@ -84,7 +84,7 @@ namespace Iis.EventMaterialAutoAssignment
                         var configs = await context.AssignmentConfigs
                             .AsNoTracking()
                             .Include(p => p.Keywords)
-                            .Select(p => new { p.Keywords, p.Name})
+                            .Select(p => new { p.Keywords, p.Id})
                             .ToArrayAsync();
                         
                         var json = Encoding.UTF8.GetString(args.Body);
@@ -94,7 +94,7 @@ namespace Iis.EventMaterialAutoAssignment
                         {
                             var message = new TermsMessage()
                             {
-                                Title = config.Name,
+                                ConfigId = config.Id,
                                 MaterialIds = materialIds,
                                 Terms = config.Keywords.Select(p => p.Keyword).ToArray()
                             };
@@ -113,7 +113,7 @@ namespace Iis.EventMaterialAutoAssignment
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("EventMaterialAssigner. Exception {e}", e);
+                    _logger.LogError("MaterialMessageHandler. Exception {e}", e);
                     _incommingChannel.BasicReject(args.DeliveryTag, false);
                 }
             };
