@@ -47,3 +47,4 @@ AcceptanceTests-test-result.xml
 
 *.feature.cs
 *feature.cs
+src/Iis.MaterialLoader/Logs/*
