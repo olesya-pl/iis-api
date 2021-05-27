@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using Iis.Api.Configuration;
 using Iis.Domain.Users;
+using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core;

@@ -13,6 +13,7 @@ using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using File = Iis.Domain.Materials.File;
 using Iis.Domain.Users;
+using Iis.Services.Contracts.Configurations;
 
 namespace IIS.Core.GraphQL.Files
 {

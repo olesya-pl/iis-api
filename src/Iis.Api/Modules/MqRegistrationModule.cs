@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 
 using Iis.Api.Configuration;
+using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Api.Modules
 {

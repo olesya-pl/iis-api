@@ -10,6 +10,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Api.Materials
 {

@@ -1,4 +1,4 @@
-﻿namespace Iis.Api.Materials
+﻿namespace Iis.Services.Contracts.Configurations
 {
     public class MaterialElasticSaverConfiguration
     {

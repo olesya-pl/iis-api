@@ -1,4 +1,4 @@
-﻿namespace IIS.Core.Materials
+﻿namespace Iis.Services.Contracts.Configurations
 {
     public class MaterialOperatorAssignerConfiguration
     {
