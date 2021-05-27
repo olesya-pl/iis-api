@@ -38,6 +38,18 @@ namespace Iis.Services
             return await IsDuplicatedAsync(contents, hash);
         }
 
+        public async Task<FileIdDto> IsDuplicatedAsync(Stream stream)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                await stream.CopyToAsync(ms);
+                stream.Seek(0, SeekOrigin.Begin);
+                var contents = ms.ToArray();
+                var hash = ComputeHash(contents);
+                return await IsDuplicatedAsync(contents, hash);
+            }            
+        }
+
         public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType,
             CancellationToken token)
         {
