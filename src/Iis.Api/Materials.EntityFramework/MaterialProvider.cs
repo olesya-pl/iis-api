@@ -3,7 +3,6 @@ using Iis.Api.Ontology;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories;
-using Iis.DbLayer.Repositories.Helpers;
 using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
@@ -17,7 +16,6 @@ using Iis.Utility;
 using IIS.Repository;
 using IIS.Repository.Factories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -49,8 +47,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMapper _mapper;
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMaterialSignRepository _materialSignRepository;
-        private readonly string _imageVectorizerUrl;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IImageVectorizer _imageVectorizer;
         private readonly NodeToJObjectMapper _nodeToJObjectMapper;
 
         public MaterialProvider(IOntologyService ontologyService,
@@ -60,9 +57,8 @@ namespace IIS.Core.Materials.EntityFramework
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
-            IConfiguration configuration,
-            IHttpClientFactory httpClientFactory,
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,            
+            IImageVectorizer imageVectorizer,
             NodeToJObjectMapper nodeToJObjectMapper) : base(unitOfWorkFactory)
         {
             _ontologyService = ontologyService;
@@ -72,8 +68,7 @@ namespace IIS.Core.Materials.EntityFramework
             _mLResponseRepository = mLResponseRepository;
             _materialSignRepository = materialSignRepository;
             _mapper = mapper;
-            _imageVectorizerUrl = configuration.GetValue<string>("imageVectorizerUrl");
-            _httpClientFactory = httpClientFactory;
+            _imageVectorizer = imageVectorizer;
             _nodeToJObjectMapper = nodeToJObjectMapper;
         }
 
@@ -350,7 +345,7 @@ namespace IIS.Core.Materials.EntityFramework
             IReadOnlyCollection<decimal[]> imageVectorList;
             try
             {
-                imageVectorList = await VectorizeImage(content, fileName);
+                imageVectorList = await _imageVectorizer.VectorizeImage(content, fileName);
 
                 if (!imageVectorList.Any()) throw new Exception("No image vectors have found.");
             }
@@ -366,20 +361,7 @@ namespace IIS.Core.Materials.EntityFramework
                     .ToList();
 
             return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
-        }
-
-        private async Task<IReadOnlyCollection<decimal[]>> VectorizeImage(byte[] fileContent, string fileName)
-        {
-            using var form = new MultipartFormDataContent();
-            using var content = new ByteArrayContent(fileContent);
-
-            form.Add(content, "file", fileName);
-            using var httpClient = _httpClientFactory.CreateClient();
-            var response = await httpClient.PostAsync(_imageVectorizerUrl, form);
-            response.EnsureSuccessStatusCode();
-            var contentJson = await response.Content.ReadAsStringAsync();
-            return FaceAPIResponseParser.GetFaceVectorList(contentJson);
-        }
+        }        
 
         public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
             IEnumerable<Guid> nodeIdList,
