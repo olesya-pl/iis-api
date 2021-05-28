@@ -12,31 +12,35 @@ using AutoMapper;
 using Iis.Services;
 using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.Users;
 
 namespace IIS.Core.GraphQL.Users
 {
     public class LoginResolver
     {
-        private IConfiguration _configuration;
         private readonly OntologyContext _context;
         private IMapper _mapper;
         private IUserService _userService;
+        private IExternalUserService _externalUserService;
+        private IConfiguration _configuration;
 
-        public LoginResolver(IConfiguration configuration, OntologyContext context, IMapper mapper, IUserService userService)
+        public LoginResolver(
+            IConfiguration configuration, 
+            OntologyContext context, 
+            IMapper mapper, 
+            IUserService userService,
+            IExternalUserService externalUserService)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper;
             _userService = userService;
+            _externalUserService = externalUserService;
+            _configuration = configuration;
         }
 
         public LoginResponse Login([Required] string username, [Required] string password)
         {
-            var hash = _configuration.GetPasswordHashAsBase64String(password);
-            var user = _userService.GetUser(username, hash);
-
-            if (user == null || user.IsBlocked)
-                throw new InvalidCredentialException($"Wrong username or password");
+            var user = _userService.ValidateAndGetUser(username, password);
 
             return new LoginResponse
             {

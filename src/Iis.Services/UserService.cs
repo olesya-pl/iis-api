@@ -17,6 +17,13 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Enums;
+using Iis.Domain.Users;
+using Microsoft.Extensions.Configuration;
+using Iis.Utility;
+using System.Security.Authentication;
+using Iis.Interfaces.Users;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Iis.Services
 {
@@ -26,18 +33,24 @@ namespace Iis.Services
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
         private readonly IMapper _mapper;
         private readonly IUserElasticService _userElasticService;
+        private IConfiguration _configuration;
+        private IExternalUserService _externalUserService;
 
         public UserService(
             OntologyContext context,
             MaxMaterialsPerOperatorConfig maxMaterialsConfig,
             IUserElasticService userElasticService,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            IConfiguration configuration,
+            IExternalUserService externalUserService) : base(unitOfWorkFactory)
         {
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;
             _mapper = mapper;
             _userElasticService = userElasticService;
+            _configuration = configuration;
+            _externalUserService = externalUserService;
         }
 
         public async Task<Guid> CreateUserAsync(User newUser)
@@ -70,22 +83,16 @@ namespace Iis.Services
             return userEntity.Id;
         }
 
-        private IQueryable<UserEntity> GetOperatorsQuery()
+        public async Task<List<User>> GetOperatorsAsync(CancellationToken ct = default)
         {
-            return _context.Users
-                .Include(p => p.UserRoles)
-                .Where(p => p.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
-                .AsNoTracking();
+            var userEntityList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(ct));
+
+            return userEntityList
+                .Select(e => _mapper.Map<User>(e))
+                .ToList();
         }
 
-        public Task<List<User>> GetOperatorsAsync()
-        {
-            return GetOperatorsQuery()
-                .Select(p => _mapper.Map<User>(p))
-                .ToListAsync();
-        }
-
-        public Task<List<Guid>> GetAvailableOperatorIdsAsync()
+        public async Task<List<Guid>> GetAvailableOperatorIdsAsync()
         {
             var maxMaterialsCount = _maxMaterialsConfig.Value;
 
@@ -97,18 +104,19 @@ namespace Iis.Services
                     && p.AssigneeId != null)
                 .GroupBy(p => p.AssigneeId)
                 .Where(group => group.Count() >= maxMaterialsCount)
-                .Select(group => group.Key);
+                .Select(group => group.Key)
+                .Where(key => key.HasValue)
+                .Select(key => key)
+                .ToArray();
 
-            return GetOperatorsQuery()
-                .Select(p => p.Id)
-                .Where(p => !unavailableOperators.Contains(p))
-                .ToListAsync();
+            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id), CancellationToken.None));
+
+            return userList.Select(e => e.Id).ToList();
         }
 
         public async Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellation = default)
         {
-            var userEntity = await GetUsersQuery()
-                                        .FirstOrDefaultAsync(e => e.Id == updatedUser.Id, cancellation);
+            var userEntity = await RunWithoutCommitAsync(uow => uow.UserRepository.GetByIdAsync(updatedUser.Id, cancellation));
 
             if (userEntity is null)
             {
@@ -144,8 +152,7 @@ namespace Iis.Services
 
         public async Task<User> GetUserAsync(Guid userId)
         {
-            var userEntity = await GetUsersQuery()
-                                    .SingleOrDefaultAsync(u => u.Id == userId);
+            var userEntity = await RunWithoutCommitAsync(uow => uow.UserRepository.GetByIdAsync(userId, CancellationToken.None));
 
             if (userEntity == null)
             {
@@ -162,10 +169,45 @@ namespace Iis.Services
 
         public User GetUser(string userName, string passwordHash)
         {
-            var userEntity = GetUsersQuery()
-                                    .SingleOrDefault(x => x.Username == userName && x.PasswordHash == passwordHash);
+            var userEntity = RunWithoutCommit(uow => uow.UserRepository.GetByUserNameAndHash(userName, passwordHash));
 
             return Map(userEntity);
+        }
+
+        public User GetUserByUserName(string userName)
+        {
+            var userEntity = RunWithoutCommit(uow => uow.UserRepository.GetByUserName(userName));
+
+            return Map(userEntity);
+        }
+
+        public bool ValidateCredentials(string userName, string password)
+        {
+            var hash = GetPasswordHashAsBase64String(password);
+            var userEntity = GetUserByUserName(userName);
+            return userEntity.PasswordHash == hash;
+        }
+
+        public User ValidateAndGetUser(string username, string password)
+        {
+            var user = GetUserByUserName(username);
+
+            if (user == null)
+                throw new InvalidCredentialException($"User {username} does not exists");
+
+            if (user.IsBlocked)
+                throw new InvalidCredentialException($"User {username} is blocked");
+
+            if (user.Source != UserSource.Internal && user.Source != _externalUserService.GetUserSource())
+                throw new InvalidCredentialException($"User {username} has wrong source");
+
+            if (user.Source == UserSource.Internal && !ValidateCredentials(username, password) ||
+                user.Source == _externalUserService.GetUserSource() && !_externalUserService.ValidateCredentials(username, password))
+            {
+                throw new InvalidCredentialException($"Wrong password");
+            }
+
+            return user;
         }
 
         public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, UserStatusType userStatusFilter, CancellationToken ct = default)
@@ -192,16 +234,6 @@ namespace Iis.Services
                             .ToArray();
 
             return (mappedUser, userCount);
-        }
-
-        private IQueryable<UserEntity> GetUsersQuery()
-        {
-            return _context.Users
-                .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                .ThenInclude(r => r.RoleAccessEntities)
-                .ThenInclude(ra => ra.AccessObject)
-                .AsNoTracking();
         }
 
         private User Map(UserEntity entity)
@@ -295,6 +327,76 @@ namespace Iis.Services
             var elasticUsers = _mapper.Map<List<ElasticUserDto>>(users);
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
+        }
+
+        private string ComputeHash(string s)
+        {
+            using (var sha1 = new SHA1Managed())
+            {
+                var hash = Encoding.UTF8.GetBytes(s);
+                var generatedHash = sha1.ComputeHash(hash);
+                var generatedHashString = Convert.ToBase64String(generatedHash);
+                return generatedHashString;
+            }
+        }
+
+        public string GetPasswordHashAsBase64String(string password)
+        {
+            var salt = _configuration.GetValue<string>("salt", string.Empty);
+            return ComputeHash(password + salt);
+        }
+
+        public int ImportUsersFromExternalSource(IEnumerable<string> userNames = null)
+        {
+            var externalUsers = _externalUserService.GetUsers()
+                .Where(eu => userNames == null || userNames.Contains(eu.UserName));
+
+            var users = _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ToList();
+
+            var roles = _context.Roles.ToList();
+
+            int cnt = 0;
+
+            foreach (var externalUser in externalUsers)
+            {
+                var user = users.FirstOrDefault(u => u.Username == externalUser.UserName);
+
+                if (user == null)
+                {
+                    user = new UserEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Username = externalUser.UserName,
+                        Source = _externalUserService.GetUserSource(),
+                        UserRoles = new List<UserRoleEntity>()
+                    };
+                    _context.Users.Add(user);
+                    cnt++;
+                }
+
+                foreach (var externalRole in externalUser.Roles)
+                {
+                    if (!user.UserRoles.Any(ur => ur.Role.Name == externalRole.Name))
+                    {
+                        var role = roles.FirstOrDefault(r => r.Name == externalRole.Name);
+
+                        if (role != null)
+                        {
+                            var userRole = new UserRoleEntity
+                            {
+                                UserId = user.Id,
+                                RoleId = role.Id
+                            };
+                        }
+                    }
+                }
+            }
+            _context.SaveChanges();
+
+            return cnt;
         }
     }
 }

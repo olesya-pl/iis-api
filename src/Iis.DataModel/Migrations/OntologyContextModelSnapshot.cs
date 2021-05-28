@@ -1310,6 +1310,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Patronymic")
                         .HasColumnType("text");
 
+                    b.Property<int>("Source")
+                        .HasColumnType("integer");
+
                     b.Property<string>("UserNameActiveDirectory")
                         .HasColumnType("text");
 

@@ -181,6 +181,11 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         public static string ToQueryString(this ElasticFilter filter)
         {
+            if(filter.CherryPickedItems.Count == 0 && filter.FilteredItems.Count == 0)
+            {
+                return filter.Suggestion;
+            }
+
             var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({filter.Suggestion})";
 
             var filteredItems = filter.FilteredItems

@@ -1,12 +1,9 @@
 using System;
-using System.Threading.Tasks;
 using HotChocolate.Execution;
 using HotChocolate.Resolvers;
-using IIS.Core.Ontology;
 using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Services.Contracts;
-using System.Linq;
+using Iis.Domain.Users;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

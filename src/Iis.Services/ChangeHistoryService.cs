@@ -47,7 +47,7 @@ namespace Iis.Services
                 TargetId = targetId,
                 UserName = userName,
                 PropertyName = attributeDotName,
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 OldValue = oldInfo.value,
                 NewValue = newInfo.value,
                 RequestId = requestId,
@@ -97,9 +97,9 @@ namespace Iis.Services
             var node = _ontologyNodesData.GetNode(id);
             if (node == null) return null;
 
-            if (node.NodeType.IsObjectOfStudy)
+            if (node.NodeType.IsEvent)
             {
-
+                return node.GetSingleProperty("name")?.Value;
             }
 
             return node.GetComputedValue("__title") ?? node.GetSingleProperty("name")?.Value;

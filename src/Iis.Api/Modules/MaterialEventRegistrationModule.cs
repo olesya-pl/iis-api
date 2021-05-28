@@ -8,6 +8,7 @@ using IIS.Core.Materials.Handlers;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.Api.Materials;
 using Iis.Api.Materials.Handlers;
+using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Api.Modules
 {
@@ -28,7 +29,7 @@ namespace Iis.Api.Modules
             var featureHandlerConfig = configuration.GetSection(featureHandlerSectionName)
                                                     .Get<FeatureHandlerConfig>();
             var elasticSaver = configuration.GetSection(elasticSaverSectionName)
-                                                    .Get<CreatedMaterialElasticSaverConfiguration>();
+                                                    .Get<MaterialElasticSaverConfiguration>();
 
             return services
                         .AddSingleton<MaterialEventConfiguration>(serviceProvider => meConfig)

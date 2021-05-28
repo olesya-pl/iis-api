@@ -157,8 +157,8 @@ namespace Iis.Api.Controllers
                 ByteProperty.Create("AccessLevel"),
                 TextProperty.Create("Content", ElasticConfiguration.DefaultTermVector),
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
-                DateProperty.Create("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
-                DateProperty.Create("Metadata.RegDate", formats:ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("Metadata.RegTime", ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("Metadata.RegDate", ElasticConfiguration.DefaultDateFormats),
                 TextProperty.Create("Metadata.Duration"),
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
@@ -232,6 +232,7 @@ namespace Iis.Api.Controllers
             return Content(json);
         }
 
+
         [HttpPost("RestartApplication")]
         public async Task RestartApplication()
         {
@@ -262,6 +263,22 @@ namespace Iis.Api.Controllers
             return Ok();
         }
 
+        [HttpGet("ExportUsers/{userNames}")]
+        public async Task<IActionResult> ExportUsers(string userNames, CancellationToken ct)
+        {
+            var cnt = _userService.ImportUsersFromExternalSource(userNames.Split(','));
+
+            return Content($"{cnt} users where successfully imported");
+        }
+
+        [HttpGet("ExportUsers")]
+        public async Task<IActionResult> ExportUsers(CancellationToken ct)
+        {
+            var cnt = _userService.ImportUsersFromExternalSource();
+
+            return Content($"{cnt} users where successfully imported");
+        }
+
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);
@@ -279,13 +296,13 @@ namespace Iis.Api.Controllers
             }
         }
 
-        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IEnumerable<string> baseIndexList, bool isHistorical, CancellationToken ct)
+        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IReadOnlyCollection<string> baseIndexList, bool isHistorical, CancellationToken ct)
         {
             var stopwatch = Stopwatch.StartNew();
 
             var indexes = indexNames == AllIndexes ? baseIndexList : indexNames.Split(",");
 
-            var notValidIndexes = indexes.Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase)).ToList();
+            var notValidIndexes = indexes.Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase)).ToArray();
 
             if (notValidIndexes.Any())
             {
@@ -304,5 +321,7 @@ namespace Iis.Api.Controllers
 
             return Content(_adminElasticService.Logger.ToString());
         }
+
+
     }
 }

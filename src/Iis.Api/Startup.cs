@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using HealthChecks.Elasticsearch;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -30,6 +29,7 @@ using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
+using Iis.EventMaterialAutoAssignment;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
@@ -40,8 +40,10 @@ using Iis.Interfaces.Roles;
 using Iis.OntologyData;
 using Iis.Services;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.DI;
+using Iis.Services.ExternalUserServices;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
@@ -49,9 +51,7 @@ using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Materials.FeatureProcessors;
-using IIS.Core.NodeMaterialRelation;
 using IIS.Core.Ontology.EntityFramework;
-using IIS.Core.Tools;
 using IIS.Repository.Factories;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -105,8 +105,6 @@ namespace IIS.Core
             });
 
             services
-                .RegisterRunUpTools()
-                .RegisterSeederTools()
                 .AddConfigurations(Configuration);
 
             services.AddMemoryCache();
@@ -118,6 +116,13 @@ namespace IIS.Core
             if (enableContext)
             {
                 services.AddDbContext<OntologyContext>(
+                    options => options
+                        .UseNpgsql(dbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Transient);
+
+                services.AddDbContext<AssignmentConfigContext>(
                     options => options
                         .UseNpgsql(dbConnectionString)
                         .UseLoggerFactory(MyLoggerFactory),
@@ -192,7 +197,6 @@ namespace IIS.Core
             services.AddTransient<IConnectionStringService, ConnectionStringService>();
             services.AddTransient<IAccessLevelService, AccessLevelService>();
             services.AddTransient<AccessObjectService>();
-            services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
@@ -298,8 +302,11 @@ namespace IIS.Core
             services.RegisterElasticModules();
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
-        }
+            services.RegisterEventMaterialAutoAssignment(Configuration);
 
+            var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
+            services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
+        }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {
@@ -352,7 +359,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
-            app.SeedUser();
+            app.SeedExternalUsers();
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
@@ -398,6 +405,14 @@ namespace IIS.Core
                 try
                 {
                     using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                    {
+                        context.Database.Migrate();
+                    }
+                }
+                catch { }
+                try
+                {
+                    using (var context = serviceScope.ServiceProvider.GetService<AssignmentConfigContext>())
                     {
                         context.Database.Migrate();
                     }

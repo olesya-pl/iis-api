@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.DbLayer.Repositories.Helpers;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Dtos;

@@ -4,27 +4,55 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Iis.DataModel;
-using IIS.Repository;
 using Microsoft.EntityFrameworkCore;
+using IIS.Repository;
+using Iis.DataModel;
+using Iis.DataModel.Roles;
 
 namespace Iis.DbLayer.Repositories
 {
     internal class UserRepository : RepositoryBase<OntologyContext>, IUserRepository
     {
-        public Task<UserEntity> GetByIdAsync(Guid userId)
+        public UserEntity GetByUserNameAndHash(string userName, string passwordHash)
         {
-            return Context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Id == userId);
+            return GetUsersQuery()
+                .SingleOrDefault(e => e.Username == userName && e.PasswordHash == passwordHash);
         }
 
-        public Task<List<UserEntity>> GetAllUsersAsync(CancellationToken cancellationToken)
+        public UserEntity GetByUserName(string userName)
+        {
+            return GetUsersQuery()
+                .SingleOrDefault(e => e.Username == userName);
+        }
+
+        public Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct)
+        {
+            return GetUsersQuery()
+                .FirstOrDefaultAsync(e => e.Id == userId, ct);
+        }
+
+        public Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct)
         {
             return Context.Users
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
         }
+
+        public Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct)
+        {
+            return GetUsersQuery()
+                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
+                .ToArrayAsync(ct);
+        }
+
+        public Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
+        {
+            return GetUsersQuery()
+                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
+                .Where(predicate)
+                .ToArrayAsync(ct);
+        }
+
         public Task<UserEntity[]> GetUsersAsync(int skip, int take, Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
         {
             return GetUsersQuery()

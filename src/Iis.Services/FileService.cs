@@ -38,6 +38,18 @@ namespace Iis.Services
             return await IsDuplicatedAsync(contents, hash);
         }
 
+        public async Task<FileIdDto> IsDuplicatedAsync(Stream stream)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                await stream.CopyToAsync(ms);
+                stream.Seek(0, SeekOrigin.Begin);
+                var contents = ms.ToArray();
+                var hash = ComputeHash(contents);
+                return await IsDuplicatedAsync(contents, hash);
+            }            
+        }
+
         public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType,
             CancellationToken token)
         {
@@ -88,7 +100,7 @@ namespace Iis.Services
             };
         }
 
-        public async Task<FileDto> GetFileAsync(Guid id)
+        public async Task<Iis.Domain.Materials.File> GetFileAsync(Guid id)
         {
             var file = await RunWithoutCommitAsync(uow => uow.FileRepository.GetAsync(f => f.Id == id));
             if (file == null) return null;
@@ -115,7 +127,7 @@ namespace Iis.Services
             if (contents == null) return null;
 
             var ms = new MemoryStream(contents);
-            return new FileDto(id, file.Name, file.ContentType, ms, file.IsTemporary);
+            return new Iis.Domain.Materials.File(id, file.Name, file.ContentType, ms, file.IsTemporary);
         }
 
         public int RemoveFiles(List<Guid> ids)

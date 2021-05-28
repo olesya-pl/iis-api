@@ -25,7 +25,7 @@ using System.Globalization;
 using System.Linq;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Params;
-using Role = Iis.Services.Contracts.Role;
+using Role = Iis.Domain.Users.Role;
 using User = IIS.Core.GraphQL.Users.User;
 using Iis.Interfaces.Ontology.Data;
 using Contracts = Iis.Services.Contracts;
@@ -34,6 +34,7 @@ using Iis.Events.Reports;
 using Iis.Api.GraphQL.Aliases;
 using Iis.DataModel.ChangeHistory;
 using Iis.Elastic;
+using Iis.Domain.Users;
 
 namespace Iis.Api
 {
@@ -150,7 +151,7 @@ namespace Iis.Api
             CreateMap<Iis.Domain.MachineLearning.MLResponse, IIS.Core.GraphQL.ML.MachineLearningResult>()
                 .ForMember(dest => dest.ProcessingDateTime, opts => opts.MapFrom(src => src.ProcessingDate.ToString("MM/dd/yyyy HH:mm:ss")));
 
-            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.DeleteNodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
+            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.DeleteNodeMaterialRelationInput, Iis.Services.NodeMaterialRelation>();
 
             CreateMap<IIisElasticField, ElasticFieldEntity>();
             CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();
@@ -173,7 +174,7 @@ namespace Iis.Api
             CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => {
                     opts.PreCondition(src => (src.FileId.HasValue));
-                    opts.MapFrom(src => new FileDto(src.FileId.Value));
+                    opts.MapFrom(src => new File(src.FileId.Value));
                 })
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.Parse(src.Data)))
@@ -197,7 +198,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileDto((Guid)src.FileId): null ))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File((Guid)src.FileId): null ))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))
                 .ForMember(dest => dest.CreatedDate,
                     opts => opts.MapFrom(src => !src.CreationDate.HasValue ? DateTime.Now : src.CreationDate))
@@ -242,36 +243,36 @@ namespace Iis.Api
                 .ForMember(dest => dest.LoadData, opts =>
                     opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)));
 
-            CreateMap<DbLayer.Repositories.Assignee, Services.Contracts.User>();
+            CreateMap<DbLayer.Repositories.Assignee, Iis.Domain.Users.User>();
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new FileDto(src.FileId.Value): null))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value): null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
             
 
             //mapping: GraphQl.UserInput -> Roles.User
-            CreateMap<BaseUserInput, Services.Contracts.User>()
+            CreateMap<BaseUserInput, Iis.Domain.Users.User>()
                 .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Role{ Id = id})));
-            CreateMap<UserCreateInput, Services.Contracts.User>()
-                .IncludeBase<BaseUserInput, Services.Contracts.User>()
+            CreateMap<UserCreateInput, Iis.Domain.Users.User>()
+                .IncludeBase<BaseUserInput, Iis.Domain.Users.User>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
-            CreateMap<UserUpdateInput, Services.Contracts.User>()
-                .IncludeBase<BaseUserInput, Services.Contracts.User>()
+            CreateMap<UserUpdateInput, Iis.Domain.Users.User>()
+                .IncludeBase<BaseUserInput, Iis.Domain.Users.User>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserName, opts => opts.Ignore());
 
             //mapping: Roles.User -> GraphQl.User
-            CreateMap<Services.Contracts.User, User>();
+            CreateMap<Iis.Domain.Users.User, User>();
 
             //mappring: UserEntity -> Roles.User
-            CreateMap<UserEntity, Services.Contracts.User>()
+            CreateMap<UserEntity, Iis.Domain.Users.User>()
                 .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
 
             //mapping: Roles.User -> UserEntity
-            CreateMap<Services.Contracts.User, UserEntity>();
+            CreateMap<Iis.Domain.Users.User, UserEntity>();
 
             CreateMap<UserEntity, UserEntity>()
                 .ForMember(dest => dest.Username, opts => opts.Ignore())
@@ -282,12 +283,12 @@ namespace Iis.Api
             //theme: graphQl input -> domain
             CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, ThemeDto>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Services.Contracts.User{ Id = src.UserId.Value }))
+                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Domain.Users.User{ Id = src.UserId.Value }))
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.UtcNow));
 
             CreateMap<IIS.Core.GraphQL.Themes.UpdateThemeInput, ThemeDto>()
                 .ForMember(dest => dest.User, opts => opts.MapFrom(src =>
-                    src.UserId.HasValue ? new Services.Contracts.User { Id = src.UserId.Value } : null))
+                    src.UserId.HasValue ? new Iis.Domain.Users.User { Id = src.UserId.Value } : null))
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.UtcNow));
 
             // theme: domain -> entity

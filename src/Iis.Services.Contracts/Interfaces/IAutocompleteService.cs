@@ -1,4 +1,5 @@
 ﻿
+using Iis.Domain.Users;
 using Iis.Services.Contracts.Dtos;
 using System.Collections.Generic;
 using System.Threading;

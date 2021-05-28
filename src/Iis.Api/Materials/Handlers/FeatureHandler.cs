@@ -19,6 +19,7 @@ using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
+using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Api.Materials.Handlers
 {

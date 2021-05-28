@@ -4,9 +4,9 @@ using AutoMapper;
 using HotChocolate;
 using HotChocolate.Resolvers;
 using Iis.DbLayer.Repositories;
+using Iis.Services;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
-using IIS.Core.NodeMaterialRelation;
 
 namespace IIS.Core.GraphQL.NodeMaterialRelation
 {
@@ -48,7 +48,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [GraphQLNonNullType] DeleteNodeMaterialRelationInput input)
         {
             var tokenPayload = ctx.GetToken();
-            await relationService.Delete(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
+            await relationService.Delete(mapper.Map<Iis.Services.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.User);
             return mapper.Map<Material>(material);
         }

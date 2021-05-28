@@ -13,19 +13,16 @@ using Iis.DbLayer.Repositories;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Roles;
-using Iis.Interfaces.Enums;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using Iis.Services;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
-using Serilog;
+using Iis.Domain.Users;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -40,7 +37,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
         private readonly ICommonData _commonData;
-        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
+        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;        
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -279,7 +276,7 @@ namespace IIS.Core.Materials.EntityFramework
                         return;
                     }
 
-                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p));
+                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p, CancellationToken.None));
 
                     changesList.Add(new ChangeHistoryDto
                     {
@@ -294,8 +291,10 @@ namespace IIS.Core.Materials.EntityFramework
                     material.Assignee = null;
                     material.AssigneeId = input.AssigneeId;
                 });
+                var eventReassignmentNeeded = false;
                 if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal))
                 {
+                    eventReassignmentNeeded = true;
                     changesList.Add(new ChangeHistoryDto
                     {
                         Date = DateTime.UtcNow,
@@ -339,12 +338,22 @@ namespace IIS.Core.Materials.EntityFramework
 
                 await Task.WhenAll(new[] { fillElasticTask, addHistoryTask });
 
+                if (eventReassignmentNeeded)
+                {
+                    SendMaterialUpdatedMessage(material);
+                }
+
                 if (MaterialShouldBeQueuedForMachineLearning(material))
                 {
                     QueueMaterialForMachineLearning(material);
                 }
             }
             return await _materialProvider.GetMaterialAsync(input.Id, user);
+        }
+
+        private void SendMaterialUpdatedMessage(MaterialEntity material)
+        {
+            _eventProducer.SendMaterialSavedToElastic(new List<Guid>() { material.Id });
         }
 
         private void CreateChangeHistory(Guid targetId,
@@ -404,7 +413,7 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null)
         {
             var accessLevel = user?.AccessLevel ?? int.MaxValue;
-            
+
             var material = await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
             if (material == null || !material.CanBeAccessedBy(accessLevel))
@@ -447,16 +456,14 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        public Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken)
+        public Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct)
         {
-            return RunWithoutCommitAsync(async (unitOfWork)
-                => await unitOfWork.MaterialRepository.PutAllMaterialsToElasticSearchAsync(cancellationToken));
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutAllMaterialsToElasticSearchAsync(ct));
         }
 
-        public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken stoppingToken)
+        public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken ct)
         {
-            return RunWithoutCommitAsync(async (unitOfWork)
-                => await unitOfWork.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, stoppingToken));
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct));
         }
 
         public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user)
