@@ -19,6 +19,7 @@ namespace Iis.Services.DI
             services.AddTransient<IUserElasticService, UserElasticService>();
             services.AddTransient<CreateEntityService>();
             services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
+            services.AddTransient<IImageVectorizer, ImageVectorizer >();
 
             return services;
         }

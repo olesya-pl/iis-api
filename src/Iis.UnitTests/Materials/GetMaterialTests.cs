@@ -91,13 +91,6 @@ namespace Iis.UnitTests.Materials
             var unitOfWorkFactory = new Mock<IUnitOfWorkFactory<IIISUnitOfWork>>();
             unitOfWorkFactory.Setup(e => e.Create()).Returns(unitOfWork.Object);
 
-            var inMemorySettings = new Dictionary<string, string> {
-                {"imageVectorizerUrl", "192.168.14.77"},
-            };
-            var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(inMemorySettings)
-                .Build();
-
             var httpClientFactory = new Mock<IHttpClientFactory>(MockBehavior.Strict);
 
             var sut = new MaterialProvider<IIISUnitOfWork>(ontologyService.Object,
@@ -108,8 +101,7 @@ namespace Iis.UnitTests.Materials
                 materialSignRepository.Object,
                 mapper.Object,
                 unitOfWorkFactory.Object,
-                configuration,
-                httpClientFactory.Object,
+                new Mock<IImageVectorizer>().Object,
                 new NodeToJObjectMapper(ontologyService.Object));
             return sut;
         }

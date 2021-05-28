@@ -56,8 +56,7 @@ namespace Iis.UnitTests.Materials
                 new Mock<IMaterialSignRepository>().Object,
                 new Mock<IMapper>().Object,
                 unitOfWorkFactoryMock.Object,
-                configurationMock.Object,
-                new Mock<IHttpClientFactory>().Object,
+                new Mock<IImageVectorizer>().Object,
                 new Api.Ontology.NodeToJObjectMapper(new Mock<IOntologyService>().Object));
         }
         public void Dispose()
