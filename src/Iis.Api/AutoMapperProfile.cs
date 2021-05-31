@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Iis.Api.GraphQL.Roles;
 using Iis.DataModel;
 using Iis.DataModel.Elastic;
 using Iis.DataModel.Materials;
@@ -9,14 +8,15 @@ using Iis.DataModel.Annotations;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Roles;
-using Iis.Services.Contracts;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Themes;
 using IIS.Core.GraphQL.Users;
 using Iis.Api.GraphQL.Common;
+using Iis.Api.GraphQL.Roles;
+using Iis.Api.GraphQL.Aliases;
+using GraphQLGraphTypes = Iis.Api.GraphQL.Graph;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -27,11 +27,11 @@ using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Params;
 using Role = Iis.Domain.Users.Role;
 using User = IIS.Core.GraphQL.Users.User;
+using DomainGraphTypes = Iis.Domain.Graph;
 using Iis.Interfaces.Ontology.Data;
 using Contracts = Iis.Services.Contracts;
 using Iis.DataModel.Reports;
 using Iis.Events.Reports;
-using Iis.Api.GraphQL.Aliases;
 using Iis.DataModel.ChangeHistory;
 using Iis.Elastic;
 using Iis.Domain.Users;
@@ -391,6 +391,9 @@ namespace Iis.Api
                 .ForMember(dest => dest.Password, opts => opts.MapFrom(src => ElasticConstants.DefaultPassword))
                 .ForMember(dest => dest.Enabled, opts => opts.MapFrom(src => !src.IsBlocked))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => new ElasticUserDtoMetadata(src.Id, src.Username, src.AccessLevel)));
+
+            CreateMap<DomainGraphTypes.GraphLink, GraphQLGraphTypes.GraphLink>();
+            CreateMap<DomainGraphTypes.GraphNode, GraphQLGraphTypes.GraphNode>();
         }
     }
 }

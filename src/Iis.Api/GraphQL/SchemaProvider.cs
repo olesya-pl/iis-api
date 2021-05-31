@@ -8,11 +8,11 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.GraphQL.Export;
+using Iis.Api.Ontology;
+using Iis.Api.GraphQL.Graph;
+using Iis.Api.GraphQL.CreateMenu;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
-using Iis.Api.Ontology;
-using Iis.Api.GraphQL;
-using Iis.Api.GraphQL.CreateMenu;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.Extensions.Logging;
 
@@ -82,6 +82,7 @@ namespace IIS.Core.GraphQL
                 d.Include<IncomingEntitiesQuery>();
                 d.Include<RelationsCountQuery>();
                 d.Include<CreateMenuItemsQuery>();
+                d.Include<GraphQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
