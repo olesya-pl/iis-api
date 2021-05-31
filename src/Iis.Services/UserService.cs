@@ -35,6 +35,7 @@ namespace Iis.Services
         private readonly IUserElasticService _userElasticService;
         private IConfiguration _configuration;
         private IExternalUserService _externalUserService;
+        private IMatrixService _matrixService;
 
         public UserService(
             OntologyContext context,
@@ -43,7 +44,8 @@ namespace Iis.Services
             IMapper mapper,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IConfiguration configuration,
-            IExternalUserService externalUserService) : base(unitOfWorkFactory)
+            IExternalUserService externalUserService,
+            IMatrixService matrixService) : base(unitOfWorkFactory)
         {
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;
@@ -51,6 +53,7 @@ namespace Iis.Services
             _userElasticService = userElasticService;
             _configuration = configuration;
             _externalUserService = externalUserService;
+            _matrixService = matrixService;
         }
 
         public async Task<Guid> CreateUserAsync(User newUser)
@@ -375,6 +378,10 @@ namespace Iis.Services
                     };
                     _context.Users.Add(user);
                     cnt++;
+                    
+                    if (_matrixService?.AutoCreateUsers == true)
+                        _matrixService.CreateUserAsync(user.Username, user.Id.ToString("N"))
+                            .GetAwaiter().GetResult();
                 }
 
                 foreach (var externalRole in externalUser.Roles)
@@ -397,6 +404,64 @@ namespace Iis.Services
             _context.SaveChanges();
 
             return cnt;
+        }
+        
+        public async Task<string> CreateMatrixUserAsync(User user)
+        {
+            try
+            {
+                return await _matrixService.CreateUserAsync(user.UserName, user.Id.ToString("N"));
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        private List<User> GetActiveUsers() =>
+            _context.Users.Where(u => !u.IsBlocked).Select(u => _mapper.Map<User>(u)).ToList();
+        public async Task<string> GetUserMatrixInfo()
+        {
+            var msg = await _matrixService.CheckMatrixAvailable();
+            if (msg != null) return msg;
+
+            var users = GetActiveUsers();
+            var sb = new StringBuilder();
+
+            foreach (var user in users)
+            {
+                var userExists = await _matrixService.UserExistsAsync(user.UserName);
+                sb.AppendLine($"{user.UserName}\t\t\t{userExists}");
+            }
+            return sb.ToString();
+        }
+
+        public async Task<string> CreateMatrixUsers(List<string> userNames = null)
+        {
+            var serverAvailability = await _matrixService.CheckMatrixAvailable();
+            if (serverAvailability != null) return serverAvailability;
+
+            var users = GetActiveUsers()
+                .Where(u => userNames == null || userNames.Contains(u.UserName));
+
+            var sb = new StringBuilder();
+
+            foreach (var user in users)
+            {
+                var userExists = await _matrixService.UserExistsAsync(user.UserName);
+                if (userExists)
+                {
+                    sb.AppendLine($"{user.UserName}\t\t\t already exists");
+                    continue;
+                }
+                var msg = await _matrixService.CreateUserAsync(user.UserName, user.Id.ToString("N"));
+                if (msg == null)
+                    sb.AppendLine($"{user.UserName}\t\t\tsuccessfully created");
+                else
+                    sb.AppendLine($"{user.UserName}\t\t\t{msg}");
+
+            }
+            return sb.ToString();
         }
     }
 }

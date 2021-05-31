@@ -42,8 +42,10 @@ using Iis.OntologyData;
 using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Matrix;
 using Iis.Services.DI;
 using Iis.Services.ExternalUserServices;
+using Iis.Services.MatrixServices;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
@@ -306,6 +308,10 @@ namespace IIS.Core
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
+
+            var matrixConfiguration = Configuration.GetSection("matrix").Get<MatrixServiceConfiguration>();
+            services.AddSingleton(matrixConfiguration);
+            services.AddTransient<IMatrixService, MatrixService>();
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
