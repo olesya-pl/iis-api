@@ -95,6 +95,7 @@ namespace Iis.EventMaterialAutoAssignment
                         var message = JsonConvert.DeserializeObject<FoundMaterialMessage>(json);
 
                         var config = await GetAssignmentConfigById(context, message);
+                        _logger.LogInformation("EventMaterialAssigner. Received messafe with confg id {configId}. Material ids {materialIds}", message.ConfigId, string.Join(',', message.MaterialIds));
 
                         if (config == null)
                         {
@@ -107,6 +108,7 @@ namespace Iis.EventMaterialAutoAssignment
 
                         if (foundEvent == null)
                         {
+                            _logger.LogInformation("EventMaterialAssigner. Event with name {name} not found", config.Name);
                             var componentId = ontologyService.GetNodeByUniqueValue(_eventComponentType.Id, config.Component, "name")?.Id;
                             var typeId = ontologyService.GetNodeByUniqueValue(_eventTypeType.Id, config.EventType, "name")?.Id;
                             var importanceId = ontologyService.GetNodeByUniqueValue(_eventImportanceType.Id, config.Importance, "name")?.Id;
@@ -117,10 +119,12 @@ namespace Iis.EventMaterialAutoAssignment
                             if (componentId.HasValue && typeId.HasValue && importanceId.HasValue
                                 && countryId.HasValue && stateId.HasValue && accessLevelId.HasValue)
                             {
+                                _logger.LogInformation("EventMaterialAssigner. All necessary components to create event {name} are found", config.Name);
                                 var properties = GenerateEventProperties(config, componentId, typeId, importanceId, countryId, stateId, accessLevelId);
 
                                 var eventId = Guid.NewGuid();
                                 await createEntityService.CreateEntity(eventId, _eventType, properties, null, eventId, Guid.NewGuid(), null);
+                                _logger.LogInformation("EventMaterialAssigner. Event {name} created", config.Name);
 
                                 await AssignEventToMaterial(nodeMaterialRelationService, message, eventId);
                             }
