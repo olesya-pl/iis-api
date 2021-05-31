@@ -15,7 +15,7 @@ namespace IIS.Core.GraphQL.Entities
             return new ElasticFilter {
                 Limit = pagination.PageSize,
                 Offset = pagination.Offset(),
-                Suggestion = filter?.Suggestion.Trim() ?? filter?.SearchQuery.Trim()
+                Suggestion = filter?.Suggestion?.Trim() ?? filter?.SearchQuery?.Trim()
             };
         }
 
