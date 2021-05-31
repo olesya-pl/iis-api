@@ -11,15 +11,12 @@ using Microsoft.Extensions.Configuration;
 using Iis.DbLayer.Repositories;
 using Moq;
 using AutoFixture.Xunit2;
-using IIS.Core.Materials.EntityFramework;
 using Iis.Domain;
-using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
-using System.Net.Http;
-using Microsoft.AspNetCore.Http;
-using Iis.Utility;
+using IIS.Services.Materials;
+using Iis.Services;
 
 namespace Iis.UnitTests.Materials
 {
@@ -57,7 +54,7 @@ namespace Iis.UnitTests.Materials
                 new Mock<IMapper>().Object,
                 unitOfWorkFactoryMock.Object,
                 new Mock<IImageVectorizer>().Object,
-                new Api.Ontology.NodeToJObjectMapper(new Mock<IOntologyService>().Object));
+                new NodeToJObjectMapper());
         }
         public void Dispose()
         {

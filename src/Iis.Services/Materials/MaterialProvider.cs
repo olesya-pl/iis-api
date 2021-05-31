@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Iis.Api.Ontology;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories;
@@ -10,23 +9,25 @@ using Iis.Domain.Users;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using Iis.Utility;
 using IIS.Repository;
 using IIS.Repository.Factories;
+using IIS.Services.Contracts.Interfaces;
+using IIS.Services.Contracts.Materials;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 
-namespace IIS.Core.Materials.EntityFramework
+namespace IIS.Services.Materials
 {
     public class MaterialProvider<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialProvider where TUnitOfWork : IIISUnitOfWork
     {

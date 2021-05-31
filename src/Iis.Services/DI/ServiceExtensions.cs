@@ -2,6 +2,8 @@
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
 using Iis.Services.Elastic;
+using IIS.Services.Contracts.Interfaces;
+using IIS.Services.Materials;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Iis.Services.DI
@@ -20,7 +22,10 @@ namespace Iis.Services.DI
             services.AddTransient<CreateEntityService>();
             services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IGraphService, GraphService>();
-            services.AddTransient<IImageVectorizer, ImageVectorizer >();
+            services.AddTransient<IImageVectorizer, ImageVectorizer>();
+            services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
+            services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
+            services.AddTransient<NodeToJObjectMapper>();
 
             return services;
         }

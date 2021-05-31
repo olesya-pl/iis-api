@@ -7,8 +7,9 @@ using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Params;
 using Iis.Domain.Users;
+using IIS.Services.Contracts.Materials;
 
-namespace IIS.Core.Materials
+namespace IIS.Services.Contracts.Interfaces
 {
     public interface IMaterialProvider
     {

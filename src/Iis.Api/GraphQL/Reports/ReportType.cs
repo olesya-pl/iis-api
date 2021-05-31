@@ -13,6 +13,7 @@ using Iis.Domain;
 using AutoMapper;
 using Iis.OntologySchema.DataTypes;
 using Iis.Interfaces.Ontology.Schema;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Reports
 {
