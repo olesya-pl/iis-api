@@ -34,6 +34,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the first material in the Materials list")]
         public void IClieckedOnTheFirstMaterialInTheMaterialsList()
         {
+            driver.WaitFor(2);
             materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
             driver.WaitFor(1);
         }
@@ -41,7 +42,9 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the relations tab in the material card")]
         public void IClickedOnTheEventsTabInTheMaterialCard()
         {
+            driver.WaitFor(2);
             materialsSectionPage.RelationsTab.Click();
+            driver.WaitFor(1);
         }
 
         [When(@"I clicked on the relation tab in the material card")]
@@ -144,6 +147,7 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
             materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Down);
             materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Enter);
+            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Escape);
         }
 
         [When(@"I clicked on the connected object")]
@@ -219,7 +223,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the Materials page")]
         public void ThenIMustSeeMaterialsPage()
         {
-            Assert.Contains("input-stream/?query=&page=1", driver.Url);
+            Assert.Contains("input-stream/?query=&sort=createdDate_desc&page=1", driver.Url);
         }
 
         [Then(@"I must see first material in the Materials list")]

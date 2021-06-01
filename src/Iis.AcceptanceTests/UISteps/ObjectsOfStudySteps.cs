@@ -69,8 +69,7 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(4);
-
+            driver.WaitFor(10);
         }
 
         [When(@"I clicked on the first search result title in the Objects of study section")]
@@ -411,6 +410,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the title (.*) in the small card")]
         public void IMustSeeTheTitleInTheSmallCard(string expectedTitle)
         {
+            driver.WaitFor(3);
             var actualTitle = objectsOfStudyPage.ObjectTitleInTheSmallCard.Text;
             Assert.Contains(expectedTitle, actualTitle);
         }
@@ -504,6 +504,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see that the (.*) event related to the object of study")]
         public void WhenIMustSeeAsRelatedToTheObjectOfStudyEvent(string eventName)
         {
+            driver.WaitFor(2);
             var eventUniqueName = context.Get<string>(eventName);
             Assert.Contains(objectsOfStudyPage.Events, _ => _.Name == eventUniqueName);
         }

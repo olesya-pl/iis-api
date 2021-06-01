@@ -67,6 +67,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I pressed Remove report button")]
         public void WhenIPressedRemoveReportButton()
         {
+            driver.WaitFor(0.5);
             reportPageObjects.ReportCreationAndEdit.RemoveEventFromReport.Click();
         }
 
@@ -109,10 +110,11 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked two times on the hour and date filter in the report page")]
         public void WhenIClickedTwoTimesOnTheHourAndDateFilterInTheReportPage()
         {
+            driver.WaitFor(3);
             reportPageObjects.HourAndDateColumn.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(3);
             reportPageObjects.HourAndDateColumn.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(3);
         }
         #endregion
 

@@ -32,6 +32,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to Themes and updates section")]
         public void INavigatedToThemesAndUpdatesSection()
         {
+            driver.WaitFor(2);
             themesAndUpdatesPageObjects.ThemesAndUpdatesSection.Click();
         }
 
