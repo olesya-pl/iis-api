@@ -34,9 +34,11 @@ namespace Iis.Services
             if(node is null) return Array.Empty<GraphLink>();
 
             var incomingLinkList = node.IncomingRelations
+                                    .Where(e => GraphTypeMapper.IsEligibleForGraphByNodeType(e.SourceNode))
                                     .Select(GraphTypeMapper.MapRelationToGraphLink)
                                     .ToArray();
             var outgoingLinkList = node.OutgoingRelations
+                                    .Where(e => GraphTypeMapper.IsEligibleForGraphByNodeType(e.TargetNode))
                                     .Select(GraphTypeMapper.MapRelationToGraphLink)
                                     .ToArray();
 
@@ -53,19 +55,29 @@ namespace Iis.Services
         {
             if(node is null) return Array.Empty<GraphNode>();
 
+            var exclusionNodeIdList = new []{node.Id};
+
             var incomingNodeList = node.IncomingRelations
                                     .Select(e => e.SourceNode)
-                                    .Select(GraphTypeMapper.MapNodeToGraphNode)
+                                    .Where(GraphTypeMapper.IsEligibleForGraphByNodeType)
+                                    .Select(e => GraphTypeMapper.MapNodeToGraphNode(e, exclusionNodeIdList))
                                     .ToArray();
 
             var outgoingNodeList = node.OutgoingRelations
                                     .Select(e => e.TargetNode)
-                                    .Select(GraphTypeMapper.MapNodeToGraphNode)
+                                    .Where(GraphTypeMapper.IsEligibleForGraphByNodeType)
+                                    .Select(e => GraphTypeMapper.MapNodeToGraphNode(e, exclusionNodeIdList))
                                     .ToArray();
 
 
-            var result = new List<GraphNode>(incomingNodeList.Length + outgoingNodeList.Length);
+            var result = new List<GraphNode>(incomingNodeList.Length + outgoingNodeList.Length + 1);
 
+            var rootNodeExclusionList = new List<Guid>(incomingNodeList.Length + outgoingNodeList.Length);
+
+            rootNodeExclusionList.AddRange(incomingNodeList.Select(e => e.Id));
+            rootNodeExclusionList.AddRange(outgoingNodeList.Select(e => e.Id));
+
+            result.Add(GraphTypeMapper.MapNodeToGraphNode(node, rootNodeExclusionList));
             result.AddRange(incomingNodeList);
             result.AddRange(outgoingNodeList);
 
