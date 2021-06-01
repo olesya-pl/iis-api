@@ -23,6 +23,7 @@ using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
 using Iis.Domain.Users;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.Materials.EntityFramework
 {

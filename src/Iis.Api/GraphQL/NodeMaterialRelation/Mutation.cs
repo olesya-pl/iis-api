@@ -6,7 +6,7 @@ using HotChocolate.Resolvers;
 using Iis.DbLayer.Repositories;
 using Iis.Services;
 using IIS.Core.GraphQL.Materials;
-using IIS.Core.Materials;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.NodeMaterialRelation
 {

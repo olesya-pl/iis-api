@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
-using IIS.Core.Materials;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
 using HotChocolate.Resolvers;
 using Iis.Services.Contracts.Params;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Materials
 {

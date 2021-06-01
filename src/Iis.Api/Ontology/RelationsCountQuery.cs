@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
 using Iis.Domain;
-using IIS.Core.Materials;
+using IIS.Services.Contracts.Interfaces;
 
 namespace Iis.Api.Ontology
 {

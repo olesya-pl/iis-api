@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 
-namespace IIS.Core.Materials
+namespace IIS.Services.Contracts.Materials
 {
     public class MaterialsDto
     {

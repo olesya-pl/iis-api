@@ -6,6 +6,7 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.UnitTests.TestHelpers;
 using IIS.Core.Materials;
+using IIS.Services.Contracts.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
