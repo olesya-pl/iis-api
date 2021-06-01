@@ -15,7 +15,7 @@ namespace Iis.AcceptanceTests.PageObjects.Controls
 
         public string Name =>
         //TODO: add selector for an event name row
-        eventElement.FindElement(By.ClassName("events-table__cell--name")).Text;
+        eventElement.FindElement(By.CssSelector("td.events-table__name > div.events-table__name-cell")).Text;
 
         public void Click()
         {

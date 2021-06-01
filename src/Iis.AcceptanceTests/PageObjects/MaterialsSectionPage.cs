@@ -22,7 +22,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement MaterialsSection;
 
-        [FindsBy(How = How.XPath, Using = "//tr[@class='el-table__row expanded']")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table materials-table']//tbody[@class='p-datatable-tbody']/tr")]
         public IWebElement FirstMaterialInTheMaterialsList;
 
         [FindsBy(How = How.CssSelector, Using = ".el-button--default")]
@@ -31,7 +31,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".el-input.entity-search__input > .el-input__inner")]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
+        [FindsBy(How = How.CssSelector, Using = ".materials-table .p-datatable-emptymessage .empty-state__message")]
         [CacheLookup]
         public IWebElement EmptySearchField;
 
@@ -96,7 +96,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-button--prev-page span")]
         public IWebElement PreviousMaterialButton;
 
-		[FindsBy(How = How.CssSelector, Using = ".el-table__row.expanded")]
+		[FindsBy(How = How.CssSelector, Using = ".materials-table tbody.p-datatable-tbody > tr")]
 		public IWebElement FirstSearchResult;
 
         [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .el-button--default")]
@@ -117,7 +117,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".confirm-message-box__action-confirm")]
         public IWebElement ConfirmDeleteRelationButton;
 
-        [FindsBy(How = How.CssSelector, Using = ".cell > div:nth-of-type(2)")]
+        [FindsBy(How = How.CssSelector, Using = "tbody.p-datatable-tbody .materials-table__title")]
         [CacheLookup]
         public IWebElement FirstSearchResultContentBlock;
 
