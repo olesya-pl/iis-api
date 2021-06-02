@@ -11,6 +11,8 @@ using Iis.Services;
 using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
+using Iis.Interfaces.Users;
+using System.Linq;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -46,9 +48,18 @@ namespace IIS.Core.GraphQL.Users
         {
             Validator.ValidateObject(user, new ValidationContext(user), true);
 
+            var existingUser = userService.GetUser(user.Id);
+            if (existingUser == null)
+                throw new Exception($"User not found, id = {user.Id}");
+
+            if (existingUser.Source != UserSource.Internal)
+            {
+                ValidateExternalUserInput(user, existingUser);
+            }
+
             var domainUser = mapper.Map<Iis.Domain.Users.User>(user);
 
-            if (!string.IsNullOrWhiteSpace(user.Password)) 
+            if (!string.IsNullOrWhiteSpace(user.Password))
             {
                 domainUser.PasswordHash = userService.GetPasswordHashAsBase64String(user.Password);
             }
@@ -58,6 +69,29 @@ namespace IIS.Core.GraphQL.Users
             domainUser = await userService.GetUserAsync(userId);
 
             return mapper.Map<User>(domainUser);
+        }
+
+        private bool IsEqual(string s1, string s2) =>
+            s1 == s2 || string.IsNullOrEmpty(s1) && string.IsNullOrEmpty(s2);
+
+        private void ValidateExternalUserInput(UserUpdateInput userInput, Iis.Domain.Users.User user)
+        {
+            if (!IsEqual(userInput.FirstName, user.FirstName))
+                throw new ArgumentException("Cannot update FirstName for external user");
+
+            if (!IsEqual(userInput.LastName, user.LastName))
+                throw new ArgumentException("Cannot update LastName for external user");
+
+            if (!IsEqual(userInput.Patronymic, user.Patronymic))
+                throw new ArgumentException("Cannot update Patronymic for external user");
+
+            if (!string.IsNullOrEmpty(userInput.Password))
+                throw new ArgumentException("Cannot update password for external user");
+
+            var oldRoles = user.Roles.OrderBy(r => r.Id).Select(r => r.Id);
+            var newRoles = userInput.Roles.OrderBy(id => id);
+            if (!Enumerable.SequenceEqual(oldRoles, newRoles))
+                throw new ArgumentException("Cannot update Roles for external user");
         }
 
         public async Task<User> DeleteUser([Service] OntologyContext context, [Service] IMapper mapper, [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
