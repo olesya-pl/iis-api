@@ -27,7 +27,7 @@ namespace Iis.Services.Contracts.Interfaces
         User ValidateAndGetUser(string username, string password);
         string GetPasswordHashAsBase64String(string password);
         int ImportUsersFromExternalSource(IEnumerable<string> userNames = null);
-        Task<string> GetUserMatrixInfo();
-        Task<string> CreateMatrixUsers(List<string> userNames = null);
+        Task<string> GetUserMatrixInfoAsync();
+        Task<string> CreateMatrixUsersAsync(List<string> userNames = null);
     }
 }

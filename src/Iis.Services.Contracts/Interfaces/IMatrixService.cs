@@ -8,8 +8,8 @@ namespace Iis.Services.Contracts.Interfaces
     public interface IMatrixService
     {
         bool AutoCreateUsers { get; }
-        Task<string> CheckMatrixAvailable();
-        Task<bool> UserExistsAsync(string userName);
+        Task<string> CheckMatrixAvailableAsync();
+        Task<bool> UserExistsAsync(string userName, string password);
         Task<string> CreateUserAsync(string userName, string password);
     }
 }

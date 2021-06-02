@@ -420,9 +420,9 @@ namespace Iis.Services
 
         private List<User> GetActiveUsers() =>
             _context.Users.Where(u => !u.IsBlocked).Select(u => _mapper.Map<User>(u)).ToList();
-        public async Task<string> GetUserMatrixInfo()
+        public async Task<string> GetUserMatrixInfoAsync()
         {
-            var msg = await _matrixService.CheckMatrixAvailable();
+            var msg = await _matrixService.CheckMatrixAvailableAsync();
             if (msg != null) return msg;
 
             var users = GetActiveUsers();
@@ -430,15 +430,15 @@ namespace Iis.Services
 
             foreach (var user in users)
             {
-                var userExists = await _matrixService.UserExistsAsync(user.UserName);
+                var userExists = await _matrixService.UserExistsAsync(user.UserName, user.Id.ToString("N"));
                 sb.AppendLine($"{user.UserName}\t\t\t{userExists}");
             }
             return sb.ToString();
         }
 
-        public async Task<string> CreateMatrixUsers(List<string> userNames = null)
+        public async Task<string> CreateMatrixUsersAsync(List<string> userNames = null)
         {
-            var serverAvailability = await _matrixService.CheckMatrixAvailable();
+            var serverAvailability = await _matrixService.CheckMatrixAvailableAsync();
             if (serverAvailability != null) return serverAvailability;
 
             var users = GetActiveUsers()
@@ -448,7 +448,7 @@ namespace Iis.Services
 
             foreach (var user in users)
             {
-                var userExists = await _matrixService.UserExistsAsync(user.UserName);
+                var userExists = await _matrixService.UserExistsAsync(user.UserName, user.Id.ToString("N"));
                 if (userExists)
                 {
                     sb.AppendLine($"{user.UserName}\t\t\t already exists");

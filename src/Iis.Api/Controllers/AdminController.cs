@@ -282,14 +282,14 @@ namespace Iis.Api.Controllers
         [HttpGet("CheckMatrixUsers")]
         public async Task<IActionResult> CheckMatrixUsers()
         {
-            var result = await _userService.GetUserMatrixInfo();
+            var result = await _userService.GetUserMatrixInfoAsync();
             return Content(result);
         }
 
         [HttpGet("CreateMatrixUsers")]
         public async Task<IActionResult> CreateMatrixUsers()
         {
-            var result = await _userService.CreateMatrixUsers();
+            var result = await _userService.CreateMatrixUsersAsync();
             return Content(result);
         }
 

@@ -16,36 +16,40 @@ namespace Iis.Services.MatrixServices
     {
         private MatrixServiceConfiguration _configuration;
         private string _accessToken;
-        private readonly HttpClient _httpClient = new HttpClient();
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly Uri _baseUri;
         private bool LoggedIn => _accessToken != null;
         private readonly ILogger<MatrixService> _logger;
         public bool AutoCreateUsers => _configuration.CreateUsers;
 
-        public MatrixService(MatrixServiceConfiguration configuration, ILoggerFactory loggerFactory)
+        public MatrixService(
+            MatrixServiceConfiguration configuration, 
+            ILoggerFactory loggerFactory, 
+            IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
             _logger = loggerFactory.CreateLogger<MatrixService>();
             _baseUri = new Uri(new Uri(_configuration.Server), "_matrix/client/r0/");
-            
-            Login().GetAwaiter().GetResult();
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<string> CreateUserAsync(string userName, string password)
         {
             if (!LoggedIn) await Login();
 
-            var param = new MatrixLoginRequest
+            var param = new MatrixRegisterRequest
             {
-                user = userName,
-                password = password
+                UserName = userName,
+                Password = password
             };
 
             var json = JsonConvert.SerializeObject(param);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var uri = GetUri("register", false);
+            
+            using var httpClient = _httpClientFactory.CreateClient();
 
-            var response = await _httpClient.PostAsync(uri, content);
+            var response = await httpClient.PostAsync(uri, content);
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError($"Cannot register user {userName} in matrix: {response.ReasonPhrase}");
@@ -54,41 +58,40 @@ namespace Iis.Services.MatrixServices
             return null;
         }
 
-        public async Task<bool> UserExistsAsync(string userName)
+        public async Task<bool> UserExistsAsync(string userName, string password)
         {
-            if (!LoggedIn) Login();
-
-            var uri = GetUri("register/available/") + $"&username={userName}";
-            var response = await _httpClient.GetAsync(uri);
-            return response.IsSuccessStatusCode;
+            var loginResponse = await GetLoginResponse(userName, password);
+            return loginResponse.IsSuccess;
         }
 
-        public async Task<string> CheckMatrixAvailable() =>
+        public async Task<string> CheckMatrixAvailableAsync() =>
             _accessToken == null ? await Login() : null;
 
-        private async Task<string> Login()
+        private async Task<MatrixLoginResponse> GetLoginResponse(string userName, string password)
         {
-            var param = new MatrixLoginRequest
-            {
-                user = _configuration.UserName,
-                password = _configuration.Password
-            };
-            
+            var param = new MatrixLoginRequest(userName, password);
+
             var json = JsonConvert.SerializeObject(param);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var uri = GetUri("login", false);
-            
-            var response = await _httpClient.PostAsync(uri, content);
+            using var httpClient = _httpClientFactory.CreateClient();
+
+            var response = await httpClient.PostAsync(uri, content);
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError($"Cannot login to matrix: {response.ReasonPhrase}");
-                return response.ReasonPhrase;
+                return new MatrixLoginResponse { ErrorMessage = response.ReasonPhrase};
             }
 
             var resultJson = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<MatrixLoginResponse>(resultJson);
-            _accessToken = result.access_token;
-            return null;
+            return JsonConvert.DeserializeObject<MatrixLoginResponse>(resultJson);
+        }
+
+        private async Task<string> Login()
+        {
+            var loginResponse = await GetLoginResponse(_configuration.UserName, _configuration.Password);
+            _accessToken = loginResponse.AccessToken;
+            return loginResponse.ErrorMessage;
         }
 
         private Uri GetUri(string relativePath, bool useAccessToken = true)

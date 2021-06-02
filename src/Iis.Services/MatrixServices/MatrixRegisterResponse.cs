@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Iis.Services.MatrixServices
 {
-    public class MatrixLoginResponse
+    public class MatrixRegisterResponse
     {
         [JsonProperty("user_id")]
         public string UserId { get; set; }
@@ -15,9 +15,5 @@ namespace Iis.Services.MatrixServices
         public string HomeServer { get; set; }
         [JsonProperty("device_id")]
         public string DeviceId { get; set; }
-        [JsonIgnore]
-        public string ErrorMessage { get; set; }
-        [JsonIgnore]
-        public bool IsSuccess => !string.IsNullOrEmpty(ErrorMessage);
     }
 }
