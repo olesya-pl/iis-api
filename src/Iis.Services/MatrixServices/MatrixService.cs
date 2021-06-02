@@ -35,8 +35,6 @@ namespace Iis.Services.MatrixServices
 
         public async Task<string> CreateUserAsync(string userName, string password)
         {
-            if (!LoggedIn) await Login();
-
             var param = new MatrixRegisterRequest
             {
                 UserName = userName,

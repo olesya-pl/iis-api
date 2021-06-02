@@ -82,6 +82,7 @@ namespace Iis.Services
 
             var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
             await _userElasticService.SaveUserAsync(elasticUser, CancellationToken.None);
+            await _matrixService.CreateUserAsync(userEntity.Username, userEntity.Id.ToString("N"));
 
             return userEntity.Id;
         }
