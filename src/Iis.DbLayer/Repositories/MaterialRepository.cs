@@ -282,9 +282,9 @@ namespace Iis.DbLayer.Repositories
                 .ToListAsync();
         }
 
-        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds)
+        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes)
         {
-            return Context.Materials
+            return GetMaterialsQuery()
                 .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
                     (Material, MaterialInfo) => new { Material, MaterialInfo })
                 .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
