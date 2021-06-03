@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
-using Iis.Api.Ontology;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories;
@@ -12,10 +11,10 @@ using Iis.Domain.Materials;
 using Iis.Domain.Users;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services;
 using Iis.Services.Contracts.Interfaces;
-using IIS.Core.Materials.EntityFramework;
 using IIS.Repository.Factories;
-using Microsoft.Extensions.Configuration;
+using IIS.Services.Materials;
 using Moq;
 using Xunit;
 
@@ -91,13 +90,6 @@ namespace Iis.UnitTests.Materials
             var unitOfWorkFactory = new Mock<IUnitOfWorkFactory<IIISUnitOfWork>>();
             unitOfWorkFactory.Setup(e => e.Create()).Returns(unitOfWork.Object);
 
-            var inMemorySettings = new Dictionary<string, string> {
-                {"imageVectorizerUrl", "192.168.14.77"},
-            };
-            var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(inMemorySettings)
-                .Build();
-
             var httpClientFactory = new Mock<IHttpClientFactory>(MockBehavior.Strict);
 
             var sut = new MaterialProvider<IIISUnitOfWork>(ontologyService.Object,
@@ -108,9 +100,8 @@ namespace Iis.UnitTests.Materials
                 materialSignRepository.Object,
                 mapper.Object,
                 unitOfWorkFactory.Object,
-                configuration,
-                httpClientFactory.Object,
-                new NodeToJObjectMapper(ontologyService.Object));
+                new Mock<IImageVectorizer>().Object,
+                new NodeToJObjectMapper());
             return sut;
         }
     }

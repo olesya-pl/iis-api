@@ -11,7 +11,7 @@ namespace Iis.Api.Ontology
     {
         public IEnumerable<IncomingRelation> GetIncomingEntities([Service] IOntologyService ontologyService,
             [Service] IMapper mapper,
-            [Service] NodeToJObjectMapper nodeToJObjectMapper,
+            [Service] Iis.Services.NodeToJObjectMapper nodeToJObjectMapper,
             Guid entityId)
         {
             var items = ontologyService.GetIncomingEntities(entityId);

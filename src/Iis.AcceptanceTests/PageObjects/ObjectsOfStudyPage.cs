@@ -32,7 +32,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//div[@class='summary-person-row text-ellipsis']/span[@class='title']")]
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='el-table__body-wrapper is-scrolling-none']//tr[1]")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table objects-table']//tbody[@class='p-datatable-tbody']/tr[1]")]
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
@@ -123,7 +123,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
         public IWebElement OOSSearchCounter;
 
-        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-emptymessage .empty-state__message")]
         [CacheLookup]
         public IWebElement OOSEmptySearchResults;
 
@@ -167,7 +167,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div[name='parent'] .el-input__inner")]
         public IWebElement DirectReportingRelationship;
 
-        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Підтвердити')]")]
+        [FindsBy(How = How.CssSelector, Using = ".confirm-message-box button.confirm-message-box__action-confirm")]
         public IWebElement ConfirmSaveOfANewObjectOfStudyButton;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Дислокація ')]")]
@@ -213,7 +213,7 @@ namespace AcceptanceTests.PageObjects
             return new HierarchyCard(driver, title);
         }
 
-        public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
+        public List<Event> Events => driver.FindElements(By.CssSelector(".events-table tbody.p-datatable-tbody > tr"))
                    .Select(webElement => new Event(driver, webElement)).ToList();
 
         public void ScrollDown(string value)

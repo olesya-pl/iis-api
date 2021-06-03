@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using HotChocolate;
-using IIS.Core.Materials;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.ML
 {

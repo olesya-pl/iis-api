@@ -127,7 +127,8 @@ namespace Iis.Services
                 throw new InvalidOperationException($"Cannot find User with id:'{updatedUser.Id}'.");
             }
 
-            if (string.Equals(userEntity.PasswordHash, updatedUser.PasswordHash, StringComparison.Ordinal))
+            if (userEntity.Source == UserSource.Internal && 
+                string.Equals(userEntity.PasswordHash, updatedUser.PasswordHash, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException($"New password must not match old.");
             }

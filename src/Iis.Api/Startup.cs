@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using HealthChecks.Elasticsearch;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -41,6 +40,7 @@ using Iis.Interfaces.Roles;
 using Iis.OntologyData;
 using Iis.Services;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Matrix;
 using Iis.Services.DI;
@@ -174,9 +174,7 @@ namespace IIS.Core
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IMaterialPutToElasticService, MaterialService<IIISUnitOfWork>>();
-            services.AddTransient<IOntologyService, OntologyServiceWithCache>();
-            services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
-            services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
+            services.AddTransient<IOntologyService, OntologyServiceWithCache>();            
 
             services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -200,7 +198,7 @@ namespace IIS.Core
             services.AddTransient<IAccessLevelService, AccessLevelService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
-            services.AddTransient<NodeToJObjectMapper>();
+            services.AddTransient<NodeMapper>();
             services.AddSingleton<FileUrlGetter>();
             services.AddSingleton<PropertyTranslator>();
 

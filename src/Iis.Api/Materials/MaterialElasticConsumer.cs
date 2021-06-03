@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.Services.Contracts.Configurations;
 using IIS.Core.Materials;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

@@ -11,13 +11,13 @@ namespace Iis.Api.Ontology
     {
         public async Task<GraphQLCollection<EventAssociatedWithEntity>> GetEventsAssociatedWithEntity(
             [Service] IOntologyService ontologyService,
-            [Service] NodeToJObjectMapper nodeToJObjectMapper,
+            [Service] NodeMapper nodeToJObjectMapper,
             [GraphQLNonNullType] Guid entityId
         )
         {
             var entities = ontologyService.GetEventsAssociatedWithEntity(entityId);
 
-            var result = entities.Select(p => nodeToJObjectMapper.EventToAssociatedWithEntity(p)).ToArray();
+            var result = entities.Select(p => nodeToJObjectMapper.ToEventToAssociatedWithEntity(p)).ToArray();
 
             return await Task.FromResult(new GraphQLCollection<EventAssociatedWithEntity>(result, result.Count()));
         }

@@ -31,7 +31,7 @@ namespace AcceptanceTests.PageObjects
 		public MaterialRelatedItems(IWebDriver driver, string value)
 		{
 			_driver = driver;
-			_tableRowElement = driver.FindElement(By.XPath($@"//table[@class='el-table__body']//tr//b[.='{value}']"));
+			_tableRowElement = driver.FindElement(By.XPath($@"//div[@class='material-objects']//div[@class='el-table__body-wrapper is-scrolling-none']//tr//b[contains(text(), '{value}')]//ancestor::tr"));
 		}
 	}
 }

@@ -63,6 +63,7 @@ namespace AcceptanceTests.UISteps
             eventPage.ConfirmSaveEventChangesButton.Click();
             driver.WaitFor(2);
             driver.Navigate().Refresh();
+            driver.WaitFor(2);
             eventPage.CloseEventCreationWindow.Click();
         }
 
@@ -196,7 +197,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the Events page")]
         public void ThenIMustSeeEventCreationButton()
         {
-            Assert.Contains("events/?query=&page=1", driver.Url);
+            Assert.Contains("?query=&sort=updatedAt_desc&page=1", driver.Url);
         }
 
         [Then(@"I must see first event in the events list")]

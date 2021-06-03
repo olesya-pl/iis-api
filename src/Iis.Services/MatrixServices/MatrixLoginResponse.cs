@@ -18,6 +18,6 @@ namespace Iis.Services.MatrixServices
         [JsonIgnore]
         public string ErrorMessage { get; set; }
         [JsonIgnore]
-        public bool IsSuccess => !string.IsNullOrEmpty(ErrorMessage);
+        public bool IsSuccess => string.IsNullOrEmpty(ErrorMessage);
     }
 }

@@ -19,7 +19,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement ReportSection;
 
-        [FindsBy(How = How.CssSelector, Using = "tbody .el-table__row:nth-of-type(1)")]
+        [FindsBy(How = How.CssSelector, Using = ".reports-table .p-datatable-tbody > tr")]
         [CacheLookup]
         public IWebElement FirstReportInTheReportList;
 
@@ -35,7 +35,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div[name='title'] .el-input__inner")]
         public IWebElement NameOfTheReportField;
 
-        [FindsBy(How = How.XPath, Using = "//div[contains(@class, 'cell') and text() = 'Час та дата']")]
+        [FindsBy(How = How.CssSelector, Using = "th.reports-table__created-date.p-sortable-column")]
         public IWebElement HourAndDateColumn;
 
         public Report GetReportByTitle(string title)
@@ -47,7 +47,7 @@ namespace AcceptanceTests.PageObjects
         {
             try
             {
-                var elem = driver.FindElement(By.XPath("//table[@class='el-table__body']//tr[@class='el-table__row']"));
+                var elem = driver.FindElement(By.CssSelector(".events-table tbody.p-datatable-tbody > tr td.simple-events-table__name-cell"));
                 return elem.Displayed;
             }
             catch

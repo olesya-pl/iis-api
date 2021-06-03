@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Iis.Api.Configuration
+namespace Iis.Services.Contracts.Configurations
 {
      /// <summary>
     /// Type for Material Event configuration
