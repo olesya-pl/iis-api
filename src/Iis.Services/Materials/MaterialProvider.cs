@@ -240,19 +240,10 @@ namespace IIS.Services.Materials
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
         {
-            IEnumerable<Task<Material>> mappingTasks;
-            IEnumerable<Material> materials;
-
             var materialsByNode = GetMaterialByNodeIdQuery(nodeId);
             //TODO: we need to add logic that provides list of NodeId
             //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
-
-            mappingTasks = materialsByNode
-                                 .Select(async e => Map(await RunWithoutCommitAsync((unitOfWork) =>
-                                     unitOfWork.MaterialRepository.GetByIdAsync(e.Id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures))));
-
-            materials = await Task.WhenAll(mappingTasks);
-
+            var materials = materialsByNode.Select(p => Map(p));
             return (materials, materials.Count());
         }
 
@@ -480,7 +471,7 @@ namespace IIS.Services.Materials
 
             nodeIdList.Add(nodeId);
 
-            return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList));
+            return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
         }
 
         private JObject GetObjectOfStudyListForMaterial(IEnumerable<Node> nodeList)
