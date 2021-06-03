@@ -279,6 +279,20 @@ namespace Iis.Api.Controllers
             return Content($"{cnt} users where successfully imported");
         }
 
+        [HttpGet("CheckMatrixUsers")]
+        public async Task<IActionResult> CheckMatrixUsers()
+        {
+            var result = await _userService.GetUserMatrixInfoAsync();
+            return Content(result);
+        }
+
+        [HttpGet("CreateMatrixUsers")]
+        public async Task<IActionResult> CreateMatrixUsers()
+        {
+            var result = await _userService.CreateMatrixUsersAsync();
+            return Content(result);
+        }
+
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);
@@ -321,7 +335,5 @@ namespace Iis.Api.Controllers
 
             return Content(_adminElasticService.Logger.ToString());
         }
-
-
     }
 }
