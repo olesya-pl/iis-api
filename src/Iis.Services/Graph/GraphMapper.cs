@@ -15,12 +15,12 @@ namespace Iis.Services.Graph
 
         public static GraphLink MapRelationToGraphLink(IRelation relation)
         {
-            if(relation is null) return null;
+            if (relation is null) return null;
 
             var extra = new JObject();
 
             extra.Add(GraphTypeExtraPropNames.Type, relation.RelationTypeName);
-            extra.Add(GraphTypeExtraPropNames.Name, relation.Node.NodeType.Title);
+            extra.Add(GraphTypeExtraPropNames.Name, GetGraphLinkNameProperty(relation));
 
             return new GraphLink
             {
@@ -33,30 +33,52 @@ namespace Iis.Services.Graph
 
         public static GraphNode MapNodeToGraphNode(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList)
         {
-            if(node is null) return null;
- 
-            var extraJObject = new JObject();
+            if (node is null) return null;
 
-            extraJObject.Add(GraphTypeExtraPropNames.HasLinks, DoesNodeHaveLink(node, exclusionNodeIdList));
-            extraJObject.Add(GraphTypeExtraPropNames.Type, $"Entity{node.NodeType.Name}");
-            extraJObject.Add(GraphTypeExtraPropNames.Name, GetNameProperty(node));
+            var extraObject = new JObject();
+
+            extraObject.Add(GraphTypeExtraPropNames.HasLinks, DoesNodeHaveLink(node, exclusionNodeIdList));
+            extraObject.Add(GraphTypeExtraPropNames.Type, $"Entity{node.NodeType.Name}");
+            extraObject.Add(GraphTypeExtraPropNames.Name, GetGraphNodeNameProperty(node));
+            extraObject.Add(GraphTypeExtraPropNames.NodeType, GetGraphNodeNodeTypeProperty(node));
+            extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, GetGraohNodeImportanceProperty(node));
 
             return new GraphNode
             {
                 Id = node.Id,
-                Extra = extraJObject
+                Extra = extraObject
             };
         }
 
         private static bool DoesNodeHaveLink(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList)
         {
-            return node.IncomingRelations.Any(e => IsEligibleForGraphByNodeType(e.SourceNode) && !exclusionNodeIdList.Contains(e.SourceNodeId)) || node.OutgoingRelations.Any(e => IsEligibleForGraphByNodeType(e.TargetNode) && !exclusionNodeIdList.Contains(e.TargetNodeId));
+            return node.IncomingRelations.Any(e => IsEligibleForGraphByNodeType(e.SourceNode) && !exclusionNodeIdList.Contains(e.SourceNodeId))
+                || node.OutgoingRelations.Any(e => IsEligibleForGraphByNodeType(e.TargetNode) && !exclusionNodeIdList.Contains(e.TargetNodeId));
         }
 
-        private static string GetNameProperty(INode node) => node switch
+        private static string GetGraphNodeNameProperty(INode node) => node switch
         {
-            var e when e.NodeType.IsEvent => node.GetSingleProperty("name")?.Value,
+            { NodeType: { IsEvent: true } } => node.GetSingleProperty("name")?.Value,
+            { NodeType: { IsObjectSign: true } } => node.GetSingleProperty("value")?.Value,
             _ => node.GetComputedValue("__title")
+        };
+
+        private static string GetGraphNodeNodeTypeProperty(INode node) => node.NodeType switch
+        {
+            { IsEvent: true } => GraphNodeNodeTypeNames.Event,
+            { IsObject: true } => GraphNodeNodeTypeNames.Object,
+            { IsObjectSign: true } => GraphNodeNodeTypeNames.Sign,
+            _ => GraphNodeNodeTypeNames.Unknown
+        };
+        private static string GetGraohNodeImportanceProperty(INode node)
+        {
+            return node.GetSingleProperty("importance")?.GetSingleProperty("code")?.Value;
+        }
+
+        private static string GetGraphLinkNameProperty(IRelation relation) => relation switch
+        {
+            { TargetNode: { NodeType: { IsObjectSign: true } } } => relation.TargetNode.NodeType.Title,
+            _ => relation.Node.NodeType.Title
         };
     }
 }
