@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Iis.Domain.Graph;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Utility;
+
 namespace Iis.Services.Graph
 {
     public static class GraphTypeMapper
@@ -41,7 +43,9 @@ namespace Iis.Services.Graph
             extraObject.Add(GraphTypeExtraPropNames.Type, $"Entity{node.NodeType.Name}");
             extraObject.Add(GraphTypeExtraPropNames.Name, GetGraphNodeNameProperty(node));
             extraObject.Add(GraphTypeExtraPropNames.NodeType, GetGraphNodeNodeTypeProperty(node));
-            extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, GetGraohNodeImportanceProperty(node));
+            extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, GetGraphNodeImportanceProperty(node));
+            extraObject.Add(GraphTypeExtraPropNames.IconName, node.NodeType.GetIconName());
+            extraObject.Add(GraphTypeExtraPropNames.PhotoUrl, GetGraphNodePhotoUrl(node));
 
             return new GraphNode
             {
@@ -70,9 +74,23 @@ namespace Iis.Services.Graph
             { IsObjectSign: true } => GraphNodeNodeTypeNames.Sign,
             _ => GraphNodeNodeTypeNames.Unknown
         };
-        private static string GetGraohNodeImportanceProperty(INode node)
+
+        private static string GetGraphNodeImportanceProperty(INode node)
         {
             return node.GetSingleProperty("importance")?.GetSingleProperty("code")?.Value;
+        }
+
+        private static string GetGraphNodePhotoUrl(INode node)
+        {
+            if (node is null) return null;
+
+            var image = node.GetChildNodes("titlePhotos").FirstOrDefault();
+
+            if(image is null) return null;
+
+            var imageId = new Guid(image.GetSingleProperty("image").Value);
+
+            return FileUrlGetter.GetFileUrl(imageId);
         }
 
         private static string GetGraphLinkNameProperty(IRelation relation) => relation switch
