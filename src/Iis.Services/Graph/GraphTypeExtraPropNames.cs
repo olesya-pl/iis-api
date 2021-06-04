@@ -8,5 +8,7 @@ namespace Iis.Services.Graph
         public const string HasLinks = "hasLinks";
         public const string NodeType = "nodeType";
         public const string ImportanceCode = "importance";
+        public const string IconName = "iconName";
+        public const string PhotoUrl = "photoUrl";
     }
 }
