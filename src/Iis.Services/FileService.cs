@@ -31,32 +31,18 @@ namespace Iis.Services
             _logger = logger;
         }
 
-        public async Task<FileIdDto> IsDuplicatedAsync(byte[] contents)
-        {
-            var hash = ComputeHash(contents);
-
-            return await IsDuplicatedAsync(contents, hash);
-        }
-
         public async Task<FileIdDto> IsDuplicatedAsync(Stream stream)
         {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                await stream.CopyToAsync(ms);
-                stream.Seek(0, SeekOrigin.Begin);
-                var contents = ms.ToArray();
-                var hash = ComputeHash(contents);
-                return await IsDuplicatedAsync(contents, hash);
-            }            
+            var hash = ComputeHash(stream);
+            return await IsDuplicatedAsync(stream, hash);
         }
 
         public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType,
             CancellationToken token)
         {
-            var contents = await ConvertToBytes(stream, token);
-            var hash = ComputeHash(contents);
+            var hash = ComputeHash(stream);
 
-            var duplicatedResult = await IsDuplicatedAsync(contents, hash, token);
+            var duplicatedResult = await IsDuplicatedAsync(stream);
             if (duplicatedResult.IsDuplicate)
                 return duplicatedResult;
 
@@ -71,7 +57,7 @@ namespace Iis.Services
 
             if (_configuration.Storage == Storage.Database || string.IsNullOrEmpty(_configuration.Path))
             {
-                file.Contents = contents;
+                file.Contents = await ConvertToBytes(stream, token);
             }
 
             await RunAsync(uow => uow.FileRepository.Create(file));
@@ -91,7 +77,10 @@ namespace Iis.Services
                 }
 
                 string path = Path.Combine(_configuration.Path, file.Id.ToString("D"));
-                await File.WriteAllBytesAsync(path, contents);
+                using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+                {
+                    await stream.CopyToAsync(fs);
+                }
             }
 
             return new FileIdDto
@@ -180,7 +169,7 @@ namespace Iis.Services
             await RunAsync(uow => uow.FileRepository.Update(file));
         }
 
-        private async Task<FileIdDto> IsDuplicatedAsync(byte[] contents, Guid hash, CancellationToken token = default)
+        private async Task<FileIdDto> IsDuplicatedAsync(Stream contents, Guid hash, CancellationToken token = default)
         {
             var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.ContentHash == hash));
             foreach (var fileData in files)
@@ -191,7 +180,14 @@ namespace Iis.Services
                 //let's do checks in both of them  
                 if (fileData.Contents != null)
                 {
-                    storedFileBody = fileData.Contents;
+                    bool areEqual = IsStreamEuqalToByteArray(fileData.Contents, contents);
+                    if (areEqual)
+                    {
+                        return new FileIdDto
+                        {
+                            IsDuplicate = true
+                        };
+                    }
                 }
                 else if (_configuration.Storage == Storage.Folder)
                 {
@@ -201,22 +197,16 @@ namespace Iis.Services
 
                     if (storedFileInfo.Exists)
                     {
-                        storedFileBody = await File.ReadAllBytesAsync(storedFileInfo.FullName, token);
+                        using var fsSource = new FileStream(storedFileInfo.FullName, FileMode.Open, FileAccess.Read);
+                        var areEqual = AreStreamsEqual(fsSource, contents);
+                        if (areEqual)
+                        {
+                            return new FileIdDto
+                            {
+                                IsDuplicate = true
+                            };
+                        }
                     }
-                }
-
-                if (storedFileBody.Length != contents.Length)
-                {
-                    continue;
-                }
-
-                if (contents.SequenceEqual(storedFileBody))
-                {
-                    return new FileIdDto
-                    {
-                        Id = fileData.Id,
-                        IsDuplicate = true
-                    };
                 }
             }
 
@@ -226,10 +216,65 @@ namespace Iis.Services
             };
         }
 
-        private static Guid ComputeHash(byte[] data)
+        private bool IsStreamEuqalToByteArray(byte[] contents, Stream stream)
+        {
+            const int bufferSize = 2048;
+            var i = 0;
+            if (contents.Length != stream.Length)
+            {
+                return false;
+            }
+            
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead;
+            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                var contentsBuffer = contents
+                    .Skip(i * bufferSize)
+                    .Take(bytesRead)
+                    .ToArray();
+
+                if (!contentsBuffer.SequenceEqual(buffer))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return false;
+                }
+            }
+            stream.Seek(0, SeekOrigin.Begin);
+            return true;
+        }
+
+        private bool AreStreamsEqual(Stream stream, Stream other)
+        {
+            const int bufferSize = 2048;
+            if (other.Length != stream.Length)
+            {
+                return false;
+            }
+
+            byte[] buffer = new byte[bufferSize];
+            byte[] otherBuffer = new byte[bufferSize];
+            while ((_ = stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                var _ = other.Read(otherBuffer, 0, otherBuffer.Length);
+
+                if (!otherBuffer.SequenceEqual(buffer))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    other.Seek(0, SeekOrigin.Begin);
+                    return false;
+                }
+            }
+            stream.Seek(0, SeekOrigin.Begin);
+            other.Seek(0, SeekOrigin.Begin);
+            return true;
+        }
+
+        private static Guid ComputeHash(Stream data)
         {
             using HashAlgorithm algorithm = MD5.Create();
             byte[] bytes = algorithm.ComputeHash(data);
+            data.Seek(0, SeekOrigin.Begin);
             return new Guid(bytes);
         }
 
