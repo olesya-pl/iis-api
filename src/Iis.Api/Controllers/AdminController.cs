@@ -263,16 +263,16 @@ namespace Iis.Api.Controllers
             return Ok();
         }
 
-        [HttpGet("ExportUsers/{userNames}")]
-        public async Task<IActionResult> ExportUsers(string userNames, CancellationToken ct)
+        [HttpGet("ImportExternalUsers/{userNames}")]
+        public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
         {
             var cnt = _userService.ImportUsersFromExternalSource(userNames.Split(','));
 
             return Content($"{cnt} users where successfully imported");
         }
 
-        [HttpGet("ExportUsers")]
-        public async Task<IActionResult> ExportUsers(CancellationToken ct)
+        [HttpGet("ImportExternalUsers")]
+        public async Task<IActionResult> ImportExternalUsers(CancellationToken ct)
         {
             var cnt = _userService.ImportUsersFromExternalSource();
 
