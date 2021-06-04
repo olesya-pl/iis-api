@@ -14,7 +14,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task<File> GetFileAsync(Guid id);
         Task FlushTemporaryFilesAsync(Predicate<DateTime> predicate);
         Task MarkFilePermanentAsync(Guid fileId);
-        Task<FileIdDto> IsDuplicatedAsync(byte[] contents);
         Task<FileIdDto> IsDuplicatedAsync(Stream contents);
         int RemoveFiles(List<Guid> ids);
     }
