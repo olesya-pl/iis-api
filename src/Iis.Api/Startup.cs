@@ -315,8 +315,10 @@ namespace IIS.Core
 
             services.Configure<KestrelServerOptions>(options =>
             {
-                options.Limits.MaxRequestBodySize = int.MaxValue; // if don't set default value is: 30 MB
+                options.Limits.MaxRequestBodySize = long.MaxValue; 
             });
+
+            services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
