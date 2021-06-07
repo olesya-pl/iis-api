@@ -14,6 +14,8 @@ using IIS.Core.Materials;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -37,18 +39,21 @@ namespace Iis.Api.Controllers
         private readonly UploadConfiguration _uploadConfiguration;
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<UploadController> _logger;
 
         public UploadController(IFileService fileService,
             IMaterialService materialService,
             UploadConfiguration uploadConfiguration,
             IUserService userService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<UploadController> logger)
         {
             _fileService = fileService;
             _materialService = materialService;
             _uploadConfiguration = uploadConfiguration;
             _userService = userService;
             _configuration = configuration;
+            _logger = logger;
         }
         
         [HttpPost]
@@ -147,6 +152,7 @@ namespace Iis.Api.Controllers
 
         private async Task<UploadResult> UploadFileAsync(string directory, Stream fileStream, UploadInput input, User user)
         {
+            _logger.LogInformation("UploadController. Upload started. File {fileName}", input.Name);
             var result = await _fileService.IsDuplicatedAsync(fileStream);
             if (result.IsDuplicate)
                 return DuplicatedUploadResult;
@@ -157,12 +163,17 @@ namespace Iis.Api.Controllers
             var userName = user is null ? string.Empty : $"{user.LastName} {user.FirstName} {user.Patronymic}";
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
+                _logger.LogInformation("UploadController. Copying file to {directory}", directory);
                 await fileStream.CopyToAsync(fs);
             }
             using (var sw = System.IO.File.CreateText(fullDataName))
             {
-                await sw.WriteLineAsync($"{AccessLevelPropertyName}: {input.AccessLevel}");
-                sw.WriteLine($"{LoadedByPropertyName}: {userName}");
+                var accessLine = $"{AccessLevelPropertyName}: {input.AccessLevel}";
+                var loadedByLine = $"{LoadedByPropertyName}: {userName}";
+                await sw.WriteLineAsync(accessLine);
+                await sw.WriteLineAsync(loadedByLine);
+                _logger.LogInformation("UploadController. Generating data file. Access level {accessLine}", accessLine);
+                _logger.LogInformation("UploadController. Generating data file. Loaded by {loadedByLine}", loadedByLine);
             }
             return new UploadResult
             {
