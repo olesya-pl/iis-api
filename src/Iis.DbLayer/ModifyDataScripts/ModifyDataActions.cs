@@ -92,15 +92,17 @@ namespace Iis.DbLayer.ModifyDataScripts
         }
         public void AddAccessLevels(OntologyContext context, IOntologyNodesData data)
         {
-            if (data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString()) != null) return;
-
             const string NAME = "name";
             const string NUMERIC_INDEX = "numericIndex";
+            var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
 
-            var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
-            var accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Грифи (рівні доступу)", false, enumEntityType.Id);
-            data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
-            SaveOntologySchema(data.Schema);
+            if (accessLevelType == null)
+            {
+                var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
+                accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Грифи (рівні доступу)", false, enumEntityType.Id);
+                data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
+                SaveOntologySchema(data.Schema);
+            }
 
             data.WriteLock(() =>
             {
@@ -496,9 +498,27 @@ namespace Iis.DbLayer.ModifyDataScripts
             var imageProperty = photoType.GetRelationByName("image");
 
             var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
-            var titlePhotosProperty = data.Schema.CreateRelationType(objectType.Id, photoType.Id, "titlePhotos", "Фото в заголовку", EmbeddingOptions.Multiple);
+            var titlePhotosProperty = objectType.GetProperty("titlePhotos");
+            if (titlePhotosProperty == null)
+            {
+                var jsonMeta = @"{
+    ""AcceptsEntityOperations"": [0,1,2],
+    ""FormField"": {
+        ""Type"": ""photo""
+    }
+}";
 
-            SaveOntologySchema(data.Schema);
+                titlePhotosProperty = data.Schema.CreateRelationTypeJson(
+                    objectType.Id,
+                    photoType.Id,
+                    "titlePhotos",
+                    "Фото в заголовку",
+                    EmbeddingOptions.Multiple,
+                    jsonMeta
+                );
+
+                SaveOntologySchema(data.Schema);
+            }
 
             var objectNodes = data.GetAllNodes().Where(n => n.NodeType.IsObject);
             foreach (var node in objectNodes)
