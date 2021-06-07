@@ -20,7 +20,6 @@ namespace AcceptanceTests.PageObjects
         public IWebElement ReportSection;
 
         [FindsBy(How = How.CssSelector, Using = ".reports-table .p-datatable-tbody > tr")]
-        [CacheLookup]
         public IWebElement FirstReportInTheReportList;
 
         [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Нове зведення')]")]

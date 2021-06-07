@@ -360,7 +360,7 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.SaveObjectOfStudyButton.Click();
             driver.WaitFor(2);
             objectsOfStudyPage.ConfirmSaveOfANewObjectOfStudyButton.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(6);
         }
 
         private void ToggleAccordion(IWebElement accordionElement, bool open)
