@@ -39,7 +39,9 @@ namespace IIS.Core.GraphQL.Entities
                 Limit = pagination.PageSize,
                 Offset = pagination.Offset(),
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
-                CherryPickedItems = filter.CherryPickedItems.ToList(),
+                CherryPickedItems = filter.CherryPickedItems
+                    .Select(p => new CherryPickedItem(p))
+                    .ToList(),
                 FilteredItems = filter.FilteredItems
             };
             var response = await ontologyService.FilterNodeAsync(types, elasticFilter, tokenPayload.User);

@@ -209,9 +209,16 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 var item = filter.CherryPickedItems[i];
                 var lastOne = i + 1 == filter.CherryPickedItems.Count;
-                pickedQuery.Append($"Id:{item} OR ");
-                pickedQuery.Append($"parent.Id:{item}~0.95 OR ");
-                pickedQuery.Append(lastOne ? $"bePartOf.Id:{item}~0.95" : $"bePartOf.Id:{item}~0.95 OR ");
+                if (item.IncludeDescendants)
+                {
+                    pickedQuery.Append($"Id:{item.Item} OR ");
+                    pickedQuery.Append($"parent.Id:{item.Item}~0.95 OR ");
+                    pickedQuery.Append(lastOne ? $"bePartOf.Id:{item.Item}~0.95" : $"bePartOf.Id:{item.Item}~0.95 OR ");
+                }                
+                else
+                {
+                    pickedQuery.Append($"Id:{item.Item}");
+                }
                 if (lastOne)
                 {
                     result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
