@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+using Iis.Interfaces.Elastic;
+
 namespace Iis.Services.Contracts.Params
 {
     public class SearchParams
@@ -5,5 +9,7 @@ namespace Iis.Services.Contracts.Params
         public string Suggestion { get; set; }
         public PaginationParams Page {get;set;}
         public SortingParams Sorting { get; set; }
+        public List<CherryPickedItem> CherryPickedItems { get; set; } = new List<CherryPickedItem>();
+        public List<Property> FilteredItems { get; set; } = new List<Property>();
     }
 }
