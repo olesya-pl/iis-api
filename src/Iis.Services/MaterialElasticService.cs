@@ -91,7 +91,6 @@ namespace Iis.Services
                 searchResult.Count = await _elasticManager
                     .WithUserId(userId)
                     .CountAsync(countQuery, _elasticState.MaterialIndexes, ct);
-
             }
 
             return searchResult;
@@ -223,15 +222,19 @@ namespace Iis.Services
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
-            var elasticSearchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = MaterialIndexes.ToList(),
-                Query = string.IsNullOrEmpty(searchParams.Suggestion) ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL"
-            };
+            var query = string.IsNullOrEmpty(searchParams.Suggestion) ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
+
+            var pagination = searchParams.Page.ToEFPage();
+            
+            var exactQueryBuilder = new ExactQueryBuilder()
+                .WithQueryString(query)
+                .WithLeniency(true)
+                .WithPagination(pagination.Skip, pagination.Take)
+                .BuildCountQuery();
 
             return _elasticManager
                 .WithUserId(userId)
-                .CountAsync(elasticSearchParams, ct);
+                .CountAsync(exactQueryBuilder.ToString(), _elasticState.MaterialIndexes, ct);
         }
 
         private static (string SortColumn, string SortOrder) MapSortingToElastic(SortingParams sorting)

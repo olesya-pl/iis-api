@@ -30,6 +30,7 @@ namespace AcceptanceTests.UISteps
         public void INavigatedToReportSection()
         {
             reportPageObjects.ReportSection.Click();
+            driver.WaitFor(2);
         }
 
         [When(@"I pressed the Create a new report button")]
