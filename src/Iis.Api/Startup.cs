@@ -60,6 +60,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -310,6 +312,13 @@ namespace IIS.Core
             var matrixConfiguration = Configuration.GetSection("matrix").Get<MatrixServiceConfiguration>();
             services.AddSingleton(matrixConfiguration);
             services.AddTransient<IMatrixService, MatrixService>();
+
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = long.MaxValue; 
+            });
+
+            services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)

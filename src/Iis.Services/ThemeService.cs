@@ -348,7 +348,14 @@ namespace Iis.Services
                 }
                 
                 var page = new PaginationParams(1, 50);
-                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(userId, new SearchParams { Page = page, Suggestion = filter.Suggestion });
+                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(
+                    userId, 
+                    new SearchParams { 
+                        Page = page, 
+                        Suggestion = filter.Suggestion,
+                        CherryPickedItems = filter.CherryPickedItems,
+                        FilteredItems = filter.FilteredItems
+                    });
                 return new QueryResult
                 {
                     Count = count,
