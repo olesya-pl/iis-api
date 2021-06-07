@@ -453,17 +453,17 @@ namespace Iis.Services
                     }
                 }
 
-                var filteredItems = Array.Empty<Property>();
+                var filteredItems = Array.Empty<FilteredItem>();
 
                 if (queryResult.ContainsKey("filteredItems"))
                 {
                     var filteredItemsJson = queryResult["filteredItems"] as JArray;
                     if (filteredItemsJson != null)
                     {
-                        filteredItems = filteredItemsJson.ToObject<Property[]>();
+                        filteredItems = filteredItemsJson.ToObject<FilteredItem[]>();
                     }
-                }              
-                
+                }
+
                 return new Query
                 {
                     Suggestion = suggestion,
@@ -471,6 +471,21 @@ namespace Iis.Services
                     SearchByImageInput = searchByImageInput,
                     SearchByRelation = searchByRelation,
                     FilteredItems = filteredItems
+                        .Select(item =>
+                        {
+                            var properties = new List<Property>();
+                            foreach (var value in item.Value)
+                            {
+                                properties.Add(new Property()
+                                {
+                                    Name = item.Name,
+                                    Value = value
+                                });
+                            }
+                            return properties;
+                        })
+                        .SelectMany(p => p)
+                        .ToList()
                 };
             }
             catch (Exception e)
@@ -502,6 +517,12 @@ namespace Iis.Services
             public bool IncludeDescendants { get; set; }
             [JsonIgnore]
             public bool HasConditions => NodeIdentityList != null && NodeIdentityList.Any();
+        }
+
+        private class FilteredItem
+        {
+            public string Name { get; set; }
+            public string[] Value { get; set; }
         }
     }
 }
