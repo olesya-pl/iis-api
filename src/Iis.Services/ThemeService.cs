@@ -272,7 +272,9 @@ namespace Iis.Services
                 Limit = 50,
                 Offset = 0,
                 Suggestion = query.Suggestion,
-                CherryPickedItems = query.CherryPickedItems.ToList(),
+                CherryPickedItems = query
+                    .CherryPickedItems
+                    .ToList(),
                 FilteredItems = query.FilteredItems.ToList()
             };
 
@@ -420,12 +422,12 @@ namespace Iis.Services
                     suggestion = queryResult["suggestion"].Value<string>();                    
                 }
 
-                var cherryPickedItems = Enumerable.Empty<string>().ToList();
+                var cherryPickedItems = Enumerable.Empty<CherryPickedItem>().ToList();
                 if (queryResult.ContainsKey("selectedEntities"))
                 {
                     cherryPickedItems = queryResult.SelectToken("selectedEntities", false)
                         .AsEnumerable()
-                        .Select(p => p.Value<string>("id"))
+                        .Select(p => new CherryPickedItem(p.Value<string>("id"), p.Value<bool>("includeDescendants")))
                         .ToList();
                 }
 
@@ -480,7 +482,7 @@ namespace Iis.Services
         private class Query
         {
             public string Suggestion { get; set; }
-            public IReadOnlyCollection<string> CherryPickedItems { get; set; } = new List<string>();
+            public IReadOnlyCollection<CherryPickedItem> CherryPickedItems { get; set; } = new List<CherryPickedItem>();
             public IReadOnlyCollection<Property> FilteredItems { get; set; } = new List<Property>();
             public SearchByImageInput SearchByImageInput { get; set; }
             public SearchByRelationInput SearchByRelation { get; set; }
