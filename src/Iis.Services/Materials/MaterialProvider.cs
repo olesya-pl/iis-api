@@ -7,6 +7,7 @@ using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
 using Iis.Domain.Users;
 using Iis.Interfaces.Constants;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
@@ -76,6 +77,8 @@ namespace IIS.Services.Materials
         public async Task<MaterialsDto> GetMaterialsAsync(
             Guid userId,
             string filterQuery,
+            IReadOnlyCollection<Property> filteredItems,
+            IReadOnlyCollection<string> cherryPickedItems,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default)
@@ -83,8 +86,10 @@ namespace IIS.Services.Materials
             var searchParams = new SearchParams
             {
                 Suggestion = string.IsNullOrWhiteSpace(filterQuery) || filterQuery == WildCart ? null : filterQuery,
+                FilteredItems = filteredItems,
+                CherryPickedItems = cherryPickedItems.Select(p => new CherryPickedItem(p)).ToList(),
                 Page = page,
-                Sorting = sorting
+                Sorting = sorting                
             };
 
             var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams);

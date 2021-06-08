@@ -187,31 +187,32 @@ namespace Iis.Elastic.SearchQueryExtensions
             }
 
             var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({filter.Suggestion})";
-            result = PopulateFilteredItems(filter, result);
-            return PopulateCherryPickedObjectsOfStudy(filter, result);
+            result = PopulateFilteredItems(filter.FilteredItems, result);
+            return PopulateCherryPickedObjectsOfStudy(filter.CherryPickedItems, result);
         }
 
         
 
-        public static string ToMaterialsQueryString(this ElasticFilter filter)
+        public static string CreateMaterialsQueryString(string suggestion,
+            IReadOnlyCollection<Property> filteredItems,
+            IReadOnlyCollection<CherryPickedItem> cherryPickedItems)
         {
-            var noSuggestion = string.IsNullOrEmpty(filter.Suggestion);
+            var noSuggestion = string.IsNullOrEmpty(suggestion);
 
-            var queryString = noSuggestion ? "ParentId:NULL" : $"({filter.Suggestion}) AND ParentId:NULL";
+            var queryString = noSuggestion ? "(ParentId:NULL)" : $"(({suggestion}) AND ParentId:NULL)";
 
-            if (filter.CherryPickedItems.Count == 0 && filter.FilteredItems.Count == 0)
+            if (cherryPickedItems.Count == 0 && filteredItems.Count == 0)
             {
                 return queryString;
             }
 
-            queryString = PopulateFilteredItems(filter, queryString);
-            return PopulateCherryPickedMaterials(filter, queryString);
+            queryString = PopulateFilteredItems(filteredItems, queryString);
+            return PopulateCherryPickedMaterials(cherryPickedItems, queryString);
         }       
 
-        private static string PopulateFilteredItems(ElasticFilter filter, string result)
+        private static string PopulateFilteredItems(IReadOnlyCollection<Property> filter, string result)
         {
-            var filteredItems = filter.FilteredItems
-                            .GroupBy(x => x.Name, x => x.Value);
+            var filteredItems = filter.GroupBy(x => x.Name, x => x.Value);
             var filteredQueries = new List<string>();
             foreach (var filteredItem in filteredItems)
             {
@@ -229,13 +230,13 @@ namespace Iis.Elastic.SearchQueryExtensions
             return result;
         }
 
-        private static string PopulateCherryPickedObjectsOfStudy(ElasticFilter filter, string result)
+        private static string PopulateCherryPickedObjectsOfStudy(IList<CherryPickedItem> cherryPickedItems, string result)
         {
             var pickedQuery = new StringBuilder();
-            for (var i = 0; i < filter.CherryPickedItems.Count; i++)
+            for (var i = 0; i < cherryPickedItems.Count; i++)
             {
-                var item = filter.CherryPickedItems[i];
-                var lastOne = i + 1 == filter.CherryPickedItems.Count;
+                var item = cherryPickedItems[i];
+                var lastOne = i + 1 == cherryPickedItems.Count;
                 if (item.IncludeDescendants)
                 {
                     pickedQuery.Append($"Id:{item.Item} OR ");
@@ -255,14 +256,14 @@ namespace Iis.Elastic.SearchQueryExtensions
             return result;
         }
 
-        private static string PopulateCherryPickedMaterials(ElasticFilter filter, string result)
+        private static string PopulateCherryPickedMaterials(IReadOnlyCollection<CherryPickedItem> cherryPickedItems, string result)
         {
             var pickedQuery = new StringBuilder();
-            for (var i = 0; i < filter.CherryPickedItems.Count; i++)
+            for (var i = 0; i < cherryPickedItems.Count; i++)
             {
-                var item = filter.CherryPickedItems[i];
-                var lastOne = i + 1 == filter.CherryPickedItems.Count;                
-                pickedQuery.Append($"Id:{item.Item}");
+                var item = cherryPickedItems.ElementAt(i);
+                var lastOne = i + 1 == cherryPickedItems.Count;                
+                pickedQuery.Append($"_id:{item.Item}");
                 if (lastOne)
                 {
                     result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
