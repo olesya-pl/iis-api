@@ -41,18 +41,22 @@ namespace Iis.Services.ExternalUserServices
                             Roles = new List<ExternalRole>()
                         };
 
-                        var groups = domainUser.GetAuthorizationGroups();
-                        foreach (Principal p in groups)
+                        try
                         {
-                            if (p is GroupPrincipal)
+                            var groups = domainUser.GetGroups(ctx);
+                            foreach (Principal p in groups)
                             {
-                                var externalRole = new ExternalRole
+                                if (p is GroupPrincipal)
                                 {
-                                    Name = (p as GroupPrincipal).Name
-                                };
-                                externalUser.Roles.Add(externalRole);
+                                    var externalRole = new ExternalRole
+                                    {
+                                        Name = (p as GroupPrincipal).Name
+                                    };
+                                    externalUser.Roles.Add(externalRole);
+                                }
                             }
                         }
+                        catch { }
 
                         myDomainUsers.Add(externalUser);
                     }

@@ -266,17 +266,31 @@ namespace Iis.Api.Controllers
         [HttpGet("ImportExternalUsers/{userNames}")]
         public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
         {
-            var cnt = _userService.ImportUsersFromExternalSource(userNames.Split(','));
+            try
+            {
+                var msg = _userService.ImportUsersFromExternalSource(userNames.Split(','));
 
-            return Content($"{cnt} users where successfully imported");
+                return Content(msg);
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error: {ex.Message}");
+            }
         }
 
         [HttpGet("ImportExternalUsers")]
         public async Task<IActionResult> ImportExternalUsers(CancellationToken ct)
         {
-            var cnt = _userService.ImportUsersFromExternalSource();
+            try
+            {
+                var msg = _userService.ImportUsersFromExternalSource();
 
-            return Content($"{cnt} users where successfully imported");
+                return Content(msg);
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error: {ex.Message}");
+            }
         }
 
         [HttpGet("CheckMatrixUsers")]

@@ -351,7 +351,7 @@ namespace Iis.Services
             return ComputeHash(password + salt);
         }
 
-        public int ImportUsersFromExternalSource(IEnumerable<string> userNames = null)
+        public string ImportUsersFromExternalSource(IEnumerable<string> userNames = null)
         {
             var externalUsers = _externalUserService.GetUsers()
                 .Where(eu => userNames == null || userNames.Contains(eu.UserName));
@@ -363,7 +363,7 @@ namespace Iis.Services
 
             var roles = _context.Roles.ToList();
 
-            int cnt = 0;
+            var sb = new StringBuilder();
 
             foreach (var externalUser in externalUsers)
             {
@@ -379,11 +379,16 @@ namespace Iis.Services
                         UserRoles = new List<UserRoleEntity>()
                     };
                     _context.Users.Add(user);
-                    cnt++;
                     
                     if (_matrixService?.AutoCreateUsers == true)
                         _matrixService.CreateUserAsync(user.Username, user.Id.ToString("N"))
                             .GetAwaiter().GetResult();
+
+                    sb.AppendLine($"User {user.Username} is successfully created");
+                }
+                else
+                {
+                    sb.AppendLine($"User {user.Username} already exists");
                 }
 
                 foreach (var externalRole in externalUser.Roles)
@@ -399,13 +404,22 @@ namespace Iis.Services
                                 UserId = user.Id,
                                 RoleId = role.Id
                             };
+                            sb.AppendLine($"... {externalRole.Name} is successfully assigned");
                         }
+                        else
+                        {
+                            sb.AppendLine($"... {externalRole.Name} does not exists and cannot be assigned");
+                        }
+                    }
+                    else
+                    {
+                        sb.AppendLine($"... {externalRole.Name} is already assigned");
                     }
                 }
             }
             _context.SaveChanges();
 
-            return cnt;
+            return sb.ToString();
         }
         
         public async Task<string> CreateMatrixUserAsync(User user)
