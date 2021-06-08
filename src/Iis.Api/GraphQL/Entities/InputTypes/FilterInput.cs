@@ -1,7 +1,6 @@
 using System;
 using HotChocolate;
 using HotChocolate.Types;
-using IIS.Core.GraphQL.Common;
 using System.Collections.Generic;
 
 namespace IIS.Core.GraphQL.Entities.InputTypes
