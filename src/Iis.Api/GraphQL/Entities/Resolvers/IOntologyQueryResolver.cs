@@ -27,7 +27,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         Task<DateTime> ResolveCreatedAt(IResolverContext ctx);
         Task<DateTime> ResolveUpdatedAt(IResolverContext ctx);
         Task<Tuple<IEnumerable<INodeTypeLinked>, ElasticFilter, IEnumerable<Guid>, User>>  GetAllEntities(IResolverContext ctx);
-        Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx);
+        Task<List<GeoCoordinate>> ResolveCoordinatesAsync(IResolverContext ctx);
         Task<string> ResolveCreatedBy(IResolverContext ctx);
         string ResolveIconName(IResolverContext ctx);
         string ResolveTitle(IResolverContext ctx);

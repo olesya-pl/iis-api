@@ -31,9 +31,9 @@ namespace Iis.DbLayer.Repositories
             return Context.AddRangeAsync(entities);
         }
 
-        public async Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(Guid entityId)
+        public Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(Guid entityId)
         {
-            return await Context.LocationHistory
+            return Context.LocationHistory
                 .Where(lh => lh.EntityId == entityId)
                 .OrderByDescending(lh => lh.RegisteredAt)
                 .ToListAsync();
@@ -48,13 +48,13 @@ namespace Iis.DbLayer.Repositories
             return query.OrderByDescending(e => e.RegisteredAt).ToListAsync();
         }
 
-        public async Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(IReadOnlyCollection<Guid> entityIdList, DateTime? dateFrom, DateTime? dateTo)
+        public Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(IReadOnlyCollection<Guid> entityIdList, DateTime? dateFrom, DateTime? dateTo)
         {
             var query = Context.LocationHistory.Where(lh => lh.EntityId != null && entityIdList.Contains(lh.EntityId.Value));
 
             query = AddDatePeriod(query, dateFrom, dateTo);
 
-            return await Context.LocationHistory
+            return Context.LocationHistory
                 .Where(lh => lh.EntityId != null && entityIdList.Contains(lh.EntityId.Value))
                 .OrderByDescending(lh => lh.RegisteredAt)
                 .ToListAsync();
@@ -73,5 +73,6 @@ namespace Iis.DbLayer.Repositories
             }
             return query;
         }
+
     }
 }

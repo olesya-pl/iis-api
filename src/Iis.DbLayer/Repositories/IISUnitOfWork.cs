@@ -8,7 +8,7 @@ namespace Iis.DbLayer.Repositories
     public interface IIISUnitOfWork : IUnitOfWork
     {
         IMaterialRepository MaterialRepository { get; }
-        IAnnotationsRepository AnnotationsRepository {get; }
+        IAnnotationsRepository AnnotationsRepository { get; }
         IFlightRadarRepository FlightRadarRepository { get; }
         IReportRepository ReportRepository { get; }
         IElasticFieldsRepository ElasticFieldsRepository { get; }
@@ -20,6 +20,7 @@ namespace Iis.DbLayer.Repositories
         ITowerLocationRepository TowerLocationRepository { get; }
         INodeMaterialRelationRepository NodeMaterialRelationRepository { get; }
         IMaterialSignRepository MaterialSignRepository { get; }
+        ILocationHistoryRepository LocationHistoryRepository { get; }
     }
     public class IISUnitOfWork<TContext> : UnitOfWork<TContext>, IIISUnitOfWork
         where TContext : DbContext
@@ -35,24 +36,25 @@ namespace Iis.DbLayer.Repositories
         public IFlightRadarRepository FlightRadarRepository => ResolveRepository<IFlightRadarRepository>();
 
         public IReportRepository ReportRepository => ResolveRepository<IReportRepository>();
-        
+
         public IElasticFieldsRepository ElasticFieldsRepository => ResolveRepository<IElasticFieldsRepository>();
 
         public IFileRepository FileRepository => ResolveRepository<IFileRepository>();
-        
+
         public IAliasRepository AliasRepository => ResolveRepository<IAliasRepository>();
-        
+
         public IThemeRepository ThemeRepository => ResolveRepository<IThemeRepository>();
 
         public IChangeHistoryRepository ChangeHistoryRepository => ResolveRepository<IChangeHistoryRepository>();
 
         public IUserRepository UserRepository => ResolveRepository<IUserRepository>();
-        
+
         public ITowerLocationRepository TowerLocationRepository => ResolveRepository<ITowerLocationRepository>();
 
         public IMaterialSignRepository MaterialSignRepository => ResolveRepository<IMaterialSignRepository>();
 
         public INodeMaterialRelationRepository NodeMaterialRelationRepository => ResolveRepository<INodeMaterialRelationRepository>();
+        public ILocationHistoryRepository LocationHistoryRepository => ResolveRepository<ILocationHistoryRepository>();
 
         protected override T ResolveRepository<T>()
         {

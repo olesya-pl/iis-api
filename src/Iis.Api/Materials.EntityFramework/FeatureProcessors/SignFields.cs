@@ -11,5 +11,7 @@
         public const string Beam = "beam";
         public const string LocationX = "locationX";
         public const string LocationY = "locationY";
+        public const string Latitude = "Latitude";
+        public const string Longitude = "Longitude";
     }
 }

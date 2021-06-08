@@ -11,7 +11,14 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
     public class SatPagingIridiumFeatureProcessor : BasePhoneSignFeatureProcessor, IFeatureProcessor
     {
         protected override string SignTypeName => "SatelliteIridiumPhoneSign";
-        public SatPagingIridiumFeatureProcessor(IElasticService elasticService, IOntologySchema ontologySchema, MutationCreateResolver createResolver, MutationUpdateResolver updateResolver, IElasticState elasticState) : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState)
+
+        public SatPagingIridiumFeatureProcessor(IElasticService elasticService,
+            IOntologySchema ontologySchema,
+            MutationCreateResolver createResolver,
+            MutationUpdateResolver updateResolver,
+            IElasticState elasticState,
+            ILocationHistoryService locationHistoryService)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService)
         {
         }
 
@@ -25,8 +32,6 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         protected override Dictionary<string, string> SignFieldsMapping => new Dictionary<string, string>
         {
-            { FeatureFields.Latitude, SignFields.LocationY},
-            { FeatureFields.Longitude, SignFields.LocationX},
             { FeatureFields.PagerId, SignFields.PhoneNumber },
             { FeatureFields.IMEI, SignFields.IMEI },
             { FeatureFields.IMSI, SignFields.IMSI },
