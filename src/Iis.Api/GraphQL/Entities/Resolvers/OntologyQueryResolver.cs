@@ -185,7 +185,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var tokenPayload = ctx.GetToken();
             return Task.FromResult(Tuple.Create(types, ctx.CreateNodeFilter(), ids, tokenPayload.User));
         }
-        public Task<List<GeoCoordinate>> ResolveCoordinates(IResolverContext ctx)
+        public async Task<List<GeoCoordinate>> ResolveCoordinatesAsync(IResolverContext ctx)
         {
             var result = new List<GeoCoordinate>();
             var parentNode = ctx.Parent<Node>();
@@ -195,7 +195,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             foreach (var attributeNode in attributeNodes)
             {
                 var relation = attributeNode.IncomingRelations.Single();
-                
+
                 if (relation.SourceNode.NodeType.IsObjectSign)
                     continue;
 
@@ -212,7 +212,33 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     PropertyName = attributeNode.GetDotName()
                 });
             }
-            return Task.FromResult(result);
+
+            if(parentNode.OriginalNode.NodeType.IsObjectSign)
+            {
+                var locationService = ctx.Service<ILocationHistoryService>();
+
+                var latestCoordinate = await locationService.GetLatestLocationHistoryAsync(parentNode.OriginalNode.Id);
+
+                if(latestCoordinate is null) return result;
+
+                var attributeNode = parentNode.OriginalNode.GetSingleProperty("value");
+                var nodeValue = attributeNode?.Value;
+
+                var propertyValue = string.IsNullOrWhiteSpace(nodeValue)
+                    ? string.Empty
+                    : $"[{nodeValue}]";
+
+                var label = $"{parentNode.OriginalNode.NodeType.Title}{propertyValue}";
+
+                result.Add(new GeoCoordinate{
+                    Label = label,
+                    Lat = latestCoordinate.Lat,
+                    Long = latestCoordinate.Long,
+                    PropertyName = "sign.location"
+                });
+            }
+
+            return result;
         }
 
         public async Task<string> ResolveCreatedBy(IResolverContext ctx)

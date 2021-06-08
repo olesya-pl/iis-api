@@ -12,12 +12,14 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
     public class SatVoiceIridiumFeatureProcessor : BasePhoneSignFeatureProcessor, IFeatureProcessor
     {
         protected override string SignTypeName => "SatelliteIridiumPhoneSign";
+
         public SatVoiceIridiumFeatureProcessor(IElasticService elasticService,
             IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
-            IElasticState elasticState)
-        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState)
+            IElasticState elasticState,
+            ILocationHistoryService locationHistoryService)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService)
         {
         }
 
@@ -30,8 +32,6 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         protected override Dictionary<string, string> SignFieldsMapping => new Dictionary<string, string>
         {
-            { FeatureFields.Latitude, SignFields.LocationY},
-            { FeatureFields.Longitude, SignFields.LocationX},
             { FeatureFields.PhoneNumber, SignFields.PhoneNumber },
             { FeatureFields.IMEI, SignFields.IMEI },
             { FeatureFields.IMSI, SignFields.IMSI },

@@ -43,10 +43,17 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
-            IElasticState elasticState, IGsmLocationService gsmLocationService)
-        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState)
+            IElasticState elasticState,
+            IGsmLocationService gsmLocationService,
+            ILocationHistoryService locationHistoryService)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService)
         {
             _gsmLocationService = gsmLocationService;
+        }
+
+        protected override Task SaveCoordinatesToLocationHistoryAsync(JObject feature)
+        {
+            return Task.CompletedTask;
         }
     }
 

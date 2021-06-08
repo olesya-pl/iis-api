@@ -42,6 +42,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("DefaultAccessLevelsForDors", actions.DefaultAccessLevelsForDors);
             _items.Add("AddPhotosToObject", actions.AddPhotosToObject);
             _items.Add("AddWikiEntityAccessObject", actions.AddWikiEntityAccessObject);
+            _items.Add("SetupNewTypesForPhoneSign", actions.SetupNewTypesForPhoneSign);
             _items.Add("AddTitlePhotosToObject", actions.AddTitlePhotosToObject);
             _items.Add("RemoveMaterialLinkAccessObjects", actions.RemoveMaterialLinkAccessObjects);
         }

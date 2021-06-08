@@ -280,5 +280,9 @@ namespace Iis.OntologyData
                 OnAccessLevelsChanged?.Invoke();
             });
         }
+
+        public void ChangeNodeTypeId(Guid idFrom, Guid idTo) =>
+            Locker.WriteLock(() => _storage.ChangeNodeTypeId(idFrom, idTo));
+
     }
 }
