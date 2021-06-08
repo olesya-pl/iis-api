@@ -34,7 +34,7 @@ namespace IIS.Core.GraphQL.Entities
             d.Field("createdAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedAt(ctx));
             d.Field("updatedAt").Type<NonNullType<DateTimeType>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveUpdatedAt(ctx));
             d.Field("_relation").Type<RelationType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveParentRelation(ctx));
-            d.Field("coordinates").Type<ListType<ObjectType<GeoCoordinate>>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCoordinates(ctx));
+            d.Field("coordinates").Type<ListType<ObjectType<GeoCoordinate>>>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCoordinatesAsync(ctx));
             d.Field("createdByUser").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveCreatedBy(ctx));
             d.Field("__iconName").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveIconName(ctx));
             d.Field("__title").Type<StringType>().Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveTitle(ctx));

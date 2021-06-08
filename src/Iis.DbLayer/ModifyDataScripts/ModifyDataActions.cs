@@ -8,6 +8,7 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using Iis.OntologySchema.ChangeParameters;
+using Iis.OntologyData;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
@@ -22,6 +23,7 @@ namespace Iis.DbLayer.ModifyDataScripts
         }
         private void SaveOntologySchema(IOntologySchema schema) =>
             _ontologySchemaService.SaveToDatabase(schema, _connectionStringService.GetIisApiConnectionString());
+
         public void RemoveEventWikiLinks(OntologyContext context, IOntologyNodesData data)
         {
             var list = new List<IRelation>();
@@ -489,6 +491,162 @@ namespace Iis.DbLayer.ModifyDataScripts
                     SearchAllowed = true
                 });
             }
+        }
+
+        private int FetchAndAddCoordinates(IReadOnlyList<INode> signList, OntologyContext context)
+        {
+            const string LocationXPropName = "locationX";
+            const string LocationYPropName = "locationY";
+            int recordAdded = 0;
+
+            foreach (var sign in signList)
+            {
+                var latStringValue = sign.GetSingleProperty(LocationYPropName)?.Value;
+                var lonStringValue = sign.GetSingleProperty(LocationXPropName)?.Value;
+
+                var parseResult = Decimal.TryParse(latStringValue, out decimal latitude)
+                                & Decimal.TryParse(lonStringValue, out decimal longitude);
+
+                if(parseResult)
+                {
+                    var entity = new DataModel.FlightRadar.LocationHistoryEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        EntityId = sign.Id,
+                        NodeId = sign.Id,
+                        Lat = latitude,
+                        Long = longitude,
+                        RegisteredAt = sign.GetSingleProperty(LocationYPropName).CreatedAt
+                    };
+
+                    context.LocationHistory.Add(entity);
+                    recordAdded++;
+                }
+            }
+            return recordAdded;
+        }
+
+        private void UpdateRelationNodeTypeId(IReadOnlyCollection<Guid> relationIdList, Guid newRelationNodeTypeId, OntologyContext context)
+        {
+            foreach (var relationId in relationIdList)
+            {
+                var nodeEntity = context.Nodes.Find(relationId);
+
+                if(nodeEntity is null) continue;
+
+                nodeEntity.NodeTypeId = newRelationNodeTypeId;
+
+                context.Nodes.Update(nodeEntity);
+            }
+        }
+
+        private IReadOnlyCollection<Guid> GetRelationIdList(IReadOnlyList<INode> signList, string relationTypeName)
+        {
+            return signList
+                    .Select(e => e.OutgoingRelations.FirstOrDefault(e => e.RelationTypeName == relationTypeName))
+                    .Where(e => e != null)
+                    .Select(e => e.Id)
+                    .ToArray();
+        }
+        public void SetupNewTypesForPhoneSign(OntologyContext context, IOntologyNodesData data)
+        {
+            const string BeamPropName = "beam";
+            const string DbObjectPropName = "dbObject";
+            const string LocationXPropName = "locationX";
+            const string LocationYPropName = "locationY";
+
+            var objectSignType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
+            var satIridiumPhoneSignType = data.Schema.GetEntityTypeByName("SatelliteIridiumPhoneSign");
+            var satPhoneSignType = data.Schema.GetEntityTypeByName("SatellitePhoneSign");
+
+            var iridiumSignList = data.GetNodesByTypeId(satIridiumPhoneSignType.Id);
+            var satPhoneSignList = data.GetNodesByTypeId(satPhoneSignType.Id);
+
+            var iridiumSingBeamRelationIdList = GetRelationIdList(iridiumSignList, BeamPropName);
+
+            var satPhoneBeamRelationIdList = GetRelationIdList(satPhoneSignList, BeamPropName);
+
+            var satPhoneDbObjectRelationIdList = GetRelationIdList(satPhoneSignList, DbObjectPropName);
+
+            //migrate coordinates for SatelliteIridiumPhoneSign
+            var recordsAdded = 0;
+            recordsAdded += FetchAndAddCoordinates(iridiumSignList, context);
+
+            recordsAdded += FetchAndAddCoordinates(satPhoneSignList, context);
+
+            if(recordsAdded > 0) context.SaveChanges();
+
+            //create and setup new abstract type AbstractSatellitePhoneSign
+            var abstractSatPhoneSignType = data.Schema.CreateEntityType("AbstractSatellitePhoneSign", "Супутниковий телефон (абстрактний)", true, objectSignType.Id);
+            data.Schema.CreateAttributeType(abstractSatPhoneSignType.Id, BeamPropName, "Луч", ScalarType.String, EmbeddingOptions.Optional);
+            data.Schema.CreateAttributeType(abstractSatPhoneSignType.Id, DbObjectPropName, "Об'єкт (локальний)", ScalarType.String, EmbeddingOptions.Optional);
+
+            //change inheritance for iridium sat phone sign
+            data.Schema.RemoveInheritance(satIridiumPhoneSignType.Id, satPhoneSignType.Id);
+            data.Schema.SetInheritance(satIridiumPhoneSignType.Id, abstractSatPhoneSignType.Id);
+
+            //change inheritance for generic sat phone sign and remove location properties
+            data.Schema.RemoveInheritance(satPhoneSignType.Id, objectSignType.Id);
+            data.Schema.SetInheritance(satPhoneSignType.Id, abstractSatPhoneSignType.Id);
+
+            var locationXRelationType = satPhoneSignType.GetProperty(LocationXPropName);
+            if(locationXRelationType != null)
+            {
+                data.Schema.RemoveRelation(locationXRelationType.Id);
+            }
+
+            var locationYRelationType = satPhoneSignType.GetProperty(LocationYPropName);
+            if(locationYRelationType != null)
+            {
+                data.Schema.RemoveRelation(locationYRelationType.Id);
+            }
+            var beamRelationType = satPhoneSignType.GetProperty(BeamPropName);
+            if(beamRelationType != null)
+            {
+                data.Schema.RemoveRelation(beamRelationType.Id);
+            }
+
+            var dbObjectRelationType = satPhoneSignType.GetProperty(DbObjectPropName);
+            if(dbObjectRelationType != null)
+            {
+                data.Schema.RemoveRelation(dbObjectRelationType.Id);
+            }
+
+
+            SaveOntologySchema(data.Schema);
+
+            //update beam relation node type
+            beamRelationType = abstractSatPhoneSignType.GetProperty(BeamPropName);
+            dbObjectRelationType = abstractSatPhoneSignType.GetProperty(DbObjectPropName);
+
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    UpdateRelationNodeTypeId(iridiumSingBeamRelationIdList, beamRelationType.Id, context);
+
+                    UpdateRelationNodeTypeId(satPhoneBeamRelationIdList, beamRelationType.Id, context);
+
+                    UpdateRelationNodeTypeId(satPhoneDbObjectRelationIdList, dbObjectRelationType.Id, context);
+
+                    var historyToRemoveEntities = context.ChangeHistory
+                                                    .Where(e => e.PropertyName == LocationXPropName || e.PropertyName == LocationYPropName)
+                                                    .ToArray();
+
+                    context.ChangeHistory.RemoveRange(historyToRemoveEntities);
+
+                    context.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                }
+            }
+
+            var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
+            data.ReloadData(rawData);
         }
 
         public void AddTitlePhotosToObject(OntologyContext context, IOntologyNodesData data)

@@ -251,7 +251,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
-            
+
 
             //mapping: GraphQl.UserInput -> Roles.User
             CreateMap<BaseUserInput, Iis.Domain.Users.User>()
@@ -331,6 +331,9 @@ namespace Iis.Api
 
             CreateMap<Iis.Domain.IncomingRelation, Iis.Api.Ontology.IncomingRelation>()
                 .ForMember(dest => dest.Entity, opts => opts.Ignore());
+
+            CreateMap<Iis.DataModel.FlightRadar.LocationHistoryEntity, Iis.Services.Contracts.Dtos.LocationHistoryDto>();
+            CreateMap<Iis.Services.Contracts.Dtos.LocationHistoryDto, Iis.DataModel.FlightRadar.LocationHistoryEntity>();
 
             CreateMap<Iis.Domain.FlightRadar.FlightRadarHistory, Iis.DataModel.FlightRadar.LocationHistoryEntity>();
             CreateMap<Iis.FlightRadar.DataModel.Routes, Iis.Domain.FlightRadar.FlightRadarHistory>()

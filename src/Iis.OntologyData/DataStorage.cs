@@ -237,5 +237,15 @@ namespace Iis.OntologyData
 
             return node;
         }
+
+        public void ChangeNodeTypeId(Guid idFrom, Guid idTo)
+        {
+            var nodes = Nodes.Values.Where(n => n.NodeTypeId == idFrom);
+            foreach (var node in nodes)
+            {
+                node.NodeTypeId = idTo;
+                _patch.AddAsUpdated(node);
+            }
+        }
     }
 }

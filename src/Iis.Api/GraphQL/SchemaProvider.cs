@@ -176,7 +176,7 @@ namespace IIS.Core.GraphQL
         protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, IOntologySchema schema)
         {
             var typesToPopulate = schema.GetEntityTypes();
-            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract).ToList();            
+            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract).ToList();
             _logger.LogInformation($"SchemaProvider. ConfigureOntologyMutation. Fetched {typesToPopulate.Count()} items. These are {string.Join(',', typesToPopulate.Select(p => p.Name))}");
             _populator.PopulateFields(descriptor, typesToPopulate,
                 Operation.Create, Operation.Update, Operation.Delete);
