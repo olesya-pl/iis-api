@@ -3,6 +3,7 @@ using Iis.Interfaces.Users;
 using Iis.Services.Contracts.ExternalUserServices;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.AspNetCore.Authentication;
+using Novell.Directory.Ldap;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
@@ -15,53 +16,41 @@ namespace Iis.Services.ExternalUserServices
     public class ActiveDirectoryUserService : IExternalUserService
     {
         ExternalUserServiceConfiguration _configuration;
+        private const string DistinguishedName = "DC=contour,DC=com";
+        private const int DefaultPort = 389;
+        private static readonly string[] IncludedFields = new string[] { "name", "objectGUID" };
         public ActiveDirectoryUserService(ExternalUserServiceConfiguration configuration)
         {
             _configuration = configuration;
         }
         public UserSource GetUserSource() => UserSource.ActiveDirectory;
+        private LdapConnection GetLdapConnection()
+        {
+            var connection = new LdapConnection();
+            connection.Connect(_configuration.Server, DefaultPort);
+            connection.Bind(_configuration.Username, _configuration.Password);
+            return connection;
+        }
         public List<ExternalUser> GetUsers()
         {
-            var myDomainUsers = new List<ExternalUser>();
+            var myDomainUsers = GetAllUsers();
 
-            using (var ctx = GetPrincipalContext())
-            {
-                var userPrincipal = new UserPrincipal(ctx);
-
-                using (var search = new PrincipalSearcher(userPrincipal))
-                {
-                    foreach (UserPrincipal domainUser in search.FindAll())
-                    {
-                        var externalUser = new ExternalUser
-                        {
-                            UserName = domainUser.SamAccountName,
-                            FirstName = domainUser.GivenName,
-                            SecondName = domainUser.MiddleName,
-                            LastName = domainUser.Surname,
-                            Roles = new List<ExternalRole>()
-                        };
-
-                        try
-                        {
-                            var groups = domainUser.GetGroups(ctx);
-                            foreach (Principal p in groups)
-                            {
-                                if (p is GroupPrincipal)
-                                {
-                                    var externalRole = new ExternalRole
-                                    {
-                                        Name = (p as GroupPrincipal).Name
-                                    };
-                                    externalUser.Roles.Add(externalRole);
-                                }
-                            }
-                        }
-                        catch { }
-
-                        myDomainUsers.Add(externalUser);
-                    }
-                }
-            }
+                        //try
+                        //{
+                        //    var groups = domainUser.GetGroups(ctx);
+                        //    foreach (Principal p in groups)
+                        //    {
+                        //        if (p is GroupPrincipal)
+                        //        {
+                        //            var externalRole = new ExternalRole
+                        //            {
+                        //                Name = (p as GroupPrincipal).Name
+                        //            };
+                        //            externalUser.Roles.Add(externalRole);
+                        //        }
+                        //    }
+                        //}
+                        //catch { }
 
             return myDomainUsers;
         }
@@ -75,5 +64,37 @@ namespace Iis.Services.ExternalUserServices
         }
         private PrincipalContext GetPrincipalContext() =>
             new PrincipalContext(ContextType.Domain, _configuration.Server, _configuration.Username, _configuration.Password);
+
+        private ILdapSearchResults MakeRequest(LdapConnection connection, string filter)
+        {
+            return connection.Search(DistinguishedName, LdapConnection.ScopeSub, filter, IncludedFields, false);
+        }
+
+        private List<ExternalUser> GetAllUsers()
+        {
+            using var ldapConn = GetLdapConnection();
+
+            var response = MakeRequest(ldapConn, "(objectClass=user)");
+            var result = new List<ExternalUser>();
+
+            while (response.HasMore())
+            {
+                try
+                {
+                    LdapEntry nextEntry = response.Next();
+                    var attributes = nextEntry.GetAttributeSet();
+                    result.Add(new ExternalUser
+                    {
+                        UserName = attributes["name"].StringValue
+                    });
+                }
+                catch (LdapException)
+                {
+                    break;
+                }
+            }
+
+            return result;
+        }
     }
 }
