@@ -284,7 +284,7 @@ namespace Iis.DbLayer.Repositories
 
         public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes)
         {
-            return GetMaterialsQuery()
+            return GetMaterialsQuery(includes)
                 .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
                     (Material, MaterialInfo) => new { Material, MaterialInfo })
                 .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
@@ -566,6 +566,7 @@ namespace Iis.DbLayer.Repositories
                     MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
                     MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
                     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
+                    MaterialIncludeEnum.WithFiles => resultQuery.WithFiles(),
                     _ => resultQuery
                 };
             }
