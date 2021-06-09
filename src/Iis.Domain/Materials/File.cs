@@ -33,7 +33,8 @@ namespace Iis.Domain.Materials
         }
 
         public File(Guid id) : this(id, null, null, null, false)
-        {
-        }
+        {}
+        public File(Guid id, string name): this(id, name, null, null, false)
+        {}
     }
 }

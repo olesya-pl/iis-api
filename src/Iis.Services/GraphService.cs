@@ -2,31 +2,49 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Iis.Domain.Graph;
+using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Graph;
 using Iis.Services.Contracts.Interfaces;
+using IIS.Services.Contracts.Interfaces;
 namespace Iis.Services
 {
     public class GraphService : IGraphService
     {
         private readonly IOntologyNodesData _data;
-        public GraphService(IOntologyNodesData data)
+        private readonly IMaterialProvider _materialProvider;
+
+        public GraphService(IOntologyNodesData data, IMaterialProvider materialProvider)
         {
             _data = data;
+            _materialProvider = materialProvider;
         }
 
-        public Task<(IReadOnlyCollection<GraphLink> LinkList, IReadOnlyCollection<GraphNode> NodeList)> GetGraphDataForNodeListAsync(IReadOnlyCollection<Guid> nodeIdList, IReadOnlyCollection<Guid> relationTypeList)
+        public async Task<(IReadOnlyCollection<GraphLink> LinkList, IReadOnlyCollection<GraphNode> NodeList)> GetGraphDataForNodeListAsync(IReadOnlyCollection<Guid> nodeIdList, IReadOnlyCollection<Guid> relationTypeList)
         {
             var nodeList = _data.GetNodes(nodeIdList);
 
-            var graphLinkList = GetGraphLinkListForNode(nodeList.First());
+            var graphLinkList  = new List<GraphLink>();
 
-            var graphNodeList = GetGraphNodeListForNode(nodeList.First());
+            var graphNodeList = new List<GraphNode>();
 
-            return Task.FromResult<(IReadOnlyCollection<GraphLink> LinkList, IReadOnlyCollection<GraphNode> NodeList)>((graphLinkList, graphNodeList));
+            foreach (INode node in nodeList)
+            {
+                var materialResult = await _materialProvider.GetMaterialsByNodeIdQuery(node.Id);
+
+                var materialList = materialResult.Materials.ToArray();
+
+                graphLinkList.AddRange(GetGraphLinkListForNode(node));
+
+                graphLinkList.AddRange(GetGraphLinksForMaterials(materialList, node));
+
+                graphNodeList.AddRange(GetGraphNodeListForNode(node));
+
+                graphNodeList.AddRange(GetGraphNodesForMaterials(materialList, node));
+            }
+
+            return (graphLinkList, graphNodeList);
         }
 
         private static IReadOnlyCollection<GraphLink> GetGraphLinkListForNode(INode node)
@@ -35,11 +53,11 @@ namespace Iis.Services
 
             var incomingLinkList = node.IncomingRelations
                                     .Where(e => GraphTypeMapper.IsEligibleForGraphByNodeType(e.SourceNode))
-                                    .Select(GraphTypeMapper.MapRelationToGraphLink)
+                                    .Select(e => GraphTypeMapper.MapRelationToGraphLink(e))
                                     .ToArray();
             var outgoingLinkList = node.OutgoingRelations
                                     .Where(e => GraphTypeMapper.IsEligibleForGraphByNodeType(e.TargetNode))
-                                    .Select(GraphTypeMapper.MapRelationToGraphLink)
+                                    .Select(e => GraphTypeMapper.MapRelationToGraphLink(e))
                                     .ToArray();
 
             var result = new List<GraphLink>(incomingLinkList.Length + outgoingLinkList.Length);
@@ -82,6 +100,24 @@ namespace Iis.Services
             result.AddRange(outgoingNodeList);
 
             return result.ToArray();
+        }
+
+        private static IReadOnlyCollection<GraphLink> GetGraphLinksForMaterials(IReadOnlyCollection<Material> materialList, INode node)
+        {
+            if(!materialList.Any()) return Array.Empty<GraphLink>();
+
+            return materialList
+                .Select(e => GraphTypeMapper.MapMaterialToGraphLink(e, node.Id))
+                .ToArray();
+        }
+
+        private static IReadOnlyCollection<GraphNode> GetGraphNodesForMaterials(IReadOnlyCollection<Material> materialList, INode node)
+        {
+            if(!materialList.Any()) return Array.Empty<GraphNode>();
+
+            return materialList
+                .Select(e => GraphTypeMapper.MapMaterialToGraphNode(e, node.Id))
+                .ToArray();
         }
     }
 }

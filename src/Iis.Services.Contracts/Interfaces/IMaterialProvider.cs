@@ -8,6 +8,7 @@ using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Params;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Materials;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Services.Contracts.Interfaces
 {
@@ -18,6 +19,8 @@ namespace IIS.Services.Contracts.Interfaces
 
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,
+            IReadOnlyCollection<Property> filteredItems,
+            IReadOnlyCollection<string> cherryPickedItems,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);
