@@ -110,6 +110,9 @@ namespace Iis.Services.Graph
 
         private static bool DoesMaterialHaveLinks(Material material, Guid nodeId)
         {
+            return false;
+            //TEMPORALY COMMENTED
+            /*
             if(material is null) return false;
 
             if(material.ObjectsOfStudy is null || !material.ObjectsOfStudy.HasValues) return false;
@@ -122,6 +125,7 @@ namespace Iis.Services.Graph
                                 .ToArray();
 
             return nodeIdList.Any();
+            */
         }
 
         private static string GetGraphNodeNameProperty(INode node) => node switch
