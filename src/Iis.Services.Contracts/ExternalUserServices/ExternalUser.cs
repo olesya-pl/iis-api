@@ -11,5 +11,7 @@ namespace Iis.Services.Contracts.ExternalUserServices
         public string SecondName { get; set; }
         public string LastName { get; set; }
         public List<ExternalRole> Roles { get; set; } = new List<ExternalRole>();
+
+        public override string ToString() => UserName;
     }
 }

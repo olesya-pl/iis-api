@@ -379,10 +379,23 @@ namespace Iis.Services
                         UserRoles = new List<UserRoleEntity>()
                     };
                     _context.Users.Add(user);
-                    
+
                     if (_matrixService?.AutoCreateUsers == true)
-                        _matrixService.CreateUserAsync(user.Username, user.Id.ToString("N"))
-                            .GetAwaiter().GetResult();
+                    {
+                        try
+                        {
+                            var msg = _matrixService.CreateUserAsync(user.Username, user.Id.ToString("N"))
+                                .GetAwaiter().GetResult();
+                            if (msg == null)
+                                sb.AppendLine("... matrix user is successfully created");
+                            else
+                                sb.AppendLine($"... matrix returns error: {msg}");
+                        }
+                        catch (Exception ex)
+                        {
+                            sb.AppendLine($"... matrix returns error: { ex.Message }");
+                        }
+                    }
 
                     sb.AppendLine($"User {user.Username} is successfully created");
                 }

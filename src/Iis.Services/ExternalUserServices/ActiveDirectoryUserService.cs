@@ -16,9 +16,7 @@ namespace Iis.Services.ExternalUserServices
     public class ActiveDirectoryUserService : IExternalUserService
     {
         ExternalUserServiceConfiguration _configuration;
-        private const string DistinguishedName = "DC=contour,DC=com";
-        private const int DefaultPort = 389;
-        private static readonly string[] IncludedFields = new string[] { "name", "objectGUID" };
+        
         public ActiveDirectoryUserService(ExternalUserServiceConfiguration configuration)
         {
             _configuration = configuration;
@@ -27,32 +25,9 @@ namespace Iis.Services.ExternalUserServices
         private LdapConnection GetLdapConnection()
         {
             var connection = new LdapConnection();
-            connection.Connect(_configuration.Server, DefaultPort);
+            connection.Connect(_configuration.Server, _configuration.Port);
             connection.Bind(_configuration.Username, _configuration.Password);
             return connection;
-        }
-        public List<ExternalUser> GetUsers()
-        {
-            var myDomainUsers = GetAllUsers();
-
-                        //try
-                        //{
-                        //    var groups = domainUser.GetGroups(ctx);
-                        //    foreach (Principal p in groups)
-                        //    {
-                        //        if (p is GroupPrincipal)
-                        //        {
-                        //            var externalRole = new ExternalRole
-                        //            {
-                        //                Name = (p as GroupPrincipal).Name
-                        //            };
-                        //            externalUser.Roles.Add(externalRole);
-                        //        }
-                        //    }
-                        //}
-                        //catch { }
-
-            return myDomainUsers;
         }
         public bool ValidateCredentials(string username, string password)
         {
@@ -65,16 +40,25 @@ namespace Iis.Services.ExternalUserServices
         private PrincipalContext GetPrincipalContext() =>
             new PrincipalContext(ContextType.Domain, _configuration.Server, _configuration.Username, _configuration.Password);
 
-        private ILdapSearchResults MakeRequest(LdapConnection connection, string filter)
+        private ILdapSearchResults MakeRequest(
+            LdapConnection connection, 
+            string filter, 
+            string[] includedFields)
         {
-            return connection.Search(DistinguishedName, LdapConnection.ScopeSub, filter, IncludedFields, false);
+            return connection.Search(
+                _configuration.Domain, 
+                LdapConnection.ScopeSub, 
+                filter, 
+                includedFields, 
+                false);
         }
 
-        private List<ExternalUser> GetAllUsers()
+        public List<ExternalUser> GetUsers()
         {
             using var ldapConn = GetLdapConnection();
-
-            var response = MakeRequest(ldapConn, "(objectClass=user)");
+            
+            var includedFields = new string[] { "samAccountName", "givenname", "middlename", "sn", "memberOf" };
+            var response = MakeRequest(ldapConn, "(objectClass=user)", includedFields);
             var result = new List<ExternalUser>();
 
             while (response.HasMore())
@@ -83,10 +67,18 @@ namespace Iis.Services.ExternalUserServices
                 {
                     LdapEntry nextEntry = response.Next();
                     var attributes = nextEntry.GetAttributeSet();
-                    result.Add(new ExternalUser
+                    var username = attributes["samAccountName"].StringValue;
+                    
+                    var externalUser = new ExternalUser
                     {
-                        UserName = attributes["name"].StringValue
-                    });
+                        UserName = username,
+                        FirstName = attributes.GetValueOrDefault("givenname")?.StringValue,
+                        SecondName = attributes.GetValueOrDefault("middlename")?.StringValue,
+                        LastName = attributes.GetValueOrDefault("sn")?.StringValue,
+                        Roles = GetExternalRoles(attributes.GetValueOrDefault("memberOf")?.StringValueArray)
+                    };
+                    
+                    result.Add(externalUser);
                 }
                 catch (LdapException)
                 {
@@ -96,5 +88,13 @@ namespace Iis.Services.ExternalUserServices
 
             return result;
         }
+
+        private string ExtractGroupName(string str) =>
+            str.Split(',')[0];
+
+        private List<ExternalRole> GetExternalRoles(string[] memberOf) =>
+            memberOf == null ?
+                new List<ExternalRole>() :
+                memberOf.Select(s => new ExternalRole { Name = ExtractGroupName(s) }).ToList();
     }
 }
