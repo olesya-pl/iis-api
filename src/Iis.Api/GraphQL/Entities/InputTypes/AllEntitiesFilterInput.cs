@@ -10,9 +10,13 @@ namespace IIS.Core.GraphQL.Entities.InputTypes
     {
         [GraphQLType(typeof(ListType<NonNullType<StringType>>))] 
         public IEnumerable<string> Types { get; set; }
-        [GraphQLType(typeof(ListType<NonNullType<StringType>>))] 
-        public IEnumerable<string> CherryPickedItems { get; set; } = new List<string>();
-        public List<Property> FilteredItems { get; set; } = new List<Property>();
-        
+        public IEnumerable<CherryPickedItem> CherryPickedItems { get; set; } = new List<CherryPickedItem>();
+        public List<Property> FilteredItems { get; set; } = new List<Property>();        
+    }
+
+    public class CherryPickedItem
+    {
+        public string Id { get; set; }
+        public bool IncludeDescendants { get; set; }
     }
 }
