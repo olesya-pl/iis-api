@@ -40,7 +40,7 @@ namespace IIS.Core.GraphQL.Entities
                 Offset = pagination.Offset(),
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
                 CherryPickedItems = filter.CherryPickedItems
-                    .Select(p => new CherryPickedItem(p))
+                    .Select(p => new Iis.Interfaces.Elastic.CherryPickedItem(p.Id, p.IncludeDescendants))
                     .ToList(),
                 FilteredItems = filter.FilteredItems
             };
