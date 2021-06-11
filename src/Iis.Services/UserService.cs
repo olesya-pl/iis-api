@@ -354,7 +354,8 @@ namespace Iis.Services
         public string ImportUsersFromExternalSource(IEnumerable<string> userNames = null)
         {
             var externalUsers = _externalUserService.GetUsers()
-                .Where(eu => userNames == null || userNames.Contains(eu.UserName));
+                .Where(eu => userNames == null || userNames.Contains(eu.UserName)
+                    && !eu.UserName.Contains('$'));
 
             var users = _context.Users
                 .Include(u => u.UserRoles)
@@ -375,6 +376,9 @@ namespace Iis.Services
                     {
                         Id = Guid.NewGuid(),
                         Username = externalUser.UserName,
+                        FirstName = externalUser.FirstName,
+                        Patronymic = externalUser.SecondName,
+                        LastName = externalUser.LastName,
                         Source = _externalUserService.GetUserSource(),
                         UserRoles = new List<UserRoleEntity>()
                     };
