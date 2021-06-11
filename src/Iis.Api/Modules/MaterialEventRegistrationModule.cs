@@ -36,7 +36,6 @@ namespace Iis.Api.Modules
                         .AddSingleton(assignerConfig)
                         .AddSingleton(featureHandlerConfig)
                         .AddSingleton(elasticSaver)
-                        .AddTransient<IGsmTranscriber>(e => new GsmTranscriber(gsmWorkerUrl))
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
                         .AddHostedService<MaterialOperatorConsumer>()
                         .AddHostedService<MaterialElasticConsumer>()
