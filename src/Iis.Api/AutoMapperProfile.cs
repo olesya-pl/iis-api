@@ -174,7 +174,7 @@ namespace Iis.Api
             CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => {
                     opts.PreCondition(src => (src.FileId.HasValue));
-                    opts.MapFrom(src => new File(src.FileId.Value));
+                    opts.MapFrom(src => new File(src.FileId.Value, src.File == null ? null : src.File.Name));
                 })
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.Parse(src.Data)))

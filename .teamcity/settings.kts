@@ -174,7 +174,7 @@ object Api_DeployIisDevNomad : BuildType({
         param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
         param("JOB_HCl", "iis_core.hcl")
         select("NOMAD_ENV", "dev", label = "NOMAD_ENV", description = "Nomad Environment",
-                options = listOf("dev", "dev2", "dev3", "qa", "demo"))
+                options = listOf("dev", "dev2", "dev3", "qa", "demo", "perf"))
     }
 
     vcs {
@@ -360,7 +360,7 @@ object MaterialLoader_DeployIisDevNomad : BuildType({
         param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
         param("JOB_HCl", "iis_material_loader.hcl")
         select("NOMAD_ENV", "dev", label = "NOMAD_ENV", description = "Nomad Environment",
-                options = listOf("dev", "dev2", "dev3", "qa", "demo"))
+                options = listOf("dev", "dev2", "dev3", "qa", "demo", "perf"))
     }
 
     vcs {

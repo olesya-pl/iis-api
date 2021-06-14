@@ -192,7 +192,8 @@ namespace IIS.Services.Materials
             result.Infos.AddRange(MapInfos(material));
 
             result.Children.AddRange(MapChildren(material));
-                        result.Assignee = _mapper.Map<User>(material.Assignee);
+
+            result.Assignee = _mapper.Map<User>(material.Assignee);
 
             var nodes = result.Infos
                                 .SelectMany(p => p.Features.Select(x => x.Node))
@@ -476,7 +477,7 @@ namespace IIS.Services.Materials
 
             nodeIdList.Add(nodeId);
 
-            return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
+            return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
         }
 
         private JObject GetObjectOfStudyListForMaterial(IEnumerable<Node> nodeList)

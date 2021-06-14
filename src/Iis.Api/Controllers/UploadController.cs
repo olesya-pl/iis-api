@@ -55,7 +55,7 @@ namespace Iis.Api.Controllers
             _configuration = configuration;
             _logger = logger;
         }
-        
+
         [HttpPost]
         [DisableRequestSizeLimit]
         public Task<UploadResult> Post([FromForm] IFormFile file, [FromForm]string fileInfo,  CancellationToken ct)

@@ -13,16 +13,6 @@ namespace Iis.Domain.Materials
         public Stream Contents { get; }
         public bool IsTemporary { get; }
 
-        public byte[] ContentBytes
-        {
-            get
-            {
-                if (Contents is MemoryStream ms)
-                    return ms.ToArray();
-                throw new NotImplementedException();
-            }
-        }
-
         public File(Guid id, string name, string contentType, Stream contents, bool isTemporary)
         {
             Id = id;
@@ -33,7 +23,8 @@ namespace Iis.Domain.Materials
         }
 
         public File(Guid id) : this(id, null, null, null, false)
-        {
-        }
+        {}
+        public File(Guid id, string name): this(id, name, null, null, false)
+        {}
     }
 }

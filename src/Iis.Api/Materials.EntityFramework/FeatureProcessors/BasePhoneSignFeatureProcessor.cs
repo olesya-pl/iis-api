@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -78,21 +77,22 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                     var updatesResult = ShouldExistingBeUpdated(searchResult.feature, feature);
 
-                    if (!updatesResult.shouldBeUpdate) continue;
-
-                    var properties = GetPropertiesFromFeature(updatesResult.updates);
-
-                    var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
-
-                    originalFeature[FeatureFields.featureId] = entity.Id.ToString();
-
-                    if (searchResult.featureId.Value != entity.Id)
+                    if (updatesResult.shouldBeUpdate)
                     {
-                        var propertiesToAdd = GetPropertiesFromFeature(searchResult.feature)
-                            .Where(pair => !properties.ContainsKey(pair.Key))
-                            .ToDictionary(pair => pair.Key, pair => pair.Value);
+                        var properties = GetPropertiesFromFeature(updatesResult.updates);
 
-                        await _updateResolver.UpdateEntity(signType, entity.Id, propertiesToAdd);
+                        var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
+
+                        originalFeature[FeatureFields.featureId] = entity.Id.ToString();
+
+                        if (searchResult.featureId.Value != entity.Id)
+                        {
+                            var propertiesToAdd = GetPropertiesFromFeature(searchResult.feature)
+                                .Where(pair => !properties.ContainsKey(pair.Key))
+                                .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                            await _updateResolver.UpdateEntity(signType, entity.Id, propertiesToAdd);
+                        }
                     }
                 }
                 else
@@ -263,14 +263,14 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         {
             var coordinatesResult = TryFetchCoordinatiesFromFeature(feature);
 
-            var entityId = feature.Property(FeatureFields.featureId).Value.Value<Guid>();
+            var entityIdResult  = TryFetchEntityIdFromFeature(feature);
 
-            if(!coordinatesResult.IsSuccess) return Task.CompletedTask;
+            if (!coordinatesResult.IsSuccess || !entityIdResult.IsSuccess) return Task.CompletedTask;
 
             var lhDto = new LocationHistoryDto
             {
-                EntityId = entityId,
-                NodeId = entityId,
+                EntityId = entityIdResult.FeatureId,
+                NodeId = entityIdResult.FeatureId,
                 Lat = coordinatesResult.Latitude,
                 Long = coordinatesResult.Longitude,
                 RegisteredAt = DateTime.UtcNow
@@ -279,7 +279,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return _locationHistoryService.SaveLocationHistoryAsync(lhDto);
         }
 
-        protected virtual (decimal Latitude, decimal Longitude, bool IsSuccess) TryFetchCoordinatiesFromFeature(JObject feature)
+        private (decimal Latitude, decimal Longitude, bool IsSuccess) TryFetchCoordinatiesFromFeature(JObject feature)
         {
             var latStringValue = feature.Property(LatitudeFeaturePropertyName)?.Value.Value<string>();
             var lonStringValue = feature.Property(LongitudeFeaturePropertyName)?.Value.Value<string>();
@@ -288,6 +288,15 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                            & Decimal.TryParse(lonStringValue, out decimal longitude);
 
             return (Latitude: latitude, Longitude: longitude, IsSuccess: parseResult);
+        }
+
+        private (Guid FeatureId, bool IsSuccess) TryFetchEntityIdFromFeature(JObject feature)
+        {
+            var featureIdStringValue = feature.Property(FeatureFields.featureId).Value.Value<string>();
+
+            var parseResult = Guid.TryParse(featureIdStringValue, out Guid featureId);
+
+            return (FeatureId: featureId, IsSuccess: parseResult);
         }
     }
 }
