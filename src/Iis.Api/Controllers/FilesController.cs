@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Iis.Services.Contracts.Dtos;
+using DTO = Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
@@ -62,7 +62,7 @@ namespace IIS.Core.Controllers
             CancellationToken token)
         {
             var material = JsonConvert.DeserializeObject<MaterialInput>(input);
-            FileIdDto fileSaveResult = await _fileService
+            DTO.FileResult fileSaveResult = await _fileService
                 .SaveFileAsync(file.OpenReadStream(), file.FileName, file.ContentType, token);
             material.FileId = fileSaveResult.Id;
             if (fileSaveResult.IsDuplicate)
