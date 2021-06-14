@@ -188,7 +188,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedConfirmButton()
         {
             materialsSectionPage.ConfirmDeleteRelationButton.Click();
-            driver.WaitFor(4);
+            driver.WaitFor(3);
 
         }
 
