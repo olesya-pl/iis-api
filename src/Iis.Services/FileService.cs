@@ -1,10 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
 using IIS.Repository;
@@ -12,7 +13,7 @@ using IIS.Repository.Factories;
 using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
-using Microsoft.Extensions.Logging;
+using Iis.Utility;
 
 namespace Iis.Services
 {
@@ -31,17 +32,15 @@ namespace Iis.Services
             _logger = logger;
         }
 
-        public async Task<FileIdDto> IsDuplicatedAsync(Stream stream)
+        public async Task<FileResult> IsDuplicatedAsync(Stream stream)
         {
-            var hash = ComputeHash(stream);
+            var hash = stream.ComputeHashAsGuid();
             return await IsDuplicatedAsync(stream, hash);
         }
 
-        public async Task<FileIdDto> SaveFileAsync(Stream stream, string fileName, string contentType,
+        public async Task<FileResult> SaveFileAsync(Stream stream, string fileName, string contentType,
             CancellationToken token)
         {
-            var hash = ComputeHash(stream);
-
             var duplicatedResult = await IsDuplicatedAsync(stream);
             if (duplicatedResult.IsDuplicate)
                 return duplicatedResult;
@@ -50,14 +49,14 @@ namespace Iis.Services
             {
                 Name = fileName,
                 ContentType = contentType,
-                ContentHash = hash,
-                UploadTime = DateTime.Now, // todo: move to db or to datetime provider
+                ContentHash = duplicatedResult.FileHash,
+                UploadTime = DateTime.UtcNow,
                 IsTemporary = true,
             };
 
             if (_configuration.Storage == Storage.Database || string.IsNullOrEmpty(_configuration.Path))
             {
-                file.Contents = await ConvertToBytes(stream, token);
+                file.Contents = await stream.ToByteArrayAsync(token);
             }
 
             await RunAsync(uow => uow.FileRepository.Create(file));
@@ -83,9 +82,11 @@ namespace Iis.Services
                 }
             }
 
-            return new FileIdDto
+            return new FileResult
             {
-                Id = file.Id
+                Id = file.Id,
+                IsDuplicate = false,
+                FileHash = duplicatedResult.FileHash
             };
         }
 
@@ -129,7 +130,7 @@ namespace Iis.Services
                 var path = Path.Combine(_configuration.Path, id.ToString("D"));
                 if (!File.Exists(path)) 
                     continue;
-                
+
                 if (TryDelete(path))
                     successOperation++;
             }
@@ -169,23 +170,24 @@ namespace Iis.Services
             await RunAsync(uow => uow.FileRepository.Update(file));
         }
 
-        private async Task<FileIdDto> IsDuplicatedAsync(Stream contents, Guid hash, CancellationToken token = default)
+        private async Task<FileResult> IsDuplicatedAsync(Stream contents, Guid hash, CancellationToken token = default)
         {
             var files = await RunWithoutCommitAsync(uow => uow.FileRepository.GetManyAsync(f => f.ContentHash == hash));
             foreach (var fileData in files)
             {
                 var storedFileBody = Array.Empty<byte>();
 
-                //since we have at least 2 types of storage: Database and Folder 
-                //let's do checks in both of them  
+                //since we have at least 2 types of storage: Database and Folder
+                //let's do checks in both of them
                 if (fileData.Contents != null)
                 {
-                    bool areEqual = IsStreamEuqalToByteArray(fileData.Contents, contents);
+                    bool areEqual = contents.IsEqual(fileData.Contents);
                     if (areEqual)
                     {
-                        return new FileIdDto
+                        return new FileResult
                         {
-                            IsDuplicate = true
+                            IsDuplicate = true,
+                            FileHash = hash
                         };
                     }
                 }
@@ -198,91 +200,23 @@ namespace Iis.Services
                     if (storedFileInfo.Exists)
                     {
                         using var fsSource = new FileStream(storedFileInfo.FullName, FileMode.Open, FileAccess.Read);
-                        var areEqual = AreStreamsEqual(fsSource, contents);
-                        if (areEqual)
+                        if (fsSource.IsEqual(contents))
                         {
-                            return new FileIdDto
+                            return new FileResult
                             {
-                                IsDuplicate = true
+                                IsDuplicate = true,
+                                FileHash = hash
                             };
                         }
                     }
                 }
             }
 
-            return new FileIdDto
+            return new FileResult
             {
-                IsDuplicate = false
+                IsDuplicate = false,
+                FileHash = hash
             };
-        }
-
-        private bool IsStreamEuqalToByteArray(byte[] contents, Stream stream)
-        {
-            const int bufferSize = 2048;
-            var i = 0;
-            if (contents.Length != stream.Length)
-            {
-                return false;
-            }
-            
-            byte[] buffer = new byte[bufferSize];
-            int bytesRead;
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                var contentsBuffer = contents
-                    .Skip(i * bufferSize)
-                    .Take(bytesRead)
-                    .ToArray();
-
-                if (!contentsBuffer.SequenceEqual(buffer))
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    return false;
-                }
-            }
-            stream.Seek(0, SeekOrigin.Begin);
-            return true;
-        }
-
-        private bool AreStreamsEqual(Stream stream, Stream other)
-        {
-            const int bufferSize = 2048;
-            if (other.Length != stream.Length)
-            {
-                return false;
-            }
-
-            byte[] buffer = new byte[bufferSize];
-            byte[] otherBuffer = new byte[bufferSize];
-            while ((_ = stream.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                var _ = other.Read(otherBuffer, 0, otherBuffer.Length);
-
-                if (!otherBuffer.SequenceEqual(buffer))
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    other.Seek(0, SeekOrigin.Begin);
-                    return false;
-                }
-            }
-            stream.Seek(0, SeekOrigin.Begin);
-            other.Seek(0, SeekOrigin.Begin);
-            return true;
-        }
-
-        private static Guid ComputeHash(Stream data)
-        {
-            using HashAlgorithm algorithm = MD5.Create();
-            byte[] bytes = algorithm.ComputeHash(data);
-            data.Seek(0, SeekOrigin.Begin);
-            return new Guid(bytes);
-        }
-
-        private static async Task<byte[]> ConvertToBytes(Stream stream, CancellationToken token)
-        {
-            using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms, token);
-            return ms.ToArray();
         }
     }
 }
