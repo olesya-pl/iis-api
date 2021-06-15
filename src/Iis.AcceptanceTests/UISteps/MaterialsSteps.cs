@@ -223,7 +223,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the Materials page")]
         public void ThenIMustSeeMaterialsPage()
         {
-            Assert.Contains("input-stream/?query=&sort=createdDate_desc&page=1", driver.Url);
+            Assert.Contains("input-stream/?sort=createdDate_desc&page=1", driver.Url);
         }
 
         [Then(@"I must see first material in the Materials list")]

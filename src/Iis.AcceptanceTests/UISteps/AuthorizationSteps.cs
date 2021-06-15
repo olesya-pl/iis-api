@@ -50,7 +50,7 @@ namespace AcceptanceTests.UISteps
         public void ThenIRedirectedToObjectsPage()
         {
             var actualLink = driver.Url;
-            Assert.Contains("objects/?query=&page=1", driver.Url);
+            Assert.Contains("objects/?page=1", driver.Url);
         }
 
         [Then(@"Login button is active")]
