@@ -1,10 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
@@ -14,6 +12,7 @@ using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
+using DomainMaterials = Iis.Domain.Materials;
 
 namespace Iis.Services
 {
@@ -90,34 +89,60 @@ namespace Iis.Services
             };
         }
 
-        public async Task<Iis.Domain.Materials.File> GetFileAsync(Guid id)
+        public async Task<DomainMaterials.File> GetFileAsync(Guid id)
         {
             var file = await RunWithoutCommitAsync(uow => uow.FileRepository.GetAsync(f => f.Id == id));
+
             if (file == null) return null;
 
-            byte[] contents;
+            return new DomainMaterials.File(id, file.Name, file.ContentType, file.IsTemporary);
+        }
 
-            if (_configuration.Storage == Storage.Folder && !string.IsNullOrEmpty(_configuration.Path))
+        public async Task<FileContentResult> GetFileContentAsync(Guid id)
+        {
+            var entity = await RunWithoutCommitAsync(uow => uow.FileRepository.GetAsync(e => e.Id == id));
+
+            if(entity is null) return FileContentResult.Empty;
+
+            if(_configuration.Storage == Storage.Database && entity.Contents.IsNotEmpty())
             {
-                string path = Path.Combine(_configuration.Path, file.Id.ToString("D"));
-                if (File.Exists(path))
+                return new FileContentResult
                 {
-                    contents = await File.ReadAllBytesAsync(path);
-                }
-                else
-                {
-                    contents = file.Contents;
-                }
+                    Id = entity.Id,
+                    Name = entity.Name,
+                    ContentType = entity.ContentType,
+                    Content = new MemoryStream(entity.Contents)
+                };
             }
-            else
+
+            if(_configuration.Storage == Storage.Folder && !string.IsNullOrWhiteSpace(_configuration.Path))
             {
-                contents = file.Contents;
+                var fileName = Path.Combine(_configuration.Path, entity.Id.ToString("D"));
+
+                if(File.Exists(fileName))
+                {
+                    return new FileContentResult
+                    {
+                        Id = entity.Id,
+                        Name = entity.Name,
+                        ContentType = entity.ContentType,
+                        Content = File.OpenRead(fileName)
+                    };
+                }
+                else if(entity.Contents.IsNotEmpty())
+                {
+                    return new FileContentResult
+                    {
+                        Id = entity.Id,
+                        Name = entity.Name,
+                        ContentType = entity.ContentType,
+                        Content = new MemoryStream(entity.Contents)
+                    };
+                }
+
             }
 
-            if (contents == null) return null;
-
-            var ms = new MemoryStream(contents);
-            return new Iis.Domain.Materials.File(id, file.Name, file.ContentType, ms, file.IsTemporary);
+            return FileContentResult.Empty;
         }
 
         public int RemoveFiles(List<Guid> ids)

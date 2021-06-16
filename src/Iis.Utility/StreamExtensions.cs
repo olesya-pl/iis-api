@@ -13,6 +13,8 @@ namespace Iis.Utility
 
         public static byte[] ToByteArray(this Stream stream)
         {
+            if(stream is null || stream.Length == 0) return Array.Empty<byte>();
+
             using var ms = new MemoryStream();
                 stream.CopyTo(ms);
                 return ms.ToArray();
@@ -20,6 +22,8 @@ namespace Iis.Utility
 
         public static async Task<byte[]> ToByteArrayAsync(this Stream stream, CancellationToken ct = default)
         {
+            if(stream is null || stream.Length == 0) return Array.Empty<byte>();
+
             using var ms = new MemoryStream();
                 await stream.CopyToAsync(ms, ct);
                 return ms.ToArray();
@@ -35,17 +39,18 @@ namespace Iis.Utility
 
         public static bool IsEqual(this Stream stream, Stream otherStream)
         {
-            if (otherStream.Length != stream.Length)
-            {
-                return false;
-            }
+            if(stream is null || stream.Length == 0) return false;
+
+            if(otherStream is null || otherStream.Length == 0) return false;
+
+            if (stream.Length != otherStream.Length) return false;
 
             byte[] buffer = new byte[bufferSize];
             byte[] otherBuffer = new byte[bufferSize];
 
-            while ((_ = stream.Read(buffer, 0, buffer.Length)) > 0)
+            while (stream.Read(buffer, 0, buffer.Length) > 0)
             {
-                var _ = otherStream.Read(otherBuffer, 0, otherBuffer.Length);
+                otherStream.Read(otherBuffer, 0, otherBuffer.Length);
 
                 if (!otherBuffer.SequenceEqual(buffer))
                 {
@@ -63,27 +68,42 @@ namespace Iis.Utility
 
         public static bool IsEqual(this Stream stream, byte[] otherBytes)
         {
-            var i = 0;
-            if (otherBytes.Length != stream.Length)
-            {
-                return false;
-            }
+            if(stream is null || stream.Length == 0) return false;
+
+            if(otherBytes is null || otherBytes.Length == 0) return false;
+
+            if (otherBytes.Length != stream.Length) return false;
 
             byte[] buffer = new byte[bufferSize];
+            ReadOnlySpan<byte> otherSpan = otherBytes;
+
             int bytesRead;
+            int slicePosition = 0;
             while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                var contentsBuffer = otherBytes
-                    .Skip(i * bufferSize)
-                    .Take(bytesRead)
-                    .ToArray();
+                var otherBuffer = otherSpan.Slice(slicePosition, bytesRead);
 
-                if (!contentsBuffer.SequenceEqual(buffer))
+                var sequencesEqual = false;
+                if(otherBuffer.Length == buffer.Length)
+                {
+                    sequencesEqual = otherBuffer.SequenceEqual(buffer);
+                }
+                else
+                {
+                    var newBuffer = new ReadOnlySpan<byte>(buffer).Slice(0, otherBuffer.Length);
+                    sequencesEqual = otherBuffer.SequenceEqual(newBuffer);
+                }
+
+                if(!sequencesEqual)
                 {
                     stream.Seek(0, SeekOrigin.Begin);
                     return false;
+
                 }
+
+                slicePosition += bytesRead;
             }
+
             stream.Seek(0, SeekOrigin.Begin);
             return true;
         }

@@ -4,8 +4,8 @@ namespace Iis.Services.Contracts.Dtos
 {
     public class FileResult
     {
-        public Guid Id { get; set; }
-        public bool IsDuplicate { get; set; }
-        public Guid FileHash { get; set; }
+        public Guid Id;
+        public bool IsDuplicate;
+        public Guid FileHash;
     }
 }

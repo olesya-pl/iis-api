@@ -1,10 +1,12 @@
 using System;
+using System.IO;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using DTO = Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
+using IIS.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
 using IIS.Core.Materials.FeatureProcessors;
@@ -12,7 +14,6 @@ using Iis.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.Controllers
 {
@@ -83,16 +84,11 @@ namespace IIS.Core.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id, CancellationToken token)
         {
-            var fi = await _fileService.GetFileAsync(id);
-            if (fi == null) return NotFound();
-            var cd = new System.Net.Mime.ContentDisposition // Always inline file
-            {
-                FileName = Uri.EscapeDataString(fi.Name),
-                Inline = true
-            };
-            Response.Headers.Add("Content-Disposition", cd.ToString());
-            Response.Headers.Add("Accept-ranges", "bytes");
-            return File(fi.Contents, fi.ContentType);
+            var contentResult = await _fileService.GetFileContentAsync(id);
+
+            if(contentResult.IsEmpty) return NotFound();
+
+            return CreateFileResult(contentResult.Name, contentResult.ContentType, contentResult.Content);
         }
 
         [HttpGet(nameof(FlushTemporary))]
@@ -101,6 +97,20 @@ namespace IIS.Core.Controllers
             // TODO: Change solution to use either datetime provider or take time from argument
             await _fileService.FlushTemporaryFilesAsync(d => d < DateTime.Now);
             return Ok();
+        }
+
+        private IActionResult CreateFileResult(string fileName, string contentType, Stream content)
+        {
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = Uri.EscapeDataString(fileName),
+                Inline = true
+            };
+
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            Response.Headers.Add("Accept-ranges", "bytes");
+
+            return File(content, contentType);
         }
     }
 }
