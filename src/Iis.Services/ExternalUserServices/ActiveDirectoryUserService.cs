@@ -89,8 +89,11 @@ namespace Iis.Services.ExternalUserServices
             return result;
         }
 
-        private string ExtractGroupName(string str) =>
-            str.Split(',')[0];
+        private string ExtractGroupName(string str)
+        {
+            var rolePart = str.Split(',')[0];
+            return rolePart.Substring(rolePart.IndexOf('=') + 1);
+        }
 
         private List<ExternalRole> GetExternalRoles(string[] memberOf) =>
             memberOf == null ?
