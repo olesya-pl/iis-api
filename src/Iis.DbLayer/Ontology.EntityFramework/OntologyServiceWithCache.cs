@@ -165,14 +165,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var accessLevels = nodes
                 .Where(p => string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal))
-                .Where(p =>
-                {
+                .Where(p => {
                     var stringValue = p.OutgoingRelations.FirstOrDefault(r => string.Equals(r.TypeName, "numericIndex", StringComparison.Ordinal)).TargetNode.Value;
                     _ = int.TryParse(stringValue, out var value);
                     return user.IsAdmin || value <= user.AccessLevel;
                 })
-                .OrderBy(n =>
-                {
+                .OrderBy(n => {
                     var p = n.GetSingleProperty("numericIndex");
                     return p == null ? 0 : int.Parse(p.Value);
                 });
@@ -490,13 +488,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                     if (alias != null && names.Contains(alias))
                         highlight.Remove(name);
                 }
-
-
-                //var children = highlight.Properties.;
-
-                //var tokens = highlight.Children
-                //foreach (var key in highlight.)
-
             }
             return res;
         }
