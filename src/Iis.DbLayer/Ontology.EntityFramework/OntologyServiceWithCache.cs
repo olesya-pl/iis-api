@@ -12,6 +12,7 @@ using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
 using Iis.Interfaces.AccessLevels;
 using Iis.Domain.Users;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -139,7 +140,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var derivedTypes = _data.Schema
                 .GetNodeTypes(types.Select(t => t.Id))
-                .Where(type => !type.IsAbstract 
+                .Where(type => !type.IsAbstract
                     && _elasticService.TypeIsAvalilable(type,
                         entitySearchGranted,
                         wikiSearchGranted));
@@ -164,12 +165,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var accessLevels = nodes
                 .Where(p => string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal))
-                .Where(p => {
+                .Where(p =>
+                {
                     var stringValue = p.OutgoingRelations.FirstOrDefault(r => string.Equals(r.TypeName, "numericIndex", StringComparison.Ordinal)).TargetNode.Value;
                     _ = int.TryParse(stringValue, out var value);
                     return user.IsAdmin || value <= user.AccessLevel;
                 })
-                .OrderBy(n => {
+                .OrderBy(n =>
+                {
                     var p = n.GetSingleProperty("numericIndex");
                     return p == null ? 0 : int.Parse(p.Value);
                 });
@@ -230,7 +233,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var node = _data.GetNode(nodeId);
 
-            if(node is null) return null;
+            if (node is null) return null;
 
             return MapNode(node);
         }
@@ -380,9 +383,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return result;
         }
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(
-            IEnumerable<string> typeNameList, 
+            IEnumerable<string> typeNameList,
             ElasticFilter filter,
-            User user, 
+            User user,
             CancellationToken cancellationToken = default)
         {
             var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
@@ -395,11 +398,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         wikiSearchGranted))
                 .Select(nt => nt.Name)
                 .Distinct();
-            return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id);
+            var res = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id);
+            return RemoveDuplicatesInHighlights(res);
         }
 
-        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, 
-            ElasticFilter filter, 
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList,
+            ElasticFilter filter,
             CancellationToken cancellationToken = default)
         {
             var derivedTypeNames = _data.Schema
@@ -453,6 +457,48 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var node = _data.GetNode(id);
             return node?.GetSingleProperty(dotName)?.Value;
+        }
+
+        private SearchEntitiesByConfiguredFieldsResult RemoveDuplicatesInHighlights(SearchEntitiesByConfiguredFieldsResult res)
+        {
+            const string HIGHLIGHT = "highlight";
+            const string HISTORICAL = "historical";
+            const string NODE_TYPE_NAME = "NodeTypeName";
+
+            foreach (var jObj in res.Entities)
+            {
+                if (!jObj.ContainsKey(HIGHLIGHT) || jObj[HIGHLIGHT].Type == JTokenType.Null) continue;
+
+                var nodeTypeName = jObj[NODE_TYPE_NAME].ToString();
+
+                var highlight = (JObject)jObj[HIGHLIGHT];
+
+                var names = new List<string>();
+                foreach (var pair in highlight)
+                {
+                    names.Add(pair.Key);
+                }
+
+                foreach (var name in names)
+                {
+                    var clearName = name.StartsWith(HISTORICAL) ?
+                        name.Substring(HISTORICAL.Length + 1) :
+                        name;
+
+                    var dotName = $"{nodeTypeName}.{clearName}";
+                    var alias = _data.Schema.GetAlias(dotName);
+                    if (alias != null && names.Contains(alias))
+                        highlight.Remove(name);
+                }
+
+
+                //var children = highlight.Properties.;
+
+                //var tokens = highlight.Children
+                //foreach (var key in highlight.)
+
+            }
+            return res;
         }
     }
 }
