@@ -522,6 +522,28 @@ namespace AcceptanceTests.UISteps
             var actualTitle = objectsOfStudyPage.RealNameFullBlock.Text;
             Assert.Equal(expectedTitle, actualTitle);
         }
+
+        [Then(@"I must see the (.*) value in the search suggestion list")]
+        public void ThenIMustSeeTheSpecifiedValueInTheSearchSuggestionList(string objectName)
+        {
+            var objectInTheList = driver.FindElement(By.XPath($"//div[contains(@class, 'entity-search__autocomplete')]//div[contains(text(),'{objectName}')]"));
+            Assert.True(objectInTheList.Displayed);
+        }
+
+        [Then(@"I see the (.*) tag in the search field")]
+        public void ThenISeeTheTagInTheSearchField(string expectedTag)
+        {
+            var actualTagValue = objectsOfStudyPage.TagInTheSearchField.Text;
+            Assert.Equal(expectedTag, actualTagValue);
+        }
+
+        [Then(@"I must see sign value (.*) in first search result")]
+        public void ThenIMustSeeSignValueInFirstSearchResult(string expectedSignValue)
+        {
+            var actualsignValue = objectsOfStudyPage.FirstSearchResultSignValue.Text;
+            Assert.Equal(expectedSignValue, actualsignValue);
+        }
+
         #endregion
     }
 }

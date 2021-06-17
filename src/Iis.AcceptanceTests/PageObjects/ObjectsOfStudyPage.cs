@@ -60,6 +60,10 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement PersonSearchResult;
 
+        [FindsBy(How = How.CssSelector, Using = ".p-datatable-scrollable-body-table tr:nth-child(1) .highlight span em")]
+        [CacheLookup]
+        public IWebElement FirstSearchResultSignValue;
+
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
         [CacheLookup]
         public IWebElement SearchCounterInOOSSearchField;
