@@ -12,6 +12,7 @@ using Iis.Services.Contracts.Interfaces;
 using Attribute = Iis.Domain.Attribute;
 using Iis.Interfaces.AccessLevels;
 using Iis.Domain.Users;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -395,7 +396,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                         wikiSearchGranted))
                 .Select(nt => nt.Name)
                 .Distinct();
-            return await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id);
+            var res = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id);
+            return RemoveDuplicatesInHighlights(res);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, 
@@ -454,5 +456,41 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var node = _data.GetNode(id);
             return node?.GetSingleProperty(dotName)?.Value;
         }
+
+        private SearchEntitiesByConfiguredFieldsResult RemoveDuplicatesInHighlights(SearchEntitiesByConfiguredFieldsResult res)
+        {
+            const string HIGHLIGHT = "highlight";
+            const string HISTORICAL = "historical";
+            const string NODE_TYPE_NAME = "NodeTypeName";
+
+            foreach (var jObj in res.Entities)
+            {
+                if (!jObj.ContainsKey(HIGHLIGHT) || jObj[HIGHLIGHT].Type == JTokenType.Null) continue;
+
+                var nodeTypeName = jObj[NODE_TYPE_NAME].ToString();
+
+                var highlight = (JObject)jObj[HIGHLIGHT];
+
+                var names = new List<string>();
+                foreach (var pair in highlight)
+                {
+                    names.Add(pair.Key);
+                }
+
+                foreach (var name in names)
+                {
+                    var clearName = name.StartsWith(HISTORICAL) ?
+                        name.Substring(HISTORICAL.Length + 1) :
+                        name;
+
+                    var dotName = $"{nodeTypeName}.{clearName}";
+                    var alias = _data.Schema.GetAlias(dotName);
+                    if (alias != null && names.Contains(alias))
+                        highlight.Remove(name);
+                }
+            }
+            return res;
+        }
+
     }
 }
