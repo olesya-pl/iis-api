@@ -674,16 +674,6 @@ object Tests_PrepareElasticIntegrationTestEnv : BuildType({
             dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
         }
         script {
-            name = "Nomad run material loader"
-            scriptContent = """
-                #!/bin/sh
-                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_material_loader.hcl
-            """.trimIndent()
-            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
-            dockerPull = true
-            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
-        }
-        script {
             name = "Nomad run ui"
             scriptContent = """
                 #!/bin/sh
