@@ -692,10 +692,6 @@ object Tests_PrepareElasticIntegrationTestEnv : BuildType({
 
     triggers {
         finishBuildTrigger {
-            buildType = "Iis_Ui_BuildDocker"
-            successfulOnly = true
-        }
-        finishBuildTrigger {
             buildType = "${Api_BuildDocker.id}"
         }
     }
