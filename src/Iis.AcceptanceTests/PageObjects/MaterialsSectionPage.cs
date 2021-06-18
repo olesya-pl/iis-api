@@ -128,6 +128,12 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
         public IWebElement DeleteRelatedEventButton;
 
+        [FindsBy(How = How.XPath, Using = "//td[@class='materials-table__title']//div")]
+        public IWebElement MaterialTitle;
+
+        [FindsBy(How = How.XPath, Using = "//button[contains(@class, 'search__clear-button')]")]
+        public IWebElement ClearSearchFieldButton;
+
         public void ScrollToEnd()
         {
             Actions actions = new Actions(driver);

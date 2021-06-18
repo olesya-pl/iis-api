@@ -72,6 +72,14 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(10);
         }
 
+        [When(@"I entered the value (.*) in the search field")]
+        public void WhenIEnteredTheValueInTheSearchField(string input)
+        {
+            objectsOfStudyPage.SearchField.SendKeys(input);
+            driver.WaitFor(2);
+        }
+
+
         [When(@"I clicked on the first search result title in the Objects of study section")]
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
@@ -370,6 +378,15 @@ namespace AcceptanceTests.UISteps
                 accordionElement.Click();
         }
 
+        [When(@"I clicked on the (.*) autocomplete button")]
+        public void WhenIClickedOnTheAutocompleteButton(string objectOfStudy)
+        {
+            var objectInTheList = driver.FindElement(By.XPath($"//div[contains(@class, 'entity-search__autocomplete')]//div[contains(text(),'{objectOfStudy}')]/following::button[@class='el-button alias-autocomplete__select-entity-button el-button--default']"));
+            objectInTheList.Click();
+            driver.WaitFor(2);
+        }
+
+
         #endregion
 
         #region Then
@@ -521,6 +538,20 @@ namespace AcceptanceTests.UISteps
         {
             var actualTitle = objectsOfStudyPage.RealNameFullBlock.Text;
             Assert.Equal(expectedTitle, actualTitle);
+        }
+
+        [Then(@"I must see the (.*) value in the search suggestion list")]
+        public void ThenIMustSeeTheSpecifiedValueInTheSearchSuggestionList(string objectName)
+        {
+            var objectInTheList = driver.FindElement(By.XPath($"//div[contains(@class, 'entity-search__autocomplete')]//div[contains(text(),'{objectName}')]"));
+            Assert.True(objectInTheList.Displayed);
+        }
+
+        [Then(@"I see the (.*) tag in the search field")]
+        public void ThenISeeTheTagInTheSearchField(string expectedTag)
+        {
+            var actualTagValue = objectsOfStudyPage.TagInTheSearchField.Text;
+            Assert.Equal(expectedTag, actualTagValue);
         }
         #endregion
     }
