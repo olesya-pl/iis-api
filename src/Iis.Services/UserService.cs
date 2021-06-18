@@ -421,6 +421,7 @@ namespace Iis.Services
                                 UserId = user.Id,
                                 RoleId = role.Id
                             };
+                            _context.Add(userRole);
                             sb.AppendLine($"... {externalRole.Name} is successfully assigned");
                         }
                         else

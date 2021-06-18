@@ -48,6 +48,7 @@ using Iis.Services.ExternalUserServices;
 using Iis.Services.MatrixServices;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
+using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
@@ -206,7 +207,7 @@ namespace IIS.Core
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
             services.AddTransient<ILocationHistoryService, LocationHistoryService<IIISUnitOfWork>>();
-            services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
+            services.AddSingleton<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyQueryResolver, GraphQL.Entities.Resolvers.OntologyQueryResolver>();
@@ -373,7 +374,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
-            app.SeedExternalUsers();
+
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
@@ -394,6 +395,8 @@ namespace IIS.Core
 #endif
             app.UseGraphQL();
             app.UsePlayground();
+            LoadHotChockolateSchema(app);
+            app.SeedExternalUsers();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();
@@ -401,6 +404,15 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void LoadHotChockolateSchema(IApplicationBuilder app)
+        {
+            using var serviceScope = app.ApplicationServices
+            .GetRequiredService<IServiceScopeFactory>()
+            .CreateScope();
+            var schemaProvider = serviceScope.ServiceProvider.GetRequiredService<ISchemaProvider>();
+            schemaProvider.GetSchema();
         }
 
         private void UpdateDatabase(IApplicationBuilder app)

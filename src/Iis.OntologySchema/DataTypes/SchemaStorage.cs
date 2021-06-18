@@ -46,6 +46,15 @@ namespace Iis.OntologySchema.DataTypes
                 AddRelation(relationType);
             }
 
+            foreach (var nodeTypeId in NodeTypes.Keys)
+            {
+                var nodeType = NodeTypes[nodeTypeId];
+                if (nodeType.Kind == Kind.Attribute && nodeType.IncomingRelations.Count == 0)
+                {
+                    NodeTypes.Remove(nodeTypeId);
+                }
+            }
+
             foreach (var attributeId in AttributeTypes.Keys)
             {
                 if (!NodeTypeExists(attributeId))

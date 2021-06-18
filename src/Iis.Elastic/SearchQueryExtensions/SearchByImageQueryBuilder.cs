@@ -15,8 +15,12 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         protected override JObject CreateQuery(JObject jsonQuery)
         {
-            jsonQuery["min_score"] = 0.1;
-            jsonQuery["query"] = JObject.FromObject(new
+
+            var termObject = JObject.FromObject(new {
+                term = new {ParentId = "NULL"}
+            });
+
+            var nestedObject = JObject.FromObject(new
             {
                 nested = new {
                     path = "ImageVectors",
@@ -30,7 +34,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                             },
                             script = new
                             {
-                                source = "double total = 0.0; for(vector in params.vectorList) { total += 1 / (l2norm(vector, doc['ImageVectors.Vector']) + 1); } return total/params.vectorListLength;",
+                                source = "double total = 0.0; for(vector in params.vectorList) { total += 1/(l2norm(vector, doc['ImageVectors.Vector']) + 1); } return total/params.vectorListLength;",
                                 @params = new
                                 {
                                     vectorList = _imageVectorList,
@@ -41,7 +45,24 @@ namespace Iis.Elastic.SearchQueryExtensions
                     }
                 }
             });
-            //можно будет попробовать эту формулу (1.0+cosineSimilarity(params.query_vector, 'my_vectors.vector'))
+
+            var mustArray = new JArray(termObject, nestedObject);
+
+            var boolObject = new JObject(
+                new JProperty("must", mustArray)
+            );
+
+            var query = new JObject(
+                new JProperty("bool", boolObject)
+            );
+
+            jsonQuery["min_score"] = 1.35;
+            jsonQuery["query"] = query;
+
+            //можно будет попробовать эти формулы модифицировать
+            //source = "double total = 0.0; for(vector in params.vectorList) { total += (1.0+cosineSimilarity(vector, doc['ImageVectors.Vector'])); } return total/params.vectorListLength;",
+            //source = "double total = 0.0; for(vector in params.vectorList) { total += 1/(l2norm(vector, doc['ImageVectors.Vector']) + 1); } return total/params.vectorListLength;",
+
             return jsonQuery;
         }
     }
