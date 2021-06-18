@@ -207,7 +207,7 @@ namespace IIS.Core
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
             services.AddTransient<ILocationHistoryService, LocationHistoryService<IIISUnitOfWork>>();
-            services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
+            services.AddSingleton<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyQueryResolver, GraphQL.Entities.Resolvers.OntologyQueryResolver>();
@@ -374,7 +374,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
-            
+
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
