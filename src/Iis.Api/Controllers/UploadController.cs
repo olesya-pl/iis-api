@@ -52,7 +52,6 @@ namespace Iis.Api.Controllers
         }
 
         [HttpPost]
-        [DisableCors]
         [DisableRequestSizeLimit]
         public Task<UploadResult> Post([FromForm] IFormFile file, [FromForm]string fileInfo,  CancellationToken ct)
         {
